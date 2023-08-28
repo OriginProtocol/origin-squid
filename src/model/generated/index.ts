@@ -1,1 +1,2 @@
-export * from "./burn.model"
+export * from "./address.model"
+export * from "./history.model"

@@ -1,7 +1,21 @@
-type Burn @entity {
+type Address @entity {
+  id: ID! @index
+  isContract: Boolean!
+  rebasingOption: String! # OptIn, OptOut
+  balance: Float!
+  earned: Float!
+  credits: BigInt!
+  lastUpdated: DateTime!
+  history: [History!]! @derivedFrom(field: "address")
+}
+
+type History @entity {
   id: ID!
-  block: Int!
-  address: String! @index
-  value: BigInt!
-  txHash: String!
+  address: Address! @index
+  value: Float!
+  balance: Float!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: String! # Swap, Yield
 }
