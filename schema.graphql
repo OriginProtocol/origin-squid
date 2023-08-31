@@ -19,3 +19,27 @@ type History @entity {
   txHash: String! @index
   type: String! # Swap, Yield
 }
+
+type Rebase @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  totalSupply: BigInt!
+  rebasingCredits: BigInt!
+  rebasingCreditsPerToken: BigInt!
+  apy: APY!
+}
+
+type APY @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  apr: Float!
+  apy: Float!
+  apy7DayAvg: Float!
+  apy14DayAvg: Float!
+  apy30DayAvg: Float!
+  rebasingCreditsPerToken: BigInt!
+}

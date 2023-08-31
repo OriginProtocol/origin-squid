@@ -1,10 +1,10 @@
 import { BlockData } from '@subsquid/evm-processor';
 import { TypeormDatabase } from '@subsquid/typeorm-store';
-import { LessThanOrEqual } from 'typeorm';
+import { LessThan, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import * as oeth from './abi/oeth';
-import { Address, History } from './model';
+import { APY, Address, History, Rebase } from './model';
 import { Context, OETH_ADDRESS, processor } from './processor';
 
 interface RawTransfer {
@@ -128,12 +128,118 @@ async function createAddress(ctx: Context, addr: string): Promise<Address> {
 }
 
 /**
+ * Create Rebase entity and set APY
+ *
+ * @param {Context} ctx subsquid context
+ * @param {RawRebase} rebaseEvent rebase event
+ * @returns {Promise<Rebase>} Rebase entity
+ */
+async function createRebaseAPY(
+  ctx: Context,
+  rebaseEvent: RawRebase,
+): Promise<Rebase> {
+  const r = new Rebase({ ...rebaseEvent });
+
+  // use date as id for APY
+  const date = new Date(rebaseEvent.timestamp);
+  const dateId = date.toISOString().substring(0, 10);
+  date.setDate(date.getDate() - 1);
+  const lastDateId = date.toISOString().substring(0, 10);
+
+  // use date as id for APY
+  date.setDate(date.getDate() - 6);
+  const last7daysDateId = {
+    key: 'apy7DayAvg',
+    value: date.toISOString().substring(0, 10),
+  };
+  date.setDate(date.getDate() - 14);
+  const last14daysDateId = {
+    key: 'apy14DayAvg',
+    value: date.toISOString().substring(0, 10),
+  };
+  date.setDate(date.getDate() - 16);
+  const last30daysDateId = {
+    key: 'apy30DayAvg',
+    value: date.toISOString().substring(0, 10),
+  };
+
+  // get last APY to compare with current one
+  let lastApy = await ctx.store.findOne(APY, {
+    where: { id: LessThan(dateId) },
+    order: { id: 'DESC' },
+  });
+
+  // check if there is already an APY for the current date
+  let apy = await ctx.store.findOne(APY, { where: { id: dateId } });
+  ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
+  // create a new APY if it doesn't exist
+  if (!apy) {
+    apy = new APY({
+      id: dateId,
+      blockNumber: rebaseEvent.blockNumber,
+      timestamp: rebaseEvent.timestamp,
+      txHash: rebaseEvent.txHash,
+      rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
+    });
+  }
+  // should only happen for the first rebase event
+  if (!lastApy) {
+    apy.apr = 0;
+    apy.apy = 0;
+    apy.apy7DayAvg = 0;
+    apy.apy14DayAvg = 0;
+    apy.apy30DayAvg = 0;
+
+    await ctx.store.upsert(apy);
+    return r;
+  }
+
+  // update APY with the new rebase event
+  apy.blockNumber = rebaseEvent.blockNumber;
+  apy.timestamp = rebaseEvent.timestamp;
+  apy.txHash = rebaseEvent.txHash;
+  apy.rebasingCreditsPerToken = rebaseEvent.rebasingCreditsPerToken;
+
+  // this should normally be 1 day but more secure to calculate it
+  const diffTime = Math.abs(
+    new Date(apy.id).getTime() - new Date(lastApy.id).getTime(),
+  );
+  const dayDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  apy.apr =
+    ((Number(lastApy.rebasingCreditsPerToken) /
+      Number(apy.rebasingCreditsPerToken) -
+      1) *
+      100 *
+      365.25) /
+    dayDiff;
+  const periods_per_year = 365.25 / dayDiff;
+  apy.apy =
+    ((1 + apy.apr / periods_per_year / 100) ** periods_per_year - 1) * 100;
+
+  // calculate average APY for the last 7, 14 and 30 days
+  for (const i of [last7daysDateId, last14daysDateId, last30daysDateId]) {
+    let pastAPYs = await ctx.store.findBy(APY, {
+      id: MoreThanOrEqual(i.value),
+    });
+    // @ts-ignore
+    apy[i.key] =
+      pastAPYs.reduce((acc: number, cur: APY) => acc + cur.apy, apy.apy) /
+      (pastAPYs.length + 1);
+  }
+
+  await ctx.store.upsert(apy);
+  return r;
+}
+
+/**
  * Process on-chain data
  *
  */
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
   const rawLogs = getRawLogs(ctx);
   const history: History[] = [];
+  const rebases: Rebase[] = [];
 
   // get all addresses from the database.
   // we need this because we increase their balance based on rebase events
@@ -194,6 +300,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
       );
     } else if (isRawRebase(t)) {
       // Rebase events
+      let rebase = createRebaseAPY(ctx, t);
       for (const address of owners.values()) {
         const newBalance =
           Number(address.credits) / Number(t.rebasingCreditsPerToken);
@@ -216,9 +323,11 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
         address.balance = newBalance;
         address.earned += earned;
       }
+      rebases.push(await rebase);
     }
   }
 
   await ctx.store.upsert([...owners.values()]);
   await ctx.store.insert(history);
+  await ctx.store.insert(rebases);
 });
