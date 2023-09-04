@@ -302,6 +302,9 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
       // Rebase events
       let rebase = createRebaseAPY(ctx, t);
       for (const address of owners.values()) {
+        if (address.rebasingOption === 'OptOut') {
+          continue;
+        }
         const newBalance =
           Number(address.credits) / Number(t.rebasingCreditsPerToken);
         const earned = newBalance - address.balance;
