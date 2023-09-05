@@ -1,5 +1,5 @@
 {
-  "name": "squid-evm-template",
+  "name": "origin-squid",
   "private": true,
   "scripts": {
     "build": "rm -rf lib && tsc"
