@@ -7,6 +7,8 @@ import * as oeth from './abi/oeth';
 import { APY, Address, History, Rebase } from './model';
 import { Context, OETH_ADDRESS, processor } from './processor';
 
+const addressZero = "0x0000000000000000000000000000000000000000"
+
 interface RawTransfer {
   id: string;
   value: bigint;
@@ -27,14 +29,16 @@ interface RawRebase {
   txHash: string;
 }
 
+type RawLog = RawTransfer | RawRebase;
+
 /**
  * Aggregate Transfer and Rebase events from the logs
  *
  * @param {Context} ctx subsquid context
- * @returns {(RawTransfer|RawRebase)[]} array of Transfer and Rebase events
+ * @returns {(RawLog)[]} array of Transfer and Rebase events
  */
-function getRawLogs(ctx: Context): (RawTransfer | RawRebase)[] {
-  let logs: (RawTransfer | RawRebase)[] = [];
+function getRawLogs(ctx: Context): (RawLog)[] {
+  let logs: (RawLog)[] = [];
   for (let block of ctx.blocks) {
     for (let log of block.logs) {
       if (
@@ -78,10 +82,10 @@ function getRawLogs(ctx: Context): (RawTransfer | RawRebase)[] {
 /**
  * Verify if the log is a Transfer event
  *
- * @param {(RawTransfer|RawRebase)} log
+ * @param {(RawLog)} log
  * @returns {boolean} true if the log is a Transfer event
  */
-function isRawTransfer(log: RawTransfer | RawRebase): log is RawTransfer {
+function isRawTransfer(log: RawLog): log is RawTransfer {
   return (
     (log as RawTransfer).value !== undefined &&
     (log as RawTransfer).from !== undefined &&
@@ -92,10 +96,10 @@ function isRawTransfer(log: RawTransfer | RawRebase): log is RawTransfer {
 /**
  * Verify if the log is a Rebase event
  *
- * @param {(RawTransfer|RawRebase)} log
+ * @param {(RawLog)} log
  * @returns {boolean} true if the log is a Rebase event
  */
-function isRawRebase(log: RawTransfer | RawRebase): log is RawRebase {
+function isRawRebase(log: RawLog): log is RawRebase {
   return (
     (log as RawRebase).totalSupply !== undefined &&
     (log as RawRebase).rebasingCredits !== undefined &&
@@ -276,6 +280,8 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
       addressSub.lastUpdated = t.timestamp;
       addressAdd.lastUpdated = t.timestamp;
 
+      const isSwap = [t.from, t.to].includes(addressZero);
+
       // update the address balance
       await Promise.all(
         [addressSub, addressAdd].map(async (address) => {
@@ -291,7 +297,7 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
               timestamp: t.timestamp,
               blockNumber: t.blockNumber,
               txHash: t.txHash,
-              type: 'Swap',
+              type: isSwap ? 'Swap' : (addressSub === address ? 'Sent' : 'Received'),
             }),
           );
           address.credits = BigInt(credits[0]); // token credits
