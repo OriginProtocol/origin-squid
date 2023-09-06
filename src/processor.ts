@@ -12,7 +12,7 @@ import { Store } from '@subsquid/typeorm-store';
 import * as oeth from './abi/oeth';
 
 export const OETH_ADDRESS =
-  '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3'.toLocaleLowerCase();
+  '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3'.toLowerCase();
 
 export const processor = new EvmBatchProcessor()
   .setDataSource({
@@ -32,27 +32,19 @@ export const processor = new EvmBatchProcessor()
   .setFields({
     transaction: {
       from: true,
-      value: true,
       hash: true,
+      gasUsed: true,
+      gas: true,
+      value: true,
     },
     log: {
+      transactionHash: true,
       topics: true,
       data: true,
     },
   })
   .setBlockRange({
     from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
-  })
-  .setFields({
-    log: {
-      transactionHash: true,
-    },
-    transaction: {
-      hash: true,
-      gasUsed: true,
-      gas: true,
-      value: true,
-    },
   })
   .addLog({
     address: [OETH_ADDRESS],
