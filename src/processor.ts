@@ -26,7 +26,12 @@ export const processor = new EvmBatchProcessor()
     // OR to enable contract state queries (https://docs.subsquid.io/evm-indexing/query-state/)
     // chain: 'https://rpc.ankr.com/eth',
     // chain: "https://mainnet.infura.io/v3/03b96dfbb4904c5c89c04680dd480064",
-    chain: process.env.RPC_ENDPOINT || 'http://localhost:8545',
+    chain: {
+      url: process.env.RPC_ENDPOINT || 'http://localhost:8545',
+      // Alchemy is deprecating `eth_getBlockReceipts` https://docs.alchemy.com/reference/eth-getblockreceipts
+      // so we need to set `maxBatchCallSize` 1 to avoid using this method
+      maxBatchCallSize: 1,
+    },
   })
   .setFinalityConfirmation(10)
   .setFields({
