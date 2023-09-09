@@ -31,4 +31,7 @@ export class Address {
 
     @OneToMany_(() => History, e => e.address)
     history!: History[]
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    ogvVotes!: bigint
 }

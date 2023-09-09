@@ -7,6 +7,8 @@ type Address @entity {
   credits: BigInt!
   lastUpdated: DateTime!
   history: [History!]! @derivedFrom(field: "address")
+
+  ogvVotes: BigInt!
 }
 
 type History @entity {
@@ -42,4 +44,46 @@ type APY @entity {
   apy14DayAvg: Float!
   apy30DayAvg: Float!
   rebasingCreditsPerToken: BigInt!
+}
+
+type ProposalTxLog @entity {
+  id: ID!
+  hash: String!
+  event: String!
+  createdAt: DateTime!
+  proposal: Proposal! @index
+}
+
+type Proposal @entity {
+  id: ID! @index
+  description: String
+  proposer: Address!
+  createdAt: DateTime!
+  status: Int!
+  logs: [ProposalTxLog]! @derivedFrom(field: "proposal")
+}
+
+type OGVLockupTxLog @entity {
+  id: ID!
+  hash: String!
+  event: String!
+  createdAt: DateTime!
+  ogvLockup: OGVLockup!
+}
+
+type OGVLockup @entity {
+  id: ID!
+  lockupId: Int! @index
+  user: Address! @index
+  logs: [OGVLockupTxLog]! @derivedFrom(field: "ogvLockup")
+  amount: BigInt!
+  end: DateTime!
+  createdAt: DateTime!
+  active: Boolean
+}
+
+type OGVProposalVoter @entity {
+  id: ID!
+  proposal: Proposal!
+  voter: Address!
 }

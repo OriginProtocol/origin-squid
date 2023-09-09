@@ -10,9 +10,10 @@ import {
 import { Store } from '@subsquid/typeorm-store';
 
 import * as oeth from './abi/oeth';
-
-export const OETH_ADDRESS =
-  '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3'.toLowerCase();
+import * as veogv from './abi/veogv';
+import * as governance from './abi/governance';
+import { GOVERNANCE_ADDRESS, OETH_ADDRESS, VEOGV_ADDRESS } from './addresses';
+import { START_OF_OUSD_GOVERNANCE } from './constants';
 
 export const processor = new EvmBatchProcessor()
   .setDataSource({
@@ -44,7 +45,7 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+    from: START_OF_OUSD_GOVERNANCE,
   })
   .addLog({
     address: [OETH_ADDRESS],
@@ -53,6 +54,16 @@ export const processor = new EvmBatchProcessor()
       oeth.events.TotalSupplyUpdatedHighres.topic,
     ],
     transaction: true,
+  })
+  .addLog({
+    address: [VEOGV_ADDRESS],
+    topic0: Object.values(veogv.events).map(x => x.topic),
+    transaction: true
+  })
+  .addLog({
+    address: [GOVERNANCE_ADDRESS],
+    topic0: Object.values(governance.events).map(x => x.topic),
+    transaction: true
   });
 
 export type Fields = EvmBatchProcessorFields<typeof processor>;
