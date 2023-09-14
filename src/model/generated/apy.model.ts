@@ -1,6 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
-import {Rebase} from "./rebase.model"
 
 @Entity_()
 export class APY {
@@ -40,7 +39,4 @@ export class APY {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     rebasingCreditsPerToken!: bigint
-
-    @OneToMany_(() => Rebase, e => e.apy)
-    rebase!: Rebase[]
 }

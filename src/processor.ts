@@ -1,4 +1,4 @@
-import { lookupArchive } from '@subsquid/archive-registry';
+import { lookupArchive } from '@subsquid/archive-registry'
 import {
   BlockHeader,
   DataHandlerContext,
@@ -6,13 +6,17 @@ import {
   EvmBatchProcessorFields,
   Log as _Log,
   Transaction as _Transaction,
-} from '@subsquid/evm-processor';
-import { Store } from '@subsquid/typeorm-store';
+} from '@subsquid/evm-processor'
+import { Store } from '@subsquid/typeorm-store'
 
-import * as oeth from './abi/oeth';
-
-export const OETH_ADDRESS =
-  '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3'.toLowerCase();
+import * as oeth from './abi/oeth'
+import * as erc20 from './abi/erc20'
+import {
+  OETH_ADDRESS,
+  OETH_VAULT_ADDRESS,
+  VAULT_HOLDINGS_ADDRESSES,
+} from './utils/addresses'
+import { pad } from 'viem'
 
 export const processor = new EvmBatchProcessor()
   .setDataSource({
@@ -49,8 +53,18 @@ export const processor = new EvmBatchProcessor()
     },
   })
   .setBlockRange({
-    from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+    from: Math.min(
+      16933090, // OETH Deploy:  https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+      17067001, // OETH Vault: https://etherscan.io/tx/0x0b81a0e2b7d824ce493465221218b9c79b4a9478c0bb7760b386be240f5985b8
+    ),
   })
+  // .addTransaction({
+  //   to: [OETH_ADDRESS],
+  //   sighash: [
+  //     oeth.functions.rebaseOptIn.sighash,
+  //     oeth.functions.rebaseOptOut.sighash,
+  //   ],
+  // })
   .addLog({
     address: [OETH_ADDRESS],
     topic0: [
@@ -58,11 +72,21 @@ export const processor = new EvmBatchProcessor()
       oeth.events.TotalSupplyUpdatedHighres.topic,
     ],
     transaction: true,
-  });
+  })
+  .addLog({
+    address: VAULT_HOLDINGS_ADDRESSES,
+    topic0: [erc20.events.Transfer.topic],
+    topic1: [pad(OETH_VAULT_ADDRESS)],
+  })
+  .addLog({
+    address: VAULT_HOLDINGS_ADDRESSES,
+    topic0: [erc20.events.Transfer.topic],
+    topic2: [pad(OETH_VAULT_ADDRESS)],
+  })
 
-export type Fields = EvmBatchProcessorFields<typeof processor>;
-export type Context = DataHandlerContext<Store, Fields>;
-export type Block = BlockHeader<Fields>;
-export type Log = _Log<Fields>;
-export type Transaction = _Transaction<Fields>;
-export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>;
+export type Fields = EvmBatchProcessorFields<typeof processor>
+export type Context = DataHandlerContext<Store, Fields>
+export type Block = BlockHeader<Fields>
+export type Log = _Log<Fields>
+export type Transaction = _Transaction<Fields>
+export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>

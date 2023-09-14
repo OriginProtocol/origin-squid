@@ -1,0 +1,18 @@
+# node_modules/@subsquid/openreader/src/model.schema.ts:26
+
+directive @entity on OBJECT
+directive @query on INTERFACE
+directive @derivedFrom(field: String!) on FIELD_DEFINITION
+directive @unique on FIELD_DEFINITION
+directive @index(fields: [String!] unique: Boolean) repeatable on OBJECT | FIELD_DEFINITION
+directive @fulltext(query: String!) on FIELD_DEFINITION
+directive @cardinality(value: Int!) on OBJECT | FIELD_DEFINITION
+directive @byteWeight(value: Float!) on FIELD_DEFINITION
+directive @variant on OBJECT # legacy
+directive @jsonField on OBJECT # legacy
+# scalar ID
+scalar BigInt
+scalar BigDecimal
+scalar Bytes
+scalar DateTime
+scalar JSON
