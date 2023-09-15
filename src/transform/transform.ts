@@ -19,6 +19,7 @@ import {
   OETH_FRAX_STAKING_ADDRESS,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
+  SFRXETH_ADDRESS,
   STETH_ADDRESS,
   VAULT_HOLDINGS_ADDRESSES,
   WETH_ADDRESS,
@@ -180,37 +181,36 @@ export const transform = async (ctx: Context, logs: RawLog[]) => {
           }
         },
       })
-      // await trackAddressBalances({
-      //   address: OETH_FRAX_STAKING_ADDRESS, // TODO: Check this, probably wrong
-      //   tokens: [FRXETH_ADDRESS], // TODO: Check this, probably wrong
-      //   log,
-      //   fn: async ({ log, token, change }) => {
-      //     const dateId = log.timestamp.toISOString()
-      //     const { latest, current } = await getLatest(
-      //       ctx,
-      //       FraxStaking,
-      //       result.fraxStakings,
-      //       dateId,
-      //     )
-      //
-      //     let fraxStaking = current
-      //     if (!fraxStaking) {
-      //       fraxStaking = new FraxStaking({
-      //         id: dateId,
-      //         timestamp: log.timestamp,
-      //         blockNumber: log.blockNumber,
-      //         txHash: log.txHash,
-      //         frxETH: latest?.frxETH ?? 0n,
-      //       })
-      //       result.fraxStakings.push(fraxStaking)
-      //     }
-      //
-      //     // TODO: Werk on me pweeze
-      //     if (token === FRXETH_ADDRESS) {
-      //       fraxStaking.frxETH += change
-      //     }
-      //   },
-      // })
+      await trackAddressBalances({
+        address: OETH_FRAX_STAKING_ADDRESS,
+        tokens: [SFRXETH_ADDRESS],
+        log,
+        fn: async ({ log, token, change }) => {
+          const dateId = log.timestamp.toISOString()
+          const { latest, current } = await getLatest(
+            ctx,
+            FraxStaking,
+            result.fraxStakings,
+            dateId,
+          )
+
+          let fraxStaking = current
+          if (!fraxStaking) {
+            fraxStaking = new FraxStaking({
+              id: dateId,
+              timestamp: log.timestamp,
+              blockNumber: log.blockNumber,
+              txHash: log.txHash,
+              frxETH: latest?.frxETH ?? 0n,
+            })
+            result.fraxStakings.push(fraxStaking)
+          }
+
+          if (token === SFRXETH_ADDRESS) {
+            fraxStaking.frxETH += change
+          }
+        },
+      })
     } else if (log.type === 'trace' && log.trace.type === 'call') {
       const trace = log.trace
       if (
