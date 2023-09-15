@@ -45,11 +45,23 @@ export const processor = new EvmBatchProcessor()
       gasUsed: true,
       gas: true,
       value: true,
+      sighash: true,
+      input: true,
+      status: true,
     },
     log: {
       transactionHash: true,
       topics: true,
       data: true,
+    },
+    trace: {
+      callTo: true,
+      callSighash: true,
+      callValue: true,
+      callFrom: true,
+      callInput: true,
+      createResultAddress: true,
+      // action: true,
     },
   })
   .setBlockRange({
@@ -58,13 +70,6 @@ export const processor = new EvmBatchProcessor()
       17067001, // OETH Vault: https://etherscan.io/tx/0x0b81a0e2b7d824ce493465221218b9c79b4a9478c0bb7760b386be240f5985b8
     ),
   })
-  // .addTransaction({
-  //   to: [OETH_ADDRESS],
-  //   sighash: [
-  //     oeth.functions.rebaseOptIn.sighash,
-  //     oeth.functions.rebaseOptOut.sighash,
-  //   ],
-  // })
   .addLog({
     address: [OETH_ADDRESS],
     topic0: [
@@ -82,6 +87,14 @@ export const processor = new EvmBatchProcessor()
     address: VAULT_HOLDINGS_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_VAULT_ADDRESS)],
+  })
+  .addTrace({
+    type: ['call', 'delegatecall'],
+    callSighash: [
+      oeth.functions.rebaseOptOut.sighash,
+      oeth.functions.rebaseOptIn.sighash,
+    ],
+    transaction: true,
   })
 
 export type Fields = EvmBatchProcessorFields<typeof processor>

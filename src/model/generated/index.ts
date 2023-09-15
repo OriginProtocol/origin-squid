@@ -1,6 +1,7 @@
 export * from "./address.model"
 export * from "./history.model"
 export * from "./rebase.model"
+export * from "./rebaseOption.model"
 export * from "./apy.model"
 export * from "./financialStatement.model"
 export * from "./vault.model"

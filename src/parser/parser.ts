@@ -4,10 +4,13 @@ import * as erc20 from '../abi/oeth'
 import { OETH_ADDRESS, OETH_VAULT_ADDRESS } from '../utils/addresses'
 import { Bytes20 } from '@subsquid/evm-processor/lib/interfaces/evm'
 import { pad } from 'viem'
+import { Trace } from '@subsquid/evm-processor'
+import { TraceCall } from '@subsquid/evm-processor/src/interfaces/data'
 
 type ContextBlocks = Context['blocks']
 type ContextBlock = ContextBlocks['0']
 type ContextLog = ContextBlocks['0']['logs']['0']
+type ContextTrace = ContextBlock['traces']['0']
 
 export interface BaseLog {
   block: ContextBlock
@@ -32,14 +35,26 @@ export interface RawRebase extends BaseLog {
   rebasingCreditsPerToken: bigint
 }
 
-export type RawLog = RawTransfer | RawRebase
+export interface RawTrace extends BaseLog {
+  type: 'trace'
+  trace: ContextTrace
+}
+
+export type RawLog = RawTransfer | RawRebase | RawTrace
 
 /**
  * Aggregate Transfer and Rebase events from the logs
  */
 export function parse(ctx: Context): RawLog[] {
   let logs: RawLog[] = []
-  const createBaseLog = (block: ContextBlock, log: ContextLog): BaseLog => {
+  const createBaseLog = (
+    block: ContextBlock,
+    log: {
+      id: string
+      transactionHash: string
+      address: string
+    },
+  ): BaseLog => {
     return {
       block,
       id: log.id,
@@ -70,6 +85,17 @@ export function parse(ctx: Context): RawLog[] {
       rebasingCreditsPerToken,
     })
   }
+  const createTrace = (block: ContextBlock, trace: ContextTrace) => {
+    logs.push({
+      ...createBaseLog(block, {
+        id: trace.transaction!.id!,
+        address: trace.transaction!.to!,
+        transactionHash: trace.transaction!.hash!,
+      }),
+      type: 'trace',
+      trace,
+    })
+  }
 
   const mapping: Record<
     Bytes20, // EVM Address
@@ -94,6 +120,17 @@ export function parse(ctx: Context): RawLog[] {
   }
 
   for (let block of ctx.blocks) {
+    for (let trace of block.traces) {
+      if (
+        trace.type === 'call' &&
+        OETH_ADDRESS === trace.action.to &&
+        (trace.action.sighash === oeth.functions.rebaseOptIn.sighash ||
+          trace.action.sighash === oeth.functions.rebaseOptOut.sighash)
+      ) {
+        // RebaseOption
+        createTrace(block, trace)
+      }
+    }
     for (let log of block.logs) {
       mapping[log.address]?.[log.topics[0]]?.(block, log)
       mapping['default']?.[log.topics[0]]?.(block, log)

@@ -31,13 +31,14 @@ type Rebase @entity {
   apy: APY!
 }
 
-# type RebaseOption @entity {
-#   id: ID!
-#   timestamp: DateTime! @index
-#   blockNumber: Int! @index
-#   txHash: String! @index
-#   status: Boolean!
-# }
+type RebaseOption @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  address: Address!
+  status: String!
+}
 
 type APY @entity {
   id: ID!

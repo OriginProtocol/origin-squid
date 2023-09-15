@@ -1,5 +1,13 @@
 import { RawLog, RawRebase, RawTransfer } from '../parser'
-import { Address, APY, FraxStaking, History, Rebase, Vault } from '../model'
+import {
+  Address,
+  APY,
+  FraxStaking,
+  History,
+  Rebase,
+  RebaseOption,
+  Vault,
+} from '../model'
 import * as oeth from '../abi/oeth'
 import { Context } from '../processor'
 import { v4 as uuidv4 } from 'uuid'
@@ -25,12 +33,14 @@ interface TransformResult {
   vaults: Vault[]
   fraxStakings: FraxStaking[]
   owners: Map<string, Address>
+  rebaseOptions: RebaseOption[]
 }
 
 export const transform = async (ctx: Context, logs: RawLog[]) => {
   const result: TransformResult = {
     history: [],
     rebases: [],
+    rebaseOptions: [],
     vaults: [],
     fraxStakings: [],
     owners: new Map(),
@@ -170,37 +180,69 @@ export const transform = async (ctx: Context, logs: RawLog[]) => {
           }
         },
       })
-      await trackAddressBalances({
-        address: OETH_FRAX_STAKING_ADDRESS, // TODO: Check this, probably wrong
-        tokens: [FRXETH_ADDRESS], // TODO: Check this, probably wrong
-        log,
-        fn: async ({ log, token, change }) => {
-          const dateId = log.timestamp.toISOString()
-          const { latest, current } = await getLatest(
-            ctx,
-            FraxStaking,
-            result.fraxStakings,
-            dateId,
-          )
+      // await trackAddressBalances({
+      //   address: OETH_FRAX_STAKING_ADDRESS, // TODO: Check this, probably wrong
+      //   tokens: [FRXETH_ADDRESS], // TODO: Check this, probably wrong
+      //   log,
+      //   fn: async ({ log, token, change }) => {
+      //     const dateId = log.timestamp.toISOString()
+      //     const { latest, current } = await getLatest(
+      //       ctx,
+      //       FraxStaking,
+      //       result.fraxStakings,
+      //       dateId,
+      //     )
+      //
+      //     let fraxStaking = current
+      //     if (!fraxStaking) {
+      //       fraxStaking = new FraxStaking({
+      //         id: dateId,
+      //         timestamp: log.timestamp,
+      //         blockNumber: log.blockNumber,
+      //         txHash: log.txHash,
+      //         frxETH: latest?.frxETH ?? 0n,
+      //       })
+      //       result.fraxStakings.push(fraxStaking)
+      //     }
+      //
+      //     // TODO: Werk on me pweeze
+      //     if (token === FRXETH_ADDRESS) {
+      //       fraxStaking.frxETH += change
+      //     }
+      //   },
+      // })
+    } else if (log.type === 'trace' && log.trace.type === 'call') {
+      const trace = log.trace
+      if (
+        OETH_ADDRESS === trace.action.to &&
+        (trace.action.sighash === oeth.functions.rebaseOptIn.sighash ||
+          trace.action.sighash === oeth.functions.rebaseOptOut.sighash)
+      ) {
+        const address = log.trace.transaction!.from
+        let owner = result.owners.get(address)
+        if (!owner) {
+          owner = await createAddress(ctx, address, log.timestamp)
+          result.owners.set(address, owner)
+        }
 
-          let fraxStaking = current
-          if (!fraxStaking) {
-            fraxStaking = new FraxStaking({
-              id: dateId,
-              timestamp: log.timestamp,
-              blockNumber: log.blockNumber,
-              txHash: log.txHash,
-              frxETH: latest?.frxETH ?? 0n,
-            })
-            result.fraxStakings.push(fraxStaking)
-          }
-
-          // TODO: Werk on me pweeze
-          if (token === FRXETH_ADDRESS) {
-            fraxStaking.frxETH += change
-          }
-        },
-      })
+        let rebaseOption = new RebaseOption({
+          id: uuidv4(),
+          timestamp: log.timestamp,
+          blockNumber: log.blockNumber,
+          txHash: log.txHash,
+          address: owner,
+          status: owner.rebasingOption,
+        })
+        result.rebaseOptions.push(rebaseOption)
+        if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
+          owner.rebasingOption = 'OptIn'
+          rebaseOption.status = 'OptIn'
+        }
+        if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
+          owner.rebasingOption = 'OptOut'
+          rebaseOption.status = 'OptOut'
+        }
+      }
     }
   }
 
@@ -210,12 +252,12 @@ export const transform = async (ctx: Context, logs: RawLog[]) => {
 const getLatest = async <T extends Entity>(
   ctx: Context,
   entity: EntityClass<T>,
-  store: T[],
+  memory: T[],
   id: string,
 ) => {
-  const current = store.slice(store.length - 1).find((v) => v.id === id)
+  const current = memory.slice(memory.length - 1).find((v) => v.id === id)
   const latest =
-    store[store.length - 1] ??
+    memory[memory.length - 1] ??
     (await ctx.store.findOne(entity as EntityClass<Entity>, {
       where: { id: LessThanOrEqual(id) },
       order: { id: 'desc' },
@@ -252,7 +294,11 @@ const trackAddressBalances = async ({
 /**
  * Create a new Address entity
  */
-async function createAddress(ctx: Context, addr: string): Promise<Address> {
+async function createAddress(
+  ctx: Context,
+  addr: string,
+  lastUpdated?: Date,
+): Promise<Address> {
   let isContract: boolean = false
   if (addr !== '0x0000000000000000000000000000000000000000') {
     isContract =
@@ -264,8 +310,10 @@ async function createAddress(ctx: Context, addr: string): Promise<Address> {
     id: addr,
     balance: 0,
     earned: 0,
+    credits: 0n,
     isContract,
     rebasingOption: isContract ? 'OptOut' : 'OptIn',
+    lastUpdated,
   })
 }
 
