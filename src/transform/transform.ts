@@ -1,6 +1,5 @@
-import { RawLog, RawRebase } from '../parser'
-import { Address, APY, History, Rebase, Vault } from '../model'
-import { BlockData } from '@subsquid/evm-processor'
+import { RawLog, RawRebase, RawTransfer } from '../parser'
+import { Address, APY, FraxStaking, History, Rebase, Vault } from '../model'
 import * as oeth from '../abi/oeth'
 import { Context } from '../processor'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,12 +8,14 @@ import {
   ADDRESS_ZERO,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_FRAX_STAKING_ADDRESS,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
   STETH_ADDRESS,
   VAULT_HOLDINGS_ADDRESSES,
   WETH_ADDRESS,
 } from '../utils/addresses'
+import { Entity, EntityClass } from '@subsquid/typeorm-store'
 
 const addressZero = '0x0000000000000000000000000000000000000000'
 
@@ -22,6 +23,7 @@ interface TransformResult {
   history: History[]
   rebases: Rebase[]
   vaults: Vault[]
+  fraxStakings: FraxStaking[]
   owners: Map<string, Address>
 }
 
@@ -30,6 +32,7 @@ export const transform = async (ctx: Context, logs: RawLog[]) => {
     history: [],
     rebases: [],
     vaults: [],
+    fraxStakings: [],
     owners: new Map(),
   }
 
@@ -124,72 +127,126 @@ export const transform = async (ctx: Context, logs: RawLog[]) => {
         const entity = await rebase
         result.rebases.push(entity)
       }
-    } else if (VAULT_HOLDINGS_ADDRESSES.includes(log.address)) {
-      if (
-        log.type === 'transfer' &&
-        log.value > 0n &&
-        (log.from === OETH_VAULT_ADDRESS || log.to === OETH_VAULT_ADDRESS)
-      ) {
-        const dateId = log.timestamp.toISOString()
+    } else if (log.type === 'transfer') {
+      await trackAddressBalances({
+        address: OETH_VAULT_ADDRESS,
+        tokens: VAULT_HOLDINGS_ADDRESSES,
+        log,
+        fn: async ({ log, token, change }) => {
+          const dateId = log.timestamp.toISOString()
+          const { latest, current } = await getLatest(
+            ctx,
+            Vault,
+            result.vaults,
+            dateId,
+          )
 
-        // Multiple transfers in a single block will lead us to modify ourselves.
-        let vault = result.vaults
-          .slice(result.vaults.length - 1)
-          .find((v) => v.id === dateId)
+          let vault = current
+          if (!vault) {
+            vault = new Vault({
+              id: dateId,
+              timestamp: log.timestamp,
+              blockNumber: log.blockNumber,
+              txHash: log.txHash,
+              eth: latest?.eth ?? 0n,
+              weth: latest?.weth ?? 0n,
+              rETH: latest?.rETH ?? 0n,
+              stETH: latest?.stETH ?? 0n,
+              frxETH: latest?.frxETH ?? 0n,
+            })
+            result.vaults.push(vault)
+          }
 
-        if (!vault) {
-          let last =
-            result.vaults[result.vaults.length - 1] ??
-            (await ctx.store.findOne(Vault, {
-              where: { id: LessThanOrEqual(dateId) },
-              order: { id: 'desc' },
-            }))
-          vault =
-            last?.id === dateId
-              ? last
-              : new Vault({
-                  id: dateId,
-                  timestamp: log.timestamp,
-                  blockNumber: log.blockNumber,
-                  txHash: log.txHash,
-                  eth: last?.eth ?? 0n,
-                  weth: last?.weth ?? 0n,
-                  rETH: last?.rETH ?? 0n,
-                  stETH: last?.stETH ?? 0n,
-                  frxETH: last?.frxETH ?? 0n,
-                })
-          result.vaults.push(vault)
-        } else {
-          ctx.log.info(`existing: ${vault}`)
-        }
+          if (token === ADDRESS_ZERO) {
+            vault.eth += change
+          } else if (token === WETH_ADDRESS) {
+            vault.weth += change
+          } else if (token === RETH_ADDRESS) {
+            vault.rETH += change
+          } else if (token === STETH_ADDRESS) {
+            vault.stETH += change
+          } else if (token === FRXETH_ADDRESS) {
+            vault.frxETH += change
+          }
+        },
+      })
+      await trackAddressBalances({
+        address: OETH_FRAX_STAKING_ADDRESS, // TODO: Check this, probably wrong
+        tokens: [FRXETH_ADDRESS], // TODO: Check this, probably wrong
+        log,
+        fn: async ({ log, token, change }) => {
+          const dateId = log.timestamp.toISOString()
+          const { latest, current } = await getLatest(
+            ctx,
+            FraxStaking,
+            result.fraxStakings,
+            dateId,
+          )
 
-        const change = log.from === OETH_VAULT_ADDRESS ? -log.value : log.value
-        if (log.address === ADDRESS_ZERO) {
-          vault.eth += change
-        } else if (log.address === WETH_ADDRESS) {
-          vault.weth += change
-        } else if (log.address === RETH_ADDRESS) {
-          vault.rETH += change
-        } else if (log.address === STETH_ADDRESS) {
-          vault.stETH += change
-        } else if (log.address === FRXETH_ADDRESS) {
-          vault.frxETH += change
-        }
+          let fraxStaking = current
+          if (!fraxStaking) {
+            fraxStaking = new FraxStaking({
+              id: dateId,
+              timestamp: log.timestamp,
+              blockNumber: log.blockNumber,
+              txHash: log.txHash,
+              frxETH: latest?.frxETH ?? 0n,
+            })
+            result.fraxStakings.push(fraxStaking)
+          }
 
-        // ctx.log.info(
-        //   `Transfer: ${log.address} : ${log.from} > ${log.to} : ${log.value}`,
-        // )
-
-        // if (log.address === FRXETH_ADDRESS) {
-        //   ctx.log.info(
-        //     `${log.address} frxETH ${change} ${vault.frxETH} ${log.txHash}`,
-        //   )
-        // }
-      }
+          // TODO: Werk on me pweeze
+          if (token === FRXETH_ADDRESS) {
+            fraxStaking.frxETH += change
+          }
+        },
+      })
     }
   }
 
   return result
+}
+
+const getLatest = async <T extends Entity>(
+  ctx: Context,
+  entity: EntityClass<T>,
+  store: T[],
+  id: string,
+) => {
+  const current = store.slice(store.length - 1).find((v) => v.id === id)
+  const latest =
+    store[store.length - 1] ??
+    (await ctx.store.findOne(entity as EntityClass<Entity>, {
+      where: { id: LessThanOrEqual(id) },
+      order: { id: 'desc' },
+    }))
+  return { current, latest }
+}
+
+const trackAddressBalances = async ({
+  log,
+  address,
+  tokens,
+  fn,
+}: {
+  log: RawTransfer
+  address: string
+  tokens: string[]
+  fn: (params: {
+    address: string
+    token: string
+    change: bigint
+    log: RawTransfer
+  }) => Promise<void>
+}) => {
+  if (
+    log.value > 0n &&
+    (log.from === address || log.to === address) &&
+    tokens.includes(log.address)
+  ) {
+    const change = log.from === address ? -log.value : log.value
+    await fn({ address, token: log.address, change, log })
+  }
 }
 
 /**
