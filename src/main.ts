@@ -5,10 +5,8 @@ import { transform } from './transform'
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
   const logs = parse(ctx)
-  const { history, rebases, owners, vaults, rebaseOptions } = await transform(
-    ctx,
-    logs,
-  )
+  const { history, rebases, owners, vaults, rebaseOptions, fraxStakings } =
+    await transform(ctx, logs)
 
   const ownerValues = [...owners.values()]
   ctx.log.info(
@@ -20,4 +18,5 @@ processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
   await ctx.store.insert(rebases)
   await ctx.store.insert(rebaseOptions)
   await ctx.store.insert(vaults)
+  await ctx.store.insert(fraxStakings)
 })
