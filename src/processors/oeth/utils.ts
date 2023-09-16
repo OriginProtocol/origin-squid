@@ -94,6 +94,7 @@ export async function createRebaseAPY(
       txHash: log.transactionHash,
       rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     })
+    apies.push(apy)
   }
 
   rebase.apy = apy
@@ -106,7 +107,6 @@ export async function createRebaseAPY(
     apy.apy14DayAvg = 0
     apy.apy30DayAvg = 0
 
-    apies.push(apy)
     return rebase
   }
 
@@ -145,6 +145,5 @@ export async function createRebaseAPY(
     }),
   )
 
-  apies.push(apy)
   return rebase
 }
