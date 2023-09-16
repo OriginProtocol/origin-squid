@@ -25,11 +25,12 @@ export const trackAddressBalances = async ({
   if (
     (log.topics[1]?.toLowerCase() === paddedAddress ||
       log.topics[2]?.toLowerCase() === paddedAddress) &&
-    tokens.includes(log.address)
+    tokens.includes(log.address.toLowerCase())
   ) {
     const data = erc20.events.Transfer.decode(log)
     if (data.value > 0n) {
-      const change = data.from === address ? -data.value : data.value
+      const change =
+        data.from.toLowerCase() === address ? -data.value : data.value
       await fn({ address, token: log.address, change, log, data })
     }
   }
