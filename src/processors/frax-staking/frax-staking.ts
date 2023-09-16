@@ -47,10 +47,8 @@ const processTransfer = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.topics[0] === erc20.events.Transfer.topic) {
-    const data = erc20.events.Transfer.decode(log)
     await trackAddressBalances({
       log,
-      data,
       address: OETH_FRAX_STAKING_ADDRESS,
       tokens: [SFRXETH_ADDRESS],
       fn: async ({ log, token, change }) => {

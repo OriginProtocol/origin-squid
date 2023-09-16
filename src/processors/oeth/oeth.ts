@@ -80,6 +80,7 @@ const processTransfer = async (
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
 ) => {
+  if (log.address !== OETH_ADDRESS) return
   if (log.topics[0] === oeth.events.Transfer.topic) {
     await result.initialize()
     const data = oeth.events.Transfer.decode(log)
@@ -138,6 +139,7 @@ const processTotalSupplyUpdatedHighres = async (
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
 ) => {
+  if (log.address !== OETH_ADDRESS) return
   if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
     await result.initialize()
     const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)

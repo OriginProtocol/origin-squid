@@ -2,16 +2,15 @@ import { Context } from '../processor'
 import * as erc20 from '../abi/erc20'
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
+import { pad } from 'viem'
 
 export const trackAddressBalances = async ({
   log,
-  data,
   address,
   tokens,
   fn,
 }: {
   log: Context['blocks']['0']['logs']['0']
-  data: ReturnType<typeof erc20.events.Transfer.decode>
   address: string
   tokens: string[]
   fn: (params: {
@@ -22,14 +21,17 @@ export const trackAddressBalances = async ({
     data: ReturnType<typeof erc20.events.Transfer.decode>
   }) => Promise<void>
 }) => {
+  const paddedAddress = pad(address as `0x${string}`)
   if (
-    data.value > 0n &&
-    (data.from.toLowerCase() === address ||
-      data.to.toLowerCase() === address) &&
+    (log.topics[1].toLowerCase() === paddedAddress ||
+      log.topics[2].toLowerCase() === paddedAddress) &&
     tokens.includes(log.address)
   ) {
-    const change = data.from === address ? -data.value : data.value
-    await fn({ address, token: log.address, change, log, data })
+    const data = erc20.events.Transfer.decode(log)
+    if (data.value > 0n) {
+      const change = data.from === address ? -data.value : data.value
+      await fn({ address, token: log.address, change, log, data })
+    }
   }
 }
 
