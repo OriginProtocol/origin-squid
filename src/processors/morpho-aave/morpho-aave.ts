@@ -44,7 +44,6 @@ const processTransfer = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.topics[0] === erc20.events.Transfer.topic) {
-    if (log.data === '0x') log.data = '0x00'
     await trackAddressBalances({
       log,
       address: OETH_MORPHO_AAVE_ADDRESS,

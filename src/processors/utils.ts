@@ -23,8 +23,8 @@ export const trackAddressBalances = async ({
 }) => {
   const paddedAddress = pad(address as `0x${string}`)
   if (
-    (log.topics[1].toLowerCase() === paddedAddress ||
-      log.topics[2].toLowerCase() === paddedAddress) &&
+    (log.topics[1]?.toLowerCase() === paddedAddress ||
+      log.topics[2]?.toLowerCase() === paddedAddress) &&
     tokens.includes(log.address)
   ) {
     const data = erc20.events.Transfer.decode(log)
