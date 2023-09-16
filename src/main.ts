@@ -1,22 +1,22 @@
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import { processor } from './processor'
-import { parse } from './parser'
-import { transform } from './transform'
+
+import * as oethProcessor from './processors/oeth'
+import * as vaultProcessor from './processors/vault'
+import * as fraxStakingProcessor from './processors/frax-staking'
+
+oethProcessor.setup(processor)
+vaultProcessor.setup(processor)
+fraxStakingProcessor.setup(processor)
 
 processor.run(new TypeormDatabase({ supportHotBlocks: true }), async (ctx) => {
-  const logs = parse(ctx)
-  const { history, rebases, owners, vaults, rebaseOptions, fraxStakings } =
-    await transform(ctx, logs)
-
-  const ownerValues = [...owners.values()]
-  ctx.log.info(
-    `Storing: ${ownerValues.length} owners, ${history.length} histories, ${rebases.length} rebases, ${rebaseOptions.length} rebaseOptions, ${vaults.length} vaults`,
-  )
-
-  await ctx.store.upsert(ownerValues)
-  await ctx.store.insert(history)
-  await ctx.store.insert(rebases)
-  await ctx.store.insert(rebaseOptions)
-  await ctx.store.insert(vaults)
-  await ctx.store.insert(fraxStakings)
+  let start = Date.now()
+  const time = (name: string) => () =>
+    ctx.log.info(`${name} ${Date.now() - start}ms`)
+  // The idea is that these processors have zero dependencies on one another and can be processed asynchronously.
+  await Promise.all([
+    oethProcessor.process(ctx).then(time('oethProcessor')), // This processor is slow. Likely due to the high quantity of address balance lookups.
+    vaultProcessor.process(ctx),
+    fraxStakingProcessor.process(ctx),
+  ])
 })
