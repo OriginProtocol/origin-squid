@@ -1,34 +1,31 @@
 import { Context } from '../../processor'
-import { FraxStaking } from '../../model'
+import { MorphoAave } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  OETH_FRAX_STAKING_ADDRESS,
-  SFRXETH_ADDRESS,
-} from '../../utils/addresses'
+import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import * as erc20 from '../../abi/erc20'
 import { pad } from 'viem'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  fraxStakings: FraxStaking[]
+  morphoAaves: MorphoAave[]
 }
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
-    address: [SFRXETH_ADDRESS],
+    address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
-    topic1: [pad(OETH_FRAX_STAKING_ADDRESS)],
+    topic1: [pad(OETH_MORPHO_AAVE_ADDRESS)],
   })
   processor.addLog({
-    address: [SFRXETH_ADDRESS],
+    address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
-    topic2: [pad(OETH_FRAX_STAKING_ADDRESS)],
+    topic2: [pad(OETH_MORPHO_AAVE_ADDRESS)],
   })
 }
 
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
-    fraxStakings: [],
+    morphoAaves: [],
   }
 
   for (const block of ctx.blocks) {
@@ -37,7 +34,7 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.insert(result.fraxStakings)
+  await ctx.store.insert(result.morphoAaves)
 }
 
 const processTransfer = async (
@@ -51,31 +48,31 @@ const processTransfer = async (
     await trackAddressBalances({
       log,
       data,
-      address: OETH_FRAX_STAKING_ADDRESS,
-      tokens: [SFRXETH_ADDRESS],
+      address: OETH_MORPHO_AAVE_ADDRESS,
+      tokens: [WETH_ADDRESS],
       fn: async ({ log, token, change }) => {
         const dateId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatest(
           ctx,
-          FraxStaking,
-          result.fraxStakings,
+          MorphoAave,
+          result.morphoAaves,
           dateId,
         )
 
-        let fraxStaking = current
-        if (!fraxStaking) {
-          fraxStaking = new FraxStaking({
+        let morphoAave = current
+        if (!morphoAave) {
+          morphoAave = new MorphoAave({
             id: dateId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
             txHash: log.transactionHash,
-            frxETH: latest?.frxETH ?? 0n,
+            weth: latest?.weth ?? 0n,
           })
-          result.fraxStakings.push(fraxStaking)
+          result.morphoAaves.push(morphoAave)
         }
 
-        if (token === SFRXETH_ADDRESS) {
-          fraxStaking.frxETH += change
+        if (token === WETH_ADDRESS) {
+          morphoAave.weth += change
         }
       },
     })
