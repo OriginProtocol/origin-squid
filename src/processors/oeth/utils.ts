@@ -34,6 +34,7 @@ export async function createAddress(
  */
 export async function createRebaseAPY(
   ctx: Context,
+  apies: APY[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
   rebaseEvent: ReturnType<typeof oeth.events.TotalSupplyUpdatedHighres.decode>,
@@ -57,28 +58,32 @@ export async function createRebaseAPY(
   // use date as id for APY
   date.setDate(date.getDate() - 6)
   const last7daysDateId = {
-    key: 'apy7DayAvg',
+    key: 'apy7DayAvg' as const,
     value: date.toISOString().substring(0, 10),
   }
   date.setDate(date.getDate() - 14)
   const last14daysDateId = {
-    key: 'apy14DayAvg',
+    key: 'apy14DayAvg' as const,
     value: date.toISOString().substring(0, 10),
   }
   date.setDate(date.getDate() - 16)
   const last30daysDateId = {
-    key: 'apy30DayAvg',
+    key: 'apy30DayAvg' as const,
     value: date.toISOString().substring(0, 10),
   }
 
   // get last APY to compare with current one
-  let lastApy = await ctx.store.findOne(APY, {
-    where: { id: LessThan(dateId) },
-    order: { id: 'DESC' },
-  })
+  let lastApy =
+    apies.slice(apies.length - 2).find((apy) => apy.id < dateId) ??
+    (await ctx.store.findOne(APY, {
+      where: { id: LessThan(dateId) },
+      order: { id: 'DESC' },
+    }))
 
   // check if there is already an APY for the current date
-  let apy = await ctx.store.findOne(APY, { where: { id: dateId } })
+  let apy =
+    apies.slice(apies.length - 1).find((apy) => apy.id === dateId) ??
+    (await ctx.store.findOne(APY, { where: { id: dateId } }))
   // ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
   // create a new APY if it doesn't exist
   if (!apy) {
@@ -101,7 +106,7 @@ export async function createRebaseAPY(
     apy.apy14DayAvg = 0
     apy.apy30DayAvg = 0
 
-    await ctx.store.upsert(apy)
+    apies.push(apy)
     return rebase
   }
 
@@ -129,16 +134,17 @@ export async function createRebaseAPY(
     ((1 + apy.apr / periods_per_year / 100) ** periods_per_year - 1) * 100
 
   // calculate average APY for the last 7, 14 and 30 days
-  for (const i of [last7daysDateId, last14daysDateId, last30daysDateId]) {
-    let pastAPYs = await ctx.store.findBy(APY, {
-      id: MoreThanOrEqual(i.value),
-    })
-    // @ts-ignore
-    apy[i.key] =
-      pastAPYs.reduce((acc: number, cur: APY) => acc + cur.apy, apy.apy) /
-      (pastAPYs.length + 1)
-  }
+  await Promise.all(
+    [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
+      const pastAPYs = await ctx.store.findBy(APY, {
+        id: MoreThanOrEqual(i.value),
+      })
+      apy![i.key] =
+        pastAPYs.reduce((acc: number, cur: APY) => acc + cur.apy, apy!.apy) /
+        (pastAPYs.length + 1)
+    }),
+  )
 
-  await ctx.store.upsert(apy)
+  apies.push(apy)
   return rebase
 }

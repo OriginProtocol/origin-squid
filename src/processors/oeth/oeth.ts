@@ -1,5 +1,5 @@
 import { Context } from '../../processor'
-import { Address, History, Rebase, RebaseOption } from '../../model'
+import { Address, APY, History, Rebase, RebaseOption } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as oeth from '../../abi/oeth'
 import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
@@ -26,22 +26,33 @@ export const setup = (processor: EvmBatchProcessor) => {
 }
 
 interface ProcessResult {
+  initialized: boolean
+  initialize: () => Promise<void>
   history: History[]
   rebases: Rebase[]
-  owners: Map<string, Address>
   rebaseOptions: RebaseOption[]
+  apies: APY[]
+  owners: Map<string, Address>
 }
 
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
+    initialized: false,
+    // Saves ~5ms init time if we have no filter matches.
+    initialize: async () => {
+      if (result.initialized) return
+      result.initialized = true
+      result.owners = await ctx.store
+        .find(Address)
+        .then((q) => new Map(q.map((i) => [i.id, i])))
+    },
     history: [],
     rebases: [],
     rebaseOptions: [],
+    apies: [],
     // get all addresses from the database.
     // we need this because we increase their balance based on rebase events
-    owners: await ctx.store
-      .find(Address)
-      .then((q) => new Map(q.map((i) => [i.id, i]))),
+    owners: undefined as unknown as Map<string, Address>, // We want to error if someone forgets to initialize.
   }
 
   for (const block of ctx.blocks) {
@@ -54,7 +65,10 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.upsert([...result.owners.values()])
+  if (result.owners) {
+    await ctx.store.upsert([...result.owners.values()])
+  }
+  await ctx.store.upsert(result.apies)
   await ctx.store.insert(result.history)
   await ctx.store.insert(result.rebases)
   await ctx.store.insert(result.rebaseOptions)
@@ -67,6 +81,7 @@ const processTransfer = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.topics[0] === oeth.events.Transfer.topic) {
+    await result.initialize()
     const data = oeth.events.Transfer.decode(log)
     // Bind the token contract to the block number
     const token = new oeth.Contract(ctx, block.header, OETH_ADDRESS)
@@ -124,9 +139,10 @@ const processTotalSupplyUpdatedHighres = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
+    await result.initialize()
     const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
     // Rebase events
-    let rebase = createRebaseAPY(ctx, block, log, data)
+    let rebase = createRebaseAPY(ctx, result.apies, block, log, data)
     for (const address of result.owners.values()) {
       if (address.rebasingOption === 'OptOut') {
         continue
@@ -163,38 +179,38 @@ const processRebaseOpt = async (
   block: Context['blocks']['0'],
   trace: Context['blocks']['0']['traces']['0'],
 ) => {
-  const timestamp = new Date(block.header.timestamp)
-  const blockNumber = block.header.height
-  if (trace.type === 'call') {
-    if (
-      OETH_ADDRESS === trace.action.to &&
-      (trace.action.sighash === oeth.functions.rebaseOptIn.sighash ||
-        trace.action.sighash === oeth.functions.rebaseOptOut.sighash)
-    ) {
-      const address = trace.transaction!.from
-      let owner = result.owners.get(address)
-      if (!owner) {
-        owner = await createAddress(ctx, address, timestamp)
-        result.owners.set(address, owner)
-      }
+  if (
+    trace.type === 'call' &&
+    OETH_ADDRESS === trace.action.to &&
+    (trace.action.sighash === oeth.functions.rebaseOptIn.sighash ||
+      trace.action.sighash === oeth.functions.rebaseOptOut.sighash)
+  ) {
+    await result.initialize()
+    const timestamp = new Date(block.header.timestamp)
+    const blockNumber = block.header.height
+    const address = trace.transaction!.from
+    let owner = result.owners.get(address)
+    if (!owner) {
+      owner = await createAddress(ctx, address, timestamp)
+      result.owners.set(address, owner)
+    }
 
-      let rebaseOption = new RebaseOption({
-        id: uuidv4(),
-        timestamp,
-        blockNumber,
-        txHash: trace.transaction?.hash,
-        address: owner,
-        status: owner.rebasingOption,
-      })
-      result.rebaseOptions.push(rebaseOption)
-      if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
-        owner.rebasingOption = 'OptIn'
-        rebaseOption.status = 'OptIn'
-      }
-      if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
-        owner.rebasingOption = 'OptOut'
-        rebaseOption.status = 'OptOut'
-      }
+    let rebaseOption = new RebaseOption({
+      id: uuidv4(),
+      timestamp,
+      blockNumber,
+      txHash: trace.transaction?.hash,
+      address: owner,
+      status: owner.rebasingOption,
+    })
+    result.rebaseOptions.push(rebaseOption)
+    if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
+      owner.rebasingOption = 'OptIn'
+      rebaseOption.status = 'OptIn'
+    }
+    if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
+      owner.rebasingOption = 'OptOut'
+      rebaseOption.status = 'OptOut'
     }
   }
 }

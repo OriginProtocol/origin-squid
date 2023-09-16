@@ -7,7 +7,7 @@ import {
   Log as _Log,
   Transaction as _Transaction,
 } from '@subsquid/evm-processor'
-import { Store } from '@subsquid/typeorm-store'
+import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 
 export const processor = new EvmBatchProcessor()
   .setDataSource({
@@ -62,6 +62,29 @@ export const processor = new EvmBatchProcessor()
       17067223, // OETH Frax Staking: https://etherscan.io/tx/0x422903d2be38a264423a77e8472d365fa567f5bca12ea2403dfaee1b305c7da4
     ),
   })
+
+export const run = (
+  processors: {
+    name?: string
+    setup: (p: typeof processor) => void
+    process: (ctx: Context) => Promise<void>
+  }[],
+) => {
+  processors.forEach((p) => p.setup(processor))
+  processor.run(
+    new TypeormDatabase({ supportHotBlocks: true }),
+    async (ctx) => {
+      let start = Date.now()
+      const time = (name: string) => () =>
+        ctx.log.info(`${name} ${Date.now() - start}ms`)
+      await Promise.all(
+        processors.map((p, index) =>
+          p.process(ctx).then(time(p.name ?? `p${index}`)),
+        ),
+      )
+    },
+  )
+}
 
 export type Fields = EvmBatchProcessorFields<typeof processor>
 export type Context = DataHandlerContext<Store, Fields>
