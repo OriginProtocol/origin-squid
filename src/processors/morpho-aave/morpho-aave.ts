@@ -1,14 +1,17 @@
-import { Context } from '../../processor'
-import { MorphoAave } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import * as erc20 from '../../abi/erc20'
 import { pad } from 'viem'
+
+import * as erc20 from '../../abi/erc20'
+import { MorphoAave } from '../../model'
+import { Context } from '../../processor'
+import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   morphoAaves: MorphoAave[]
 }
+
+export const from = 17367102 // https://etherscan.io/tx/0x15294349d566059bb37e200b2dba45428e237d6050de11862aa57c7875476526
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({

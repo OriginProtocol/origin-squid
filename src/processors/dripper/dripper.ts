@@ -1,14 +1,17 @@
-import { Context } from '../../processor'
-import { Dripper } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import * as erc20 from '../../abi/erc20'
 import { pad } from 'viem'
+
+import * as erc20 from '../../abi/erc20'
+import { Dripper } from '../../model'
+import { Context } from '../../processor'
+import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   drippers: Dripper[]
 }
+
+export const from = 17067704 // https://etherscan.io/tx/0x8e4217c5883891816b9035100b0b1342492f8e618029bf022bdc85bf9aa330f2
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({

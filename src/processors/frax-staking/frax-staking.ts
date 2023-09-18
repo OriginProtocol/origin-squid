@@ -1,17 +1,20 @@
-import { Context } from '../../processor'
-import { FraxStaking } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { pad } from 'viem'
+
+import * as erc20 from '../../abi/erc20'
+import { FraxStaking } from '../../model'
+import { Context } from '../../processor'
 import {
   OETH_FRAX_STAKING_ADDRESS,
   SFRXETH_ADDRESS,
 } from '../../utils/addresses'
-import * as erc20 from '../../abi/erc20'
-import { pad } from 'viem'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   fraxStakings: FraxStaking[]
 }
+
+export const from = 17067223 // https://etherscan.io/tx/0x422903d2be38a264423a77e8472d365fa567f5bca12ea2403dfaee1b305c7da4
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({

@@ -1,6 +1,9 @@
-import { Context } from '../../processor'
-import { Vault } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { pad } from 'viem'
+
+import * as erc20 from '../../abi/erc20'
+import { Vault } from '../../model'
+import { Context } from '../../processor'
 import {
   ADDRESS_ZERO,
   FRXETH_ADDRESS,
@@ -10,13 +13,13 @@ import {
   VAULT_HOLDINGS_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
-import * as erc20 from '../../abi/erc20'
-import { pad } from 'viem'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   vaults: Vault[]
 }
+
+export const from = 17067001 // https://etherscan.io/tx/0x0b81a0e2b7d824ce493465221218b9c79b4a9478c0bb7760b386be240f5985b8
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({

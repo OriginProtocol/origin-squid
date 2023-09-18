@@ -1,10 +1,13 @@
-import { Context } from '../../processor'
-import { Address, APY, History, Rebase, RebaseOption } from '../../model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import * as oeth from '../../abi/oeth'
-import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
 import { v4 as uuidv4 } from 'uuid'
+
+import * as oeth from '../../abi/oeth'
+import { APY, Address, History, Rebase, RebaseOption } from '../../model'
+import { Context } from '../../processor'
+import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
 import { createAddress, createRebaseAPY } from './utils'
+
+export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addTrace({
