@@ -2,7 +2,9 @@
   "name": "origin-squid",
   "private": true,
   "scripts": {
-    "build": "rm -rf lib && tsc"
+    "build": "rm -rf lib && tsc",
+    "prettier-check": "prettier --check **/*.ts **/*.json",
+    "prettier-fix": "prettier --write **/*.ts **/*.json"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.1.0",
