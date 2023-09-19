@@ -2,9 +2,18 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { v4 as uuidv4 } from 'uuid'
 
 import * as oeth from '../../abi/oeth'
-import { APY, Address, History, Rebase, RebaseOption } from '../../model'
+import {
+  APY,
+  Address,
+  History,
+  HistoryType,
+  Rebase,
+  RebaseOption,
+  RebasingOption,
+} from '../../model'
 import { Context } from '../../processor'
 import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
+import { DECIMALS_18 } from '../../utils/constants'
 import { createAddress, createRebaseAPY } from './utils'
 
 export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
@@ -111,7 +120,7 @@ const processTransfer = async (
     await Promise.all(
       [addressSub, addressAdd].map(async (address) => {
         const credits = await token.creditsBalanceOfHighres(address.id)
-        const newBalance = Number(credits[0]) / Number(credits[1])
+        const newBalance = (credits[0] * DECIMALS_18) / credits[1]
         result.history.push(
           new History({
             // we can't use {t.id} because it's not unique
@@ -123,14 +132,14 @@ const processTransfer = async (
             blockNumber: block.header.height,
             txHash: log.transactionHash,
             type: isSwap
-              ? 'Swap'
+              ? HistoryType.Swap
               : addressSub === address
-              ? 'Sent'
-              : 'Received',
+              ? HistoryType.Sent
+              : HistoryType.Received,
           }),
         )
         address.credits = BigInt(credits[0]) // token credits
-        address.balance = Number(credits[0]) / Number(credits[1]) // token balance
+        address.balance = newBalance // token balance
       }),
     )
   }
@@ -149,11 +158,11 @@ const processTotalSupplyUpdatedHighres = async (
     // Rebase events
     let rebase = createRebaseAPY(ctx, result.apies, block, log, data)
     for (const address of result.owners.values()) {
-      if (address.rebasingOption === 'OptOut') {
+      if (address.rebasingOption === RebasingOption.OptOut) {
         continue
       }
       const newBalance =
-        Number(address.credits) / Number(data.rebasingCreditsPerToken)
+        (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
       const earned = newBalance - address.balance
 
       result.history.push(
@@ -166,7 +175,7 @@ const processTotalSupplyUpdatedHighres = async (
           timestamp: new Date(block.header.timestamp),
           blockNumber: block.header.height,
           txHash: log.transactionHash,
-          type: 'Yield',
+          type: HistoryType.Yield,
         }),
       )
 
@@ -210,12 +219,12 @@ const processRebaseOpt = async (
     })
     result.rebaseOptions.push(rebaseOption)
     if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
-      owner.rebasingOption = 'OptIn'
-      rebaseOption.status = 'OptIn'
+      owner.rebasingOption = RebasingOption.OptIn
+      rebaseOption.status = RebasingOption.OptIn
     }
     if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
-      owner.rebasingOption = 'OptOut'
-      rebaseOption.status = 'OptOut'
+      owner.rebasingOption = RebasingOption.OptOut
+      rebaseOption.status = RebasingOption.OptOut
     }
   }
 }

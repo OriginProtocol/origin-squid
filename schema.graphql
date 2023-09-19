@@ -1,23 +1,35 @@
+enum RebasingOption {
+  OptIn
+  OptOut
+}
+
 type Address @entity {
   id: ID! @index
   isContract: Boolean!
-  rebasingOption: String! # OptIn, OptOut
-  balance: Float!
-  earned: Float!
+  rebasingOption: RebasingOption!
+  balance: BigInt!
+  earned: BigInt!
   credits: BigInt!
   lastUpdated: DateTime!
   history: [History!]! @derivedFrom(field: "address")
 }
 
+enum HistoryType {
+  Swap
+  Sent
+  Received
+  Yield
+}
+
 type History @entity {
   id: ID!
   address: Address! @index
-  value: Float!
-  balance: Float!
+  value: BigInt!
+  balance: BigInt!
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
-  type: String! # Swap, Yield
+  type: HistoryType!
 }
 
 type Rebase @entity {
@@ -37,7 +49,7 @@ type RebaseOption @entity {
   blockNumber: Int! @index
   txHash: String! @index
   address: Address!
-  status: String!
+  status: RebasingOption!
 }
 
 type APY @entity {

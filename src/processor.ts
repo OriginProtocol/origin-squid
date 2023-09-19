@@ -1,11 +1,8 @@
 import { lookupArchive } from '@subsquid/archive-registry'
 import {
-  BlockHeader,
   DataHandlerContext,
   EvmBatchProcessor,
   EvmBatchProcessorFields,
-  Log as _Log,
-  Transaction as _Transaction,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 
@@ -83,14 +80,17 @@ export const run = ({
     new TypeormDatabase({ supportHotBlocks: true }),
     async (ctx) => {
       resetProcessorState()
-      let start = Date.now()
+      let start: number
       const time = (name: string) => () =>
         ctx.log.info(`${name} ${Date.now() - start}ms`)
+
+      start = Date.now()
       await Promise.all(
         processors.map((p, index) =>
           p.process(ctx).then(time(p.name ?? `processor-${index}`)),
         ),
       )
+
       start = Date.now()
       await Promise.all(
         postProcessors.map((p, index) =>
@@ -103,7 +103,7 @@ export const run = ({
 
 export type Fields = EvmBatchProcessorFields<typeof processor>
 export type Context = DataHandlerContext<Store, Fields>
-export type Block = BlockHeader<Fields>
-export type Log = _Log<Fields>
-export type Transaction = _Transaction<Fields>
-export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>
+export type Block = Context['blocks']['0']
+export type Log = Context['blocks']['0']['logs']['0']
+export type Transaction = Context['blocks']['0']['transactions']['0']
+export type Trace = Context['blocks']['0']['traces']['0']

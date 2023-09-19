@@ -1,5 +1,7 @@
 export * from "./address.model"
+export * from "./_rebasingOption"
 export * from "./history.model"
+export * from "./_historyType"
 export * from "./rebase.model"
 export * from "./rebaseOption.model"
 export * from "./apy.model"

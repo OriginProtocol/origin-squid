@@ -1,5 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import {Address} from "./address.model"
+import {RebasingOption} from "./_rebasingOption"
 
 @Entity_()
 export class RebaseOption {
@@ -26,6 +27,6 @@ export class RebaseOption {
     @ManyToOne_(() => Address, {nullable: true})
     address!: Address
 
-    @Column_("text", {nullable: false})
-    status!: string
+    @Column_("varchar", {length: 6, nullable: false})
+    status!: RebasingOption
 }

@@ -1,7 +1,9 @@
-import { Context } from '../../processor'
-import { Address, APY, Rebase } from '../../model'
+import dayjs from 'dayjs'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
+
 import * as oeth from '../../abi/oeth'
+import { APY, Address, Rebase, RebasingOption } from '../../model'
+import { Context } from '../../processor'
 
 /**
  * Create a new Address entity
@@ -20,11 +22,11 @@ export async function createAddress(
   // ctx.log.info(`New address ${rawAddress}`);
   return new Address({
     id: addr,
-    balance: 0,
-    earned: 0,
+    balance: 0n,
+    earned: 0n,
     credits: 0n,
     isContract,
-    rebasingOption: isContract ? 'OptOut' : 'OptIn',
+    rebasingOption: isContract ? RebasingOption.OptOut : RebasingOption.OptIn,
     lastUpdated,
   })
 }
@@ -52,25 +54,6 @@ export async function createRebaseAPY(
   // use date as id for APY
   const date = new Date(block.header.timestamp)
   const dateId = date.toISOString().substring(0, 10)
-  date.setDate(date.getDate() - 1)
-  const lastDateId = date.toISOString().substring(0, 10)
-
-  // use date as id for APY
-  date.setDate(date.getDate() - 6)
-  const last7daysDateId = {
-    key: 'apy7DayAvg' as const,
-    value: date.toISOString().substring(0, 10),
-  }
-  date.setDate(date.getDate() - 14)
-  const last14daysDateId = {
-    key: 'apy14DayAvg' as const,
-    value: date.toISOString().substring(0, 10),
-  }
-  date.setDate(date.getDate() - 16)
-  const last30daysDateId = {
-    key: 'apy30DayAvg' as const,
-    value: date.toISOString().substring(0, 10),
-  }
 
   // get last APY to compare with current one
   let lastApy =
@@ -117,9 +100,7 @@ export async function createRebaseAPY(
   apy.rebasingCreditsPerToken = rebaseEvent.rebasingCreditsPerToken
 
   // this should normally be 1 day but more secure to calculate it
-  const diffTime = Math.abs(
-    new Date(apy.id).getTime() - new Date(lastApy.id).getTime(),
-  )
+  const diffTime = Math.abs(Date.parse(apy.id) - Date.parse(lastApy.id))
   const dayDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
   apy.apr =
@@ -132,6 +113,19 @@ export async function createRebaseAPY(
   const periods_per_year = 365.25 / dayDiff
   apy.apy =
     ((1 + apy.apr / periods_per_year / 100) ** periods_per_year - 1) * 100
+
+  const last7daysDateId = {
+    key: 'apy7DayAvg' as const,
+    value: dayjs(date).subtract(7, 'days').toISOString().substring(0, 10),
+  }
+  const last14daysDateId = {
+    key: 'apy14DayAvg' as const,
+    value: dayjs(date).subtract(14, 'days').toISOString().substring(0, 10),
+  }
+  const last30daysDateId = {
+    key: 'apy30DayAvg' as const,
+    value: dayjs(date).subtract(30, 'days').toISOString().substring(0, 10),
+  }
 
   // calculate average APY for the last 7, 14 and 30 days
   await Promise.all(

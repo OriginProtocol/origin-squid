@@ -1,6 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 import {Address} from "./address.model"
+import {HistoryType} from "./_historyType"
 
 @Entity_()
 export class History {
@@ -15,11 +16,11 @@ export class History {
     @ManyToOne_(() => Address, {nullable: true})
     address!: Address
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
-    value!: number
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    value!: bigint
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
-    balance!: number
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance!: bigint
 
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
@@ -32,6 +33,6 @@ export class History {
     @Column_("text", {nullable: false})
     txHash!: string
 
-    @Column_("text", {nullable: false})
-    type!: string
+    @Column_("varchar", {length: 8, nullable: false})
+    type!: HistoryType
 }

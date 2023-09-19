@@ -7,15 +7,9 @@ import * as morphoAave from './processors/morpho-aave'
 import * as oeth from './processors/oeth'
 import * as vault from './processors/vault'
 
-// The idea is that these processors have zero dependencies on one another and can be processed asynchronously.
 run({
-  processors: [
-    // oeth,
-    vault,
-    fraxStaking,
-    morphoAave,
-    dripper,
-    curveLp,
-  ],
+  // The idea is that these processors have zero dependencies on one another and can be processed asynchronously.
+  processors: [oeth, vault, fraxStaking, morphoAave, dripper, curveLp],
+  // For processors which depend on results from other processors, post processors run after all processors have finished.
   postProcessors: [financialStatement],
 })

@@ -52,8 +52,12 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    for (const transaction of block.transactions) {
-      await processNativeTransfers(ctx, result, block, transaction)
+    const transaction = block.transactions.find(
+      (t) => t.from === OETH_CURVE_LP_ADDRESS || t.to === OETH_CURVE_LP_ADDRESS,
+    )
+    if (transaction) {
+      // We only want to do this once per block.
+      await updateETHBalance(ctx, result, block)
     }
     for (const log of block.logs) {
       await processTransfer(ctx, result, block, log)
@@ -63,28 +67,23 @@ export const process = async (ctx: Context) => {
   await ctx.store.insert(result.vaults)
 }
 
-const processNativeTransfers = async (
+const updateETHBalance = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  transaction: Context['blocks']['0']['transactions']['0'],
 ) => {
-  if (
-    transaction.from === OETH_CURVE_LP_ADDRESS ||
-    transaction.to === OETH_CURVE_LP_ADDRESS
-  ) {
-    const { vault, isNew } = await getLatestVault(ctx, result, block, {
-      skipFinancialStatementUpdate: true,
-    })
-    const eth = await getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block)
-    if (vault.eth === eth) {
-      // Nothing to do, remove the new vault record if we created one.
-      if (isNew) {
-        result.vaults.pop()
-      }
-    } else {
-      vault.eth = eth
+  const { vault, isNew } = await getLatestVault(ctx, result, block, {
+    skipFinancialStatementUpdate: true,
+  })
+  const eth = await getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block)
+  if (vault.eth === eth) {
+    // Nothing to do, remove the new vault record if we created one.
+    if (isNew) {
+      result.vaults.pop()
     }
+  } else {
+    vault.eth = eth
+    await updateFinancialStatement(ctx, block, { vault })
   }
 }
 

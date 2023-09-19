@@ -1,12 +1,12 @@
-module.exports = class Data1695154585193 {
-    name = 'Data1695154585193'
+module.exports = class Data1695162784724 {
+    name = 'Data1695162784724'
 
     async up(db) {
-        await db.query(`CREATE TABLE "history" ("id" character varying NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" text NOT NULL, "address_id" character varying, CONSTRAINT "PK_9384942edf4804b38ca0ee51416" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "history" ("id" character varying NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(8) NOT NULL, "address_id" character varying, CONSTRAINT "PK_9384942edf4804b38ca0ee51416" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_59a55adcc59ddb69c297da693e" ON "history" ("address_id") `)
         await db.query(`CREATE INDEX "IDX_7a259431108a22e8ca2f375fc7" ON "history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_1b82c15d87635d95eaa4dd42ec" ON "history" ("tx_hash") `)
-        await db.query(`CREATE TABLE "address" ("id" character varying NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" text NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "address" ("id" character varying NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(6) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_d92de1f82754668b5f5f5dd4fd5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "apy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, CONSTRAINT "PK_7826924ff9c029af7533753f6af" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1f069a908b679be0b5fbc0b2e6" ON "apy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7fb752652a983d6629a722ae7a" ON "apy" ("block_number") `)
@@ -16,7 +16,7 @@ module.exports = class Data1695154585193 {
         await db.query(`CREATE INDEX "IDX_a5955dbd9ac031314697cbd54f" ON "rebase" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_7cd793b6c4bc15b9082e0eb97a" ON "rebase" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_02d02f9022ef86e60f1a84b9dc" ON "rebase" ("apy_id") `)
-        await db.query(`CREATE TABLE "rebase_option" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "status" text NOT NULL, "address_id" character varying, CONSTRAINT "PK_426a38c91faad05465d687740ea" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "rebase_option" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "status" character varying(6) NOT NULL, "address_id" character varying, CONSTRAINT "PK_426a38c91faad05465d687740ea" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_751e6b6352737ddf4f0da0d6d8" ON "rebase_option" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_e59c9a534fcf23a97a8ac92afa" ON "rebase_option" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_6b6c08ec25dacd1a5bd6170152" ON "rebase_option" ("tx_hash") `)
