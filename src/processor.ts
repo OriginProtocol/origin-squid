@@ -32,6 +32,7 @@ export const processor = new EvmBatchProcessor()
   .setFields({
     transaction: {
       from: true,
+      to: true,
       hash: true,
       gasUsed: true,
       gas: true,
@@ -46,10 +47,10 @@ export const processor = new EvmBatchProcessor()
       data: true,
     },
     trace: {
+      callFrom: true,
       callTo: true,
       callSighash: true,
       callValue: true,
-      callFrom: true,
       callInput: true,
       createResultAddress: true,
       // action: true,

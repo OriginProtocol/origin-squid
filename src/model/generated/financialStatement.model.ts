@@ -1,6 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import {Vault} from "./vault.model"
-import {Curve} from "./curve.model"
+import {CurveLP} from "./curveLp.model"
 import {FraxStaking} from "./fraxStaking.model"
 import {MorphoAave} from "./morphoAave.model"
 import {Dripper} from "./dripper.model"
@@ -31,8 +31,8 @@ export class FinancialStatement {
     vault!: Vault
 
     @Index_()
-    @ManyToOne_(() => Curve, {nullable: true})
-    curve!: Curve
+    @ManyToOne_(() => CurveLP, {nullable: true})
+    curve!: CurveLP
 
     @Index_()
     @ManyToOne_(() => FraxStaking, {nullable: true})
