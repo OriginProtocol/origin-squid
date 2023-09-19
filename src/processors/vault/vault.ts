@@ -14,6 +14,7 @@ import {
   VAULT_ERC20_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
+import { getEthBalance } from '../../utils/getEthBalance'
 import {
   updateFinancialStatement,
   useFinancialStatements,
@@ -36,6 +37,12 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: VAULT_ERC20_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_VAULT_ADDRESS)],
+  })
+  processor.addTransaction({
+    from: [OETH_VAULT_ADDRESS],
+  })
+  processor.addTransaction({
+    to: [OETH_VAULT_ADDRESS],
   })
 }
 
@@ -62,16 +69,21 @@ const processNativeTransfers = async (
   block: Context['blocks']['0'],
   transaction: Context['blocks']['0']['transactions']['0'],
 ) => {
-  if (transaction.value > 0n) {
-    if (
-      transaction.from.toLowerCase() === OETH_CURVE_LP_ADDRESS &&
-      transaction.to?.toLowerCase() !== OETH_CURVE_LP_ADDRESS
-    ) {
-      const vault = await getLatestVault(ctx, result, block)
-      vault.eth -= transaction.value
-    } else if (transaction.to?.toLowerCase() === OETH_CURVE_LP_ADDRESS) {
-      const vault = await getLatestVault(ctx, result, block)
-      vault.eth += transaction.value
+  if (
+    transaction.from === OETH_CURVE_LP_ADDRESS ||
+    transaction.to === OETH_CURVE_LP_ADDRESS
+  ) {
+    const { vault, isNew } = await getLatestVault(ctx, result, block, {
+      skipFinancialStatementUpdate: true,
+    })
+    const eth = await getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block)
+    if (vault.eth === eth) {
+      // Nothing to do, remove the new vault record if we created one.
+      if (isNew) {
+        result.vaults.pop()
+      }
+    } else {
+      vault.eth = eth
     }
   }
 }
@@ -82,28 +94,13 @@ const processTransfer = async (
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
 ) => {
-  if (log.transaction) {
-    if (log.transaction.value > 0) {
-      if (
-        log.transaction.from === OETH_VAULT_ADDRESS &&
-        log.transaction.to !== OETH_VAULT_ADDRESS
-      ) {
-        const vault = await getLatestVault(ctx, result, block)
-        vault.eth -= log.transaction.value
-      } else if (log.transaction.to === OETH_VAULT_ADDRESS) {
-        const vault = await getLatestVault(ctx, result, block)
-        vault.eth += log.transaction.value
-      }
-    }
-  }
-
   if (log.topics[0] === erc20.events.Transfer.topic) {
     await trackAddressBalances({
       log,
       address: OETH_VAULT_ADDRESS,
       tokens: VAULT_ERC20_ADDRESSES,
-      fn: async ({ log, token, change }) => {
-        const vault = await getLatestVault(ctx, result, block)
+      fn: async ({ token, change }) => {
+        const { vault } = await getLatestVault(ctx, result, block)
         if (token === WETH_ADDRESS) {
           vault.weth += change
         } else if (token === RETH_ADDRESS) {
@@ -122,7 +119,9 @@ const getLatestVault = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
+  options?: { skipFinancialStatementUpdate: boolean },
 ) => {
+  let isNew = false
   const timestampId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatest(
     ctx,
@@ -142,8 +141,11 @@ const getLatestVault = async (
       stETH: latest?.stETH ?? 0n,
       frxETH: latest?.frxETH ?? 0n,
     })
+    isNew = true
     result.vaults.push(vault)
-    await updateFinancialStatement(ctx, block, { vault })
+    if (!options?.skipFinancialStatementUpdate) {
+      await updateFinancialStatement(ctx, block, { vault })
+    }
   }
-  return vault
+  return { vault, isNew }
 }

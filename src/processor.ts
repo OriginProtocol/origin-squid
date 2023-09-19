@@ -91,6 +91,7 @@ export const run = ({
           p.process(ctx).then(time(p.name ?? `processor-${index}`)),
         ),
       )
+      start = Date.now()
       await Promise.all(
         postProcessors.map((p, index) =>
           p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),

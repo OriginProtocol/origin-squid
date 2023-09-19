@@ -44,9 +44,7 @@ export const updateFinancialStatement = async (
       fraxStaking: true,
     },
   })
-
-  ctx.log.info({ lastFinancialStatement })
-
+  
   let financialStatement: FinancialStatement
   if (!lastFinancialStatement) {
     financialStatement = new FinancialStatement({
