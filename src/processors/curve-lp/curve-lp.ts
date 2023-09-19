@@ -10,6 +10,7 @@ import {
   OETH_CURVE_LP_ADDRESS,
   OETH_CURVE_LP_OWNER_ADDRESS,
 } from '../../utils/addresses'
+import { getEthBalance } from '../../utils/getEthBalance'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -26,18 +27,17 @@ export const setup = (processor: EvmBatchProcessor) => {
       curve_lp_token.events.RemoveLiquidity.topic,
       curve_lp_token.events.RemoveLiquidityImbalance.topic,
       curve_lp_token.events.RemoveLiquidityOne.topic,
-      curve_lp_token.events.Transfer.topic,
-      curve_lp_token.events.TokenExchange.topic,
+      // curve_lp_token.events.TokenExchange.topic, // Not sure if including this helps get up-to-date eth balances.
     ],
   })
   processor.addLog({
     address: [OETH_ADDRESS],
-    topic0: [curve_lp_token.events.Transfer.topic],
+    topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_CURVE_LP_ADDRESS)],
   })
   processor.addLog({
     address: [OETH_ADDRESS],
-    topic0: [curve_lp_token.events.Transfer.topic],
+    topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_CURVE_LP_ADDRESS)],
   })
   processor.addLog({
@@ -50,11 +50,18 @@ export const setup = (processor: EvmBatchProcessor) => {
     topic0: [curve_lp_token.events.Transfer.topic],
     topic2: [pad(OETH_CURVE_LP_OWNER_ADDRESS)],
   })
+  // Not sure if this is needed to get up-to-date ETH balances.
   // processor.addTransaction({
   //   from: [OETH_CURVE_LP_ADDRESS],
+  //   traces: false,
+  //   logs: false,
+  //   stateDiffs: false,
   // })
   // processor.addTransaction({
   //   to: [OETH_CURVE_LP_ADDRESS],
+  //   traces: false,
+  //   logs: false,
+  //   stateDiffs: false,
   // })
 }
 
@@ -64,50 +71,56 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    // for (const transaction of block.transactions) {
-    //   await processNativeTransfers(ctx, result, block, transaction)
-    // }
+    let haveUpdatedEthBalance = false
     for (const log of block.logs) {
       await processHoldingsTransfer(ctx, result, block, log)
       if (log.address === OETH_CURVE_LP_ADDRESS) {
         await processLiquidityEvents(ctx, result, block, log)
         await processCurveLPTransfer(ctx, result, block, log)
+        if (!haveUpdatedEthBalance) {
+          haveUpdatedEthBalance = true
+          await updateETHBalance(ctx, result, block, log.transactionHash)
+        }
       }
     }
+    // Not sure if this is needed to get up-to-date ETH balances.
+    // const transaction = block.transactions.find(
+    //   (transaction) =>
+    //     transaction.from === OETH_CURVE_LP_ADDRESS ||
+    //     transaction.to === OETH_CURVE_LP_ADDRESS,
+    // )
+    // if (transaction) {
+    //   await updateETHBalance(ctx, result, block, transaction.hash)
+    // }
   }
 
   await ctx.store.insert(result.curveLPs)
 }
 
-const processNativeTransfers = async (
+const updateETHBalance = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  transaction: Context['blocks']['0']['transactions']['0'],
+  transactionHash: string,
 ) => {
-  if (!transaction) return
-  if (transaction.value > 0n) {
-    if (
-      transaction.from.toLowerCase() === OETH_CURVE_LP_ADDRESS &&
-      transaction.to?.toLowerCase() !== OETH_CURVE_LP_ADDRESS
-    ) {
-      const curveLP = await getLatestCurveLP(ctx, result, block, {
-        transactionHash: transaction.hash,
-      })
-      curveLP.eth -= transaction.value
-      curveLP.ethOwned = curveLP.totalSupply
-        ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-        : 0n
-    } else if (transaction.to?.toLowerCase() === OETH_CURVE_LP_ADDRESS) {
-      const curveLP = await getLatestCurveLP(ctx, result, block, {
-        transactionHash: transaction.hash,
-      })
-      curveLP.eth += transaction.value
-      curveLP.ethOwned = curveLP.totalSupply
-        ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-        : 0n
+  const [eth, { curveLP, isNew }] = await Promise.all([
+    getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block),
+    getLatestCurveLP(ctx, result, block, transactionHash),
+  ])
+  if (curveLP.eth === eth) {
+    // No change, let's cancel what we're doing.
+    if (isNew) {
+      result.curveLPs.pop()
     }
+    return
   }
+  curveLP.eth = eth
+  curveLP.ethOwned = curveLP.totalSupply
+    ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+    : 0n
+  curveLP.oethOwned = curveLP.totalSupply
+    ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+    : 0n
 }
 
 const processHoldingsTransfer = async (
@@ -122,7 +135,12 @@ const processHoldingsTransfer = async (
       address: OETH_CURVE_LP_ADDRESS,
       tokens: [OETH_ADDRESS],
       fn: async ({ log, change }) => {
-        const curveLP = await getLatestCurveLP(ctx, result, block, log)
+        const { curveLP } = await getLatestCurveLP(
+          ctx,
+          result,
+          block,
+          log.transactionHash,
+        )
         curveLP.oeth += change
         curveLP.oethOwned = curveLP.totalSupply
           ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -139,65 +157,45 @@ const processLiquidityEvents = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.topics[0] === curve_lp_token.events.AddLiquidity.topic) {
-    const eth = await ctx._chain.client
-      .call('eth_getBalance', [OETH_CURVE_LP_ADDRESS, block.header.hash])
-      .then((r: `0x${string}`) => hexToBigInt(r))
     const { token_supply } = curve_lp_token.events.AddLiquidity.decode(log)
-    const curveLP = await getLatestCurveLP(ctx, result, block, log)
+    const { curveLP } = await getLatestCurveLP(
+      ctx,
+      result,
+      block,
+      log.transactionHash,
+    )
     curveLP.totalSupply = token_supply
-    curveLP.eth = eth
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
   } else if (
     log.topics[0] === curve_lp_token.events.RemoveLiquidityImbalance.topic
   ) {
-    const eth = await ctx._chain.client
-      .call('eth_getBalance', [OETH_CURVE_LP_ADDRESS, block.header.hash])
-      .then((r: `0x${string}`) => hexToBigInt(r))
     const { token_supply } =
       curve_lp_token.events.RemoveLiquidityImbalance.decode(log)
-    const curveLP = await getLatestCurveLP(ctx, result, block, log)
+    const { curveLP } = await getLatestCurveLP(
+      ctx,
+      result,
+      block,
+      log.transactionHash,
+    )
     curveLP.totalSupply = token_supply
-    curveLP.eth = eth
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
   } else if (log.topics[0] === curve_lp_token.events.RemoveLiquidityOne.topic) {
-    const eth = await ctx._chain.client
-      .call('eth_getBalance', [OETH_CURVE_LP_ADDRESS, block.header.hash])
-      .then((r: `0x${string}`) => hexToBigInt(r))
     const { token_supply } =
       curve_lp_token.events.RemoveLiquidityOne.decode(log)
-    const curveLP = await getLatestCurveLP(ctx, result, block, log)
+    const { curveLP } = await getLatestCurveLP(
+      ctx,
+      result,
+      block,
+      log.transactionHash,
+    )
     curveLP.totalSupply = token_supply
-    curveLP.eth = eth
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
   } else if (log.topics[0] === curve_lp_token.events.RemoveLiquidity.topic) {
-    const eth = await ctx._chain.client
-      .call('eth_getBalance', [OETH_CURVE_LP_ADDRESS, block.header.hash])
-      .then((r: `0x${string}`) => hexToBigInt(r))
     const { token_supply } = curve_lp_token.events.RemoveLiquidity.decode(log)
-    const curveLP = await getLatestCurveLP(ctx, result, block, log)
+    const { curveLP } = await getLatestCurveLP(
+      ctx,
+      result,
+      block,
+      log.transactionHash,
+    )
     curveLP.totalSupply = token_supply
-    curveLP.eth = eth
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
   }
 }
 
@@ -212,8 +210,13 @@ const processCurveLPTransfer = async (
       log,
       address: OETH_CURVE_LP_OWNER_ADDRESS,
       tokens: [OETH_CURVE_LP_ADDRESS],
-      fn: async ({ log, token, change }) => {
-        const curveLP = await getLatestCurveLP(ctx, result, block, log)
+      fn: async ({ log, change }) => {
+        const { curveLP } = await getLatestCurveLP(
+          ctx,
+          result,
+          block,
+          log.transactionHash,
+        )
         curveLP.totalSupplyOwned += change
         curveLP.ethOwned = curveLP.totalSupply
           ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -230,7 +233,7 @@ const getLatestCurveLP = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  log: { transactionHash: string },
+  transactionHash: string,
 ) => {
   const dateId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatest(
@@ -240,13 +243,14 @@ const getLatestCurveLP = async (
     dateId,
   )
 
+  let isNew = false
   let curveLP = current
   if (!curveLP) {
     curveLP = new CurveLP({
       id: dateId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
-      txHash: log.transactionHash,
+      txHash: transactionHash,
       totalSupply: latest?.totalSupply ?? 0n,
       eth: latest?.eth ?? 0n,
       oeth: latest?.oeth ?? 0n,
@@ -255,6 +259,7 @@ const getLatestCurveLP = async (
       oethOwned: latest?.oethOwned ?? 0n,
     })
     result.curveLPs.push(curveLP)
+    isNew = true
   }
-  return curveLP
+  return { curveLP, isNew }
 }
