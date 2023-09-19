@@ -18,10 +18,6 @@ export class MorphoAave {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    @Index_()
-    @Column_("text", {nullable: false})
-    txHash!: string
-
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     weth!: bigint
 }

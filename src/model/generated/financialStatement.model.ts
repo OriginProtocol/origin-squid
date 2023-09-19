@@ -23,16 +23,12 @@ export class FinancialStatement {
     blockNumber!: number
 
     @Index_()
-    @Column_("text", {nullable: false})
-    txHash!: string
-
-    @Index_()
     @ManyToOne_(() => Vault, {nullable: true})
     vault!: Vault
 
     @Index_()
     @ManyToOne_(() => CurveLP, {nullable: true})
-    curve!: CurveLP
+    curveLP!: CurveLP
 
     @Index_()
     @ManyToOne_(() => FraxStaking, {nullable: true})

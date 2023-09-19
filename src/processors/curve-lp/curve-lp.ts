@@ -11,6 +11,7 @@ import {
   OETH_CURVE_LP_OWNER_ADDRESS,
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
+import { updateFinancialStatement } from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -79,7 +80,7 @@ export const process = async (ctx: Context) => {
         await processCurveLPTransfer(ctx, result, block, log)
         if (!haveUpdatedEthBalance) {
           haveUpdatedEthBalance = true
-          await updateETHBalance(ctx, result, block, log.transactionHash)
+          await updateETHBalance(ctx, result, block)
         }
       }
     }
@@ -101,11 +102,12 @@ const updateETHBalance = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  transactionHash: string,
 ) => {
   const [eth, { curveLP, isNew }] = await Promise.all([
     getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block),
-    getLatestCurveLP(ctx, result, block, transactionHash),
+    getLatestCurveLP(ctx, result, block, {
+      skipFinancialStatementUpdate: true,
+    }),
   ])
   if (curveLP.eth === eth) {
     // No change, let's cancel what we're doing.
@@ -114,6 +116,7 @@ const updateETHBalance = async (
     }
     return
   }
+  await updateFinancialStatement(ctx, block, { curveLP })
   curveLP.eth = eth
   curveLP.ethOwned = curveLP.totalSupply
     ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -135,12 +138,7 @@ const processHoldingsTransfer = async (
       address: OETH_CURVE_LP_ADDRESS,
       tokens: [OETH_ADDRESS],
       fn: async ({ log, change }) => {
-        const { curveLP } = await getLatestCurveLP(
-          ctx,
-          result,
-          block,
-          log.transactionHash,
-        )
+        const { curveLP } = await getLatestCurveLP(ctx, result, block)
         curveLP.oeth += change
         curveLP.oethOwned = curveLP.totalSupply
           ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -158,43 +156,23 @@ const processLiquidityEvents = async (
 ) => {
   if (log.topics[0] === curve_lp_token.events.AddLiquidity.topic) {
     const { token_supply } = curve_lp_token.events.AddLiquidity.decode(log)
-    const { curveLP } = await getLatestCurveLP(
-      ctx,
-      result,
-      block,
-      log.transactionHash,
-    )
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   } else if (
     log.topics[0] === curve_lp_token.events.RemoveLiquidityImbalance.topic
   ) {
     const { token_supply } =
       curve_lp_token.events.RemoveLiquidityImbalance.decode(log)
-    const { curveLP } = await getLatestCurveLP(
-      ctx,
-      result,
-      block,
-      log.transactionHash,
-    )
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   } else if (log.topics[0] === curve_lp_token.events.RemoveLiquidityOne.topic) {
     const { token_supply } =
       curve_lp_token.events.RemoveLiquidityOne.decode(log)
-    const { curveLP } = await getLatestCurveLP(
-      ctx,
-      result,
-      block,
-      log.transactionHash,
-    )
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   } else if (log.topics[0] === curve_lp_token.events.RemoveLiquidity.topic) {
     const { token_supply } = curve_lp_token.events.RemoveLiquidity.decode(log)
-    const { curveLP } = await getLatestCurveLP(
-      ctx,
-      result,
-      block,
-      log.transactionHash,
-    )
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   }
 }
@@ -210,13 +188,8 @@ const processCurveLPTransfer = async (
       log,
       address: OETH_CURVE_LP_OWNER_ADDRESS,
       tokens: [OETH_CURVE_LP_ADDRESS],
-      fn: async ({ log, change }) => {
-        const { curveLP } = await getLatestCurveLP(
-          ctx,
-          result,
-          block,
-          log.transactionHash,
-        )
+      fn: async ({ change }) => {
+        const { curveLP } = await getLatestCurveLP(ctx, result, block)
         curveLP.totalSupplyOwned += change
         curveLP.ethOwned = curveLP.totalSupply
           ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -233,24 +206,23 @@ const getLatestCurveLP = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  transactionHash: string,
+  options?: { skipFinancialStatementUpdate: boolean },
 ) => {
-  const dateId = new Date(block.header.timestamp).toISOString()
+  const timestampId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatest(
     ctx,
     CurveLP,
     result.curveLPs,
-    dateId,
+    timestampId,
   )
 
   let isNew = false
   let curveLP = current
   if (!curveLP) {
     curveLP = new CurveLP({
-      id: dateId,
+      id: timestampId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
-      txHash: transactionHash,
       totalSupply: latest?.totalSupply ?? 0n,
       eth: latest?.eth ?? 0n,
       oeth: latest?.oeth ?? 0n,
@@ -259,6 +231,9 @@ const getLatestCurveLP = async (
       oethOwned: latest?.oethOwned ?? 0n,
     })
     result.curveLPs.push(curveLP)
+    if (!options?.skipFinancialStatementUpdate) {
+      await updateFinancialStatement(ctx, block, { curveLP })
+    }
     isNew = true
   }
   return { curveLP, isNew }

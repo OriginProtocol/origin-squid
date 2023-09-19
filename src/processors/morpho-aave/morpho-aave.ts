@@ -5,6 +5,7 @@ import * as erc20 from '../../abi/erc20'
 import { MorphoAave } from '../../model'
 import { Context } from '../../processor'
 import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
+import { updateFinancialStatement } from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -52,29 +53,27 @@ const processTransfer = async (
       address: OETH_MORPHO_AAVE_ADDRESS,
       tokens: [WETH_ADDRESS],
       fn: async ({ log, token, change }) => {
-        const dateId = new Date(block.header.timestamp).toISOString()
+        const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatest(
           ctx,
           MorphoAave,
           result.morphoAaves,
-          dateId,
+          timestampId,
         )
 
         let morphoAave = current
         if (!morphoAave) {
           morphoAave = new MorphoAave({
-            id: dateId,
+            id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
-            txHash: log.transactionHash,
             weth: latest?.weth ?? 0n,
           })
           result.morphoAaves.push(morphoAave)
+          await updateFinancialStatement(ctx, block, { morphoAave })
         }
 
-        if (token === WETH_ADDRESS) {
-          morphoAave.weth += change
-        }
+        morphoAave.weth += change
       },
     })
   }

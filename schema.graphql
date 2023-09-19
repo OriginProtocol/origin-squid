@@ -57,9 +57,8 @@ type FinancialStatement @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   vault: Vault!
-  curve: CurveLP!
+  curveLP: CurveLP!
   fraxStaking: FraxStaking!
   morphoAave: MorphoAave!
   dripper: Dripper!
@@ -70,7 +69,6 @@ type Vault @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   eth: BigInt!
   weth: BigInt!
   stETH: BigInt!
@@ -85,7 +83,6 @@ type CurveLP @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   totalSupply: BigInt!
   eth: BigInt!
   oeth: BigInt!
@@ -99,7 +96,6 @@ type FraxStaking @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   frxETH: BigInt!
 }
 
@@ -108,7 +104,6 @@ type MorphoAave @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   weth: BigInt!
 }
 
@@ -117,6 +112,5 @@ type Dripper @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
   weth: BigInt!
 }

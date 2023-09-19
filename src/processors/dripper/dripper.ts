@@ -5,6 +5,7 @@ import * as erc20 from '../../abi/erc20'
 import { Dripper } from '../../model'
 import { Context } from '../../processor'
 import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
+import { updateFinancialStatement } from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -52,29 +53,27 @@ const processTransfer = async (
       address: OETH_DRIPPER_ADDRESS,
       tokens: [WETH_ADDRESS],
       fn: async ({ log, token, change }) => {
-        const dateId = new Date(block.header.timestamp).toISOString()
+        const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatest(
           ctx,
           Dripper,
           result.drippers,
-          dateId,
+          timestampId,
         )
 
         let dripper = current
         if (!dripper) {
           dripper = new Dripper({
-            id: dateId,
+            id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
-            txHash: log.transactionHash,
             weth: latest?.weth ?? 0n,
           })
           result.drippers.push(dripper)
+          await updateFinancialStatement(ctx, block, { dripper })
         }
 
-        if (token === WETH_ADDRESS) {
-          dripper.weth += change
-        }
+        dripper.weth += change
       },
     })
   }

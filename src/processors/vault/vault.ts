@@ -14,6 +14,10 @@ import {
   VAULT_ERC20_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
+import {
+  updateFinancialStatement,
+  useFinancialStatements,
+} from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -63,14 +67,10 @@ const processNativeTransfers = async (
       transaction.from.toLowerCase() === OETH_CURVE_LP_ADDRESS &&
       transaction.to?.toLowerCase() !== OETH_CURVE_LP_ADDRESS
     ) {
-      const vault = await getLatestVault(ctx, result, block, {
-        transactionHash: transaction.hash,
-      })
+      const vault = await getLatestVault(ctx, result, block)
       vault.eth -= transaction.value
     } else if (transaction.to?.toLowerCase() === OETH_CURVE_LP_ADDRESS) {
-      const vault = await getLatestVault(ctx, result, block, {
-        transactionHash: transaction.hash,
-      })
+      const vault = await getLatestVault(ctx, result, block)
       vault.eth += transaction.value
     }
   }
@@ -88,10 +88,10 @@ const processTransfer = async (
         log.transaction.from === OETH_VAULT_ADDRESS &&
         log.transaction.to !== OETH_VAULT_ADDRESS
       ) {
-        const vault = await getLatestVault(ctx, result, block, log)
+        const vault = await getLatestVault(ctx, result, block)
         vault.eth -= log.transaction.value
       } else if (log.transaction.to === OETH_VAULT_ADDRESS) {
-        const vault = await getLatestVault(ctx, result, block, log)
+        const vault = await getLatestVault(ctx, result, block)
         vault.eth += log.transaction.value
       }
     }
@@ -103,7 +103,7 @@ const processTransfer = async (
       address: OETH_VAULT_ADDRESS,
       tokens: VAULT_ERC20_ADDRESSES,
       fn: async ({ log, token, change }) => {
-        const vault = await getLatestVault(ctx, result, block, log)
+        const vault = await getLatestVault(ctx, result, block)
         if (token === WETH_ADDRESS) {
           vault.weth += change
         } else if (token === RETH_ADDRESS) {
@@ -122,18 +122,20 @@ const getLatestVault = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  log: { transactionHash: string },
 ) => {
-  const dateId = new Date(block.header.timestamp).toISOString()
-  const { latest, current } = await getLatest(ctx, Vault, result.vaults, dateId)
-
+  const timestampId = new Date(block.header.timestamp).toISOString()
+  const { latest, current } = await getLatest(
+    ctx,
+    Vault,
+    result.vaults,
+    timestampId,
+  )
   let vault = current
   if (!vault) {
     vault = new Vault({
-      id: dateId,
+      id: timestampId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
-      txHash: log.transactionHash,
       eth: latest?.eth ?? 0n,
       weth: latest?.weth ?? 0n,
       rETH: latest?.rETH ?? 0n,
@@ -141,6 +143,7 @@ const getLatestVault = async (
       frxETH: latest?.frxETH ?? 0n,
     })
     result.vaults.push(vault)
+    await updateFinancialStatement(ctx, block, { vault })
   }
   return vault
 }

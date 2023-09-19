@@ -8,6 +8,7 @@ import {
   OETH_FRAX_STAKING_ADDRESS,
   SFRXETH_ADDRESS,
 } from '../../utils/addresses'
+import { updateFinancialStatement } from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -54,30 +55,28 @@ const processTransfer = async (
       log,
       address: OETH_FRAX_STAKING_ADDRESS,
       tokens: [SFRXETH_ADDRESS],
-      fn: async ({ log, token, change }) => {
-        const dateId = new Date(block.header.timestamp).toISOString()
+      fn: async ({ token, change }) => {
+        const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatest(
           ctx,
           FraxStaking,
           result.fraxStakings,
-          dateId,
+          timestampId,
         )
 
         let fraxStaking = current
         if (!fraxStaking) {
           fraxStaking = new FraxStaking({
-            id: dateId,
+            id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
-            txHash: log.transactionHash,
             frxETH: latest?.frxETH ?? 0n,
           })
           result.fraxStakings.push(fraxStaking)
+          await updateFinancialStatement(ctx, block, { fraxStaking })
         }
 
-        if (token === SFRXETH_ADDRESS) {
-          fraxStaking.frxETH += change
-        }
+        fraxStaking.frxETH += change
       },
     })
   }

@@ -9,6 +9,8 @@ import {
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 
+import { resetProcessorState } from './utils/state'
+
 export const processor = new EvmBatchProcessor()
   .setDataSource({
     // Change the Archive endpoints for run the squid
@@ -57,25 +59,41 @@ export const processor = new EvmBatchProcessor()
     },
   })
 
-export const run = (
-  processors: {
-    name?: string
-    from: number
-    setup: (p: typeof processor) => void
-    process: (ctx: Context) => Promise<void>
-  }[],
-) => {
-  processor.setBlockRange({ from: Math.min(...processors.map((p) => p.from)) })
-  processors.forEach((p) => p.setup(processor))
+interface Processor {
+  name?: string
+  from?: number
+  setup?: (p: typeof processor) => void
+  process: (ctx: Context) => Promise<void>
+}
+
+export const run = ({
+  processors,
+  postProcessors = [],
+}: {
+  processors: Processor[]
+  postProcessors: Processor[]
+}) => {
+  processor.setBlockRange({
+    from: Math.min(
+      ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+    ),
+  })
+  processors.forEach((p) => p.setup?.(processor))
   processor.run(
     new TypeormDatabase({ supportHotBlocks: true }),
     async (ctx) => {
+      resetProcessorState()
       let start = Date.now()
       const time = (name: string) => () =>
         ctx.log.info(`${name} ${Date.now() - start}ms`)
       await Promise.all(
         processors.map((p, index) =>
-          p.process(ctx).then(time(p.name ?? `p${index}`)),
+          p.process(ctx).then(time(p.name ?? `processor-${index}`)),
+        ),
+      )
+      await Promise.all(
+        postProcessors.map((p, index) =>
+          p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
         ),
       )
     },
