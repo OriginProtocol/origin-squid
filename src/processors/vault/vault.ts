@@ -2,10 +2,10 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
+import * as stEth from '../../abi/liquid-staked-eth-2.0'
 import { Vault } from '../../model'
 import { Context } from '../../processor'
 import {
-  ADDRESS_ZERO,
   FRXETH_ADDRESS,
   OETH_CURVE_LP_ADDRESS,
   OETH_VAULT_ADDRESS,
@@ -15,10 +15,7 @@ import {
   WETH_ADDRESS,
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
-import {
-  updateFinancialStatement,
-  useFinancialStatements,
-} from '../financial-statement'
+import { updateFinancialStatement } from '../financial-statement'
 import { getLatest, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -37,6 +34,10 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: VAULT_ERC20_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_VAULT_ADDRESS)],
+  })
+  processor.addLog({
+    address: [STETH_ADDRESS],
+    topic0: [stEth.events.TokenRebased.topic],
   })
   processor.addTransaction({
     from: [OETH_VAULT_ADDRESS],
@@ -61,6 +62,7 @@ export const process = async (ctx: Context) => {
     }
     for (const log of block.logs) {
       await processTransfer(ctx, result, block, log)
+      await processStEthRebase(ctx, result, block, log)
     }
   }
 
@@ -72,10 +74,13 @@ const updateETHBalance = async (
   result: ProcessResult,
   block: Context['blocks']['0'],
 ) => {
-  const { vault, isNew } = await getLatestVault(ctx, result, block, {
-    skipFinancialStatementUpdate: true,
-  })
-  const eth = await getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block)
+  ctx.log.info('vault: updating eth balance')
+  const [{ vault, isNew }, eth] = await Promise.all([
+    getLatestVault(ctx, result, block, {
+      skipFinancialStatementUpdate: true,
+    }),
+    getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block),
+  ])
   if (vault.eth === eth) {
     // Nothing to do, remove the new vault record if we created one.
     if (isNew) {
@@ -84,6 +89,23 @@ const updateETHBalance = async (
   } else {
     vault.eth = eth
     await updateFinancialStatement(ctx, block, { vault })
+  }
+}
+
+const processStEthRebase = async (
+  ctx: Context,
+  result: ProcessResult,
+  block: Context['blocks']['0'],
+  log: Context['blocks']['0']['logs']['0'],
+) => {
+  if (
+    log.address === STETH_ADDRESS &&
+    log.topics[0] === stEth.events.TokenRebased.topic
+  ) {
+    ctx.log.info('vault: updating stETH balance')
+    const { vault } = await getLatestVault(ctx, result, block)
+    const contract = new stEth.Contract(ctx, block.header, STETH_ADDRESS)
+    vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
   }
 }
 
