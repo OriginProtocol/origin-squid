@@ -1,8 +1,9 @@
-import { Context } from '../processor'
-import * as erc20 from '../abi/erc20'
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
 import { pad } from 'viem'
+
+import * as erc20 from '../abi/erc20'
+import { Context } from '../processor'
 
 export const trackAddressBalances = async ({
   log,
@@ -36,7 +37,7 @@ export const trackAddressBalances = async ({
   }
 }
 
-export const getLatest = async <T extends Entity>(
+export const getLatestEntity = async <T extends Entity>(
   ctx: Context,
   entity: EntityClass<T>,
   memory: T[],

@@ -9,7 +9,7 @@ import {
   SFRXETH_ADDRESS,
 } from '../../utils/addresses'
 import { updateFinancialStatement } from '../financial-statement'
-import { getLatest, trackAddressBalances } from '../utils'
+import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   fraxStakings: FraxStaking[]
@@ -57,7 +57,7 @@ const processTransfer = async (
       tokens: [SFRXETH_ADDRESS],
       fn: async ({ token, change }) => {
         const timestampId = new Date(block.header.timestamp).toISOString()
-        const { latest, current } = await getLatest(
+        const { latest, current } = await getLatestEntity(
           ctx,
           FraxStaking,
           result.fraxStakings,

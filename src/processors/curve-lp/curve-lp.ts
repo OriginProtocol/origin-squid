@@ -12,7 +12,7 @@ import {
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
 import { updateFinancialStatement } from '../financial-statement'
-import { getLatest, trackAddressBalances } from '../utils'
+import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   curveLPs: CurveLP[]
@@ -208,7 +208,7 @@ const getLatestCurveLP = async (
   options?: { skipFinancialStatementUpdate: boolean },
 ) => {
   const timestampId = new Date(block.header.timestamp).toISOString()
-  const { latest, current } = await getLatest(
+  const { latest, current } = await getLatestEntity(
     ctx,
     CurveLP,
     result.curveLPs,

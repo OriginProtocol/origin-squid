@@ -16,7 +16,7 @@ import {
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
 import { updateFinancialStatement } from '../financial-statement'
-import { getLatest, trackAddressBalances } from '../utils'
+import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   vaults: Vault[]
@@ -144,7 +144,7 @@ const getLatestVault = async (
 ) => {
   let isNew = false
   const timestampId = new Date(block.header.timestamp).toISOString()
-  const { latest, current } = await getLatest(
+  const { latest, current } = await getLatestEntity(
     ctx,
     Vault,
     result.vaults,

@@ -6,7 +6,7 @@ import { Dripper } from '../../model'
 import { Context } from '../../processor'
 import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { updateFinancialStatement } from '../financial-statement'
-import { getLatest, trackAddressBalances } from '../utils'
+import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   drippers: Dripper[]
@@ -54,7 +54,7 @@ const processTransfer = async (
       tokens: [WETH_ADDRESS],
       fn: async ({ log, token, change }) => {
         const timestampId = new Date(block.header.timestamp).toISOString()
-        const { latest, current } = await getLatest(
+        const { latest, current } = await getLatestEntity(
           ctx,
           Dripper,
           result.drippers,
