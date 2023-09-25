@@ -66,7 +66,9 @@ async function _handleStake(ctx: Context, log: Log) {
   const contract = new veogv.Contract(ctx, log.block, VEOGV_ADDRESS)
   address.ogvVotes = await contract.getVotes(user)
 
-  await ctx.store.save([address, lockup, txLog])
+  await ctx.store.save(address)
+  await ctx.store.save(lockup)
+  await ctx.store.save(txLog)
 }
 
 async function _handleUnstake(ctx: Context, log: Log) {
@@ -89,5 +91,7 @@ async function _handleUnstake(ctx: Context, log: Log) {
   const contract = new veogv.Contract(ctx, log.block, VEOGV_ADDRESS)
   address.ogvVotes = await contract.getVotes(user)
 
-  await ctx.store.save([address, lockup, txLog])
+  await ctx.store.save(address)
+  await ctx.store.save(lockup)
+  await ctx.store.save(txLog)
 }
