@@ -7,7 +7,6 @@ import { Vault } from '../../model'
 import { Context } from '../../processor'
 import {
   FRXETH_ADDRESS,
-  OETH_CURVE_LP_ADDRESS,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
   STETH_ADDRESS,
@@ -54,7 +53,7 @@ export const process = async (ctx: Context) => {
 
   for (const block of ctx.blocks) {
     const transaction = block.transactions.find(
-      (t) => t.from === OETH_CURVE_LP_ADDRESS || t.to === OETH_CURVE_LP_ADDRESS,
+      (t) => t.from === OETH_VAULT_ADDRESS || t.to === OETH_VAULT_ADDRESS,
     )
     if (transaction) {
       // We only want to do this once per block.
@@ -79,7 +78,7 @@ const updateETHBalance = async (
     getLatestVault(ctx, result, block, {
       skipFinancialStatementUpdate: true,
     }),
-    getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block),
+    getEthBalance(ctx, OETH_VAULT_ADDRESS, block),
   ])
   if (vault.eth === eth) {
     // Nothing to do, remove the new vault record if we created one.
