@@ -72,18 +72,6 @@ type APY @entity {
   rebasingCreditsPerToken: BigInt!
 }
 
-type FinancialStatement @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  oeth: OETH!
-  vault: Vault!
-  curveLP: CurveLP!
-  fraxStaking: FraxStaking!
-  morphoAave: MorphoAave!
-  dripper: Dripper!
-}
-
 # OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
 type Vault @entity {
   id: ID!

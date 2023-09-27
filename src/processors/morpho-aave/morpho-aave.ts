@@ -5,7 +5,6 @@ import * as erc20 from '../../abi/erc20'
 import { MorphoAave } from '../../model'
 import { Context } from '../../processor'
 import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -70,7 +69,6 @@ const processTransfer = async (
             weth: latest?.weth ?? 0n,
           })
           result.morphoAaves.push(morphoAave)
-          await updateFinancialStatement(ctx, block, { morphoAave })
         }
 
         morphoAave.weth += change

@@ -8,7 +8,6 @@ import {
   OETH_FRAX_STAKING_ADDRESS,
   SFRXETH_ADDRESS,
 } from '../../utils/addresses'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -73,7 +72,6 @@ const processTransfer = async (
             frxETH: latest?.frxETH ?? 0n,
           })
           result.fraxStakings.push(fraxStaking)
-          await updateFinancialStatement(ctx, block, { fraxStaking })
         }
 
         fraxStaking.frxETH += change

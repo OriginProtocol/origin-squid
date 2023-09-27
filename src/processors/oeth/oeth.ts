@@ -15,7 +15,6 @@ import {
 import { Context } from '../../processor'
 import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
 import { DECIMALS_18 } from '../../utils/constants'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity } from '../utils'
 import { createAddress, createRebaseAPY } from './utils'
 
@@ -180,7 +179,6 @@ const processTotalSupplyUpdatedHighres = async (
         totalSupply: latest?.totalSupply ?? 0n,
       })
       result.oeths.push(oethObject)
-      await updateFinancialStatement(ctx, block, { oeth: oethObject })
     }
     oethObject.totalSupply = data.totalSupply
 

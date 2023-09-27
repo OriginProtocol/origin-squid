@@ -13,8 +13,6 @@ import {
   VAULT_ERC20_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
-import { getEthBalance } from '../../utils/getEthBalance'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -103,7 +101,6 @@ const getLatestVault = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  options?: { skipFinancialStatementUpdate: boolean },
 ) => {
   let isNew = false
   const timestampId = new Date(block.header.timestamp).toISOString()
@@ -126,9 +123,6 @@ const getLatestVault = async (
     })
     isNew = true
     result.vaults.push(vault)
-    if (!options?.skipFinancialStatementUpdate) {
-      await updateFinancialStatement(ctx, block, { vault })
-    }
   }
   return { vault, isNew }
 }

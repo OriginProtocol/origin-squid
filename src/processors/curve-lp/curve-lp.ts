@@ -11,7 +11,6 @@ import {
   OETH_CURVE_LP_OWNER_ADDRESS,
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -105,9 +104,7 @@ const updateETHBalance = async (
 ) => {
   const [eth, { curveLP, isNew }] = await Promise.all([
     getEthBalance(ctx, OETH_CURVE_LP_ADDRESS, block),
-    getLatestCurveLP(ctx, result, block, {
-      skipFinancialStatementUpdate: true,
-    }),
+    getLatestCurveLP(ctx, result, block),
   ])
   if (curveLP.eth === eth) {
     // No change, let's cancel what we're doing.
@@ -116,7 +113,6 @@ const updateETHBalance = async (
     }
     return
   }
-  await updateFinancialStatement(ctx, block, { curveLP })
   curveLP.eth = eth
   curveLP.ethOwned = curveLP.totalSupply
     ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
@@ -205,7 +201,6 @@ const getLatestCurveLP = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
-  options?: { skipFinancialStatementUpdate: boolean },
 ) => {
   const timestampId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatestEntity(
@@ -230,9 +225,6 @@ const getLatestCurveLP = async (
       oethOwned: latest?.oethOwned ?? 0n,
     })
     result.curveLPs.push(curveLP)
-    if (!options?.skipFinancialStatementUpdate) {
-      await updateFinancialStatement(ctx, block, { curveLP })
-    }
     isNew = true
   }
   return { curveLP, isNew }

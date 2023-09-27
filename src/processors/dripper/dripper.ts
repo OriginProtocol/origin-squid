@@ -5,7 +5,6 @@ import * as erc20 from '../../abi/erc20'
 import { Dripper } from '../../model'
 import { Context } from '../../processor'
 import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import { updateFinancialStatement } from '../financial-statement'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
@@ -70,7 +69,6 @@ const processTransfer = async (
             weth: latest?.weth ?? 0n,
           })
           result.drippers.push(dripper)
-          await updateFinancialStatement(ctx, block, { dripper })
         }
 
         dripper.weth += change
