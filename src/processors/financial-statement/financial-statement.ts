@@ -38,6 +38,7 @@ export const updateFinancialStatement = async (
     where: { id: LessThan(timestampId) },
     order: { id: 'desc' },
     relations: {
+      oeth: true,
       vault: true,
       morphoAave: true,
       dripper: true,

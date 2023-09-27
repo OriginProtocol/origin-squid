@@ -162,6 +162,7 @@ const processTotalSupplyUpdatedHighres = async (
   if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
     await result.initialize()
     const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
+    
     // OETH Object
     const timestampId = new Date(block.header.timestamp).toISOString()
     const { latest, current } = await getLatestEntity(
