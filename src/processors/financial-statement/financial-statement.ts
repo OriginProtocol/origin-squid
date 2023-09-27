@@ -1,5 +1,7 @@
 import { LessThan, LessThanOrEqual } from 'typeorm'
 
+import AsyncLock from 'async-lock'
+
 import {
   CurveLP,
   Dripper,
@@ -11,6 +13,8 @@ import {
 } from '../../model'
 import { Context } from '../../processor'
 import { useProcessorState } from '../../utils/state'
+
+const lock = new AsyncLock();
 
 export const useFinancialStatements = () => {
   return useProcessorState<Map<string, FinancialStatement>>(
@@ -47,90 +51,95 @@ export const updateFinancialStatement = async (
     },
   })
 
-  let financialStatement: FinancialStatement
-  if (!lastFinancialStatement) {
-    financialStatement = new FinancialStatement({
-      id: timestampId,
-      timestamp,
-      blockNumber,
-      ...partial,
-    })
-    if (!financialStatement.curveLP) {
-      financialStatement.curveLP = new CurveLP({
+  lock.acquire([
+    timestampId, 
+    lastFinancialStatement?.id!
+  ].filter(x => Boolean(x)), async () => {
+    let financialStatement: FinancialStatement
+    if (!lastFinancialStatement) {
+      financialStatement = new FinancialStatement({
         id: timestampId,
         timestamp,
         blockNumber,
-        eth: 0n,
-        ethOwned: 0n,
-        oeth: 0n,
-        oethOwned: 0n,
-        totalSupply: 0n,
-        totalSupplyOwned: 0n,
+        ...partial,
       })
-      await ctx.store.insert(financialStatement.curveLP)
-    }
-    if (!financialStatement.fraxStaking) {
-      financialStatement.fraxStaking = new FraxStaking({
+      if (!financialStatement.curveLP) {
+        financialStatement.curveLP = new CurveLP({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          eth: 0n,
+          ethOwned: 0n,
+          oeth: 0n,
+          oethOwned: 0n,
+          totalSupply: 0n,
+          totalSupplyOwned: 0n,
+        })
+        await ctx.store.insert(financialStatement.curveLP)
+      }
+      if (!financialStatement.fraxStaking) {
+        financialStatement.fraxStaking = new FraxStaking({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          frxETH: 0n,
+        })
+        await ctx.store.insert(financialStatement.fraxStaking)
+      }
+      if (!financialStatement.dripper) {
+        financialStatement.dripper = new Dripper({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          weth: 0n,
+        })
+        await ctx.store.insert(financialStatement.dripper)
+      }
+      if (!financialStatement.morphoAave) {
+        financialStatement.morphoAave = new MorphoAave({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          weth: 0n,
+        })
+        await ctx.store.insert(financialStatement.morphoAave)
+      }
+      if (!financialStatement.vault) {
+        financialStatement.vault = new Vault({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          weth: 0n,
+          frxETH: 0n,
+          rETH: 0n,
+          stETH: 0n,
+        })
+        await ctx.store.insert(financialStatement.vault)
+      }
+      if (!financialStatement.oeth) {
+        financialStatement.oeth = new OETH({
+          id: timestampId,
+          timestamp,
+          blockNumber,
+          totalSupply: 0n,
+        })
+        await ctx.store.insert(financialStatement.oeth)
+      }
+    } else if (financialStatements.has(timestampId)) {
+      financialStatement = financialStatements.get(timestampId)!
+      Object.assign(financialStatement, partial)
+    } else {
+      financialStatement = new FinancialStatement({
+        ...lastFinancialStatement,
         id: timestampId,
         timestamp,
         blockNumber,
-        frxETH: 0n,
+        ...partial,
       })
-      await ctx.store.insert(financialStatement.fraxStaking)
     }
-    if (!financialStatement.dripper) {
-      financialStatement.dripper = new Dripper({
-        id: timestampId,
-        timestamp,
-        blockNumber,
-        weth: 0n,
-      })
-      await ctx.store.insert(financialStatement.dripper)
-    }
-    if (!financialStatement.morphoAave) {
-      financialStatement.morphoAave = new MorphoAave({
-        id: timestampId,
-        timestamp,
-        blockNumber,
-        weth: 0n,
-      })
-      await ctx.store.insert(financialStatement.morphoAave)
-    }
-    if (!financialStatement.vault) {
-      financialStatement.vault = new Vault({
-        id: timestampId,
-        timestamp,
-        blockNumber,
-        weth: 0n,
-        frxETH: 0n,
-        rETH: 0n,
-        stETH: 0n,
-      })
-      await ctx.store.insert(financialStatement.vault)
-    }
-    if (!financialStatement.oeth) {
-      financialStatement.oeth = new OETH({
-        id: timestampId,
-        timestamp,
-        blockNumber,
-        totalSupply: 0n,
-      })
-      await ctx.store.insert(financialStatement.oeth)
-    }
-  } else if (financialStatements.has(timestampId)) {
-    financialStatement = financialStatements.get(timestampId)!
-    Object.assign(financialStatement, partial)
-  } else {
-    financialStatement = new FinancialStatement({
-      ...lastFinancialStatement,
-      id: timestampId,
-      timestamp,
-      blockNumber,
-      ...partial,
-    })
-  }
-
-  financialStatements.set(timestampId, financialStatement)
+  
+    financialStatements.set(timestampId, financialStatement)
+  })
 }
 
 export const process = async (ctx: Context) => {
