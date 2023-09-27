@@ -5,7 +5,6 @@ import * as oeth from '../../abi/oeth'
 import {
   APY,
   Address,
-  CurveLP,
   History,
   HistoryType,
   OETH,
@@ -162,7 +161,7 @@ const processTotalSupplyUpdatedHighres = async (
   if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
     await result.initialize()
     const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
-    
+
     // OETH Object
     const timestampId = new Date(block.header.timestamp).toISOString()
     const { latest, current } = await getLatestEntity(
@@ -174,7 +173,7 @@ const processTotalSupplyUpdatedHighres = async (
 
     let oethObject = current
     if (!oethObject) {
-      oethObject = new CurveLP({
+      oethObject = new OETH({
         id: timestampId,
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
