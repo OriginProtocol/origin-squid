@@ -1,3 +1,4 @@
+export * from "./oeth.model"
 export * from "./address.model"
 export * from "./_rebasingOption"
 export * from "./history.model"

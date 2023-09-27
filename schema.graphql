@@ -1,3 +1,10 @@
+type OETH @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  totalSupply: BigInt!
+}
+
 enum RebasingOption {
   OptIn
   OptOut
@@ -69,6 +76,7 @@ type FinancialStatement @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  oeth: OETH!
   vault: Vault!
   curveLP: CurveLP!
   fraxStaking: FraxStaking!
@@ -81,7 +89,6 @@ type Vault @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  eth: BigInt!
   weth: BigInt!
   stETH: BigInt!
   rETH: BigInt!

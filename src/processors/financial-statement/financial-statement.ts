@@ -6,6 +6,7 @@ import {
   FinancialStatement,
   FraxStaking,
   MorphoAave,
+  OETH,
   Vault,
 } from '../../model'
 import { Context } from '../../processor'
@@ -24,7 +25,7 @@ export const updateFinancialStatement = async (
   partial: Partial<
     Pick<
       FinancialStatement,
-      'vault' | 'curveLP' | 'dripper' | 'fraxStaking' | 'morphoAave'
+      'oeth' | 'vault' | 'curveLP' | 'dripper' | 'fraxStaking' | 'morphoAave'
     >
   >,
 ) => {
@@ -44,7 +45,7 @@ export const updateFinancialStatement = async (
       fraxStaking: true,
     },
   })
-  
+
   let financialStatement: FinancialStatement
   if (!lastFinancialStatement) {
     financialStatement = new FinancialStatement({
@@ -99,13 +100,21 @@ export const updateFinancialStatement = async (
         id: timestampId,
         timestamp,
         blockNumber,
-        eth: 0n,
         weth: 0n,
         frxETH: 0n,
         rETH: 0n,
         stETH: 0n,
       })
       await ctx.store.insert(financialStatement.vault)
+    }
+    if (!financialStatement.oeth) {
+      financialStatement.oeth = new OETH({
+        id: timestampId,
+        timestamp,
+        blockNumber,
+        totalSupply: 0n,
+      })
+      await ctx.store.insert(financialStatement.oeth)
     }
   } else {
     financialStatement =

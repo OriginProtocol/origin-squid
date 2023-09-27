@@ -1,4 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
+import {OETH} from "./oeth.model"
 import {Vault} from "./vault.model"
 import {CurveLP} from "./curveLp.model"
 import {FraxStaking} from "./fraxStaking.model"
@@ -21,6 +22,10 @@ export class FinancialStatement {
     @Index_()
     @Column_("int4", {nullable: false})
     blockNumber!: number
+
+    @Index_()
+    @ManyToOne_(() => OETH, {nullable: true})
+    oeth!: OETH
 
     @Index_()
     @ManyToOne_(() => Vault, {nullable: true})

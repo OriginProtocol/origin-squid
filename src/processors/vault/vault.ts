@@ -38,12 +38,6 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: [STETH_ADDRESS],
     topic0: [stEth.events.TokenRebased.topic],
   })
-  processor.addTransaction({
-    from: [OETH_VAULT_ADDRESS],
-  })
-  processor.addTransaction({
-    to: [OETH_VAULT_ADDRESS],
-  })
 }
 
 export const process = async (ctx: Context) => {
@@ -52,13 +46,6 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    const transaction = block.transactions.find(
-      (t) => t.from === OETH_VAULT_ADDRESS || t.to === OETH_VAULT_ADDRESS,
-    )
-    if (transaction) {
-      // We only want to do this once per block.
-      await updateETHBalance(ctx, result, block)
-    }
     for (const log of block.logs) {
       await processTransfer(ctx, result, block, log)
       await processStEthRebase(ctx, result, block, log)
@@ -66,29 +53,6 @@ export const process = async (ctx: Context) => {
   }
 
   await ctx.store.insert(result.vaults)
-}
-
-const updateETHBalance = async (
-  ctx: Context,
-  result: ProcessResult,
-  block: Context['blocks']['0'],
-) => {
-  ctx.log.info('vault: updating eth balance')
-  const [{ vault, isNew }, eth] = await Promise.all([
-    getLatestVault(ctx, result, block, {
-      skipFinancialStatementUpdate: true,
-    }),
-    getEthBalance(ctx, OETH_VAULT_ADDRESS, block),
-  ])
-  if (vault.eth === eth) {
-    // Nothing to do, remove the new vault record if we created one.
-    if (isNew) {
-      result.vaults.pop()
-    }
-  } else {
-    vault.eth = eth
-    await updateFinancialStatement(ctx, block, { vault })
-  }
 }
 
 const processStEthRebase = async (
@@ -155,7 +119,6 @@ const getLatestVault = async (
       id: timestampId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
-      eth: latest?.eth ?? 0n,
       weth: latest?.weth ?? 0n,
       rETH: latest?.rETH ?? 0n,
       stETH: latest?.stETH ?? 0n,

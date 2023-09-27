@@ -5,8 +5,10 @@ import * as oeth from '../../abi/oeth'
 import {
   APY,
   Address,
+  CurveLP,
   History,
   HistoryType,
+  OETH,
   Rebase,
   RebaseOption,
   RebasingOption,
@@ -14,6 +16,8 @@ import {
 import { Context } from '../../processor'
 import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
 import { DECIMALS_18 } from '../../utils/constants'
+import { updateFinancialStatement } from '../financial-statement'
+import { getLatestEntity } from '../utils'
 import { createAddress, createRebaseAPY } from './utils'
 
 export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
@@ -40,6 +44,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 interface ProcessResult {
   initialized: boolean
   initialize: () => Promise<void>
+  oeths: OETH[]
   history: History[]
   rebases: Rebase[]
   rebaseOptions: RebaseOption[]
@@ -58,6 +63,7 @@ export const process = async (ctx: Context) => {
         .find(Address)
         .then((q) => new Map(q.map((i) => [i.id, i])))
     },
+    oeths: [],
     history: [],
     rebases: [],
     rebaseOptions: [],
@@ -81,6 +87,7 @@ export const process = async (ctx: Context) => {
     await ctx.store.upsert([...result.owners.values()])
   }
   await ctx.store.upsert(result.apies)
+  await ctx.store.insert(result.oeths)
   await ctx.store.insert(result.history)
   await ctx.store.insert(result.rebases)
   await ctx.store.insert(result.rebaseOptions)
@@ -155,6 +162,28 @@ const processTotalSupplyUpdatedHighres = async (
   if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
     await result.initialize()
     const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
+    // OETH Object
+    const timestampId = new Date(block.header.timestamp).toISOString()
+    const { latest, current } = await getLatestEntity(
+      ctx,
+      OETH,
+      result.oeths,
+      timestampId,
+    )
+
+    let oethObject = current
+    if (!oethObject) {
+      oethObject = new CurveLP({
+        id: timestampId,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        totalSupply: latest?.totalSupply ?? 0n,
+      })
+      result.oeths.push(oethObject)
+      await updateFinancialStatement(ctx, block, { oeth: oethObject })
+    }
+    oethObject.totalSupply = data.totalSupply
+
     // Rebase events
     let rebase = createRebaseAPY(ctx, result.apies, block, log, data)
     for (const address of result.owners.values()) {

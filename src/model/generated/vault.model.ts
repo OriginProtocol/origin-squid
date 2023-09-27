@@ -19,9 +19,6 @@ export class Vault {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    eth!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     weth!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
