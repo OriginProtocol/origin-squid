@@ -117,16 +117,17 @@ export const updateFinancialStatement = async (
       })
       await ctx.store.insert(financialStatement.oeth)
     }
+  } else if (financialStatements.has(timestampId)) {
+    financialStatement = financialStatements.get(timestampId)!
+    Object.assign(financialStatement, partial)
   } else {
-    financialStatement =
-      financialStatements.get(timestampId) ??
-      new FinancialStatement({
-        ...lastFinancialStatement,
-        id: timestampId,
-        timestamp,
-        blockNumber,
-        ...partial,
-      })
+    financialStatement = new FinancialStatement({
+      ...lastFinancialStatement,
+      id: timestampId,
+      timestamp,
+      blockNumber,
+      ...partial,
+    })
   }
 
   financialStatements.set(timestampId, financialStatement)
