@@ -1,11 +1,11 @@
-manifestVersion: subsquid.io/v0.5
+manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 5
+version: 6
 description: 'The very first evm squid from manifest  '
-build: 
+build:
 deploy:
   addons:
-    postgres: 
+    postgres:
   secrets:
     - RPC_ENDPOINT
   processor:

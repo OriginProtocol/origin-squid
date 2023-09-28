@@ -1,5 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
+import {RebasingOption} from "./_rebasingOption"
 import {History} from "./history.model"
 
 @Entity_()
@@ -14,14 +15,14 @@ export class Address {
     @Column_("bool", {nullable: false})
     isContract!: boolean
 
-    @Column_("text", {nullable: false})
-    rebasingOption!: string
+    @Column_("varchar", {length: 6, nullable: false})
+    rebasingOption!: RebasingOption
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
-    balance!: number
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance!: bigint
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
-    earned!: number
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    earned!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     credits!: bigint

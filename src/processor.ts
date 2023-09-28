@@ -1,18 +1,12 @@
-import { lookupArchive } from '@subsquid/archive-registry';
+import { lookupArchive } from '@subsquid/archive-registry'
 import {
-  BlockHeader,
   DataHandlerContext,
   EvmBatchProcessor,
   EvmBatchProcessorFields,
-  Log as _Log,
-  Transaction as _Transaction,
-} from '@subsquid/evm-processor';
-import { Store } from '@subsquid/typeorm-store';
+} from '@subsquid/evm-processor'
+import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 
-import * as oeth from './abi/oeth';
-
-export const OETH_ADDRESS =
-  '0x856c4Efb76C1D1AE02e20CEB03A2A6a08b0b8dC3'.toLowerCase();
+import { resetProcessorState } from './utils/state'
 
 export const processor = new EvmBatchProcessor()
   .setDataSource({
@@ -37,32 +31,79 @@ export const processor = new EvmBatchProcessor()
   .setFields({
     transaction: {
       from: true,
+      to: true,
       hash: true,
       gasUsed: true,
       gas: true,
       value: true,
+      sighash: true,
+      input: true,
+      status: true,
     },
     log: {
       transactionHash: true,
       topics: true,
       data: true,
     },
+    trace: {
+      callFrom: true,
+      callTo: true,
+      callSighash: true,
+      callValue: true,
+      callInput: true,
+      createResultAddress: true,
+      // action: true,
+    },
   })
-  .setBlockRange({
-    from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
-  })
-  .addLog({
-    address: [OETH_ADDRESS],
-    topic0: [
-      oeth.events.Transfer.topic,
-      oeth.events.TotalSupplyUpdatedHighres.topic,
-    ],
-    transaction: true,
-  });
 
-export type Fields = EvmBatchProcessorFields<typeof processor>;
-export type Context = DataHandlerContext<Store, Fields>;
-export type Block = BlockHeader<Fields>;
-export type Log = _Log<Fields>;
-export type Transaction = _Transaction<Fields>;
-export type ProcessorContext<Store> = DataHandlerContext<Store, Fields>;
+interface Processor {
+  name?: string
+  from?: number
+  setup?: (p: typeof processor) => void
+  process: (ctx: Context) => Promise<void>
+}
+
+export const run = ({
+  processors,
+  postProcessors = [],
+}: {
+  processors: Processor[]
+  postProcessors: Processor[]
+}) => {
+  processor.setBlockRange({
+    from: Math.min(
+      ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+    ),
+  })
+  processors.forEach((p) => p.setup?.(processor))
+  processor.run(
+    new TypeormDatabase({ supportHotBlocks: true }),
+    async (ctx) => {
+      resetProcessorState()
+      let start: number
+      const time = (name: string) => () =>
+        ctx.log.info(`${name} ${Date.now() - start}ms`)
+
+      start = Date.now()
+      await Promise.all(
+        processors.map((p, index) =>
+          p.process(ctx).then(time(p.name ?? `processor-${index}`)),
+        ),
+      )
+
+      start = Date.now()
+      await Promise.all(
+        postProcessors.map((p, index) =>
+          p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
+        ),
+      )
+    },
+  )
+}
+
+export type Fields = EvmBatchProcessorFields<typeof processor>
+export type Context = DataHandlerContext<Store, Fields>
+export type Block = Context['blocks']['0']
+export type Log = Context['blocks']['0']['logs']['0']
+export type Transaction = Context['blocks']['0']['transactions']['0']
+export type Trace = Context['blocks']['0']['traces']['0']
