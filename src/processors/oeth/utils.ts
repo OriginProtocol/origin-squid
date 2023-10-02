@@ -40,6 +40,10 @@ export async function createRebaseAPY(
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
   rebaseEvent: ReturnType<typeof oeth.events.TotalSupplyUpdatedHighres.decode>,
+  lastYieldDistributionEvent: {
+    fee: bigint
+    yield: bigint
+  },
 ): Promise<Rebase> {
   const rebase = new Rebase({
     id: log.id,
@@ -49,6 +53,8 @@ export async function createRebaseAPY(
     rebasingCredits: rebaseEvent.rebasingCredits,
     rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     totalSupply: rebaseEvent.totalSupply,
+    fee: lastYieldDistributionEvent.fee,
+    yield: lastYieldDistributionEvent.yield,
   })
 
   // use date as id for APY

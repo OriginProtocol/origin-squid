@@ -48,6 +48,8 @@ type Rebase @entity {
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
   apy: APY!
+  fee: BigInt!
+  yield: BigInt!
 }
 
 type RebaseOption @entity {

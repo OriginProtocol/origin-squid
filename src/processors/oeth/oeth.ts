@@ -2,6 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { v4 as uuidv4 } from 'uuid'
 
 import * as oeth from '../../abi/oeth'
+import * as oethVault from '../../abi/oeth-vault'
 import {
   APY,
   Address,
@@ -13,7 +14,11 @@ import {
   RebasingOption,
 } from '../../model'
 import { Context } from '../../processor'
-import { ADDRESS_ZERO, OETH_ADDRESS } from '../../utils/addresses'
+import {
+  ADDRESS_ZERO,
+  OETH_ADDRESS,
+  OETH_VAULT_ADDRESS,
+} from '../../utils/addresses'
 import { DECIMALS_18 } from '../../utils/constants'
 import { getLatestEntity } from '../utils'
 import { createAddress, createRebaseAPY } from './utils'
@@ -37,6 +42,10 @@ export const setup = (processor: EvmBatchProcessor) => {
     ],
     transaction: true,
   })
+  processor.addLog({
+    address: [OETH_VAULT_ADDRESS],
+    topic0: [oethVault.events.YieldDistribution.topic],
+  })
 }
 
 interface ProcessResult {
@@ -48,6 +57,10 @@ interface ProcessResult {
   rebaseOptions: RebaseOption[]
   apies: APY[]
   owners: Map<string, Address>
+  lastYieldDistributionEvent?: {
+    fee: bigint
+    yield: bigint
+  }
 }
 
 export const process = async (ctx: Context) => {
@@ -77,6 +90,7 @@ export const process = async (ctx: Context) => {
     }
     for (const log of block.logs) {
       await processTransfer(ctx, result, block, log)
+      await processYieldDistribution(ctx, result, block, log)
       await processTotalSupplyUpdatedHighres(ctx, result, block, log)
     }
   }
@@ -163,61 +177,86 @@ const processTotalSupplyUpdatedHighres = async (
   log: Context['blocks']['0']['logs']['0'],
 ) => {
   if (log.address !== OETH_ADDRESS) return
-  if (log.topics[0] === oeth.events.TotalSupplyUpdatedHighres.topic) {
-    await result.initialize()
-    const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
+  if (log.topics[0] !== oeth.events.TotalSupplyUpdatedHighres.topic) return
 
-    // OETH Object
-    const timestampId = new Date(block.header.timestamp).toISOString()
-    const { latest, current } = await getLatestEntity(
-      ctx,
-      OETH,
-      result.oeths,
-      timestampId,
-    )
+  await result.initialize()
+  const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
 
-    let oethObject = current
-    if (!oethObject) {
-      oethObject = new OETH({
-        id: timestampId,
+  // OETH Object
+  const timestampId = new Date(block.header.timestamp).toISOString()
+  const { latest, current } = await getLatestEntity(
+    ctx,
+    OETH,
+    result.oeths,
+    timestampId,
+  )
+
+  let oethObject = current
+  if (!oethObject) {
+    oethObject = new OETH({
+      id: timestampId,
+      timestamp: new Date(block.header.timestamp),
+      blockNumber: block.header.height,
+      totalSupply: latest?.totalSupply ?? 0n,
+    })
+    result.oeths.push(oethObject)
+  }
+  oethObject.totalSupply = data.totalSupply
+
+  if (!result.lastYieldDistributionEvent) {
+    throw new Error('lastYieldDistributionEvent is not set')
+  }
+
+  // Rebase events
+  let rebase = createRebaseAPY(
+    ctx,
+    result.apies,
+    block,
+    log,
+    data,
+    result.lastYieldDistributionEvent,
+  )
+  for (const address of result.owners.values()) {
+    if (address.rebasingOption === RebasingOption.OptOut) {
+      continue
+    }
+    const newBalance =
+      (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
+    const earned = newBalance - address.balance
+
+    result.history.push(
+      new History({
+        id: uuidv4(),
+        // we can't use {t.id} because it's not unique
+        address: address,
+        value: earned,
+        balance: newBalance,
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
-        totalSupply: latest?.totalSupply ?? 0n,
-      })
-      result.oeths.push(oethObject)
-    }
-    oethObject.totalSupply = data.totalSupply
+        txHash: log.transactionHash,
+        type: HistoryType.Yield,
+      }),
+    )
 
-    // Rebase events
-    let rebase = createRebaseAPY(ctx, result.apies, block, log, data)
-    for (const address of result.owners.values()) {
-      if (address.rebasingOption === RebasingOption.OptOut) {
-        continue
-      }
-      const newBalance =
-        (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
-      const earned = newBalance - address.balance
-
-      result.history.push(
-        new History({
-          id: uuidv4(),
-          // we can't use {t.id} because it's not unique
-          address: address,
-          value: earned,
-          balance: newBalance,
-          timestamp: new Date(block.header.timestamp),
-          blockNumber: block.header.height,
-          txHash: log.transactionHash,
-          type: HistoryType.Yield,
-        }),
-      )
-
-      address.balance = newBalance
-      address.earned += earned
-    }
-    const entity = await rebase
-    result.rebases.push(entity)
+    address.balance = newBalance
+    address.earned += earned
   }
+  const entity = await rebase
+  result.rebases.push(entity)
+}
+
+const processYieldDistribution = async (
+  ctx: Context,
+  result: ProcessResult,
+  block: Context['blocks']['0'],
+  log: Context['blocks']['0']['logs']['0'],
+) => {
+  if (log.address !== OETH_VAULT_ADDRESS) return
+  if (log.topics[0] !== oethVault.events.YieldDistribution.topic) return
+
+  await result.initialize()
+  const { _yield, _fee } = oethVault.events.YieldDistribution.decode(log)
+  result.lastYieldDistributionEvent = { yield: _yield, fee: _fee }
 }
 
 const processRebaseOpt = async (

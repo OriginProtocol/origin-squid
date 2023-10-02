@@ -35,4 +35,10 @@ export class Rebase {
     @Index_()
     @ManyToOne_(() => APY, {nullable: true})
     apy!: APY
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    fee!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yield!: bigint
 }
