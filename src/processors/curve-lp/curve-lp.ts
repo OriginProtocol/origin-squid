@@ -1,14 +1,16 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
+import * as baseRewardPool from '../../abi/base-reward-pool'
 import * as curveLpToken from '../../abi/curve-lp-token'
 import * as erc20 from '../../abi/erc20'
 import { CurveLP } from '../../model'
 import { Context } from '../../processor'
 import {
   OETH_ADDRESS,
+  OETH_CONVEX_ADDRESS,
   OETH_CURVE_LP_ADDRESS,
-  OETH_CURVE_LP_OWNER_ADDRESS,
+  OETH_CURVE_REWARD_LP_ADDRESS,
 } from '../../utils/addresses'
 import { getEthBalance } from '../../utils/getEthBalance'
 import { getLatestEntity, trackAddressBalances } from '../utils'
@@ -17,7 +19,10 @@ interface ProcessResult {
   curveLPs: CurveLP[]
 }
 
-export const from = 17130232 // https://etherscan.io/tx/0xbf9dca462a157215e744ba7f2c17f036ad4d5c708f0e9e49ec53e4069e87771f
+export const from = Math.min(
+  17130232, // https://etherscan.io/tx/0xbf9dca462a157215e744ba7f2c17f036ad4d5c708f0e9e49ec53e4069e87771f
+  17221745, // https://etherscan.io/tx/0xb969af9b4757baaddc1fa93186df25ef2016d52e83a915816e14d44671eb7a02
+)
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
@@ -41,14 +46,12 @@ export const setup = (processor: EvmBatchProcessor) => {
     topic2: [pad(OETH_CURVE_LP_ADDRESS)],
   })
   processor.addLog({
-    address: [OETH_CURVE_LP_ADDRESS],
-    topic0: [curveLpToken.events.Transfer.topic],
-    topic1: [pad(OETH_CURVE_LP_OWNER_ADDRESS)],
-  })
-  processor.addLog({
-    address: [OETH_CURVE_LP_ADDRESS],
-    topic0: [curveLpToken.events.Transfer.topic],
-    topic2: [pad(OETH_CURVE_LP_OWNER_ADDRESS)],
+    address: [OETH_CURVE_REWARD_LP_ADDRESS],
+    topic0: [
+      baseRewardPool.events.Staked.topic,
+      baseRewardPool.events.Withdrawn.topic,
+    ],
+    topic1: [pad(OETH_CONVEX_ADDRESS)],
   })
   // Not sure if this is needed to get up-to-date ETH balances.
   // processor.addTransaction({
@@ -76,11 +79,13 @@ export const process = async (ctx: Context) => {
       await processHoldingsTransfer(ctx, result, block, log)
       if (log.address === OETH_CURVE_LP_ADDRESS) {
         await processLiquidityEvents(ctx, result, block, log)
-        await processCurveLPTransfer(ctx, result, block, log)
         if (!haveUpdatedEthBalance) {
           haveUpdatedEthBalance = true
           await updateETHBalance(ctx, result, block)
         }
+      }
+      if (log.address === OETH_CURVE_REWARD_LP_ADDRESS) {
+        await processCurveRewardEvents(ctx, result, block, log)
       }
     }
     // Not sure if this is needed to get up-to-date ETH balances.
@@ -172,28 +177,33 @@ const processLiquidityEvents = async (
   }
 }
 
-const processCurveLPTransfer = async (
+const processCurveRewardEvents = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
 ) => {
-  if (log.topics[0] === curveLpToken.events.Transfer.topic) {
-    await trackAddressBalances({
-      log,
-      address: OETH_CURVE_LP_OWNER_ADDRESS,
-      tokens: [OETH_CURVE_LP_ADDRESS],
-      fn: async ({ change }) => {
-        const { curveLP } = await getLatestCurveLP(ctx, result, block)
-        curveLP.totalSupplyOwned += change
-        curveLP.ethOwned = curveLP.totalSupply
-          ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-          : 0n
-        curveLP.oethOwned = curveLP.totalSupply
-          ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-          : 0n
-      },
-    })
+  if (log.topics[1] !== pad(OETH_CONVEX_ADDRESS)) return
+  if (log.topics[0] === baseRewardPool.events.Staked.topic) {
+    const { amount } = baseRewardPool.events.Staked.decode(log)
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
+    curveLP.totalSupplyOwned += amount
+    curveLP.ethOwned = curveLP.totalSupply
+      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+      : 0n
+    curveLP.oethOwned = curveLP.totalSupply
+      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+      : 0n
+  } else if (log.topics[0] === baseRewardPool.events.Withdrawn.topic) {
+    const { amount } = baseRewardPool.events.Withdrawn.decode(log)
+    const { curveLP } = await getLatestCurveLP(ctx, result, block)
+    curveLP.totalSupplyOwned -= amount
+    curveLP.ethOwned = curveLP.totalSupply
+      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+      : 0n
+    curveLP.oethOwned = curveLP.totalSupply
+      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
+      : 0n
   }
 }
 
