@@ -121,6 +121,15 @@ const processTransfer = async (
       value: dataRaw.value,
     }
 
+    if (data.from === ADDRESS_ZERO) {
+      const oethObject = await getLatestOETHObject(ctx, result, block)
+      oethObject.totalSupply += data.value
+    }
+    if (data.to === ADDRESS_ZERO) {
+      const oethObject = await getLatestOETHObject(ctx, result, block)
+      oethObject.totalSupply -= data.value
+    }
+
     // Bind the token contract to the block number
     const token = new oeth.Contract(ctx, block.header, OETH_ADDRESS)
     // Transfer events
@@ -183,24 +192,7 @@ const processTotalSupplyUpdatedHighres = async (
   const data = oeth.events.TotalSupplyUpdatedHighres.decode(log)
 
   // OETH Object
-  const timestampId = new Date(block.header.timestamp).toISOString()
-  const { latest, current } = await getLatestEntity(
-    ctx,
-    OETH,
-    result.oeths,
-    timestampId,
-  )
-
-  let oethObject = current
-  if (!oethObject) {
-    oethObject = new OETH({
-      id: timestampId,
-      timestamp: new Date(block.header.timestamp),
-      blockNumber: block.header.height,
-      totalSupply: latest?.totalSupply ?? 0n,
-    })
-    result.oeths.push(oethObject)
-  }
+  const oethObject = await getLatestOETHObject(ctx, result, block)
   oethObject.totalSupply = data.totalSupply
 
   if (!result.lastYieldDistributionEvent) {
@@ -299,4 +291,31 @@ const processRebaseOpt = async (
       rebaseOption.status = RebasingOption.OptOut
     }
   }
+}
+
+const getLatestOETHObject = async (
+  ctx: Context,
+  result: ProcessResult,
+  block: Context['blocks']['0'],
+) => {
+  const timestampId = new Date(block.header.timestamp).toISOString()
+  const { latest, current } = await getLatestEntity(
+    ctx,
+    OETH,
+    result.oeths,
+    timestampId,
+  )
+
+  let oethObject = current
+  if (!oethObject) {
+    oethObject = new OETH({
+      id: timestampId,
+      timestamp: new Date(block.header.timestamp),
+      blockNumber: block.header.height,
+      totalSupply: latest?.totalSupply ?? 0n,
+    })
+    result.oeths.push(oethObject)
+  }
+
+  return oethObject
 }
