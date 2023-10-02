@@ -1,6 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
+/**
+ * The OETH entity tracks the change in total supply of OETH over time.
+ */
 @Entity_()
 export class OETH {
     constructor(props?: Partial<OETH>) {
@@ -18,6 +21,9 @@ export class OETH {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
+    /**
+     * The total supply of OETH tokens at the corresponding block.
+     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     totalSupply!: bigint
 }
