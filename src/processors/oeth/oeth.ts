@@ -114,7 +114,13 @@ const processTransfer = async (
   if (log.address !== OETH_ADDRESS) return
   if (log.topics[0] === oeth.events.Transfer.topic) {
     await result.initialize()
-    const data = oeth.events.Transfer.decode(log)
+    const dataRaw = oeth.events.Transfer.decode(log)
+    const data = {
+      from: dataRaw.from.toLowerCase(),
+      to: dataRaw.to.toLowerCase(),
+      value: dataRaw.value,
+    }
+
     // Bind the token contract to the block number
     const token = new oeth.Contract(ctx, block.header, OETH_ADDRESS)
     // Transfer events
@@ -268,7 +274,7 @@ const processRebaseOpt = async (
     await result.initialize()
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
-    const address = trace.transaction!.from
+    const address = trace.transaction!.from.toLowerCase()
     let owner = result.owners.get(address)
     if (!owner) {
       owner = await createAddress(ctx, address, timestamp)
