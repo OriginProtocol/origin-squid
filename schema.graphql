@@ -3,6 +3,8 @@ type OETH @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   totalSupply: BigInt!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
 }
 
 enum RebasingOption {

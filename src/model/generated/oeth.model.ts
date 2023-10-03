@@ -20,4 +20,10 @@ export class OETH {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     totalSupply!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    rebasingSupply!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    nonRebasingSupply!: bigint
 }

@@ -121,12 +121,10 @@ const processTransfer = async (
       value: dataRaw.value,
     }
 
+    const oethObject = await getLatestOETHObject(ctx, result, block)
     if (data.from === ADDRESS_ZERO) {
-      const oethObject = await getLatestOETHObject(ctx, result, block)
       oethObject.totalSupply += data.value
-    }
-    if (data.to === ADDRESS_ZERO) {
-      const oethObject = await getLatestOETHObject(ctx, result, block)
+    } else if (data.to === ADDRESS_ZERO) {
       oethObject.totalSupply -= data.value
     }
 
@@ -155,12 +153,13 @@ const processTransfer = async (
       [addressSub, addressAdd].map(async (address) => {
         const credits = await token.creditsBalanceOfHighres(address.id)
         const newBalance = (credits[0] * DECIMALS_18) / credits[1]
+        const change = newBalance - address.balance
         result.history.push(
           new History({
             // we can't use {t.id} because it's not unique
             id: uuidv4(),
             address: address,
-            value: newBalance - address.balance,
+            value: change,
             balance: newBalance,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
@@ -176,6 +175,36 @@ const processTransfer = async (
         address.balance = newBalance // token balance
       }),
     )
+
+    if (
+      addressAdd.rebasingOption === RebasingOption.OptOut &&
+      addressSub.id === ADDRESS_ZERO
+    ) {
+      oethObject.nonRebasingSupply += data.value
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
+    } else if (
+      addressAdd.id === ADDRESS_ZERO &&
+      addressSub.rebasingOption === RebasingOption.OptOut
+    ) {
+      oethObject.nonRebasingSupply -= data.value
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
+    } else if (
+      addressAdd.rebasingOption === RebasingOption.OptOut &&
+      addressSub.rebasingOption === RebasingOption.OptIn
+    ) {
+      oethObject.nonRebasingSupply += data.value
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
+    } else if (
+      addressAdd.rebasingOption === RebasingOption.OptIn &&
+      addressSub.rebasingOption === RebasingOption.OptOut
+    ) {
+      oethObject.nonRebasingSupply -= data.value
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
+    }
   }
 }
 
@@ -231,6 +260,7 @@ const processTotalSupplyUpdatedHighres = async (
     )
 
     address.balance = newBalance
+    oethObject.rebasingSupply += earned
     address.earned += earned
   }
   const entity = await rebase
@@ -267,6 +297,7 @@ const processRebaseOpt = async (
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
     const address = trace.transaction!.from.toLowerCase()
+    const oethObject = await getLatestOETHObject(ctx, result, block)
     let owner = result.owners.get(address)
     if (!owner) {
       owner = await createAddress(ctx, address, timestamp)
@@ -285,10 +316,16 @@ const processRebaseOpt = async (
     if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
       owner.rebasingOption = RebasingOption.OptIn
       rebaseOption.status = RebasingOption.OptIn
+      oethObject.nonRebasingSupply -= owner.balance
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
     }
     if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
       owner.rebasingOption = RebasingOption.OptOut
       rebaseOption.status = RebasingOption.OptOut
+      oethObject.nonRebasingSupply += owner.balance
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
     }
   }
 }
@@ -313,6 +350,8 @@ const getLatestOETHObject = async (
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
       totalSupply: latest?.totalSupply ?? 0n,
+      rebasingSupply: latest?.rebasingSupply ?? 0n,
+      nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
     })
     result.oeths.push(oethObject)
   }
