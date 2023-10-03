@@ -180,31 +180,36 @@ const processTransfer = async (
       addressAdd.rebasingOption === RebasingOption.OptOut &&
       addressSub.id === ADDRESS_ZERO
     ) {
+      // If it's a mint and minter has opted out of rebasing, 
+      // add to non-rebasing supply
       oethObject.nonRebasingSupply += data.value
-      oethObject.rebasingSupply =
-        oethObject.totalSupply - oethObject.nonRebasingSupply
     } else if (
       addressAdd.id === ADDRESS_ZERO &&
       addressSub.rebasingOption === RebasingOption.OptOut
     ) {
+      // If it's a redeem and redeemer has opted out of rebasing, 
+      // subtract non-rebasing supply
       oethObject.nonRebasingSupply -= data.value
-      oethObject.rebasingSupply =
-        oethObject.totalSupply - oethObject.nonRebasingSupply
     } else if (
       addressAdd.rebasingOption === RebasingOption.OptOut &&
       addressSub.rebasingOption === RebasingOption.OptIn
     ) {
+      // If receiver has opted out but sender hasn't,
+      // Add to non-rebasing supply
       oethObject.nonRebasingSupply += data.value
-      oethObject.rebasingSupply =
-        oethObject.totalSupply - oethObject.nonRebasingSupply
     } else if (
       addressAdd.rebasingOption === RebasingOption.OptIn &&
       addressSub.rebasingOption === RebasingOption.OptOut
     ) {
+      // If sender has opted out but receiver hasn't,
+      // Subtract non-rebasing supply
       oethObject.nonRebasingSupply -= data.value
-      oethObject.rebasingSupply =
-        oethObject.totalSupply - oethObject.nonRebasingSupply
     }
+
+    // Update rebasing supply in all cases
+    oethObject.rebasingSupply =
+      oethObject.totalSupply - oethObject.nonRebasingSupply
+
   }
 }
 
