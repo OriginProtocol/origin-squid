@@ -27,7 +27,7 @@ export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addTrace({
-    type: ['call', 'delegatecall'],
+    type: ['call'],
     callSighash: [
       oeth.functions.rebaseOptOut.sighash,
       oeth.functions.rebaseOptIn.sighash,
@@ -178,16 +178,16 @@ const processTransfer = async (
 
     if (
       addressAdd.rebasingOption === RebasingOption.OptOut &&
-      addressSub.id === ADDRESS_ZERO
+      data.from === ADDRESS_ZERO
     ) {
-      // If it's a mint and minter has opted out of rebasing, 
+      // If it's a mint and minter has opted out of rebasing,
       // add to non-rebasing supply
       oethObject.nonRebasingSupply += data.value
     } else if (
-      addressAdd.id === ADDRESS_ZERO &&
+      data.to === ADDRESS_ZERO &&
       addressSub.rebasingOption === RebasingOption.OptOut
     ) {
-      // If it's a redeem and redeemer has opted out of rebasing, 
+      // If it's a redeem and redeemer has opted out of rebasing,
       // subtract non-rebasing supply
       oethObject.nonRebasingSupply -= data.value
     } else if (
@@ -209,7 +209,6 @@ const processTransfer = async (
     // Update rebasing supply in all cases
     oethObject.rebasingSupply =
       oethObject.totalSupply - oethObject.nonRebasingSupply
-
   }
 }
 
@@ -228,6 +227,8 @@ const processTotalSupplyUpdatedHighres = async (
   // OETH Object
   const oethObject = await getLatestOETHObject(ctx, result, block)
   oethObject.totalSupply = data.totalSupply
+  oethObject.rebasingSupply =
+    oethObject.totalSupply - oethObject.nonRebasingSupply
 
   if (!result.lastYieldDistributionEvent) {
     throw new Error('lastYieldDistributionEvent is not set')
@@ -265,7 +266,6 @@ const processTotalSupplyUpdatedHighres = async (
     )
 
     address.balance = newBalance
-    oethObject.rebasingSupply += earned
     address.earned += earned
   }
   const entity = await rebase
@@ -301,7 +301,7 @@ const processRebaseOpt = async (
     await result.initialize()
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
-    const address = trace.transaction!.from.toLowerCase()
+    const address = trace.action.from.toLowerCase()
     const oethObject = await getLatestOETHObject(ctx, result, block)
     let owner = result.owners.get(address)
     if (!owner) {
