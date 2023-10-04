@@ -2,8 +2,8 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as baseRewardPool from '../../abi/base-reward-pool'
-import * as curveLpToken from '../../abi/curve-lp-token'
 import * as erc20 from '../../abi/erc20'
+import * as vyperContract from '../../abi/vyper-contract'
 import { CurveLP } from '../../model'
 import { Context } from '../../processor'
 import {
@@ -28,10 +28,10 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
     address: [OETH_CURVE_LP_ADDRESS],
     topic0: [
-      curveLpToken.events.AddLiquidity.topic,
-      curveLpToken.events.RemoveLiquidity.topic,
-      curveLpToken.events.RemoveLiquidityImbalance.topic,
-      curveLpToken.events.RemoveLiquidityOne.topic,
+      vyperContract.events.AddLiquidity.topic,
+      vyperContract.events.RemoveLiquidity.topic,
+      vyperContract.events.RemoveLiquidityImbalance.topic,
+      vyperContract.events.RemoveLiquidityOne.topic,
       // curve_lp_token.events.TokenExchange.topic, // Not sure if including this helps get up-to-date eth balances.
     ],
   })
@@ -155,23 +155,23 @@ const processLiquidityEvents = async (
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
 ) => {
-  if (log.topics[0] === curveLpToken.events.AddLiquidity.topic) {
-    const { token_supply } = curveLpToken.events.AddLiquidity.decode(log)
+  if (log.topics[0] === vyperContract.events.AddLiquidity.topic) {
+    const { token_supply } = vyperContract.events.AddLiquidity.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   } else if (
-    log.topics[0] === curveLpToken.events.RemoveLiquidityImbalance.topic
+    log.topics[0] === vyperContract.events.RemoveLiquidityImbalance.topic
   ) {
     const { token_supply } =
-      curveLpToken.events.RemoveLiquidityImbalance.decode(log)
+      vyperContract.events.RemoveLiquidityImbalance.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
-  } else if (log.topics[0] === curveLpToken.events.RemoveLiquidityOne.topic) {
-    const { token_supply } = curveLpToken.events.RemoveLiquidityOne.decode(log)
+  } else if (log.topics[0] === vyperContract.events.RemoveLiquidityOne.topic) {
+    const { token_supply } = vyperContract.events.RemoveLiquidityOne.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
-  } else if (log.topics[0] === curveLpToken.events.RemoveLiquidity.topic) {
-    const { token_supply } = curveLpToken.events.RemoveLiquidity.decode(log)
+  } else if (log.topics[0] === vyperContract.events.RemoveLiquidity.topic) {
+    const { token_supply } = vyperContract.events.RemoveLiquidity.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupply = token_supply
   }

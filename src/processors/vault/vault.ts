@@ -2,7 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
-import * as stEth from '../../abi/liquid-staked-eth-2.0'
+import * as lido from '../../abi/lido'
 import { Vault } from '../../model'
 import { Context } from '../../processor'
 import {
@@ -34,7 +34,7 @@ export const setup = (processor: EvmBatchProcessor) => {
   })
   processor.addLog({
     address: [STETH_ADDRESS],
-    topic0: [stEth.events.TokenRebased.topic],
+    topic0: [lido.events.TokenRebased.topic],
   })
 }
 
@@ -61,11 +61,11 @@ const processStEthRebase = async (
 ) => {
   if (
     log.address === STETH_ADDRESS &&
-    log.topics[0] === stEth.events.TokenRebased.topic
+    log.topics[0] === lido.events.TokenRebased.topic
   ) {
     ctx.log.info('vault: updating stETH balance')
     const { vault } = await getLatestVault(ctx, result, block)
-    const contract = new stEth.Contract(ctx, block.header, STETH_ADDRESS)
+    const contract = new lido.Contract(ctx, block.header, STETH_ADDRESS)
     vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
   }
 }

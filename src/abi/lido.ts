@@ -1,6 +1,6 @@
 import * as ethers from 'ethers'
 import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './liquid-staked-eth-2.0.abi'
+import {ABI_JSON} from './lido.abi'
 
 export const abi = new ethers.Interface(ABI_JSON);
 
