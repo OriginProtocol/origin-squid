@@ -8,7 +8,7 @@ import {
 } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 
-import { OETH } from '../model'
+import { OETH } from '../../model'
 
 // Define custom GraphQL ObjectType of the query result
 @ObjectType()
