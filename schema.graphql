@@ -125,3 +125,13 @@ type Dripper @entity {
   blockNumber: Int! @index
   weth: BigInt!
 }
+
+# OETHBalancerMetaPoolStrategy: 0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc
+type BalancerMetaPoolStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  total: BigInt!
+  rETH: BigInt!
+  weth: BigInt!
+}

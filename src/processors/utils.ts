@@ -52,3 +52,25 @@ export const getLatestEntity = async <T extends Entity>(
     }))
   return { current, latest }
 }
+
+export const getOrCreate = async <T extends Entity>(
+  ctx: Context,
+  entity: EntityClass<T>,
+  memory: T[],
+  id: string,
+  createNew: (latest: T | undefined) => T,
+) => {
+  const current = memory.slice(memory.length - 1).find((v) => v.id === id)
+  if (current) return current
+  const latest =
+    memory[memory.length - 1] ??
+    (await ctx.store.findOne(entity as EntityClass<Entity>, {
+      where: { id: LessThanOrEqual(id) },
+      order: { id: 'desc' },
+    }))
+
+  const value = createNew(latest)
+  memory.push(value)
+
+  return value
+}

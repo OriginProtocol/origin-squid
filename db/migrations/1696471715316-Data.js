@@ -1,5 +1,5 @@
-module.exports = class Data1696284606457 {
-    name = 'Data1696284606457'
+module.exports = class Data1696471715316 {
+    name = 'Data1696471715316'
 
     async up(db) {
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
@@ -39,6 +39,9 @@ module.exports = class Data1696284606457 {
         await db.query(`CREATE TABLE "dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_74fd102c8d1c60f4b1650a61ffc" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_88c58f8948c3294c2a9e2791dc" ON "dripper" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_06822c0a260797711acc9023d5" ON "dripper" ("block_number") `)
+        await db.query(`CREATE TABLE "balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total" numeric NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_45e940df650a615eee3b7d93551" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_7e32ebb0d5d950103ce8f14cf9" ON "balancer_meta_pool_strategy" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_0bc3af65ef5d204a326388b7ad" ON "balancer_meta_pool_strategy" ("block_number") `)
         await db.query(`ALTER TABLE "history" ADD CONSTRAINT "FK_59a55adcc59ddb69c297da693e5" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "rebase" ADD CONSTRAINT "FK_02d02f9022ef86e60f1a84b9dc2" FOREIGN KEY ("apy_id") REFERENCES "apy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "rebase_option" ADD CONSTRAINT "FK_66c04aee6855c74debae4add8fe" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -82,6 +85,9 @@ module.exports = class Data1696284606457 {
         await db.query(`DROP TABLE "dripper"`)
         await db.query(`DROP INDEX "public"."IDX_88c58f8948c3294c2a9e2791dc"`)
         await db.query(`DROP INDEX "public"."IDX_06822c0a260797711acc9023d5"`)
+        await db.query(`DROP TABLE "balancer_meta_pool_strategy"`)
+        await db.query(`DROP INDEX "public"."IDX_7e32ebb0d5d950103ce8f14cf9"`)
+        await db.query(`DROP INDEX "public"."IDX_0bc3af65ef5d204a326388b7ad"`)
         await db.query(`ALTER TABLE "history" DROP CONSTRAINT "FK_59a55adcc59ddb69c297da693e5"`)
         await db.query(`ALTER TABLE "rebase" DROP CONSTRAINT "FK_02d02f9022ef86e60f1a84b9dc2"`)
         await db.query(`ALTER TABLE "rebase_option" DROP CONSTRAINT "FK_66c04aee6855c74debae4add8fe"`)

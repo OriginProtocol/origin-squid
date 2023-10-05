@@ -1,5 +1,75 @@
 [
   {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "platformAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "vaultAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct InitializableAbstractStrategy.BaseStrategyConfig",
+        "name": "_stratConfig",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "rEthAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "stEthAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "wstEthAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "frxEthAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "sfrxEthAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "balancerVaultAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "balancerPoolId",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct BaseBalancerStrategy.BaseBalancerConfig",
+        "name": "_balancerConfig",
+        "type": "tuple"
+      },
+      {
+        "internalType": "address",
+        "name": "_auraRewardPoolAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -60,6 +130,44 @@
       }
     ],
     "name": "HarvesterAddressesUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_prevMaxDeviationPercentage",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newMaxDeviationPercentage",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxDepositDeviationUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_prevMaxDeviationPercentage",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_newMaxDeviationPercentage",
+        "type": "uint256"
+      }
+    ],
+    "name": "MaxWithdrawalDeviationUpdated",
     "type": "event"
   },
   {
@@ -208,6 +316,45 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "auraRewardPoolAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "balancerPoolId",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "balancerVault",
+    "outputs": [
+      {
+        "internalType": "contract IBalancerVault",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -219,7 +366,20 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "balance",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "checkBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "value",
         "type": "uint256"
       }
     ],
@@ -244,13 +404,31 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_asset",
+        "name": "",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_amount",
+        "name": "",
         "type": "uint256"
+      }
+    ],
+    "name": "deposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
       }
     ],
     "name": "deposit",
@@ -263,6 +441,19 @@
     "name": "depositAll",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "frxETH",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -342,7 +533,46 @@
   },
   {
     "inputs": [],
+    "name": "maxDepositDeviation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxWithdrawalDeviation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "platformAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rETH",
     "outputs": [
       {
         "internalType": "address",
@@ -408,6 +638,32 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_maxDepositDeviation",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxDepositDeviation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxWithdrawalDeviation",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxWithdrawalDeviation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_asset",
         "type": "address"
@@ -434,6 +690,32 @@
     "name": "setRewardTokenAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sfrxETH",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stETH",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -508,13 +790,36 @@
       },
       {
         "internalType": "address",
-        "name": "_asset",
+        "name": "_strategyAsset",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_amount",
+        "name": "_strategyAmount",
         "type": "uint256"
+      }
+    ],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_strategyAssets",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_strategyAmounts",
+        "type": "uint256[]"
       }
     ],
     "name": "withdraw",
@@ -527,6 +832,19 @@
     "name": "withdrawAll",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wstETH",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
