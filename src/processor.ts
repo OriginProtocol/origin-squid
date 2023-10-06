@@ -81,22 +81,27 @@ export const run = ({
     async (ctx) => {
       resetProcessorState()
       let start: number
-      const time = (name: string) => () =>
-        ctx.log.info(`${name} ${Date.now() - start}ms`)
+      const time = (name: string) => () => {
+        const message = `${name} ${Date.now() - start}ms`
+        return () => ctx.log.info(message)
+      }
 
+      ctx.log.info(`=== processing from ${ctx.blocks[0].header.height}`)
       start = Date.now()
-      await Promise.all(
+      const times = await Promise.all(
         processors.map((p, index) =>
           p.process(ctx).then(time(p.name ?? `processor-${index}`)),
         ),
       )
+      times.forEach((t) => t())
 
       start = Date.now()
-      await Promise.all(
+      const postTimes = await Promise.all(
         postProcessors.map((p, index) =>
           p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
         ),
       )
+      postTimes.forEach((t) => t())
     },
   )
 }
