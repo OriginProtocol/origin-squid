@@ -1,9 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The Vault entity tracks the OETH vault balance over time.
- */
 @Entity_()
 export class Vault {
     constructor(props?: Partial<Vault>) {

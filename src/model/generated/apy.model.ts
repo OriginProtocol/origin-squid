@@ -1,9 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The APY entity tracks historical APY values by day.
- */
 @Entity_()
 export class APY {
     constructor(props?: Partial<APY>) {
