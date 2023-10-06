@@ -1,7 +1,14 @@
+"""
+The OETH entity tracks the change in total supply of OETH over time.
+"""
 type OETH @entity {
   id: ID! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+
+  """
+  The total supply of OETH tokens at the corresponding block.
+  """
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
@@ -12,13 +19,32 @@ enum RebasingOption {
   OptOut
 }
 
+"""
+The OETH balance, history and other information for a given address.
+"""
 type Address @entity {
   id: ID! @index
   isContract: Boolean!
+
+  """
+  Is the address opted in our out of yield.
+  """
   rebasingOption: RebasingOption!
+
+  """
+  The current balance of OETH held by the address.
+  """
   balance: BigInt!
+
+  """
+  The total amount of OETH earned by the address.
+  """
   earned: BigInt!
   credits: BigInt!
+
+  """
+  The last time the address information was updated.
+  """
   lastUpdated: DateTime!
   history: [History!]! @derivedFrom(field: "address")
 }
@@ -30,6 +56,9 @@ enum HistoryType {
   Yield
 }
 
+"""
+The History entity tracks events that change the balance of OETH for an address.
+"""
 type History @entity {
   id: ID!
   address: Address! @index
@@ -41,6 +70,9 @@ type History @entity {
   type: HistoryType!
 }
 
+"""
+The Rebase entity tracks historical rebase events on the OETH contract.
+"""
 type Rebase @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -54,6 +86,9 @@ type Rebase @entity {
   yield: BigInt!
 }
 
+"""
+The RebaseOption entity tracks historical rebase option changes by address.
+"""
 type RebaseOption @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -63,6 +98,9 @@ type RebaseOption @entity {
   status: RebasingOption!
 }
 
+"""
+The APY entity tracks historical APY values by day.
+"""
 type APY @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -77,6 +115,9 @@ type APY @entity {
 }
 
 # OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
+"""
+The Vault entity tracks the OETH vault balance over time.
+"""
 type Vault @entity {
   id: ID!
   timestamp: DateTime! @index
