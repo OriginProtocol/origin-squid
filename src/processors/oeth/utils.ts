@@ -113,12 +113,10 @@ export async function createRebaseAPY(
     ((Number(lastApy.rebasingCreditsPerToken) /
       Number(apy.rebasingCreditsPerToken) -
       1) *
-      100 *
       365.25) /
     dayDiff
   const periods_per_year = 365.25 / dayDiff
-  apy.apy =
-    ((1 + apy.apr / periods_per_year / 100) ** periods_per_year - 1) * 100
+  apy.apy = (1 + apy.apr / periods_per_year) ** periods_per_year - 1
 
   const last7daysDateId = {
     key: 'apy7DayAvg' as const,
