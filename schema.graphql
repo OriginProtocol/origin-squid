@@ -10,6 +10,8 @@ type OETH @entity {
   The total supply of OETH tokens at the corresponding block.
   """
   totalSupply: BigInt!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
 }
 
 enum RebasingOption {

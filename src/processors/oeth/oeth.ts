@@ -27,7 +27,7 @@ export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addTrace({
-    type: ['call', 'delegatecall'],
+    type: ['call'],
     callSighash: [
       oeth.functions.rebaseOptOut.sighash,
       oeth.functions.rebaseOptIn.sighash,
@@ -121,12 +121,10 @@ const processTransfer = async (
       value: dataRaw.value,
     }
 
+    const oethObject = await getLatestOETHObject(ctx, result, block)
     if (data.from === ADDRESS_ZERO) {
-      const oethObject = await getLatestOETHObject(ctx, result, block)
       oethObject.totalSupply += data.value
-    }
-    if (data.to === ADDRESS_ZERO) {
-      const oethObject = await getLatestOETHObject(ctx, result, block)
+    } else if (data.to === ADDRESS_ZERO) {
       oethObject.totalSupply -= data.value
     }
 
@@ -155,12 +153,13 @@ const processTransfer = async (
       [addressSub, addressAdd].map(async (address) => {
         const credits = await token.creditsBalanceOfHighres(address.id)
         const newBalance = (credits[0] * DECIMALS_18) / credits[1]
+        const change = newBalance - address.balance
         result.history.push(
           new History({
             // we can't use {t.id} because it's not unique
             id: uuidv4(),
             address: address,
-            value: newBalance - address.balance,
+            value: change,
             balance: newBalance,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
@@ -176,6 +175,40 @@ const processTransfer = async (
         address.balance = newBalance // token balance
       }),
     )
+
+    if (
+      addressAdd.rebasingOption === RebasingOption.OptOut &&
+      data.from === ADDRESS_ZERO
+    ) {
+      // If it's a mint and minter has opted out of rebasing,
+      // add to non-rebasing supply
+      oethObject.nonRebasingSupply += data.value
+    } else if (
+      data.to === ADDRESS_ZERO &&
+      addressSub.rebasingOption === RebasingOption.OptOut
+    ) {
+      // If it's a redeem and redeemer has opted out of rebasing,
+      // subtract non-rebasing supply
+      oethObject.nonRebasingSupply -= data.value
+    } else if (
+      addressAdd.rebasingOption === RebasingOption.OptOut &&
+      addressSub.rebasingOption === RebasingOption.OptIn
+    ) {
+      // If receiver has opted out but sender hasn't,
+      // Add to non-rebasing supply
+      oethObject.nonRebasingSupply += data.value
+    } else if (
+      addressAdd.rebasingOption === RebasingOption.OptIn &&
+      addressSub.rebasingOption === RebasingOption.OptOut
+    ) {
+      // If sender has opted out but receiver hasn't,
+      // Subtract non-rebasing supply
+      oethObject.nonRebasingSupply -= data.value
+    }
+
+    // Update rebasing supply in all cases
+    oethObject.rebasingSupply =
+      oethObject.totalSupply - oethObject.nonRebasingSupply
   }
 }
 
@@ -194,6 +227,8 @@ const processTotalSupplyUpdatedHighres = async (
   // OETH Object
   const oethObject = await getLatestOETHObject(ctx, result, block)
   oethObject.totalSupply = data.totalSupply
+  oethObject.rebasingSupply =
+    oethObject.totalSupply - oethObject.nonRebasingSupply
 
   if (!result.lastYieldDistributionEvent) {
     throw new Error('lastYieldDistributionEvent is not set')
@@ -266,7 +301,8 @@ const processRebaseOpt = async (
     await result.initialize()
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
-    const address = trace.transaction!.from.toLowerCase()
+    const address = trace.action.from.toLowerCase()
+    const oethObject = await getLatestOETHObject(ctx, result, block)
     let owner = result.owners.get(address)
     if (!owner) {
       owner = await createAddress(ctx, address, timestamp)
@@ -285,10 +321,16 @@ const processRebaseOpt = async (
     if (trace.action.sighash === oeth.functions.rebaseOptIn.sighash) {
       owner.rebasingOption = RebasingOption.OptIn
       rebaseOption.status = RebasingOption.OptIn
+      oethObject.nonRebasingSupply -= owner.balance
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
     }
     if (trace.action.sighash === oeth.functions.rebaseOptOut.sighash) {
       owner.rebasingOption = RebasingOption.OptOut
       rebaseOption.status = RebasingOption.OptOut
+      oethObject.nonRebasingSupply += owner.balance
+      oethObject.rebasingSupply =
+        oethObject.totalSupply - oethObject.nonRebasingSupply
     }
   }
 }
@@ -313,6 +355,8 @@ const getLatestOETHObject = async (
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
       totalSupply: latest?.totalSupply ?? 0n,
+      rebasingSupply: latest?.rebasingSupply ?? 0n,
+      nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
     })
     result.oeths.push(oethObject)
   }
