@@ -1,19 +1,4 @@
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/subsquid/squid-evm-template)
-
-# Minimal EVM squid
-
-This is a starter template of a squid indexer for EVM networks (Ethereum, Polygon, BSC, etc.). See [Squid SDK docs](https://docs.subsquid.io/) for a complete reference.
-
-To extract EVM logs and transactions by a topic or a contract address, use `EvmBatchProcessor.addLog()` and `EvmBatchProcessor.addTransaction()` methods of the `EvmBatchProcessor` instance defined in `src/processor.ts`.
-
-The requested data is transformed in batches by a single handler provided to the `processor.run()` method.
-
-For a full list of supported networks and config options,
-check the [`EvmBatchProcessor` overview](https://docs.subsquid.io/develop-a-squid/evm-processor/) and the [configuration page](https://docs.subsquid.io/develop-a-squid/evm-processor/configuration/).
-
-For a step-by-step migration guide from TheGraph, see [the dedicated docs page](https://docs.subsquid.io/migrate/migrate-subgraph/).
-
-Dependencies: Node.js, Docker.
+# Origin Subsquid
 
 ## Quickstart
 
@@ -78,7 +63,9 @@ See [docs on database migrations](https://docs.subsquid.io/basics/db-migrations)
 
 ### 4. Import ABI contract and generate interfaces to decode events
 
-It is necessary to import the respective ABI definition to decode EVM logs. One way to generate a type-safe facade class to decode EVM logs is by placing the relevant JSON ABIs to `./abi`, then using `squid-evm-typegen(1)` via an `sqd` script:
+It is necessary to import the respective ABI definition to decode EVM logs. One way to generate a type-safe facade class
+to decode EVM logs is by placing the relevant JSON ABIs to `./abi`, then using `squid-evm-typegen(1)` via an `sqd`
+script:
 
 ```bash
 sqd typegen
