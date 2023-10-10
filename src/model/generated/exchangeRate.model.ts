@@ -7,6 +7,9 @@ export class ExchangeRate {
         Object.assign(this, props)
     }
 
+    /**
+     * Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+     */
     @PrimaryColumn_()
     id!: string
 
@@ -20,6 +23,12 @@ export class ExchangeRate {
 
     @Column_("text", {nullable: false})
     pair!: string
+
+    @Column_("text", {nullable: false})
+    base!: string
+
+    @Column_("text", {nullable: false})
+    quote!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     rate!: bigint

@@ -189,5 +189,7 @@ type ExchangeRate @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   pair: String!
+  base: String!
+  quote: String!
   rate: BigInt!
 }

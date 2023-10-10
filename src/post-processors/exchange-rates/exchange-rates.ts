@@ -36,6 +36,8 @@ export const ensureExchangeRate = async (
       timestamp,
       blockNumber,
       pair,
+      base,
+      quote,
       rate: price,
     })
     exchangeRates.set(id, exchangeRate)

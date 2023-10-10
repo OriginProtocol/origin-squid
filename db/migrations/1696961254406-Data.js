@@ -1,5 +1,5 @@
-module.exports = class Data1696896722428 {
-    name = 'Data1696896722428'
+module.exports = class Data1696961254406 {
+    name = 'Data1696961254406'
 
     async up(db) {
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
@@ -42,7 +42,7 @@ module.exports = class Data1696896722428 {
         await db.query(`CREATE TABLE "balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total" numeric NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_45e940df650a615eee3b7d93551" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7e32ebb0d5d950103ce8f14cf9" ON "balancer_meta_pool_strategy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_0bc3af65ef5d204a326388b7ad" ON "balancer_meta_pool_strategy" ("block_number") `)
-        await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c61a93768eed9e58ce399bbe01" ON "exchange_rate" ("block_number") `)
         await db.query(`ALTER TABLE "history" ADD CONSTRAINT "FK_59a55adcc59ddb69c297da693e5" FOREIGN KEY ("address_id") REFERENCES "address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
