@@ -1,6 +1,7 @@
 import { ExchangeRate } from '../../model'
 import { Block, Context } from '../../processor'
 import { useProcessorState } from '../../utils/state'
+import { Currency } from './currencies'
 import { getPrice } from './price-routing'
 
 const useExchangeRates = () =>
@@ -14,8 +15,8 @@ export const process = async (ctx: Context) => {
 export const ensureExchangeRate = async (
   ctx: Context,
   block: Block,
-  base: string,
-  quote: string,
+  base: Currency,
+  quote: Currency,
 ) => {
   const [exchangeRates] = useExchangeRates()
   const pair = `${base}_${quote}`
@@ -44,7 +45,7 @@ export const ensureExchangeRate = async (
 export const ensureExchangeRates = async (
   ctx: Context,
   block: Block,
-  pairs: [string, string][],
+  pairs: [Currency, Currency][],
 ) => {
   await Promise.all(
     pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote)),

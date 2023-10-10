@@ -1,4 +1,4 @@
-export const currencies: Record<string, string> = {
+export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
   ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
@@ -8,4 +8,6 @@ export const currencies: Record<string, string> = {
   rETH: '0xae78736cd615f374d3085123a210448e74fc6393',
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
-}
+} as const
+
+export type Currency = keyof typeof currencies

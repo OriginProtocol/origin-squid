@@ -2,13 +2,13 @@ import * as chainlinkFeedRegistry from '../../abi/chainlink-feed-registry'
 import * as oethOracleRouter from '../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../abi/sfrx-eth'
 import { Block, Context } from '../../processor'
-import { currencies } from './currencies'
+import { Currency, currencies } from './currencies'
 
 export const getPrice = async (
   ctx: Context,
   block: Block,
-  base: string,
-  quote: string,
+  base: Currency,
+  quote: Currency,
 ) => {
   if (base === 'ETH' && quote === 'WETH') {
     return 1_000_000_000_000_000_000n
@@ -27,8 +27,8 @@ const registryAddress = '0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf'
 export const getChainlinkPrice = (
   ctx: Context,
   block: Block,
-  base: string,
-  quote: string,
+  base: Currency,
+  quote: Currency,
 ) => {
   const registry = new chainlinkFeedRegistry.Contract(
     ctx,
@@ -47,7 +47,7 @@ const oethOracleAddress = '0xbE19cC5654e30dAF04AD3B5E06213D70F4e882eE'
 export const getOethOraclePrice = (
   ctx: Context,
   block: Block,
-  quote: string,
+  quote: Currency,
 ) => {
   const router = new oethOracleRouter.Contract(
     ctx,
