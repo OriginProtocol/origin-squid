@@ -176,3 +176,14 @@ type BalancerMetaPoolStrategy @entity {
   rETH: BigInt!
   weth: BigInt!
 }
+
+type ExchangeRate @entity {
+  """
+  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  pair: String!
+  rate: BigInt!
+}

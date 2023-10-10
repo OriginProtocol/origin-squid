@@ -4,6 +4,7 @@ import { pad } from 'viem'
 import * as erc20 from '../../abi/erc20'
 import * as lido from '../../abi/lido'
 import { Vault } from '../../model'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import {
   FRXETH_ADDRESS,
@@ -124,5 +125,12 @@ const getLatestVault = async (
     isNew = true
     result.vaults.push(vault)
   }
+  await ensureExchangeRates(ctx, block, [
+    ['ETH', 'USD'],
+    ['ETH', 'WETH'],
+    ['ETH', 'rETH'],
+    ['ETH', 'stETH'],
+    ['ETH', 'frxETH'],
+  ])
   return { vault, isNew }
 }

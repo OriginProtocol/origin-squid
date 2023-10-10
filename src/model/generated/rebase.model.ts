@@ -2,6 +2,9 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 import {APY} from "./apy.model"
 
+/**
+ * The Rebase entity tracks historical rebase events on the OETH contract.
+ */
 @Entity_()
 export class Rebase {
     constructor(props?: Partial<Rebase>) {
