@@ -35,7 +35,7 @@ export const getChainlinkPrice = (
     block.header,
     registryAddress,
   )
-  return registry.latestRound(
+  return registry.latestAnswer(
     currencies[base] ?? base,
     currencies[quote] ?? quote,
   )
