@@ -18,6 +18,7 @@ import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   vaults: Vault[]
+  promises: Promise<unknown>[]
 }
 
 export const from = 17067001 // https://etherscan.io/tx/0x0b81a0e2b7d824ce493465221218b9c79b4a9478c0bb7760b386be240f5985b8
@@ -42,6 +43,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
     vaults: [],
+    promises: [], // Anything async we can wait for at the end of our loop.
   }
 
   for (const block of ctx.blocks) {
@@ -64,7 +66,6 @@ const processStEthRebase = async (
     log.address === STETH_ADDRESS &&
     log.topics[0] === lido.events.TokenRebased.topic
   ) {
-    ctx.log.info('vault: updating stETH balance')
     const { vault } = await getLatestVault(ctx, result, block)
     const contract = new lido.Contract(ctx, block.header, STETH_ADDRESS)
     vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
@@ -113,6 +114,15 @@ const getLatestVault = async (
   )
   let vault = current
   if (!vault) {
+    result.promises.push(
+      ensureExchangeRates(ctx, block, [
+        ['ETH', 'USD'],
+        ['ETH', 'WETH'],
+        ['ETH', 'rETH'],
+        ['ETH', 'stETH'],
+        ['ETH', 'frxETH'],
+      ]),
+    )
     vault = new Vault({
       id: timestampId,
       timestamp: new Date(block.header.timestamp),
@@ -125,12 +135,5 @@ const getLatestVault = async (
     isNew = true
     result.vaults.push(vault)
   }
-  await ensureExchangeRates(ctx, block, [
-    ['ETH', 'USD'],
-    ['ETH', 'WETH'],
-    ['ETH', 'rETH'],
-    ['ETH', 'stETH'],
-    ['ETH', 'frxETH'],
-  ])
   return { vault, isNew }
 }

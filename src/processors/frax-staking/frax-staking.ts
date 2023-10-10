@@ -3,6 +3,7 @@ import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
 import { FraxStaking } from '../../model'
+import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import {
   OETH_FRAX_STAKING_ADDRESS,
@@ -12,6 +13,7 @@ import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   fraxStakings: FraxStaking[]
+  promises: Promise<unknown>[]
 }
 
 export const from = 17067223 // https://etherscan.io/tx/0x422903d2be38a264423a77e8472d365fa567f5bca12ea2403dfaee1b305c7da4
@@ -32,6 +34,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
     fraxStakings: [],
+    promises: [], // Anything async we can wait for at the end of our loop.
   }
 
   for (const block of ctx.blocks) {
@@ -40,6 +43,7 @@ export const process = async (ctx: Context) => {
     }
   }
 
+  await Promise.all(result.promises)
   await ctx.store.insert(result.fraxStakings)
 }
 
@@ -65,6 +69,7 @@ const processTransfer = async (
 
         let fraxStaking = current
         if (!fraxStaking) {
+          result.promises.push(ensureExchangeRate(ctx, block, 'ETH', 'sfrxETH'))
           fraxStaking = new FraxStaking({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),

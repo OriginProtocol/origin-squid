@@ -3,6 +3,7 @@ import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
 import { Dripper } from '../../model'
+import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '../utils'
@@ -62,6 +63,7 @@ const processTransfer = async (
 
         let dripper = current
         if (!dripper) {
+          await ensureExchangeRate(ctx, block, 'ETH', 'WETH') // No async since WETH.
           dripper = new Dripper({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),

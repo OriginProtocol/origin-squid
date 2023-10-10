@@ -3,6 +3,7 @@ import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
 import { MorphoAave } from '../../model'
+import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '../utils'
@@ -62,6 +63,7 @@ const processTransfer = async (
 
         let morphoAave = current
         if (!morphoAave) {
+          await ensureExchangeRate(ctx, block, 'ETH', 'WETH') // No async since WETH.
           morphoAave = new MorphoAave({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),
