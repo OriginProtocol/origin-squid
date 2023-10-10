@@ -148,6 +148,10 @@ type FraxStaking @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  """
+  - sfrxETH is what's actually stored here, slightly confusing and may want to change.
+  - used by balance sheet
+  """
   frxETH: BigInt!
 }
 
