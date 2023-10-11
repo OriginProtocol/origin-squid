@@ -1,3 +1,4 @@
+import * as exchangeRates from './post-processors/exchange-rates'
 import { run } from './processor'
 import * as curveLp from './processors/curve-lp'
 import * as dripper from './processors/dripper'
@@ -19,5 +20,5 @@ run({
     balancerMetaPoolStrategy,
   ],
   // For processors which depend on results from other processors, post processors run after all processors have finished.
-  postProcessors: [],
+  postProcessors: [exchangeRates],
 })

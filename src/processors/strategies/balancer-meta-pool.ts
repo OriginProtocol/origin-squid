@@ -5,6 +5,7 @@ import * as baseRewardPool4626 from '../../abi/base-reward-pool-4626'
 import * as metaStablePool from '../../abi/meta-stable-pool'
 import * as originLens from '../../abi/origin-lens'
 import { BalancerMetaPoolStrategy } from '../../model'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity } from '../utils'
@@ -70,11 +71,13 @@ const topicsToListenTo = new Set([
 
 interface ProcessResult {
   strategies: BalancerMetaPoolStrategy[]
+  promises: Promise<unknown>[]
 }
 
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
     strategies: [],
+    promises: [], // Anything async we can wait for at the end of our loop.
   }
 
   for (const block of ctx.blocks) {
@@ -96,6 +99,12 @@ export const updateValues = async (
   block: Context['blocks']['0'],
   result: ProcessResult,
 ) => {
+  result.promises.push(
+    ensureExchangeRates(ctx, block, [
+      ['ETH', 'WETH'],
+      ['ETH', 'rETH'],
+    ]),
+  )
   const timestampId = new Date(block.header.timestamp).toISOString()
   const strategy = new balancerMetaPoolStrategy.Contract(
     ctx,

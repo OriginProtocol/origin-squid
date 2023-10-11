@@ -148,6 +148,10 @@ type FraxStaking @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  """
+  - sfrxETH is what's actually stored here, slightly confusing and may want to change.
+  - used by balance sheet
+  """
   frxETH: BigInt!
 }
 
@@ -175,4 +179,17 @@ type BalancerMetaPoolStrategy @entity {
   total: BigInt!
   rETH: BigInt!
   weth: BigInt!
+}
+
+type ExchangeRate @entity {
+  """
+  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  pair: String!
+  base: String!
+  quote: String!
+  rate: BigInt!
 }

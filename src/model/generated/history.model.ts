@@ -3,6 +3,9 @@ import * as marshal from "./marshal"
 import {Address} from "./address.model"
 import {HistoryType} from "./_historyType"
 
+/**
+ * The History entity tracks events that change the balance of OETH for an address.
+ */
 @Entity_()
 export class History {
     constructor(props?: Partial<History>) {

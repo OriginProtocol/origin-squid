@@ -1,15 +1,15 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The Vault entity tracks the OETH vault balance over time.
- */
 @Entity_()
-export class Vault {
-    constructor(props?: Partial<Vault>) {
+export class ExchangeRate {
+    constructor(props?: Partial<ExchangeRate>) {
         Object.assign(this, props)
     }
 
+    /**
+     * Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+     */
     @PrimaryColumn_()
     id!: string
 
@@ -21,15 +21,15 @@ export class Vault {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    weth!: bigint
+    @Column_("text", {nullable: false})
+    pair!: string
+
+    @Column_("text", {nullable: false})
+    base!: string
+
+    @Column_("text", {nullable: false})
+    quote!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    stETH!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rETH!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    frxETH!: bigint
+    rate!: bigint
 }

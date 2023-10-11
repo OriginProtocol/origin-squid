@@ -2,6 +2,9 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import {Address} from "./address.model"
 import {RebasingOption} from "./_rebasingOption"
 
+/**
+ * The RebaseOption entity tracks historical rebase option changes by address.
+ */
 @Entity_()
 export class RebaseOption {
     constructor(props?: Partial<RebaseOption>) {
