@@ -11,4 +11,3 @@ projects:
     schema: schema-ogv.graphql
 include:
   - types.graphql
-  - types-otoken.graphql
