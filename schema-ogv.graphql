@@ -1,0 +1,35 @@
+# OGV Price (5m?)
+# OGV Market Cap (5m?)
+# OGV Circulating Supply
+# OGV Total Supply
+type OGV @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  circulating: BigInt!
+  total: BigInt!
+}
+
+# OGV Amount Staked & Percentage
+# OGV Staking APY
+type StakedOGV @entity { # Representing `veOGV`
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  total: BigInt!
+  apy: BigInt!
+}
+
+# OGV Registered Voters
+# OGV Open-source contributors
+# OGV Improvement proposals
+type OGVGovernance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  registeredVoters: Int!
+  openSourceContributors: Int!
+  improvementProposals: Int!
+}
+
+# TODO: More

@@ -1,9 +1,12 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
+/**
+ * The Vault entity tracks the OUSD vault balance over time.
+ */
 @Entity_()
-export class MorphoAave {
-    constructor(props?: Partial<MorphoAave>) {
+export class OUSDVault {
+    constructor(props?: Partial<OUSDVault>) {
         Object.assign(this, props)
     }
 
@@ -19,5 +22,11 @@ export class MorphoAave {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    weth!: bigint
+    dai!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    usdt!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    usdc!: bigint
 }

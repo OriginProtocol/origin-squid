@@ -1,12 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The OETH entity tracks the change in total supply of OETH over time.
- */
 @Entity_()
-export class OETH {
-    constructor(props?: Partial<OETH>) {
+export class OUSDMetaStrategy {
+    constructor(props?: Partial<OUSDMetaStrategy>) {
         Object.assign(this, props)
     }
 
@@ -22,11 +19,11 @@ export class OETH {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupply!: bigint
+    dai!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rebasingSupply!: bigint
+    usdt!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    nonRebasingSupply!: bigint
+    usdc!: bigint
 }

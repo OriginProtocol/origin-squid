@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class BalancerMetaPoolStrategy {
-    constructor(props?: Partial<BalancerMetaPoolStrategy>) {
+export class ConvexLUSDPlus3Crv {
+    constructor(props?: Partial<ConvexLUSDPlus3Crv>) {
         Object.assign(this, props)
     }
 
@@ -19,11 +19,11 @@ export class BalancerMetaPoolStrategy {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    total!: bigint
+    dai!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rETH!: bigint
+    usdt!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    weth!: bigint
+    usdc!: bigint
 }

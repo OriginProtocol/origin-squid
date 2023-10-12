@@ -2,11 +2,11 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 /**
- * The OETH entity tracks the change in total supply of OETH over time.
+ * The OUSD entity tracks the change in total supply of OUSD over time.
  */
 @Entity_()
-export class OETH {
-    constructor(props?: Partial<OETH>) {
+export class OUSD {
+    constructor(props?: Partial<OUSD>) {
         Object.assign(this, props)
     }
 

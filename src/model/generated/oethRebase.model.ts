@@ -1,9 +1,13 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import * as marshal from "./marshal"
+import {OETHAPY} from "./oethapy.model"
 
+/**
+ * The Rebase entity tracks historical rebase events on the OETH contract.
+ */
 @Entity_()
-export class CurveLP {
-    constructor(props?: Partial<CurveLP>) {
+export class OETHRebase {
+    constructor(props?: Partial<OETHRebase>) {
         Object.assign(this, props)
     }
 
@@ -18,21 +22,26 @@ export class CurveLP {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @Column_("text", {nullable: false})
+    txHash!: string
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     totalSupply!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    eth!: bigint
+    rebasingCredits!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    oeth!: bigint
+    rebasingCreditsPerToken!: bigint
+
+    @Index_()
+    @ManyToOne_(() => OETHAPY, {nullable: true})
+    apy!: OETHAPY
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupplyOwned!: bigint
+    fee!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    ethOwned!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    oethOwned!: bigint
+    yield!: bigint
 }

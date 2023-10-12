@@ -1,12 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The Vault entity tracks the OETH vault balance over time.
- */
 @Entity_()
-export class Vault {
-    constructor(props?: Partial<Vault>) {
+export class OETHCurveLP {
+    constructor(props?: Partial<OETHCurveLP>) {
         Object.assign(this, props)
     }
 
@@ -22,14 +19,20 @@ export class Vault {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    weth!: bigint
+    totalSupply!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    stETH!: bigint
+    eth!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rETH!: bigint
+    oeth!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    frxETH!: bigint
+    totalSupplyOwned!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    ethOwned!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    oethOwned!: bigint
 }

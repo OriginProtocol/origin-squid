@@ -1,4 +1,4 @@
-export enum HistoryType {
+export enum OETHHistoryType {
     Swap = "Swap",
     Sent = "Sent",
     Received = "Received",

@@ -1,0 +1,17 @@
+"""
+Any entity which has a price associated with it should have that price go in here.
+Prices can change very frequently and we don't want those changes on the same track
+as values which change less frequently.
+"""
+type ExchangeRate @entity {
+  """
+  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  pair: String!
+  base: String!
+  quote: String!
+  rate: BigInt!
+}

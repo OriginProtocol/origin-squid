@@ -1,3 +1,22 @@
+# GENERATED, DO NOT MODIFY
+
+"""
+Any entity which has a price associated with it should have that price go in here.
+Prices can change very frequently and we don't want those changes on the same track
+as values which change less frequently.
+"""
+type ExchangeRate @entity {
+  """
+  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  pair: String!
+  base: String!
+  quote: String!
+  rate: BigInt!
+}
 """
 The OETH entity tracks the change in total supply of OETH over time.
 """
@@ -5,16 +24,12 @@ type OETH @entity {
   id: ID! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-
-  """
-  The total supply of OETH tokens at the corresponding block.
-  """
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
 }
 
-enum RebasingOption {
+enum OETHRebasingOption {
   OptIn
   OptOut
 }
@@ -22,34 +37,18 @@ enum RebasingOption {
 """
 The OETH balance, history and other information for a given address.
 """
-type Address @entity {
+type OETHAddress @entity {
   id: ID! @index
   isContract: Boolean!
-
-  """
-  Is the address opted in our out of yield.
-  """
-  rebasingOption: RebasingOption!
-
-  """
-  The current balance of OETH held by the address.
-  """
+  rebasingOption: OETHRebasingOption!
   balance: BigInt!
-
-  """
-  The total amount of OETH earned by the address.
-  """
   earned: BigInt!
   credits: BigInt!
-
-  """
-  The last time the address information was updated.
-  """
   lastUpdated: DateTime!
-  history: [History!]! @derivedFrom(field: "address")
+  history: [OETHHistory!]! @derivedFrom(field: "address")
 }
 
-enum HistoryType {
+enum OETHHistoryType {
   Swap
   Sent
   Received
@@ -59,21 +58,21 @@ enum HistoryType {
 """
 The History entity tracks events that change the balance of OETH for an address.
 """
-type History @entity {
+type OETHHistory @entity {
   id: ID!
-  address: Address! @index
+  address: OETHAddress! @index
   value: BigInt!
   balance: BigInt!
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
-  type: HistoryType!
+  type: OETHHistoryType!
 }
 
 """
 The Rebase entity tracks historical rebase events on the OETH contract.
 """
-type Rebase @entity {
+type OETHRebase @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -81,7 +80,7 @@ type Rebase @entity {
   totalSupply: BigInt!
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
-  apy: APY!
+  apy: OETHAPY!
   fee: BigInt!
   yield: BigInt!
 }
@@ -89,19 +88,19 @@ type Rebase @entity {
 """
 The RebaseOption entity tracks historical rebase option changes by address.
 """
-type RebaseOption @entity {
+type OETHRebaseOption @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index
-  address: Address!
-  status: RebasingOption!
+  address: OETHAddress!
+  status: OETHRebasingOption!
 }
 
 """
 The APY entity tracks historical APY values by day.
 """
-type APY @entity {
+type OETHAPY @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -118,7 +117,7 @@ type APY @entity {
 """
 The Vault entity tracks the OETH vault balance over time.
 """
-type Vault @entity {
+type OETHVault @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -131,7 +130,7 @@ type Vault @entity {
 # OETH Convex: 0x1827F9eA98E0bf96550b2FC20F7233277FcD7E63
 # Curve LP Token: 0x94B17476A93b3262d87B9a326965D1E91f9c13E7
 # Convex Deposit: 0xF403C135812408BFbE8713b5A23a04b3D48AAE31
-type CurveLP @entity {
+type OETHCurveLP @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -144,7 +143,7 @@ type CurveLP @entity {
 }
 
 # OETH Frax Staking: 0x3fF8654D633D4Ea0faE24c52Aec73B4A20D0d0e5
-type FraxStaking @entity {
+type OETHFraxStaking @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -156,7 +155,7 @@ type FraxStaking @entity {
 }
 
 # OETH Morpho Aave: 0xc1fc9E5eC3058921eA5025D703CBE31764756319
-type MorphoAave @entity {
+type OETHMorphoAave @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -172,7 +171,7 @@ type Dripper @entity {
 }
 
 # OETHBalancerMetaPoolStrategy: 0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc
-type BalancerMetaPoolStrategy @entity {
+type OETHBalancerMetaPoolStrategy @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -180,16 +179,226 @@ type BalancerMetaPoolStrategy @entity {
   rETH: BigInt!
   weth: BigInt!
 }
-
-type ExchangeRate @entity {
-  """
-  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
-  """
+# OGV Price (5m?)
+# OGV Market Cap (5m?)
+# OGV Circulating Supply
+# OGV Total Supply
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  pair: String!
-  base: String!
-  quote: String!
-  rate: BigInt!
+  circulating: BigInt!
+  total: BigInt!
+}
+
+# OGV Amount Staked & Percentage
+# OGV Staking APY
+type StakedOGV @entity { # Representing `veOGV`
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  total: BigInt!
+  apy: BigInt!
+}
+
+# OGV Registered Voters
+# OGV Open-source contributors
+# OGV Improvement proposals
+type OGVGovernance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  registeredVoters: Int!
+  openSourceContributors: Int!
+  improvementProposals: Int!
+}
+
+# TODO: More
+"""
+The OUSD entity tracks the change in total supply of OUSD over time.
+"""
+type OUSD @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  totalSupply: BigInt!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
+}
+
+enum OUSDRebasingOption {
+  OptIn
+  OptOut
+}
+
+"""
+The OUSD balance, history and other information for a given address.
+"""
+type OUSDAddress @entity {
+  id: ID! @index
+  isContract: Boolean!
+  rebasingOption: OUSDRebasingOption!
+  balance: BigInt!
+  earned: BigInt!
+  credits: BigInt!
+  lastUpdated: DateTime!
+  history: [OUSDHistory!]! @derivedFrom(field: "address")
+}
+
+enum OUSDHistoryType {
+  Swap
+  Sent
+  Received
+  Yield
+}
+
+"""
+The History entity tracks events that change the balance of OUSD for an address.
+"""
+type OUSDHistory @entity {
+  id: ID!
+  address: OUSDAddress! @index
+  value: BigInt!
+  balance: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: OUSDHistoryType!
+}
+
+"""
+The Rebase entity tracks historical rebase events on the OUSD contract.
+"""
+type OUSDRebase @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  totalSupply: BigInt!
+  rebasingCredits: BigInt!
+  rebasingCreditsPerToken: BigInt!
+  apy: OUSDAPY!
+  fee: BigInt!
+  yield: BigInt!
+}
+
+"""
+The RebaseOption entity tracks historical rebase option changes by address.
+"""
+type OUSDRebaseOption @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  address: OUSDAddress!
+  status: OUSDRebasingOption!
+}
+
+"""
+The APY entity tracks historical APY values by day.
+"""
+type OUSDAPY @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  apr: Float!
+  apy: Float!
+  apy7DayAvg: Float!
+  apy14DayAvg: Float!
+  apy30DayAvg: Float!
+  rebasingCreditsPerToken: BigInt!
+}
+
+"""
+The Vault entity tracks the OUSD vault balance over time.
+"""
+type OUSDVault @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+# OUSD Strategies!
+
+type OUSDMorphoAave @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type OUSDMorphoCompound @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type MakerDSRStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+}
+
+type OUSDFluxStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type OUSDCompoundStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type OUSDConvexStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type OUSDAaveStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type OUSDMetaStrategy @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
+}
+
+type ConvexLUSDPlus3Crv @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  dai: BigInt!
+  usdt: BigInt!
+  usdc: BigInt!
 }

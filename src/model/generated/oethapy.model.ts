@@ -5,8 +5,8 @@ import * as marshal from "./marshal"
  * The APY entity tracks historical APY values by day.
  */
 @Entity_()
-export class APY {
-    constructor(props?: Partial<APY>) {
+export class OETHAPY {
+    constructor(props?: Partial<OETHAPY>) {
         Object.assign(this, props)
     }
 

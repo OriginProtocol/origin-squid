@@ -2,11 +2,11 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 /**
- * The OETH entity tracks the change in total supply of OETH over time.
+ * The Vault entity tracks the OETH vault balance over time.
  */
 @Entity_()
-export class OETH {
-    constructor(props?: Partial<OETH>) {
+export class OETHVault {
+    constructor(props?: Partial<OETHVault>) {
         Object.assign(this, props)
     }
 
@@ -22,11 +22,14 @@ export class OETH {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupply!: bigint
+    weth!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rebasingSupply!: bigint
+    stETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    nonRebasingSupply!: bigint
+    rETH!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    frxETH!: bigint
 }

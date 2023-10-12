@@ -1,12 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The OETH entity tracks the change in total supply of OETH over time.
- */
 @Entity_()
-export class OETH {
-    constructor(props?: Partial<OETH>) {
+export class OETHFraxStaking {
+    constructor(props?: Partial<OETHFraxStaking>) {
         Object.assign(this, props)
     }
 
@@ -21,12 +18,10 @@ export class OETH {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
+    /**
+     * - sfrxETH is what's actually stored here, slightly confusing and may want to change.
+     * - used by balance sheet
+     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupply!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rebasingSupply!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    nonRebasingSupply!: bigint
+    frxETH!: bigint
 }

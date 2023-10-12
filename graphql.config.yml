@@ -1,4 +1,14 @@
-schema: schema.graphql
-documents: '**/*.graphql'
+projects:
+  combined:
+    schema: schema.graphql
+  base:
+    schema: schema-base.graphql
+  oeth:
+    schema: schema-oeth.graphql
+  ousd:
+    schema: schema-ousd.graphql
+  ogv:
+    schema: schema-ogv.graphql
 include:
   - types.graphql
+  - types-otoken.graphql
