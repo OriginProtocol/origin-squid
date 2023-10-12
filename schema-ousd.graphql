@@ -178,7 +178,7 @@ type OUSDMetaStrategy @entity {
   usdc: BigInt!
 }
 
-type ConvexLUSDPlus3Crv @entity {
+type OUSDConvexLUSDPlus3Crv @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
