@@ -1,7 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 import {OETHAddress} from "./oethAddress.model"
-import {OETHHistoryType} from "./_oethHistoryType"
+import {HistoryType} from "./_historyType"
 
 /**
  * The History entity tracks events that change the balance of OETH for an address.
@@ -37,5 +37,5 @@ export class OETHHistory {
     txHash!: string
 
     @Column_("varchar", {length: 8, nullable: false})
-    type!: OETHHistoryType
+    type!: HistoryType
 }

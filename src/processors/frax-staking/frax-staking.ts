@@ -2,7 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
-import { FraxStaking } from '../../model'
+import { OETHFraxStaking } from '../../model'
 import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import {
@@ -12,7 +12,7 @@ import {
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  fraxStakings: FraxStaking[]
+  fraxStakings: OETHFraxStaking[]
   promises: Promise<unknown>[]
 }
 
@@ -62,7 +62,7 @@ const processTransfer = async (
         const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatestEntity(
           ctx,
-          FraxStaking,
+          OETHFraxStaking,
           result.fraxStakings,
           timestampId,
         )
@@ -70,7 +70,7 @@ const processTransfer = async (
         let fraxStaking = current
         if (!fraxStaking) {
           result.promises.push(ensureExchangeRate(ctx, block, 'ETH', 'sfrxETH'))
-          fraxStaking = new FraxStaking({
+          fraxStaking = new OETHFraxStaking({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,

@@ -1,6 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
-import {OUSDRebasingOption} from "./_ousdRebasingOption"
+import {RebasingOption} from "./_rebasingOption"
 import {OUSDHistory} from "./ousdHistory.model"
 
 /**
@@ -19,7 +19,7 @@ export class OUSDAddress {
     isContract!: boolean
 
     @Column_("varchar", {length: 6, nullable: false})
-    rebasingOption!: OUSDRebasingOption
+    rebasingOption!: RebasingOption
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance!: bigint

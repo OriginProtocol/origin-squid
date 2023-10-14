@@ -10,30 +10,18 @@ type OUSD @entity {
   nonRebasingSupply: BigInt!
 }
 
-enum OUSDRebasingOption {
-  OptIn
-  OptOut
-}
-
 """
 The OUSD balance, history and other information for a given address.
 """
 type OUSDAddress @entity {
   id: ID! @index
   isContract: Boolean!
-  rebasingOption: OUSDRebasingOption!
+  rebasingOption: RebasingOption!
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
   lastUpdated: DateTime!
   history: [OUSDHistory!]! @derivedFrom(field: "address")
-}
-
-enum OUSDHistoryType {
-  Swap
-  Sent
-  Received
-  Yield
 }
 
 """
@@ -47,7 +35,7 @@ type OUSDHistory @entity {
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
-  type: OUSDHistoryType!
+  type: HistoryType!
 }
 
 """
@@ -75,7 +63,7 @@ type OUSDRebaseOption @entity {
   blockNumber: Int! @index
   txHash: String! @index
   address: OUSDAddress!
-  status: OUSDRebasingOption!
+  status: RebasingOption!
 }
 
 """

@@ -74,3 +74,163 @@ Catalog of data requirements.
     - Available for collection
     - Drip rate (1d, 1h, 1m)
 
+## [prometheus-monitoring](https://github.com/oplabs/prometheus-monitoring)
+
+### [Metrics](https://github.com/oplabs/prometheus-monitoring/blob/2ef3f67ccd88a965c67553457a265b9853c57b33/lambda-scrapers/exporters/src/utils/prometheus.js)
+
+#### total_supply
+
+Track total supply for **OUSD**, **OGV**, and **OETH**.
+
+#### vault
+
+Vault price metrics for: `["USDC", "USDT", "DAI"]`
+
+- `vault.priceUnitMint(assetAddress)`
+- `vault.priceUnitRedeem(assetAddress)`
+
+Vault holdings (`balanceOf`) for:
+
+- OUSD: `["USDC", "USDT", "DAI"]`
+- OETH: `["WETH", "stETH", "rETH", "frxETH"]`
+
+#### strategies
+
+OUSD Holdings: `["USDC", "USDT", "DAI"]`
+
+- Compound
+- Aave
+- Convex
+- MorphoCompound
+- MorphoAave
+- OUSDMeta
+- LUSDMeta
+
+OETH Holdings: `["frxETH", "rETH", "stETH", "WETH"]`
+
+- FraxETH
+- CurveAMO
+
+#### threePool
+
+Assets: `["USDC", "USDT", "DAI"]`
+
+```javascript
+const threepoolCoinIndexMap = {
+  DAI: 0,
+  USDC: 1,
+  USDT: 2,
+};
+
+contracts.ThreePool
+
+contract.balances(threepoolCoinIndexMap[asset])
+```
+
+#### metapools
+
+- `curveMetapoolBalanceMetric`
+    - addresses.OUSDMetapool: 0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca
+        - OUSD: `main_coin_balance = await poolContract.balances(0)`
+        - ThreePoolLP: `three_crv_balance = await poolContract.balances(1)`
+    - addresses.LUSDMetapool: 0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca
+        - LUSD: `main_coin_balance = await poolContract.balances(0)`
+        - ThreePoolLP: `three_crv_balance = await poolContract.balances(1)`
+- `balancerPoolMetric`
+    - Here we save the **rate** and **balance** for each pool.
+        - If an asset doesn't have a rate provider (zero address) default to 1e18 as suggested by
+          Balancer: https://docs.balancer.fi/reference/contracts/rate-providers.html
+        - rETH_sfrxETH_wstETH
+            - balancerPoolId: 0x42ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b
+            - poolAddress: 0x42ED016F826165C2e5976fe5bC3df540C5aD0Af7
+    - rETH_WETH
+        - balancerPoolId: 0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112
+        - poolAddress: 0x1E19CF2D73a72Ef1332C882F20534B6519Be0276
+
+```javascript
+const [tokens, balances] = await balancerVault.getPoolTokens(poolId);
+const rateProviders = await getBalancerPoolRateProviders(poolAddress);
+rateProvider.getRate()
+const balancerMetaStablePoolABI = [
+  "function getRateProviders() external view returns (address[])",
+];
+```
+
+#### oeth
+
+- curvePoolBalanceMetric: `poolContract.balances(0) or poolContract.balances(1)`
+    - addresses.EthFrxEthPool: ETH frxETH
+    - addresses.EthStEthPool: ETH stETH
+    - addresses.REthEthPool: rETH ETH
+    - addresses.WEthStEthPool: WETH stETH
+    - addresses.OEthEthPool: OETH ETH
+
+#### aave_comp_platforms
+
+- AaveCompoundBorrowableMetric:  `"USDC", "USDT", "DAI"`
+    - For each of the below:
+
+```javascript
+balance = await assetContract.balanceOf(address)
+```
+
+`assetContract` being USDC, USDT, or DAI
+balanceOf `address` from the map below.
+
+```javascript
+const aaveAssetToPlatformMap = {
+  USDT: {
+    token: "aUSDT",
+    address: addresses.aUSDT, // 0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811
+  },
+  USDC: {
+    token: "aUSDC",
+    address: addresses.aUSDC, // 0xBcca60bB61934080951369a648Fb03DF4F96263C
+  },
+  DAI: {
+    token: "aDAI",
+    address: addresses.aDAI, // 0x028171bca77440897b824ca71d1c56cac55b68a3
+  },
+};
+```
+
+#### rebasing_credits
+
+- ✅ OETH
+    - This is done for OETH in Subsquid.
+- OUSD
+    - A virtually identical implementation should work for OUSD.
+
+
+- `rebasingCreditsPerTokenMetric`: OETH, OUSD
+    - `event TotalSupplyUpdatedHighres(uint256 totalSupply, uint256 rebasingCredits, uint256 rebasingCreditsPerToken)`
+- `rebasingCreditsMetric`: OETH, OUSD
+    - `function rebasingCredits() external view returns (uint256)`
+- `nonRebasingSupplyMetric`: OETH, OUSD
+    - `function nonRebasingSupply() external view returns (uint256)`
+
+##### Ramblings
+
+- AaveCompoundBorrowableMetric
+    - TRACK ERC20 BALANCES
+        - Is this as simple as tracking transfers or do some of these receive balance in other ways? (magical rebasing,
+          etc...)
+    - cUSDT: "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9"
+    - cUSDC: "0x39aa39c021dfbae8fac545936693ac917d5e7563"
+    - cDAI: "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+    - aUSDT: "0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811"
+    - aUSDC: "0xBcca60bB61934080951369a648Fb03DF4F96263C"
+    - aDAI: "0x028171bca77440897b824ca71d1c56cac55b68a3"
+- balancerPoolMetric
+    - balancer vault `getPoolTokens(poolId)` data
+    -
+- curveMetapoolBalanceMetric
+- curvePoolBalanceMetric
+- nonRebasingSupplyMetric
+- rebasingCreditsMetric
+- rebasingCreditsPerTokenMetric
+- strategyHoldingMetric
+- threepoolBalanceMetric
+- totalSupplyMetric
+- vaultHoldingMetric
+- vaultUSDPriceMetric

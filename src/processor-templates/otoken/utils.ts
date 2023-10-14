@@ -1,18 +1,24 @@
 import dayjs from 'dayjs'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
 
-import * as oeth from '../../abi/oeth'
-import { APY, Address, Rebase, RebasingOption } from '../../model'
+import * as otoken from '../../abi/otoken'
+import {
+  OETHAPY,
+  OETHAddress,
+  OETHRebase,
+  OUSDAddress,
+  RebasingOption,
+} from '../../model'
 import { Context } from '../../processor'
+
+export type Newable<T> = { new (partial: Partial<T>): T }
 
 /**
  * Create a new Address entity
  */
-export async function createAddress(
-  ctx: Context,
-  addr: string,
-  lastUpdated?: Date,
-): Promise<Address> {
+export async function createAddress<
+  T extends typeof OETHAddress | typeof OUSDAddress,
+>(entity: T, ctx: Context, addr: string, lastUpdated?: Date) {
   let isContract: boolean = false
   if (addr !== '0x0000000000000000000000000000000000000000') {
     isContract =
@@ -20,7 +26,7 @@ export async function createAddress(
   }
 
   // ctx.log.info(`New address ${rawAddress}`);
-  return new Address({
+  return new entity({
     id: addr,
     balance: 0n,
     earned: 0n,
@@ -36,16 +42,18 @@ export async function createAddress(
  */
 export async function createRebaseAPY(
   ctx: Context,
-  apies: APY[],
+  apies: OETHAPY[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
-  rebaseEvent: ReturnType<typeof oeth.events.TotalSupplyUpdatedHighres.decode>,
+  rebaseEvent: ReturnType<
+    typeof otoken.events.TotalSupplyUpdatedHighres.decode
+  >,
   lastYieldDistributionEvent: {
     fee: bigint
     yield: bigint
   },
-): Promise<Rebase> {
-  const rebase = new Rebase({
+): Promise<OETHRebase> {
+  const rebase = new OETHRebase({
     id: log.id,
     blockNumber: block.header.height,
     timestamp: new Date(block.header.timestamp),
@@ -64,7 +72,7 @@ export async function createRebaseAPY(
   // get last APY to compare with current one
   let lastApy =
     apies.slice(apies.length - 2).find((apy) => apy.id < dateId) ??
-    (await ctx.store.findOne(APY, {
+    (await ctx.store.findOne(OETHAPY, {
       where: { id: LessThan(dateId) },
       order: { id: 'DESC' },
     }))
@@ -72,11 +80,11 @@ export async function createRebaseAPY(
   // check if there is already an APY for the current date
   let apy =
     apies.slice(apies.length - 1).find((apy) => apy.id === dateId) ??
-    (await ctx.store.findOne(APY, { where: { id: dateId } }))
+    (await ctx.store.findOne(OETHAPY, { where: { id: dateId } }))
   // ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
   // create a new APY if it doesn't exist
   if (!apy) {
-    apy = new APY({
+    apy = new OETHAPY({
       id: dateId,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
@@ -134,11 +142,14 @@ export async function createRebaseAPY(
   // calculate average APY for the last 7, 14 and 30 days
   await Promise.all(
     [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
-      const pastAPYs = await ctx.store.findBy(APY, {
+      const pastAPYs = await ctx.store.findBy(OETHAPY, {
         id: MoreThanOrEqual(i.value),
       })
       apy![i.key] =
-        pastAPYs.reduce((acc: number, cur: APY) => acc + cur.apy, apy!.apy) /
+        pastAPYs.reduce(
+          (acc: number, cur: OETHAPY) => acc + cur.apy,
+          apy!.apy,
+        ) /
         (pastAPYs.length + 1)
     }),
   )

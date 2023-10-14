@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class ConvexLUSDPlus3Crv {
-    constructor(props?: Partial<ConvexLUSDPlus3Crv>) {
+export class OUSDConvexLUSDPlus3Crv {
+    constructor(props?: Partial<OUSDConvexLUSDPlus3Crv>) {
         Object.assign(this, props)
     }
 

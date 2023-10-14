@@ -1,4 +1,4 @@
-export enum OUSDRebasingOption {
+export enum RebasingOption {
     OptIn = "OptIn",
     OptOut = "OptOut",
 }

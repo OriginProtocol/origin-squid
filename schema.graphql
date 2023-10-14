@@ -17,7 +17,18 @@ type ExchangeRate @entity {
   quote: String!
   rate: BigInt!
 }
-"""
+
+enum RebasingOption {
+  OptIn
+  OptOut
+}
+
+enum HistoryType {
+  Swap
+  Sent
+  Received
+  Yield
+}"""
 The OETH entity tracks the change in total supply of OETH over time.
 """
 type OETH @entity {
@@ -29,30 +40,18 @@ type OETH @entity {
   nonRebasingSupply: BigInt!
 }
 
-enum OETHRebasingOption {
-  OptIn
-  OptOut
-}
-
 """
 The OETH balance, history and other information for a given address.
 """
 type OETHAddress @entity {
   id: ID! @index
   isContract: Boolean!
-  rebasingOption: OETHRebasingOption!
+  rebasingOption: RebasingOption!
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
   lastUpdated: DateTime!
   history: [OETHHistory!]! @derivedFrom(field: "address")
-}
-
-enum OETHHistoryType {
-  Swap
-  Sent
-  Received
-  Yield
 }
 
 """
@@ -66,7 +65,7 @@ type OETHHistory @entity {
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
-  type: OETHHistoryType!
+  type: HistoryType!
 }
 
 """
@@ -94,7 +93,7 @@ type OETHRebaseOption @entity {
   blockNumber: Int! @index
   txHash: String! @index
   address: OETHAddress!
-  status: OETHRebasingOption!
+  status: RebasingOption!
 }
 
 """
@@ -226,30 +225,18 @@ type OUSD @entity {
   nonRebasingSupply: BigInt!
 }
 
-enum OUSDRebasingOption {
-  OptIn
-  OptOut
-}
-
 """
 The OUSD balance, history and other information for a given address.
 """
 type OUSDAddress @entity {
   id: ID! @index
   isContract: Boolean!
-  rebasingOption: OUSDRebasingOption!
+  rebasingOption: RebasingOption!
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
   lastUpdated: DateTime!
   history: [OUSDHistory!]! @derivedFrom(field: "address")
-}
-
-enum OUSDHistoryType {
-  Swap
-  Sent
-  Received
-  Yield
 }
 
 """
@@ -263,7 +250,7 @@ type OUSDHistory @entity {
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
-  type: OUSDHistoryType!
+  type: HistoryType!
 }
 
 """
@@ -291,7 +278,7 @@ type OUSDRebaseOption @entity {
   blockNumber: Int! @index
   txHash: String! @index
   address: OUSDAddress!
-  status: OUSDRebasingOption!
+  status: RebasingOption!
 }
 
 """
@@ -394,7 +381,7 @@ type OUSDMetaStrategy @entity {
   usdc: BigInt!
 }
 
-type ConvexLUSDPlus3Crv @entity {
+type OUSDConvexLUSDPlus3Crv @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index

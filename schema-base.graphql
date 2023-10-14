@@ -15,3 +15,15 @@ type ExchangeRate @entity {
   quote: String!
   rate: BigInt!
 }
+
+enum RebasingOption {
+  OptIn
+  OptOut
+}
+
+enum HistoryType {
+  Swap
+  Sent
+  Received
+  Yield
+}

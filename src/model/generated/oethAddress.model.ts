@@ -1,6 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
-import {OETHRebasingOption} from "./_oethRebasingOption"
+import {RebasingOption} from "./_rebasingOption"
 import {OETHHistory} from "./oethHistory.model"
 
 /**
@@ -19,7 +19,7 @@ export class OETHAddress {
     isContract!: boolean
 
     @Column_("varchar", {length: 6, nullable: false})
-    rebasingOption!: OETHRebasingOption
+    rebasingOption!: RebasingOption
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance!: bigint

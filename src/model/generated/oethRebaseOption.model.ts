@@ -1,6 +1,6 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import {OETHAddress} from "./oethAddress.model"
-import {OETHRebasingOption} from "./_oethRebasingOption"
+import {RebasingOption} from "./_rebasingOption"
 
 /**
  * The RebaseOption entity tracks historical rebase option changes by address.
@@ -31,5 +31,5 @@ export class OETHRebaseOption {
     address!: OETHAddress
 
     @Column_("varchar", {length: 6, nullable: false})
-    status!: OETHRebasingOption
+    status!: RebasingOption
 }

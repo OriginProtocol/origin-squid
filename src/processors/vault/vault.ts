@@ -3,7 +3,7 @@ import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
 import * as lido from '../../abi/lido'
-import { Vault } from '../../model'
+import { OETHVault } from '../../model'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import {
@@ -17,7 +17,7 @@ import {
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  vaults: Vault[]
+  vaults: OETHVault[]
   promises: Promise<unknown>[]
 }
 
@@ -66,7 +66,7 @@ const processStEthRebase = async (
     log.address === STETH_ADDRESS &&
     log.topics[0] === lido.events.TokenRebased.topic
   ) {
-    const { vault } = await getLatestVault(ctx, result, block)
+    const { vault } = await getLatestOETHVault(ctx, result, block)
     const contract = new lido.Contract(ctx, block.header, STETH_ADDRESS)
     vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
   }
@@ -84,7 +84,7 @@ const processTransfer = async (
       address: OETH_VAULT_ADDRESS,
       tokens: VAULT_ERC20_ADDRESSES,
       fn: async ({ token, change }) => {
-        const { vault } = await getLatestVault(ctx, result, block)
+        const { vault } = await getLatestOETHVault(ctx, result, block)
         if (token === WETH_ADDRESS) {
           vault.weth += change
         } else if (token === RETH_ADDRESS) {
@@ -99,7 +99,7 @@ const processTransfer = async (
   }
 }
 
-const getLatestVault = async (
+const getLatestOETHVault = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
@@ -108,7 +108,7 @@ const getLatestVault = async (
   const timestampId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatestEntity(
     ctx,
-    Vault,
+    OETHVault,
     result.vaults,
     timestampId,
   )
@@ -123,7 +123,7 @@ const getLatestVault = async (
         ['ETH', 'frxETH'],
       ]),
     )
-    vault = new Vault({
+    vault = new OETHVault({
       id: timestampId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,

@@ -102,6 +102,20 @@ export const run = ({
         ),
       )
       postTimes.forEach((t) => t())
+
+      // ctx.log.info({
+      //   blocks: ctx.blocks.length,
+      //   logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
+      //   traces: ctx.blocks.reduce((sum, block) => sum + block.traces.length, 0),
+      //   transactions: ctx.blocks.reduce(
+      //     (sum, block) => sum + block.transactions.length,
+      //     0,
+      //   ),
+      //   logArray: ctx.blocks.reduce(
+      //     (logs, block) => [...logs, ...block.logs],
+      //     [] as Log[],
+      //   ),
+      // })
     },
   )
 }

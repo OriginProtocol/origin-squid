@@ -1,7 +1,7 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 import {OUSDAddress} from "./ousdAddress.model"
-import {OUSDHistoryType} from "./_ousdHistoryType"
+import {HistoryType} from "./_historyType"
 
 /**
  * The History entity tracks events that change the balance of OUSD for an address.
@@ -37,5 +37,5 @@ export class OUSDHistory {
     txHash!: string
 
     @Column_("varchar", {length: 8, nullable: false})
-    type!: OUSDHistoryType
+    type!: HistoryType
 }
