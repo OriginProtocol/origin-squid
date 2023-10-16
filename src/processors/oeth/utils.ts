@@ -63,7 +63,7 @@ export async function createRebaseAPY(
 
   // get last APY to compare with current one
   let lastApy =
-    apies.slice(apies.length - 2).find((apy) => apy.id < dateId) ??
+    apies.find((apy) => apy.id < dateId) ??
     (await ctx.store.findOne(APY, {
       where: { id: LessThan(dateId) },
       order: { id: 'DESC' },
@@ -71,7 +71,7 @@ export async function createRebaseAPY(
 
   // check if there is already an APY for the current date
   let apy =
-    apies.slice(apies.length - 1).find((apy) => apy.id === dateId) ??
+    apies.find((apy) => apy.id === dateId) ??
     (await ctx.store.findOne(APY, { where: { id: dateId } }))
   // ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
   // create a new APY if it doesn't exist
@@ -106,16 +106,15 @@ export async function createRebaseAPY(
   apy.rebasingCreditsPerToken = rebaseEvent.rebasingCreditsPerToken
 
   // this should normally be 1 day but more secure to calculate it
-  const diffTime = Math.abs(Date.parse(apy.id) - Date.parse(lastApy.id))
-  const dayDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const diffTime = apy.timestamp.getTime() - lastApy.timestamp.getTime()
+  const dayDiff = diffTime / (1000 * 60 * 60 * 24)
 
   apy.apr =
-    ((Number(lastApy.rebasingCreditsPerToken) /
+    (Number(lastApy.rebasingCreditsPerToken) /
       Number(apy.rebasingCreditsPerToken) -
       1) *
-      365.25) /
-    dayDiff
-  const periods_per_year = 365.25 / dayDiff
+    (365.25 / dayDiff)
+  const periods_per_year = 365.25 / Number(dayDiff)
   apy.apy = (1 + apy.apr / periods_per_year) ** periods_per_year - 1
 
   const last7daysDateId = {
@@ -143,5 +142,7 @@ export async function createRebaseAPY(
     }),
   )
 
+  // FIXME: we need something better than this
+  await ctx.store.save(apy)
   return rebase
 }
