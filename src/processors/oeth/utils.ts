@@ -146,7 +146,5 @@ export async function createRebaseAPY(
     }),
   )
 
-  // FIXME: we need something better than this
-  await ctx.store.save(apy)
   return rebase
 }
