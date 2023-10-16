@@ -34,16 +34,19 @@ export const setup = (processor: EvmBatchProcessor) => {
       curveLpToken.events.RemoveLiquidityOne.topic,
       // curve_lp_token.events.TokenExchange.topic, // Not sure if including this helps get up-to-date eth balances.
     ],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_CURVE_LP_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_CURVE_LP_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_CURVE_REWARD_LP_ADDRESS],
@@ -52,6 +55,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       baseRewardPool.events.Withdrawn.topic,
     ],
     topic1: [pad(OETH_CONVEX_ADDRESS)],
+    range: { from },
   })
   // Not sure if this is needed to get up-to-date ETH balances.
   // processor.addTransaction({

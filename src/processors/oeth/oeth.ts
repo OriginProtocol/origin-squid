@@ -24,6 +24,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       otoken.functions.rebaseOptIn.sighash,
     ],
     transaction: true,
+    range: { from },
   })
   processor.addLog({
     address: [OETH_ADDRESS],
@@ -32,10 +33,12 @@ export const setup = (processor: EvmBatchProcessor) => {
       otoken.events.TotalSupplyUpdatedHighres.topic,
     ],
     transaction: true,
+    range: { from },
   })
   processor.addLog({
     address: [OETH_VAULT_ADDRESS],
     topic0: [otokenVault.events.YieldDistribution.topic],
+    range: { from },
   })
 }
 

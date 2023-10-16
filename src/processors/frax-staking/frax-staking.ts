@@ -23,11 +23,13 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: [SFRXETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_FRAX_STAKING_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [SFRXETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_FRAX_STAKING_ADDRESS)],
+    range: { from },
   })
 }
 

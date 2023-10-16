@@ -59,9 +59,12 @@ export const processor = new EvmBatchProcessor()
 interface Processor {
   name?: string
   from?: number
+  initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
   setup?: (p: typeof processor) => void
   process: (ctx: Context) => Promise<void>
 }
+
+let initialized = false
 
 export const run = ({
   processors,
@@ -79,43 +82,67 @@ export const run = ({
   processor.run(
     new TypeormDatabase({ supportHotBlocks: true }),
     async (ctx) => {
-      resetProcessorState()
-      let start: number
-      const time = (name: string) => () => {
-        const message = `${name} ${Date.now() - start}ms`
-        return () => ctx.log.info(message)
+      try {
+        resetProcessorState()
+        let start: number
+        const time = (name: string) => () => {
+          const message = `${name} ${Date.now() - start}ms`
+          return () => ctx.log.info(message)
+        }
+
+        // Initialization Run
+        if (!initialized) {
+          ctx.log.info(`=== initializing`)
+          start = Date.now()
+          const times = await Promise.all(
+            processors
+              .filter((p) => p.initialize)
+              .map((p, index) =>
+                p.initialize!(ctx).then(
+                  time(p.name ?? `initializing processor-${index}`),
+                ),
+              ),
+          )
+          times.forEach((t) => t())
+        }
+
+        // Main Processing Run
+        ctx.log.info(`=== processing from ${ctx.blocks[0].header.height}`)
+        start = Date.now()
+        const times = await Promise.all(
+          processors.map((p, index) =>
+            p.process(ctx).then(time(p.name ?? `processor-${index}`)),
+          ),
+        )
+        times.forEach((t) => t())
+
+        // Post Processing Run
+        start = Date.now()
+        const postTimes = await Promise.all(
+          postProcessors.map((p, index) =>
+            p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
+          ),
+        )
+        postTimes.forEach((t) => t())
+      } catch (err) {
+        ctx.log.info({
+          blocks: ctx.blocks.length,
+          logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
+          traces: ctx.blocks.reduce(
+            (sum, block) => sum + block.traces.length,
+            0,
+          ),
+          transactions: ctx.blocks.reduce(
+            (sum, block) => sum + block.transactions.length,
+            0,
+          ),
+          logArray: ctx.blocks.reduce(
+            (logs, block) => [...logs, ...block.logs],
+            [] as Log[],
+          ),
+        })
+        throw err
       }
-
-      ctx.log.info(`=== processing from ${ctx.blocks[0].header.height}`)
-      start = Date.now()
-      const times = await Promise.all(
-        processors.map((p, index) =>
-          p.process(ctx).then(time(p.name ?? `processor-${index}`)),
-        ),
-      )
-      times.forEach((t) => t())
-
-      start = Date.now()
-      const postTimes = await Promise.all(
-        postProcessors.map((p, index) =>
-          p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
-        ),
-      )
-      postTimes.forEach((t) => t())
-
-      // ctx.log.info({
-      //   blocks: ctx.blocks.length,
-      //   logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
-      //   traces: ctx.blocks.reduce((sum, block) => sum + block.traces.length, 0),
-      //   transactions: ctx.blocks.reduce(
-      //     (sum, block) => sum + block.transactions.length,
-      //     0,
-      //   ),
-      //   logArray: ctx.blocks.reduce(
-      //     (logs, block) => [...logs, ...block.logs],
-      //     [] as Log[],
-      //   ),
-      // })
     },
   )
 }

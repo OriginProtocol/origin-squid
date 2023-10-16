@@ -159,11 +159,11 @@ const balancerMetaStablePoolABI = [
 #### oeth
 
 - curvePoolBalanceMetric: `poolContract.balances(0) or poolContract.balances(1)`
-    - addresses.EthFrxEthPool: ETH frxETH
-    - addresses.EthStEthPool: ETH stETH
-    - addresses.REthEthPool: rETH ETH
-    - addresses.WEthStEthPool: WETH stETH
-    - addresses.OEthEthPool: OETH ETH
+    - EthFrxEthPool: "0xa1f8a6807c402e4a15ef4eba36528a3fed24e577" - ETH frxETH
+    - REthEthPool: "0x0f3159811670c117c372428d4e69ac32325e4d0f" - ETH stETH
+    - EthStEthPool: "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022" - rETH ETH
+    - WEthStEthPool: "0x828b154032950c8ff7cf8085d841723db2696056" - WETH stETH
+    - OEthEthPool: "0x94B17476A93b3262d87B9a326965D1E91f9c13E7" - OETH ETH
 
 #### aave_comp_platforms
 
@@ -201,12 +201,13 @@ const aaveAssetToPlatformMap = {
 - OUSD
     - A virtually identical implementation should work for OUSD.
 
+For each of the above:
 
-- `rebasingCreditsPerTokenMetric`: OETH, OUSD
+- `rebasingCreditsPerTokenMetric`
     - `event TotalSupplyUpdatedHighres(uint256 totalSupply, uint256 rebasingCredits, uint256 rebasingCreditsPerToken)`
-- `rebasingCreditsMetric`: OETH, OUSD
+- `rebasingCreditsMetric`
     - `function rebasingCredits() external view returns (uint256)`
-- `nonRebasingSupplyMetric`: OETH, OUSD
+- `nonRebasingSupplyMetric`
     - `function nonRebasingSupply() external view returns (uint256)`
 
 ##### Ramblings

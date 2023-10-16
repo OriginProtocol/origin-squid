@@ -31,6 +31,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       balancerMetaPoolStrategy.events.Deposit.topic,
       balancerMetaPoolStrategy.events.Withdrawal.topic,
     ],
+    range: { from },
   })
   processor.addLog({
     address: [addresses.lpToken],
@@ -38,6 +39,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       metaStablePool.events.Transfer.topic,
       metaStablePool.events.PriceRateCacheUpdated.topic,
     ],
+    range: { from },
   })
   processor.addLog({
     address: [addresses.auraRewardsPool],
@@ -48,6 +50,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       baseRewardPool4626.events.Withdrawn.topic,
       baseRewardPool4626.events.Withdraw.topic,
     ],
+    range: { from },
   })
 }
 

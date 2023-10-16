@@ -45,6 +45,7 @@ type OTokenRebaseOption =
   | EntityClass<OUSDRebaseOption>
 
 export const createOTokenProcessor = (params: {
+  Upgrade_CreditsBalanceOfHighRes?: number
   OTOKEN_ADDRESS: string
   OTOKEN_VAULT_ADDRESS: string
   OToken: OToken
@@ -166,9 +167,22 @@ export const createOTokenProcessor = (params: {
       // update the address balance
       await Promise.all(
         [addressSub, addressAdd].map(async (address) => {
-          const credits = await token.creditsBalanceOfHighres(address.id)
-          const newBalance = (credits[0] * DECIMALS_18) / credits[1]
-          const change = newBalance - address.balance
+          let credits: [bigint, bigint] = [0n, 0n]
+          let newBalance: bigint
+          let change: bigint
+          if (
+            block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+          ) {
+            const credits = await token.creditsBalanceOfHighres(address.id)
+            newBalance = (credits[0] * DECIMALS_18) / credits[1]
+            change = newBalance - address.balance
+          } else {
+            const credits = await token
+              .creditsBalanceOf(address.id)
+              .then((credits) => credits.map((credit) => credit * 1000000000n))
+            newBalance = (credits[0] * DECIMALS_18) / credits[1]
+            change = newBalance - address.balance
+          }
           result.history.push(
             new params.OTokenHistory({
               // we can't use {t.id} because it's not unique

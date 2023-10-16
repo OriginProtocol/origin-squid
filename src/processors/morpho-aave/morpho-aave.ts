@@ -19,11 +19,13 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_MORPHO_AAVE_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_MORPHO_AAVE_ADDRESS)],
+    range: { from },
   })
 }
 

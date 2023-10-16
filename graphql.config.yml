@@ -20,5 +20,10 @@ projects:
     include:
       - schema-base.graphql
       - types.graphql
+  curve:
+    schema: schema-curve.graphql
+    include:
+      - schema-base.graphql
+      - types.graphql
 include:
   - types.graphql

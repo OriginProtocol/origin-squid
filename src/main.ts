@@ -14,15 +14,13 @@ run({
   processors: [
     oeth,
     ousd,
-    // vault,
-    // fraxStaking,
-    // morphoAave,
-    // dripper,
-    // curveLp,
-    // balancerMetaPoolStrategy,
+    vault,
+    fraxStaking,
+    morphoAave,
+    dripper,
+    curveLp,
+    balancerMetaPoolStrategy,
   ],
   // For processors which depend on results from other processors, post processors run after all processors have finished.
-  postProcessors: [
-    // exchangeRates
-  ],
+  postProcessors: [exchangeRates],
 })
