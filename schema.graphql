@@ -37,6 +37,7 @@ type CurvePoolBalance @entity {
   address: String!
   balance0: BigInt!
   balance1: BigInt!
+  balance2: BigInt!
 }
 """
 The OETH entity tracks the change in total supply of OETH over time.

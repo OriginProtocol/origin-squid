@@ -26,4 +26,7 @@ export class CurvePoolBalance {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance1!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance2!: bigint
 }
