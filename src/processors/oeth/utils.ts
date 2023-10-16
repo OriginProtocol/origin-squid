@@ -70,9 +70,13 @@ export async function createRebaseAPY(
     }))
 
   // check if there is already an APY for the current date
-  let apy =
-    apies.find((apy) => apy.id === dateId) ??
-    (await ctx.store.findOne(APY, { where: { id: dateId } }))
+  let apy = apies.find((apy) => apy.id === dateId)
+  if (!apy) {
+    apy = await ctx.store.findOne(APY, { where: { id: dateId } })
+    if (apy) {
+      apies.push(apy)
+    }
+  }
   // ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
   // create a new APY if it doesn't exist
   if (!apy) {
