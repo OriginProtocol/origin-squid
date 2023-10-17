@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 7
-description: 'The very first evm squid from manifest  '
+version: 8
+description: 'Origin Protocol 🦑'
 build:
 deploy:
   addons:

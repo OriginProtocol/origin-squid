@@ -1,13 +1,13 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import * as marshal from "./marshal"
-import {APY} from "./apy.model"
+import {OUSDAPY} from "./ousdapy.model"
 
 /**
- * The Rebase entity tracks historical rebase events on the OETH contract.
+ * The Rebase entity tracks historical rebase events on the OUSD contract.
  */
 @Entity_()
-export class Rebase {
-    constructor(props?: Partial<Rebase>) {
+export class OUSDRebase {
+    constructor(props?: Partial<OUSDRebase>) {
         Object.assign(this, props)
     }
 
@@ -36,8 +36,8 @@ export class Rebase {
     rebasingCreditsPerToken!: bigint
 
     @Index_()
-    @ManyToOne_(() => APY, {nullable: true})
-    apy!: APY
+    @ManyToOne_(() => OUSDAPY, {nullable: true})
+    apy!: OUSDAPY
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     fee!: bigint

@@ -21,9 +21,6 @@ export class OETH {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    /**
-     * The total supply of OETH tokens at the corresponding block.
-     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     totalSupply!: bigint
 

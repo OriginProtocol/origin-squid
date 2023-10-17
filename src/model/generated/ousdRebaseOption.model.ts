@@ -1,13 +1,13 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
-import {Address} from "./address.model"
+import {OUSDAddress} from "./ousdAddress.model"
 import {RebasingOption} from "./_rebasingOption"
 
 /**
  * The RebaseOption entity tracks historical rebase option changes by address.
  */
 @Entity_()
-export class RebaseOption {
-    constructor(props?: Partial<RebaseOption>) {
+export class OUSDRebaseOption {
+    constructor(props?: Partial<OUSDRebaseOption>) {
         Object.assign(this, props)
     }
 
@@ -27,8 +27,8 @@ export class RebaseOption {
     txHash!: string
 
     @Index_()
-    @ManyToOne_(() => Address, {nullable: true})
-    address!: Address
+    @ManyToOne_(() => OUSDAddress, {nullable: true})
+    address!: OUSDAddress
 
     @Column_("varchar", {length: 6, nullable: false})
     status!: RebasingOption

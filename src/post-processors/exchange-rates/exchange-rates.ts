@@ -4,11 +4,11 @@ import { useProcessorState } from '../../utils/state'
 import { Currency } from './currencies'
 import { getPrice } from './price-routing'
 
-const useExchangeRates = () =>
-  useProcessorState('exchange-rates', new Map<string, ExchangeRate>())
+const useExchangeRates = (ctx: Context) =>
+  useProcessorState(ctx, 'exchange-rates', new Map<string, ExchangeRate>())
 
 export const process = async (ctx: Context) => {
-  const [rates] = useExchangeRates()
+  const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
     ctx.log.info({ count: rates.size }, 'exchange-rates')
     await ctx.store.insert([...rates.values()])
@@ -21,7 +21,7 @@ export const ensureExchangeRate = async (
   base: Currency,
   quote: Currency,
 ) => {
-  const [exchangeRates] = useExchangeRates()
+  const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height
   const id = `${blockNumber}:${pair}`

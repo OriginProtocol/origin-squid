@@ -1,6 +1,6 @@
 import * as ethers from 'ethers'
 import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './oeth-vault.abi'
+import {ABI_JSON} from './otoken-vault.abi'
 
 export const abi = new ethers.Interface(ABI_JSON);
 

@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class MorphoAave {
-    constructor(props?: Partial<MorphoAave>) {
+export class OETHMorphoAave {
+    constructor(props?: Partial<OETHMorphoAave>) {
         Object.assign(this, props)
     }
 

@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class BalancerMetaPoolStrategy {
-    constructor(props?: Partial<BalancerMetaPoolStrategy>) {
+export class OETHCurveLP {
+    constructor(props?: Partial<OETHCurveLP>) {
         Object.assign(this, props)
     }
 
@@ -19,11 +19,20 @@ export class BalancerMetaPoolStrategy {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    total!: bigint
+    totalSupply!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rETH!: bigint
+    eth!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    weth!: bigint
+    oeth!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    totalSupplyOwned!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    ethOwned!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    oethOwned!: bigint
 }

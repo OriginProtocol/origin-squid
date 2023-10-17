@@ -1,6 +1,11 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
+/**
+ * Any entity which has a price associated with it should have that price go in here.
+ * Prices can change very frequently and we don't want those changes on the same track
+ * as values which change less frequently.
+ */
 @Entity_()
 export class ExchangeRate {
     constructor(props?: Partial<ExchangeRate>) {

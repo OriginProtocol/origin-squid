@@ -2,14 +2,14 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
-import { MorphoAave } from '../../model'
+import { OETHMorphoAave } from '../../model'
 import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  morphoAaves: MorphoAave[]
+  morphoAaves: OETHMorphoAave[]
 }
 
 export const from = 17367102 // https://etherscan.io/tx/0x15294349d566059bb37e200b2dba45428e237d6050de11862aa57c7875476526
@@ -19,11 +19,13 @@ export const setup = (processor: EvmBatchProcessor) => {
     address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_MORPHO_AAVE_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [WETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_MORPHO_AAVE_ADDRESS)],
+    range: { from },
   })
 }
 
@@ -56,7 +58,7 @@ const processTransfer = async (
         const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatestEntity(
           ctx,
-          MorphoAave,
+          OETHMorphoAave,
           result.morphoAaves,
           timestampId,
         )
@@ -64,7 +66,7 @@ const processTransfer = async (
         let morphoAave = current
         if (!morphoAave) {
           await ensureExchangeRate(ctx, block, 'ETH', 'WETH') // No async since WETH.
-          morphoAave = new MorphoAave({
+          morphoAave = new OETHMorphoAave({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,

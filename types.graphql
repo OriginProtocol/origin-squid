@@ -16,3 +16,6 @@ scalar BigDecimal
 scalar Bytes
 scalar DateTime
 scalar JSON
+
+
+# OToken Types

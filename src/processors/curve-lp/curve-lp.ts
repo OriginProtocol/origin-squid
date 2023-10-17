@@ -4,7 +4,7 @@ import { pad } from 'viem'
 import * as baseRewardPool from '../../abi/base-reward-pool'
 import * as curveLpToken from '../../abi/curve-lp-token'
 import * as erc20 from '../../abi/erc20'
-import { CurveLP } from '../../model'
+import { OETHCurveLP } from '../../model'
 import { Context } from '../../processor'
 import {
   OETH_ADDRESS,
@@ -16,7 +16,7 @@ import { getEthBalance } from '../../utils/getEthBalance'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  curveLPs: CurveLP[]
+  curveLPs: OETHCurveLP[]
 }
 
 export const from = Math.min(
@@ -34,16 +34,19 @@ export const setup = (processor: EvmBatchProcessor) => {
       curveLpToken.events.RemoveLiquidityOne.topic,
       // curve_lp_token.events.TokenExchange.topic, // Not sure if including this helps get up-to-date eth balances.
     ],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_CURVE_LP_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_ADDRESS],
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_CURVE_LP_ADDRESS)],
+    range: { from },
   })
   processor.addLog({
     address: [OETH_CURVE_REWARD_LP_ADDRESS],
@@ -52,6 +55,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       baseRewardPool.events.Withdrawn.topic,
     ],
     topic1: [pad(OETH_CONVEX_ADDRESS)],
+    range: { from },
   })
   // Not sure if this is needed to get up-to-date ETH balances.
   // processor.addTransaction({
@@ -215,7 +219,7 @@ const getLatestCurveLP = async (
   const timestampId = new Date(block.header.timestamp).toISOString()
   const { latest, current } = await getLatestEntity(
     ctx,
-    CurveLP,
+    OETHCurveLP,
     result.curveLPs,
     timestampId,
   )
@@ -223,7 +227,7 @@ const getLatestCurveLP = async (
   let isNew = false
   let curveLP = current
   if (!curveLP) {
-    curveLP = new CurveLP({
+    curveLP = new OETHCurveLP({
       id: timestampId,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,

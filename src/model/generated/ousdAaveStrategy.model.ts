@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class FraxStaking {
-    constructor(props?: Partial<FraxStaking>) {
+export class OUSDAaveStrategy {
+    constructor(props?: Partial<OUSDAaveStrategy>) {
         Object.assign(this, props)
     }
 
@@ -18,10 +18,12 @@ export class FraxStaking {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    /**
-     * - sfrxETH is what's actually stored here, slightly confusing and may want to change.
-     * - used by balance sheet
-     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    frxETH!: bigint
+    dai!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    usdt!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    usdc!: bigint
 }

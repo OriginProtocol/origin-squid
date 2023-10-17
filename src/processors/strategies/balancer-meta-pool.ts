@@ -4,7 +4,7 @@ import * as balancerMetaPoolStrategy from '../../abi/balancer-meta-pool-strategy
 import * as baseRewardPool4626 from '../../abi/base-reward-pool-4626'
 import * as metaStablePool from '../../abi/meta-stable-pool'
 import * as originLens from '../../abi/origin-lens'
-import { BalancerMetaPoolStrategy } from '../../model'
+import { OETHBalancerMetaPoolStrategy } from '../../model'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
@@ -31,6 +31,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       balancerMetaPoolStrategy.events.Deposit.topic,
       balancerMetaPoolStrategy.events.Withdrawal.topic,
     ],
+    range: { from },
   })
   processor.addLog({
     address: [addresses.lpToken],
@@ -38,6 +39,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       metaStablePool.events.Transfer.topic,
       metaStablePool.events.PriceRateCacheUpdated.topic,
     ],
+    range: { from },
   })
   processor.addLog({
     address: [addresses.auraRewardsPool],
@@ -48,6 +50,7 @@ export const setup = (processor: EvmBatchProcessor) => {
       baseRewardPool4626.events.Withdrawn.topic,
       baseRewardPool4626.events.Withdraw.topic,
     ],
+    range: { from },
   })
 }
 
@@ -70,7 +73,7 @@ const topicsToListenTo = new Set([
 ])
 
 interface ProcessResult {
-  strategies: BalancerMetaPoolStrategy[]
+  strategies: OETHBalancerMetaPoolStrategy[]
   promises: Promise<unknown>[]
 }
 
@@ -115,7 +118,7 @@ export const updateValues = async (
   const [{ current, latest }, { total, rETH, weth }] = await Promise.all([
     getLatestEntity(
       ctx,
-      BalancerMetaPoolStrategy,
+      OETHBalancerMetaPoolStrategy,
       result.strategies,
       timestampId,
     ),
@@ -142,7 +145,7 @@ export const updateValues = async (
       latest.weth !== weth
     ) {
       result.strategies.push(
-        new BalancerMetaPoolStrategy({
+        new OETHBalancerMetaPoolStrategy({
           id: timestampId,
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
