@@ -2,6 +2,7 @@
 
 ## v8
 
+- Data requirements analysis
 - Ability to handle multiple squid processors:
     - [main.ts](src%2Fmain.ts)
     - [processor.ts](src%2Fprocessor.ts)
