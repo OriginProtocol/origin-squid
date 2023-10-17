@@ -4,10 +4,8 @@ import {
   EvmBatchProcessor,
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
+import { createLogger } from '@subsquid/logger'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { create } from 'domain'
-
-import { resetProcessorState } from './utils/state'
 
 export const createSquidProcessor = () =>
   new EvmBatchProcessor()
@@ -70,13 +68,19 @@ let initialized = false
 
 export const run = (
   params: {
-    stateSchema?: string
+    name: string
     processors: Processor[]
     postProcessors?: Processor[]
   }[],
 ) => {
-  for (const { stateSchema, processors, postProcessors = [] } of params) {
+  for (const { name, processors, postProcessors = [] } of params) {
     const processor = createSquidProcessor()
+    if (name) {
+      // Hack our logging so it's unique per processor.
+      const hackableProcessor = processor as any
+      hackableProcessor.getLogger = () => createLogger(`sqd:processor-${name}`)
+    }
+
     processor.setBlockRange({
       from: Math.min(
         ...(processors.map((p) => p.from).filter((x) => x) as number[]),
@@ -84,10 +88,15 @@ export const run = (
     })
     processors.forEach((p) => p.setup?.(processor))
     processor.run(
-      new TypeormDatabase({ stateSchema, supportHotBlocks: true }),
-      async (ctx) => {
+      new TypeormDatabase({
+        stateSchema: `${name}-processor`,
+        supportHotBlocks: true,
+      }),
+      async (_ctx) => {
+        const ctx = _ctx as Context
         try {
-          resetProcessorState()
+          ctx.name = name
+          ctx.state = new Map<string, unknown>()
           let start: number
           const time = (name: string) => () => {
             const message = `${name} ${Date.now() - start}ms`
@@ -96,7 +105,8 @@ export const run = (
 
           // Initialization Run
           if (!initialized) {
-            ctx.log.info(`=== initializing`)
+            initialized = true
+            ctx.log.info(`initializing`)
             start = Date.now()
             const times = await Promise.all(
               processors
@@ -111,14 +121,15 @@ export const run = (
           }
 
           // Main Processing Run
-          ctx.log.info(`=== processing from ${ctx.blocks[0].header.height}`)
           start = Date.now()
           const times = await Promise.all(
             processors.map((p, index) =>
               p.process(ctx).then(time(p.name ?? `processor-${index}`)),
             ),
           )
-          times.forEach((t) => t())
+          if (process.env.DEBUG_PERF === 'true') {
+            times.forEach((t) => t())
+          }
 
           if (postProcessors) {
             // Post Processing Run
@@ -128,7 +139,9 @@ export const run = (
                 p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
               ),
             )
-            postTimes.forEach((t) => t())
+            if (process.env.DEBUG_PERF === 'true') {
+              postTimes.forEach((t) => t())
+            }
           }
         } catch (err) {
           ctx.log.info({
@@ -157,7 +170,10 @@ export const run = (
 export type Fields = EvmBatchProcessorFields<
   ReturnType<typeof createSquidProcessor>
 >
-export type Context = DataHandlerContext<Store, Fields>
+export type Context = DataHandlerContext<Store, Fields> & {
+  name: string
+  state: Map<string, unknown>
+}
 export type Block = Context['blocks']['0']
 export type Log = Context['blocks']['0']['logs']['0']
 export type Transaction = Context['blocks']['0']['transactions']['0']

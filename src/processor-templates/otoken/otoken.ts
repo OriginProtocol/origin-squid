@@ -1,3 +1,4 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { v4 as uuidv4 } from 'uuid'
 
 import * as otoken from '../../abi/otoken'
@@ -43,6 +44,42 @@ type OTokenRebase = EntityClass<OETHRebase> | EntityClass<OUSDRebase>
 type OTokenRebaseOption =
   | EntityClass<OETHRebaseOption>
   | EntityClass<OUSDRebaseOption>
+
+export const createOTokenSetup =
+  ({
+    address,
+    vaultAddress,
+    from,
+  }: {
+    address: string
+    vaultAddress: string
+    from: number
+  }) =>
+  (processor: EvmBatchProcessor) => {
+    processor.addTrace({
+      type: ['call'],
+      callSighash: [
+        otoken.functions.rebaseOptOut.sighash,
+        otoken.functions.rebaseOptIn.sighash,
+      ],
+      transaction: true,
+      range: { from },
+    })
+    processor.addLog({
+      address: [address],
+      topic0: [
+        otoken.events.Transfer.topic,
+        otoken.events.TotalSupplyUpdatedHighres.topic,
+      ],
+      transaction: true,
+      range: { from },
+    })
+    processor.addLog({
+      address: [vaultAddress],
+      topic0: [otokenVault.events.YieldDistribution.topic],
+      range: { from },
+    })
+  }
 
 export const createOTokenProcessor = (params: {
   Upgrade_CreditsBalanceOfHighRes?: number

@@ -12,11 +12,11 @@ import * as vault from './processors/vault'
 
 run([
   {
-    stateSchema: 'curve-processing',
+    name: 'curve',
     processors: [curve],
   },
   {
-    stateSchema: 'oeth-processing',
+    name: 'oeth',
     processors: [
       oeth,
       vault,
@@ -29,7 +29,7 @@ run([
     postProcessors: [exchangeRates],
   },
   {
-    stateSchema: 'ousd-processing',
+    name: 'ousd',
     processors: [ousd],
   },
 ])

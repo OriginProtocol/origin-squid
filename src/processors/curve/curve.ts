@@ -65,15 +65,15 @@ const pools = [
   },
 ] as const
 
-const processors = pools.map((pool) =>
-  createCurveProcessor(pool.address.toLowerCase(), pool.count),
-)
-
 export const setup = (processor: EvmBatchProcessor) => {
   for (const pool of pools) {
-    createCurveSetup(pool.address.toLowerCase(), pool.from, processor)
+    createCurveSetup(pool.from, processor)
   }
 }
+
+const processors = pools.map((pool) =>
+  createCurveProcessor(pool.address.toLowerCase(), pool.count, pool.from),
+)
 
 export const process = async (ctx: Context) => {
   await Promise.all(processors.map((p) => p(ctx)))

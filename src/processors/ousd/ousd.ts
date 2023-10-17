@@ -1,7 +1,3 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import * as otoken from '../../abi/otoken'
-import * as otokenVault from '../../abi/otoken-vault'
 import {
   OUSD,
   OUSDAPY,
@@ -10,40 +6,21 @@ import {
   OUSDRebase,
   OUSDRebaseOption,
 } from '../../model'
-import { createOTokenProcessor } from '../../processor-templates/otoken'
+import {
+  createOTokenProcessor,
+  createOTokenSetup,
+} from '../../processor-templates/otoken'
 import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS } from '../../utils/addresses'
 
 // export const from = 10884563 // https://etherscan.io/tx/0x9141921f5ebf072e58c00fe56332b6bee0c02f0ae4f54c42999b8a3a88662681
 // export const from = 11585978 // OUSDReset - Has issues with archive queries. :(
 export const from = 13533937 // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
 
-export const setup = (processor: EvmBatchProcessor) => {
-  processor.addTrace({
-    type: ['call'],
-    callSighash: [
-      otoken.functions.rebaseOptOut.sighash,
-      otoken.functions.rebaseOptIn.sighash,
-    ],
-    transaction: true,
-    range: { from },
-  })
-  processor.addLog({
-    address: [OUSD_ADDRESS],
-    topic0: [
-      otoken.events.Transfer.topic,
-      otoken.events.TotalSupplyUpdatedHighres.topic,
-    ],
-    transaction: true,
-    range: { from },
-  })
-  processor.addLog({
-    address: [OUSD_VAULT_ADDRESS],
-    topic0: [otokenVault.events.YieldDistribution.topic],
-    range: { from },
-  })
-}
-
-// TODO: Handle the version upgrade gracefully so we have accurate numbers.
+export const setup = createOTokenSetup({
+  address: OUSD_ADDRESS,
+  vaultAddress: OUSD_VAULT_ADDRESS,
+  from,
+})
 
 export const process = createOTokenProcessor({
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf

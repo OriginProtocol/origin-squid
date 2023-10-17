@@ -1,8 +1,11 @@
-let state = new Map<string, unknown>()
-export const resetProcessorState = () => {
-  state = new Map<string, unknown>()
-}
-export const useProcessorState = <T>(key: string, defaultValue: T) => {
+import { Context } from '../processor'
+
+export const useProcessorState = <T>(
+  ctx: Context,
+  key: string,
+  defaultValue: T,
+) => {
+  const { state } = ctx
   let value = state.get(key) as T | undefined
   if (!value) {
     value = defaultValue
