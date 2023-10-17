@@ -6,12 +6,12 @@ import {
   OETHAPY,
   OETHAddress,
   OETHRebase,
+  OUSDAPY,
   OUSDAddress,
+  OUSDRebase,
   RebasingOption,
 } from '../../model'
 import { Context } from '../../processor'
-
-export type Newable<T> = { new (partial: Partial<T>): T }
 
 /**
  * Create a new Address entity
@@ -40,9 +40,14 @@ export async function createAddress<
 /**
  * Create Rebase entity and set APY
  */
-export async function createRebaseAPY(
+export async function createRebaseAPY<
+  TOTokenAPY extends typeof OETHAPY | typeof OUSDAPY,
+  TOTokenRebase extends typeof OETHRebase | typeof OUSDRebase,
+>(
+  OTokenAPY: TOTokenAPY,
+  OTokenRebase: TOTokenRebase,
   ctx: Context,
-  apies: OETHAPY[],
+  apies: InstanceType<TOTokenAPY>[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
   rebaseEvent: ReturnType<
@@ -52,8 +57,8 @@ export async function createRebaseAPY(
     fee: bigint
     yield: bigint
   },
-): Promise<OETHRebase> {
-  const rebase = new OETHRebase({
+) {
+  const rebase = new OTokenRebase({
     id: log.id,
     blockNumber: block.header.height,
     timestamp: new Date(block.header.timestamp),
@@ -72,15 +77,19 @@ export async function createRebaseAPY(
   // get last APY to compare with current one
   let lastApy =
     apies.find((apy) => apy.id < dateId) ??
-    (await ctx.store.findOne(OETHAPY, {
+    (await ctx.store.findOne(OTokenAPY, {
       where: { id: LessThan(dateId) },
       order: { id: 'DESC' },
     }))
 
   // check if there is already an APY for the current date
-  let apy = apies.find((apy) => apy.id === dateId)
+  let apy: InstanceType<TOTokenAPY> | undefined = apies.find(
+    (apy) => apy.id === dateId,
+  )
   if (!apy) {
-    apy = await ctx.store.findOne(OETHAPY, { where: { id: dateId } })
+    apy = (await ctx.store.findOne(OTokenAPY, {
+      where: { id: dateId },
+    })) as InstanceType<TOTokenAPY>
     if (apy) {
       apies.push(apy)
     }
@@ -88,13 +97,13 @@ export async function createRebaseAPY(
   // ctx.log.info(`APY: ${dateId} ${apy}, ${lastDateId} ${lastApy}`);
   // create a new APY if it doesn't exist
   if (!apy) {
-    apy = new OETHAPY({
+    apy = new OTokenAPY({
       id: dateId,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
       txHash: log.transactionHash,
       rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
-    })
+    }) as InstanceType<TOTokenAPY>
     apies.push(apy)
   }
 
@@ -145,14 +154,11 @@ export async function createRebaseAPY(
   // calculate average APY for the last 7, 14 and 30 days
   await Promise.all(
     [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
-      const pastAPYs = await ctx.store.findBy(OETHAPY, {
+      const pastAPYs = await ctx.store.findBy(OTokenAPY, {
         id: MoreThanOrEqual(i.value),
       })
       apy![i.key] =
-        pastAPYs.reduce(
-          (acc: number, cur: OETHAPY) => acc + cur.apy,
-          apy!.apy,
-        ) /
+        pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) /
         (pastAPYs.length + 1)
     }),
   )

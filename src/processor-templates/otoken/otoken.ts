@@ -302,6 +302,8 @@ export const createOTokenProcessor = (params: {
 
     // Rebase events
     let rebase = createRebaseAPY(
+      params.OTokenAPY,
+      params.OTokenRebase,
       ctx,
       result.apies,
       block,
