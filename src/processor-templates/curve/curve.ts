@@ -20,15 +20,15 @@ export const createCurveSetup = (
   processor.includeAllBlocks({ from })
 }
 
+let lastBlockHeightProcessed = 0
 export const createCurveProcessor =
   (poolAddress: string, count: number, from: number) =>
   async (ctx: Context) => {
     const result: ProcessResult = {
       curvePoolBalances: [],
     }
-    let last = 0
     const nextBlockIndex = ctx.blocks.findIndex(
-      (b) => b.header.height >= last + UPDATE_FREQUENCY,
+      (b) => b.header.height >= lastBlockHeightProcessed + UPDATE_FREQUENCY,
     )
     for (let i = nextBlockIndex; i < ctx.blocks.length; i += UPDATE_FREQUENCY) {
       const block = ctx.blocks[i]
@@ -52,7 +52,7 @@ export const createCurveProcessor =
         balance2: balances[2] ?? 0n,
       })
       result.curvePoolBalances.push(curve)
-      last = block.header.height
+      lastBlockHeightProcessed = block.header.height
     }
     await ctx.store.insert(result.curvePoolBalances)
   }

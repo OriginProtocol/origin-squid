@@ -1,5 +1,6 @@
 import * as exchangeRates from './post-processors/exchange-rates'
 import { run } from './processor'
+import * as aaveCompound from './processors/aave-compound'
 import * as curve from './processors/curve'
 import * as curveLp from './processors/curve-lp'
 import * as dripper from './processors/dripper'
@@ -12,8 +13,8 @@ import * as vault from './processors/vault'
 
 run([
   {
-    name: 'curve',
-    processors: [curve],
+    name: 'grafana-metrics',
+    processors: [aaveCompound, curve],
   },
   {
     name: 'oeth',

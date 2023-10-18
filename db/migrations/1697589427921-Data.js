@@ -1,10 +1,13 @@
-module.exports = class Data1697501723589 {
-    name = 'Data1697501723589'
+module.exports = class Data1697589427921 {
+    name = 'Data1697589427921'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c61a93768eed9e58ce399bbe01" ON "exchange_rate" ("block_number") `)
+        await db.query(`CREATE TABLE "balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "token" text NOT NULL, "address" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_079dddd31a81672e8143a649ca0" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_a956b410c329b8eca7898c3c51" ON "balance" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_6b451b59c9f6a6fdd685f530b2" ON "balance" ("block_number") `)
         await db.query(`CREATE TABLE "curve_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_40412750bb910ca560aa084dd88" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ffb0d0f86f03faacef7cb3e092" ON "curve_pool_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_db5522c865eb8ed76fa7aeb4a8" ON "curve_pool_balance" ("block_number") `)
@@ -121,6 +124,9 @@ module.exports = class Data1697501723589 {
         await db.query(`DROP TABLE "exchange_rate"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)
         await db.query(`DROP INDEX "public"."IDX_c61a93768eed9e58ce399bbe01"`)
+        await db.query(`DROP TABLE "balance"`)
+        await db.query(`DROP INDEX "public"."IDX_a956b410c329b8eca7898c3c51"`)
+        await db.query(`DROP INDEX "public"."IDX_6b451b59c9f6a6fdd685f530b2"`)
         await db.query(`DROP TABLE "curve_pool_balance"`)
         await db.query(`DROP INDEX "public"."IDX_ffb0d0f86f03faacef7cb3e092"`)
         await db.query(`DROP INDEX "public"."IDX_db5522c865eb8ed76fa7aeb4a8"`)
