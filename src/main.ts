@@ -1,3 +1,4 @@
+import * as dailyStats from './post-processors/daily-stats'
 import * as exchangeRates from './post-processors/exchange-rates'
 import { run } from './processor'
 import * as curve from './processors/curve'
@@ -26,10 +27,10 @@ run([
       curveLp,
       balancerMetaPoolStrategy,
     ],
-    postProcessors: [exchangeRates],
+    postProcessors: [exchangeRates, dailyStats],
   },
-  {
-    name: 'ousd',
-    processors: [ousd],
-  },
+  // {
+  //   name: 'ousd',
+  //   processors: [ousd],
+  // },
 ])

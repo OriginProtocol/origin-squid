@@ -189,6 +189,104 @@ type OETHBalancerMetaPoolStrategy @entity {
   rETH: BigInt!
   weth: BigInt!
 }
+
+type OETHDailyStat @entity {
+  id: ID!
+  """
+  Timestamp, eg 2023-10-17
+  """
+  blockNumber: Int! @index
+  """
+  Last block number stats were updated
+  """
+  timestamp: DateTime! @index
+  """
+  Timestamp of block number stats were updated
+  """
+  apr: Float!
+  apy: Float!
+  apy7DayAvg: Float!
+  apy14DayAvg: Float!
+  apy30DayAvg: Float!
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
+  amoSupply: BigInt!
+
+  yield: BigInt!
+  fees: BigInt!
+  revenue: BigInt!
+  revenue7DayAvg: BigInt!
+  revenue7DayTotal: BigInt!
+  revenueAllTime: BigInt!
+
+  pegPrice: BigInt!
+  """
+  Price of OETH in ETH
+  """
+  strategies: [OETHStrategyDailyStat] @derivedFrom(field: "dailyStatId")
+  collateral: [OETHCollateralDailyStat] @derivedFrom(field: "dailyStatId")
+}
+
+type OETHStrategyDailyStat @entity {
+  id: ID!
+  dailyStatId: OETHDailyStat!
+  total: BigInt!
+  """
+  Sum of tokens in strategy
+  """
+  tvl: BigInt!
+  """
+  Total ETH value
+  """
+  holdings: [OETHStrategyHoldingDailyStat]
+    @derivedFrom(field: "strategyDailyStatId")
+}
+
+type OETHStrategyHoldingDailyStat @entity {
+  id: ID!
+  strategyDailyStatId: OETHStrategyDailyStat!
+  """
+  Token symbol
+  """
+  symbol: String!
+
+  """
+  Amount held
+  """
+  amount: BigInt!
+
+  """
+  Total ETH value
+  """
+  value: BigInt!
+}
+
+type OETHCollateralDailyStat @entity {
+  id: ID!
+  dailyStatId: OETHDailyStat! @index
+  """
+  Token symbol
+  """
+  symbol: String!
+
+  """
+  Amount held
+  """
+  amount: BigInt!
+
+  """
+  Price in ETH
+  """
+  price: BigInt!
+
+  """
+  Total ETH value
+  """
+  value: BigInt!
+}
 # OGV Price (5m?)
 # OGV Market Cap (5m?)
 # OGV Circulating Supply
