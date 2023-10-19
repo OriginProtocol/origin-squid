@@ -30,6 +30,7 @@ run([
       balancerMetaPoolStrategy,
     ],
     postProcessors: [exchangeRates, dailyStats],
+    validators: [],
   },
   // {
   //   name: 'ousd',

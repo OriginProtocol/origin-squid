@@ -71,6 +71,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastFrax,
     lastMorpho,
     lastRethExchangeRate,
+    lastSfrxEthExchangeRate,
   ] = await Promise.all([
     ctx.store.findOne(OETHAPY, queryParams),
     ctx.store.findOne(OETH, queryParams),
@@ -81,6 +82,10 @@ async function updateDailyStats(ctx: Context, date: Date) {
     ctx.store.findOne(OETHMorphoAave, queryParams),
     ctx.store.findOne(ExchangeRate, {
       where: { timestamp: LessThanOrEqual(date), pair: 'ETH_rETH' },
+      order: { timestamp: 'desc' as FindOptionsOrderValue },
+    }),
+    ctx.store.findOne(ExchangeRate, {
+      where: { timestamp: LessThanOrEqual(date), pair: 'ETH_sfrxETH' },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
   ])
@@ -156,7 +161,11 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const rethExchRate = lastRethExchangeRate?.rate || 1000000000000000000n
   const rETH = (rETHRaw * rethExchRate) / 1000000000000000000n
 
-  const frxETH = (lastVault?.frxETH || 0n) + (lastFrax?.frxETH || 0n)
+  const sfrxEthExchRate = lastSfrxEthExchangeRate?.rate || 1000000000000000000n
+  const sfrxETH = lastFrax?.sfrxETH || 0n
+  const frxETH =
+    (lastVault?.frxETH || 0n) +
+    (sfrxETH * sfrxEthExchRate) / 1000000000000000000n
 
   const totalCollateral = ETH + WETH + frxETH + stETH + rETH
 
@@ -204,8 +213,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
     new OETHStrategyDailyStat({
       id: `${id}-FRAX`,
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastFrax?.frxETH || 0n,
-      total: lastFrax?.frxETH || 0n,
+      tvl: lastFrax?.sfrxETH || 0n,
+      total: frxETH,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-MORPHO`,
@@ -266,11 +275,11 @@ async function updateDailyStats(ctx: Context, date: Date) {
       value: lastBalancer?.weth || 0n,
     }),
     new OETHStrategyHoldingDailyStat({
-      id: `${id}-FRAX-FRXETH`,
+      id: `${id}-FRAX-SFRXETH`,
       strategyDailyStatId: `${id}-FRAX` as unknown as OETHStrategyDailyStat,
-      symbol: 'FRXETH',
-      amount: lastFrax?.frxETH || 0n,
-      value: lastFrax?.frxETH || 0n,
+      symbol: 'SFRXETH',
+      amount: lastFrax?.sfrxETH || 0n,
+      value: (sfrxETH * sfrxEthExchRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-MORPHO-WETH`,
@@ -318,9 +327,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-FRXETH`,
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'FRXETH',
-      amount: frxETH,
+      amount: sfrxETH,
       price: 1n,
-      value: frxETH,
+      value: sfrxETH,
     }),
   ]
 
