@@ -1,8 +1,8 @@
-import { Context } from '../../processor'
+import { Context } from '../processor'
 import {
   createER20BalanceSetup,
   createERC20BalanceProcessor,
-} from '../../processor-templates/erc20-balance'
+} from '../processor-templates/erc20-balance'
 
 const ESTIMATED_BPS = 12.06 // Circa 2023
 const SECONDS_PER_DAY = 86400

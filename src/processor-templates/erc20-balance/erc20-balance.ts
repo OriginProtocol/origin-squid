@@ -13,20 +13,19 @@ export const createER20BalanceSetup =
     processor.includeAllBlocks({ from })
   }
 
-let lastBlockHeightProcessed = 0
-export const createERC20BalanceProcessor =
-  ({
-    from,
-    address,
-    token,
-    frequency,
-  }: {
-    from: number
-    address: string
-    token: string
-    frequency: number
-  }) =>
-  async (ctx: Context) => {
+export const createERC20BalanceProcessor = ({
+  from,
+  address,
+  token,
+  frequency,
+}: {
+  from: number
+  address: string
+  token: string
+  frequency: number
+}) => {
+  let lastBlockHeightProcessed = 0
+  return async (ctx: Context) => {
     const result: ProcessResult = {
       balances: [],
     }
@@ -51,3 +50,4 @@ export const createERC20BalanceProcessor =
     }
     await ctx.store.insert(result.balances)
   }
+}

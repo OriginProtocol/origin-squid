@@ -1,5 +1,7 @@
 # Origin Subsquid
 
+### [Design Decisions Notion Document](https://www.notion.so/originprotocol/Subsquid-Design-Decisions-04ef82ae0d6848d1b14de893e9929ce4#d8e8d367069c4a619809e926f72db074)
+
 ## Quickstart
 
 ```bash

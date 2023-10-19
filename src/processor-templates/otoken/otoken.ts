@@ -58,6 +58,7 @@ export const createOTokenSetup =
   (processor: EvmBatchProcessor) => {
     processor.addTrace({
       type: ['call'],
+      callTo: [address],
       callSighash: [
         otoken.functions.rebaseOptOut.sighash,
         otoken.functions.rebaseOptIn.sighash,
@@ -100,12 +101,15 @@ export const createOTokenProcessor = (params: {
     rebases: InstanceTypeOfConstructor<OTokenRebase>[]
     rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
     apies: InstanceTypeOfConstructor<OTokenAPY>[]
-    owners: Map<string, InstanceTypeOfConstructor<OTokenAddress>>
     lastYieldDistributionEvent?: {
       fee: bigint
       yield: bigint
     }
   }
+
+  let owners:
+    | Map<string, InstanceTypeOfConstructor<OTokenAddress>>
+    | undefined = undefined
 
   const process = async (ctx: Context) => {
     const result: ProcessResult = {
@@ -114,7 +118,10 @@ export const createOTokenProcessor = (params: {
       initialize: async () => {
         if (result.initialized) return
         result.initialized = true
-        result.owners = await ctx.store
+
+        // get all addresses from the database.
+        // we need this because we increase their balance based on rebase events
+        owners = await ctx.store
           .find<InstanceTypeOfConstructor<OTokenAddress>>(
             params.OTokenAddress as any,
           )
@@ -125,12 +132,6 @@ export const createOTokenProcessor = (params: {
       rebases: [],
       rebaseOptions: [],
       apies: [],
-      // get all addresses from the database.
-      // we need this because we increase their balance based on rebase events
-      owners: undefined as unknown as Map<
-        string,
-        InstanceTypeOfConstructor<OTokenAddress>
-      >, // We want to error if someone forgets to initialize.
     }
 
     for (const block of ctx.blocks) {
@@ -144,14 +145,16 @@ export const createOTokenProcessor = (params: {
       }
     }
 
-    if (result.owners) {
-      await ctx.store.upsert([...result.owners.values()])
+    if (owners) {
+      await ctx.store.upsert([...owners.values()])
     }
-    await ctx.store.upsert(result.apies)
-    await ctx.store.insert(result.otokens)
-    await ctx.store.insert(result.history)
-    await ctx.store.insert(result.rebases)
-    await ctx.store.insert(result.rebaseOptions)
+    await Promise.all([
+      ctx.store.upsert(result.apies),
+      ctx.store.insert(result.otokens),
+      ctx.store.insert(result.history),
+      ctx.store.insert(result.rebases),
+      ctx.store.insert(result.rebaseOptions),
+    ])
   }
 
   const processTransfer = async (
@@ -184,16 +187,16 @@ export const createOTokenProcessor = (params: {
         params.OTOKEN_ADDRESS,
       )
       // Transfer events
-      let addressSub = result.owners.get(data.from)
-      let addressAdd = result.owners.get(data.to)
+      let addressSub = owners!.get(data.from)
+      let addressAdd = owners!.get(data.to)
 
       if (addressSub == null) {
         addressSub = await createAddress(params.OTokenAddress, ctx, data.from)
-        result.owners.set(addressSub.id, addressSub)
+        owners!.set(addressSub.id, addressSub)
       }
       if (addressAdd == null) {
         addressAdd = await createAddress(params.OTokenAddress, ctx, data.to)
-        result.owners.set(addressAdd.id, addressAdd)
+        owners!.set(addressAdd.id, addressAdd)
       }
 
       addressSub.lastUpdated = new Date(block.header.timestamp)
@@ -311,8 +314,11 @@ export const createOTokenProcessor = (params: {
       data,
       result.lastYieldDistributionEvent,
     )
-    for (const address of result.owners.values()) {
-      if (address.rebasingOption === RebasingOption.OptOut) {
+    for (const address of owners!.values()) {
+      if (
+        !address.credits ||
+        address.rebasingOption === RebasingOption.OptOut
+      ) {
         continue
       }
       const newBalance =
@@ -371,7 +377,7 @@ export const createOTokenProcessor = (params: {
       const blockNumber = block.header.height
       const address = trace.action.from.toLowerCase()
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
-      let owner = result.owners.get(address)
+      let owner = owners!.get(address)
       if (!owner) {
         owner = await createAddress(
           params.OTokenAddress,
@@ -379,7 +385,7 @@ export const createOTokenProcessor = (params: {
           address,
           timestamp,
         )
-        result.owners.set(address, owner)
+        owners!.set(address, owner)
       }
 
       let rebaseOption = new params.OTokenRebaseOption({

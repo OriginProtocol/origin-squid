@@ -3,6 +3,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as curveLpToken from '../../abi/curve-lp-token'
 import { CurvePoolBalance } from '../../model'
 import { Context } from '../../processor'
+import { range } from '../../utils/range'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]
@@ -20,10 +21,13 @@ export const createCurveSetup = (
   processor.includeAllBlocks({ from })
 }
 
-let lastBlockHeightProcessed = 0
-export const createCurveProcessor =
-  (poolAddress: string, count: number, from: number) =>
-  async (ctx: Context) => {
+export const createCurveProcessor = (
+  poolAddress: string,
+  count: number,
+  from: number,
+) => {
+  let lastBlockHeightProcessed = 0
+  return async (ctx: Context) => {
     const result: ProcessResult = {
       curvePoolBalances: [],
     }
@@ -38,9 +42,7 @@ export const createCurveProcessor =
       const contract = new curveLpToken.Contract(ctx, block.header, poolAddress)
 
       const balances = await Promise.all(
-        new Array(count)
-          .fill(0)
-          .map((_, index) => contract.balances(BigInt(index))),
+        range(count).map((n) => contract.balances(BigInt(n))),
       )
       const curve = new CurvePoolBalance({
         id: `${poolAddress}-${timestampId}`,
@@ -56,3 +58,4 @@ export const createCurveProcessor =
     }
     await ctx.store.insert(result.curvePoolBalances)
   }
+}

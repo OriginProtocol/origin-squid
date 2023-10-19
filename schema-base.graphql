@@ -40,3 +40,14 @@ enum HistoryType {
   Yield
 }
 
+type StrategyBalance @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+}
