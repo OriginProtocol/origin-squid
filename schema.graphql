@@ -18,6 +18,18 @@ type ExchangeRate @entity {
   rate: BigInt!
 }
 
+type Balance @entity {
+  """
+  Format: 'token:address:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  token: String!
+  address: String!
+  balance: BigInt!
+}
+
 enum RebasingOption {
   OptIn
   OptOut
@@ -30,7 +42,17 @@ enum HistoryType {
   Yield
 }
 
-type CurvePoolBalance @entity {
+type StrategyBalance @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+}type CurvePoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
