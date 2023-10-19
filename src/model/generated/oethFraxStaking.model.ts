@@ -23,5 +23,5 @@ export class OETHFraxStaking {
      * - used by balance sheet
      */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    frxETH!: bigint
+    sfrxETH!: bigint
 }

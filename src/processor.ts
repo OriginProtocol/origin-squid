@@ -70,10 +70,11 @@ export const run = (
   params: {
     name: string
     processors: Processor[]
-    postProcessors?: Processor[]
+    postProcessors?: Pick<Processor, 'process' | 'name'>[]
+    validators?: Pick<Processor, 'process' | 'name'>[]
   }[],
 ) => {
-  for (const { name, processors, postProcessors = [] } of params) {
+  for (const { name, processors, postProcessors, validators } of params) {
     if (process.env.PROCESSOR_NAME && process.env.PROCESSOR_NAME !== name) {
       continue
     }
@@ -145,6 +146,19 @@ export const run = (
             )
             if (process.env.DEBUG_PERF === 'true') {
               postTimes.forEach((t) => t())
+            }
+          }
+
+          if (validators) {
+            // Validation Run
+            start = Date.now()
+            const validatorTimes = await Promise.all(
+              validators.map((p, index) =>
+                p.process(ctx).then(time(p.name ?? `validator-${index}`)),
+              ),
+            )
+            if (process.env.DEBUG_PERF === 'true') {
+              validatorTimes.forEach((t) => t())
             }
           }
         } catch (err) {

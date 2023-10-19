@@ -1,5 +1,5 @@
-module.exports = class Data1697599559759 {
-    name = 'Data1697599559759'
+module.exports = class Data1697749344979 {
+    name = 'Data1697749344979'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -42,7 +42,7 @@ module.exports = class Data1697599559759 {
         await db.query(`CREATE TABLE "oeth_curve_lp" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "eth" numeric NOT NULL, "oeth" numeric NOT NULL, "total_supply_owned" numeric NOT NULL, "eth_owned" numeric NOT NULL, "oeth_owned" numeric NOT NULL, CONSTRAINT "PK_2b055044664e80f44d6172fdf54" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d9bbd20e888fa1b4b2c5d2f039" ON "oeth_curve_lp" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7617d593c36dce1b1565a8d74a" ON "oeth_curve_lp" ("block_number") `)
-        await db.query(`CREATE TABLE "oeth_frax_staking" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "frx_eth" numeric NOT NULL, CONSTRAINT "PK_694f53c8600ae88c7bdcf7305dd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_frax_staking" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "sfrx_eth" numeric NOT NULL, CONSTRAINT "PK_694f53c8600ae88c7bdcf7305dd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ce6c2c65e90967dfeaac97025b" ON "oeth_frax_staking" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_1a7f7d650390e2f9c212651e05" ON "oeth_frax_staking" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_morpho_aave" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_86de8f846e9335c92b8ad7df3a1" PRIMARY KEY ("id"))`)

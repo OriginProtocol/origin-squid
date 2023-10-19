@@ -183,7 +183,7 @@ type OETHFraxStaking @entity {
   - sfrxETH is what's actually stored here, slightly confusing and may want to change.
   - used by balance sheet
   """
-  frxETH: BigInt!
+  sfrxETH: BigInt!
 }
 
 # OETH Morpho Aave: 0xc1fc9E5eC3058921eA5025D703CBE31764756319
