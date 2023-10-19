@@ -80,16 +80,16 @@ Catalog of data requirements.
 
 #### total_supply
 
-Track total supply for **OUSD**, **OGV**, and **OETH**.
+Track total supply for **OUSD** ✅, **OGV** ⚠️, and **OETH** ✅.
 
 #### vault
 
-Vault price metrics for: `["USDC", "USDT", "DAI"]`
+Vault price metrics for: `["USDC", "USDT", "DAI"]` ⚠️
 
 - `vault.priceUnitMint(assetAddress)`
 - `vault.priceUnitRedeem(assetAddress)`
 
-Vault holdings (`balanceOf`) for:
+Vault holdings (`balanceOf`) for: ✅
 
 - OUSD: `["USDC", "USDT", "DAI"]`
 - OETH: `["WETH", "stETH", "rETH", "frxETH"]`
@@ -97,6 +97,10 @@ Vault holdings (`balanceOf`) for:
 #### strategies
 
 OUSD Holdings: `["USDC", "USDT", "DAI"]`
+
+- ✅ [ousd](..%2Fsrc%2Fprocessors%2Fousd) (vault holdings)
+
+TODO: ⚠️
 
 - Compound
 - Aave
@@ -108,10 +112,14 @@ OUSD Holdings: `["USDC", "USDT", "DAI"]`
 
 OETH Holdings: `["frxETH", "rETH", "stETH", "WETH"]`
 
+- ✅ [oeth](..%2Fsrc%2Fprocessors%2Foeth) (vault holdings)
+
+TODO: ⚠️
+
 - FraxETH
 - CurveAMO
 
-#### threePool
+#### threePool ✅ [curve](..%2Fsrc%2Fprocessors%2Fcurve)
 
 Assets: `["USDC", "USDT", "DAI"]`
 
@@ -127,7 +135,7 @@ contracts.ThreePool
 contract.balances(threepoolCoinIndexMap[asset])
 ```
 
-#### metapools
+#### metapools ✅ [curve](..%2Fsrc%2Fprocessors%2Fcurve)
 
 - `curveMetapoolBalanceMetric`
     - addresses.OUSDMetapool: 0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca
@@ -156,7 +164,7 @@ const balancerMetaStablePoolABI = [
 ];
 ```
 
-#### oeth
+#### oeth ✅ [curve](..%2Fsrc%2Fprocessors%2Fcurve)
 
 - curvePoolBalanceMetric: `poolContract.balances(0) or poolContract.balances(1)`
     - EthFrxEthPool: "0xa1f8a6807c402e4a15ef4eba36528a3fed24e577" - ETH frxETH
@@ -165,7 +173,7 @@ const balancerMetaStablePoolABI = [
     - WEthStEthPool: "0x828b154032950c8ff7cf8085d841723db2696056" - WETH stETH
     - OEthEthPool: "0x94B17476A93b3262d87B9a326965D1E91f9c13E7" - OETH ETH
 
-#### aave_comp_platforms
+#### aave_comp_platforms ✅ [aave-compound](..%2Fsrc%2Fprocessors%2Faave-compound)
 
 - AaveCompoundBorrowableMetric:  `"USDC", "USDT", "DAI"`
     - For each of the below:
@@ -179,15 +187,15 @@ balanceOf `address` from the map below.
 
 ```javascript
 const aaveAssetToPlatformMap = {
-  USDT: {
+  USDT: { // 0xdac17f958d2ee523a2206206994597c13d831ec7
     token: "aUSDT",
     address: addresses.aUSDT, // 0x3Ed3B47Dd13EC9a98b44e6204A523E766B225811
   },
-  USDC: {
+  USDC: { // 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
     token: "aUSDC",
     address: addresses.aUSDC, // 0xBcca60bB61934080951369a648Fb03DF4F96263C
   },
-  DAI: {
+  DAI: { // 0x6b175474e89094c44da98b954eedeac495271d0f
     token: "aDAI",
     address: addresses.aDAI, // 0x028171bca77440897b824ca71d1c56cac55b68a3
   },
@@ -196,10 +204,11 @@ const aaveAssetToPlatformMap = {
 
 #### rebasing_credits
 
-- ✅ OETH
+- ✅ OETH [oeth](..%2Fsrc%2Fprocessors%2Foeth)
     - This is done for OETH in Subsquid.
-- OUSD
+- ✅⚠️ OUSD [ousd](..%2Fsrc%2Fprocessors%2Fousd)
     - A virtually identical implementation should work for OUSD.
+    - TODO items exist
 
 For each of the above:
 

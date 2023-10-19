@@ -74,6 +74,10 @@ export const run = (
   }[],
 ) => {
   for (const { name, processors, postProcessors = [] } of params) {
+    if (process.env.PROCESSOR_NAME && process.env.PROCESSOR_NAME !== name) {
+      continue
+    }
+
     const processor = createSquidProcessor()
     if (name) {
       // Hack our logging so it's unique per processor.
