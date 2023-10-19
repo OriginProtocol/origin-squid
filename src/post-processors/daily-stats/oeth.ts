@@ -2,6 +2,7 @@ import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
 import { formatEther } from 'viem'
 
 import {
+  ExchangeRate,
   OETH,
   OETHAPY,
   OETHBalancerMetaPoolStrategy,
@@ -69,6 +70,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastBalancer,
     lastFrax,
     lastMorpho,
+    lastRethExchangeRate,
   ] = await Promise.all([
     ctx.store.findOne(OETHAPY, queryParams),
     ctx.store.findOne(OETH, queryParams),
@@ -77,6 +79,10 @@ async function updateDailyStats(ctx: Context, date: Date) {
     ctx.store.findOne(OETHBalancerMetaPoolStrategy, queryParams),
     ctx.store.findOne(OETHFraxStaking, queryParams),
     ctx.store.findOne(OETHMorphoAave, queryParams),
+    ctx.store.findOne(ExchangeRate, {
+      where: { timestamp: LessThanOrEqual(date), pair: 'ETH_rETH' },
+      order: { timestamp: 'desc' as FindOptionsOrderValue },
+    }),
   ])
 
   const allEntities = [lastApy, lastOeth]
@@ -92,6 +98,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastBalancer,
     lastFrax,
     lastMorpho,
+    lastRethExchangeRate,
   })
 
   const entityManager = (
@@ -138,12 +145,17 @@ async function updateDailyStats(ctx: Context, date: Date) {
 
   // Collateral totals
   const ETH = lastCurve?.ethOwned || 0n
+  const OETHOwned = lastCurve?.oethOwned || 0n
   const WETH =
     (lastVault?.weth || 0n) +
     (lastMorpho?.weth || 0n) +
     (lastBalancer?.weth || 0n)
   const stETH = lastVault?.stETH || 0n
-  const rETH = (lastVault?.rETH || 0n) + (lastBalancer?.rETH || 0n)
+
+  const rETHRaw = (lastVault?.rETH || 0n) + (lastBalancer?.rETH || 0n)
+  const rethExchRate = lastRethExchangeRate?.rate || 1000000000000000000n
+  const rETH = (rETHRaw * rethExchRate) / 1000000000000000000n
+
   const frxETH = (lastVault?.frxETH || 0n) + (lastFrax?.frxETH || 0n)
 
   const totalCollateral = ETH + WETH + frxETH + stETH + rETH
@@ -151,15 +163,15 @@ async function updateDailyStats(ctx: Context, date: Date) {
   console.log(`Day: ${date}`)
   log([
     ['Total Supply', dailyStat.totalSupply],
+    ['Circulating Supply', dailyStat.totalSupply - OETHOwned],
     ['Total Collateral', totalCollateral],
-    ['Difference', dailyStat.totalSupply - totalCollateral],
+    ['Difference', dailyStat.totalSupply - OETHOwned - totalCollateral],
     ['Total ETH', ETH],
     ['Total WETH', WETH],
     ['Total stETH', stETH],
     ['Total rETH', rETH],
     ['Total frxETH', frxETH],
   ])
-
 
   // Strategy totals
   const vaultTotal =
@@ -237,14 +249,14 @@ async function updateDailyStats(ctx: Context, date: Date) {
       strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
       symbol: 'RETH',
       amount: lastVault?.rETH || 0n,
-      value: lastVault?.rETH || 0n,
+      value: ((lastVault?.rETH || 0n) * rethExchRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-BALANCER-RETH`,
       strategyDailyStatId: `${id}-BALANCER` as unknown as OETHStrategyDailyStat,
       symbol: 'RETH',
       amount: lastBalancer?.rETH || 0n,
-      value: lastBalancer?.rETH || 0n,
+      value: ((lastBalancer?.rETH || 0n) * rethExchRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-BALANCER-WETH`,
@@ -299,8 +311,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'RETH',
       amount: rETH,
-      price: 1n,
-      value: rETH,
+      price: rethExchRate,
+      value: (rETH * rethExchRate) / 1000000000000000000n,
     }),
     new OETHCollateralDailyStat({
       id: `${id}-FRXETH`,
