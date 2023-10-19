@@ -9,6 +9,8 @@ import {
   OETHDailyStat,
   OETHFraxStaking,
   OETHMorphoAave,
+  OETHStrategyDailyStat,
+  OETHStrategyHoldingDailyStat,
   OETHVault,
 } from '../../model'
 import { Context } from '../../processor'
@@ -33,16 +35,23 @@ export const process = async (ctx: Context) => {
 
   const dailyStats = [] as OETHDailyStat[]
   const dailyCollateralStats = [] as OETHCollateralDailyStat[]
+  const dailyStrategyStats = [] as OETHStrategyDailyStat[]
+  const dailyHoldingsStats = [] as OETHStrategyHoldingDailyStat[]
+
   for (const day of days) {
     const dailyStatInserts = await updateDailyStats(ctx, day)
     if (dailyStatInserts) {
       dailyStats.push(dailyStatInserts.dailyStat)
       dailyCollateralStats.push(...dailyStatInserts.dailyCollateralStats)
+      dailyStrategyStats.push(...dailyStatInserts.dailyStrategyStats)
+      dailyHoldingsStats.push(...dailyStatInserts.dailyStrategyHoldingsStats)
     }
   }
 
   await ctx.store.upsert(dailyStats)
   await ctx.store.upsert(dailyCollateralStats)
+  await ctx.store.upsert(dailyStrategyStats)
+  await ctx.store.upsert(dailyHoldingsStats)
 }
 
 async function updateDailyStats(ctx: Context, date: Date) {
@@ -50,16 +59,24 @@ async function updateDailyStats(ctx: Context, date: Date) {
     where: { timestamp: LessThanOrEqual(date) },
     order: { timestamp: 'desc' as FindOptionsOrderValue },
   }
-  const lastApy = await ctx.store.findOne(OETHAPY, queryParams)
-  const lastOeth = await ctx.store.findOne(OETH, queryParams)
-  const lastCurve = await ctx.store.findOne(OETHCurveLP, queryParams)
-  const lastVault = await ctx.store.findOne(OETHVault, queryParams)
-  const lastBalancer = await ctx.store.findOne(
-    OETHBalancerMetaPoolStrategy,
-    queryParams,
-  )
-  const lastFrax = await ctx.store.findOne(OETHFraxStaking, queryParams)
-  const lastMorpho = await ctx.store.findOne(OETHMorphoAave, queryParams)
+
+  const [
+    lastApy,
+    lastOeth,
+    lastCurve,
+    lastVault,
+    lastBalancer,
+    lastFrax,
+    lastMorpho,
+  ] = await Promise.all([
+    ctx.store.findOne(OETHAPY, queryParams),
+    ctx.store.findOne(OETH, queryParams),
+    ctx.store.findOne(OETHCurveLP, queryParams),
+    ctx.store.findOne(OETHVault, queryParams),
+    ctx.store.findOne(OETHBalancerMetaPoolStrategy, queryParams),
+    ctx.store.findOne(OETHFraxStaking, queryParams),
+    ctx.store.findOne(OETHMorphoAave, queryParams),
+  ])
 
   const allEntities = [lastApy, lastOeth]
   if (!allEntities.every((entity) => !!entity)) {
@@ -102,11 +119,11 @@ async function updateDailyStats(ctx: Context, date: Date) {
     apy14DayAvg: lastApy?.apy14DayAvg,
     apy30DayAvg: lastApy?.apy30DayAvg,
 
-    totalSupply: lastOeth?.totalSupply,
+    totalSupply: lastOeth?.totalSupply || 0n,
     totalSupplyUSD: 0,
-    rebasingSupply: lastOeth?.rebasingSupply,
-    nonRebasingSupply: lastOeth?.nonRebasingSupply,
-    amoSupply: lastCurve?.oethOwned,
+    rebasingSupply: lastOeth?.rebasingSupply || 0n,
+    nonRebasingSupply: lastOeth?.nonRebasingSupply || 0n,
+    amoSupply: lastCurve?.oethOwned || 0n,
 
     yield: yieldStats[0].total_yield || 0n,
     fees: yieldStats[0].total_fees || 0n,
@@ -118,18 +135,180 @@ async function updateDailyStats(ctx: Context, date: Date) {
     pegPrice: 0n,
   })
 
+  // Collateral totals
+  const ETH = lastCurve?.ethOwned || 0n
+  const WETH =
+    (lastVault?.weth || 0n) +
+    (lastMorpho?.weth || 0n) +
+    (lastBalancer?.weth || 0n)
+  const stETH = lastVault?.stETH || 0n
+  const rETH = (lastVault?.rETH || 0n) + (lastBalancer?.rETH || 0n)
+  const frxETH = (lastVault?.frxETH || 0n) + (lastFrax?.frxETH || 0n)
+
+  const totalCollateral = ETH + WETH + frxETH + stETH + rETH
+  console.log({
+    date,
+    totalCollateral,
+    totalSupply: dailyStat.totalSupply,
+  })
+
+  // Strategy totals
+  const vaultTotal =
+    (lastVault?.frxETH || 0n) +
+    (lastVault?.weth || 0n) +
+    (lastVault?.stETH || 0n) +
+    (lastVault?.rETH || 0n)
+
+  const balancerTotal = (lastBalancer?.weth || 0n) + (lastBalancer?.rETH || 0n)
+
+  const dailyStrategyStats = [
+    new OETHStrategyDailyStat({
+      id: `${id}-CURVE`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      tvl: lastCurve?.ethOwned || 0n,
+      total: lastCurve?.ethOwned || 0n,
+    }),
+    new OETHStrategyDailyStat({
+      id: `${id}-VAULT`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      tvl: vaultTotal,
+      total: vaultTotal,
+    }),
+    new OETHStrategyDailyStat({
+      id: `${id}-BALANCER`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      tvl: balancerTotal,
+      total: balancerTotal,
+    }),
+    new OETHStrategyDailyStat({
+      id: `${id}-FRAX`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      tvl: lastFrax?.frxETH || 0n,
+      total: lastFrax?.frxETH || 0n,
+    }),
+    new OETHStrategyDailyStat({
+      id: `${id}-MORPHO`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      tvl: lastMorpho?.weth || 0n,
+      total: lastMorpho?.weth || 0n,
+    }),
+  ]
+
+  const dailyStrategyHoldingsStats = [
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-CURVE-ETH`,
+      strategyDailyStatId: `${id}-CURVE` as unknown as OETHStrategyDailyStat,
+      symbol: 'ETH',
+      amount: lastCurve?.eth || 0n,
+      value: lastCurve?.eth || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-VAULT-WETH`,
+      strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
+      symbol: 'WETH',
+      amount: lastVault?.weth || 0n,
+      value: lastVault?.weth || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-VAULT-FRXETH`,
+      strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
+      symbol: 'FRXETH',
+      amount: lastVault?.frxETH || 0n,
+      value: lastVault?.frxETH || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-VAULT-STETH`,
+      strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
+      symbol: 'STETH',
+      amount: lastVault?.stETH || 0n,
+      value: lastVault?.stETH || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-VAULT-RETH`,
+      strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
+      symbol: 'RETH',
+      amount: lastVault?.rETH || 0n,
+      value: lastVault?.rETH || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-BALANCER-RETH`,
+      strategyDailyStatId: `${id}-BALANCER` as unknown as OETHStrategyDailyStat,
+      symbol: 'RETH',
+      amount: lastBalancer?.rETH || 0n,
+      value: lastBalancer?.rETH || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-BALANCER-WETH`,
+      strategyDailyStatId: `${id}-BALANCER` as unknown as OETHStrategyDailyStat,
+      symbol: 'WETH',
+      amount: lastBalancer?.weth || 0n,
+      value: lastBalancer?.weth || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-FRAX-FRXETH`,
+      strategyDailyStatId: `${id}-FRAX` as unknown as OETHStrategyDailyStat,
+      symbol: 'FRXETH',
+      amount: lastFrax?.frxETH || 0n,
+      value: lastFrax?.frxETH || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-MORPHO-WETH`,
+      strategyDailyStatId: `${id}-MORPHO` as unknown as OETHStrategyDailyStat,
+      symbol: 'WETH',
+      amount: lastMorpho?.weth || 0n,
+      value: lastMorpho?.weth || 0n,
+    }),
+  ]
+
   const dailyCollateralStats = [
     new OETHCollateralDailyStat({
       id: `${id}-ETH`,
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'ETH',
-      amount: 0n,
-      price: 0n,
-      value: 0n,
+      amount: ETH,
+      price: 1n,
+      value: ETH,
+    }),
+    new OETHCollateralDailyStat({
+      id: `${id}-WETH`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      symbol: 'WETH',
+      amount: WETH,
+      price: 1n,
+      value: WETH,
+    }),
+    new OETHCollateralDailyStat({
+      id: `${id}-STETH`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      symbol: 'STETH',
+      amount: stETH,
+      price: 1n,
+      value: stETH,
+    }),
+    new OETHCollateralDailyStat({
+      id: `${id}-RETH`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      symbol: 'RETH',
+      amount: rETH,
+      price: 1n,
+      value: rETH,
+    }),
+    new OETHCollateralDailyStat({
+      id: `${id}-FRXETH`,
+      dailyStatId: id as unknown as OETHDailyStat,
+      symbol: 'FRXETH',
+      amount: frxETH,
+      price: 1n,
+      value: frxETH,
     }),
   ]
 
-  return { dailyStat, dailyCollateralStats }
+  return {
+    dailyStat,
+    dailyCollateralStats,
+    dailyStrategyStats,
+    dailyStrategyHoldingsStats,
+  }
 }
 
 function getStartOfDays(startTimestamp: number, endTimestamp: number): Date[] {
