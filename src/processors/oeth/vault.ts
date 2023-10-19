@@ -117,6 +117,7 @@ const getLatestOETHVault = async (
   )
   let vault = current
   if (!vault) {
+    console.log('ENSURE EXCHANGE RATES')
     result.promises.push(
       ensureExchangeRates(ctx, block, [
         ['ETH', 'USD'],

@@ -1,4 +1,5 @@
 import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
+import { formatEther } from 'viem'
 
 import {
   OETH,
@@ -146,11 +147,19 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const frxETH = (lastVault?.frxETH || 0n) + (lastFrax?.frxETH || 0n)
 
   const totalCollateral = ETH + WETH + frxETH + stETH + rETH
-  console.log({
-    date,
-    totalCollateral,
-    totalSupply: dailyStat.totalSupply,
-  })
+
+  console.log(`Day: ${date}`)
+  log([
+    ['Total Supply', dailyStat.totalSupply],
+    ['Total Collateral', totalCollateral],
+    ['Difference', dailyStat.totalSupply - totalCollateral],
+    ['Total ETH', ETH],
+    ['Total WETH', WETH],
+    ['Total stETH', stETH],
+    ['Total rETH', rETH],
+    ['Total frxETH', frxETH],
+  ])
+
 
   // Strategy totals
   const vaultTotal =
@@ -350,3 +359,17 @@ SELECT 'all time' as period, SUM(fee) as total_fees, SUM(yield) as total_yield, 
 FROM oeth_rebase
 WHERE timestamp <= $1::timestamp
 `
+
+function log(entries: [string, bigint][]): void {
+  // Find the longest label for alignment
+  const maxLength = Math.max(...entries.map((entry) => entry[0].length))
+
+  const lines = entries.map(([label, value]) => {
+    // Format the value
+    const formattedValue = Number(formatEther(value)).toFixed(3)
+    // Right-align the label and value
+    return `${label.padEnd(maxLength)} ${formattedValue.padStart(10)}`
+  })
+
+  console.log(`${lines.join('\n')}\n`)
+}
