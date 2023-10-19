@@ -41,6 +41,7 @@ export const createCurveProcessor = (
       const timestampId = timestamp.toISOString()
       const contract = new curveLpToken.Contract(ctx, block.header, poolAddress)
 
+      // TODO: use `get_balances()` where possible
       const balances = await Promise.all(
         range(count).map((n) => contract.balances(BigInt(n))),
       )
