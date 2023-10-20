@@ -8,6 +8,8 @@ import { jsonify } from '../../utils/jsonify'
 
 export const name = 'validate-oeth'
 
+let firstBlock = true
+
 export const process = async (ctx: Context) => {
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, OETHVault, expectations.oethVaults)
@@ -17,6 +19,7 @@ export const process = async (ctx: Context) => {
       OETHMorphoAave,
       expectations.oethMorphoAave,
     )
+    firstBlock = false
   }
 }
 
@@ -29,6 +32,11 @@ const validateExpectations = async <
   expectations?: T[],
 ) => {
   if (!expectations) return
+  if (firstBlock) {
+    while (expectations[0]?.blockNumber < block.header.height) {
+      expectations.shift()
+    }
+  }
   assert(
     !expectations.length || expectations[0]?.blockNumber >= block.header.height,
     'Something is missing',
@@ -57,22 +65,40 @@ const expectations: Record<string, any[]> = {
   oethVaults: sortBy(
     [
       {
-        id: '2023-04-26T12:09:35.000Z',
-        timestamp: '2023-04-26T12:09:35.000000Z',
-        blockNumber: 17130306,
-        rETH: '0',
-        stETH: '250206338304274399',
-        weth: '72000000000000000',
-        frxETH: '99995919665342123',
+        id: '2023-04-28T00:39:11.000Z',
+        timestamp: '2023-04-28T00:39:11.000000Z',
+        blockNumber: 17141121,
+        rETH: '9360000000000000',
+        stETH: '215069621854827437',
+        weth: '1119651661749004532',
+        frxETH: '7695288773432093',
       },
       {
-        id: '2023-06-20T09:07:35.000Z',
-        timestamp: '2023-06-20T09:07:35.000000Z',
-        blockNumber: 17519916,
+        id: '2023-06-10T19:50:59.000Z',
+        timestamp: '2023-06-10T19:50:59.000000Z',
+        blockNumber: 17451954,
         rETH: '2554674408676488827943',
-        stETH: '781566911007603525469',
-        weth: '9305529378012728527471',
-        frxETH: '2497474125748771996882',
+        stETH: '779656163342992671163',
+        weth: '1026508082715309353868',
+        frxETH: '0',
+      },
+      {
+        id: '2023-06-10T19:52:11.000Z',
+        timestamp: '2023-06-10T19:52:11.000000Z',
+        blockNumber: 17451960,
+        rETH: '2554674408676488827943',
+        stETH: '779656163342992671163',
+        weth: '1026508082715309353868',
+        frxETH: '99144201818216785',
+      },
+      {
+        id: '2023-06-19T06:59:47.000Z',
+        timestamp: '2023-06-19T06:59:47.000000Z',
+        blockNumber: 17512166,
+        rETH: '2554674408676488827943',
+        stETH: '781491659677780491225',
+        weth: '368830581327791252482',
+        frxETH: '0',
       },
     ],
     (v) => v.blockNumber,
