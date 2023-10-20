@@ -13,27 +13,23 @@ import * as vault from './processors/oeth/vault'
 import * as ousd from './processors/ousd'
 import * as strategies from './processors/strategies'
 
-run([
-  {
-    name: 'block-frequency-updates',
-    processors: [aaveCompound, curve, strategies],
-  },
-  {
-    name: 'oeth',
-    processors: [
-      oeth,
-      vault,
-      fraxStaking,
-      morphoAave,
-      dripper,
-      curveLp,
-      balancerMetaPoolStrategy,
-    ],
-    postProcessors: [exchangeRates],
-    validators: [validateOeth],
-  },
-  {
-    name: 'ousd',
-    processors: [ousd],
-  },
-])
+run({
+  processors: [
+    // Block Frequency Updates
+    aaveCompound,
+    curve,
+    strategies,
+    // OETH Related
+    oeth,
+    vault,
+    fraxStaking,
+    morphoAave,
+    dripper,
+    curveLp,
+    balancerMetaPoolStrategy,
+    // OUSD Related
+    // ousd,
+  ],
+  postProcessors: [exchangeRates],
+  validators: [validateOeth],
+})

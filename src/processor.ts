@@ -66,131 +66,118 @@ interface Processor {
 
 let initialized = false
 
-export const run = (
-  params: {
-    name: string
-    processors: Processor[]
-    postProcessors?: Pick<Processor, 'process' | 'name'>[]
-    validators?: Pick<Processor, 'process' | 'name'>[]
-  }[],
-) => {
-  for (const { name, processors, postProcessors, validators } of params) {
-    if (process.env.PROCESSOR_NAME && process.env.PROCESSOR_NAME !== name) {
-      continue
-    }
+export const run = ({
+  processors,
+  postProcessors,
+  validators,
+}: {
+  processors: Processor[]
+  postProcessors?: Pick<Processor, 'process' | 'name'>[]
+  validators?: Pick<Processor, 'process' | 'name'>[]
+}) => {
+  const processor = createSquidProcessor()
 
-    const processor = createSquidProcessor()
-    if (name) {
-      // Hack our logging so it's unique per processor.
-      const hackableProcessor = processor as any
-      hackableProcessor.getLogger = () => createLogger(`sqd:processor-${name}`)
-    }
+  processor.setBlockRange({
+    from: Math.min(
+      ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+    ),
+  })
+  processors.forEach((p) => p.setup?.(processor))
+  processor.run(
+    new TypeormDatabase({
+      supportHotBlocks: true,
+    }),
+    async (_ctx) => {
+      const ctx = _ctx as Context
+      try {
+        ctx.__state = new Map<string, unknown>()
+        let start: number
+        const time = (name: string) => () => {
+          const message = `${name} ${Date.now() - start}ms`
+          return () => ctx.log.info(message)
+        }
 
-    processor.setBlockRange({
-      from: Math.min(
-        ...(processors.map((p) => p.from).filter((x) => x) as number[]),
-      ),
-    })
-    processors.forEach((p) => p.setup?.(processor))
-    processor.run(
-      new TypeormDatabase({
-        stateSchema: `${name}-processor`,
-        supportHotBlocks: true,
-      }),
-      async (_ctx) => {
-        const ctx = _ctx as Context
-        try {
-          ctx.name = name
-          ctx.state = new Map<string, unknown>()
-          let start: number
-          const time = (name: string) => () => {
-            const message = `${name} ${Date.now() - start}ms`
-            return () => ctx.log.info(message)
-          }
-
-          // Initialization Run
-          if (!initialized) {
-            initialized = true
-            ctx.log.info(`initializing`)
-            start = Date.now()
-            const times = await Promise.all(
-              processors
-                .filter((p) => p.initialize)
-                .map((p, index) =>
-                  p.initialize!(ctx).then(
-                    time(p.name ?? `initializing processor-${index}`),
-                  ),
-                ),
-            )
-            times.forEach((t) => t())
-          }
-
-          // Main Processing Run
+        // Initialization Run
+        if (!initialized) {
+          initialized = true
+          ctx.log.info(`initializing`)
           start = Date.now()
           const times = await Promise.all(
-            processors.map((p, index) =>
-              p.process(ctx).then(time(p.name ?? `processor-${index}`)),
+            processors
+              .filter((p) => p.initialize)
+              .map((p, index) =>
+                p.initialize!(ctx).then(
+                  time(p.name ?? `initializing processor-${index}`),
+                ),
+              ),
+          )
+          times.forEach((t) => t())
+        }
+
+        // Main Processing Run
+        start = Date.now()
+        const times = await Promise.all(
+          processors.map((p, index) =>
+            p.process(ctx).then(time(p.name ?? `processor-${index}`)),
+          ),
+        )
+        if (process.env.DEBUG_PERF === 'true') {
+          times.forEach((t) => t())
+        }
+
+        if (postProcessors) {
+          // Post Processing Run
+          start = Date.now()
+          const postTimes = await Promise.all(
+            postProcessors.map((p, index) =>
+              p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
             ),
           )
           if (process.env.DEBUG_PERF === 'true') {
-            times.forEach((t) => t())
+            postTimes.forEach((t) => t())
           }
-
-          if (postProcessors) {
-            // Post Processing Run
-            start = Date.now()
-            const postTimes = await Promise.all(
-              postProcessors.map((p, index) =>
-                p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
-              ),
-            )
-            if (process.env.DEBUG_PERF === 'true') {
-              postTimes.forEach((t) => t())
-            }
-          }
-
-          if (validators) {
-            // Validation Run
-            start = Date.now()
-            const validatorTimes = await Promise.all(
-              validators.map((p, index) =>
-                p.process(ctx).then(time(p.name ?? `validator-${index}`)),
-              ),
-            )
-            if (process.env.DEBUG_PERF === 'true') {
-              validatorTimes.forEach((t) => t())
-            }
-          }
-        } catch (err) {
-          ctx.log.info({
-            blocks: ctx.blocks.length,
-            logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
-            traces: ctx.blocks.reduce(
-              (sum, block) => sum + block.traces.length,
-              0,
-            ),
-            transactions: ctx.blocks.reduce(
-              (sum, block) => sum + block.transactions.length,
-              0,
-            ),
-            // logArray: ctx.blocks.reduce(
-            //   (logs, block) => [...logs, ...block.logs],
-            //   [] as Log[],
-            // ),
-          })
-          throw err
         }
-      },
-    )
-  }
+
+        if (validators) {
+          // Validation Run
+          start = Date.now()
+          const validatorTimes = await Promise.all(
+            validators.map((p, index) =>
+              p.process(ctx).then(time(p.name ?? `validator-${index}`)),
+            ),
+          )
+          if (process.env.DEBUG_PERF === 'true') {
+            validatorTimes.forEach((t) => t())
+          }
+        }
+      } catch (err) {
+        ctx.log.info({
+          blocks: ctx.blocks.length,
+          logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
+          traces: ctx.blocks.reduce(
+            (sum, block) => sum + block.traces.length,
+            0,
+          ),
+          transactions: ctx.blocks.reduce(
+            (sum, block) => sum + block.transactions.length,
+            0,
+          ),
+          // logArray: ctx.blocks.reduce(
+          //   (logs, block) => [...logs, ...block.logs],
+          //   [] as Log[],
+          // ),
+        })
+        throw err
+      }
+    },
+  )
 }
 
 export type Fields = EvmBatchProcessorFields<
   ReturnType<typeof createSquidProcessor>
 >
 export type Context = DataHandlerContext<Store, Fields> & {
-  name: string
-  state: Map<string, unknown>
+  __state: Map<string, unknown>
 }
 export type Block = Context['blocks']['0']
 export type Log = Context['blocks']['0']['logs']['0']

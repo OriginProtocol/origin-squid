@@ -74,6 +74,7 @@ export const getOethOraclePrice = (
 
 const stakedFraxAddress = '0xac3e018457b222d93114458476f3e3416abbe38f'
 export const getStakedFraxPrice = (ctx: Context, block: Block) => {
+  if (block.header.height < 15686046) return undefined
   const router = new stakedFraxEth.Contract(
     ctx,
     block.header,
