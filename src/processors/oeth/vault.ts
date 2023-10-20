@@ -3,7 +3,6 @@ import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
 import * as lido from '../../abi/lido'
-import * as otokenVault from '../../abi/otoken-vault'
 import { OETHVault } from '../../model'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
@@ -15,7 +14,7 @@ import {
   VAULT_ERC20_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
-import { getLatestEntity } from '../utils'
+import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
   vaults: OETHVault[]
@@ -30,24 +29,19 @@ export const setup = (processor: EvmBatchProcessor) => {
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_VAULT_ADDRESS)],
     range: { from },
-    transaction: false,
   })
   processor.addLog({
     address: VAULT_ERC20_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_VAULT_ADDRESS)],
     range: { from },
-    transaction: false,
   })
   processor.addLog({
     address: [STETH_ADDRESS],
     topic0: [lido.events.TokenRebased.topic],
     range: { from },
-    transaction: false,
   })
 }
-
-const addresses = new Set(VAULT_ERC20_ADDRESSES.map((a) => a.toLowerCase()))
 
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
@@ -56,23 +50,9 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    const haveTransfer = block.logs.find(
-      (log) =>
-        log.topics[0] === erc20.events.Transfer.topic &&
-        addresses.has(log.address as `0x${string}`) &&
-        (log.topics[1] === pad(OETH_VAULT_ADDRESS) ||
-          log.topics[2] === pad(OETH_VAULT_ADDRESS)),
-    )
-    if (haveTransfer) {
-      await processTransfer(ctx, result, block)
-    }
-    const haveStRebase = block.logs.find(
-      (log) =>
-        log.address === STETH_ADDRESS &&
-        log.topics[0] === lido.events.TokenRebased.topic,
-    )
-    if (haveStRebase) {
-      await processStEthRebase(ctx, result, block)
+    for (const log of block.logs) {
+      await processTransfer(ctx, result, block, log)
+      await processStEthRebase(ctx, result, block, log)
     }
   }
 
@@ -83,27 +63,43 @@ const processStEthRebase = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
+  log: Context['blocks']['0']['logs']['0'],
 ) => {
-  const { vault } = await getLatestOETHVault(ctx, result, block)
-  const contract = new lido.Contract(ctx, block.header, STETH_ADDRESS)
-  vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
+  if (
+    log.address === STETH_ADDRESS &&
+    log.topics[0] === lido.events.TokenRebased.topic
+  ) {
+    const { vault } = await getLatestOETHVault(ctx, result, block)
+    const contract = new lido.Contract(ctx, block.header, STETH_ADDRESS)
+    vault.stETH = await contract.balanceOf(OETH_VAULT_ADDRESS)
+  }
 }
 
 const processTransfer = async (
   ctx: Context,
   result: ProcessResult,
   block: Context['blocks']['0'],
+  log: Context['blocks']['0']['logs']['0'],
 ) => {
-  const { vault } = await getLatestOETHVault(ctx, result, block)
-  const vaultContract = new otokenVault.Contract(
-    ctx,
-    block.header,
-    OETH_VAULT_ADDRESS,
-  )
-  vault.weth = await vaultContract.checkBalance(WETH_ADDRESS)
-  vault.rETH = await vaultContract.checkBalance(RETH_ADDRESS)
-  vault.stETH = await vaultContract.checkBalance(STETH_ADDRESS)
-  vault.frxETH = await vaultContract.checkBalance(FRXETH_ADDRESS)
+  if (log.topics[0] === erc20.events.Transfer.topic) {
+    await trackAddressBalances({
+      log,
+      address: OETH_VAULT_ADDRESS,
+      tokens: VAULT_ERC20_ADDRESSES,
+      fn: async ({ token, change }) => {
+        const { vault } = await getLatestOETHVault(ctx, result, block)
+        if (token === WETH_ADDRESS) {
+          vault.weth += change
+        } else if (token === RETH_ADDRESS) {
+          vault.rETH += change
+        } else if (token === STETH_ADDRESS) {
+          vault.stETH += change
+        } else if (token === FRXETH_ADDRESS) {
+          vault.frxETH += change
+        }
+      },
+    })
+  }
 }
 
 const getLatestOETHVault = async (
