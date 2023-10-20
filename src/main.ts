@@ -1,5 +1,6 @@
 import * as dailyStats from './post-processors/daily-stats'
 import * as exchangeRates from './post-processors/exchange-rates'
+import * as validateOeth from './post-processors/validate-oeth'
 import { run } from './processor'
 import * as aaveCompound from './processors/aave-compound'
 import * as curve from './processors/curve'
@@ -30,7 +31,7 @@ run([
       balancerMetaPoolStrategy,
     ],
     postProcessors: [exchangeRates, dailyStats],
-    validators: [],
+    validators: [validateOeth],
   },
   // {
   //   name: 'ousd',

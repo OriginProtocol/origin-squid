@@ -265,6 +265,74 @@ export const ABI_JSON = [
     {
         "type": "event",
         "anonymous": false,
+        "name": "SwapAllowedUndervalueChanged",
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_basis",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "SwapSlippageChanged",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_asset",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "_basis",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "Swapped",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_fromAsset",
+                "indexed": true
+            },
+            {
+                "type": "address",
+                "name": "_toAsset",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "_fromAssetAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "_toAssetAmount",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "SwapperChanged",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_address",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
         "name": "TrusteeAddressChanged",
         "inputs": [
             {
@@ -321,16 +389,15 @@ export const ABI_JSON = [
         ]
     },
     {
+        "type": "fallback",
+        "stateMutability": "payable"
+    },
+    {
         "type": "function",
-        "name": "approveStrategy",
+        "name": "allocate",
         "constant": false,
         "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_addr"
-            }
-        ],
+        "inputs": [],
         "outputs": []
     },
     {
@@ -368,16 +435,35 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "cacheDecimals",
+        "name": "burnForStrategy",
         "constant": false,
         "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "_asset"
+                "type": "uint256",
+                "name": "_amount"
             }
         ],
         "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "calculateRedeemOutputs",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_amount"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "uint256[]",
+                "name": ""
+            }
+        ]
     },
     {
         "type": "function",
@@ -395,6 +481,25 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
+        "name": "checkBalance",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_asset"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
         "name": "claimGovernance",
         "constant": false,
         "payable": false,
@@ -403,24 +508,96 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "depositToStrategy",
-        "constant": false,
+        "name": "getAllAssets",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "address[]",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getAllStrategies",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "address[]",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getAssetConfig",
+        "constant": true,
+        "stateMutability": "view",
         "payable": false,
         "inputs": [
             {
                 "type": "address",
-                "name": "_strategyToAddress"
-            },
-            {
-                "type": "address[]",
-                "name": "_assets"
-            },
-            {
-                "type": "uint256[]",
-                "name": "_amounts"
+                "name": "_asset"
             }
         ],
-        "outputs": []
+        "outputs": [
+            {
+                "type": "tuple",
+                "name": "config",
+                "components": [
+                    {
+                        "type": "bool",
+                        "name": "isSupported"
+                    },
+                    {
+                        "type": "uint8",
+                        "name": "unitConversion"
+                    },
+                    {
+                        "type": "uint8",
+                        "name": "decimals"
+                    },
+                    {
+                        "type": "uint16",
+                        "name": "allowedOracleSlippageBps"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getAssetCount",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getStrategyCount",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ]
     },
     {
         "type": "function",
@@ -438,28 +615,30 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "initialize",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_priceProvider"
-            },
-            {
-                "type": "address",
-                "name": "_ousd"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
         "name": "isGovernor",
         "constant": true,
         "stateMutability": "view",
         "payable": false,
         "inputs": [],
+        "outputs": [
+            {
+                "type": "bool",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "isSupportedAsset",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_asset"
+            }
+        ],
         "outputs": [
             {
                 "type": "bool",
@@ -480,6 +659,40 @@ export const ABI_JSON = [
                 "name": ""
             }
         ]
+    },
+    {
+        "type": "function",
+        "name": "mint",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_asset"
+            },
+            {
+                "type": "uint256",
+                "name": "_amount"
+            },
+            {
+                "type": "uint256",
+                "name": "_minimumOusdAmount"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "mintForStrategy",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_amount"
+            }
+        ],
+        "outputs": []
     },
     {
         "type": "function",
@@ -525,22 +738,6 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "pauseCapital",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "pauseRebase",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
         "name": "priceProvider",
         "constant": true,
         "stateMutability": "view",
@@ -555,27 +752,48 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "reallocate",
-        "constant": false,
+        "name": "priceUnitMint",
+        "constant": true,
+        "stateMutability": "view",
         "payable": false,
         "inputs": [
             {
                 "type": "address",
-                "name": "_strategyFromAddress"
-            },
-            {
-                "type": "address",
-                "name": "_strategyToAddress"
-            },
-            {
-                "type": "address[]",
-                "name": "_assets"
-            },
-            {
-                "type": "uint256[]",
-                "name": "_amounts"
+                "name": "asset"
             }
         ],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": "price"
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "priceUnitRedeem",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "asset"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": "price"
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "rebase",
+        "constant": false,
+        "payable": false,
+        "inputs": [],
         "outputs": []
     },
     {
@@ -608,6 +826,36 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
+        "name": "redeem",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_amount"
+            },
+            {
+                "type": "uint256",
+                "name": "_minimumUnitAmount"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "redeemAll",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "_minimumUnitAmount"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
         "name": "redeemFeeBps",
         "constant": true,
         "stateMutability": "view",
@@ -622,19 +870,6 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "removeStrategy",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_addr"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
         "name": "setAdminImpl",
         "constant": false,
         "payable": false,
@@ -642,166 +877,6 @@ export const ABI_JSON = [
             {
                 "type": "address",
                 "name": "newImpl"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setAssetDefaultStrategy",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
-            },
-            {
-                "type": "address",
-                "name": "_strategy"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setAutoAllocateThreshold",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_threshold"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setMaxSupplyDiff",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_maxSupplyDiff"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setNetOusdMintForStrategyThreshold",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_threshold"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setOusdMetaStrategy",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_ousdMetaStrategy"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setPriceProvider",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_priceProvider"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setRebaseThreshold",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_threshold"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setRedeemFeeBps",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_redeemFeeBps"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setStrategistAddr",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_address"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setTrusteeAddress",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_address"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setTrusteeFeeBps",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_basis"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "setVaultBuffer",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_vaultBuffer"
             }
         ],
         "outputs": []
@@ -822,20 +897,17 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "supportAsset",
-        "constant": false,
+        "name": "totalValue",
+        "constant": true,
+        "stateMutability": "view",
         "payable": false,
-        "inputs": [
+        "inputs": [],
+        "outputs": [
             {
-                "type": "address",
-                "name": "_asset"
-            },
-            {
-                "type": "uint8",
-                "name": "_unitConversion"
+                "type": "uint256",
+                "name": "value"
             }
-        ],
-        "outputs": []
+        ]
     },
     {
         "type": "function",
@@ -846,23 +918,6 @@ export const ABI_JSON = [
             {
                 "type": "address",
                 "name": "_newGovernor"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "transferToken",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
-            },
-            {
-                "type": "uint256",
-                "name": "_amount"
             }
         ],
         "outputs": []
@@ -897,22 +952,6 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "unpauseCapital",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "unpauseRebase",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
         "name": "vaultBuffer",
         "constant": true,
         "stateMutability": "view",
@@ -924,47 +963,5 @@ export const ABI_JSON = [
                 "name": ""
             }
         ]
-    },
-    {
-        "type": "function",
-        "name": "withdrawAllFromStrategies",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "withdrawAllFromStrategy",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_strategyAddr"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "withdrawFromStrategy",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_strategyFromAddress"
-            },
-            {
-                "type": "address[]",
-                "name": "_assets"
-            },
-            {
-                "type": "uint256[]",
-                "name": "_amounts"
-            }
-        ],
-        "outputs": []
     }
 ]
