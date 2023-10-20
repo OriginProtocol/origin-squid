@@ -68,6 +68,18 @@ export const events = {
     StrategyRemoved: new LogEvent<([_addr: string] & {_addr: string})>(
         abi, '0x09a1db4b80c32706328728508c941a6b954f31eb5affd32f236c1fd405f8fea4'
     ),
+    SwapAllowedUndervalueChanged: new LogEvent<([_basis: bigint] & {_basis: bigint})>(
+        abi, '0xf12c00256bee2b6facb111a88a9b1cff86e79132939b44f1353212d6f7469557'
+    ),
+    SwapSlippageChanged: new LogEvent<([_asset: string, _basis: bigint] & {_asset: string, _basis: bigint})>(
+        abi, '0x8d22e9d2cbe8bb65a3c4412bd8970743864512a1a0e004e8d00fb96277b78b94'
+    ),
+    Swapped: new LogEvent<([_fromAsset: string, _toAsset: string, _fromAssetAmount: bigint, _toAssetAmount: bigint] & {_fromAsset: string, _toAsset: string, _fromAssetAmount: bigint, _toAssetAmount: bigint})>(
+        abi, '0xa078c4190abe07940190effc1846be0ccf03ad6007bc9e93f9697d0b460befbb'
+    ),
+    SwapperChanged: new LogEvent<([_address: string] & {_address: string})>(
+        abi, '0x7d7719313229e558c5a3893cad2eb86a86a049156d1d9ebd5c63a8eedefd1c03'
+    ),
     TrusteeAddressChanged: new LogEvent<([_address: string] & {_address: string})>(
         abi, '0x1e4af5ac389e8cde1bdaa6830881b6c987c62a45cfb3b33d27d805cde3b57750'
     ),
@@ -83,8 +95,8 @@ export const events = {
 }
 
 export const functions = {
-    approveStrategy: new Func<[_addr: string], {_addr: string}, []>(
-        abi, '0x3b8ae397'
+    allocate: new Func<[], {}, []>(
+        abi, '0xabaa9916'
     ),
     assetDefaultStrategies: new Func<[_: string], {}, string>(
         abi, '0xa403e4d5'
@@ -92,29 +104,53 @@ export const functions = {
     autoAllocateThreshold: new Func<[], {}, bigint>(
         abi, '0x9fa1826e'
     ),
-    cacheDecimals: new Func<[_asset: string], {_asset: string}, []>(
-        abi, '0x36b6d944'
+    burnForStrategy: new Func<[_amount: bigint], {_amount: bigint}, []>(
+        abi, '0x6217f3ea'
+    ),
+    calculateRedeemOutputs: new Func<[_amount: bigint], {_amount: bigint}, Array<bigint>>(
+        abi, '0x67bd7ba3'
     ),
     capitalPaused: new Func<[], {}, boolean>(
         abi, '0xe6cc5432'
     ),
+    checkBalance: new Func<[_asset: string], {_asset: string}, bigint>(
+        abi, '0x5f515226'
+    ),
     claimGovernance: new Func<[], {}, []>(
         abi, '0x5d36b190'
     ),
-    depositToStrategy: new Func<[_strategyToAddress: string, _assets: Array<string>, _amounts: Array<bigint>], {_strategyToAddress: string, _assets: Array<string>, _amounts: Array<bigint>}, []>(
-        abi, '0x840c4c7a'
+    getAllAssets: new Func<[], {}, Array<string>>(
+        abi, '0x2acada4d'
+    ),
+    getAllStrategies: new Func<[], {}, Array<string>>(
+        abi, '0xc3b28864'
+    ),
+    getAssetConfig: new Func<[_asset: string], {_asset: string}, ([isSupported: boolean, unitConversion: number, decimals: number, allowedOracleSlippageBps: number] & {isSupported: boolean, unitConversion: number, decimals: number, allowedOracleSlippageBps: number})>(
+        abi, '0x6ec3ab67'
+    ),
+    getAssetCount: new Func<[], {}, bigint>(
+        abi, '0xa0aead4d'
+    ),
+    getStrategyCount: new Func<[], {}, bigint>(
+        abi, '0x31e19cfa'
     ),
     governor: new Func<[], {}, string>(
         abi, '0x0c340a24'
     ),
-    initialize: new Func<[_priceProvider: string, _ousd: string], {_priceProvider: string, _ousd: string}, []>(
-        abi, '0x485cc955'
-    ),
     isGovernor: new Func<[], {}, boolean>(
         abi, '0xc7af3352'
     ),
+    isSupportedAsset: new Func<[_asset: string], {_asset: string}, boolean>(
+        abi, '0x9be918e6'
+    ),
     maxSupplyDiff: new Func<[], {}, bigint>(
         abi, '0x8e510b52'
+    ),
+    mint: new Func<[_asset: string, _amount: bigint, _minimumOusdAmount: bigint], {_asset: string, _amount: bigint, _minimumOusdAmount: bigint}, []>(
+        abi, '0x156e29f6'
+    ),
+    mintForStrategy: new Func<[_amount: bigint], {_amount: bigint}, []>(
+        abi, '0xab80dafb'
     ),
     netOusdMintForStrategyThreshold: new Func<[], {}, bigint>(
         abi, '0x7a2202f3'
@@ -125,17 +161,17 @@ export const functions = {
     ousdMetaStrategy: new Func<[], {}, string>(
         abi, '0x18ce56bd'
     ),
-    pauseCapital: new Func<[], {}, []>(
-        abi, '0x3dbc911f'
-    ),
-    pauseRebase: new Func<[], {}, []>(
-        abi, '0xc5f00841'
-    ),
     priceProvider: new Func<[], {}, string>(
         abi, '0xb888879e'
     ),
-    reallocate: new Func<[_strategyFromAddress: string, _strategyToAddress: string, _assets: Array<string>, _amounts: Array<bigint>], {_strategyFromAddress: string, _strategyToAddress: string, _assets: Array<string>, _amounts: Array<bigint>}, []>(
-        abi, '0x7fe2d393'
+    priceUnitMint: new Func<[asset: string], {asset: string}, bigint>(
+        abi, '0x3b8fe28d'
+    ),
+    priceUnitRedeem: new Func<[asset: string], {asset: string}, bigint>(
+        abi, '0x5b60f9fc'
+    ),
+    rebase: new Func<[], {}, []>(
+        abi, '0xaf14052c'
     ),
     rebasePaused: new Func<[], {}, boolean>(
         abi, '0x53ca9f24'
@@ -143,62 +179,26 @@ export const functions = {
     rebaseThreshold: new Func<[], {}, bigint>(
         abi, '0x52d38e5d'
     ),
+    redeem: new Func<[_amount: bigint, _minimumUnitAmount: bigint], {_amount: bigint, _minimumUnitAmount: bigint}, []>(
+        abi, '0x7cbc2373'
+    ),
+    redeemAll: new Func<[_minimumUnitAmount: bigint], {_minimumUnitAmount: bigint}, []>(
+        abi, '0x7136a7a6'
+    ),
     redeemFeeBps: new Func<[], {}, bigint>(
         abi, '0x09f6442c'
-    ),
-    removeStrategy: new Func<[_addr: string], {_addr: string}, []>(
-        abi, '0x175188e8'
     ),
     setAdminImpl: new Func<[newImpl: string], {newImpl: string}, []>(
         abi, '0xfc0cfeee'
     ),
-    setAssetDefaultStrategy: new Func<[_asset: string, _strategy: string], {_asset: string, _strategy: string}, []>(
-        abi, '0xbc90106b'
-    ),
-    setAutoAllocateThreshold: new Func<[_threshold: bigint], {_threshold: bigint}, []>(
-        abi, '0xb2c9336d'
-    ),
-    setMaxSupplyDiff: new Func<[_maxSupplyDiff: bigint], {_maxSupplyDiff: bigint}, []>(
-        abi, '0x663e64ce'
-    ),
-    setNetOusdMintForStrategyThreshold: new Func<[_threshold: bigint], {_threshold: bigint}, []>(
-        abi, '0x636e6c40'
-    ),
-    setOusdMetaStrategy: new Func<[_ousdMetaStrategy: string], {_ousdMetaStrategy: string}, []>(
-        abi, '0xd58e3b3a'
-    ),
-    setPriceProvider: new Func<[_priceProvider: string], {_priceProvider: string}, []>(
-        abi, '0x372aa224'
-    ),
-    setRebaseThreshold: new Func<[_threshold: bigint], {_threshold: bigint}, []>(
-        abi, '0xb890ebf6'
-    ),
-    setRedeemFeeBps: new Func<[_redeemFeeBps: bigint], {_redeemFeeBps: bigint}, []>(
-        abi, '0xeb03654b'
-    ),
-    setStrategistAddr: new Func<[_address: string], {_address: string}, []>(
-        abi, '0x773540b3'
-    ),
-    setTrusteeAddress: new Func<[_address: string], {_address: string}, []>(
-        abi, '0x2da845a8'
-    ),
-    setTrusteeFeeBps: new Func<[_basis: bigint], {_basis: bigint}, []>(
-        abi, '0x0acbda75'
-    ),
-    setVaultBuffer: new Func<[_vaultBuffer: bigint], {_vaultBuffer: bigint}, []>(
-        abi, '0x8ec489a2'
-    ),
     strategistAddr: new Func<[], {}, string>(
         abi, '0x570d8e1d'
     ),
-    supportAsset: new Func<[_asset: string, _unitConversion: number], {_asset: string, _unitConversion: number}, []>(
-        abi, '0x6c7561e8'
+    totalValue: new Func<[], {}, bigint>(
+        abi, '0xd4c3eea0'
     ),
     transferGovernance: new Func<[_newGovernor: string], {_newGovernor: string}, []>(
         abi, '0xd38bfff4'
-    ),
-    transferToken: new Func<[_asset: string, _amount: bigint], {_asset: string, _amount: bigint}, []>(
-        abi, '0x1072cbea'
     ),
     trusteeAddress: new Func<[], {}, string>(
         abi, '0x49c1d54d'
@@ -206,23 +206,8 @@ export const functions = {
     trusteeFeeBps: new Func<[], {}, bigint>(
         abi, '0x207134b0'
     ),
-    unpauseCapital: new Func<[], {}, []>(
-        abi, '0x94828ffd'
-    ),
-    unpauseRebase: new Func<[], {}, []>(
-        abi, '0x09f49bf5'
-    ),
     vaultBuffer: new Func<[], {}, bigint>(
         abi, '0x1edfe3da'
-    ),
-    withdrawAllFromStrategies: new Func<[], {}, []>(
-        abi, '0xc9919112'
-    ),
-    withdrawAllFromStrategy: new Func<[_strategyAddr: string], {_strategyAddr: string}, []>(
-        abi, '0x597c8910'
-    ),
-    withdrawFromStrategy: new Func<[_strategyFromAddress: string, _assets: Array<string>, _amounts: Array<bigint>], {_strategyFromAddress: string, _assets: Array<string>, _amounts: Array<bigint>}, []>(
-        abi, '0xae69f3cb'
     ),
 }
 
@@ -236,8 +221,36 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.autoAllocateThreshold, [])
     }
 
+    calculateRedeemOutputs(_amount: bigint): Promise<Array<bigint>> {
+        return this.eth_call(functions.calculateRedeemOutputs, [_amount])
+    }
+
     capitalPaused(): Promise<boolean> {
         return this.eth_call(functions.capitalPaused, [])
+    }
+
+    checkBalance(_asset: string): Promise<bigint> {
+        return this.eth_call(functions.checkBalance, [_asset])
+    }
+
+    getAllAssets(): Promise<Array<string>> {
+        return this.eth_call(functions.getAllAssets, [])
+    }
+
+    getAllStrategies(): Promise<Array<string>> {
+        return this.eth_call(functions.getAllStrategies, [])
+    }
+
+    getAssetConfig(_asset: string): Promise<([isSupported: boolean, unitConversion: number, decimals: number, allowedOracleSlippageBps: number] & {isSupported: boolean, unitConversion: number, decimals: number, allowedOracleSlippageBps: number})> {
+        return this.eth_call(functions.getAssetConfig, [_asset])
+    }
+
+    getAssetCount(): Promise<bigint> {
+        return this.eth_call(functions.getAssetCount, [])
+    }
+
+    getStrategyCount(): Promise<bigint> {
+        return this.eth_call(functions.getStrategyCount, [])
     }
 
     governor(): Promise<string> {
@@ -246,6 +259,10 @@ export class Contract extends ContractBase {
 
     isGovernor(): Promise<boolean> {
         return this.eth_call(functions.isGovernor, [])
+    }
+
+    isSupportedAsset(_asset: string): Promise<boolean> {
+        return this.eth_call(functions.isSupportedAsset, [_asset])
     }
 
     maxSupplyDiff(): Promise<bigint> {
@@ -268,6 +285,14 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.priceProvider, [])
     }
 
+    priceUnitMint(asset: string): Promise<bigint> {
+        return this.eth_call(functions.priceUnitMint, [asset])
+    }
+
+    priceUnitRedeem(asset: string): Promise<bigint> {
+        return this.eth_call(functions.priceUnitRedeem, [asset])
+    }
+
     rebasePaused(): Promise<boolean> {
         return this.eth_call(functions.rebasePaused, [])
     }
@@ -282,6 +307,10 @@ export class Contract extends ContractBase {
 
     strategistAddr(): Promise<string> {
         return this.eth_call(functions.strategistAddr, [])
+    }
+
+    totalValue(): Promise<bigint> {
+        return this.eth_call(functions.totalValue, [])
     }
 
     trusteeAddress(): Promise<string> {
