@@ -91,6 +91,14 @@ export const run = ({
       const ctx = _ctx as Context
       try {
         ctx.__state = new Map<string, unknown>()
+        if (ctx.blocks.length > 1) {
+          const timespan =
+            ctx.blocks[ctx.blocks.length - 1].header.timestamp -
+            ctx.blocks[0].header.timestamp
+          ctx.bps = timespan / (ctx.blocks.length - 1) / 1000
+          ctx.log.info({ bps: ctx.bps })
+        }
+
         let start: number
         const time = (name: string) => () => {
           const message = `${name} ${Date.now() - start}ms`
@@ -177,6 +185,7 @@ export type Fields = EvmBatchProcessorFields<
   ReturnType<typeof createSquidProcessor>
 >
 export type Context = DataHandlerContext<Store, Fields> & {
+  bps: number
   __state: Map<string, unknown>
 }
 export type Block = Context['blocks']['0']

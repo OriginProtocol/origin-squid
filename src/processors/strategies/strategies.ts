@@ -6,11 +6,6 @@ import {
   createStrategySetup,
 } from '../../processor-templates/strategy'
 
-const ESTIMATED_BPS = 12.06 // Circa 2023
-const SECONDS_PER_DAY = 86400
-const BLOCKS_PER_DAY = SECONDS_PER_DAY / ESTIMATED_BPS
-const UPDATE_FREQUENCY = Math.floor(BLOCKS_PER_DAY)
-
 const DAI = '0x6b175474e89094c44da98b954eedeac495271d0f'.toLowerCase()
 const USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7'.toLowerCase()
 const USDC = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'.toLowerCase()
@@ -109,9 +104,7 @@ export const setup = (processor: EvmBatchProcessor) => {
   strategies.forEach((s) => createStrategySetup(s.from)(processor))
 }
 
-const processors = strategies.map((s) =>
-  createStrategyProcessor({ ...s, frequency: UPDATE_FREQUENCY }),
-)
+const processors = strategies.map(createStrategyProcessor)
 
 export const process = async (ctx: Context) => {
   await Promise.all(processors.map((p) => p(ctx)))

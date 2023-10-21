@@ -3,6 +3,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as initializableAbstractStrategy from '../../abi/initializable-abstract-strategy'
 import { StrategyBalance } from '../../model'
 import { Context } from '../../processor'
+import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 
 export const createStrategySetup =
   (from: number) => (processor: EvmBatchProcessor) => {
@@ -11,28 +12,20 @@ export const createStrategySetup =
 
 export const createStrategyProcessor = ({
   from,
-  frequency,
   address,
   assets,
 }: {
   from: number
-  frequency: number
   address: string
   assets: readonly string[]
 }) => {
-  let lastBlockHeightProcessed = 0
+  const update = blockFrequencyUpdater({ from })
   let lastStrategyBalances = new Map<string, StrategyBalance>()
   return async (ctx: Context) => {
     const results = {
       strategyBalances: [] as StrategyBalance[],
     }
-    const nextBlockIndex = ctx.blocks.findIndex(
-      (b) => b.header.height >= lastBlockHeightProcessed + frequency,
-    )
-    for (let i = nextBlockIndex; i < ctx.blocks.length; i += frequency) {
-      const block = ctx.blocks[i]
-      if (!block || block.header.height < from) continue
-
+    await update(ctx, async (ctx, block) => {
       const contract = new initializableAbstractStrategy.Contract(
         ctx,
         block.header,
@@ -73,7 +66,7 @@ export const createStrategyProcessor = ({
           lastStrategyBalances.set(asset, strategyBalance)
         }
       }
-    }
+    })
     await ctx.store.insert(results.strategyBalances)
   }
 }
