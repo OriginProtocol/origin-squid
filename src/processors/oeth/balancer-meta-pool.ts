@@ -124,10 +124,9 @@ export const updateValues = async (
     ),
     block.header.height < originLensProxyDeployBlock
       ? Promise.all([
-          strategy['checkBalance()'](),
           strategy['checkBalance(address)'](RETH_ADDRESS),
           strategy['checkBalance(address)'](WETH_ADDRESS),
-        ]).then(([total, rETH, weth]) => ({ total, rETH, weth }))
+        ]).then(([rETH, weth]) => ({ rETH, weth }))
       : lens
           .getStrategyBalances(addresses.strategy)
           .then(({ assetBalances: [rETH, weth] }) => ({
