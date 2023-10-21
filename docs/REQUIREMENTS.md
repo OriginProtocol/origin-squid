@@ -168,8 +168,8 @@ const balancerMetaStablePoolABI = [
 
 - curvePoolBalanceMetric: `poolContract.balances(0) or poolContract.balances(1)`
     - EthFrxEthPool: "0xa1f8a6807c402e4a15ef4eba36528a3fed24e577" - ETH frxETH
-    - REthEthPool: "0x0f3159811670c117c372428d4e69ac32325e4d0f" - ETH stETH
-    - EthStEthPool: "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022" - rETH ETH
+    - REthEthPool: "0x0f3159811670c117c372428d4e69ac32325e4d0f" - ETH rETH
+    - EthStEthPool: "0xDC24316b9AE028F1497c275EB9192a3Ea0f67022" - ETH stETH
     - WEthStEthPool: "0x828b154032950c8ff7cf8085d841723db2696056" - WETH stETH
     - OEthEthPool: "0x94B17476A93b3262d87B9a326965D1E91f9c13E7" - OETH ETH
 

@@ -40,7 +40,7 @@ const pools = [
     count: 2,
   },
   {
-    name: 'REthEthPool',
+    name: 'EthRethPool',
     address: '0x0f3159811670c117c372428d4e69ac32325e4d0f',
     from: Math.max(16615906, oethDeployFrom),
     count: 2,
