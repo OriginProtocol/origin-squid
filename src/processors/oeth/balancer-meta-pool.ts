@@ -115,7 +115,7 @@ export const updateValues = async (
     addresses.strategy,
   )
   const lens = new originLens.Contract(ctx, block.header, addresses.originLens)
-  const [{ current, latest }, { total, rETH, weth }] = await Promise.all([
+  const [{ current, latest }, { rETH, weth }] = await Promise.all([
     getLatestEntity(
       ctx,
       OETHBalancerMetaPoolStrategy,
@@ -131,25 +131,18 @@ export const updateValues = async (
       : lens
           .getStrategyBalances(addresses.strategy)
           .then(({ assetBalances: [rETH, weth] }) => ({
-            total: rETH + weth,
             rETH,
             weth,
           })),
   ])
 
   if (!current) {
-    if (
-      !latest ||
-      latest.total !== total ||
-      latest.rETH !== rETH ||
-      latest.weth !== weth
-    ) {
+    if (!latest || latest.rETH !== rETH || latest.weth !== weth) {
       result.strategies.push(
         new OETHBalancerMetaPoolStrategy({
           id: timestampId,
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
-          total: total,
           rETH: rETH,
           weth: weth,
         }),
