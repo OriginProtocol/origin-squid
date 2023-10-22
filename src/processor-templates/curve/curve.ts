@@ -3,16 +3,12 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as curveLpToken from '../../abi/curve-lp-token'
 import { CurvePoolBalance } from '../../model'
 import { Context } from '../../processor'
+import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 import { range } from '../../utils/range'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]
 }
-
-const ESTIMATED_BPS = 12.06 // Circa 2023
-const SECONDS_PER_DAY = 86400
-const BLOCKS_PER_DAY = SECONDS_PER_DAY / ESTIMATED_BPS
-const UPDATE_FREQUENCY = Math.floor(BLOCKS_PER_DAY)
 
 export const createCurveSetup = (
   from: number,
@@ -26,17 +22,12 @@ export const createCurveProcessor = (
   count: number,
   from: number,
 ) => {
-  let lastBlockHeightProcessed = 0
+  const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
     const result: ProcessResult = {
       curvePoolBalances: [],
     }
-    const nextBlockIndex = ctx.blocks.findIndex(
-      (b) => b.header.height >= lastBlockHeightProcessed + UPDATE_FREQUENCY,
-    )
-    for (let i = nextBlockIndex; i < ctx.blocks.length; i += UPDATE_FREQUENCY) {
-      const block = ctx.blocks[i]
-      if (!block || block.header.height < from) continue
+    await update(ctx, async (ctx, block) => {
       const timestamp = new Date(block.header.timestamp)
       const timestampId = timestamp.toISOString()
       const contract = new curveLpToken.Contract(ctx, block.header, poolAddress)
@@ -55,8 +46,7 @@ export const createCurveProcessor = (
         balance2: balances[2] ?? 0n,
       })
       result.curvePoolBalances.push(curve)
-      lastBlockHeightProcessed = block.header.height
-    }
+    })
     await ctx.store.insert(result.curvePoolBalances)
   }
 }

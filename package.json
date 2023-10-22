@@ -3,19 +3,22 @@
   "private": true,
   "scripts": {
     "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat schema-*.graphql >> schema.graphql && sqd codegen && git add src/model/generated/*",
+    "migration:generate": "sqd down && sqd up && sqd migration:generate",
     "build": "rm -rf lib && tsc",
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",
-    "@subsquid/evm-processor": "^1.8.4",
+    "@subsquid/evm-processor": "^1.8.5",
     "@subsquid/graphql-server": "^4.3.1",
     "@subsquid/typeorm-migration": "^1.2.2",
     "@subsquid/typeorm-store": "^1.2.4",
+    "@types/lodash": "^4.14.200",
     "dayjs": "^1.11.10",
     "dotenv": "^16.1.4",
     "ethers": "^6.5.1",
+    "lodash": "^4.17.21",
     "pg": "^8.11.0",
     "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.16",

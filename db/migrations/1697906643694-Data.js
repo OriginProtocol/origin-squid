@@ -1,5 +1,5 @@
-module.exports = class Data1697749344979 {
-    name = 'Data1697749344979'
+module.exports = class Data1697906643694 {
+    name = 'Data1697906643694'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -51,7 +51,7 @@ module.exports = class Data1697749344979 {
         await db.query(`CREATE TABLE "dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_74fd102c8d1c60f4b1650a61ffc" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_88c58f8948c3294c2a9e2791dc" ON "dripper" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_06822c0a260797711acc9023d5" ON "dripper" ("block_number") `)
-        await db.query(`CREATE TABLE "oeth_balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total" numeric NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_6ddf5b8ba878e6d706e59bd6de0" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_6ddf5b8ba878e6d706e59bd6de0" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5e7ef383756fa18cb602f50089" ON "oeth_balancer_meta_pool_strategy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_11d344b3e0e03cdb6697dd61f7" ON "oeth_balancer_meta_pool_strategy" ("block_number") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)

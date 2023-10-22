@@ -1,4 +1,5 @@
 import * as exchangeRates from './post-processors/exchange-rates'
+import * as validateOeth from './post-processors/validate-oeth'
 import { run } from './processor'
 import * as aaveCompound from './processors/aave-compound'
 import * as curve from './processors/curve'
@@ -12,27 +13,23 @@ import * as vault from './processors/oeth/vault'
 import * as ousd from './processors/ousd'
 import * as strategies from './processors/strategies'
 
-run([
-  {
-    name: 'block-frequency-updates',
-    processors: [aaveCompound, curve, strategies],
-  },
-  {
-    name: 'oeth',
-    processors: [
-      oeth,
-      vault,
-      fraxStaking,
-      morphoAave,
-      dripper,
-      curveLp,
-      balancerMetaPoolStrategy,
-    ],
-    postProcessors: [exchangeRates],
-    validators: [],
-  },
-  {
-    name: 'ousd',
-    processors: [ousd],
-  },
-])
+run({
+  processors: [
+    // Block Frequency Updates
+    aaveCompound,
+    curve,
+    strategies,
+    // OETH Related
+    oeth,
+    vault,
+    fraxStaking,
+    morphoAave,
+    dripper,
+    curveLp,
+    balancerMetaPoolStrategy,
+    // OUSD Related
+    // ousd,
+  ],
+  postProcessors: [exchangeRates],
+  validators: [validateOeth],
+})
