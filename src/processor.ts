@@ -4,7 +4,6 @@ import {
   EvmBatchProcessor,
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
-import { createLogger } from '@subsquid/logger'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 
 export const createSquidProcessor = () =>
@@ -96,7 +95,6 @@ export const run = ({
             ctx.blocks[ctx.blocks.length - 1].header.timestamp -
             ctx.blocks[0].header.timestamp
           ctx.bps = timespan / (ctx.blocks.length - 1) / 1000
-          ctx.log.info({ bps: ctx.bps })
         }
 
         let start: number
