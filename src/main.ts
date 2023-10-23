@@ -1,3 +1,4 @@
+import * as dailyStats from './post-processors/daily-stats'
 import * as exchangeRates from './post-processors/exchange-rates'
 import * as validateOeth from './post-processors/validate-oeth'
 import { run } from './processor'
@@ -30,6 +31,6 @@ run({
     // OUSD Related
     // ousd,
   ],
-  postProcessors: [exchangeRates],
+  postProcessors: [exchangeRates, dailyStats],
   validators: [validateOeth],
 })
