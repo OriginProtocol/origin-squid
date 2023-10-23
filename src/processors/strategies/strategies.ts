@@ -4,7 +4,9 @@ import { Context } from '../../processor'
 import {
   createStrategyProcessor,
   createStrategySetup,
+  IStrategyData,
 } from '../../processor-templates/strategy'
+import { FRXETH_ADDRESS, OETH_ADDRESS, RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 
 // const DAI = '0x6b175474e89094c44da98b954eedeac495271d0f'.toLowerCase()
 // const USDT = '0xdac17f958d2ee523a2206206994597c13d831ec7'.toLowerCase()
@@ -65,30 +67,42 @@ import {
 // },
 // ] as const
 
-const oethStrategies = [
+const oethStrategies: readonly IStrategyData[] = [
   {
     from: 18083920,
     name: 'OETH Convex ETH+OETH (AMO)',
     address: '0x1827F9eA98E0bf96550b2FC20F7233277FcD7E63'.toLowerCase(),
     kind: 'CurveAMO',
+    curvePoolInfo: {
+      poolAddress: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
+      rewardsPoolAddress: '0x24b65dc1cf053a8d96872c323d29e86ec43eb33a'
+    },
+    assets: [WETH_ADDRESS, OETH_ADDRESS]
   },
   {
     from: 17513633,
     name: 'OETH Frax Staking',
     address: '0x3fF8654D633D4Ea0faE24c52Aec73B4A20D0d0e5'.toLowerCase(),
-    kind: 'CurveAMO',
+    kind: 'Generic',
+    assets: [FRXETH_ADDRESS]
   },
   {
     from: 17612333,
     name: 'OETH Morpho Aave V2',
     address: '0xc1fc9E5eC3058921eA5025D703CBE31764756319'.toLowerCase(),
-    kind: 'CurveAMO',
+    kind: 'Generic',
+    assets: [WETH_ADDRESS]
   },
   {
     from: 18156225,
     name: 'OETH Aura rETH/WETH',
     address: '0x49109629aC1deB03F2e9b2fe2aC4a623E0e7dfDC'.toLowerCase(),
     kind: 'BalancerMetaStablePool',
+    assets: [WETH_ADDRESS, RETH_ADDRESS],
+    balancerPoolInfo: {
+      poolId: '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
+      poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276'
+    }
   },
 ] as const
 
