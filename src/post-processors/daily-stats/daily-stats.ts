@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
 import { formatEther } from 'viem'
 
@@ -17,13 +18,17 @@ import {
 } from '../../model'
 import { Context } from '../../processor'
 
+export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+
 export const process = async (ctx: Context) => {
-  const firstBlockTimestamp = new Date(ctx.blocks[0]?.header.timestamp)
+  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)
+    ?.header.timestamp
+  if (!firstBlockTimestamp) return
 
   const firstBlock = ctx.blocks[0]
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
   const lastDailyStat = await ctx.store.findOne(OETHDailyStat, {
-    where: { timestamp: LessThanOrEqual(firstBlockTimestamp) },
+    where: { timestamp: LessThanOrEqual(new Date(firstBlockTimestamp)) },
     order: { id: 'desc' },
   })
 
@@ -51,9 +56,11 @@ export const process = async (ctx: Context) => {
   }
 
   await ctx.store.upsert(dailyStats)
-  await ctx.store.upsert(dailyCollateralStats)
-  await ctx.store.upsert(dailyStrategyStats)
-  await ctx.store.upsert(dailyHoldingsStats)
+  await Promise.all([
+    ctx.store.upsert(dailyCollateralStats),
+    ctx.store.upsert(dailyStrategyStats),
+    ctx.store.upsert(dailyHoldingsStats),
+  ])
 }
 
 async function updateDailyStats(ctx: Context, date: Date) {
@@ -70,8 +77,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastBalancer,
     lastFrax,
     lastMorpho,
-    lastRethExchangeRate,
-    lastSfrxEthExchangeRate,
+    lastRethRate,
+    lastSfrxEthRate,
   ] = await Promise.all([
     ctx.store.findOne(OETHAPY, queryParams),
     ctx.store.findOne(OETH, queryParams),
@@ -90,30 +97,37 @@ async function updateDailyStats(ctx: Context, date: Date) {
     }),
   ])
 
+  // Do we have any useful data yet?
   const allEntities = [lastApy, lastOeth]
   if (!allEntities.every((entity) => !!entity)) {
     return null
   }
 
-  console.log({
-    lastApy,
-    lastOeth,
-    lastCurve,
-    lastVault,
-    lastBalancer,
-    lastFrax,
-    lastMorpho,
-    lastRethExchangeRate,
-    lastSfrxEthExchangeRate,
-  })
+  // console.log({
+  //   lastApy,
+  //   lastOeth,
+  //   lastCurve,
+  //   lastVault,
+  //   lastBalancer,
+  //   lastFrax,
+  //   lastMorpho,
+  //   lastRethExchangeRate,
+  //   lastSfrxEthExchangeRate,
+  // })
 
   const entityManager = (
     ctx.store as unknown as { em: () => EntityManager }
   ).em()
 
-  const end = new Date(date)
-  end.setUTCHours(23, 59, 59, 0)
-  const yieldStats = await entityManager.query(yieldStatsQuery, [end])
+  const end = dayjs(date).endOf('day').toDate()
+  const yieldStats = await entityManager.query<
+    {
+      period: string
+      total_yield: bigint
+      total_fees: bigint
+      total_revenue: bigint
+    }[]
+  >(yieldStatsQuery, [end])
 
   const mostRecentEntity = allEntities.reduce((highest, current) => {
     if (!highest || !current) return current
@@ -159,31 +173,32 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const stETH = lastVault?.stETH || 0n
 
   const rETHRaw = (lastVault?.rETH || 0n) + (lastBalancer?.rETH || 0n)
-  const rethExchRate = lastRethExchangeRate?.rate || 1000000000000000000n
-  const rETH = (rETHRaw * rethExchRate) / 1000000000000000000n
+  const rethRate = lastRethRate?.rate || 1000000000000000000n
+  const rETH = (rETHRaw * rethRate) / 1000000000000000000n
 
-  const sfrxEthExchRate = lastSfrxEthExchangeRate?.rate || 1000000000000000000n
+  const sfrxEthExchangeRate = lastSfrxEthRate?.rate || 1000000000000000000n
   const sfrxETH = lastFrax?.sfrxETH || 0n
-  const convertedSfrxEth = (sfrxETH * sfrxEthExchRate) / 1000000000000000000n
+  const convertedSfrxEth =
+    (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n
   const frxETH = (lastVault?.frxETH || 0n) + convertedSfrxEth
 
   const totalCollateral = ETH + WETH + frxETH + stETH + rETH
 
-  console.log(`Day: ${date}`)
-  log([
-    ['Total Supply', dailyStat.totalSupply],
-    ['Circulating Supply', dailyStat.totalSupply - OETHOwned],
-    ['Total Collateral', totalCollateral],
-    ['Difference', dailyStat.totalSupply - OETHOwned - totalCollateral],
-    ['Total ETH', ETH],
-    ['Total WETH', WETH],
-    ['Total stETH', stETH],
-    ['Total rETH', rETH],
-    ['Total frxETH', frxETH],
-    ['', null],
-    ['Vault frxETH', lastVault?.frxETH || 0n],
-    ['Total sfrxETH', sfrxETH],
-  ])
+  // console.log(`Day: ${date}`)
+  // log([
+  //   ['Total Supply', dailyStat.totalSupply],
+  //   ['Circulating Supply', dailyStat.totalSupply - OETHOwned],
+  //   ['Total Collateral', totalCollateral],
+  //   ['Difference', dailyStat.totalSupply - OETHOwned - totalCollateral],
+  //   ['Total ETH', ETH],
+  //   ['Total WETH', WETH],
+  //   ['Total stETH', stETH],
+  //   ['Total rETH', rETH],
+  //   ['Total frxETH', frxETH],
+  //   ['', null],
+  //   ['Vault frxETH', lastVault?.frxETH || 0n],
+  //   ['Total sfrxETH', sfrxETH],
+  // ])
 
   // Strategy totals
   const vaultTotal =
@@ -261,14 +276,14 @@ async function updateDailyStats(ctx: Context, date: Date) {
       strategyDailyStatId: `${id}-VAULT` as unknown as OETHStrategyDailyStat,
       symbol: 'RETH',
       amount: lastVault?.rETH || 0n,
-      value: ((lastVault?.rETH || 0n) * rethExchRate) / 1000000000000000000n,
+      value: ((lastVault?.rETH || 0n) * rethRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-BALANCER-RETH`,
       strategyDailyStatId: `${id}-BALANCER` as unknown as OETHStrategyDailyStat,
       symbol: 'RETH',
       amount: lastBalancer?.rETH || 0n,
-      value: ((lastBalancer?.rETH || 0n) * rethExchRate) / 1000000000000000000n,
+      value: ((lastBalancer?.rETH || 0n) * rethRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-BALANCER-WETH`,
@@ -282,7 +297,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       strategyDailyStatId: `${id}-FRAX` as unknown as OETHStrategyDailyStat,
       symbol: 'SFRXETH',
       amount: lastFrax?.sfrxETH || 0n,
-      value: (sfrxETH * sfrxEthExchRate) / 1000000000000000000n,
+      value: (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-MORPHO-WETH`,
@@ -323,8 +338,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'RETH',
       amount: rETH,
-      price: rethExchRate,
-      value: (rETH * rethExchRate) / 1000000000000000000n,
+      price: rethRate,
+      value: (rETH * rethRate) / 1000000000000000000n,
     }),
     new OETHCollateralDailyStat({
       id: `${id}-FRXETH`,
