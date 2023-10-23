@@ -31,7 +31,8 @@ run([
       balancerMetaPoolStrategy,
     ],
     postProcessors: [exchangeRates, dailyStats],
-    validators: [validateOeth],
+    // validators: [validateOeth],
+    validators: [],
   },
   // {
   //   name: 'ousd',

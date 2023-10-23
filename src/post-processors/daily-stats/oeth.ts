@@ -104,6 +104,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastFrax,
     lastMorpho,
     lastRethExchangeRate,
+    lastSfrxEthExchangeRate,
   })
 
   const entityManager = (
@@ -163,9 +164,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
 
   const sfrxEthExchRate = lastSfrxEthExchangeRate?.rate || 1000000000000000000n
   const sfrxETH = lastFrax?.sfrxETH || 0n
-  const frxETH =
-    (lastVault?.frxETH || 0n) +
-    (sfrxETH * sfrxEthExchRate) / 1000000000000000000n
+  const convertedSfrxEth = (sfrxETH * sfrxEthExchRate) / 1000000000000000000n
+  const frxETH = (lastVault?.frxETH || 0n) + convertedSfrxEth
 
   const totalCollateral = ETH + WETH + frxETH + stETH + rETH
 
@@ -180,6 +180,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
     ['Total stETH', stETH],
     ['Total rETH', rETH],
     ['Total frxETH', frxETH],
+    ['', null],
+    ['Vault frxETH', lastVault?.frxETH || 0n],
+    ['Total sfrxETH', sfrxETH],
   ])
 
   // Strategy totals
@@ -381,13 +384,17 @@ FROM oeth_rebase
 WHERE timestamp <= $1::timestamp
 `
 
-function log(entries: [string, bigint][]): void {
+function log(entries: [string, bigint | null][]): void {
+  if (!entries) {
+    console.log('')
+    return
+  }
   // Find the longest label for alignment
   const maxLength = Math.max(...entries.map((entry) => entry[0].length))
 
   const lines = entries.map(([label, value]) => {
     // Format the value
-    const formattedValue = Number(formatEther(value)).toFixed(3)
+    const formattedValue = value ? Number(formatEther(value)).toFixed(3) : ''
     // Right-align the label and value
     return `${label.padEnd(maxLength)} ${formattedValue.padStart(10)}`
   })

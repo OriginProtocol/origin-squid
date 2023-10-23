@@ -104,6 +104,8 @@ const processTransfer = async (
   vault.rETH = await vaultContract.checkBalance(RETH_ADDRESS)
   vault.stETH = await vaultContract.checkBalance(STETH_ADDRESS)
   vault.frxETH = await vaultContract.checkBalance(FRXETH_ADDRESS)
+  console.log('Header', block.header)
+  console.log('Vault frxEth', vault.frxETH.toString())
 }
 
 const getLatestOETHVault = async (
