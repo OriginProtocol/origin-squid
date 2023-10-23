@@ -1,6 +1,7 @@
 // Lowercase Addresses
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
 export const OUSD_ADDRESS = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'
 export const OUSD_VAULT_ADDRESS = '0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70'
@@ -41,3 +42,6 @@ export const OETH_DRIPPER_ADDRESS = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
 
 export const OETH_STRATEGY_BALANCER_ADDRESS =
   '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'
+
+
+export const BALANCER_VAULT = '0xba12222222228d8ba445958a75a0704d566bf2c8'
