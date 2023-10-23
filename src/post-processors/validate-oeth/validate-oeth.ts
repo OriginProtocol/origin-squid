@@ -2,7 +2,7 @@ import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import assert from 'assert'
 import { sortBy } from 'lodash'
 
-import { OETHMorphoAave, OETHVault } from '../../model'
+import { OETHMorphoAave, OETHVault, StrategyBalance } from '../../model'
 import { Block, Context } from '../../processor'
 import { jsonify } from '../../utils/jsonify'
 
@@ -18,6 +18,12 @@ export const process = async (ctx: Context) => {
       block,
       OETHMorphoAave,
       expectations.oethMorphoAave,
+    )
+    await validateExpectations(
+      ctx,
+      block,
+      StrategyBalance,
+      expectations.strategyBalances,
     )
     firstBlock = false
   }
@@ -57,11 +63,12 @@ const validateExpectation = async <
   const actual = await ctx.store.findOne(Class, {
     where: { id: expectation.id },
   })
+  assert(actual, 'Expected entity does not exist.')
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
   assert.deepEqual(JSON.parse(jsonify(actual)), expectation)
 }
 
-const expectations: Record<string, any[]> = {
+const expectations = {
   oethVaults: sortBy(
     [
       {
@@ -100,7 +107,7 @@ const expectations: Record<string, any[]> = {
         weth: '368830581327791252482',
         frxETH: '0',
       },
-    ],
+    ] as any[],
     (v) => v.blockNumber,
   ),
   oethMorphoAave: sortBy(
@@ -123,7 +130,13 @@ const expectations: Record<string, any[]> = {
         blockNumber: 17479788,
         weth: '103288680000000000000',
       },
-    ],
+    ] as any[],
     (v) => v.blockNumber,
   ),
-}
+  strategyBalances: sortBy(
+    [
+      // Place verified strategy balances in here.
+    ] as any[],
+    (v) => v.blockNumber,
+  ),
+} as const
