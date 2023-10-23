@@ -76,9 +76,12 @@ export const run = ({
   const processor = createSquidProcessor()
 
   processor.setBlockRange({
-    from: Math.min(
-      ...(processors.map((p) => p.from).filter((x) => x) as number[]),
-    ),
+    from: process.env.BLOCK_FROM
+      ? Number(process.env.BLOCK_FROM)
+      : Math.min(
+          ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+        ),
+    to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
   processors.forEach((p) => p.setup?.(processor))
   processor.run(

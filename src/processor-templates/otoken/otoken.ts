@@ -213,13 +213,15 @@ export const createOTokenProcessor = (params: {
           if (
             block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
           ) {
-            const credits = await token.creditsBalanceOfHighres(address.id)
+            credits = await token
+              .creditsBalanceOfHighres(address.id)
+              .then((r) => [r[0], r[1]])
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           } else {
-            const credits = await token
+            credits = await token
               .creditsBalanceOf(address.id)
-              .then((credits) => credits.map((credit) => credit * 1000000000n))
+              .then((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           }
