@@ -19,9 +19,6 @@ export class OETHBalancerMetaPoolStrategy {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    total!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     rETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})

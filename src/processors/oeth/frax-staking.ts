@@ -64,7 +64,10 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    const haveLog = block.logs.find((log) => topicsToWatch.has(log.topics[0]))
+    const haveLog = block.logs.find(
+      (log) =>
+        log.address === SFRXETH_ADDRESS && topicsToWatch.has(log.topics[0]),
+    )
     if (haveLog) {
       await createOETHFraxStaking(ctx, result, block)
     }

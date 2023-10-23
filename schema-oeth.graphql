@@ -144,7 +144,6 @@ type OETHBalancerMetaPoolStrategy @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  total: BigInt!
   rETH: BigInt!
   weth: BigInt!
 }
