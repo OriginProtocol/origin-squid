@@ -11,7 +11,10 @@ import * as dripper from './processors/oeth/dripper'
 import * as fraxStaking from './processors/oeth/frax-staking'
 import * as morphoAave from './processors/oeth/morpho-aave'
 import * as vault from './processors/oeth/vault'
-import * as ousd from './processors/ousd'
+import * as governance from './processors/ogv/governance'
+import * as ogv from './processors/ogv/ogv'
+import * as ogvSupply from './processors/ogv/ogv-supply'
+// import * as ousd from './processors/ousd'
 import * as strategies from './processors/strategies'
 
 run({
@@ -20,6 +23,8 @@ run({
     aaveCompound,
     curve,
     strategies,
+    ogvSupply,
+
     // OETH Related
     oeth,
     vault,
@@ -30,7 +35,10 @@ run({
     balancerMetaPoolStrategy,
     // OUSD Related
     // ousd,
+
+    // OGV
+    ogv,
   ],
-  postProcessors: [exchangeRates, dailyStats],
+  postProcessors: [exchangeRates, dailyStats, governance],
   validators: [validateOeth],
 })

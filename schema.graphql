@@ -308,41 +308,104 @@ type OETHCollateralDailyStat @entity {
   """
   value: BigInt!
 }
-# OGV Price (5m?)
-# OGV Market Cap (5m?)
-# OGV Circulating Supply
-# OGV Total Supply
 type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
   circulating: BigInt!
+  staked: BigInt!
   total: BigInt!
 }
 
-# OGV Amount Staked & Percentage
-# OGV Staking APY
-type StakedOGV @entity { # Representing `veOGV`
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  total: BigInt!
-  apy: BigInt!
+type OGVAddress @entity {
+  id: ID! @index
+  balance: BigInt!
+  veogvBalance: BigInt!
+  votingPower: BigInt!
+  delegatee: OGVAddress
+  lastUpdated: DateTime!
 }
 
-# OGV Registered Voters
-# OGV Open-source contributors
-# OGV Improvement proposals
-type OGVGovernance @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  registeredVoters: Int!
-  openSourceContributors: Int!
-  improvementProposals: Int!
+enum OGVLockupEventType {
+  Staked
+  Unstaked
+  Extended
 }
 
-# TODO: More
+type OGVLockupTxLog @entity {
+  id: ID!
+  hash: String!
+  event: OGVLockupEventType!
+  timestamp: DateTime!
+  ogvLockup: OGVLockup!
+}
+
+type OGVLockup @entity {
+  id: ID!
+  lockupId: Int! @index
+  address: OGVAddress! @index
+  logs: [OGVLockupTxLog]! @derivedFrom(field: "ogvLockup")
+  amount: BigInt!
+  end: DateTime!
+  veogv: BigInt! # Amount of veOGV received
+  timestamp: DateTime!
+  # active: Boolean
+}
+
+enum OGVProposalState {
+  Pending
+  Active
+  Canceled
+  Defeated
+  Succeeded
+  Queued
+  Expired
+  Executed
+}
+
+enum OGVProposalEvent {
+  Created
+  Queued
+  Canceled
+  Extended
+  Executed
+}
+
+enum OGVVoteType {
+  Against
+  For
+  Abstain
+}
+
+type OGVProposalTxLog @entity {
+  id: ID!
+  hash: String!
+  event: OGVProposalEvent!
+  timestamp: DateTime!
+  proposal: OGVProposal! @index
+}
+
+type OGVProposal @entity {
+  id: ID! @index
+  description: String
+  proposer: OGVAddress!
+  timestamp: DateTime!
+  startBlock: BigInt!
+  endBlock: BigInt!
+  lastUpdated: DateTime!
+  status: OGVProposalState!
+  logs: [OGVProposalTxLog]! @derivedFrom(field: "proposal")
+}
+
+type OGVProposalVote @entity {
+  id: ID!
+  proposal: OGVProposal! @index
+  voter: OGVAddress! @index
+  weight: BigInt!
+  type: OGVVoteType!
+  txHash: String!
+  timestamp: DateTime!
+}
 """
 The OUSD entity tracks the change in total supply of OUSD over time.
 """
