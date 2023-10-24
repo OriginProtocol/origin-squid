@@ -233,17 +233,16 @@ export const createOTokenProcessor = (params: {
             credits = await token
               .creditsBalanceOfHighres(address.id)
               .then((r) => [r[0], r[1]])
-            if (!credits) return
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           } else {
             credits = await token
               .creditsBalanceOf(address.id)
               .then((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
-            if (!credits) return
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           }
+          if (change === 0n) return
           const type = isSwap
             ? HistoryType.Swap
             : addressSub === address
@@ -347,6 +346,7 @@ export const createOTokenProcessor = (params: {
         (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
       const earned = newBalance - address.balance
 
+      if (earned === 0n) continue
       result.history.push(
         new params.OTokenHistory({
           id: getUniqueId(log.id),

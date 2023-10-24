@@ -1,4 +1,4 @@
-const data = require('./source.json')
+const data = require('../source.json')
 
 const results = []
 
