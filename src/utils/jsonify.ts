@@ -6,4 +6,10 @@ function replacer(key: string, value: unknown) {
   }
 }
 
-export const jsonify = (value: any) => JSON.stringify(value, replacer)
+export const jsonify = (
+  value: any,
+  customReplacer?: (key: string, value: unknown) => unknown,
+) =>
+  JSON.stringify(value, (key, value) =>
+    replacer(key, customReplacer?.(key, value) ?? value),
+  )

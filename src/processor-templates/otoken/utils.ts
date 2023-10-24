@@ -133,8 +133,8 @@ export async function createRebaseAPY<
     apy.rebasingCreditsPerToken,
     lastApy.rebasingCreditsPerToken,
   )
-  apy.apr = apyCalc.aprDecimal
-  apy.apy = apyCalc.apyDecimal
+  apy.apr = apyCalc.apr
+  apy.apy = apyCalc.apy
 
   const last7daysDateId = {
     key: 'apy7DayAvg' as const,

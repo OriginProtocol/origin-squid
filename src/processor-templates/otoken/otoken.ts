@@ -251,7 +251,7 @@ export const createOTokenProcessor = (params: {
           result.history.push(
             new params.OTokenHistory({
               // we can't use {t.id} because it's not unique
-              id: getUniqueId(log.id),
+              id: getUniqueId(`${log.id}-${address.id}`),
               address: address,
               value: change,
               balance: newBalance,
@@ -349,7 +349,7 @@ export const createOTokenProcessor = (params: {
       if (earned === 0n) continue
       result.history.push(
         new params.OTokenHistory({
-          id: getUniqueId(log.id),
+          id: getUniqueId(`${log.id}-${address.id}`),
           // we can't use {t.id} because it's not unique
           address: address,
           value: earned,
@@ -411,7 +411,7 @@ export const createOTokenProcessor = (params: {
       }
 
       let rebaseOption = new params.OTokenRebaseOption({
-        id: getUniqueId(trace.transaction?.hash!),
+        id: getUniqueId(`${trace.transaction?.hash!}-${owner.id}`),
         timestamp,
         blockNumber,
         txHash: trace.transaction?.hash,
