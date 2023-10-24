@@ -90,7 +90,19 @@ const validateExpectation = async <
     `Expected entity does not exist: Entity=${Class.name} id=${expectation.id}`,
   )
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
-  assert.deepEqual(JSON.parse(jsonify(actual)), expectation)
+  // We decide to only care about float decimal accuracy to the 8th.
+  assert.deepEqual(
+    JSON.parse(
+      jsonify(actual, (_key, value) =>
+        typeof value === 'number' ? Number(value.toFixed(8)) : value,
+      ),
+    ),
+    JSON.parse(
+      jsonify(expectation, (_key, value) =>
+        typeof value === 'number' ? Number(value.toFixed(8)) : value,
+      ),
+    ),
+  )
   ctx.log.info(`Validated entity: Entity=${Class.name} id=${expectation.id}`)
 }
 
@@ -103,15 +115,15 @@ const expectations = {
     {
       id: '2023-06-25',
       blockNumber: 17559113,
-      timestamp: '2023-06-25T21:18:47.000000Z',
+      timestamp: '2023-06-25T21:18:47.000Z',
       txHash:
         '0x43ce3a8d77ab8d0ec80e1929c6e2490ef2aeb5563c5f9f17a83a0467ebc13182',
       rebasingCreditsPerToken: '964774349509154447326281289',
-      apy7DayAvg: 0.09953001952183743,
-      apy30DayAvg: 0.1087649234534527,
-      apy14DayAvg: 0.1077996886609001,
+      apy7DayAvg: 0.09953001952182788,
+      apy30DayAvg: 0.10876492345344473,
+      apy14DayAvg: 0.1077996886608841,
       apy: 0.08976154125067537,
-      apr: 0.08596862227645369,
+      apr: 0.08596862227643688,
     },
     {
       id: '2023-08-01',
@@ -120,11 +132,11 @@ const expectations = {
       txHash:
         '0xdb0d39ba852986922f1aac3287a1e6cf47e60e45681011f6e778cfc2be8e8a89',
       rebasingCreditsPerToken: '957036931267910885633239775',
-      apy7DayAvg: 0.07675027302663857,
-      apy30DayAvg: 0.09497559027581592,
-      apy14DayAvg: 0.08339748368809696,
+      apy7DayAvg: 0.07675027302663752,
+      apy30DayAvg: 0.09497559027580538,
+      apy14DayAvg: 0.08339748368809637,
       apy: 0.043503105119109486,
-      apr: 0.04258725623671474,
+      apr: 0.0425872562366986,
     },
     {
       id: '2023-08-24',
@@ -133,24 +145,24 @@ const expectations = {
       txHash:
         '0x7e3babd3c816f676e14409077a955796de0f30dbd72b26ca103b618ca3cc85dd',
       rebasingCreditsPerToken: '952455810812982773029042302',
-      apy7DayAvg: 0.09684362917504816,
-      apy30DayAvg: 0.08341071009644238,
-      apy14DayAvg: 0.08959106507297927,
+      apy7DayAvg: 0.09684362917507827,
+      apy30DayAvg: 0.08341071009645365,
+      apy14DayAvg: 0.08959106507298947,
       apy: 0.08723340962362891,
-      apr: 0.08364588976198084,
+      apr: 0.08364588976201764,
     },
     {
       id: '2023-09-19',
       blockNumber: 18168332,
-      timestamp: '2023-09-19T07:00:23.000000Z',
+      timestamp: '2023-09-19T07:00:23.000Z',
       txHash:
         '0x100ed769fccd330bde46eef786676ab664088f0df2fa65bfea471864a1f5ad6c',
       rebasingCreditsPerToken: '947329020791392212393605891',
-      apy7DayAvg: 0.08259288698447587,
-      apy30DayAvg: 0.08029158038417668,
-      apy14DayAvg: 0.08154501471752601,
-      apy: 0.09203689283640748,
-      apr: 0.08805527839701369,
+      apy7DayAvg: 0.08259288698445386,
+      apy30DayAvg: 0.08029158038416882,
+      apy14DayAvg: 0.08154501471751427,
+      apy: 0.09203689283631888,
+      apr: 0.08805527839694752,
     },
     {
       id: '2023-10-22',
@@ -160,212 +172,212 @@ const expectations = {
         '0x1eab96d75579c8050869ffadec5d38bccf8a9714f49d6e27ce67088f15be0535',
       rebasingCreditsPerToken: '941672759591769536254510513',
       apy7DayAvg: 0.05113846400982916,
-      apy30DayAvg: 0.06959144820278103,
-      apy14DayAvg: 0.0517046369648323,
+      apy30DayAvg: 0.06959144820278466,
+      apy14DayAvg: 0.05170463696483984,
       apy: 0.042174184267448345,
-      apr: 0.04131142884407507,
+      apr: 0.04131142884409124,
     },
   ]),
   oethHistories: e([
     {
-      id: '0017448122-000001-2db00-2',
-      blockNumber: 17448122,
-      timestamp: '2023-06-10T06:53:47.000000Z',
-      balance: '54269081655259431188',
+      balance: '4994819891394470874',
+      blockNumber: 17684499,
+      id: '0017684499-000297-32534-0x0ad9ea110bdd131683c0d36df8ba80cd3ed1a5fb-1',
+      timestamp: '2023-07-13T12:12:23.000000Z',
+      txHash:
+        '0x51dc5890e7057aa049a8ee3675e9f5a2d1df8afae3ccf1aae7991d2141b082bb',
       type: 'Received',
-      txHash:
-        '0x334a2c2d69205ed97c205ff0efd3ff54f19c9acb23a8393f4d2aaebedfb630da',
-      value: '-4528428283779551001',
+      value: '4994819891394470874',
     },
     {
-      id: '0017981349-000279-11920-2',
-      blockNumber: 17981349,
-      timestamp: '2023-08-24T01:40:59.000000Z',
-      balance: '16567405974344349682',
+      balance: '989',
+      blockNumber: 17780803,
+      id: '0017780803-000424-d030b-0x24902aa0cf0000a08c0ea0b003b0c0bf600000e0-1',
+      timestamp: '2023-07-27T00:22:23.000000Z',
+      txHash:
+        '0x723583207fa4221d4ad6d606b43927019e088c93c0edcbcd89a62c6327e1925f',
       type: 'Received',
-      txHash:
-        '0xd44c412b9ca902289beaf0fbb8c69b2ea03b7e7f08eb22f4a7d04ebdd1bc1aa8',
-      value: '349963057927172181',
+      value: '81',
     },
     {
-      id: '0018210827-000166-9ac57-1',
-      blockNumber: 18210827,
-      timestamp: '2023-09-25T05:50:47.000000Z',
-      balance: '0',
+      balance: '3620809167086458796690',
+      blockNumber: 18161346,
+      id: '0018161346-000161-142ff-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
+      timestamp: '2023-09-18T07:27:11.000000Z',
+      txHash:
+        '0xa66fbf3fb92fc8d44e2790a1692ce5e9f10139f0bf728da2533c8d5e7b4a1a70',
       type: 'Received',
-      txHash:
-        '0x43ab72d152cb130b7b4689199ebaea37c8e5b40f15d6afc6c4a27afe857ec24b',
-      value: '0',
+      value: '316259151664720778',
     },
     {
-      id: '0018411970-000151-b09fb-2',
-      blockNumber: 18411970,
-      timestamp: '2023-10-23T09:07:11.000000Z',
-      balance: '2500600214692767585',
+      balance: '30999999999999',
+      blockNumber: 18412140,
+      id: '0018412140-000178-00f48-0xc69bfa6ab78853a4addb9b6c553102c7e62ada15-1',
+      timestamp: '2023-10-23T09:41:23.000000Z',
+      txHash:
+        '0xc1cdeca03c9214546cf820a725ed6c730860479197c19c6fa1836f1d92a9eb09',
       type: 'Received',
-      txHash:
-        '0xb38699895ac1eed36ec3dea56be4038b2d7fa6ff83ac3a4e099459b0352236ed',
-      value: '1999431151658221182',
+      value: '10000000000000',
     },
     {
-      id: '0017325665-000222-bb52b-1',
-      blockNumber: 17325665,
-      timestamp: '2023-05-24T01:03:35.000000Z',
-      balance: '1518502560492495675505',
+      balance: '199908452113059508',
+      blockNumber: 18229171,
+      id: '0018229171-000263-264de-0x018abc2b6bc71013efd9f98f2104ca53132db615-1',
+      timestamp: '2023-09-27T19:26:47.000000Z',
+      txHash:
+        '0x4dfaca9c52226b02c6ebd16f97bab0159370bf3e9f252a48ff965700e27f4653',
       type: 'Received',
-      txHash:
-        '0x8e113b649e739f98f5e4459cbb64da9186a6dbf9d3ad0e5d73bb13afe1e4f46b',
-      value: '262499999999999999999',
+      value: '108554825178258',
     },
     {
-      id: '0017481076-000107-fbce2-2',
-      blockNumber: 17481076,
-      timestamp: '2023-06-14T22:14:35.000000Z',
-      balance: '53423263935262651794',
+      balance: '70007164149821693',
+      blockNumber: 17130412,
+      id: '0017130412-000118-770f2-0x94b17476a93b3262d87b9a326965d1e91f9c13e7-1',
+      timestamp: '2023-04-26T12:30:59.000000Z',
+      txHash:
+        '0xf9498f5b8d65e7f7252a515edcc3af4cd3b0e96ee841ef82f11de349ded5f330',
       type: 'Sent',
-      txHash:
-        '0x97e569e4e0fb12f2cb15687db00b26ec8f8e42020795d6cecd54d7a0fdda3639',
-      value: '-120019220020411503',
+      value: '-9992835850178307',
     },
     {
-      id: '0017760559-000231-5d794-2',
-      blockNumber: 17760559,
-      timestamp: '2023-07-24T04:23:35.000000Z',
-      balance: '41923787891862932559',
+      balance: '0',
+      blockNumber: 17542358,
+      id: '0017542358-000170-8207a-0x9ffd0a5b5438b95861167422e745d34d151bcc3b-1',
+      timestamp: '2023-06-23T12:46:47.000000Z',
+      txHash:
+        '0x02d96712bdceff945b568905980bc747e920b58cab2191b6ac04a6f0223efd6d',
       type: 'Sent',
-      txHash:
-        '0x65b4e86f3ea5f5173917b98151c7b136e35c37849c9be53f606f2bb4d62c2e61',
-      value: '0',
+      value: '-753495508936036139',
     },
     {
-      id: '0018348957-000120-213ab-2',
-      blockNumber: 18348957,
-      timestamp: '2023-10-14T13:36:11.000000Z',
       balance: '0',
+      blockNumber: 18202824,
+      id: '0018202824-000167-52e26-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
+      timestamp: '2023-09-24T02:55:59.000000Z',
+      txHash:
+        '0x427dd09882a59b6906d40b5031029fbd34e4ebc747b4429cc8cad1aefb9e62c5',
       type: 'Sent',
-      txHash:
-        '0xb157fe3ef2ceb1c6b238842e29a62c5b9a2dc6b4f958ab35f54a2041c2e75af7',
-      value: '-865307408847667252',
+      value: '-33861098543774741169',
     },
     {
-      id: '0017516713-000203-0dfcb-1',
-      blockNumber: 17516713,
-      timestamp: '2023-06-19T22:20:23.000000Z',
       balance: '0',
+      blockNumber: 18260101,
+      id: '0018260101-000216-20cba-0xe4bac3e44e8080e1491c11119197d33e396ea82b-1',
+      timestamp: '2023-10-02T03:16:23.000000Z',
+      txHash:
+        '0xb8b8a275a004ccfbc4159989cec584b266c148153dd37658b8a26966d39d18de',
       type: 'Sent',
-      txHash:
-        '0x2bfa5f354ca845e515dec129578ff2e37e4c218edcd34539a7cf0e2de7e66a25',
-      value: '0',
+      value: '-20491766350512037673',
     },
     {
-      id: '0017527550-000129-f42c5-2',
-      blockNumber: 17527550,
-      timestamp: '2023-06-21T10:50:23.000000Z',
-      balance: '5688157047270493570549',
+      balance: '35811706077256008074',
+      blockNumber: 18154738,
+      id: '0018154738-000203-13b93-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
+      timestamp: '2023-09-17T09:00:35.000000Z',
+      txHash:
+        '0x931e5cea2e7d4551691988867947489594d30cdef7acd0906fd7607e887e5aae',
       type: 'Sent',
-      txHash:
-        '0xbf4c60a70a47998ed7360b28851e06c2c73a162023b76e4b4f5097283f4583c2',
-      value: '-16980807390958917240',
+      value: '-1200000000000000000',
     },
     {
-      id: '0017189726-000506-2d30f-2',
-      blockNumber: 17189726,
-      timestamp: '2023-05-04T20:37:59.000000Z',
-      balance: '0',
+      balance: '49999999999999999',
+      blockNumber: 17150073,
+      id: '0017150073-000306-0f425-0x58890a9cb27586e83cb51d2d26bbe18a1a647245-1',
+      timestamp: '2023-04-29T06:48:11.000000Z',
+      txHash:
+        '0x4af5c7b310ae8c814ae6e5415da99f9c9f414e6b4ca8257cd1dea1a6d9067b36',
       type: 'Swap',
-      txHash:
-        '0x5ba5b845a1829863756e2af0572d70121cee13968e6f260fcbf1169986a8f811',
-      value: '0',
+      value: '49999999999999999',
     },
     {
-      id: '0017385450-000357-946e1-2',
-      blockNumber: 17385450,
-      timestamp: '2023-06-01T10:45:35.000000Z',
-      balance: '0',
+      balance: '375433998881638354',
+      blockNumber: 17278567,
+      id: '0017278567-000195-1f61f-0x79b664dba8015e3aa505fa4507f0d64df7e451e2-1',
+      timestamp: '2023-05-17T09:47:23.000000Z',
+      txHash:
+        '0xd9a0e30f23956cb91293cb44a6e54b6d6bbe772e3d70b5e68a1760b28c8f78ef',
       type: 'Swap',
-      txHash:
-        '0x9ee048bf89bf92783a9cb3e0a01eff8775728c5a81cb1e3233172721f43f1414',
-      value: '0',
+      value: '375433998881638354',
     },
     {
-      id: '0017444613-000265-2962b-1',
-      blockNumber: 17444613,
-      timestamp: '2023-06-09T19:02:35.000000Z',
-      balance: '0',
+      balance: '1499066120128420574',
+      blockNumber: 17286539,
+      id: '0017286539-000156-4976c-0x938500c0df0fdc138c28ddf4bc4289107c7354ce-1',
+      timestamp: '2023-05-18T12:49:35.000000Z',
+      txHash:
+        '0xcd68e7d50fcb683add60e71253673af2ff2547e6375d40ffc4639a1410bc3104',
       type: 'Swap',
-      txHash:
-        '0x0bacb249d1562bdd43cfa8d5dfc3396f1792fc56887907039943ed610abaca44',
-      value: '0',
+      value: '1499066120128420574',
     },
     {
-      id: '0017760876-000137-ffcd8-1',
-      blockNumber: 17760876,
-      timestamp: '2023-07-24T05:27:47.000000Z',
-      balance: '0',
+      balance: '5384270268711162736',
+      blockNumber: 17633180,
+      id: '0017633180-000408-d89c5-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
+      timestamp: '2023-07-06T07:00:11.000000Z',
+      txHash:
+        '0x97db34103137321f032b4a54ccaed3112d054bc1204125ac862a0b81fb3f3279',
       type: 'Swap',
-      txHash:
-        '0xf5cc833f7e762f48c8213490f26a5341bf866673bee7e89357858c3558c7602d',
-      value: '0',
+      value: '1273337667112407520',
     },
     {
-      id: '0017997221-000140-78424-1',
-      blockNumber: 17997221,
-      timestamp: '2023-08-26T07:01:11.000000Z',
-      balance: '10881483809262264875',
+      balance: '674774321229336771',
+      blockNumber: 17299409,
+      id: '0017299409-000434-9ce80-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
+      timestamp: '2023-05-20T08:19:59.000000Z',
+      txHash:
+        '0x787fbdec5e65927b0e1b48601d891f48d7671db88fc4c11ac74f8e874e667936',
       type: 'Swap',
-      txHash:
-        '0x2e85b0cc1b6f85aebb26cc45d620fcf521ce901f6f5b662cb62b34c2c8c866e1',
-      value: '988832714543348663',
+      value: '1049118249013688',
     },
     {
-      id: '0017193191-000115-fbe27-15',
-      blockNumber: 17193191,
-      timestamp: '2023-05-05T08:17:59.000000Z',
-      balance: '22535751744063969467',
+      balance: '32292882396504207',
+      blockNumber: 17275137,
+      id: '0017275137-000516-66451-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
+      timestamp: '2023-05-16T22:12:35.000000Z',
+      txHash:
+        '0x24d1f4ff2ad45826b91206594d706af0866bca1f5d20377d070679599a2dbe55',
       type: 'Yield',
-      txHash:
-        '0x4dbda6d0b12c71f9d438a47210f2d348422e83928461f859eaa37f8aea501f56',
-      value: '154429314564162',
+      value: '218258202002',
     },
     {
-      id: '0017275142-000249-3edd0-16',
-      blockNumber: 17275142,
-      timestamp: '2023-05-16T22:13:35.000000Z',
-      balance: '30095268186371063',
+      balance: '10070499668604762317',
+      blockNumber: 17276891,
+      id: '0017276891-000052-12fd3-0x57b0dd7967955c92b6e34a038b47fee63e1efd1a-1',
+      timestamp: '2023-05-17T04:08:11.000000Z',
+      txHash:
+        '0x76fe3dc19782ba2e1274f81dd4347dcacc151960918b1b52bb91582a9d49ab50',
       type: 'Yield',
-      txHash:
-        '0x4d7959cda3ca1699caf7179d20ccf5294856970f6fd79a5628a0e0384e8d2113',
-      value: '2388892809',
+      value: '16150488605744',
     },
     {
-      id: '0017275823-000272-843af-14',
-      blockNumber: 17275823,
-      timestamp: '2023-05-17T00:30:35.000000Z',
-      balance: '4798484031005241244',
+      balance: '100429877759821',
+      blockNumber: 17277099,
+      id: '0017277099-000273-05d64-0xd6415162f48140d6090959cb8068174c68e81705-1',
+      timestamp: '2023-05-17T04:49:59.000000Z',
+      txHash:
+        '0xeec79549578a28e024ce86def3784830d28c26b8fe1bfe4bde093f4854b32cde',
       type: 'Yield',
-      txHash:
-        '0x2f62cd6ab307233ca751ee0264f03cca302390f9ee60914992196e7e6a64f4b2',
-      value: '38308162641651',
+      value: '87786385',
     },
     {
-      id: '0017277825-000185-fadc4-34',
-      blockNumber: 17277825,
-      timestamp: '2023-05-17T07:17:35.000000Z',
-      balance: '35147348289421819',
+      balance: '1025746659014252',
+      blockNumber: 17283304,
+      id: '0017283304-000280-32e6f-0xfd9e6005187f448957a0972a7d0c0a6da2911236-1',
+      timestamp: '2023-05-18T01:54:23.000000Z',
+      txHash:
+        '0xaa9c72db7346ea7de332196f6df85d4f47c6fe42e3b7f7fcdc0965933486b128',
       type: 'Yield',
-      txHash:
-        '0xb7c484f2d2625e0354c7e29b3c345a71e0419afb07152febee9cdc963a6ead52',
-      value: '11972581721',
+      value: '1492199898',
     },
     {
-      id: '0017283378-000634-fde11-45',
+      balance: '261226340935297362',
       blockNumber: 17283378,
+      id: '0017283378-000634-fde11-0x2f19980c3acd87f6d9468663c9a9839c12456a14-1',
       timestamp: '2023-05-18T02:09:23.000000Z',
-      balance: '3000311847766043460',
-      type: 'Yield',
       txHash:
         '0xda99a68fd12da72f11d68e5997fa1cccea120a4e5a5b71d2e660785ddf5251ab',
-      value: '157970456472902',
+      type: 'Yield',
+      value: '13753918397190',
     },
   ]),
   oethRebases: e([

@@ -12,6 +12,7 @@ import {
   RebasingOption,
 } from '../../model'
 import { Context } from '../../processor'
+import { calculateAPY } from '../../utils/calculateAPY'
 
 /**
  * Create a new Address entity
@@ -126,17 +127,14 @@ export async function createRebaseAPY<
   apy.txHash = log.transactionHash
   apy.rebasingCreditsPerToken = rebaseEvent.rebasingCreditsPerToken
 
-  // this should normally be 1 day but more secure to calculate it
-  const diffTime = apy.timestamp.getTime() - lastApy.timestamp.getTime()
-  const dayDiff = diffTime / (1000 * 60 * 60 * 24)
-
-  apy.apr =
-    (Number(lastApy.rebasingCreditsPerToken) /
-      Number(apy.rebasingCreditsPerToken) -
-      1) *
-    (365.25 / dayDiff)
-  const periods_per_year = 365.25 / Number(dayDiff)
-  apy.apy = (1 + apy.apr / periods_per_year) ** periods_per_year - 1
+  const apyCalc = calculateAPY(
+    lastApy.timestamp,
+    apy.timestamp,
+    apy.rebasingCreditsPerToken,
+    lastApy.rebasingCreditsPerToken,
+  )
+  apy.apr = apyCalc.apr
+  apy.apy = apyCalc.apy
 
   const last7daysDateId = {
     key: 'apy7DayAvg' as const,
