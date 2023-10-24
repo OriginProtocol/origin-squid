@@ -29,12 +29,15 @@ export interface EntityClass<T> {
   new (partial: Partial<T>): T
 }
 
-type InstanceTypeOfConstructor<T extends { new (...args: any[]): any }> =
+type InstanceTypeOfConstructor<
   T extends {
-    new (...args: any[]): infer R
-  }
-    ? R
-    : any
+    new (...args: any[]): any
+  },
+> = T extends {
+  new (...args: any[]): infer R
+}
+  ? R
+  : any
 
 type OToken = EntityClass<OETH> | EntityClass<OUSD>
 type OTokenAPY = EntityClass<OETHAPY> | EntityClass<OUSDAPY>
@@ -111,7 +114,15 @@ export const createOTokenProcessor = (params: {
     | Map<string, InstanceTypeOfConstructor<OTokenAddress>>
     | undefined = undefined
 
+  let idMap: Map<string, number>
+  const getUniqueId = (partialId: string) => {
+    const nextId = (idMap.get(partialId) ?? 0) + 1
+    idMap.set(partialId, nextId)
+    return `${partialId}-${nextId}`
+  }
+
   const process = async (ctx: Context) => {
+    idMap = new Map<string, number>()
     const result: ProcessResult = {
       initialized: false,
       // Saves ~5ms init time if we have no filter matches.
@@ -172,6 +183,7 @@ export const createOTokenProcessor = (params: {
         to: dataRaw.to.toLowerCase(),
         value: dataRaw.value,
       }
+      if (data.value === 0n) return
 
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       if (data.from === ADDRESS_ZERO) {
@@ -204,10 +216,15 @@ export const createOTokenProcessor = (params: {
 
       const isSwap = [data.from, data.to].includes(ADDRESS_ZERO)
 
+      /**
+       * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
+       * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
+       */
+
       // update the address balance
       await Promise.all(
         [addressSub, addressAdd].map(async (address) => {
-          let credits: [bigint, bigint] = [0n, 0n]
+          let credits: [bigint, bigint]
           let newBalance: bigint
           let change: bigint
           if (
@@ -216,30 +233,33 @@ export const createOTokenProcessor = (params: {
             credits = await token
               .creditsBalanceOfHighres(address.id)
               .then((r) => [r[0], r[1]])
+            if (!credits) return
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           } else {
             credits = await token
               .creditsBalanceOf(address.id)
               .then((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
+            if (!credits) return
             newBalance = (credits[0] * DECIMALS_18) / credits[1]
             change = newBalance - address.balance
           }
+          const type = isSwap
+            ? HistoryType.Swap
+            : addressSub === address
+            ? HistoryType.Sent
+            : HistoryType.Received
           result.history.push(
             new params.OTokenHistory({
               // we can't use {t.id} because it's not unique
-              id: uuidv4(),
+              id: getUniqueId(log.id),
               address: address,
               value: change,
               balance: newBalance,
               timestamp: new Date(block.header.timestamp),
               blockNumber: block.header.height,
               txHash: log.transactionHash,
-              type: isSwap
-                ? HistoryType.Swap
-                : addressSub === address
-                ? HistoryType.Sent
-                : HistoryType.Received,
+              type,
             }),
           )
           address.credits = BigInt(credits[0]) // token credits
@@ -329,7 +349,7 @@ export const createOTokenProcessor = (params: {
 
       result.history.push(
         new params.OTokenHistory({
-          id: uuidv4(),
+          id: getUniqueId(log.id),
           // we can't use {t.id} because it's not unique
           address: address,
           value: earned,
@@ -391,7 +411,7 @@ export const createOTokenProcessor = (params: {
       }
 
       let rebaseOption = new params.OTokenRebaseOption({
-        id: uuidv4(),
+        id: getUniqueId(trace.transaction?.hash!),
         timestamp,
         blockNumber,
         txHash: trace.transaction?.hash,
