@@ -50,5 +50,4 @@ type StrategyBalance @entity {
   strategy: String!
   asset: String!
   balance: BigInt!
-  apy: Float!
 }
