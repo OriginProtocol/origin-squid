@@ -3,15 +3,15 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as balancerMetaPoolStrategy from '../../abi/balancer-meta-pool-strategy'
 import * as baseRewardPool4626 from '../../abi/base-reward-pool-4626'
 import * as metaStablePool from '../../abi/meta-stable-pool'
-import * as originLens from '../../abi/origin-lens'
 import { OETHBalancerMetaPoolStrategy } from '../../model'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
+import { getBalancerStrategyHoldings } from '../../processor-templates/strategy'
 import { RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
+import { oethStrategies } from '../strategies'
 import { getLatestEntity } from '../utils'
 
 const strategyDeployBlock = 18156219
-const originLensProxyDeployBlock = 18292379
 
 export const from = strategyDeployBlock // https://etherscan.io/tx/0x41c4c0e86ef95e0bfaac7bd94f30f7c30505278f5d7d70c4e99deb4d79b14f58
 const addresses = {
@@ -23,6 +23,10 @@ const addresses = {
 }
 const poolId =
   '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112'
+
+const strategyData = oethStrategies.find(
+  (s) => s.address === addresses.strategy,
+)!
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
@@ -109,12 +113,6 @@ export const updateValues = async (
     ]),
   )
   const timestampId = new Date(block.header.timestamp).toISOString()
-  const strategy = new balancerMetaPoolStrategy.Contract(
-    ctx,
-    block.header,
-    addresses.strategy,
-  )
-  const lens = new originLens.Contract(ctx, block.header, addresses.originLens)
   const [{ current, latest }, { rETH, weth }] = await Promise.all([
     getLatestEntity(
       ctx,
@@ -122,30 +120,26 @@ export const updateValues = async (
       result.strategies,
       timestampId,
     ),
-    block.header.height < originLensProxyDeployBlock
-      ? Promise.all([
-          strategy['checkBalance(address)'](RETH_ADDRESS),
-          strategy['checkBalance(address)'](WETH_ADDRESS),
-        ]).then(([rETH, weth]) => ({ rETH, weth }))
-      : lens
-          .getStrategyBalances(addresses.strategy)
-          .then(({ assetBalances: [rETH, weth] }) => ({
-            rETH,
-            weth,
-          })),
+    getBalancerStrategyHoldings(ctx, block, strategyData).then((holdings) => {
+      return {
+        rETH: holdings.find((h) => h.asset.toLowerCase() === RETH_ADDRESS)!
+          .balance,
+        weth: holdings.find((h) => h.asset.toLowerCase() === WETH_ADDRESS)!
+          .balance,
+      }
+    }),
   ])
 
   if (!current) {
     if (!latest || latest.rETH !== rETH || latest.weth !== weth) {
-      result.strategies.push(
-        new OETHBalancerMetaPoolStrategy({
-          id: timestampId,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          rETH: rETH,
-          weth: weth,
-        }),
-      )
+      const entry = new OETHBalancerMetaPoolStrategy({
+        id: timestampId,
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+        rETH: rETH,
+        weth: weth,
+      })
+      result.strategies.push(entry)
     }
   }
 }

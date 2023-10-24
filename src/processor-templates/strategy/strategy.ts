@@ -1,37 +1,46 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { memoize } from 'lodash'
 
-import * as abstractStrategyAbi from '../../abi/initializable-abstract-strategy'
+import * as balancerMetaStablePoolStrategyAbi from '../../abi/balancer-meta-pool-strategy'
+import * as balancerRateProvider from '../../abi/balancer-rate-provider'
+import * as balancerVaultAbi from '../../abi/balancer-vault'
 import * as curvePool from '../../abi/curve-lp-token'
 import * as erc20 from '../../abi/erc20'
-import * as balancerVaultAbi from '../../abi/balancer-vault'
+import * as abstractStrategyAbi from '../../abi/initializable-abstract-strategy'
 import * as balancerMetaStablePoolAbi from '../../abi/meta-stable-pool'
-import * as balancerRateProvider from '../../abi/balancer-rate-provider'
-import * as balancerMetaStablePoolStrategyAbi from '../../abi/balancer-meta-pool-strategy'
-
 import { StrategyBalance } from '../../model'
-import { Context, Block } from '../../processor'
+import { Block, Context } from '../../processor'
+import {
+  ADDRESS_ZERO,
+  BALANCER_VAULT,
+  ETH_ADDRESS,
+  OETH_ADDRESS,
+  WETH_ADDRESS,
+} from '../../utils/addresses'
 import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
-import { ADDRESS_ZERO, BALANCER_VAULT, ETH_ADDRESS, OETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 
 export type IBalancerPoolInfo = {
-  poolId: string,
-  poolAddress: string,
+  poolId: string
+  poolAddress: string
 }
 
 export type ICurveAMOInfo = {
-  poolAddress: string,
+  poolAddress: string
   rewardsPoolAddress: string
 }
 
 export type IStrategyData = {
-  from: number,
-  name: string,
-  address: string,
-  kind: 'Generic' | 'CurveAMO' | 'BalancerMetaStablePool' | 'BalancerComposableStablePool',
-  assets: readonly string[],
-  balancerPoolInfo?: IBalancerPoolInfo,
-  curvePoolInfo?: ICurveAMOInfo,
+  from: number
+  name: string
+  address: string
+  kind:
+    | 'Generic'
+    | 'CurveAMO'
+    | 'BalancerMetaStablePool'
+    | 'BalancerComposableStablePool'
+  assets: readonly string[]
+  balancerPoolInfo?: IBalancerPoolInfo
+  curvePoolInfo?: ICurveAMOInfo
 }
 
 export const createStrategySetup =
@@ -50,15 +59,15 @@ export const createStrategyProcessor = (strategyData: IStrategyData) => {
     await update(ctx, async (ctx, block) => {
       if (kind == 'Generic') {
         results.strategyBalances.push(
-          ...(await _getStrategyHoldings(ctx, block, strategyData))
+          ...(await _getStrategyHoldings(ctx, block, strategyData)),
         )
       } else if (kind == 'CurveAMO') {
         results.strategyBalances.push(
-          ...(await _getCurveAMOStrategyHoldings(ctx, block, strategyData))
+          ...(await _getCurveAMOStrategyHoldings(ctx, block, strategyData)),
         )
       } else if (kind == 'BalancerMetaStablePool') {
         results.strategyBalances.push(
-          ...(await _getBalancerStrategyHoldings(ctx, block, strategyData))
+          ...(await getBalancerStrategyHoldings(ctx, block, strategyData)),
         )
       }
     })
@@ -66,24 +75,32 @@ export const createStrategyProcessor = (strategyData: IStrategyData) => {
   }
 }
 
-const _getStrategyHoldings = async (ctx: Context, block: Block, strategyData: IStrategyData): Promise<StrategyBalance[]> => {
+const _getStrategyHoldings = async (
+  ctx: Context,
+  block: Block,
+  strategyData: IStrategyData,
+): Promise<StrategyBalance[]> => {
   const { assets, address } = strategyData
   const strategy = new abstractStrategyAbi.Contract(ctx, block.header, address)
-  const promises = assets.map(async asset => {
+  const promises = assets.map(async (asset) => {
     return new StrategyBalance({
       id: `${address}:${asset}:${block.header.height}`,
       strategy: address,
       asset: asset,
       balance: await strategy.checkBalance(asset),
       blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp)
+      timestamp: new Date(block.header.timestamp),
     })
   })
 
   return await Promise.all(promises)
 }
 
-const _getCurveAMOStrategyHoldings = async (ctx: Context, block: Block, strategyData: IStrategyData): Promise<StrategyBalance[]> => {
+const _getCurveAMOStrategyHoldings = async (
+  ctx: Context,
+  block: Block,
+  strategyData: IStrategyData,
+): Promise<StrategyBalance[]> => {
   const { assets, address, curvePoolInfo } = strategyData
   const { poolAddress, rewardsPoolAddress } = curvePoolInfo!
 
@@ -108,7 +125,7 @@ const _getCurveAMOStrategyHoldings = async (ctx: Context, block: Block, strategy
       // Vault only deals in WETH not ETH
       coin = WETH_ADDRESS
     }
-    
+
     if (coin != OETH_ADDRESS) {
       const pTokenAddr = await strategy.assetToPToken(assets[i])
       const pToken = new erc20.Contract(ctx, block.header, pTokenAddr)
@@ -118,12 +135,13 @@ const _getCurveAMOStrategyHoldings = async (ctx: Context, block: Block, strategy
     poolAssets.push(coin)
   }
 
-  const eth1 = BigInt("1000000000000000000")
-  const totalStrategyLPBalance = (stakedLPBalance + unstakedBalance) * lpPrice / eth1
+  const eth1 = BigInt('1000000000000000000')
+  const totalStrategyLPBalance =
+    ((stakedLPBalance + unstakedBalance) * lpPrice) / eth1
 
   return poolAssets.map((asset, i) => {
-    const poolAssetSplit = BigInt(10000) * assetBalances[i] / totalPoolValue
-    const balance = totalStrategyLPBalance * poolAssetSplit / BigInt(10000)
+    const poolAssetSplit = (BigInt(10000) * assetBalances[i]) / totalPoolValue
+    const balance = (totalStrategyLPBalance * poolAssetSplit) / BigInt(10000)
 
     return new StrategyBalance({
       id: `${address}:${asset}:${block.header.height}`,
@@ -131,23 +149,39 @@ const _getCurveAMOStrategyHoldings = async (ctx: Context, block: Block, strategy
       asset,
       balance,
       blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp)
+      timestamp: new Date(block.header.timestamp),
     })
   })
 }
 
-const _getBalancerStrategyHoldings = async (ctx: Context, block: Block, strategyData: IStrategyData) => {
+export const getBalancerStrategyHoldings = async (
+  ctx: Context,
+  block: Block,
+  strategyData: IStrategyData,
+) => {
   const { address, balancerPoolInfo } = strategyData
   const { poolAddress, poolId } = balancerPoolInfo!
 
-  const rateProviders = await _getBalancePoolRateProviders(ctx, block, poolAddress);
+  const rateProviders = await _getBalancePoolRateProviders(
+    ctx,
+    block,
+    poolAddress,
+  )
 
-  const strategy = new balancerMetaStablePoolStrategyAbi.Contract(ctx, block.header, address)
-  const balancerVault = new balancerVaultAbi.Contract(ctx, block.header, BALANCER_VAULT)
+  const strategy = new balancerMetaStablePoolStrategyAbi.Contract(
+    ctx,
+    block.header,
+    address,
+  )
+  const balancerVault = new balancerVaultAbi.Contract(
+    ctx,
+    block.header,
+    BALANCER_VAULT,
+  )
   let [poolAssets, balances] = await balancerVault.getPoolTokens(poolId)
 
   const totalStrategyBalance = await strategy['checkBalance()']() // in WETH
-  const eth1 = BigInt("1000000000000000000")
+  const eth1 = BigInt('1000000000000000000')
 
   let totalPoolValue = BigInt(0)
   const assetBalances: bigint[] = []
@@ -162,19 +196,26 @@ const _getBalancerStrategyHoldings = async (ctx: Context, block: Block, strategy
     if (ADDRESS_ZERO == rateProviders[i]) {
       assetRates.push(eth1)
     } else {
-      const provider = new balancerRateProvider.Contract(ctx, block.header, rateProviders[i])
+      const provider = new balancerRateProvider.Contract(
+        ctx,
+        block.header,
+        rateProviders[i],
+      )
       const rate = await provider.getRate()
       assetRates.push(rate)
-      tokenBalance = tokenBalance * rate / eth1
+      tokenBalance = (tokenBalance * rate) / eth1
     }
 
-    assetBalances.push(tokenBalance) 
+    assetBalances.push(tokenBalance)
     totalPoolValue += tokenBalance // Balance of asset in WETH
   }
 
   return poolAssets.map((asset, i) => {
-    const poolAssetSplit = BigInt(10000) * assetBalances[i] / totalPoolValue
-    const balance = eth1 * totalStrategyBalance * poolAssetSplit / assetRates[i] / BigInt(10000)
+    const poolAssetSplit = (BigInt(10000) * assetBalances[i]) / totalPoolValue
+    const balance =
+      (eth1 * totalStrategyBalance * poolAssetSplit) /
+      assetRates[i] /
+      BigInt(10000)
 
     return new StrategyBalance({
       id: `${address}:${asset}:${block.header.height}`,
@@ -182,13 +223,20 @@ const _getBalancerStrategyHoldings = async (ctx: Context, block: Block, strategy
       asset,
       balance,
       blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp)
+      timestamp: new Date(block.header.timestamp),
     })
   })
 }
 
-const _getBalancePoolRateProviders = memoize(async (ctx: Context, block: Block, address: string) => {
-  const pool = new balancerMetaStablePoolAbi.Contract(ctx, block.header, address)
-  const rateProviders = await pool.getRateProviders();
-  return rateProviders
-}, (_ctx, _block, address) => address.toLowerCase())
+const _getBalancePoolRateProviders = memoize(
+  async (ctx: Context, block: Block, address: string) => {
+    const pool = new balancerMetaStablePoolAbi.Contract(
+      ctx,
+      block.header,
+      address,
+    )
+    const rateProviders = await pool.getRateProviders()
+    return rateProviders
+  },
+  (_ctx, _block, address) => address.toLowerCase(),
+)

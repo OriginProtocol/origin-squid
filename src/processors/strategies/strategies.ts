@@ -72,7 +72,7 @@ import {
 // },
 // ] as const
 
-const oethStrategies: readonly IStrategyData[] = [
+export const oethStrategies: readonly IStrategyData[] = [
   {
     from: 18083920,
     name: 'OETH Convex ETH+OETH (AMO)',
