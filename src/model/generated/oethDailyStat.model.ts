@@ -60,6 +60,9 @@ export class OETHDailyStat {
     amoSupply!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    dripperWETH!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yield!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})

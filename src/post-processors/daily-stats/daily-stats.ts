@@ -10,6 +10,7 @@ import {
   OETHCollateralDailyStat,
   OETHCurveLP,
   OETHDailyStat,
+  OETHDripper,
   OETHFraxStaking,
   OETHMorphoAave,
   OETHStrategyDailyStat,
@@ -64,6 +65,7 @@ export const process = async (ctx: Context) => {
 }
 
 async function updateDailyStats(ctx: Context, date: Date) {
+  ctx.log.info(`Daily stats: ${date}`)
   const queryParams = {
     where: { timestamp: LessThanOrEqual(date) },
     order: { timestamp: 'desc' as FindOptionsOrderValue },
@@ -77,6 +79,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastBalancer,
     lastFrax,
     lastMorpho,
+    lastDripper,
     lastRethRate,
     lastSfrxEthRate,
   ] = await Promise.all([
@@ -87,6 +90,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     ctx.store.findOne(OETHBalancerMetaPoolStrategy, queryParams),
     ctx.store.findOne(OETHFraxStaking, queryParams),
     ctx.store.findOne(OETHMorphoAave, queryParams),
+    ctx.store.findOne(OETHDripper, queryParams),
     ctx.store.findOne(ExchangeRate, {
       where: { timestamp: LessThanOrEqual(date), pair: 'ETH_rETH' },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
@@ -116,7 +120,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
   // })
 
   const entityManager = (
-    ctx.store as unknown as { em: () => EntityManager }
+    ctx.store as unknown as {
+      em: () => EntityManager
+    }
   ).em()
 
   const end = dayjs(date).endOf('day').toDate()
@@ -152,6 +158,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     rebasingSupply: lastOeth?.rebasingSupply || 0n,
     nonRebasingSupply: lastOeth?.nonRebasingSupply || 0n,
     amoSupply: lastCurve?.oethOwned || 0n,
+    dripperWETH: lastDripper?.weth || 0n,
 
     yield: yieldStats[0].total_yield || 0n,
     fees: yieldStats[0].total_fees || 0n,
