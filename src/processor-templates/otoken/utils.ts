@@ -138,23 +138,28 @@ export async function createRebaseAPY<
 
   const last7daysDateId = {
     key: 'apy7DayAvg' as const,
-    value: dayjs(date).subtract(7, 'days').toISOString().substring(0, 10),
+    value: dayjs(date).subtract(6, 'days').toISOString().substring(0, 10),
+    days: 7,
   }
   const last14daysDateId = {
     key: 'apy14DayAvg' as const,
-    value: dayjs(date).subtract(14, 'days').toISOString().substring(0, 10),
+    value: dayjs(date).subtract(13, 'days').toISOString().substring(0, 10),
+    days: 14,
   }
   const last30daysDateId = {
     key: 'apy30DayAvg' as const,
-    value: dayjs(date).subtract(30, 'days').toISOString().substring(0, 10),
+    value: dayjs(date).subtract(29, 'days').toISOString().substring(0, 10),
+    days: 30,
   }
 
   // calculate average APY for the last 7, 14 and 30 days
   await Promise.all(
     [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
-      const pastAPYs = await ctx.store.findBy(OTokenAPY, {
-        id: MoreThanOrEqual(i.value),
-      })
+      const pastAPYs = await ctx.store
+        .findBy(OTokenAPY, {
+          id: MoreThanOrEqual(i.value),
+        })
+        .then((r) => r.slice(0, i.days - 1))
       apy![i.key] =
         pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) /
         (pastAPYs.length + 1)

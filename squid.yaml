@@ -8,6 +8,7 @@ deploy:
     postgres:
   secrets:
     - RPC_ENDPOINT
+    - RPC_ENDPOINT_999
   processor:
     cmd:
       - node
