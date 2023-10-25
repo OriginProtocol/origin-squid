@@ -16,6 +16,9 @@ export class OETHStrategyDailyStat {
     @ManyToOne_(() => OETHDailyStat, {nullable: true})
     dailyStatId!: OETHDailyStat
 
+    @Column_("text", {nullable: false})
+    name!: string
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     total!: bigint
 

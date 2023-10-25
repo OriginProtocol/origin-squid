@@ -191,6 +191,7 @@ type OETHDailyStat @entity {
 type OETHStrategyDailyStat @entity {
   id: ID!
   dailyStatId: OETHDailyStat!
+  name: String!
   total: BigInt!
   """
   Sum of tokens in strategy
