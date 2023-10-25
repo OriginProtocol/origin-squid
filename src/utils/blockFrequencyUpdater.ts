@@ -1,9 +1,11 @@
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
 
 import { Block, Context } from '../processor'
 
 dayjs.extend(duration)
+dayjs.extend(utc)
 
 const SECONDS_PER_WEEK = dayjs.duration({ weeks: 1 }).asSeconds()
 const SECONDS_PER_DAY = dayjs.duration({ days: 1 }).asSeconds()

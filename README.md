@@ -2,6 +2,14 @@
 
 ### [Design Decisions Notion Document](https://www.notion.so/originprotocol/Subsquid-Design-Decisions-04ef82ae0d6848d1b14de893e9929ce4#d8e8d367069c4a619809e926f72db074)
 
+## Env Options
+
+```shell
+DEBUG_PERF=true sqd process     # Run with performance numbers
+BLOCK_FROM=18421105 sqd process # Start processing at block 18421105
+BLOCK_TO=18421105 sqd process   # Process up to block 18421105
+```
+
 ## Quickstart
 
 ```bash

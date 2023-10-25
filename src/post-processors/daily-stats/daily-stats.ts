@@ -1,4 +1,6 @@
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
 import { formatEther } from 'viem'
 
@@ -19,7 +21,13 @@ import {
 } from '../../model'
 import { Context } from '../../processor'
 
+dayjs.extend(utc)
+
 export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+
+export const setup = async (processor: EvmBatchProcessor) => {
+  processor.includeAllBlocks({ from })
+}
 
 export const process = async (ctx: Context) => {
   const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)
@@ -28,26 +36,26 @@ export const process = async (ctx: Context) => {
 
   const firstBlock = ctx.blocks[0]
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-  const lastDailyStat = await ctx.store.findOne(OETHDailyStat, {
-    where: { timestamp: LessThanOrEqual(new Date(firstBlockTimestamp)) },
-    order: { id: 'desc' },
-  })
+  const startDate = dayjs.utc(firstBlock.header.timestamp).endOf('day')
+  const endDate = dayjs.utc(lastBlock.header.timestamp).endOf('day')
 
-  const startTimestamp = Math.min(
-    lastDailyStat?.timestamp.getTime() || Date.now(),
-    firstBlock.header.timestamp,
-  )
-  const endTimestamp = lastBlock?.header.timestamp || Date.now()
-
-  const days = getStartOfDays(startTimestamp, endTimestamp)
+  let dates: Date[] = []
+  for (
+    let date = startDate;
+    !date.isAfter(endDate);
+    date = date.add(1, 'day').endOf('day')
+  ) {
+    // ctx.log.info({ date })
+    dates.push(date.toDate())
+  }
 
   const dailyStats = [] as OETHDailyStat[]
   const dailyCollateralStats = [] as OETHCollateralDailyStat[]
   const dailyStrategyStats = [] as OETHStrategyDailyStat[]
   const dailyHoldingsStats = [] as OETHStrategyHoldingDailyStat[]
 
-  for (const day of days) {
-    const dailyStatInserts = await updateDailyStats(ctx, day)
+  for (const date of dates) {
+    const dailyStatInserts = await updateDailyStats(ctx, date)
     if (dailyStatInserts) {
       dailyStats.push(dailyStatInserts.dailyStat)
       dailyCollateralStats.push(...dailyStatInserts.dailyCollateralStats)
@@ -65,7 +73,6 @@ export const process = async (ctx: Context) => {
 }
 
 async function updateDailyStats(ctx: Context, date: Date) {
-  ctx.log.info(`Daily stats: ${date}`)
   const queryParams = {
     where: { timestamp: LessThanOrEqual(date) },
     order: { timestamp: 'desc' as FindOptionsOrderValue },
@@ -125,7 +132,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     }
   ).em()
 
-  const end = dayjs(date).endOf('day').toDate()
+  const end = dayjs.utc(date).endOf('day').toDate()
   const yieldStats = await entityManager.query<
     {
       period: string
@@ -141,6 +148,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
   })
 
   const id = date.toISOString().substring(0, 10)
+  // ctx.log.info({ date, id })
 
   const dailyStat = new OETHDailyStat({
     id,

@@ -11,6 +11,7 @@ import {
   StrategyBalance,
 } from '../../model'
 import { Block, Context } from '../../processor'
+import { env } from '../../utils/env'
 import { jsonify } from '../../utils/jsonify'
 
 export const name = 'validate-oeth'
@@ -18,6 +19,7 @@ export const name = 'validate-oeth'
 let firstBlock = true
 
 export const process = async (ctx: Context) => {
+  if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, OETHAPY, expectations.oethApies)
     await validateExpectations(
