@@ -1,5 +1,5 @@
-module.exports = class Data1698085120905 {
-    name = 'Data1698085120905'
+module.exports = class Data1698266502449 {
+    name = 'Data1698266502449'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -56,7 +56,7 @@ module.exports = class Data1698085120905 {
         await db.query(`CREATE INDEX "IDX_11d344b3e0e03cdb6697dd61f7" ON "oeth_balancer_meta_pool_strategy" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_strategy_holding_daily_stat" ("id" character varying NOT NULL, "symbol" text NOT NULL, "amount" numeric NOT NULL, "value" numeric NOT NULL, "strategy_daily_stat_id_id" character varying, CONSTRAINT "PK_7f1a62da5e53cf264c2f39b4acf" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_4e867f220975e615e6077d860c" ON "oeth_strategy_holding_daily_stat" ("strategy_daily_stat_id_id") `)
-        await db.query(`CREATE TABLE "oeth_strategy_daily_stat" ("id" character varying NOT NULL, "total" numeric NOT NULL, "tvl" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_8af1a0c60e67b05baf928787a8e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_strategy_daily_stat" ("id" character varying NOT NULL, "name" text NOT NULL, "total" numeric NOT NULL, "tvl" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_8af1a0c60e67b05baf928787a8e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_6c7096c96a000d8471256ca8fc" ON "oeth_strategy_daily_stat" ("daily_stat_id_id") `)
         await db.query(`CREATE TABLE "oeth_collateral_daily_stat" ("id" character varying NOT NULL, "symbol" text NOT NULL, "amount" numeric NOT NULL, "price" numeric NOT NULL, "value" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_5fb23d7bae30dffe4543e7aa069" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a90045de50406be7bd56efd3ea" ON "oeth_collateral_daily_stat" ("daily_stat_id_id") `)

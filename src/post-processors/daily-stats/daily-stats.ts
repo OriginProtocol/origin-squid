@@ -212,30 +212,35 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const dailyStrategyStats = [
     new OETHStrategyDailyStat({
       id: `${id}-CURVE`,
+      name: 'CURVE',
       dailyStatId: id as unknown as OETHDailyStat,
       tvl: lastCurve?.ethOwned || 0n,
       total: lastCurve?.ethOwned || 0n,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-VAULT`,
+      name: 'VAULT',
       dailyStatId: id as unknown as OETHDailyStat,
       tvl: vaultTotal,
       total: vaultTotal,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-BALANCER`,
+      name: 'BALANCER',
       dailyStatId: id as unknown as OETHDailyStat,
       tvl: balancerTotal,
       total: balancerTotal,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-FRAX`,
+      name: 'FRAX',
       dailyStatId: id as unknown as OETHDailyStat,
       tvl: lastFrax?.sfrxETH || 0n,
       total: frxETH,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-MORPHO`,
+      name: 'MORPHO',
       dailyStatId: id as unknown as OETHDailyStat,
       tvl: lastMorpho?.weth || 0n,
       total: lastMorpho?.weth || 0n,
