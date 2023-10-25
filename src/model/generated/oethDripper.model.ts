@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class Dripper {
-    constructor(props?: Partial<Dripper>) {
+export class OETHDripper {
+    constructor(props?: Partial<OETHDripper>) {
         Object.assign(this, props)
     }
 

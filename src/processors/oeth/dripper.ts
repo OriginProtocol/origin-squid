@@ -2,14 +2,14 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
 import * as erc20 from '../../abi/erc20'
-import { Dripper } from '../../model'
+import { OETHDripper } from '../../model'
 import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { Context } from '../../processor'
 import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '../utils'
 
 interface ProcessResult {
-  drippers: Dripper[]
+  drippers: OETHDripper[]
 }
 
 export const from = 17067704 // https://etherscan.io/tx/0x8e4217c5883891816b9035100b0b1342492f8e618029bf022bdc85bf9aa330f2
@@ -58,7 +58,7 @@ const processTransfer = async (
         const timestampId = new Date(block.header.timestamp).toISOString()
         const { latest, current } = await getLatestEntity(
           ctx,
-          Dripper,
+          OETHDripper,
           result.drippers,
           timestampId,
         )
@@ -66,7 +66,7 @@ const processTransfer = async (
         let dripper = current
         if (!dripper) {
           await ensureExchangeRate(ctx, block, 'ETH', 'WETH') // No async since WETH.
-          dripper = new Dripper({
+          dripper = new OETHDripper({
             id: timestampId,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,

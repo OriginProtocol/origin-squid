@@ -1,5 +1,4 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { v4 as uuidv4 } from 'uuid'
 
 import * as otoken from '../../abi/otoken'
 import * as otokenVault from '../../abi/otoken-vault'
@@ -23,30 +22,17 @@ import { Context } from '../../processor'
 import { getLatestEntity } from '../../processors/utils'
 import { ADDRESS_ZERO } from '../../utils/addresses'
 import { DECIMALS_18 } from '../../utils/constants'
+import { EntityClassT, InstanceTypeOfConstructor } from '../../utils/type'
 import { createAddress, createRebaseAPY } from './utils'
 
-export interface EntityClass<T> {
-  new (partial: Partial<T>): T
-}
-
-type InstanceTypeOfConstructor<
-  T extends {
-    new (...args: any[]): any
-  },
-> = T extends {
-  new (...args: any[]): infer R
-}
-  ? R
-  : any
-
-type OToken = EntityClass<OETH> | EntityClass<OUSD>
-type OTokenAPY = EntityClass<OETHAPY> | EntityClass<OUSDAPY>
-type OTokenAddress = EntityClass<OETHAddress> | EntityClass<OUSDAddress>
-type OTokenHistory = EntityClass<OETHHistory> | EntityClass<OUSDHistory>
-type OTokenRebase = EntityClass<OETHRebase> | EntityClass<OUSDRebase>
+type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
+type OTokenAPY = EntityClassT<OETHAPY> | EntityClassT<OUSDAPY>
+type OTokenAddress = EntityClassT<OETHAddress> | EntityClassT<OUSDAddress>
+type OTokenHistory = EntityClassT<OETHHistory> | EntityClassT<OUSDHistory>
+type OTokenRebase = EntityClassT<OETHRebase> | EntityClassT<OUSDRebase>
 type OTokenRebaseOption =
-  | EntityClass<OETHRebaseOption>
-  | EntityClass<OUSDRebaseOption>
+  | EntityClassT<OETHRebaseOption>
+  | EntityClassT<OUSDRebaseOption>
 
 export const createOTokenSetup =
   ({
@@ -335,6 +321,7 @@ export const createOTokenProcessor = (params: {
       data,
       result.lastYieldDistributionEvent,
     )
+
     for (const address of owners!.values()) {
       if (
         !address.credits ||
