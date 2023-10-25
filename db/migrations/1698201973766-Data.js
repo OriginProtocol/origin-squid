@@ -1,5 +1,5 @@
-module.exports = class Data1698085120905 {
-    name = 'Data1698085120905'
+module.exports = class Data1698201973766 {
+    name = 'Data1698201973766'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -48,9 +48,9 @@ module.exports = class Data1698085120905 {
         await db.query(`CREATE TABLE "oeth_morpho_aave" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_86de8f846e9335c92b8ad7df3a1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_25e239b985844f1d33fac79981" ON "oeth_morpho_aave" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a6662224e95eb6921bb14cb5f9" ON "oeth_morpho_aave" ("block_number") `)
-        await db.query(`CREATE TABLE "dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_74fd102c8d1c60f4b1650a61ffc" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_88c58f8948c3294c2a9e2791dc" ON "dripper" ("timestamp") `)
-        await db.query(`CREATE INDEX "IDX_06822c0a260797711acc9023d5" ON "dripper" ("block_number") `)
+        await db.query(`CREATE TABLE "oeth_dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_77731281c1564c24eff0c265984" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_16ac742ceeb05d28e530da9649" ON "oeth_dripper" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_d356832c14603916a492608e7b" ON "oeth_dripper" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_6ddf5b8ba878e6d706e59bd6de0" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5e7ef383756fa18cb602f50089" ON "oeth_balancer_meta_pool_strategy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_11d344b3e0e03cdb6697dd61f7" ON "oeth_balancer_meta_pool_strategy" ("block_number") `)
@@ -63,6 +63,9 @@ module.exports = class Data1698085120905 {
         await db.query(`CREATE TABLE "oeth_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "revenue" numeric NOT NULL, "revenue7_day_avg" numeric NOT NULL, "revenue7_day_total" numeric NOT NULL, "revenue_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_9144a02ab13b1baa818a7d5eae5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98d9001013aa37425ca47b7126" ON "oeth_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_c3e66051c7df4efd6a8fa8f9c1" ON "oeth_daily_stat" ("timestamp") `)
+        await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_81a9fa43ae4a6ae63e4103127b" ON "oeth_reward_token_collected" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_d36c78b9c3e9d737f067638bc4" ON "oeth_reward_token_collected" ("block_number") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2418a8b8b92b2f5977be761cf9" ON "ogv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_b8f20bcf48e4aa77e0f48d77db" ON "ogv" ("block_number") `)
@@ -182,9 +185,9 @@ module.exports = class Data1698085120905 {
         await db.query(`DROP TABLE "oeth_morpho_aave"`)
         await db.query(`DROP INDEX "public"."IDX_25e239b985844f1d33fac79981"`)
         await db.query(`DROP INDEX "public"."IDX_a6662224e95eb6921bb14cb5f9"`)
-        await db.query(`DROP TABLE "dripper"`)
-        await db.query(`DROP INDEX "public"."IDX_88c58f8948c3294c2a9e2791dc"`)
-        await db.query(`DROP INDEX "public"."IDX_06822c0a260797711acc9023d5"`)
+        await db.query(`DROP TABLE "oeth_dripper"`)
+        await db.query(`DROP INDEX "public"."IDX_16ac742ceeb05d28e530da9649"`)
+        await db.query(`DROP INDEX "public"."IDX_d356832c14603916a492608e7b"`)
         await db.query(`DROP TABLE "oeth_balancer_meta_pool_strategy"`)
         await db.query(`DROP INDEX "public"."IDX_5e7ef383756fa18cb602f50089"`)
         await db.query(`DROP INDEX "public"."IDX_11d344b3e0e03cdb6697dd61f7"`)
@@ -197,6 +200,9 @@ module.exports = class Data1698085120905 {
         await db.query(`DROP TABLE "oeth_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_98d9001013aa37425ca47b7126"`)
         await db.query(`DROP INDEX "public"."IDX_c3e66051c7df4efd6a8fa8f9c1"`)
+        await db.query(`DROP TABLE "oeth_reward_token_collected"`)
+        await db.query(`DROP INDEX "public"."IDX_81a9fa43ae4a6ae63e4103127b"`)
+        await db.query(`DROP INDEX "public"."IDX_d36c78b9c3e9d737f067638bc4"`)
         await db.query(`DROP TABLE "ogv"`)
         await db.query(`DROP INDEX "public"."IDX_2418a8b8b92b2f5977be761cf9"`)
         await db.query(`DROP INDEX "public"."IDX_b8f20bcf48e4aa77e0f48d77db"`)
