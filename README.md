@@ -2,6 +2,27 @@
 
 ### [Design Decisions Notion Document](https://www.notion.so/originprotocol/Subsquid-Design-Decisions-04ef82ae0d6848d1b14de893e9929ce4#d8e8d367069c4a619809e926f72db074)
 
+## Env Options
+
+```shell
+DEBUG_PERF=true sqd process:oeth     # Run with performance numbers
+BLOCK_FROM=18421105 sqd process:oeth # Start processing at block 18421105
+BLOCK_TO=18421105 sqd process:oeth   # Process up to block 18421105
+```
+
+## Frequent Commands
+
+```shell
+yarn codegen           # Generate Schema code
+sqd typegen            # Generate ABI code
+sqd down               # Bring down squid container
+sqd up                 # Bring up squid container
+sqd process:oeth       # Run OETH processor
+sqd process:ousd       # Run OUSD processor
+sqd process:other      # Run misc processor
+sqd migration:generate # Generate migration (sqd down && sqd up first)
+```
+
 ## Quickstart
 
 ```bash
@@ -19,7 +40,7 @@ npm ci
 sqd up
 
 # 4. Build and start the processor
-sqd process
+sqd process:oeth
 
 # 5. The command above will block the terminal
 #    being busy with fetching the chain data,

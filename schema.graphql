@@ -195,7 +195,7 @@ type OETHMorphoAave @entity {
 }
 
 # OETH Dripper: 0xc0F42F73b8f01849a2DD99753524d4ba14317EB3
-type Dripper @entity {
+type OETHDripper @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -235,6 +235,7 @@ type OETHDailyStat @entity {
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
   amoSupply: BigInt!
+  dripperWETH: BigInt!
 
   yield: BigInt!
   fees: BigInt!
@@ -264,7 +265,7 @@ type OETHStrategyDailyStat @entity {
   Total ETH value
   """
   holdings: [OETHStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {
@@ -309,7 +310,15 @@ type OETHCollateralDailyStat @entity {
   """
   value: BigInt!
 }
-# OGV Price (5m?)
+
+type OETHRewardTokenCollected @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  recipient: String!
+  rewardToken: String!
+  amount: BigInt!
+}# OGV Price (5m?)
 # OGV Market Cap (5m?)
 # OGV Circulating Supply
 # OGV Total Supply
