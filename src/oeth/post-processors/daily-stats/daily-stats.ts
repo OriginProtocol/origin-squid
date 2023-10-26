@@ -109,8 +109,19 @@ async function updateDailyStats(ctx: Context, date: Date) {
   ])
 
   // Do we have any useful data yet?
-  const allEntities = [lastApy, lastOeth]
-  if (!allEntities.every((entity) => !!entity)) {
+  const allEntities = [
+    lastApy,
+    lastOeth,
+    lastCurve,
+    lastVault,
+    lastBalancer,
+    lastFrax,
+    lastMorpho,
+    lastDripper,
+    lastRethRate,
+    lastSfrxEthRate,
+  ]
+  if (![lastApy, lastOeth].every((entity) => !!entity)) {
     return null
   }
 
@@ -122,8 +133,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
   //   lastBalancer,
   //   lastFrax,
   //   lastMorpho,
-  //   lastRethExchangeRate,
-  //   lastSfrxEthExchangeRate,
   // })
 
   const entityManager = (
@@ -229,8 +238,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-CURVE`,
       name: 'CURVE',
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastCurve?.ethOwned || 0n,
-      total: lastCurve?.ethOwned || 0n,
+      tvl: lastCurve?.totalSupply || 0n,
+      total: lastCurve?.totalSupplyOwned || 0n,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-VAULT`,
@@ -267,8 +276,15 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-CURVE-ETH`,
       strategyDailyStatId: `${id}-CURVE` as unknown as OETHStrategyDailyStat,
       symbol: 'ETH',
-      amount: lastCurve?.eth || 0n,
-      value: lastCurve?.eth || 0n,
+      amount: lastCurve?.ethOwned || 0n,
+      value: lastCurve?.ethOwned || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-CURVE-OETH`,
+      strategyDailyStatId: `${id}-CURVE` as unknown as OETHStrategyDailyStat,
+      symbol: 'OETH',
+      amount: lastCurve?.oethOwned || 0n,
+      value: lastCurve?.oethOwned || 0n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-VAULT-WETH`,
