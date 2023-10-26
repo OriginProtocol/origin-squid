@@ -5,6 +5,12 @@ import {
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(duration)
+dayjs.extend(utc)
 
 export const createSquidProcessor = () =>
   new EvmBatchProcessor()

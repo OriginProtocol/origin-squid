@@ -1,6 +1,6 @@
-import * as exchangeRates from './post-processors/exchange-rates'
+import * as ousd from './ousd/processors/ousd'
 import { run } from './processor'
-import * as ousd from './processors/ousd'
+import * as exchangeRates from './shared/post-processors/exchange-rates'
 
 run({
   stateSchema: 'ousd-processor',

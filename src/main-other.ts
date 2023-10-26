@@ -10,19 +10,12 @@ import * as vault from './oeth/processors/vault'
 import * as validateOeth from './oeth/validators/validate-oeth'
 import { run } from './processor'
 import * as exchangeRates from './shared/post-processors/exchange-rates'
+import * as aaveCompound from './shared/processors/aave-compound'
+import * as curve from './shared/processors/curve'
 
 run({
-  stateSchema: 'oeth-processor',
-  processors: [
-    oeth,
-    vault,
-    fraxStaking,
-    morphoAave,
-    dripper,
-    curveLp,
-    balancerMetaPoolStrategy,
-    strategies,
-  ],
-  postProcessors: [exchangeRates, dailyStats],
-  validators: [validateOeth],
+  stateSchema: 'other-processor',
+  processors: [aaveCompound, curve],
+  postProcessors: [exchangeRates],
+  validators: [],
 })
