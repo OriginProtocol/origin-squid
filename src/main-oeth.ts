@@ -15,6 +15,7 @@ import * as ousd from './processors/ousd'
 import * as strategies from './processors/strategies'
 
 run({
+  stateSchema: 'oeth-processor',
   processors: [
     // Block Frequency Updates
     aaveCompound,

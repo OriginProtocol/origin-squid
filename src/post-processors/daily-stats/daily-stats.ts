@@ -45,7 +45,7 @@ export const process = async (ctx: Context) => {
     !date.isAfter(endDate);
     date = date.add(1, 'day').endOf('day')
   ) {
-    // ctx.log.info({ date })
+    // ctx.log.info({ date, startDate, endDate })
     dates.push(date.toDate())
   }
 

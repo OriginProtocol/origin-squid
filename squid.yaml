@@ -10,9 +10,14 @@ deploy:
     - RPC_ENDPOINT
     - RPC_ENDPOINT_999
   processor:
-    cmd:
-      - node
-      - lib/main
+    - name: oeth-processor
+      cmd: [ "node", "lib/main-oeth" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_999
+  #    - name: ousd-processor
+  #      cmd: [ "node", "lib/main-ousd" ]
+  #      env:
+  #        RPC_ENV: RPC_ENDPOINT_999
   api:
     cmd:
       - npx
