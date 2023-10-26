@@ -1,19 +1,21 @@
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
 
 import { Block, Context } from '../processor'
 
 dayjs.extend(duration)
+dayjs.extend(utc)
 
 const SECONDS_PER_WEEK = dayjs.duration({ weeks: 1 }).asSeconds()
 const SECONDS_PER_DAY = dayjs.duration({ days: 1 }).asSeconds()
 const SECONDS_PER_MINUTE = 60
 
-const oneYearAgo = dayjs().subtract(1, 'year').valueOf()
-const oneMonthAgo = dayjs().subtract(1, 'month').valueOf()
-const oneWeekAgo = dayjs().subtract(1, 'week').valueOf()
-const oneDayAgo = dayjs().subtract(1, 'day').valueOf()
-const oneHourAgo = dayjs().subtract(1, 'hour').valueOf()
+const oneYearAgo = dayjs.utc().subtract(1, 'year').valueOf()
+const oneMonthAgo = dayjs.utc().subtract(1, 'month').valueOf()
+const oneWeekAgo = dayjs.utc().subtract(1, 'week').valueOf()
+const oneDayAgo = dayjs.utc().subtract(1, 'day').valueOf()
+const oneHourAgo = dayjs.utc().subtract(1, 'hour').valueOf()
 
 const getFrequency = (bps: number, timestamp: number) => {
   if (timestamp < oneYearAgo) {

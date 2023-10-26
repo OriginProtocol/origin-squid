@@ -5,6 +5,12 @@ import {
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(duration)
+dayjs.extend(utc)
 
 export const createSquidProcessor = () =>
   new EvmBatchProcessor()
@@ -20,7 +26,9 @@ export const createSquidProcessor = () =>
       // chain: 'https://rpc.ankr.com/eth',
       // chain: "https://mainnet.infura.io/v3/03b96dfbb4904c5c89c04680dd480064",
       chain: {
-        url: process.env.RPC_ENDPOINT || 'http://localhost:8545',
+        url:
+          process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'] ||
+          'http://localhost:8545',
         // Alchemy is deprecating `eth_getBlockReceipts` https://docs.alchemy.com/reference/eth-getblockreceipts
         // so we need to set `maxBatchCallSize` 1 to avoid using this method
         maxBatchCallSize: 1,
@@ -65,10 +73,12 @@ interface Processor {
 let initialized = false
 
 export const run = ({
+  stateSchema,
   processors,
   postProcessors,
   validators,
 }: {
+  stateSchema: string
   processors: Processor[]
   postProcessors?: Pick<Processor, 'process' | 'name'>[]
   validators?: Pick<Processor, 'process' | 'name'>[]
@@ -86,6 +96,7 @@ export const run = ({
   processors.forEach((p) => p.setup?.(processor))
   processor.run(
     new TypeormDatabase({
+      stateSchema,
       supportHotBlocks: true,
     }),
     async (_ctx) => {

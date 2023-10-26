@@ -195,7 +195,7 @@ type OETHMorphoAave @entity {
 }
 
 # OETH Dripper: 0xc0F42F73b8f01849a2DD99753524d4ba14317EB3
-type Dripper @entity {
+type OETHDripper @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -235,6 +235,7 @@ type OETHDailyStat @entity {
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
   amoSupply: BigInt!
+  dripperWETH: BigInt!
 
   yield: BigInt!
   fees: BigInt!
@@ -254,6 +255,7 @@ type OETHDailyStat @entity {
 type OETHStrategyDailyStat @entity {
   id: ID!
   dailyStatId: OETHDailyStat!
+  name: String!
   total: BigInt!
   """
   Sum of tokens in strategy
@@ -263,7 +265,7 @@ type OETHStrategyDailyStat @entity {
   Total ETH value
   """
   holdings: [OETHStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {
@@ -308,7 +310,15 @@ type OETHCollateralDailyStat @entity {
   """
   value: BigInt!
 }
-type OGV @entity {
+
+type OETHRewardTokenCollected @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  recipient: String!
+  rewardToken: String!
+  amount: BigInt!
+}type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
