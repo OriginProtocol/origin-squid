@@ -238,7 +238,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-CURVE`,
       name: 'CURVE',
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastCurve?.totalSupply || 0n,
+      tvl: lastCurve?.totalSupplyOwned || 0n,
       total: lastCurve?.totalSupplyOwned || 0n,
     }),
     new OETHStrategyDailyStat({
@@ -259,8 +259,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-FRAX`,
       name: 'FRAX',
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastFrax?.sfrxETH || 0n,
-      total: frxETH,
+      tvl: convertedSfrxEth,
+      total: sfrxETH,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-MORPHO`,
@@ -333,7 +333,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       strategyDailyStatId: `${id}-FRAX` as unknown as OETHStrategyDailyStat,
       symbol: 'SFRXETH',
       amount: lastFrax?.sfrxETH || 0n,
-      value: (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n,
+      value: convertedSfrxEth,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-MORPHO-WETH`,
@@ -373,9 +373,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-RETH`,
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'RETH',
-      amount: rETH,
+      amount: rETHRaw,
       price: rethRate,
-      value: (rETH * rethRate) / 1000000000000000000n,
+      value: rETH,
     }),
     new OETHCollateralDailyStat({
       id: `${id}-FRXETH`,
@@ -383,7 +383,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       symbol: 'FRXETH',
       amount: sfrxETH,
       price: 1n,
-      value: sfrxETH,
+      value: convertedSfrxEth,
     }),
   ]
 
