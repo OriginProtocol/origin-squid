@@ -124,7 +124,7 @@
         "lib/main-other.js"
       ]
     },
-    "process:prod": {
+    "process:oeth:prod": {
       "description": "Start the squid processor",
       "deps": [
         "migration:apply"
@@ -132,6 +132,28 @@
       "cmd": [
         "node",
         "lib/main-oeth.js"
+      ],
+      "hidden": true
+    },
+    "process:ousd:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-ousd.js"
+      ],
+      "hidden": true
+    },
+    "process:other:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-other.js"
       ],
       "hidden": true
     },

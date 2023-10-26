@@ -5,9 +5,22 @@
 ## Env Options
 
 ```shell
-DEBUG_PERF=true sqd process     # Run with performance numbers
-BLOCK_FROM=18421105 sqd process # Start processing at block 18421105
-BLOCK_TO=18421105 sqd process   # Process up to block 18421105
+DEBUG_PERF=true sqd process:oeth     # Run with performance numbers
+BLOCK_FROM=18421105 sqd process:oeth # Start processing at block 18421105
+BLOCK_TO=18421105 sqd process:oeth   # Process up to block 18421105
+```
+
+## Frequent Commands
+
+```shell
+yarn codegen           # Generate Schema code
+sqd typegen            # Generate ABI code
+sqd down               # Bring down squid container
+sqd up                 # Bring up squid container
+sqd process:oeth       # Run OETH processor
+sqd process:ousd       # Run OUSD processor
+sqd process:other      # Run misc processor
+sqd migration:generate # Generate migration (sqd down && sqd up first)
 ```
 
 ## Quickstart
@@ -27,7 +40,7 @@ npm ci
 sqd up
 
 # 4. Build and start the processor
-sqd process
+sqd process:oeth
 
 # 5. The command above will block the terminal
 #    being busy with fetching the chain data,
