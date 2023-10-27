@@ -1,11 +1,16 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
+import { OETHRewardTokenCollected } from '../../../model'
 import { Context } from '../../../processor'
 import {
   IStrategyData,
   createStrategyProcessor,
   createStrategySetup,
 } from '../../../shared/processor-templates/strategy'
+import {
+  createStrategyRewardProcessor,
+  createStrategyRewardSetup,
+} from '../../../shared/processor-templates/strategy-rewards'
 import {
   FRXETH_ADDRESS,
   OETH_ADDRESS,
@@ -118,9 +123,18 @@ export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {
   strategies.forEach((s) => createStrategySetup(s.from)(processor))
+  strategies.forEach((s) => createStrategyRewardSetup(s)(processor))
 }
 
-const processors = strategies.map(createStrategyProcessor)
+const processors = [
+  ...strategies.map(createStrategyProcessor),
+  ...strategies.map((strategy) =>
+    createStrategyRewardProcessor({
+      ...strategy,
+      OTokenRewardTokenCollected: OETHRewardTokenCollected,
+    }),
+  ),
+]
 
 export const process = async (ctx: Context) => {
   await Promise.all(processors.map((p) => p(ctx)))

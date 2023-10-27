@@ -1,5 +1,5 @@
-module.exports = class Data1698267277150 {
-    name = 'Data1698267277150'
+module.exports = class Data1698364374796 {
+    name = 'Data1698364374796'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -63,7 +63,7 @@ module.exports = class Data1698267277150 {
         await db.query(`CREATE TABLE "oeth_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "revenue" numeric NOT NULL, "revenue7_day_avg" numeric NOT NULL, "revenue7_day_total" numeric NOT NULL, "revenue_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_9144a02ab13b1baa818a7d5eae5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98d9001013aa37425ca47b7126" ON "oeth_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_c3e66051c7df4efd6a8fa8f9c1" ON "oeth_daily_stat" ("timestamp") `)
-        await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_81a9fa43ae4a6ae63e4103127b" ON "oeth_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d36c78b9c3e9d737f067638bc4" ON "oeth_reward_token_collected" ("block_number") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)

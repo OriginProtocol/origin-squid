@@ -28,6 +28,7 @@ export const createStrategyRewardProcessor = (params: {
   OTokenRewardTokenCollected: EntityClassT<OETHRewardTokenCollected>
 }) => {
   return async (ctx: Context) => {
+    const events: OETHRewardTokenCollected[] = []
     if (ctx.blocks[ctx.blocks.length - 1].header.height < params.from) return
     for (const block of ctx.blocks) {
       if (block.header.height < params.from) continue
@@ -38,12 +39,15 @@ export const createStrategyRewardProcessor = (params: {
             id: log.id,
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
-            recipient: data.recipient,
-            rewardToken: data.rewardToken,
+            strategy: params.address,
+            recipient: data.recipient.toLowerCase(),
+            rewardToken: data.rewardToken.toLowerCase(),
             amount: data.amount,
           })
+          events.push(event)
         }
       }
     }
+    await ctx.store.upsert(events)
   }
 }
