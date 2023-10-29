@@ -1,5 +1,5 @@
-module.exports = class Data1698344256133 {
-    name = 'Data1698344256133'
+module.exports = class Data1698545669111 {
+    name = 'Data1698545669111'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -69,9 +69,9 @@ module.exports = class Data1698344256133 {
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2418a8b8b92b2f5977be761cf9" ON "ogv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_b8f20bcf48e4aa77e0f48d77db" ON "ogv" ("block_number") `)
-        await db.query(`CREATE TABLE "ogv_address" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "veogv_balance" numeric NOT NULL, "voting_power" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "delegatee_id" character varying, CONSTRAINT "PK_f13c77575687ef480ca0b7de5d8" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ogv_address" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "staked" numeric NOT NULL, "veogv_balance" numeric NOT NULL, "voting_power" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "delegatee_id" character varying, CONSTRAINT "PK_f13c77575687ef480ca0b7de5d8" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_49d26f287904b8b1aef6e9ac2b" ON "ogv_address" ("delegatee_id") `)
-        await db.query(`CREATE TABLE "ogv_lockup" ("id" character varying NOT NULL, "lockup_id" integer NOT NULL, "amount" numeric NOT NULL, "end" TIMESTAMP WITH TIME ZONE NOT NULL, "veogv" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address_id" character varying, CONSTRAINT "PK_6b6d5ed3a004dd3f546c1b11fa4" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ogv_lockup" ("id" character varying NOT NULL, "lockup_id" text NOT NULL, "amount" numeric NOT NULL, "end" TIMESTAMP WITH TIME ZONE NOT NULL, "veogv" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address_id" character varying, CONSTRAINT "PK_6b6d5ed3a004dd3f546c1b11fa4" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_8114101b53d9d6bc26fe80838a" ON "ogv_lockup" ("lockup_id") `)
         await db.query(`CREATE INDEX "IDX_8be94cd63e35b91adf1301a156" ON "ogv_lockup" ("address_id") `)
         await db.query(`CREATE TABLE "ogv_lockup_tx_log" ("id" character varying NOT NULL, "hash" text NOT NULL, "event" character varying(8) NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "ogv_lockup_id" character varying, CONSTRAINT "PK_1c4a8425ce42f0c9da10056adee" PRIMARY KEY ("id"))`)

@@ -48,11 +48,14 @@ export const process = async (ctx: Context) => {
     proposalLogs: [],
     votes: []
   }
-  const addresses = new Map<string, OGVAddress>();
 
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       const firstTopic = log.topics[0]
+
+      if (![VEOGV_ADDRESS, OGV_ADDRESS].includes(log.address)) {
+        return
+      }
 
       if (firstTopic == governanceAbi.events.ProposalCreated.topic) {
         await _processProposalCreated(ctx, result, block, log);
@@ -66,7 +69,10 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.upsert(Array.from(addresses.values()))
+  await ctx.store.upsert(Array.from(result.addresses.values()))
+  await ctx.store.upsert(Array.from(result.proposals.values()))
+  await ctx.store.upsert(result.proposalLogs)
+  await ctx.store.upsert(result.votes)
 }
 
 const _processProposalCreated = async (

@@ -13,8 +13,8 @@ export class OGVLockup {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
-    lockupId!: number
+    @Column_("text", {nullable: false})
+    lockupId!: string
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})

@@ -330,6 +330,7 @@ type OETHRewardTokenCollected @entity {
 type OGVAddress @entity {
   id: ID! @index
   balance: BigInt!
+  staked: BigInt!
   veogvBalance: BigInt!
   votingPower: BigInt!
   delegatee: OGVAddress
@@ -352,7 +353,7 @@ type OGVLockupTxLog @entity {
 
 type OGVLockup @entity {
   id: ID!
-  lockupId: Int! @index
+  lockupId: String! @index
   address: OGVAddress! @index
   logs: [OGVLockupTxLog]! @derivedFrom(field: "ogvLockup")
   amount: BigInt!

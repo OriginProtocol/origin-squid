@@ -44,11 +44,14 @@ export const process = async (ctx: Context) => {
     lockups: new Map<string, OGVLockup>(),
     lockupEvents: []
   }
-  const addresses = new Map<string, OGVAddress>();
 
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       const firstTopic = log.topics[0]
+
+      if (![VEOGV_ADDRESS, OGV_ADDRESS].includes(log.address.toLowerCase())) {
+        return
+      }
 
       if (firstTopic == veogvAbi.events.Transfer.topic) {
         await _processTransfer(ctx, result, block, log)
@@ -63,8 +66,13 @@ export const process = async (ctx: Context) => {
       }
     }
   }
-
-  await ctx.store.upsert(Array.from(addresses.values()))
+  
+  await ctx.store.upsert(
+    Array.from(result.addresses.values())
+      .sort((a, b) => a.delegatee?.id ? 1 : -1)
+  )
+  await ctx.store.upsert(Array.from(result.lockups.values()))
+  await ctx.store.upsert(result.lockupEvents)
 }
 
 const _processTransfer = async (
@@ -79,7 +87,6 @@ const _processTransfer = async (
   from = from.toLowerCase()
   to = to.toLowerCase()
 
-  // const isStakingEvent = [from, to].includes(VEOGV_ADDRESS.toLowerCase())
   const isVeOGV = log.address.toLowerCase() == VEOGV_ADDRESS.toLowerCase()
 
   const blockTimestamp = new Date(block.header.timestamp)
@@ -93,18 +100,18 @@ const _processTransfer = async (
       sender.balance -= value;
     }
     sender.lastUpdated = blockTimestamp
-    // addresses.set(from, sender)
+    addresses.set(from, sender)
   }
 
   if (to != ADDRESS_ZERO) {
-    const receiver = await _getAddress(ctx, from, result)
+    const receiver = await _getAddress(ctx, to, result)
     if (isVeOGV) {
       receiver.veogvBalance += value;
     } else {
       receiver.balance += value;
     }
     receiver.lastUpdated = blockTimestamp
-    // addresses.set(to, receiver)
+    addresses.set(to, receiver)
   }
 }
 
@@ -125,7 +132,8 @@ const _processDelegateChanged = async (
   address.delegatee = await _getAddress(ctx, toDelegate, result)
   address.lastUpdated = new Date(block.header.timestamp)
 
-  // addresses.set(delegator, address);
+  addresses.set(toDelegate, address.delegatee);
+  addresses.set(delegator, address);
 }
 
 const _processDelegateVotesChanged = async (
@@ -143,7 +151,7 @@ const _processDelegateVotesChanged = async (
   address.votingPower = newBalance
   address.lastUpdated = new Date(block.header.timestamp)
 
-  // addresses.set(delegate, address);
+  addresses.set(delegate, address);
 }
 
 const _processStake = async (
@@ -158,24 +166,24 @@ const _processStake = async (
   const address = await _getAddress(ctx, user, result)
   const lockup = await _getLockup(ctx, lockupId.toString(), address, result)
 
-  const isExtend = !!lockup.timestamp
-
   lockup.amount = amount
   lockup.veogv = points
-  lockup.end = new Date(Number(end.toString()))
+  lockup.end = new Date(Number(end) * 1000)
   lockup.timestamp = new Date(block.header.timestamp)
-  // lockups.set(lockup.id, lockup)
+  lockups.set(lockup.id, lockup)
 
-  if (isExtend) {
-    // Find last Unstake txLog and replace it
-    const unstakeIndex = result.lockupEvents.findIndex(x => 
-      x.event == OGVLockupEventType.Unstaked 
-        // Unstake is emitted just before Stake for Extend
-        && x.id == `${log.transactionHash}:${log.logIndex - 1}`
-    )
-
+  // Find last Unstake txLog
+  const unstakeIndex = result.lockupEvents.findIndex(x => 
+    x.event == OGVLockupEventType.Unstaked 
+      // Unstake is emitted just before Stake for Extend
+      && x.id == `${log.transactionHash}:${log.logIndex - 1}`
+  )
+  
+  if (unstakeIndex >= 0) {
+    // If it exists, it's an extend
     result.lockupEvents[unstakeIndex].event = OGVLockupEventType.Extended
   } else {
+    // If not, it's just a new stake
     result.lockupEvents.push(new OGVLockupTxLog({
       id: `${log.transactionHash}:${log.logIndex}`,
       hash: log.transactionHash,
@@ -184,6 +192,8 @@ const _processStake = async (
       ogvLockup: lockup,
     }))
   }
+
+  address.staked += amount;
 
   await _updateVotingPowers(ctx, result, block, address)
 }
@@ -194,7 +204,7 @@ const _processUnstake = async (
   block: Block,
   log: Log
 ) => {
-  const { lockupId, user } = veogvAbi.events.Unstake.decode(log)
+  const { lockupId, user, amount } = veogvAbi.events.Unstake.decode(log)
   const address = await _getAddress(ctx, user, result)
   const lockup = await _getLockup(ctx, lockupId.toString(), address, result)
 
@@ -205,6 +215,8 @@ const _processUnstake = async (
     timestamp: new Date(block.header.timestamp),
     ogvLockup: lockup,
   }))
+
+  address.staked -= amount;
 
   await _updateVotingPowers(ctx, result, block, address)
 }
@@ -220,14 +232,14 @@ const _updateVotingPowers = async(
 
   address.votingPower = await veogv.getVotes(address.id)
   address.lastUpdated = new Date(block.header.timestamp)
-  // addresses.set(address.id, address)
+  addresses.set(address.id, address)
 
   const delegateeId = address.delegatee?.id
   if (delegateeId && delegateeId !== address.id) {
     const delegatee = await _getAddress(ctx, address.delegatee?.id!, result)
     delegatee.votingPower = await veogv.getVotes(delegateeId)
     delegatee.lastUpdated = new Date(block.header.timestamp)
-    // addresses.set(delegateeId, delegatee)
+    addresses.set(delegateeId, delegatee)
   }
 }
 
@@ -247,6 +259,7 @@ const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Pr
     address = new OGVAddress({
       id: id.toLowerCase(),
       balance: 0n,
+      staked: 0n,
       veogvBalance: 0n,
       votingPower: 0n,
       lastUpdated: new Date(),
@@ -274,6 +287,7 @@ const _getLockup = async (ctx: Context, lockupId: string, address: OGVAddress, r
     lockup = new OGVLockup({
       id,
       address,
+      lockupId
     })
   }
 
