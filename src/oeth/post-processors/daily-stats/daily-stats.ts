@@ -109,8 +109,19 @@ async function updateDailyStats(ctx: Context, date: Date) {
   ])
 
   // Do we have any useful data yet?
-  const allEntities = [lastApy, lastOeth]
-  if (!allEntities.every((entity) => !!entity)) {
+  const allEntities = [
+    lastApy,
+    lastOeth,
+    lastCurve,
+    lastVault,
+    lastBalancer,
+    lastFrax,
+    lastMorpho,
+    lastDripper,
+    lastRethRate,
+    lastSfrxEthRate,
+  ]
+  if (![lastApy, lastOeth].every((entity) => !!entity)) {
     return null
   }
 
@@ -122,8 +133,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
   //   lastBalancer,
   //   lastFrax,
   //   lastMorpho,
-  //   lastRethExchangeRate,
-  //   lastSfrxEthExchangeRate,
   // })
 
   const entityManager = (
@@ -229,8 +238,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-CURVE`,
       name: 'CURVE',
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastCurve?.ethOwned || 0n,
-      total: lastCurve?.ethOwned || 0n,
+      tvl: lastCurve?.totalSupplyOwned || 0n,
+      total: lastCurve?.totalSupplyOwned || 0n,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-VAULT`,
@@ -250,8 +259,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-FRAX`,
       name: 'FRAX',
       dailyStatId: id as unknown as OETHDailyStat,
-      tvl: lastFrax?.sfrxETH || 0n,
-      total: frxETH,
+      tvl: convertedSfrxEth,
+      total: sfrxETH,
     }),
     new OETHStrategyDailyStat({
       id: `${id}-MORPHO`,
@@ -267,8 +276,15 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-CURVE-ETH`,
       strategyDailyStatId: `${id}-CURVE` as unknown as OETHStrategyDailyStat,
       symbol: 'ETH',
-      amount: lastCurve?.eth || 0n,
-      value: lastCurve?.eth || 0n,
+      amount: lastCurve?.ethOwned || 0n,
+      value: lastCurve?.ethOwned || 0n,
+    }),
+    new OETHStrategyHoldingDailyStat({
+      id: `${id}-CURVE-OETH`,
+      strategyDailyStatId: `${id}-CURVE` as unknown as OETHStrategyDailyStat,
+      symbol: 'OETH',
+      amount: lastCurve?.oethOwned || 0n,
+      value: lastCurve?.oethOwned || 0n,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-VAULT-WETH`,
@@ -317,7 +333,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       strategyDailyStatId: `${id}-FRAX` as unknown as OETHStrategyDailyStat,
       symbol: 'SFRXETH',
       amount: lastFrax?.sfrxETH || 0n,
-      value: (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n,
+      value: convertedSfrxEth,
     }),
     new OETHStrategyHoldingDailyStat({
       id: `${id}-MORPHO-WETH`,
@@ -357,9 +373,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
       id: `${id}-RETH`,
       dailyStatId: id as unknown as OETHDailyStat,
       symbol: 'RETH',
-      amount: rETH,
+      amount: rETHRaw,
       price: rethRate,
-      value: (rETH * rethRate) / 1000000000000000000n,
+      value: rETH,
     }),
     new OETHCollateralDailyStat({
       id: `${id}-FRXETH`,
@@ -367,7 +383,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       symbol: 'FRXETH',
       amount: sfrxETH,
       price: 1n,
-      value: sfrxETH,
+      value: convertedSfrxEth,
     }),
   ]
 
@@ -400,21 +416,21 @@ function getStartOfDays(startTimestamp: number, endTimestamp: number): Date[] {
 
 const yieldStatsQuery = `
 -- Results for 1 day
-SELECT '1 day' as period, SUM(fee) as total_fees, SUM(yield) as total_yield, SUM(yield - fee) as total_revenue
+SELECT '1 day' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
 FROM oeth_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
 
 UNION ALL
 
 -- Results for 7 days
-SELECT '7 days' as period, SUM(fee) as total_fees, SUM(yield) as total_yield, SUM(yield - fee) as total_revenue
+SELECT '7 days' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
 FROM oeth_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
 
 UNION ALL
 
 -- Results for all time up to the end date
-SELECT 'all time' as period, SUM(fee) as total_fees, SUM(yield) as total_yield, SUM(yield - fee) as total_revenue
+SELECT 'all time' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
 FROM oeth_rebase
 WHERE timestamp <= $1::timestamp
 `
