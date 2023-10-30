@@ -3,7 +3,6 @@ import { pad } from 'viem'
 
 import * as dripperAbi from '../../abi/dripper'
 import * as erc20 from '../../abi/erc20'
-// import * as erc20 from '../../abi/drip'
 import { OETHDripper } from '../../model'
 import { Context } from '../../processor'
 import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
