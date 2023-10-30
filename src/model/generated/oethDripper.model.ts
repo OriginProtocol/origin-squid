@@ -20,4 +20,13 @@ export class OETHDripper {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     weth!: bigint
+
+    @Column_("int4", {nullable: false})
+    lastCollectTimestamp!: number
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    dripRatePerBlock!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    dripDuration!: bigint
 }
