@@ -1,7 +1,9 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
+import * as dripperAbi from '../../abi/dripper'
 import * as erc20 from '../../abi/erc20'
+// import * as erc20 from '../../abi/drip'
 import { OETHDripper } from '../../model'
 import { Context } from '../../processor'
 import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
@@ -63,6 +65,12 @@ const processTransfer = async (
           timestampId,
         )
 
+        const dripperContract = new dripperAbi.Contract(
+          ctx,
+          block.header,
+          OETH_DRIPPER_ADDRESS,
+        )
+
         let dripper = current
         if (!dripper) {
           await ensureExchangeRate(ctx, block, 'ETH', 'WETH') // No async since WETH.
@@ -75,7 +83,12 @@ const processTransfer = async (
           result.drippers.push(dripper)
         }
 
+        const drip = await dripperContract.drip()
+
         dripper.weth += change
+        dripper.lastCollectTimestamp = Number(drip.lastCollect)
+        dripper.dripRatePerBlock = drip.perBlock
+        dripper.dripDuration = await dripperContract.dripDuration()
       },
     })
   }
