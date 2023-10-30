@@ -109,3 +109,12 @@ Squid tools assume a certain [project layout](https://docs.subsquid.io/basics/sq
 - Database schema must be defined in `schema.graphql`.
 - Database migrations must reside in `db/migrations` and must be plain js files.
 - `sqd(1)` and `squid-*(1)` executables consult `.env` file for environment variables.
+
+## Deploy a new version
+
+- Visit [Squid deploy dashboard](https://app.subsquid.io/squids/deploy)
+- Auth with `sqd auth -k sqd_XXX` (key is on squid deploy page)
+- Update `squid.yaml` to set the correct version
+- Run `sqd deploy .`
+- Make branch for new version (eg v9) and push to origin
+- Switch back to main branch
