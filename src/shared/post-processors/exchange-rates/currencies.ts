@@ -1,3 +1,5 @@
+import { invert, mapKeys } from 'lodash'
+
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
   ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Chainlink Denominations.ETH
@@ -8,6 +10,11 @@ export const currencies = {
   rETH: '0xae78736cd615f374d3085123a210448e74fc6393',
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
+  CRV: '0xD533a949740bb3306d119CC777fa900bA034cd52',
 } as const
+
+export const currenciesByAddress = mapKeys(invert(currencies), (v, k) =>
+  k.toLowerCase(),
+) as Record<string, Currency>
 
 export type Currency = keyof typeof currencies

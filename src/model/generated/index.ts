@@ -1,6 +1,7 @@
 export * from "./exchangeRate.model"
 export * from "./balance.model"
 export * from "./strategyBalance.model"
+export * from "./strategyYield.model"
 export * from "./curvePoolBalance.model"
 export * from "./oeth.model"
 export * from "./oethAddress.model"

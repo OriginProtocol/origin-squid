@@ -52,6 +52,19 @@ type StrategyBalance @entity {
   strategy: String!
   asset: String!
   balance: BigInt!
+}
+
+type StrategyYield @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+  earnings: BigInt!
 }type CurvePoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index

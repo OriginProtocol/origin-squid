@@ -1,7 +1,7 @@
 import { ExchangeRate } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { useProcessorState } from '../../../utils/state'
-import { Currency } from './currencies'
+import { Currency, currenciesByAddress } from './currencies'
 import { getPrice } from './price-routing'
 
 const useExchangeRates = (ctx: Context) =>
@@ -21,6 +21,8 @@ export const ensureExchangeRate = async (
   base: Currency,
   quote: Currency,
 ) => {
+  if (currenciesByAddress[base]) base = currenciesByAddress[base]
+  if (currenciesByAddress[quote]) quote = currenciesByAddress[quote]
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height

@@ -33,7 +33,10 @@ export const createStrategyRewardProcessor = (params: {
     for (const block of ctx.blocks) {
       if (block.header.height < params.from) continue
       for (const log of block.logs) {
-        if (log.address === params.address) {
+        if (
+          log.address === params.address &&
+          log.topics[0] === iat.events.RewardTokenCollected.topic
+        ) {
           const data = iat.events.RewardTokenCollected.decode(log)
           const event = new params.OTokenRewardTokenCollected({
             id: log.id,
