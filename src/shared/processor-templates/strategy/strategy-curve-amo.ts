@@ -9,33 +9,21 @@ import { Block, Context } from '../../../processor'
 import {
   ETH_ADDRESS,
   OETH_ADDRESS,
-  OETH_DRIPPER_ADDRESS,
-  OETH_HARVESTER_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
-import { processStrategyEarnings } from './strategy-earnings'
+import {
+  processStrategyEarnings,
+  setupStrategyEarnings,
+} from './strategy-earnings'
 
 export const setup = (
   processor: EvmBatchProcessor,
   strategyData: IStrategyData,
 ) => {
   processor.includeAllBlocks({ from: strategyData.from })
-  processor.addLog({
-    address: [strategyData.address],
-    topic0: [
-      abstractStrategyAbi.events.Deposit.topic,
-      abstractStrategyAbi.events.Withdrawal.topic,
-      abstractStrategyAbi.events.RewardTokenCollected.topic,
-    ],
-  })
-  processor.addLog({
-    address: [WETH_ADDRESS],
-    topic0: [erc20.events.Transfer.topic],
-    topic1: [pad(OETH_HARVESTER_ADDRESS)],
-    topic2: [pad(OETH_DRIPPER_ADDRESS)],
-  })
+  setupStrategyEarnings(processor, strategyData)
 }
 
 export const process = async (ctx: Context, strategyData: IStrategyData) => {

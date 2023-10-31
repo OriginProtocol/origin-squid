@@ -27,6 +27,10 @@ export type IStrategyData = {
   assets: readonly string[]
   balancerPoolInfo?: IBalancerPoolInfo
   curvePoolInfo?: ICurveAMOInfo
+  earnings: {
+    rewardTokenCollected?: boolean
+    passiveByDepositWithdrawal?: boolean
+  }
 }
 
 const processors: Record<

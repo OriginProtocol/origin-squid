@@ -1,40 +1,27 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { LessThan } from 'typeorm'
-import { formatEther } from 'viem'
 
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
-import { StrategyBalance, StrategyYield } from '../../../model'
+import { StrategyBalance } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
-import { processStrategyEarnings } from './strategy-earnings'
+import {
+  processStrategyEarnings,
+  setupStrategyEarnings,
+} from './strategy-earnings'
 
 export const setup = (
   processor: EvmBatchProcessor,
   strategyData: IStrategyData,
 ) => {
   processor.includeAllBlocks({ from: strategyData.from })
-  processor.addLog({
-    address: [strategyData.address],
-    topic0: [
-      abstractStrategyAbi.events.Deposit.topic,
-      abstractStrategyAbi.events.Withdrawal.topic,
-      abstractStrategyAbi.events.RewardTokenCollected.topic,
-    ],
-  })
+  setupStrategyEarnings(processor, strategyData)
 }
 
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
-  ctx.log.info(`NEW CONTEXT`)
-
   const shouldUpdate = blockFrequencyTracker({ from: strategyData.from })
   const strategyBalances: StrategyBalance[] = []
-  const strategyYields = new Map<string, StrategyYield[]>()
-
   for (const block of ctx.blocks) {
-    if (block.logs.length) {
-      ctx.log.info(`NEW BLOCK: ${block.logs.length} logs`)
-    }
     if (shouldUpdate(ctx, block)) {
       const results = await getStrategyHoldings(ctx, block, strategyData)
       strategyBalances.push(...results)

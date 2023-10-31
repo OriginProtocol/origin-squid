@@ -18,21 +18,17 @@ import {
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
 import { getStrategyBalances } from './strategy-curve-amo'
-import { processStrategyEarnings } from './strategy-earnings'
+import {
+  processStrategyEarnings,
+  setupStrategyEarnings,
+} from './strategy-earnings'
 
 export const setup = (
   processor: EvmBatchProcessor,
   strategyData: IStrategyData,
 ) => {
   processor.includeAllBlocks({ from: strategyData.from })
-  processor.addLog({
-    address: [strategyData.address],
-    topic0: [
-      abstractStrategyAbi.events.Deposit.topic,
-      abstractStrategyAbi.events.Withdrawal.topic,
-      abstractStrategyAbi.events.RewardTokenCollected.topic,
-    ],
-  })
+  setupStrategyEarnings(processor, strategyData)
 }
 
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
@@ -49,7 +45,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     }
   }
   await ctx.store.insert(data)
-  // await processStrategyEarnings(ctx, strategyData, getStrategyBalances)
+  await processStrategyEarnings(ctx, strategyData, getStrategyBalances)
 }
 
 export const getBalancerStrategyHoldings = async (

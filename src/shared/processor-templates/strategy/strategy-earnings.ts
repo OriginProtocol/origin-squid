@@ -1,4 +1,4 @@
-import { sum } from 'lodash'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { LessThan } from 'typeorm'
 import { formatEther, pad } from 'viem'
 
@@ -11,8 +11,39 @@ import {
   OETH_HARVESTER_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
-import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { IStrategyData } from './strategy'
+
+const depositWithdrawalTopics = new Set([
+  abstractStrategyAbi.events.Deposit.topic,
+  abstractStrategyAbi.events.Withdrawal.topic,
+])
+
+export const setupStrategyEarnings = (
+  processor: EvmBatchProcessor,
+  strategyData: IStrategyData,
+) => {
+  if (strategyData.earnings.passiveByDepositWithdrawal) {
+    processor.addLog({
+      address: [strategyData.address],
+      topic0: [
+        abstractStrategyAbi.events.Deposit.topic,
+        abstractStrategyAbi.events.Withdrawal.topic,
+      ],
+    })
+  }
+  if (strategyData.earnings.rewardTokenCollected) {
+    processor.addLog({
+      address: [strategyData.address],
+      topic0: [abstractStrategyAbi.events.RewardTokenCollected.topic],
+    })
+    processor.addLog({
+      address: [WETH_ADDRESS],
+      topic0: [erc20.events.Transfer.topic],
+      topic1: [pad(OETH_HARVESTER_ADDRESS)],
+      topic2: [pad(OETH_DRIPPER_ADDRESS)],
+    })
+  }
+}
 
 export const processStrategyEarnings = async (
   ctx: Context,
@@ -29,20 +60,50 @@ export const processStrategyEarnings = async (
 
   for (const block of ctx.blocks) {
     if (block.logs.length) {
-      ctx.log.info(`NEW BLOCK: ${block.logs.length} logs`)
+      ctx.log.info(
+        `${new Date(block.header.timestamp).toJSON()} NEW BLOCK: ${
+          block.logs.length
+        } logs`,
+      )
     }
     const txIgnore = new Set<string>()
     for (const log of block.logs) {
+      const balanceTrackingUpdate = async () => {
+        const previousBalances = await getStrategyBalances(
+          ctx,
+          { height: block.header.height - 1 },
+          strategyData,
+        )
+        const balances = await getStrategyBalances(
+          ctx,
+          block.header,
+          strategyData,
+        )
+        await Promise.all(
+          strategyData.assets.map((asset) => {
+            return processDepositWithdrawal(
+              ctx,
+              strategyData,
+              block,
+              strategyYields,
+              asset,
+              previousBalances.find((b) => b.asset === asset)!.balance,
+              balances.find((b) => b.asset === asset)!.balance,
+            )
+          }),
+        )
+      }
+      const topic0 = log.topics[0]
       if (log.address === strategyData.address) {
-        const topic0 = log.topics[0]
         ctx.log.info({
           block: block.header.height,
           tx: log.transactionHash,
           topic0,
         })
+        // TODO: TRACK CURVE AMO VIRTUAL PRICE INCREASES
         if (
-          topic0 === abstractStrategyAbi.events.Deposit.topic ||
-          topic0 === abstractStrategyAbi.events.Withdrawal.topic
+          strategyData.earnings.passiveByDepositWithdrawal &&
+          depositWithdrawalTopics.has(topic0)
         ) {
           ctx.log.info({
             type:
@@ -51,31 +112,9 @@ export const processStrategyEarnings = async (
                 : 'Withdrawal',
             transactionHash: log.transactionHash,
           })
-          const previousBalances = await getStrategyBalances(
-            ctx,
-            { height: block.header.height - 1 },
-            strategyData,
-          )
-          const balances = await getStrategyBalances(
-            ctx,
-            block.header,
-            strategyData,
-          )
-          await Promise.all(
-            strategyData.assets.map((asset) => {
-              ensureExchangeRate(ctx, block, 'CRV', 'ETH')
-              return processDepositWithdrawal(
-                ctx,
-                strategyData,
-                block,
-                strategyYields,
-                asset,
-                previousBalances.find((b) => b.asset === asset)!.balance,
-                balances.find((b) => b.asset === asset)!.balance,
-              )
-            }),
-          )
+          await balanceTrackingUpdate()
         } else if (
+          strategyData.earnings.rewardTokenCollected &&
           topic0 === abstractStrategyAbi.events.RewardTokenCollected.topic &&
           !txIgnore.has(log.transactionHash)
         ) {
@@ -161,7 +200,6 @@ const processDepositWithdrawal = async (
     asset,
     id,
   )
-  ctx.log.info(`${!!latest} ${!!current} ${results.length}`)
   if (!current) {
     const earningsChange =
       previousBalance - (latest?.balance ?? previousBalance)
@@ -179,6 +217,8 @@ const processDepositWithdrawal = async (
         balance,
       )}, last balance: ${formatEther(
         latest?.balance ?? 0n,
+      )}, previous block balance: ${formatEther(
+        previousBalance,
       )}, perceived earnings: ${formatEther(
         earningsChange,
       )}, total earnings: ${formatEther(current.earnings)}`,
