@@ -22,6 +22,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     from: 17249899,
     name: 'OETH Convex ETH+OETH (AMO)',
+    contractName: 'ConvexEthMetaStrategy',
     address: '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63',
     kind: 'CurveAMO',
     curvePoolInfo: {
@@ -29,31 +30,34 @@ export const oethStrategies: readonly IStrategyData[] = [
       rewardsPoolAddress: '0x24b65dc1cf053a8d96872c323d29e86ec43eb33a',
     },
     assets: [WETH_ADDRESS, OETH_ADDRESS],
-    earnings: { rewardTokenCollected: true },
+    earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
   {
     from: 17067232,
     name: 'OETH Frax Staking',
+    contractName: 'FraxETHStrategy',
     address: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
     kind: 'Generic',
     assets: [FRXETH_ADDRESS],
-    earnings: { passiveByDepositWithdrawal: true },
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
     from: 17367105,
     name: 'OETH Morpho Aave V2',
+    contractName: 'MorphoAaveStrategy',
     address: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     kind: 'Generic',
     assets: [WETH_ADDRESS],
-    earnings: { passiveByDepositWithdrawal: true },
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
     from: 18156225,
     name: 'OETH Aura rETH/WETH',
+    contractName: 'BalancerMetaPoolStrategy',
     address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
     kind: 'BalancerMetaStablePool',
     assets: [WETH_ADDRESS, RETH_ADDRESS],
-    earnings: { passiveByDepositWithdrawal: true },
+    earnings: { rewardTokenCollected: true },
     balancerPoolInfo: {
       poolId:
         '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',

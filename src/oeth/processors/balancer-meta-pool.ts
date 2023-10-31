@@ -120,14 +120,16 @@ export const updateValues = async (
       result.strategies,
       timestampId,
     ),
-    getBalancerStrategyHoldings(ctx, block, strategyData).then((holdings) => {
-      return {
-        rETH: holdings.find((h) => h.asset.toLowerCase() === RETH_ADDRESS)!
-          .balance,
-        weth: holdings.find((h) => h.asset.toLowerCase() === WETH_ADDRESS)!
-          .balance,
-      }
-    }),
+    getBalancerStrategyHoldings(ctx, block.header, strategyData).then(
+      (holdings) => {
+        return {
+          rETH: holdings.find((h) => h.asset.toLowerCase() === RETH_ADDRESS)!
+            .balance,
+          weth: holdings.find((h) => h.asset.toLowerCase() === WETH_ADDRESS)!
+            .balance,
+        }
+      },
+    ),
   ])
 
   if (!current) {

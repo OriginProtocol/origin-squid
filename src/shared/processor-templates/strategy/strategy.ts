@@ -18,6 +18,7 @@ export type ICurveAMOInfo = {
 export type IStrategyData = {
   from: number
   name: string
+  contractName: string
   address: string
   kind:
     | 'Generic'

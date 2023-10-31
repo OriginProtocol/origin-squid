@@ -2,6 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { LessThan } from 'typeorm'
 import { formatEther, pad } from 'viem'
 
+import * as baseRewardPool from '../../../abi/base-reward-pool'
 import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import { StrategyYield } from '../../../model'
@@ -30,6 +31,16 @@ export const setupStrategyEarnings = (
         abstractStrategyAbi.events.Withdrawal.topic,
       ],
     })
+    if (strategyData.kind === 'CurveAMO') {
+      processor.addLog({
+        address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
+        topic0: [
+          baseRewardPool.events.Staked.topic,
+          baseRewardPool.events.Withdrawn.topic,
+        ],
+        topic1: [pad(strategyData.address as `0x${string}`)],
+      })
+    }
   }
   if (strategyData.earnings.rewardTokenCollected) {
     processor.addLog({
@@ -68,6 +79,11 @@ export const processStrategyEarnings = async (
     }
     const txIgnore = new Set<string>()
     for (const log of block.logs) {
+      if (
+        log.topics[0] === baseRewardPool.events.Staked.topic ||
+        log.topics[0] === baseRewardPool.events.Withdrawn.topic
+      )
+        ctx.log.info(log.topics)
       const balanceTrackingUpdate = async () => {
         const previousBalances = await getStrategyBalances(
           ctx,
@@ -79,35 +95,68 @@ export const processStrategyEarnings = async (
           block.header,
           strategyData,
         )
-        await Promise.all(
-          strategyData.assets.map((asset) => {
-            return processDepositWithdrawal(
-              ctx,
-              strategyData,
-              block,
-              strategyYields,
-              asset,
-              previousBalances.find((b) => b.asset === asset)!.balance,
-              balances.find((b) => b.asset === asset)!.balance,
-            )
-          }),
-        )
+        if (strategyData.kind === 'CurveAMO') {
+          await processDepositWithdrawal(
+            ctx,
+            strategyData,
+            block,
+            strategyYields,
+            strategyData.curvePoolInfo!.poolAddress,
+            previousBalances.reduce((sum, b) => sum + b.balance, 0n),
+            balances.reduce((sum, b) => sum + b.balance, 0n),
+          )
+        } else {
+          await Promise.all(
+            strategyData.assets.map((asset) => {
+              return processDepositWithdrawal(
+                ctx,
+                strategyData,
+                block,
+                strategyYields,
+                asset,
+                previousBalances.find((b) => b.asset === asset)!.balance,
+                balances.find((b) => b.asset === asset)!.balance,
+              )
+            }),
+          )
+        }
       }
-      const topic0 = log.topics[0]
-      if (log.address === strategyData.address) {
+      if (
+        strategyData.kind === 'CurveAMO' &&
+        log.address === strategyData.curvePoolInfo!.rewardsPoolAddress &&
+        log.topics[0] === baseRewardPool.events.Staked.topic &&
+        log.topics[1] === pad(strategyData.address as `0x${string}`)
+      ) {
         ctx.log.info({
-          block: block.header.height,
-          tx: log.transactionHash,
-          topic0,
+          type: 'Staked',
+          transactionHash: log.transactionHash,
         })
+        await balanceTrackingUpdate()
+      } else if (
+        strategyData.kind === 'CurveAMO' &&
+        log.address === strategyData.curvePoolInfo!.rewardsPoolAddress &&
+        log.topics[0] === baseRewardPool.events.Withdrawn.topic &&
+        log.topics[1] === pad(strategyData.address as `0x${string}`)
+      ) {
+        ctx.log.info({
+          type: 'Withdrawn',
+          transactionHash: log.transactionHash,
+        })
+        await balanceTrackingUpdate()
+      } else if (log.address === strategyData.address) {
+        // ctx.log.info({
+        //   block: block.header.height,
+        //   tx: log.transactionHash,
+        //   log.topics[0],
+        // })
         // TODO: TRACK CURVE AMO VIRTUAL PRICE INCREASES
         if (
           strategyData.earnings.passiveByDepositWithdrawal &&
-          depositWithdrawalTopics.has(topic0)
+          depositWithdrawalTopics.has(log.topics[0])
         ) {
           ctx.log.info({
             type:
-              topic0 === abstractStrategyAbi.events.Deposit.topic
+              log.topics[0] === abstractStrategyAbi.events.Deposit.topic
                 ? 'Deposit'
                 : 'Withdrawal',
             transactionHash: log.transactionHash,
@@ -115,7 +164,8 @@ export const processStrategyEarnings = async (
           await balanceTrackingUpdate()
         } else if (
           strategyData.earnings.rewardTokenCollected &&
-          topic0 === abstractStrategyAbi.events.RewardTokenCollected.topic &&
+          log.topics[0] ===
+            abstractStrategyAbi.events.RewardTokenCollected.topic &&
           !txIgnore.has(log.transactionHash)
         ) {
           txIgnore.add(log.transactionHash)

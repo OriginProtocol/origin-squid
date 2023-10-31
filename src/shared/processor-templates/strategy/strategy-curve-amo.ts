@@ -104,13 +104,13 @@ export const getStrategyBalances = async (
     poolAssets.push(coin)
   }
 
-  const eth1 = BigInt('1000000000000000000')
+  const eth1 = 1000000000000000000n
   const totalStrategyLPBalance =
     ((stakedLPBalance + unstakedBalance) * lpPrice) / eth1
 
   return poolAssets.map((asset, i) => {
-    const poolAssetSplit = (BigInt(10000) * assetBalances[i]) / totalPoolValue
-    const balance = (totalStrategyLPBalance * poolAssetSplit) / BigInt(10000)
-    return { address, asset: coins[i], balance }
+    const poolAssetSplit = (eth1 * assetBalances[i]) / totalPoolValue
+    const balance = (totalStrategyLPBalance * poolAssetSplit) / eth1
+    return { address, asset: coins[i].toLowerCase(), balance }
   })
 }

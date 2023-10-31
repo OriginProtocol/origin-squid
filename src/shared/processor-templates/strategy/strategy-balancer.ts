@@ -4,20 +4,17 @@ import { memoize } from 'lodash'
 import * as balancerMetaStablePoolStrategyAbi from '../../../abi/balancer-meta-pool-strategy'
 import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as balancerVaultAbi from '../../../abi/balancer-vault'
-import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import * as balancerMetaStablePoolAbi from '../../../abi/meta-stable-pool'
 import { StrategyBalance } from '../../../model'
-import { Block, Context } from '../../../processor'
+import { Context } from '../../../processor'
 import {
   ADDRESS_ZERO,
   BALANCER_VAULT,
   ETH_ADDRESS,
-  OETH_HARVESTER_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
-import { getStrategyBalances } from './strategy-curve-amo'
 import {
   processStrategyEarnings,
   setupStrategyEarnings,
@@ -38,19 +35,30 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     if (shouldUpdate(ctx, block)) {
       const results = await getBalancerStrategyHoldings(
         ctx,
-        block,
+        block.header,
         strategyData,
+      ).then((holdings) =>
+        holdings.map(({ address, asset, balance }) => {
+          return new StrategyBalance({
+            id: `${address}:${asset}:${block.header.height}`,
+            strategy: address,
+            asset,
+            balance,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+          })
+        }),
       )
       data.push(...results)
     }
   }
   await ctx.store.insert(data)
-  await processStrategyEarnings(ctx, strategyData, getStrategyBalances)
+  await processStrategyEarnings(ctx, strategyData, getBalancerStrategyHoldings)
 }
 
 export const getBalancerStrategyHoldings = async (
   ctx: Context,
-  block: Block,
+  block: { height: number },
   strategyData: IStrategyData,
 ) => {
   const { address, balancerPoolInfo } = strategyData
@@ -64,12 +72,12 @@ export const getBalancerStrategyHoldings = async (
 
   const strategy = new balancerMetaStablePoolStrategyAbi.Contract(
     ctx,
-    block.header,
+    block,
     address,
   )
   const balancerVault = new balancerVaultAbi.Contract(
     ctx,
-    block.header,
+    block,
     BALANCER_VAULT,
   )
   let [poolAssets, balances] = await balancerVault.getPoolTokens(poolId)
@@ -87,12 +95,12 @@ export const getBalancerStrategyHoldings = async (
       poolAssets[i] = WETH_ADDRESS
     }
 
-    if (ADDRESS_ZERO == rateProviders[i]) {
+    if (ADDRESS_ZERO === rateProviders[i]) {
       assetRates.push(eth1)
     } else {
       const provider = new balancerRateProvider.Contract(
         ctx,
-        block.header,
+        block,
         rateProviders[i],
       )
       const rate = await provider.getRate()
@@ -111,24 +119,13 @@ export const getBalancerStrategyHoldings = async (
       assetRates[i] /
       BigInt(10000)
 
-    return new StrategyBalance({
-      id: `${address}:${asset}:${block.header.height}`,
-      strategy: address,
-      asset,
-      balance,
-      blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp),
-    })
+    return { address, asset: asset.toLowerCase(), balance }
   })
 }
 
 const _getBalancePoolRateProviders = memoize(
-  async (ctx: Context, block: Block, address: string) => {
-    const pool = new balancerMetaStablePoolAbi.Contract(
-      ctx,
-      block.header,
-      address,
-    )
+  async (ctx: Context, block: { height: number }, address: string) => {
+    const pool = new balancerMetaStablePoolAbi.Contract(ctx, block, address)
     const rateProviders = await pool.getRateProviders()
     return rateProviders
   },
