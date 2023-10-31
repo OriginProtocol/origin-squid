@@ -159,8 +159,11 @@ export async function createRebaseAPY<
   await Promise.all(
     [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
       const pastAPYs = await ctx.store
-        .findBy(OTokenAPY, {
-          id: MoreThanOrEqual(i.value),
+        .find(OTokenAPY, {
+          where: {
+            id: MoreThanOrEqual(i.value),
+          },
+          order: { id: 'asc' },
         })
         .then((r) => r.slice(0, i.days - 1))
       apy![i.key] =
