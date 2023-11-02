@@ -1,5 +1,5 @@
-module.exports = class Data1698545669111 {
-    name = 'Data1698545669111'
+module.exports = class Data1698911538983 {
+    name = 'Data1698911538983'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -48,7 +48,7 @@ module.exports = class Data1698545669111 {
         await db.query(`CREATE TABLE "oeth_morpho_aave" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_86de8f846e9335c92b8ad7df3a1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_25e239b985844f1d33fac79981" ON "oeth_morpho_aave" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a6662224e95eb6921bb14cb5f9" ON "oeth_morpho_aave" ("block_number") `)
-        await db.query(`CREATE TABLE "oeth_dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_77731281c1564c24eff0c265984" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_dripper" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, "last_collect_timestamp" integer NOT NULL, "drip_rate_per_block" numeric NOT NULL, "drip_duration" numeric NOT NULL, CONSTRAINT "PK_77731281c1564c24eff0c265984" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_16ac742ceeb05d28e530da9649" ON "oeth_dripper" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d356832c14603916a492608e7b" ON "oeth_dripper" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_balancer_meta_pool_strategy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "r_eth" numeric NOT NULL, "weth" numeric NOT NULL, CONSTRAINT "PK_6ddf5b8ba878e6d706e59bd6de0" PRIMARY KEY ("id"))`)
