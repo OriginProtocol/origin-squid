@@ -1,9 +1,10 @@
 import * as chainlinkFeedRegistry from '../../../abi/chainlink-feed-registry'
 import * as eacAggregatorProxy from '../../../abi/eac-aggregator-proxy'
+import * as frxEthFraxOracle from '../../../abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '../../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../../abi/sfrx-eth'
 import { Block, Context } from '../../../processor'
-import { Currency, currencies } from './currencies'
+import { Currency, CurrencySymbol, currencies } from './currencies'
 
 export const getPrice = async (
   ctx: Context,
@@ -11,20 +12,29 @@ export const getPrice = async (
   base: Currency,
   quote: Currency,
 ) => {
+  if (base === 'ETH' && quote === 'OETH') {
+    return 1_005_000_000_000_000_000n
+  }
   if (base === 'ETH' && quote === 'WETH') {
     return 1_000_000_000_000_000_000n
   }
   if (base === 'ETH' && quote === 'sfrxETH') {
-    return await getStakedFraxPrice(ctx, block)
+    return getStakedFraxPrice(ctx, block)
   }
   if (base === 'ETH' && quote === 'rETH') {
-    return await getRETHPrice(ctx, block)
+    return getRETHPrice(ctx, block)
   }
-  if (base === 'ETH' && oethOracleCurrencies.has(quote)) {
-    if (block.header.height < 18032298) return undefined
-    return await getOethOraclePrice(ctx, block, quote)
+  if (base === 'ETH' && quote === 'frxETH') {
+    return getFrxEthPrice(ctx, block)
   }
-  return await getChainlinkPrice(ctx, block, base, quote)
+  if (
+    base === 'ETH' &&
+    oethOracleCurrencies.has(quote) &&
+    block.header.height >= 18032298
+  ) {
+    return getOethOraclePrice(ctx, block, quote)
+  }
+  return getChainlinkPrice(ctx, block, base, quote)
 }
 
 const rETHRegistryAddress = '0x536218f9E9Eb48863970252233c8F271f554C2d0'
@@ -39,7 +49,7 @@ export const getRETHPrice = (ctx: Context, block: Block) => {
 }
 
 const registryAddress = '0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf'
-export const getChainlinkPrice = (
+export const getChainlinkPrice = async (
   ctx: Context,
   block: Block,
   base: Currency,
@@ -50,10 +60,17 @@ export const getChainlinkPrice = (
     block.header,
     registryAddress,
   )
-  return registry.latestAnswer(
-    currencies[base] ?? base,
-    currencies[quote] ?? quote,
-  )
+  try {
+    return await registry.latestAnswer(
+      currencies[base as CurrencySymbol] ?? base,
+      currencies[quote as CurrencySymbol] ?? quote,
+    )
+  } catch (err: any) {
+    if (err.message === 'execution reverted: Feed not found') {
+      return 0n
+    }
+    throw err
+  }
 }
 
 export const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
@@ -69,7 +86,7 @@ export const getOethOraclePrice = (
     block.header,
     oethOracleAddress,
   )
-  return router.price(currencies[quote] ?? quote)
+  return router.price(currencies[quote as CurrencySymbol] ?? quote)
 }
 
 const stakedFraxAddress = '0xac3e018457b222d93114458476f3e3416abbe38f'
@@ -81,4 +98,15 @@ export const getStakedFraxPrice = (ctx: Context, block: Block) => {
     stakedFraxAddress,
   )
   return router.previewRedeem(1_000_000_000_000_000_000n)
+}
+
+const frxEthFraxOracleAddress = '0xC58F3385FBc1C8AD2c0C9a061D7c13b141D7A5Df'
+export const getFrxEthPrice = (ctx: Context, block: Block) => {
+  if (block.header.height < 17571367) return 1_000_000_000_000_000_000n
+  const frxEth = new frxEthFraxOracle.Contract(
+    ctx,
+    block.header,
+    frxEthFraxOracleAddress,
+  )
+  return frxEth.latestRoundData().then((lrd) => lrd.answer)
 }

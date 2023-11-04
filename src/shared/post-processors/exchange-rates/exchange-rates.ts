@@ -28,11 +28,11 @@ export const ensureExchangeRate = async (
   const blockNumber = block.header.height
   const id = `${blockNumber}:${pair}`
   let exchangeRate = exchangeRates.get(id)
-  if (exchangeRate) return
+  if (exchangeRate) return exchangeRate
 
   const timestamp = new Date(block.header.timestamp)
   const price = await getPrice(ctx, block, base, quote).catch((err) => {
-    ctx.log.info({ base, quote, err })
+    ctx.log.info({ base, quote, err, message: err.message })
     throw err
   })
   if (price) {
@@ -47,6 +47,7 @@ export const ensureExchangeRate = async (
     })
     exchangeRates.set(id, exchangeRate)
   }
+  return exchangeRate
 }
 
 export const ensureExchangeRates = async (
@@ -54,7 +55,7 @@ export const ensureExchangeRates = async (
   block: Block,
   pairs: [Currency, Currency][],
 ) => {
-  await Promise.all(
+  return await Promise.all(
     pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote)),
   )
 }

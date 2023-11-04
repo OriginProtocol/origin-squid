@@ -5,6 +5,16 @@ import { pad } from 'viem'
 import * as erc20 from '../abi/erc20'
 import { Context } from '../processor'
 
+export const lastExcept = <T extends { id: string }>(
+  arr: T[] | undefined,
+  id: string,
+) =>
+  arr
+    ? arr[arr.length - 1]?.id === id
+      ? arr[arr.length - 2]
+      : arr[arr.length - 1]
+    : undefined
+
 export const trackAddressBalances = async ({
   log,
   address,

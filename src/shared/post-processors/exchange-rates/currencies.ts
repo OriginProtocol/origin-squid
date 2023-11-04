@@ -1,5 +1,7 @@
 import { invert, mapKeys } from 'lodash'
 
+import { ExchangeRate } from '../../../model'
+
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
   ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Chainlink Denominations.ETH
@@ -17,4 +19,24 @@ export const currenciesByAddress = mapKeys(invert(currencies), (v, k) =>
   k.toLowerCase(),
 ) as Record<string, Currency>
 
-export type Currency = keyof typeof currencies
+const eth1 = 1000000000000000000n
+export const convertRate = (
+  rates: ExchangeRate[],
+  base: Currency,
+  quote: Currency,
+  balance: bigint,
+) => {
+  base = currenciesByAddress[base.toLowerCase() as CurrencyAddress] ?? base
+  quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress] ?? quote
+  const rate = rates.find((r) => r.base === base && r.quote === quote)
+  if (rate) {
+    return (balance * rate.rate) / eth1
+  } else {
+    return 0n
+  }
+}
+
+export type CurrencySymbol = keyof typeof currencies
+export type CurrencyAddress = (typeof currencies)[keyof typeof currencies]
+
+export type Currency = CurrencySymbol | CurrencyAddress

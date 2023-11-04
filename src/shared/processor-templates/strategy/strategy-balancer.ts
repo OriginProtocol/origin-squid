@@ -13,7 +13,7 @@ import {
   ETH_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
-import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
+import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -28,30 +28,35 @@ export const setup = (
   setupStrategyEarnings(processor, strategyData)
 }
 
+const trackers = new Map<string, ReturnType<typeof blockFrequencyUpdater>>()
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
-  const shouldUpdate = blockFrequencyTracker({ from: strategyData.from })
-  const data: StrategyBalance[] = []
-  for (const block of ctx.blocks) {
-    if (shouldUpdate(ctx, block)) {
-      const results = await getBalancerStrategyHoldings(
-        ctx,
-        block.header,
-        strategyData,
-      ).then((holdings) =>
-        holdings.map(({ address, asset, balance }) => {
-          return new StrategyBalance({
-            id: `${address}:${asset}:${block.header.height}`,
-            strategy: address,
-            asset,
-            balance,
-            blockNumber: block.header.height,
-            timestamp: new Date(block.header.timestamp),
-          })
-        }),
-      )
-      data.push(...results)
-    }
+  if (!trackers.has(strategyData.address)) {
+    trackers.set(
+      strategyData.address,
+      blockFrequencyUpdater({ from: strategyData.from }),
+    )
   }
+  const blockFrequencyUpdate = trackers.get(strategyData.address)!
+  const data: StrategyBalance[] = []
+  await blockFrequencyUpdate(ctx, async (ctx, block) => {
+    const results = await getBalancerStrategyHoldings(
+      ctx,
+      block.header,
+      strategyData,
+    ).then((holdings) =>
+      holdings.map(({ address, asset, balance }) => {
+        return new StrategyBalance({
+          id: `${address}:${asset}:${block.header.height}`,
+          strategy: address,
+          asset,
+          balance,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+        })
+      }),
+    )
+    data.push(...results)
+  })
   await ctx.store.insert(data)
   await processStrategyEarnings(ctx, strategyData, getBalancerStrategyHoldings)
 }

@@ -16,7 +16,7 @@ export const createStrategyRewardSetup = ({
     processor.addLog({
       address: [address],
       topic0: [iat.events.RewardTokenCollected.topic],
-      transaction: true,
+      transaction: false,
       range: { from },
     })
   }

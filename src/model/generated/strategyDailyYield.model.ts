@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class StrategyYield {
-    constructor(props?: Partial<StrategyYield>) {
+export class StrategyDailyYield {
+    constructor(props?: Partial<StrategyDailyYield>) {
         Object.assign(this, props)
     }
 
@@ -35,4 +35,10 @@ export class StrategyYield {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     earningsChange!: bigint
+
+    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    apr!: number
+
+    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    apy!: number
 }

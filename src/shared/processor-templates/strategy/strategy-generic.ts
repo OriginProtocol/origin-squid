@@ -3,7 +3,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import { StrategyBalance } from '../../../model'
 import { Block, Context } from '../../../processor'
-import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
+import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -18,15 +18,20 @@ export const setup = (
   setupStrategyEarnings(processor, strategyData)
 }
 
+const trackers = new Map<string, ReturnType<typeof blockFrequencyUpdater>>()
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
-  const shouldUpdate = blockFrequencyTracker({ from: strategyData.from })
-  const strategyBalances: StrategyBalance[] = []
-  for (const block of ctx.blocks) {
-    if (shouldUpdate(ctx, block)) {
-      const results = await getStrategyHoldings(ctx, block, strategyData)
-      strategyBalances.push(...results)
-    }
+  if (!trackers.has(strategyData.address)) {
+    trackers.set(
+      strategyData.address,
+      blockFrequencyUpdater({ from: strategyData.from }),
+    )
   }
+  const blockFrequencyUpdate = trackers.get(strategyData.address)!
+  const strategyBalances: StrategyBalance[] = []
+  await blockFrequencyUpdate(ctx, async (ctx, block) => {
+    const results = await getStrategyHoldings(ctx, block, strategyData)
+    strategyBalances.push(...results)
+  })
   await ctx.store.insert(strategyBalances)
   await processStrategyEarnings(ctx, strategyData, getStrategyBalances)
 }

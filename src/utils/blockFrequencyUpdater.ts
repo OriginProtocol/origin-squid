@@ -11,6 +11,7 @@ const SECONDS_PER_WEEK = dayjs.duration({ weeks: 1 }).asSeconds()
 const SECONDS_PER_DAY = dayjs.duration({ days: 1 }).asSeconds()
 const SECONDS_PER_MINUTE = 60
 
+// It's OK that these are only calculated at launch.
 const oneYearAgo = dayjs.utc().subtract(1, 'year').valueOf()
 const oneMonthAgo = dayjs.utc().subtract(1, 'month').valueOf()
 const oneWeekAgo = dayjs.utc().subtract(1, 'week').valueOf()
@@ -32,20 +33,20 @@ const getFrequency = (bps: number, timestamp: number) => {
   return (SECONDS_PER_MINUTE / bps) ^ 0
 }
 
-export const blockFrequencyTracker = (params: { from: number }) => {
-  let lastBlockHeightProcessed = 0
-  return (ctx: Context, block: Block) => {
-    if (block.header.height < params.from) return
-    // If we're not at head, determine our frequency and then process.
-    const { bps } = ctx
-    let frequency: number = getFrequency(bps, ctx.blocks[0].header.timestamp)
-    if (block.header.height >= lastBlockHeightProcessed + frequency) {
-      lastBlockHeightProcessed = block.header.height
-      return true
-    }
-    return false
-  }
-}
+// export const blockFrequencyTracker = (params: { from: number }) => {
+//   let nextBlockToProcess = 0
+//   return (ctx: Context, block: Block) => {
+//     if (block.header.height < params.from) return
+//     // If we're not at head, determine our frequency and then process.
+//     const { bps } = ctx
+//     const frequency: number = getFrequency(bps, block.header.timestamp)
+//     if (block.header.height >= nextBlockToProcess) {
+//       nextBlockToProcess = block.header.height + frequency
+//       return true
+//     }
+//     return false
+//   }
+// }
 
 export const blockFrequencyUpdater = (params: { from: number }) => {
   let lastBlockHeightProcessed = 0
