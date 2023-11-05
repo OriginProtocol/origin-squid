@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { compact } from 'lodash'
-import { Between, In, LessThan } from 'typeorm'
+import { Between, In, LessThan, LessThanOrEqual } from 'typeorm'
 
 import { StrategyDailyYield, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
@@ -44,14 +44,39 @@ export const processStrategyDailyEarnings = async (
     }
 
     // Get the latest StrategyYield results.
-    const yields = await ctx.store.find(StrategyYield, {
+    const todayYields = await ctx.store.find(StrategyYield, {
       where: {
         strategy: strategyData.address,
         asset: In(strategyData.assets),
-        blockNumber: Between(latest?.blockNumber ?? 0, block.header.height),
+        blockNumber: Between(
+          (latest?.blockNumber ?? 0) + 1,
+          block.header.height,
+        ),
       },
       order: { id: 'desc' },
     })
+
+    let yields: StrategyYield[] = []
+    await Promise.all(
+      strategyData.assets.map(async (asset) => {
+        const todayAssetYields = todayYields.filter((y) => y.asset === asset)
+        if (todayAssetYields.length > 0) {
+          yields.push(...todayAssetYields)
+        } else {
+          const latestAssetYield = await ctx.store.findOne(StrategyYield, {
+            where: {
+              strategy: strategyData.address,
+              asset,
+              blockNumber: LessThanOrEqual(block.header.height),
+            },
+            order: { id: 'desc' },
+          })
+          if (latestAssetYield) {
+            yields.push(latestAssetYield)
+          }
+        }
+      }),
+    )
 
     // TODO: This is good except sometimes certain assets get yield while other's don't on a specific day.
     // So if for one of our assets this has no results, then we need to look back for whatever the last
@@ -65,27 +90,50 @@ export const processStrategyDailyEarnings = async (
       yields.map((y) => ['ETH', y.asset as Currency]),
     ).then(compact)
 
+    // Sort so following `.find` actions get the most recent.
+    yields.sort((a, b) => b.blockNumber - a.blockNumber)
+
     // Convert into ETH values
     const ethBalance = yields.reduce(
       (sum, y) =>
         sum + convertRate(rates, 'ETH', y.asset as Currency, y.balance),
       0n,
     )
-    const ethEarnings = yields.reduce(
-      (sum, y) =>
-        sum + convertRate(rates, 'ETH', y.asset as Currency, y.earnings),
-      0n,
-    )
-    const ethEarningsChange = yields.reduce(
-      (sum, y) =>
-        sum + convertRate(rates, 'ETH', y.asset as Currency, y.earningsChange),
-      0n,
-    )
+    const ethEarnings = strategyData.assets.reduce((sum, asset) => {
+      const strategyYield = yields.find((y) => y.asset === asset)
+      return (
+        sum +
+        convertRate(
+          rates,
+          'ETH',
+          asset as Currency,
+          strategyYield?.earnings ?? 0n,
+        )
+      )
+    }, 0n)
+
+    const ethEarningsChange = strategyData.assets.reduce((sum, asset) => {
+      const strategyYield = yields.find((y) => y.asset === asset)
+      return (
+        sum +
+        convertRate(
+          rates,
+          'ETH',
+          asset as Currency,
+          strategyYield?.earningsChange ?? 0n,
+        )
+      )
+    }, 0n)
 
     // Apply ETH values
     current.balance = ethBalance
     current.earnings = ethEarnings
     current.earningsChange = ethEarningsChange
+
+    if (current.earnings < (latest?.earnings ?? 0n)) {
+      ctx.log.info({ current, latest, yields })
+      // throw new Error('how!??!?!')
+    }
 
     // Calculate APY values
     if (latest) {
