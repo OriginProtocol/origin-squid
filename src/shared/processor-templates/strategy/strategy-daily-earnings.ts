@@ -94,11 +94,18 @@ export const processStrategyDailyEarnings = async (
     yields.sort((a, b) => b.blockNumber - a.blockNumber)
 
     // Convert into ETH values
-    const ethBalance = yields.reduce(
-      (sum, y) =>
-        sum + convertRate(rates, 'ETH', y.asset as Currency, y.balance),
-      0n,
-    )
+    const ethBalance = strategyData.assets.reduce((sum, asset) => {
+      const strategyYield = yields.find((y) => y.asset === asset)
+      return (
+        sum +
+        convertRate(
+          rates,
+          'ETH',
+          asset as Currency,
+          strategyYield?.balance ?? 0n,
+        )
+      )
+    }, 0n)
     const ethEarnings = strategyData.assets.reduce((sum, asset) => {
       const strategyYield = yields.find((y) => y.asset === asset)
       return (
@@ -112,18 +119,11 @@ export const processStrategyDailyEarnings = async (
       )
     }, 0n)
 
-    const ethEarningsChange = strategyData.assets.reduce((sum, asset) => {
-      const strategyYield = yields.find((y) => y.asset === asset)
-      return (
-        sum +
-        convertRate(
-          rates,
-          'ETH',
-          asset as Currency,
-          strategyYield?.earningsChange ?? 0n,
-        )
-      )
-    }, 0n)
+    const ethEarningsChange = todayYields.reduce(
+      (sum, y) =>
+        sum + convertRate(rates, 'ETH', y.asset as Currency, y.earningsChange),
+      0n,
+    )
 
     // Apply ETH values
     current.balance = ethBalance
