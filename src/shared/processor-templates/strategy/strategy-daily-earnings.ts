@@ -137,16 +137,15 @@ export const processStrategyDailyEarnings = async (
 
     // Calculate APY values
     if (latest) {
-      // ctx.log.info(
-      //   `Calculating APR: ${formatEther(latest.balance)} ${formatEther(
-      //     current.earningsChange,
-      //   )}`,
-      // )
+      // On Frax Staking if we only use `latest.balance` we get crazy APY.
+      //   (only early on)
+      // On Morpho Aave v2 if we only use `current.balance` we get 0 APY.
+      // I've done `current.balance || latest?.balance` to try and balance out what we see.
       const { apr, apy } = calculateAPY(
         latest.timestamp,
         current.timestamp,
-        current.balance,
-        current.balance + current.earningsChange,
+        current.balance || latest?.balance,
+        (current.balance || latest?.balance) + current.earningsChange,
       )
       current.apr = apr
       current.apy = apy
