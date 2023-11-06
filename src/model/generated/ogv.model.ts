@@ -22,5 +22,8 @@ export class OGV {
     circulating!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    staked!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     total!: bigint
 }
