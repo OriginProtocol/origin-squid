@@ -18,6 +18,9 @@ export const getPrice = async (
   if (base === 'ETH' && quote === 'WETH') {
     return 1_000_000_000_000_000_000n
   }
+  if (base === 'ETH' && quote === 'ETH') {
+    return 1_000_000_000_000_000_000n
+  }
   if (base === 'ETH' && quote === 'sfrxETH') {
     return getStakedFraxPrice(ctx, block)
   }

@@ -1,3 +1,5 @@
+import { compact } from 'lodash'
+
 import { ExchangeRate } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { useProcessorState } from '../../../utils/state'
@@ -57,5 +59,5 @@ export const ensureExchangeRates = async (
 ) => {
   return await Promise.all(
     pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote)),
-  )
+  ).then(compact)
 }
