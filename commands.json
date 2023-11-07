@@ -112,6 +112,18 @@
         "lib/main-ousd.js"
       ]
     },
+    "process:ogv": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build",
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "lib/main-ogv.js"
+      ]
+    },
     "process:other": {
       "description": "Load .env and start the squid processor",
       "deps": [

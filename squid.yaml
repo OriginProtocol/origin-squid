@@ -18,6 +18,10 @@ deploy:
     #   cmd: [ "node", "lib/main-ousd" ]
     #   env:
     #     RPC_ENV: RPC_ENDPOINT_999
+    - name: ogv-processor
+      cmd: [ "node", "lib/main-ogv" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_999
     - name: other-processor
       cmd: [ "node", "lib/main-other" ]
       env:
