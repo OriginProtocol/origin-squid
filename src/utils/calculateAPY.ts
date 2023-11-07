@@ -19,23 +19,6 @@ export const calculateAPY = (
   const periods_per_year = 365.25 / Number(dayDiff)
   const apy = (1 + apr / periods_per_year) ** periods_per_year - 1
 
-  if (apy > 1) {
-    // console.log(
-    //   {
-    //     diffTime,
-    //     dayDiff,
-    //     apr,
-    //     periods_per_year,
-    //     apy,
-    //     fromAmount: formatEther(fromAmount),
-    //     toAmount: formatEther(toAmount),
-    //   },
-    //   'HIGH APY CALCULATION',
-    // )
-    // if (apy > 1000) {
-    //   throw new Error('APY calculation is unrealistic')
-    // }
-  }
   return {
     apr: apr || 0,
     apy: apy || 0,

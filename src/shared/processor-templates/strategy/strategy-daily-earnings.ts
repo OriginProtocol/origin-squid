@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import { compact } from 'lodash'
-import { Between, In, LessThan, LessThanOrEqual } from 'typeorm'
+import { Between, LessThan, LessThanOrEqual } from 'typeorm'
+import { parseEther } from 'viem'
 
 import { StrategyDailyYield, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
@@ -8,6 +8,8 @@ import { ETH_ADDRESS } from '../../../utils/addresses'
 import { calculateAPY } from '../../../utils/calculateAPY'
 import { lastExcept } from '../../../utils/utils'
 import { IStrategyData } from './strategy'
+
+const eth1 = 1000000000000000000n
 
 export const processStrategyDailyEarnings = async (
   ctx: Context,
@@ -74,6 +76,7 @@ export const processStrategyDailyEarnings = async (
 
     // Convert into ETH values
     const balance = yields[yields.length - 1]?.balance ?? 0n
+    const balanceWeight = yields[yields.length - 1]?.balanceWeight ?? 1
     const earnings = yields[yields.length - 1]?.earnings ?? 0n
     const earningsChange = todayYields.reduce(
       (sum, y) => sum + y.earningsChange,
@@ -92,15 +95,18 @@ export const processStrategyDailyEarnings = async (
 
     // Calculate APY values
     if (latest) {
-      // On Frax Staking if we only use `latest.balance` we get crazy APY.
-      //   (only early on)
-      // On Morpho Aave v2 if we only use `current.balance` we get 0 APY.
-      // I've done `current.balance || latest?.balance` to try and balance out what we see.
+      // The use of `balanceWeight` is for the Curve AMO ETH+OETH Strategy
+      // It is an attempt at excluding OETH from the rate calculations.
+      const yieldBalance =
+        ((latest?.balance || current.balance) *
+          parseEther(balanceWeight.toString())) /
+        eth1
+
       const { apr, apy } = calculateAPY(
         latest.timestamp,
         current.timestamp,
-        current.balance || latest?.balance,
-        (current.balance || latest?.balance) + current.earningsChange,
+        yieldBalance,
+        yieldBalance + current.earningsChange,
       )
       current.apr = apr
       current.apy = apy

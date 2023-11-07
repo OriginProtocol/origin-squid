@@ -1,7 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import { LessThan } from 'typeorm'
-import { formatEther, pad } from 'viem'
+import { formatEther, pad, parseEther, parseUnits } from 'viem'
 
 import * as baseRewardPool from '../../../abi/base-reward-pool'
 import * as erc20 from '../../../abi/erc20'
@@ -11,6 +11,7 @@ import { Block, Context } from '../../../processor'
 import {
   AURA_REWARDS_POOL_ADDRESS,
   ETH_ADDRESS,
+  OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_HARVESTER_ADDRESS,
   WETH_ADDRESS,
@@ -19,6 +20,8 @@ import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { lastExcept } from '../../../utils/utils'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
+
+const eth1 = 1000000000000000000n
 
 const depositWithdrawalTopics = new Set([
   abstractStrategyAbi.events.Deposit.topic,
@@ -275,6 +278,7 @@ const processRewardTokenCollected = async (
       strategy: strategyData.address,
       asset: ETH_ADDRESS,
       balance: latest?.balance ?? 0n,
+      balanceWeight: latest?.balanceWeight ?? 1,
       earnings: (latest?.earnings ?? 0n) + amount,
       earningsChange: amount,
     })
@@ -325,9 +329,25 @@ const processDepositWithdrawal = async (
       return sum + a.balance // convertRate(rates, 'ETH', a.asset as Currency, a.balance)
     }, 0n)
 
+    const oethBalance =
+      assets.find((a) => a.asset.toLowerCase() === OETH_ADDRESS)?.balance ?? 0n
+
+    const balanceWeightN =
+      balance === 0n ? eth1 : (oethBalance * eth1) / balance
+    const balanceWeight = Number(formatEther(balanceWeightN))
+
     const timestamp = new Date(block.header.timestamp)
     let earningsChange =
       previousBalance - (latest?.balance ?? previousBalance) ?? 0n
+
+    // TODO: Probably should listen for add/remove liquidity events
+    //  and calculate earnings changes from fees rather than relying on this
+    //  picking up those events. It works fine in some pools, but if we want to
+    //  remove OETH from APY considerations then we need more detail.
+    if (strategyData.kind === 'CurveAMO') {
+      // Only consider earnings on this event by ETH proportion.
+      earningsChange *= balanceWeightN / eth1
+    }
 
     current = new StrategyYield({
       id,
@@ -336,6 +356,7 @@ const processDepositWithdrawal = async (
       strategy: strategyData.address,
       asset: ETH_ADDRESS,
       balance,
+      balanceWeight,
       earningsChange,
       earnings: (latest?.earnings ?? 0n) + earningsChange,
     })

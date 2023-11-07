@@ -30,6 +30,9 @@ export class StrategyYield {
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance!: bigint
 
+    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    balanceWeight!: number
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     earnings!: bigint
 
