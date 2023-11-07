@@ -33,20 +33,19 @@ const getFrequency = (bps: number, timestamp: number) => {
   return (SECONDS_PER_MINUTE / bps) ^ 0
 }
 
-// export const blockFrequencyTracker = (params: { from: number }) => {
-//   let nextBlockToProcess = 0
-//   return (ctx: Context, block: Block) => {
-//     if (block.header.height < params.from) return
-//     // If we're not at head, determine our frequency and then process.
-//     const { bps } = ctx
-//     const frequency: number = getFrequency(bps, block.header.timestamp)
-//     if (block.header.height >= nextBlockToProcess) {
-//       nextBlockToProcess = block.header.height + frequency
-//       return true
-//     }
-//     return false
-//   }
-// }
+export const blockFrequencyTracker = (params: { from: number }) => {
+  let nextBlockToProcess = 0
+  return (ctx: Context, block: Block) => {
+    if (block.header.height < params.from) return
+    const { bps } = ctx
+    const frequency: number = getFrequency(bps, block.header.timestamp)
+    if (block.header.height >= nextBlockToProcess) {
+      nextBlockToProcess = block.header.height + frequency
+      return true
+    }
+    return false
+  }
+}
 
 export const blockFrequencyUpdater = (params: { from: number }) => {
   let lastBlockHeightProcessed = 0

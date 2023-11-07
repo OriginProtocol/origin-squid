@@ -15,15 +15,8 @@ import {
   OETH_HARVESTER_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
+import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { lastExcept } from '../../../utils/utils'
-import {
-  ensureExchangeRate,
-  ensureExchangeRates,
-} from '../../post-processors/exchange-rates'
-import {
-  Currency,
-  convertRate,
-} from '../../post-processors/exchange-rates/currencies'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 
@@ -40,6 +33,8 @@ export const setupStrategyEarnings = (
   processor: EvmBatchProcessor,
   strategyData: IStrategyData,
 ) => {
+  processor.includeAllBlocks({ from: strategyData.from })
+
   // Detect Deposit/Withdraw events
   // To help us understand when balances change passively vs from activity.
   if (strategyData.earnings.passiveByDepositWithdrawal) {
@@ -83,6 +78,7 @@ export const setupStrategyEarnings = (
   }
 }
 
+const trackers = new Map<string, ReturnType<typeof blockFrequencyTracker>>()
 export const processStrategyEarnings = async (
   ctx: Context,
   strategyData: IStrategyData,
@@ -95,31 +91,35 @@ export const processStrategyEarnings = async (
   const days = new Map<string, Block>()
   const strategyYields = new Map<string, StrategyYield[]>()
   for (const block of ctx.blocks) {
-    const dayId = dayjs.utc(block.header.timestamp).format('YYYY-MM-DD')
+    let didUpdate = false
+    days.set(dayjs.utc(block.header.timestamp).format('YYYY-MM-DD'), block)
     const txIgnore = new Set<string>()
+    const getBalances = async (
+      { compare }: { compare: number } = { compare: -1 },
+    ) => {
+      const compareBalances = await getStrategyBalances(
+        ctx,
+        { height: block.header.height + compare },
+        strategyData,
+      )
+      const balances =
+        compare === 0
+          ? compareBalances
+          : await getStrategyBalances(ctx, block.header, strategyData)
+      return balances.map((balance, i) => {
+        return {
+          asset: balance.asset,
+          balance: balance.balance,
+          compareBalance: compareBalances[i].balance,
+        }
+      })
+    }
+
     for (const log of block.logs) {
-      const getBalances = async () => {
-        const previousBalances = await getStrategyBalances(
-          ctx,
-          { height: block.header.height - 1 },
-          strategyData,
-        )
-        const balances = await getStrategyBalances(
-          ctx,
-          block.header,
-          strategyData,
-        )
-        return balances.map((balance, i) => {
-          return {
-            asset: balance.asset,
-            balance: balance.balance,
-            previousBalance: previousBalances[i].balance,
-          }
-        })
-      }
+      // Various update functions we might call
       const balanceTrackingUpdate = async () => {
-        ctx.log.info(`balanceTrackingUpdate`)
-        days.set(dayId, block)
+        // ctx.log.info(`balanceTrackingUpdate`)
+        didUpdate = true
         const balances = await getBalances()
         await processDepositWithdrawal(
           ctx,
@@ -130,8 +130,8 @@ export const processStrategyEarnings = async (
         )
       }
       const balanceTrackingUpdateBalancerMetaStablePool = async () => {
-        ctx.log.info(`balanceTrackingUpdateBalancerMetaStablePool`)
-        days.set(dayId, block)
+        // ctx.log.info(`balanceTrackingUpdateBalancerMetaStablePool`)
+        didUpdate = true
         const balances = await getBalances()
         await processDepositWithdrawal(
           ctx,
@@ -141,6 +141,35 @@ export const processStrategyEarnings = async (
           balances,
         )
       }
+      const rewardTokenCollectedUpdate = async () => {
+        // ctx.log.info(`rewardTokenCollectedUpdate`)
+        didUpdate = true
+        txIgnore.add(log.transactionHash)
+        const wethTransferLogs = block.logs.filter(
+          (l) =>
+            l.transactionHash === log.transactionHash &&
+            l.address.toLowerCase() === WETH_ADDRESS &&
+            l.topics[0] === erc20.events.Transfer.topic &&
+            l.topics[1] === pad(OETH_HARVESTER_ADDRESS) &&
+            l.topics[2] === pad(OETH_DRIPPER_ADDRESS),
+        )
+        const amount = wethTransferLogs.reduce(
+          (sum, l) => sum + BigInt(l.data),
+          0n,
+        )
+
+        await processRewardTokenCollected(
+          ctx,
+          strategyData,
+          block,
+          strategyYields,
+          {
+            token: WETH_ADDRESS,
+            amount,
+          },
+        )
+      }
+
       if (
         strategyData.kind === 'CurveAMO' &&
         log.address === strategyData.curvePoolInfo!.rewardsPoolAddress &&
@@ -175,30 +204,24 @@ export const processStrategyEarnings = async (
           abstractStrategyAbi.events.RewardTokenCollected.topic &&
         !txIgnore.has(log.transactionHash)
       ) {
-        days.set(dayId, block)
-        txIgnore.add(log.transactionHash)
-        const wethTransferLogs = block.logs.filter(
-          (l) =>
-            l.transactionHash === log.transactionHash &&
-            l.address.toLowerCase() === WETH_ADDRESS &&
-            l.topics[0] === erc20.events.Transfer.topic &&
-            l.topics[1] === pad(OETH_HARVESTER_ADDRESS) &&
-            l.topics[2] === pad(OETH_DRIPPER_ADDRESS),
-        )
-        const amount = wethTransferLogs.reduce(
-          (sum, l) => sum + BigInt(l.data),
-          0n,
-        )
+        await rewardTokenCollectedUpdate()
+      }
+    }
 
-        await processRewardTokenCollected(
+    if (!didUpdate) {
+      let tracker = trackers.get(strategyData.address)
+      if (!tracker) {
+        tracker = blockFrequencyTracker({ from: strategyData.from })
+        trackers.set(strategyData.address, tracker)
+      }
+      if (tracker(ctx, block)) {
+        const balances = await getBalances({ compare: 0 })
+        await processDepositWithdrawal(
           ctx,
           strategyData,
           block,
           strategyYields,
-          {
-            token: WETH_ADDRESS,
-            amount,
-          },
+          balances,
         )
       }
     }
@@ -228,19 +251,21 @@ const processRewardTokenCollected = async (
   )
 
   // Convert value to ETH
-  const rate = await ensureExchangeRate(
-    ctx,
-    block,
-    'ETH',
-    params.token as Currency,
-  )
+  // const rates = await ensureExchangeRatesAverages(
+  //   ctx,
+  //   block,
+  //   dayjs.utc(block.header.timestamp).subtract(1, 'week').toDate(),
+  //   new Date(block.header.timestamp),
+  //   [['ETH', params.token as Currency]],
+  // )
 
-  const amount = convertRate(
-    [rate!],
-    'ETH',
-    params.token as Currency,
-    params.amount,
-  )
+  const amount = params.amount
+  // const amount = convertRate(
+  //   rates,
+  //   'ETH',
+  //   params.token as Currency,
+  //   params.amount,
+  // )
 
   if (!current) {
     current = new StrategyYield({
@@ -267,7 +292,7 @@ const processDepositWithdrawal = async (
   resultMap: Map<string, StrategyYield[]>,
   assets: {
     asset: string
-    previousBalance: bigint
+    compareBalance: bigint
     balance: bigint
   }[],
 ) => {
@@ -284,18 +309,20 @@ const processDepositWithdrawal = async (
 
   if (!current) {
     // Convert incoming values to ETH
-    const rates = await ensureExchangeRates(
-      ctx,
-      block,
-      assets.map((a) => ['ETH', a.asset as Currency]),
-    )
+    // const rates = await ensureExchangeRatesAverages(
+    //   ctx,
+    //   block,
+    //   dayjs.utc(block.header.timestamp).subtract(1, 'week').toDate(),
+    //   new Date(block.header.timestamp),
+    //   assets.map((a) => ['ETH', a.asset as Currency]),
+    // )
     const previousBalance = assets.reduce((sum, a) => {
       return (
-        sum + convertRate(rates, 'ETH', a.asset as Currency, a.previousBalance)
+        sum + a.compareBalance // convertRate(rates, 'ETH', a.asset as Currency, a.compareBalance)
       )
     }, 0n)
     const balance = assets.reduce((sum, a) => {
-      return sum + convertRate(rates, 'ETH', a.asset as Currency, a.balance)
+      return sum + a.balance // convertRate(rates, 'ETH', a.asset as Currency, a.balance)
     }, 0n)
 
     const timestamp = new Date(block.header.timestamp)
@@ -313,7 +340,9 @@ const processDepositWithdrawal = async (
       earnings: (latest?.earnings ?? 0n) + earningsChange,
     })
     ctx.log.info(
-      `Setting balance: ${formatEther(balance)}, last balance: ${formatEther(
+      `${block.header.height} Setting balance: ${formatEther(
+        balance,
+      )}, last balance: ${formatEther(
         latest?.balance ?? 0n,
       )}, previous block balance: ${formatEther(
         previousBalance,
@@ -321,10 +350,28 @@ const processDepositWithdrawal = async (
         earningsChange,
       )}, total earnings: ${formatEther(current.earnings)}`,
     )
+
+    if (+formatEther(earningsChange) > 2000) {
+      throw new Error('Weird shit yo')
+    }
+
     if (earningsChange < 0) {
       ctx.log.warn('WARNING: earnings change is negative')
     }
-    results.push(current)
+
+    // Avoid creating this if nothing has changed.
+    if (
+      !(
+        latest &&
+        latest.strategy === current.strategy &&
+        latest.asset === current.asset &&
+        latest.balance === current.balance &&
+        latest.earningsChange === current.earningsChange &&
+        latest.earnings === current.earnings
+      )
+    ) {
+      results.push(current)
+    }
   }
 }
 

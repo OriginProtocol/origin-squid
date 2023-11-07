@@ -7,11 +7,6 @@ import { Block, Context } from '../../../processor'
 import { ETH_ADDRESS } from '../../../utils/addresses'
 import { calculateAPY } from '../../../utils/calculateAPY'
 import { lastExcept } from '../../../utils/utils'
-import { ensureExchangeRates } from '../../post-processors/exchange-rates'
-import {
-  Currency,
-  convertRate,
-} from '../../post-processors/exchange-rates/currencies'
 import { IStrategyData } from './strategy'
 
 export const processStrategyDailyEarnings = async (
@@ -21,6 +16,7 @@ export const processStrategyDailyEarnings = async (
 ) => {
   const results: StrategyDailyYield[] = []
   for (const block of blocks) {
+    if (block.header.height < strategyData.from) return
     const day = dayjs.utc(block.header.timestamp).format('YYYY-MM-DD')
     const id = `${strategyData.address}:${ETH_ADDRESS}:${day}`
     // ctx.log.info(`processStrategyDailyEarnings ${block.header.height} ${id}`)
@@ -53,7 +49,7 @@ export const processStrategyDailyEarnings = async (
           block.header.height,
         ),
       },
-      order: { id: 'desc' },
+      order: { id: 'asc' },
     })
 
     let yields: StrategyYield[] = []
@@ -77,8 +73,8 @@ export const processStrategyDailyEarnings = async (
     yields.sort((a, b) => b.blockNumber - a.blockNumber)
 
     // Convert into ETH values
-    const balance = yields[yields.length - 1].balance
-    const earnings = yields[yields.length - 1].earnings
+    const balance = yields[yields.length - 1]?.balance ?? 0n
+    const earnings = yields[yields.length - 1]?.earnings ?? 0n
     const earningsChange = todayYields.reduce(
       (sum, y) => sum + y.earningsChange,
       0n,

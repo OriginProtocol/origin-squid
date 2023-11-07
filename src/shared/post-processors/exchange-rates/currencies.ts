@@ -21,7 +21,7 @@ export const currenciesByAddress = mapKeys(invert(currencies), (v, k) =>
 
 const eth1 = 1000000000000000000n
 export const convertRate = (
-  rates: ExchangeRate[],
+  rates: Pick<ExchangeRate, 'base' | 'quote' | 'rate'>[],
   base: Currency,
   quote: Currency,
   balance: bigint,

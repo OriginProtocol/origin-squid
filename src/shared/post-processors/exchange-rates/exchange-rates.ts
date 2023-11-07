@@ -1,4 +1,5 @@
 import { compact } from 'lodash'
+import { Between } from 'typeorm'
 
 import { ExchangeRate } from '../../../model'
 import { Block, Context } from '../../../processor'
@@ -33,10 +34,12 @@ export const ensureExchangeRate = async (
   if (exchangeRate) return exchangeRate
 
   const timestamp = new Date(block.header.timestamp)
-  const price = await getPrice(ctx, block, base, quote).catch((err) => {
-    ctx.log.info({ base, quote, err, message: err.message })
-    throw err
-  })
+  const price = await getPrice(ctx, block.header.height, base, quote).catch(
+    (err) => {
+      ctx.log.info({ base, quote, err, message: err.message })
+      throw err
+    },
+  )
   if (price) {
     exchangeRate = new ExchangeRate({
       id,
@@ -61,3 +64,39 @@ export const ensureExchangeRates = async (
     pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote)),
   ).then(compact)
 }
+
+// export const ensureExchangeRatesAverages = async (
+//   ctx: Context,
+//   block: Block,
+//   from: Date,
+//   to: Date,
+//   pairs: [Currency, Currency][],
+// ) => {
+//   return await Promise.all(
+//     pairs.map(([base, quote]) =>
+//       ensureExchangeRate(ctx, block, base, quote)
+//         .then((rate) => {
+//           if (!rate) return []
+//           return ctx.store
+//             .find(ExchangeRate, {
+//               where: { pair: rate?.pair, timestamp: Between(from, to) },
+//             })
+//             .then((rates) => rates.concat(rate!))
+//         })
+//         .then((rates) => {
+//           const pair = `${base}_${quote}`
+//           const rate =
+//             rates.reduce((sum, r) => sum + r.rate, 0n) / BigInt(rates.length)
+//           ctx.log.info(
+//             `Created average exchange rate of ${rate} using ${rates.length} rates`,
+//           )
+//           return new ExchangeRate({
+//             base: rates[0].base,
+//             quote: rates[0].quote,
+//             pair,
+//             rate,
+//           })
+//         }),
+//     ),
+//   )
+// }
