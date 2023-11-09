@@ -1,11 +1,15 @@
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
-import { pad } from 'viem'
+import { formatUnits, pad, parseUnits } from 'viem'
 
 import * as erc20 from '../abi/erc20'
 import { Context } from '../processor'
 
-export const lastExcept = <T extends { id: string }>(
+export const lastExcept = <
+  T extends {
+    id: string
+  },
+>(
   arr: T[] | undefined,
   id: string,
 ) =>
@@ -83,4 +87,20 @@ export const getOrCreate = async <T extends Entity>(
   memory.push(value)
 
   return value
+}
+
+export const convertDecimals = (
+  from: {
+    address: string
+    decimals: number
+  },
+  to: {
+    address: string
+    decimals: number
+  },
+  value: bigint,
+) => {
+  const fromFactor = 10n ** BigInt(from.decimals)
+  const toFactor = 10n ** BigInt(to.decimals)
+  return (value * toFactor) / fromFactor
 }

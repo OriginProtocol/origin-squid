@@ -1,6 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { Context } from '../../../processor'
+import { LogFilter } from '../../../utils/logFilter'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'
@@ -25,7 +26,19 @@ export type IStrategyData = {
     | 'CurveAMO'
     | 'BalancerMetaStablePool'
     | 'BalancerComposableStablePool'
-  assets: readonly string[]
+  base: {
+    address: string
+    decimals: number
+  }
+  assets: {
+    address: string
+    decimals: number
+  }[]
+  balanceUpdateFilters?: LogFilter[]
+  aaveInfo?: {
+    lendingPool: string
+    pTokens: string[]
+  }
   balancerPoolInfo?: IBalancerPoolInfo
   curvePoolInfo?: ICurveAMOInfo
   earnings: {

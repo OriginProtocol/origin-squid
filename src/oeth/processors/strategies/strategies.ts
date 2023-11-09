@@ -2,6 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { OETHRewardTokenCollected } from '../../../model'
 import { Context } from '../../../processor'
+import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import {
   IStrategyData,
   createStrategyProcessor,
@@ -29,7 +30,11 @@ export const oethStrategies: readonly IStrategyData[] = [
       poolAddress: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
       rewardsPoolAddress: '0x24b65dc1cf053a8d96872c323d29e86ec43eb33a',
     },
-    assets: [WETH_ADDRESS, OETH_ADDRESS],
+    base: { address: currencies.ETH, decimals: 18 },
+    assets: [WETH_ADDRESS, OETH_ADDRESS].map((address) => ({
+      address,
+      decimals: 18,
+    })),
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
   {
@@ -38,7 +43,8 @@ export const oethStrategies: readonly IStrategyData[] = [
     contractName: 'FraxETHStrategy',
     address: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
     kind: 'Generic',
-    assets: [FRXETH_ADDRESS],
+    base: { address: currencies.ETH, decimals: 18 },
+    assets: [FRXETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
@@ -47,7 +53,8 @@ export const oethStrategies: readonly IStrategyData[] = [
     contractName: 'MorphoAaveStrategy',
     address: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     kind: 'Generic',
-    assets: [WETH_ADDRESS],
+    base: { address: currencies.ETH, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   // {
@@ -56,7 +63,8 @@ export const oethStrategies: readonly IStrategyData[] = [
   //   contractName: 'BalancerMetaPoolStrategy',
   //   address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
   //   kind: 'BalancerMetaStablePool',
-  //   assets: [WETH_ADDRESS, RETH_ADDRESS],
+  //   base: { address: currencies.ETH, decimals: 18},
+  //   assets: [WETH_ADDRESS, RETH_ADDRESS].map(address => ({address, decimals: 18})),
   //   earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   //   balancerPoolInfo: {
   //     poolId:
@@ -64,7 +72,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   //     poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
   //   },
   // },
-] as const
+]
 
 const strategies = oethStrategies
 

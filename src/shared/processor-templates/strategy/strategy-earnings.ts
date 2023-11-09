@@ -3,6 +3,8 @@ import dayjs from 'dayjs'
 import { LessThan } from 'typeorm'
 import { formatEther, pad, parseEther, parseUnits } from 'viem'
 
+import * as aaveLendingPool from '../../../abi/aave-lending-pool'
+import * as aToken from '../../../abi/aave-token'
 import * as baseRewardPool from '../../../abi/base-reward-pool'
 import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
@@ -17,7 +19,8 @@ import {
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
-import { lastExcept } from '../../../utils/utils'
+import { logFilter } from '../../../utils/logFilter'
+import { convertDecimals, lastExcept } from '../../../utils/utils'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 
@@ -37,6 +40,8 @@ export const setupStrategyEarnings = (
   strategyData: IStrategyData,
 ) => {
   processor.includeAllBlocks({ from: strategyData.from })
+  const balanceUpdateFilters = strategyData.balanceUpdateFilters ?? []
+  strategyData.balanceUpdateFilters = balanceUpdateFilters
 
   // Detect Deposit/Withdraw events
   // To help us understand when balances change passively vs from activity.
@@ -49,11 +54,13 @@ export const setupStrategyEarnings = (
     // Detect Staked/Withdrawn events
     // The curve incident caused us to fully withdraw from our pool and these logs contain that.
     if (strategyData.kind === 'CurveAMO') {
-      processor.addLog({
-        address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
-        topic0: [...baseRewardPoolTopics.values()],
-        topic1: [pad(strategyData.address as `0x${string}`)],
-      })
+      balanceUpdateFilters.push(
+        logFilter({
+          address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
+          topic0: [...baseRewardPoolTopics.values()],
+          topic1: [pad(strategyData.address as `0x${string}`)],
+        }),
+      )
     }
   }
 
@@ -79,6 +86,10 @@ export const setupStrategyEarnings = (
       topic2: [pad(OETH_DRIPPER_ADDRESS)],
     })
   }
+
+  for (const filter of balanceUpdateFilters) {
+    processor.addLog(filter.value)
+  }
 }
 
 const trackers = new Map<string, ReturnType<typeof blockFrequencyTracker>>()
@@ -87,9 +98,17 @@ export const processStrategyEarnings = async (
   strategyData: IStrategyData,
   getStrategyBalances: (
     ctx: Context,
-    block: { height: number },
+    block: {
+      height: number
+    },
     strategyData: IStrategyData,
-  ) => Promise<{ address: string; asset: string; balance: bigint }[]>,
+  ) => Promise<
+    {
+      address: string
+      asset: string
+      balance: bigint
+    }[]
+  >,
 ) => {
   const days = new Map<string, Block>()
   const strategyYields = new Map<string, StrategyYield[]>()
@@ -98,7 +117,11 @@ export const processStrategyEarnings = async (
     days.set(dayjs.utc(block.header.timestamp).format('YYYY-MM-DD'), block)
     const txIgnore = new Set<string>()
     const getBalances = async (
-      { compare }: { compare: number } = { compare: -1 },
+      {
+        compare,
+      }: {
+        compare: number
+      } = { compare: -1 },
     ) => {
       const compareBalances = await getStrategyBalances(
         ctx,
@@ -109,13 +132,31 @@ export const processStrategyEarnings = async (
         compare === 0
           ? compareBalances
           : await getStrategyBalances(ctx, block.header, strategyData)
-      return balances.map((balance, i) => {
-        return {
-          asset: balance.asset,
-          balance: balance.balance,
-          compareBalance: compareBalances[i].balance,
-        }
-      })
+      return balances
+        .map((balance, i) => {
+          return {
+            asset: balance.asset,
+            balance: balance.balance,
+            compareBalance: compareBalances[i].balance,
+          }
+        })
+        .map((b) => {
+          b.balance = convertDecimals(
+            strategyData.assets.find(
+              (a) => a.address === b.asset.toLowerCase(),
+            )!,
+            strategyData.base,
+            b.balance,
+          )
+          b.compareBalance = convertDecimals(
+            strategyData.assets.find(
+              (a) => a.address === b.asset.toLowerCase(),
+            )!,
+            strategyData.base,
+            b.compareBalance,
+          )
+          return b
+        })
     }
 
     for (const log of block.logs) {
@@ -174,19 +215,16 @@ export const processStrategyEarnings = async (
       }
 
       if (
-        strategyData.kind === 'CurveAMO' &&
-        log.address === strategyData.curvePoolInfo!.rewardsPoolAddress &&
-        baseRewardPoolTopics.has(log.topics[0]) &&
-        log.topics[1] === pad(strategyData.address as `0x${string}`)
-      ) {
-        await balanceTrackingUpdate()
-      } else if (
         strategyData.kind === 'BalancerMetaStablePool' &&
         log.address === AURA_REWARDS_POOL_ADDRESS &&
         baseRewardPoolTopics.has(log.topics[0]) &&
         log.topics[1] === pad(strategyData.address as `0x${string}`)
       ) {
         await balanceTrackingUpdateBalancerMetaStablePool()
+      } else if (
+        strategyData.balanceUpdateFilters?.find((f) => f.matches(log))
+      ) {
+        await balanceTrackingUpdate()
       } else if (
         log.address === strategyData.address &&
         strategyData.earnings.passiveByDepositWithdrawal &&
@@ -239,9 +277,12 @@ const processRewardTokenCollected = async (
   strategyData: IStrategyData,
   block: Block,
   resultMap: Map<string, StrategyYield[]>,
-  params: { token: string; amount: bigint },
+  params: {
+    token: string
+    amount: bigint
+  },
 ) => {
-  const id = `${block.header.height}:${strategyData.address}:${ETH_ADDRESS}`
+  const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
   // ctx.log.info(`processRewardTokenCollected ${id}`)
   // ctx.log.info(`Amount earned through rewards: ${formatEther(params.amount)}`)
   let { latest, current, results } = await getLatest(
@@ -249,7 +290,7 @@ const processRewardTokenCollected = async (
     block,
     resultMap,
     strategyData,
-    ETH_ADDRESS,
+    strategyData.base.address,
     id,
   )
 
@@ -276,7 +317,7 @@ const processRewardTokenCollected = async (
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
       strategy: strategyData.address,
-      asset: ETH_ADDRESS,
+      asset: strategyData.base.address,
       balance: latest?.balance ?? 0n,
       balanceWeight: latest?.balanceWeight ?? 1,
       earnings: (latest?.earnings ?? 0n) + amount,
@@ -300,14 +341,14 @@ const processDepositWithdrawal = async (
     balance: bigint
   }[],
 ) => {
-  const id = `${block.header.height}:${strategyData.address}:${ETH_ADDRESS}`
+  const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
   ctx.log.info(assets, `processDepositWithdrawal ${id}`)
   let { latest, current, results } = await getLatest(
     ctx,
     block,
     resultMap,
     strategyData,
-    ETH_ADDRESS,
+    strategyData.base.address,
     id,
   )
 
@@ -354,7 +395,7 @@ const processDepositWithdrawal = async (
       blockNumber: block.header.height,
       timestamp,
       strategy: strategyData.address,
-      asset: ETH_ADDRESS,
+      asset: strategyData.base.address,
       balance,
       balanceWeight,
       earningsChange,
@@ -372,12 +413,9 @@ const processDepositWithdrawal = async (
       )}, total earnings: ${formatEther(current.earnings)}`,
     )
 
-    if (+formatEther(earningsChange) > 2000) {
-      throw new Error('Weird shit yo')
-    }
-
     if (earningsChange < 0) {
       ctx.log.warn('WARNING: earnings change is negative')
+      throw new Error()
     }
 
     // Avoid creating this if nothing has changed.

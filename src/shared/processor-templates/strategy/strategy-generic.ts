@@ -45,10 +45,10 @@ const getStrategyHoldings = async (
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
   const promises = assets.map(async (asset) => {
     return new StrategyBalance({
-      id: `${address}:${asset}:${block.header.height}`,
+      id: `${address}:${asset.address}:${block.header.height}`,
       strategy: address,
-      asset: asset,
-      balance: balances.find((b) => b.asset === asset)?.balance,
+      asset: asset.address,
+      balance: balances.find((b) => b.asset === asset.address)?.balance,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
     })
@@ -69,8 +69,8 @@ const getStrategyBalances = async (
         block,
         strategyData.address,
       )
-      const balance = await contract.checkBalance(asset)
-      return { address: strategyData.address, asset, balance }
+      const balance = await contract.checkBalance(asset.address)
+      return { address: strategyData.address, asset: asset.address, balance }
     }),
   )
 }

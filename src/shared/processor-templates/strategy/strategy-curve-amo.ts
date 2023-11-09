@@ -97,7 +97,7 @@ export const getStrategyBalances = async (
     }
 
     if (coin != OETH_ADDRESS) {
-      const pTokenAddr = await strategy.assetToPToken(assets[i])
+      const pTokenAddr = await strategy.assetToPToken(assets[i].address)
       const pToken = new erc20.Contract(ctx, block, pTokenAddr)
       unstakedBalance += await pToken.balanceOf(address)
     }

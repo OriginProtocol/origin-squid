@@ -4,7 +4,6 @@ import { parseEther } from 'viem'
 
 import { StrategyDailyYield, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
-import { ETH_ADDRESS } from '../../../utils/addresses'
 import { calculateAPY } from '../../../utils/calculateAPY'
 import { lastExcept } from '../../../utils/utils'
 import { IStrategyData } from './strategy'
@@ -20,7 +19,7 @@ export const processStrategyDailyEarnings = async (
   for (const block of blocks) {
     if (block.header.height < strategyData.from) return
     const day = dayjs.utc(block.header.timestamp).format('YYYY-MM-DD')
-    const id = `${strategyData.address}:${ETH_ADDRESS}:${day}`
+    const id = `${strategyData.address}:${strategyData.base.address}:${day}`
     // ctx.log.info(`processStrategyDailyEarnings ${block.header.height} ${id}`)
 
     // Get or create today's StrategyDailyYield.
@@ -34,7 +33,7 @@ export const processStrategyDailyEarnings = async (
         balance: latest?.balance ?? 0n,
         earnings: latest?.earnings ?? 0n,
         earningsChange: latest?.earningsChange ?? 0n,
-        asset: ETH_ADDRESS,
+        asset: strategyData.base.address,
         apr: latest?.apr ?? 0,
         apy: latest?.apy ?? 0,
       })
@@ -45,7 +44,7 @@ export const processStrategyDailyEarnings = async (
     const todayYields = await ctx.store.find(StrategyYield, {
       where: {
         strategy: strategyData.address,
-        asset: ETH_ADDRESS,
+        asset: strategyData.base.address,
         blockNumber: Between(
           (latest?.blockNumber ?? 0) + 1,
           block.header.height,
@@ -61,7 +60,7 @@ export const processStrategyDailyEarnings = async (
       const latestAssetYield = await ctx.store.findOne(StrategyYield, {
         where: {
           strategy: strategyData.address,
-          asset: ETH_ADDRESS,
+          asset: strategyData.base.address,
           blockNumber: LessThanOrEqual(block.header.height),
         },
         order: { id: 'desc' },
