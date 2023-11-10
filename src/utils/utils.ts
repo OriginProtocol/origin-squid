@@ -1,9 +1,13 @@
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
-import { formatUnits, pad, parseUnits } from 'viem'
+import { pad } from 'viem'
 
 import * as erc20 from '../abi/erc20'
 import { Context } from '../processor'
+
+export const max = (values: bigint[], start = 0n) => {
+  return values.reduce((max, v) => (max > v ? max : v), start)
+}
 
 export const lastExcept = <
   T extends {

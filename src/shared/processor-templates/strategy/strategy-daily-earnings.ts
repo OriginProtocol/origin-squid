@@ -5,7 +5,7 @@ import { parseEther } from 'viem'
 import { StrategyDailyYield, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { calculateAPY } from '../../../utils/calculateAPY'
-import { lastExcept } from '../../../utils/utils'
+import { lastExcept, max } from '../../../utils/utils'
 import { IStrategyData } from './strategy'
 
 const eth1 = 1000000000000000000n
@@ -73,9 +73,8 @@ export const processStrategyDailyEarnings = async (
     // Sort so following `.find` actions get the most recent.
     yields.sort((a, b) => b.blockNumber - a.blockNumber)
 
-    // Convert into ETH values
-    const balance = yields[yields.length - 1]?.balance ?? 0n
-    const balanceWeight = yields[yields.length - 1]?.balanceWeight ?? 1
+    const balance = max(yields.map((y) => y.balance)) // Use the highest balance in the last day. (conservative approach)
+    const balanceWeight = Math.min(...yields.map((y) => y.balanceWeight)) // Use the lowest balance weight in the last day. (conservative approach)
     const earnings = yields[yields.length - 1]?.earnings ?? 0n
     const earningsChange = todayYields.reduce(
       (sum, y) => sum + y.earningsChange,
@@ -88,7 +87,7 @@ export const processStrategyDailyEarnings = async (
     current.earningsChange = earningsChange
 
     if (current.earnings < (latest?.earnings ?? 0n)) {
-      ctx.log.info({ current, latest, yields }, 'earnings went down :(')
+      ctx.log.info('earnings went down :(')
       // throw new Error('how!??!?!')
     }
 
@@ -97,7 +96,7 @@ export const processStrategyDailyEarnings = async (
       // The use of `balanceWeight` is for the Curve AMO ETH+OETH Strategy
       // It is an attempt at excluding OETH from the rate calculations.
       const yieldBalance =
-        ((latest?.balance || current.balance) *
+        (max([current.balance, latest.balance]) * // Use the max of either of these two for more realistic APY values.
           parseEther(balanceWeight.toString())) /
         eth1
 

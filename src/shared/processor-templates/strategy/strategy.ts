@@ -1,7 +1,9 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { Context } from '../../../processor'
+import { OETH_ADDRESS, OUSD_ADDRESS } from '../../../utils/addresses'
 import { LogFilter } from '../../../utils/logFilter'
+import { TraceFilter } from '../../../utils/traceFilter'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'
@@ -18,6 +20,7 @@ export type ICurveAMOInfo = {
 
 export type IStrategyData = {
   from: number
+  oTokenAddress: typeof OUSD_ADDRESS | typeof OETH_ADDRESS
   name: string
   contractName: string
   address: string
@@ -34,7 +37,8 @@ export type IStrategyData = {
     address: string
     decimals: number
   }[]
-  balanceUpdateFilters?: LogFilter[]
+  balanceUpdateLogFilters?: LogFilter[]
+  balanceUpdateTraceFilters?: TraceFilter[]
   aaveInfo?: {
     lendingPool: string
     pTokens: string[]
@@ -44,6 +48,7 @@ export type IStrategyData = {
   earnings: {
     rewardTokenCollected?: boolean
     passiveByDepositWithdrawal?: boolean
+    passiveByDepositWithdrawalByTrace?: boolean
   }
 }
 

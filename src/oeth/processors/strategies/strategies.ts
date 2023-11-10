@@ -15,7 +15,6 @@ import {
 import {
   FRXETH_ADDRESS,
   OETH_ADDRESS,
-  RETH_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 
@@ -25,6 +24,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     name: 'OETH Convex ETH+OETH (AMO)',
     contractName: 'ConvexEthMetaStrategy',
     address: '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63',
+    oTokenAddress: OETH_ADDRESS,
     kind: 'CurveAMO',
     curvePoolInfo: {
       poolAddress: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
@@ -42,6 +42,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     name: 'OETH Frax Staking',
     contractName: 'FraxETHStrategy',
     address: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
+    oTokenAddress: OETH_ADDRESS,
     kind: 'Generic',
     base: { address: currencies.ETH, decimals: 18 },
     assets: [FRXETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
@@ -52,6 +53,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     name: 'OETH Morpho Aave V2',
     contractName: 'MorphoAaveStrategy',
     address: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
+    oTokenAddress: OETH_ADDRESS,
     kind: 'Generic',
     base: { address: currencies.ETH, decimals: 18 },
     assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
@@ -62,6 +64,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   //   name: 'OETH Aura rETH/WETH',
   //   contractName: 'BalancerMetaPoolStrategy',
   //   address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
+  //   oTokenAddress: OETH_ADDRESS,
   //   kind: 'BalancerMetaStablePool',
   //   base: { address: currencies.ETH, decimals: 18},
   //   assets: [WETH_ADDRESS, RETH_ADDRESS].map(address => ({address, decimals: 18})),

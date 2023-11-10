@@ -8,14 +8,18 @@ import * as aToken from '../../../abi/aave-token'
 import * as baseRewardPool from '../../../abi/base-reward-pool'
 import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
-import { StrategyYield } from '../../../model'
+import * as otoken from '../../../abi/otoken'
+import { OETH, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
 import {
   AURA_REWARDS_POOL_ADDRESS,
-  ETH_ADDRESS,
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_HARVESTER_ADDRESS,
+  OUSD_ADDRESS,
+  OUSD_DRIPPER_ADDRESS,
+  OUSD_HARVESTER_ADDRESS,
+  USDT_ADDRESS,
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
@@ -35,13 +39,26 @@ const baseRewardPoolTopics = new Set([
   baseRewardPool.events.Withdrawn.topic,
 ])
 
+const oTokenValues = {
+  [OUSD_ADDRESS]: {
+    rewardConversionToken: USDT_ADDRESS,
+    harvester: OUSD_HARVESTER_ADDRESS,
+    dripper: OUSD_DRIPPER_ADDRESS,
+  },
+  [OETH_ADDRESS]: {
+    rewardConversionToken: WETH_ADDRESS,
+    harvester: OETH_HARVESTER_ADDRESS,
+    dripper: OETH_DRIPPER_ADDRESS,
+  },
+} as const
+
 export const setupStrategyEarnings = (
   processor: EvmBatchProcessor,
   strategyData: IStrategyData,
 ) => {
   processor.includeAllBlocks({ from: strategyData.from })
-  const balanceUpdateFilters = strategyData.balanceUpdateFilters ?? []
-  strategyData.balanceUpdateFilters = balanceUpdateFilters
+  const balanceUpdateFilters = strategyData.balanceUpdateLogFilters ?? []
+  strategyData.balanceUpdateLogFilters = balanceUpdateFilters
 
   // Detect Deposit/Withdraw events
   // To help us understand when balances change passively vs from activity.
@@ -49,6 +66,7 @@ export const setupStrategyEarnings = (
     processor.addLog({
       address: [strategyData.address],
       topic0: [...depositWithdrawalTopics.values()],
+      range: { from: strategyData.from },
     })
 
     // Detect Staked/Withdrawn events
@@ -59,9 +77,13 @@ export const setupStrategyEarnings = (
           address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
           topic0: [...baseRewardPoolTopics.values()],
           topic1: [pad(strategyData.address as `0x${string}`)],
+          range: { from: strategyData.from },
         }),
       )
     }
+  }
+  for (const filter of strategyData.balanceUpdateTraceFilters ?? []) {
+    processor.addTrace(filter.value)
   }
 
   if (strategyData.kind === 'BalancerMetaStablePool') {
@@ -69,6 +91,7 @@ export const setupStrategyEarnings = (
       address: [AURA_REWARDS_POOL_ADDRESS],
       topic0: [...baseRewardPoolTopics.values()],
       topic1: [pad(strategyData.address as `0x${string}`)],
+      range: { from: strategyData.from },
     })
   }
 
@@ -78,12 +101,18 @@ export const setupStrategyEarnings = (
     processor.addLog({
       address: [strategyData.address],
       topic0: [abstractStrategyAbi.events.RewardTokenCollected.topic],
+      range: { from: strategyData.from },
     })
     processor.addLog({
-      address: [WETH_ADDRESS],
+      address: [
+        strategyData.oTokenAddress === OUSD_ADDRESS
+          ? USDT_ADDRESS
+          : WETH_ADDRESS,
+      ],
       topic0: [erc20.events.Transfer.topic],
-      topic1: [pad(OETH_HARVESTER_ADDRESS)],
-      topic2: [pad(OETH_DRIPPER_ADDRESS)],
+      topic1: [pad(oTokenValues[strategyData.oTokenAddress].harvester)],
+      topic2: [pad(oTokenValues[strategyData.oTokenAddress].dripper)],
+      range: { from: strategyData.from },
     })
   }
 
@@ -158,46 +187,62 @@ export const processStrategyEarnings = async (
           return b
         })
     }
+    const balanceTrackingUpdate = async () => {
+      // ctx.log.info(`balanceTrackingUpdate`)
+      didUpdate = true
+      const balances = await getBalances()
+      await processDepositWithdrawal(
+        ctx,
+        strategyData,
+        block,
+        strategyYields,
+        balances,
+      )
+    }
+    const balanceTrackingUpdateBalancerMetaStablePool = async () => {
+      // ctx.log.info(`balanceTrackingUpdateBalancerMetaStablePool`)
+      didUpdate = true
+      const balances = await getBalances()
+      await processDepositWithdrawal(
+        ctx,
+        strategyData,
+        block,
+        strategyYields,
+        balances,
+      )
+    }
+
+    if (
+      strategyData.balanceUpdateTraceFilters &&
+      strategyData.balanceUpdateTraceFilters.length > 0
+    ) {
+      for (const trace of block.traces) {
+        if (
+          strategyData.balanceUpdateTraceFilters.find((f) => f.matches(trace))
+        ) {
+          await balanceTrackingUpdate()
+        }
+      }
+    }
 
     for (const log of block.logs) {
-      // Various update functions we might call
-      const balanceTrackingUpdate = async () => {
-        // ctx.log.info(`balanceTrackingUpdate`)
-        didUpdate = true
-        const balances = await getBalances()
-        await processDepositWithdrawal(
-          ctx,
-          strategyData,
-          block,
-          strategyYields,
-          balances,
-        )
-      }
-      const balanceTrackingUpdateBalancerMetaStablePool = async () => {
-        // ctx.log.info(`balanceTrackingUpdateBalancerMetaStablePool`)
-        didUpdate = true
-        const balances = await getBalances()
-        await processDepositWithdrawal(
-          ctx,
-          strategyData,
-          block,
-          strategyYields,
-          balances,
-        )
-      }
       const rewardTokenCollectedUpdate = async () => {
         // ctx.log.info(`rewardTokenCollectedUpdate`)
         didUpdate = true
         txIgnore.add(log.transactionHash)
-        const wethTransferLogs = block.logs.filter(
+
+        const earningsTransferLogs = block.logs.filter(
           (l) =>
             l.transactionHash === log.transactionHash &&
-            l.address.toLowerCase() === WETH_ADDRESS &&
+            l.address.toLowerCase() ===
+              oTokenValues[strategyData.oTokenAddress].rewardConversionToken &&
             l.topics[0] === erc20.events.Transfer.topic &&
-            l.topics[1] === pad(OETH_HARVESTER_ADDRESS) &&
-            l.topics[2] === pad(OETH_DRIPPER_ADDRESS),
+            l.topics[1] ===
+              pad(oTokenValues[strategyData.oTokenAddress].harvester) &&
+            l.topics[2] ===
+              pad(oTokenValues[strategyData.oTokenAddress].dripper),
         )
-        const amount = wethTransferLogs.reduce(
+        const amount = earningsTransferLogs.reduce(
           (sum, l) => sum + BigInt(l.data),
           0n,
         )
@@ -222,7 +267,7 @@ export const processStrategyEarnings = async (
       ) {
         await balanceTrackingUpdateBalancerMetaStablePool()
       } else if (
-        strategyData.balanceUpdateFilters?.find((f) => f.matches(log))
+        strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))
       ) {
         await balanceTrackingUpdate()
       } else if (
@@ -342,7 +387,7 @@ const processDepositWithdrawal = async (
   }[],
 ) => {
   const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
-  ctx.log.info(assets, `processDepositWithdrawal ${id}`)
+  // ctx.log.info(assets, `processDepositWithdrawal ${id}`)
   let { latest, current, results } = await getLatest(
     ctx,
     block,
@@ -370,12 +415,15 @@ const processDepositWithdrawal = async (
       return sum + a.balance // convertRate(rates, 'ETH', a.asset as Currency, a.balance)
     }, 0n)
 
-    const oethBalance =
-      assets.find((a) => a.asset.toLowerCase() === OETH_ADDRESS)?.balance ?? 0n
+    const otokenBalance =
+      assets.find((a) => a.asset.toLowerCase() === strategyData.oTokenAddress)
+        ?.balance ?? 0n
 
     const balanceWeightN =
-      balance === 0n ? eth1 : (oethBalance * eth1) / balance
+      eth1 - (balance === 0n ? 0n : (otokenBalance * eth1) / balance)
     const balanceWeight = Number(formatEther(balanceWeightN))
+
+    // ctx.log.info({ balanceWeight })
 
     const timestamp = new Date(block.header.timestamp)
     let earningsChange =
@@ -415,7 +463,6 @@ const processDepositWithdrawal = async (
 
     if (earningsChange < 0) {
       ctx.log.warn('WARNING: earnings change is negative')
-      throw new Error()
     }
 
     // Avoid creating this if nothing has changed.
