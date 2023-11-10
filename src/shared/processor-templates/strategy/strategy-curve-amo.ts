@@ -67,6 +67,27 @@ export const getStrategyBalances = async (
   block: { height: number },
   strategyData: IStrategyData,
 ) => {
+  if (strategyData.address === '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63') {
+    return getConvexEthMetaStrategyBalances(ctx, block, strategyData)
+  }
+  return await Promise.all(
+    strategyData.assets.map(async (asset) => {
+      const contract = new abstractStrategyAbi.Contract(
+        ctx,
+        block,
+        strategyData.address,
+      )
+      const balance = await contract.checkBalance(asset.address)
+      return { address: strategyData.address, asset: asset.address, balance }
+    }),
+  )
+}
+
+export const getConvexEthMetaStrategyBalances = async (
+  ctx: Context,
+  block: { height: number },
+  strategyData: IStrategyData,
+) => {
   const { assets, address, curvePoolInfo } = strategyData
   const { poolAddress, rewardsPoolAddress } = curvePoolInfo!
 
@@ -78,6 +99,7 @@ export const getStrategyBalances = async (
   const stakedLPBalance = await rewardsPool.balanceOf(address)
   let unstakedBalance = BigInt(0)
 
+  const pTokenAddresses = new Set<string>()
   const poolAssets: string[] = []
   const assetBalances: bigint[] = []
   let totalPoolValue = BigInt(0)
@@ -96,10 +118,15 @@ export const getStrategyBalances = async (
       coins[i] = coin
     }
 
-    if (coin != OETH_ADDRESS) {
+    if (coin !== strategyData.oTokenAddress) {
       const pTokenAddr = await strategy.assetToPToken(assets[i].address)
-      const pToken = new erc20.Contract(ctx, block, pTokenAddr)
-      unstakedBalance += await pToken.balanceOf(address)
+      if (!pTokenAddresses.has(pTokenAddr)) {
+        pTokenAddresses.add(pTokenAddr)
+        const pToken = new erc20.Contract(ctx, block, pTokenAddr)
+        const pTokenBalance = await pToken.balanceOf(address)
+        ctx.log.info({ height: block.height, pTokenAddr, pTokenBalance })
+        unstakedBalance += pTokenBalance
+      }
     }
 
     poolAssets.push(coin)

@@ -93,18 +93,8 @@ export const getOrCreate = async <T extends Entity>(
   return value
 }
 
-export const convertDecimals = (
-  from: {
-    address: string
-    decimals: number
-  },
-  to: {
-    address: string
-    decimals: number
-  },
-  value: bigint,
-) => {
-  const fromFactor = 10n ** BigInt(from.decimals)
-  const toFactor = 10n ** BigInt(to.decimals)
+export const convertDecimals = (from: number, to: number, value: bigint) => {
+  const fromFactor = 10n ** BigInt(from)
+  const toFactor = 10n ** BigInt(to)
   return (value * toFactor) / fromFactor
 }

@@ -1,12 +1,16 @@
+import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import { IStrategyData } from '../../../shared/processor-templates/strategy'
 import { OUSD_ADDRESS } from '../../../utils/addresses'
+import { logFilter } from '../../../utils/logFilter'
 import { traceFilter } from '../../../utils/traceFilter'
 import { DAI, USDC, USDT } from './const'
 
+const from = 15896478
+
 export const convexMetaStrategy: IStrategyData = {
-  from: 15896478,
+  from,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'CurveAMO',
   name: 'OUSD Convex OUSD+3Crv (AMO)',
@@ -18,14 +22,9 @@ export const convexMetaStrategy: IStrategyData = {
     traceFilter({
       type: ['call'],
       callTo: ['0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'.toLowerCase()],
-      callSighash: [
-        abstractStrategyAbi.functions.withdraw.sighash,
-        abstractStrategyAbi.functions.withdrawAll.sighash,
-        abstractStrategyAbi.functions.deposit.sighash,
-        abstractStrategyAbi.functions.depositAll.sighash,
-      ],
+      callSighash: [abstractStrategyAbi.functions.withdrawAll.sighash],
       transaction: true,
-      range: { from: 15896478 },
+      range: { from },
     }),
   ],
   earnings: {

@@ -42,11 +42,13 @@ const baseRewardPoolTopics = new Set([
 const oTokenValues = {
   [OUSD_ADDRESS]: {
     rewardConversionToken: USDT_ADDRESS,
+    rewardConversionTokenDecimals: 6,
     harvester: OUSD_HARVESTER_ADDRESS,
     dripper: OUSD_DRIPPER_ADDRESS,
   },
   [OETH_ADDRESS]: {
     rewardConversionToken: WETH_ADDRESS,
+    rewardConversionTokenDecimals: 18,
     harvester: OETH_HARVESTER_ADDRESS,
     dripper: OETH_DRIPPER_ADDRESS,
   },
@@ -104,11 +106,7 @@ export const setupStrategyEarnings = (
       range: { from: strategyData.from },
     })
     processor.addLog({
-      address: [
-        strategyData.oTokenAddress === OUSD_ADDRESS
-          ? USDT_ADDRESS
-          : WETH_ADDRESS,
-      ],
+      address: [oTokenValues[strategyData.oTokenAddress].rewardConversionToken],
       topic0: [erc20.events.Transfer.topic],
       topic1: [pad(oTokenValues[strategyData.oTokenAddress].harvester)],
       topic2: [pad(oTokenValues[strategyData.oTokenAddress].dripper)],
@@ -172,16 +170,16 @@ export const processStrategyEarnings = async (
         .map((b) => {
           b.balance = convertDecimals(
             strategyData.assets.find(
-              (a) => a.address === b.asset.toLowerCase(),
-            )!,
-            strategyData.base,
+              (a) => a.address.toLowerCase() === b.asset.toLowerCase(),
+            )!.decimals,
+            strategyData.base.decimals,
             b.balance,
           )
           b.compareBalance = convertDecimals(
             strategyData.assets.find(
-              (a) => a.address === b.asset.toLowerCase(),
-            )!,
-            strategyData.base,
+              (a) => a.address.toLowerCase() === b.asset.toLowerCase(),
+            )!.decimals,
+            strategyData.base.decimals,
             b.compareBalance,
           )
           return b
@@ -253,8 +251,13 @@ export const processStrategyEarnings = async (
           block,
           strategyYields,
           {
-            token: WETH_ADDRESS,
-            amount,
+            token: strategyData.base.address,
+            amount: convertDecimals(
+              oTokenValues[strategyData.oTokenAddress]
+                .rewardConversionTokenDecimals,
+              strategyData.base.decimals,
+              amount,
+            ),
           },
         )
       }
@@ -339,23 +342,7 @@ const processRewardTokenCollected = async (
     id,
   )
 
-  // Convert value to ETH
-  // const rates = await ensureExchangeRatesAverages(
-  //   ctx,
-  //   block,
-  //   dayjs.utc(block.header.timestamp).subtract(1, 'week').toDate(),
-  //   new Date(block.header.timestamp),
-  //   [['ETH', params.token as Currency]],
-  // )
-
   const amount = params.amount
-  // const amount = convertRate(
-  //   rates,
-  //   'ETH',
-  //   params.token as Currency,
-  //   params.amount,
-  // )
-
   if (!current) {
     current = new StrategyYield({
       id,
@@ -429,7 +416,7 @@ const processDepositWithdrawal = async (
     let earningsChange =
       previousBalance - (latest?.balance ?? previousBalance) ?? 0n
 
-    // TODO: Probably should listen for add/remove liquidity events
+    // TODO: ??? Probably should listen for add/remove liquidity events
     //  and calculate earnings changes from fees rather than relying on this
     //  picking up those events. It works fine in some pools, but if we want to
     //  remove OETH from APY considerations then we need more detail.
@@ -472,6 +459,7 @@ const processDepositWithdrawal = async (
         latest.strategy === current.strategy &&
         latest.asset === current.asset &&
         latest.balance === current.balance &&
+        latest.balanceWeight === current.balanceWeight &&
         latest.earningsChange === current.earningsChange &&
         latest.earnings === current.earnings
       )
