@@ -34,21 +34,33 @@ const getFrequency = (bps: number, timestamp: number) => {
 }
 
 export const blockFrequencyTracker = (params: { from: number }) => {
-  let nextBlockToProcess = 0
+  let nextBlockToProcess = params.from
+  const shouldProcess = (b: Block, frequency: number) => {
+    let result = b.header.height >= nextBlockToProcess
+    if (result) {
+      nextBlockToProcess =
+        Math.floor((b.header.height + frequency) / frequency) * frequency
+    }
+    return result
+  }
   return (ctx: Context, block: Block) => {
     if (block.header.height < params.from) return
     const { bps } = ctx
     const frequency: number = getFrequency(bps, block.header.timestamp)
-    if (block.header.height >= nextBlockToProcess) {
-      nextBlockToProcess = block.header.height + frequency
-      return true
-    }
-    return false
+    return shouldProcess(block, frequency)
   }
 }
 
 export const blockFrequencyUpdater = (params: { from: number }) => {
-  let lastBlockHeightProcessed = 0
+  let nextBlockToProcess = params.from
+  const shouldProcess = (b: Block, frequency: number) => {
+    let result = b.header.height >= nextBlockToProcess
+    if (result) {
+      nextBlockToProcess =
+        Math.floor((b.header.height + frequency) / frequency) * frequency
+    }
+    return result
+  }
   return async (
     ctx: Context,
     fn: (ctx: Context, block: Block) => Promise<void>,
@@ -57,14 +69,13 @@ export const blockFrequencyUpdater = (params: { from: number }) => {
     // If we're not at head, determine our frequency and then process.
     const { bps } = ctx
     let frequency: number = getFrequency(bps, ctx.blocks[0].header.timestamp)
-    const nextBlockIndex = ctx.blocks.findIndex(
-      (b) => b.header.height >= lastBlockHeightProcessed + frequency,
+    const nextBlockIndex = ctx.blocks.findIndex((b) =>
+      shouldProcess(b, frequency),
     )
     for (let i = nextBlockIndex; i < ctx.blocks.length; i += frequency) {
       const block = ctx.blocks[i]
-      if (!block || block.header.height < params.from) continue
+      if (!shouldProcess(block, frequency)) continue
       await fn(ctx, block)
-      lastBlockHeightProcessed = block.header.height
       frequency = getFrequency(bps, block.header.timestamp)
     }
   }
