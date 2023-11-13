@@ -74,7 +74,8 @@ export const processStrategyDailyEarnings = async (
     yields.sort((a, b) => b.blockNumber - a.blockNumber)
 
     const balance = max(yields.map((y) => y.balance)) // Use the highest balance in the last day. (conservative approach)
-    const balanceWeight = Math.min(...yields.map((y) => y.balanceWeight)) // Use the lowest balance weight in the last day. (conservative approach)
+    const balanceWeight = // Use the lowest balance weight in the last day. (conservative approach)
+      Math.min(1, ...yields.map((y) => y.balanceWeight))
     const earnings = yields[yields.length - 1]?.earnings ?? 0n
     const earningsChange = todayYields.reduce(
       (sum, y) => sum + y.earningsChange,

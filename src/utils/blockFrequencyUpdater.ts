@@ -72,6 +72,7 @@ export const blockFrequencyUpdater = (params: { from: number }) => {
     const nextBlockIndex = ctx.blocks.findIndex((b) =>
       shouldProcess(b, frequency),
     )
+    if (nextBlockIndex === -1) return
     for (let i = nextBlockIndex; i < ctx.blocks.length; i += frequency) {
       const block = ctx.blocks[i]
       if (!shouldProcess(block, frequency)) continue
