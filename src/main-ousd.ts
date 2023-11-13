@@ -6,10 +6,7 @@ import * as exchangeRates from './shared/post-processors/exchange-rates'
 
 run({
   stateSchema: 'ousd-processor',
-  processors: [
-    // ousd,
-    strategies,
-  ],
+  processors: [ousd, strategies],
   postProcessors: [exchangeRates],
   validators: [validateOusd],
 })

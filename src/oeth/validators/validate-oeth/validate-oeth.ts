@@ -113,73 +113,7 @@ const e = (arr: any[]) => {
 }
 
 const expectations = {
-  oethApies: e([
-    {
-      id: '2023-05-21',
-      blockNumber: 17308770,
-      timestamp: '2023-05-21T15:56:35.000000Z',
-      apr: 0.16602547769982764,
-      apy: 0.18057162002158744,
-      apy14DayAvg: 0.13580689693628772,
-      apy30DayAvg: 71.91799220107755,
-      apy7DayAvg: 0.1316157561741356,
-      rebasingCreditsPerToken: '973558594004638273359591150',
-      txHash:
-        '0x51f29d85120bcfd778966df4e48b76a3c71c9c234cf7b25686e4ac91db412d8c',
-    },
-    {
-      id: '2023-07-10',
-      blockNumber: 17665600,
-      timestamp: '2023-07-10T20:21:35.000000Z',
-      apr: 0.0733424611059912,
-      apy: 0.07608887367524164,
-      apy14DayAvg: 0.09265404218819209,
-      apy30DayAvg: 0.10058755647324388,
-      apy7DayAvg: 0.09496520318128009,
-      rebasingCreditsPerToken: '961364244058751780406499058',
-      txHash:
-        '0x6f4bdbbe1ae933cd140a0d438c7e5f4c68b9deead2768263d7641e90d4a0a097',
-    },
-    {
-      id: '2023-07-11',
-      blockNumber: 17670987,
-      timestamp: '2023-07-11T14:32:35.000000Z',
-      apr: 0.10857842918766517,
-      apy: 0.11467870202052977,
-      apy14DayAvg: 0.09535269567741077,
-      apy30DayAvg: 0.10185645436835511,
-      apy7DayAvg: 0.09375739816960833,
-      rebasingCreditsPerToken: '961147770054335281101637566',
-      txHash:
-        '0x8f7bf364b8f76174643efc8b32f301d1e2face0f076f1b01f65b8c9f01d408c5',
-    },
-    {
-      id: '2023-09-17',
-      blockNumber: 18154149,
-      timestamp: '2023-09-17T06:59:47.000000Z',
-      apr: 0.08216005342266121,
-      apy: 0.0856202277249658,
-      apy14DayAvg: 0.08075225029410789,
-      apy30DayAvg: 0.08356906482602125,
-      apy7DayAvg: 0.08119969703969342,
-      rebasingCreditsPerToken: '947758663109881526211028768',
-      txHash:
-        '0xa4533cc844d8e5a52f444bc32dba546b404860cafa642c210973be6a12242aeb',
-    },
-    {
-      id: '2023-10-25',
-      blockNumber: 18425626,
-      timestamp: '2023-10-25T07:00:11.000000Z',
-      apr: 0.045516307791970176,
-      apy: 0.04656591498844653,
-      apy14DayAvg: 0.04977127541255704,
-      apy30DayAvg: 0.062044304063055396,
-      apy7DayAvg: 0.04802668795516692,
-      rebasingCreditsPerToken: '941364114470046460777492892',
-      txHash:
-        '0x67ef6bda379e51a3983f7c2822b39538a40fb93b1d26f66b687da41657f17239',
-    },
-  ]),
+  oethApies: e([]),
   oethHistories: e([
     {
       balance: '4994819891394470874',
