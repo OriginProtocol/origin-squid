@@ -65,38 +65,38 @@ export const ensureExchangeRates = async (
   ).then(compact)
 }
 
-// export const ensureExchangeRatesAverages = async (
-//   ctx: Context,
-//   block: Block,
-//   from: Date,
-//   to: Date,
-//   pairs: [Currency, Currency][],
-// ) => {
-//   return await Promise.all(
-//     pairs.map(([base, quote]) =>
-//       ensureExchangeRate(ctx, block, base, quote)
-//         .then((rate) => {
-//           if (!rate) return []
-//           return ctx.store
-//             .find(ExchangeRate, {
-//               where: { pair: rate?.pair, timestamp: Between(from, to) },
-//             })
-//             .then((rates) => rates.concat(rate!))
-//         })
-//         .then((rates) => {
-//           const pair = `${base}_${quote}`
-//           const rate =
-//             rates.reduce((sum, r) => sum + r.rate, 0n) / BigInt(rates.length)
-//           ctx.log.info(
-//             `Created average exchange rate of ${rate} using ${rates.length} rates`,
-//           )
-//           return new ExchangeRate({
-//             base: rates[0].base,
-//             quote: rates[0].quote,
-//             pair,
-//             rate,
-//           })
-//         }),
-//     ),
-//   )
-// }
+export const ensureExchangeRatesAverages = async (
+  ctx: Context,
+  block: Block,
+  from: Date,
+  to: Date,
+  pairs: [Currency, Currency][],
+) => {
+  return await Promise.all(
+    pairs.map(([base, quote]) =>
+      ensureExchangeRate(ctx, block, base, quote)
+        .then((rate) => {
+          if (!rate) return []
+          return ctx.store
+            .find(ExchangeRate, {
+              where: { pair: rate?.pair, timestamp: Between(from, to) },
+            })
+            .then((rates) => rates.concat(rate!))
+        })
+        .then((rates) => {
+          const pair = `${base}_${quote}`
+          const rate =
+            rates.reduce((sum, r) => sum + r.rate, 0n) / BigInt(rates.length)
+          ctx.log.info(
+            `Created average exchange rate of ${rate} using ${rates.length} rates`,
+          )
+          return new ExchangeRate({
+            base: rates[0].base,
+            quote: rates[0].quote,
+            pair,
+            rate,
+          })
+        }),
+    ),
+  )
+}

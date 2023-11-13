@@ -25,6 +25,11 @@ import {
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { logFilter } from '../../../utils/logFilter'
 import { convertDecimals, lastExcept } from '../../../utils/utils'
+import { ensureExchangeRatesAverages } from '../../post-processors/exchange-rates'
+import {
+  Currency,
+  convertRate,
+} from '../../post-processors/exchange-rates/currencies'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 
@@ -64,7 +69,7 @@ export const setupStrategyEarnings = (
 
   // Detect Deposit/Withdraw events
   // To help us understand when balances change passively vs from activity.
-  if (strategyData.earnings.passiveByDepositWithdrawal) {
+  if (strategyData.earnings?.passiveByDepositWithdrawal) {
     processor.addLog({
       address: [strategyData.address],
       topic0: [...depositWithdrawalTopics.values()],
@@ -99,7 +104,7 @@ export const setupStrategyEarnings = (
 
   // Listen for RewardTokenCollected events and their associated logs
   //  showing how much WETH Harvester sent to Dripper.
-  if (strategyData.earnings.rewardTokenCollected) {
+  if (strategyData.earnings?.rewardTokenCollected) {
     processor.addLog({
       address: [strategyData.address],
       topic0: [abstractStrategyAbi.events.RewardTokenCollected.topic],
@@ -112,6 +117,21 @@ export const setupStrategyEarnings = (
       topic2: [pad(oTokenValues[strategyData.oTokenAddress].dripper)],
       range: { from: strategyData.from },
     })
+  }
+
+  if (strategyData.kind === 'Vault') {
+    balanceUpdateFilters.push(
+      logFilter({
+        address: strategyData.assets.map((asset) => asset.address),
+        topic0: [erc20.events.Transfer.topic],
+        topic1: [strategyData.address],
+      }),
+      logFilter({
+        address: strategyData.assets.map((asset) => asset.address),
+        topic0: [erc20.events.Transfer.topic],
+        topic2: [strategyData.address],
+      }),
+    )
   }
 
   for (const filter of balanceUpdateFilters) {
@@ -275,7 +295,7 @@ export const processStrategyEarnings = async (
         await balanceTrackingUpdate()
       } else if (
         log.address === strategyData.address &&
-        strategyData.earnings.passiveByDepositWithdrawal &&
+        strategyData.earnings?.passiveByDepositWithdrawal &&
         depositWithdrawalTopics.has(log.topics[0])
       ) {
         ctx.log.info({
@@ -288,7 +308,7 @@ export const processStrategyEarnings = async (
         await balanceTrackingUpdate()
       } else if (
         log.address === strategyData.address &&
-        strategyData.earnings.rewardTokenCollected &&
+        strategyData.earnings?.rewardTokenCollected &&
         log.topics[0] ===
           abstractStrategyAbi.events.RewardTokenCollected.topic &&
         !txIgnore.has(log.transactionHash)
@@ -386,20 +406,29 @@ const processDepositWithdrawal = async (
 
   if (!current) {
     // Convert incoming values to ETH
-    // const rates = await ensureExchangeRatesAverages(
-    //   ctx,
-    //   block,
-    //   dayjs.utc(block.header.timestamp).subtract(1, 'week').toDate(),
-    //   new Date(block.header.timestamp),
-    //   assets.map((a) => ['ETH', a.asset as Currency]),
-    // )
-    const previousBalance = assets.reduce((sum, a) => {
-      return (
-        sum + a.compareBalance // convertRate(rates, 'ETH', a.asset as Currency, a.compareBalance)
-      )
+    const desiredRates = strategyData.assets
+      .filter((a) => a.convertTo)
+      .map((a) => [a.convertTo!.address, a.address]) as [Currency, Currency][]
+    const rates = await ensureExchangeRatesAverages(
+      ctx,
+      block,
+      dayjs.utc(block.header.timestamp).subtract(21, 'days').toDate(),
+      new Date(block.header.timestamp),
+      desiredRates,
+    )
+    const previousBalance = assets.reduce((sum, a, index) => {
+      const asset = strategyData.assets[index]
+      const compareBalance = asset.convertTo
+        ? convertRate(rates, 'ETH', a.asset as Currency, a.compareBalance)
+        : a.compareBalance
+      return sum + compareBalance
     }, 0n)
-    const balance = assets.reduce((sum, a) => {
-      return sum + a.balance // convertRate(rates, 'ETH', a.asset as Currency, a.balance)
+    const balance = assets.reduce((sum, a, index) => {
+      const asset = strategyData.assets[index]
+      const balance = asset.convertTo
+        ? convertRate(rates, 'ETH', a.asset as Currency, a.balance)
+        : a.balance
+      return sum + balance
     }, 0n)
 
     const otokenBalance =
@@ -409,8 +438,6 @@ const processDepositWithdrawal = async (
     const balanceWeightN =
       eth1 - (balance === 0n ? 0n : (otokenBalance * eth1) / balance)
     const balanceWeight = Number(formatEther(balanceWeightN))
-
-    // ctx.log.info({ balanceWeight })
 
     const timestamp = new Date(block.header.timestamp)
     let earningsChange =

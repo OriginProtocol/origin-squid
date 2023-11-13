@@ -1,4 +1,5 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import durationPlugin from 'dayjs/plugin/duration'
 
 import { Context } from '../../../processor'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '../../../utils/addresses'
@@ -7,6 +8,7 @@ import { TraceFilter } from '../../../utils/traceFilter'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'
+import * as strategyVault from './strategy-vault'
 
 export type IBalancerPoolInfo = {
   poolId: string
@@ -26,6 +28,7 @@ export type IStrategyData = {
   address: string
   kind:
     | 'Generic'
+    | 'Vault'
     | 'CurveAMO'
     | 'BalancerMetaStablePool'
     | 'BalancerComposableStablePool'
@@ -36,6 +39,10 @@ export type IStrategyData = {
   assets: {
     address: string
     decimals: number
+    convertTo?: {
+      address: string
+      decimals: number
+    }
   }[]
   balanceUpdateLogFilters?: LogFilter[]
   balanceUpdateTraceFilters?: TraceFilter[]
@@ -45,7 +52,7 @@ export type IStrategyData = {
   }
   balancerPoolInfo?: IBalancerPoolInfo
   curvePoolInfo?: ICurveAMOInfo
-  earnings: {
+  earnings?: {
     rewardTokenCollected?: boolean
     passiveByDepositWithdrawal?: boolean
     passiveByDepositWithdrawalByTrace?: boolean
@@ -60,6 +67,7 @@ const processors: Record<
   }
 > = {
   Generic: strategyGeneric,
+  Vault: strategyVault,
   CurveAMO: strategyCurveAMO,
   BalancerMetaStablePool: strategyBalancer,
   BalancerComposableStablePool: {

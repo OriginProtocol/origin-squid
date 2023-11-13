@@ -24,14 +24,12 @@ import { morphoCompound } from './morpho-compound'
 
 const ousdStrategies: readonly IStrategyData[] = [
   convexMetaStrategy,
-
-  // Reasonable Results
-  // aaveStrategy,
-  // morphoCompound,
-  // morphoAave,
-  // fluxStrategy,
-  // makerDsrStrategy,
-
+  aaveStrategy,
+  morphoCompound,
+  morphoAave,
+  fluxStrategy,
+  makerDsrStrategy,
+  
   // Deprecated
   // {
   //   from: 13369299,

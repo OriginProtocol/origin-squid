@@ -128,6 +128,7 @@ const getLatest = async (
       order: { id: 'desc' },
       where: {
         strategy: strategyData.address,
+        asset: strategyData.base.address,
         id: LessThan(id),
       },
     }))
