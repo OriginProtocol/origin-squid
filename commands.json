@@ -88,6 +88,18 @@
         "--multicall"
       ]
     },
+    "process": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build",
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "lib/main.js"
+      ]
+    },
     "process:oeth": {
       "description": "Load .env and start the squid processor",
       "deps": [

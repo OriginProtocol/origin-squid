@@ -63,22 +63,25 @@ export const oethStrategies: readonly IStrategyData[] = [
     assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
-  // {
-  //   from: 18156225,
-  //   name: 'OETH Aura rETH/WETH',
-  //   contractName: 'BalancerMetaPoolStrategy',
-  //   address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
-  //   oTokenAddress: OETH_ADDRESS,
-  //   kind: 'BalancerMetaStablePool',
-  //   base: { address: currencies.ETH, decimals: 18},
-  //   assets: [WETH_ADDRESS, RETH_ADDRESS].map(address => ({address, decimals: 18})),
-  //   earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
-  //   balancerPoolInfo: {
-  //     poolId:
-  //       '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
-  //     poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
-  //   },
-  // },
+  {
+    from: 18156225,
+    name: 'OETH Aura rETH/WETH',
+    contractName: 'BalancerMetaPoolStrategy',
+    address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'BalancerMetaStablePool',
+    base: { address: currencies.ETH, decimals: 18 },
+    assets: [WETH_ADDRESS, RETH_ADDRESS].map((address) => ({
+      address,
+      decimals: 18,
+    })),
+    earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
+    balancerPoolInfo: {
+      poolId:
+        '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
+      poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
+    },
+  },
   {
     from: 17141121,
     name: 'OETH Vault (rETH)',

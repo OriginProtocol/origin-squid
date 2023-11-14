@@ -78,7 +78,7 @@ export const run = ({
   postProcessors,
   validators,
 }: {
-  stateSchema: string
+  stateSchema?: string
   processors: Processor[]
   postProcessors?: Pick<Processor, 'process' | 'name'>[]
   validators?: Pick<Processor, 'process' | 'name'>[]
