@@ -5,3 +5,4 @@ next version.
 
 - https://github.com/OriginProtocol/oeth.com
 - https://github.com/OriginProtocol/origin-defi
+- https://origindefi.grafana.net/dashboards

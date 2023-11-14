@@ -19,18 +19,21 @@ const oneDayAgo = dayjs.utc().subtract(1, 'day').valueOf()
 const oneHourAgo = dayjs.utc().subtract(1, 'hour').valueOf()
 
 const getFrequency = (bps: number, timestamp: number) => {
+  let frequency = 1
   if (timestamp < oneYearAgo) {
-    return (SECONDS_PER_WEEK / bps) ^ 0 // Older than one year ago
+    frequency = (SECONDS_PER_WEEK / bps) ^ 0 // Older than one year ago
   } else if (timestamp < oneMonthAgo) {
-    return (SECONDS_PER_DAY / bps) ^ 0 // Older than one month ago
+    frequency = (SECONDS_PER_DAY / bps) ^ 0 // Older than one month ago
   } else if (timestamp < oneWeekAgo) {
-    return (SECONDS_PER_DAY / bps / 4) ^ 0 // Older than one week ago
+    frequency = (SECONDS_PER_DAY / bps / 4) ^ 0 // Older than one week ago
   } else if (timestamp < oneDayAgo) {
-    return (SECONDS_PER_DAY / bps / 24) ^ 0 // Older than one day ago
+    frequency = (SECONDS_PER_DAY / bps / 24) ^ 0 // Older than one day ago
   } else if (timestamp < oneHourAgo) {
-    return ((SECONDS_PER_MINUTE * 5) / bps) ^ 0 // Older than one hour ago
+    frequency = ((SECONDS_PER_MINUTE * 5) / bps) ^ 0 // Older than one hour ago
+  } else {
+    frequency = (SECONDS_PER_MINUTE / bps) ^ 0
   }
-  return (SECONDS_PER_MINUTE / bps) ^ 0
+  return frequency || 1
 }
 
 export const blockFrequencyTracker = (params: { from: number }) => {
