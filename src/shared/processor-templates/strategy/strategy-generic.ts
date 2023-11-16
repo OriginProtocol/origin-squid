@@ -42,8 +42,8 @@ const getStrategyHoldings = async (
   strategyData: IStrategyData,
 ): Promise<StrategyBalance[]> => {
   const { assets, address } = strategyData
-  const balances = await getStrategyBalances(ctx, block.header, strategyData)
   const promises = assets.map(async (asset) => {
+    const balances = await getStrategyBalances(ctx, block.header, strategyData)
     return new StrategyBalance({
       id: `${address}:${asset.address}:${block.header.height}`,
       strategy: address,
@@ -53,8 +53,7 @@ const getStrategyHoldings = async (
       timestamp: new Date(block.header.timestamp),
     })
   })
-
-  return await Promise.all(promises)
+  return Promise.all(promises)
 }
 
 const getStrategyBalances = async (

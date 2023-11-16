@@ -56,13 +56,8 @@ export const blockFrequencyTracker = (params: { from: number }) => {
 
 export const blockFrequencyUpdater = (params: { from: number }) => {
   let nextBlockToProcess = params.from
-  const shouldProcess = (b: Block, frequency: number) => {
-    let result = b.header.height >= nextBlockToProcess
-    if (result) {
-      nextBlockToProcess =
-        Math.floor((b.header.height + frequency) / frequency) * frequency
-    }
-    return result
+  const shouldProcess = (b: Block) => {
+    return b.header.height >= nextBlockToProcess
   }
   return async (
     ctx: Context,
@@ -72,14 +67,12 @@ export const blockFrequencyUpdater = (params: { from: number }) => {
     // If we're not at head, determine our frequency and then process.
     const { bps } = ctx
     let frequency: number = getFrequency(bps, ctx.blocks[0].header.timestamp)
-    const nextBlockIndex = ctx.blocks.findIndex((b) =>
-      shouldProcess(b, frequency),
-    )
-    if (nextBlockIndex === -1) return
-    for (let i = nextBlockIndex; i < ctx.blocks.length; i += frequency) {
+    for (let i = 0; i < ctx.blocks.length; i += frequency) {
       const block = ctx.blocks[i]
-      if (!shouldProcess(block, frequency)) continue
+      if (!shouldProcess(block)) continue
       await fn(ctx, block)
+      nextBlockToProcess =
+        Math.floor((block.header.height + frequency) / frequency) * frequency
       frequency = getFrequency(bps, block.header.timestamp)
     }
   }
