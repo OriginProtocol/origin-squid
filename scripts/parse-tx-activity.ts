@@ -5,7 +5,7 @@ import { type Transaction, activityFromTx } from '../src/utils/activityFromTx'
 
 const client = createPublicClient({
   chain: mainnet,
-  transport: http('http://160.202.128.241:8545'),
+  transport: http(process.env.RPC_ENDPOINT),
 })
 
 async function go(hash: `0x${string}`) {
