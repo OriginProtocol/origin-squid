@@ -549,25 +549,6 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "hasDelegationSet",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
         "name": "increaseAllowance",
         "constant": false,
         "payable": false,

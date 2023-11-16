@@ -259,3 +259,24 @@ type OETHRewardTokenCollected @entity {
   rewardToken: String!
   amount: BigInt!
 }
+
+type OETHActivity @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromTokenAddress: String
+  toTokenAddress: String
+  fromTokenAmount: BigInt
+  toTokenAmount: BigInt
+
+  from: String
+  to: String
+}
+

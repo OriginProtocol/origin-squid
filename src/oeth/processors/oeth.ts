@@ -1,6 +1,7 @@
 import {
   OETH,
   OETHAPY,
+  OETHActivity,
   OETHAddress,
   OETHHistory,
   OETHRebase,
@@ -29,4 +30,5 @@ export const process = createOTokenProcessor({
   OTokenAPY: OETHAPY,
   OTokenRebase: OETHRebase,
   OTokenRebaseOption: OETHRebaseOption,
+  OTokenActivity: OETHActivity,
 })

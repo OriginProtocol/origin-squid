@@ -1,4 +1,5 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { groupBy } from 'lodash'
 
 import * as otoken from '../../../abi/otoken'
 import * as otokenVault from '../../../abi/otoken-vault'
@@ -6,12 +7,14 @@ import {
   HistoryType,
   OETH,
   OETHAPY,
+  OETHActivity,
   OETHAddress,
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
   OUSD,
   OUSDAPY,
+  OUSDActivity,
   OUSDAddress,
   OUSDHistory,
   OUSDRebase,
@@ -19,6 +22,7 @@ import {
   RebasingOption,
 } from '../../../model'
 import { Context } from '../../../processor'
+import { type Transaction, activityFromTx } from '../../../utils/activityFromTx'
 import { ADDRESS_ZERO } from '../../../utils/addresses'
 import { DECIMALS_18 } from '../../../utils/constants'
 import { EntityClassT, InstanceTypeOfConstructor } from '../../../utils/type'
@@ -27,6 +31,7 @@ import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
 type OTokenAPY = EntityClassT<OETHAPY> | EntityClassT<OUSDAPY>
+type OTokenActivity = EntityClassT<OETHActivity> | EntityClassT<OUSDActivity>
 type OTokenAddress = EntityClassT<OETHAddress> | EntityClassT<OUSDAddress>
 type OTokenHistory = EntityClassT<OETHHistory> | EntityClassT<OUSDHistory>
 type OTokenRebase = EntityClassT<OETHRebase> | EntityClassT<OUSDRebase>
@@ -79,6 +84,7 @@ export const createOTokenProcessor = (params: {
   OTokenAPY: OTokenAPY
   OTokenAddress: OTokenAddress
   OTokenHistory: OTokenHistory
+  OTokenActivity: OTokenActivity
   OTokenRebase: OTokenRebase
   OTokenRebaseOption: OTokenRebaseOption
 }) => {
@@ -90,6 +96,7 @@ export const createOTokenProcessor = (params: {
     rebases: InstanceTypeOfConstructor<OTokenRebase>[]
     rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
     apies: InstanceTypeOfConstructor<OTokenAPY>[]
+    activity: InstanceTypeOfConstructor<OTokenActivity>[]
     lastYieldDistributionEvent?: {
       fee: bigint
       yield: bigint
@@ -129,6 +136,7 @@ export const createOTokenProcessor = (params: {
       rebases: [],
       rebaseOptions: [],
       apies: [],
+      activity: [],
     }
 
     for (const block of ctx.blocks) {
@@ -140,6 +148,7 @@ export const createOTokenProcessor = (params: {
         await processYieldDistribution(ctx, result, block, log)
         await processTotalSupplyUpdatedHighres(ctx, result, block, log)
       }
+      await processActivity(ctx, result, block)
     }
 
     if (owners) {
@@ -151,6 +160,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.history),
       ctx.store.insert(result.rebases),
       ctx.store.insert(result.rebaseOptions),
+      ctx.store.insert(result.activity),
     ])
   }
 
@@ -285,6 +295,37 @@ export const createOTokenProcessor = (params: {
       // Update rebasing supply in all cases
       otokenObject.rebasingSupply =
         otokenObject.totalSupply - otokenObject.nonRebasingSupply
+    }
+  }
+
+  const processActivity = async (
+    ctx: Context,
+    result: ProcessResult,
+    block: Context['blocks']['0'],
+  ) => {
+    await result.initialize()
+    const logs = block.logs
+    const groupedLogs = groupBy(logs, (log) => log.transactionHash)
+    for (const [txHash, logs] of Object.entries(groupedLogs)) {
+      const log = logs.find((l) => l.address === params.OTOKEN_ADDRESS)
+      const transaction = log?.transaction as unknown as Transaction
+      // const trace = block.traces.find(t => t.transaction?.hash === txHash)
+      if (log && transaction) {
+        const activity = await activityFromTx(transaction)
+        if (activity) {
+          for (const item of activity) {
+            result.activity.push(
+              new params.OTokenActivity({
+                id: getUniqueId(log.id),
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                txHash: log.transactionHash,
+                ...item,
+              }),
+            )
+          }
+        }
+      }
     }
   }
 

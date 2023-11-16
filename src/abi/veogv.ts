@@ -80,9 +80,6 @@ export const functions = {
     getVotes: new Func<[account: string], {account: string}, bigint>(
         abi, '0x9ab24eb0'
     ),
-    hasDelegationSet: new Func<[_: string], {}, boolean>(
-        abi, '0x0348dbf1'
-    ),
     increaseAllowance: new Func<[spender: string, addedValue: bigint], {spender: string, addedValue: bigint}, boolean>(
         abi, '0x39509351'
     ),
@@ -186,10 +183,6 @@ export class Contract extends ContractBase {
 
     getVotes(account: string): Promise<bigint> {
         return this.eth_call(functions.getVotes, [account])
-    }
-
-    hasDelegationSet(arg0: string): Promise<boolean> {
-        return this.eth_call(functions.hasDelegationSet, [arg0])
     }
 
     lockups(arg0: string, arg1: bigint): Promise<([amount: bigint, end: bigint, points: bigint] & {amount: bigint, end: bigint, points: bigint})> {
