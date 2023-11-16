@@ -11,6 +11,7 @@ import * as oeth_vault from './oeth/processors/vault'
 import * as oeth_validate from './oeth/validators/validate-oeth'
 import * as ousd from './ousd/processors/ousd'
 import * as ousd_strategies from './ousd/processors/strategies'
+import * as ousd_vault from './ousd/processors/vault'
 import * as ousd_validate from './ousd/validators/validate-ousd'
 import { run } from './processor'
 import * as exchangeRatesPostProcessor from './shared/post-processors/exchange-rates'
@@ -32,6 +33,7 @@ run({
 
     // OUSD
     ousd,
+    ousd_vault,
     ousd_strategies,
 
     // Shared
