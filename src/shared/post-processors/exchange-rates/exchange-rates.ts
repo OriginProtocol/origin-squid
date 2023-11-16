@@ -14,7 +14,7 @@ export const process = async (ctx: Context) => {
   const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
     ctx.log.debug({ count: rates.size }, 'exchange-rates')
-    await ctx.store.insert([...rates.values()])
+    await ctx.store.upsert([...rates.values()])
   }
 }
 
