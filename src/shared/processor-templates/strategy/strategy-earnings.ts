@@ -125,11 +125,13 @@ export const setupStrategyEarnings = (
         address: strategyData.assets.map((asset) => asset.address),
         topic0: [erc20.events.Transfer.topic],
         topic1: [strategyData.address],
+        range: { from: strategyData.from },
       }),
       logFilter({
         address: strategyData.assets.map((asset) => asset.address),
         topic0: [erc20.events.Transfer.topic],
         topic2: [strategyData.address],
+        range: { from: strategyData.from },
       }),
     )
   }
