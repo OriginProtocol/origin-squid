@@ -13,7 +13,7 @@ export const aaveStrategy: IStrategyData = {
   kind: 'Generic',
   name: 'OUSD Aave',
   contractName: 'AaveStrategy',
-  address: '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'.toLowerCase(),
+  address: '0x5e3646a1db86993f73e6b74a57d8640b69f7e259',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI, USDT],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },

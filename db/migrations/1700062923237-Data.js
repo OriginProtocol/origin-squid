@@ -1,5 +1,5 @@
-module.exports = class Data1699399319368 {
-    name = 'Data1699399319368'
+module.exports = class Data1700062923237 {
+    name = 'Data1700062923237'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -14,7 +14,7 @@ module.exports = class Data1699399319368 {
         await db.query(`CREATE TABLE "strategy_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, CONSTRAINT "PK_e87c46575e870fe2202190c2728" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5108f2a2563d5665892d0c06b0" ON "strategy_yield" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_41c3567c9d43c598e07a0029c5" ON "strategy_yield" ("block_number") `)
-        await db.query(`CREATE TABLE "strategy_daily_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_b0dd2686bc95bb032ff532b3a0e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "strategy_daily_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_b0dd2686bc95bb032ff532b3a0e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_0ba1974747f1906e0c102cd2cd" ON "strategy_daily_yield" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_df364fb6e82d1feeed2a5dfffa" ON "strategy_daily_yield" ("block_number") `)
         await db.query(`CREATE TABLE "curve_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_40412750bb910ca560aa084dd88" PRIMARY KEY ("id"))`)

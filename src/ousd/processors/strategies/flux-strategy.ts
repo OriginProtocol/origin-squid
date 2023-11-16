@@ -9,7 +9,7 @@ export const fluxStrategy: IStrategyData = {
   kind: 'Generic',
   name: 'OUSD Flux',
   contractName: 'FluxStrategy',
-  address: '0x76Bf500B6305Dc4ea851384D3d5502f1C7a0ED44'.toLowerCase(),
+  address: '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI, USDT, USDC],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },

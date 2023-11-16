@@ -9,7 +9,7 @@ export const morphoAave: IStrategyData = {
   kind: 'Generic',
   name: 'OUSD Morpho Aave',
   contractName: 'MorphoAaveStrategy',
-  address: '0x79F2188EF9350A1dC11A062cca0abE90684b0197'.toLowerCase(),
+  address: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI, USDT, USDC],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },

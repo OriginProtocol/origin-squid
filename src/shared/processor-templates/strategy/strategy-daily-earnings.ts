@@ -31,6 +31,7 @@ export const processStrategyDailyEarnings = async (
         blockNumber: block.header.height,
         strategy: strategyData.address,
         balance: latest?.balance ?? 0n,
+        balanceWeight: latest?.balanceWeight ?? 1,
         earnings: latest?.earnings ?? 0n,
         earningsChange: latest?.earningsChange ?? 0n,
         asset: strategyData.base.address,
@@ -84,6 +85,7 @@ export const processStrategyDailyEarnings = async (
 
     // Apply ETH values
     current.balance = balance
+    current.balanceWeight = balanceWeight
     current.earnings = earnings
     current.earningsChange = earningsChange
 

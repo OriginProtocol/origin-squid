@@ -9,7 +9,7 @@ export const morphoCompound: IStrategyData = {
   kind: 'Generic',
   name: 'OUSD Morpho Compound',
   contractName: 'MorphoCompoundStrategy',
-  address: '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'.toLowerCase(),
+  address: '0x5a4eee58744d1430876d5ca93cab5ccb763c037d',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI, USDT, USDC],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },

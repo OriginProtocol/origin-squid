@@ -79,6 +79,7 @@ type StrategyDailyYield @entity {
   strategy: String!
   asset: String!
   balance: BigInt!
+  balanceWeight: Float!
   earnings: BigInt!
   earningsChange: BigInt!
   apr: Float!

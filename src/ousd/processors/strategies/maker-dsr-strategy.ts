@@ -9,7 +9,7 @@ export const makerDsrStrategy: IStrategyData = {
   kind: 'Generic',
   name: 'OUSD Maker DSR',
   contractName: 'Generalized4626Strategy',
-  address: '0x6b69B755C629590eD59618A2712d8a2957CA98FC'.toLowerCase(),
+  address: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },

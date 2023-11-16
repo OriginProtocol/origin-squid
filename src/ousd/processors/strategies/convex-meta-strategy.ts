@@ -15,7 +15,7 @@ export const convexMetaStrategy: IStrategyData = {
   kind: 'CurveAMO',
   name: 'OUSD Convex OUSD+3Crv (AMO)',
   contractName: 'ConvexOUSDMetaStrategy',
-  address: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'.toLowerCase(),
+  address: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
   base: { address: currencies.USD, decimals: 18 },
   assets: [DAI, USDT, USDC],
   balanceUpdateTraceFilters: [
