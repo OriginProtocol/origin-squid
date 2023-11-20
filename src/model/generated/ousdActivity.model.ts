@@ -26,6 +26,12 @@ export class OUSDActivity {
     callDataLast4Bytes!: string
 
     @Column_("text", {nullable: true})
+    address!: string | undefined | null
+
+    @Column_("text", {nullable: true})
+    sighash!: string | undefined | null
+
+    @Column_("text", {nullable: true})
     action!: string | undefined | null
 
     @Column_("text", {nullable: true})
@@ -35,20 +41,11 @@ export class OUSDActivity {
     interface!: string | undefined | null
 
     @Column_("text", {nullable: true})
-    fromTokenAddress!: string | undefined | null
+    fromSymbol!: string | undefined | null
 
     @Column_("text", {nullable: true})
-    toTokenAddress!: string | undefined | null
+    toSymbol!: string | undefined | null
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
-    fromTokenAmount!: bigint | undefined | null
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: true})
-    toTokenAmount!: bigint | undefined | null
-
-    @Column_("text", {nullable: true})
-    from!: string | undefined | null
-
-    @Column_("text", {nullable: true})
-    to!: string | undefined | null
+    amount!: bigint | undefined | null
 }

@@ -329,19 +329,19 @@ type OETHActivity @entity {
   blockNumber: Int! @index
   txHash: String! @index
   callDataLast4Bytes: String!
+  address: String
+  sighash: String
 
   action: String
   exchange: String
   interface: String
 
-  fromTokenAddress: String
-  toTokenAddress: String
-  fromTokenAmount: BigInt
-  toTokenAmount: BigInt
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
+}
 
-  from: String
-  to: String
-}type OGV @entity {
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -623,16 +623,14 @@ type OUSDActivity @entity {
   blockNumber: Int! @index
   txHash: String! @index
   callDataLast4Bytes: String!
+  address: String
+  sighash: String
 
   action: String
   exchange: String
   interface: String
 
-  fromTokenAddress: String
-  toTokenAddress: String
-  fromTokenAmount: BigInt
-  toTokenAmount: BigInt
-
-  from: String
-  to: String
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
 }

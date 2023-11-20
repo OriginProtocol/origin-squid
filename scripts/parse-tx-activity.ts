@@ -10,8 +10,8 @@ const client = createPublicClient({
 
 async function go(hash: `0x${string}`) {
   const transaction = await client.getTransaction({ hash })
-  // const receipt = await client.getTransactionReceipt({ hash })
-  const activity = await activityFromTx(transaction as Transaction) //, receipt.logs)
+  const receipt = await client.getTransactionReceipt({ hash })
+  const activity = await activityFromTx(transaction as Transaction, receipt.logs)
   console.log(activity)
 }
 
@@ -24,7 +24,7 @@ async function go(hash: `0x${string}`) {
 // go('0x09fdafc7e32550140a29e6198c6a02aa55144120c25012a031b6fac4a430e9ba') // Dapp
 // go('0xfa6b3593a844f7d4513575b748e335a51731d10538c66068f5307a8b461759ad') // Dapp Wrap OETH
 
-go('0x3f33526f008985e72c5b529f95f6ed4e1014f62ea1b00f22e14063768e497a4d')
+go('0x505062da483b2d4ec7d3ee9c55896c17e32745a4a5a34e24e939527f4875bca2')
 // 0x11c2550a88f84410a0aa284a784b47a974ec7afc998b6621e1f60c6d104e2594
 // 0x34825eec4a4265005ea6a26c869ea2e1013fefc10ad0edf7a192367af6b8bb4d
 // 0x84d5f98f5e4d7245b5985644899f047304607d57c7f20dea38391a427dd2d733
@@ -59,3 +59,56 @@ go('0x3f33526f008985e72c5b529f95f6ed4e1014f62ea1b00f22e14063768e497a4d')
 // 0x248436c3864b176ab1891b8751e2a66d863b4594d8932c2bc17115c2f6b0f422
 // 0x75350e67dda0c47c968ea614f9f664b11f672121d1ab9b6f80f1409d579630c5
 // 0x601a4985b0f3988be459b25f4a07d0607b0ab67fb5e472ea83c1af1fa4ce0ce4
+
+
+
+// 497 | 0x94b17476a93b3262d87b9a326965d1e91f9c13e7 Curve OETH
+// 401 | 0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66 OETH Zapper
+// 210 | 0x3fc91a3afd70395cd496c647d5a6cc9d4b2b7fad Uniswap Router
+// 197 | 0x02777053d6764996e594c3e88af1d58d5363a2e6 Keeper Registry
+// 149 | 0x39254033945aa2e4809cc2977e7087bee48bd7ab OETH Vault
+// 145 | 0x0000000001e4ef00d069e71d6ba041b0a16f7ea0 Pendle
+// 126 | 0x99a58482bd75cbab83b27ec03ca68ff489b5788f Curve registry
+// 113 | 0xdcee70654261af21c44c093c300ed3bb97b78192 Wrapped OETH
+// 113 | 0x9008d19f58aabd9ed0d60971565aa8510560ab41 Gnosis Settlement
+// 107 | 0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3 OETH
+//  80 | 0x1111111254eeb25477b68fb85ed929f73a960582 1inch
+//  66 | 0x24902aa0cf0000a08c0ea0b003b0c0bf600000e0 # ? Mev?
+//  57 | 0xad3b67bca8935cb510c8d18bd45f0b94f54a968f # ? 1inch Mev?
+//  54 | 0xdef171fe48cf0115b1d80b88dc8eab59176fee57 Paraswap
+//  50 | 0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc # Gnosis Safe
+//  50 | 0x0000000000a84d1a9b0063a910315c7ffa9cd248 # ? Mev?
+//  45 | 0x881d40237659c251811cec9c364ef91dc08d300c MetaMask Swap
+//  39 | 0x6e3fddab68bf1ebaf9dacf9f7907c7bc0951d1dc # Gnosis Safe
+//  38 | 0xdef1c0ded9bec7f1a1670819833240f027b25eff ZeroEx
+//  29 | 0x70fce97d671e81080ca3ab4cc7a59aac2e117137 # Gnosis Safe
+//  21 | 0xfd0000000100069ad1670066004306009b487ad7 # ? Mev?
+//  21 | 0xd1742b3c4fbb096990c8950fa635aec75b30781a Seawise
+//  19 | 0xd19dc09880685dd8cf60687d57936358582876b5 # ?
+//  19 | 0xf0d4c12a5768d806021f80a262b4d39d26c58b8d Curve router
+//  18 | 0xfa0bbb0a5815f6648241c9221027b70914dd8949 Curve Swap
+//  17 | 0x53facee52e897740b140f5304e9cd9dc6238d735 # ?
+//  15 | 0x0090eb43008a030065000000e70099482c00b6df # ? Mev?
+//  15 | 0xc11ce44147c9f6149fbe54adb0588523c38718d7 # ? Mev?
+//  12 | 0xcb3702bc25b0f284b032e5edf1a1ebea2fe43255 # ? Mev?
+//  12 | 0x7d32c90762e22379235fc311fdb16fab399ed40a
+//  11 | 0xef1c6e67703c7bd7107eed8303fbe6ec2554bf6b
+//  11 | 0xecb456ea5365865ebab8a2661b0c503410e9b347
+//  11 | 0x507888e987257a8dde6f8afa46375cefe2cbf504
+//  10 | 0x6352a56caadc4f1e25cd6c75970fa768a3304e64
+//  10 | 0x6b75d8af000000e20b7a7ddf000ba900b4009a80
+//   9 | 0x0693e566e00d95edea67deb414e49c17768d6596
+//   9 | 0x462206b11d185ef6f64b41d344325401c37ec335
+//   8 | 0x4f1cdf43f5e407abd569878976960d4d0a3d3452
+//   7 | 0xa88800cd213da5ae406ce248380802bd53b47647
+//   7 | 0x493f461aead031cee2027f1b95370a692611acb9
+//   6 | 0x00000000009e50a7ddb7a7b0e2ee6604fd120e49
+//   6 | 0xa80db00007020e013fa10d0560700c0018003b8b
+//   6 | 0x30ea35bf5dbe2b80fc2438418848a53a0b194e3b
+//   6 | 0x12b6eba545e4a9666cb7a77d1da25df9ffb172f3
+//   5 | 0x95ca391fb08f612dc6b0cbddcb6708c21d5a8295
+//   5 | 0x000b30cccc05f85c45349a6f462c681542c0afe4
+//   5 | 0xba3f5c056500ce033e9d74494b820d495efcf19d
+//   5 | 0xcddc0f6053432de3dd0f8db3786d696fffc3a860
+//   4 | 0x00fc00900000002c00be4ef8f49c000211000c43
+//   4 | 0x247b69f78d2a590bec1ac0a4a4066debe3fca2b8

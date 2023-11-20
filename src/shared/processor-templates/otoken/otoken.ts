@@ -1,5 +1,6 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { groupBy } from 'lodash'
+import { GetTransactionReceiptReturnType } from 'viem'
 
 import * as otoken from '../../../abi/otoken'
 import * as otokenVault from '../../../abi/otoken-vault'
@@ -311,7 +312,18 @@ export const createOTokenProcessor = (params: {
       const transaction = log?.transaction as unknown as Transaction
       // const trace = block.traces.find(t => t.transaction?.hash === txHash)
       if (log && transaction) {
-        const activity = await activityFromTx(transaction)
+        const txReceipt = await ctx._chain.client.call(
+          'eth_getTransactionReceipt',
+          [log.transactionHash, 'latest'],
+        )
+
+        // .call('eth_getBalance', [address, block.header.hash])
+        // .then((r: `0x${string}`) => hexToBigInt(r))
+
+        const activity = await activityFromTx(
+          transaction,
+          txReceipt.logs as unknown as GetTransactionReceiptReturnType['logs'],
+        )
         if (activity) {
           for (const item of activity) {
             result.activity.push(
@@ -320,6 +332,8 @@ export const createOTokenProcessor = (params: {
                 timestamp: new Date(block.header.timestamp),
                 blockNumber: block.header.height,
                 txHash: log.transactionHash,
+                address: transaction.to,
+                sighash: transaction.input.slice(0, 10),
                 ...item,
               }),
             )
