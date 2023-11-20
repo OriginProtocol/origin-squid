@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 999
+version: 10
 description: 'Origin Protocol 🦑'
 build:
 deploy:
@@ -40,4 +40,3 @@ deploy:
       - '1000'
 scale:
   dedicated: true
-  
