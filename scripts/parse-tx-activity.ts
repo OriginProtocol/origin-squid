@@ -11,7 +11,10 @@ const client = createPublicClient({
 async function go(hash: `0x${string}`) {
   const transaction = await client.getTransaction({ hash })
   const receipt = await client.getTransactionReceipt({ hash })
-  const activity = await activityFromTx(transaction as Transaction, receipt.logs)
+  const activity = await activityFromTx(
+    transaction as Transaction,
+    receipt.logs,
+  )
   console.log(activity)
 }
 
@@ -24,7 +27,7 @@ async function go(hash: `0x${string}`) {
 // go('0x09fdafc7e32550140a29e6198c6a02aa55144120c25012a031b6fac4a430e9ba') // Dapp
 // go('0xfa6b3593a844f7d4513575b748e335a51731d10538c66068f5307a8b461759ad') // Dapp Wrap OETH
 
-go('0x505062da483b2d4ec7d3ee9c55896c17e32745a4a5a34e24e939527f4875bca2')
+go('0xd3705c324d3e59545a21eb9773108cbb266631251484ace5016b59c25719a02a')
 // 0x11c2550a88f84410a0aa284a784b47a974ec7afc998b6621e1f60c6d104e2594
 // 0x34825eec4a4265005ea6a26c869ea2e1013fefc10ad0edf7a192367af6b8bb4d
 // 0x84d5f98f5e4d7245b5985644899f047304607d57c7f20dea38391a427dd2d733
@@ -59,8 +62,6 @@ go('0x505062da483b2d4ec7d3ee9c55896c17e32745a4a5a34e24e939527f4875bca2')
 // 0x248436c3864b176ab1891b8751e2a66d863b4594d8932c2bc17115c2f6b0f422
 // 0x75350e67dda0c47c968ea614f9f664b11f672121d1ab9b6f80f1409d579630c5
 // 0x601a4985b0f3988be459b25f4a07d0607b0ab67fb5e472ea83c1af1fa4ce0ce4
-
-
 
 // 497 | 0x94b17476a93b3262d87b9a326965d1e91f9c13e7 Curve OETH
 // 401 | 0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66 OETH Zapper
