@@ -243,8 +243,8 @@ export const createOTokenProcessor = (params: {
           const type = isSwap
             ? HistoryType.Swap
             : addressSub === address
-            ? HistoryType.Sent
-            : HistoryType.Received
+              ? HistoryType.Sent
+              : HistoryType.Received
           result.history.push(
             new params.OTokenHistory({
               // we can't use {t.id} because it's not unique
@@ -310,15 +310,14 @@ export const createOTokenProcessor = (params: {
     for (const [txHash, logs] of Object.entries(groupedLogs)) {
       const log = logs.find((l) => l.address === params.OTOKEN_ADDRESS)
       const transaction = log?.transaction as unknown as Transaction
-      // const trace = block.traces.find(t => t.transaction?.hash === txHash)
       if (log && transaction) {
+        // We need to get the whole transaction receipt for all related logs.
+        // This shouldn't slow things down too much since it's only done for
+        // OToken transactions.
         const txReceipt = await ctx._chain.client.call(
           'eth_getTransactionReceipt',
           [log.transactionHash, 'latest'],
         )
-
-        // .call('eth_getBalance', [address, block.header.hash])
-        // .then((r: `0x${string}`) => hexToBigInt(r))
 
         const activity = await activityFromTx(
           transaction,
