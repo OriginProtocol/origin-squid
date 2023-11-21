@@ -131,8 +131,8 @@ export async function createRebaseAPY<
   apy.rebasingCreditsPerToken = rebaseEvent.rebasingCreditsPerToken
 
   const apyCalc = calculateAPY(
-    lastApy.timestamp,
-    apy.timestamp,
+    dayjs.utc(lastApy.timestamp).endOf('day').toDate(),
+    dayjs.utc(apy.timestamp).endOf('day').toDate(),
     apy.rebasingCreditsPerToken,
     lastApy.rebasingCreditsPerToken,
   )
