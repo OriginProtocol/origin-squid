@@ -354,7 +354,27 @@ type OETHRewardTokenCollected @entity {
   recipient: String!
   rewardToken: String!
   amount: BigInt!
-}type OGV @entity {
+}
+
+type OETHActivity @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+  address: String
+  sighash: String
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
+}
+
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -628,4 +648,22 @@ type OUSDConvexLUSDPlus3Crv @entity {
   dai: BigInt!
   usdt: BigInt!
   usdc: BigInt!
+}
+
+type OUSDActivity @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+  address: String
+  sighash: String
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
 }

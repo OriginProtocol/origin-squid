@@ -1,6 +1,7 @@
 import {
   OUSD,
   OUSDAPY,
+  OUSDActivity,
   OUSDAddress,
   OUSDHistory,
   OUSDRebase,
@@ -32,4 +33,5 @@ export const process = createOTokenProcessor({
   OTokenAPY: OUSDAPY,
   OTokenRebase: OUSDRebase,
   OTokenRebaseOption: OUSDRebaseOption,
+  OTokenActivity: OUSDActivity,
 })

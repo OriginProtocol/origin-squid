@@ -174,3 +174,21 @@ type OUSDConvexLUSDPlus3Crv @entity {
   usdt: BigInt!
   usdc: BigInt!
 }
+
+type OUSDActivity @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+  address: String
+  sighash: String
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
+}
