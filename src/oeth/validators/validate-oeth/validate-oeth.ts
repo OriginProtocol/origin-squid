@@ -113,7 +113,73 @@ const e = (arr: any[]) => {
 }
 
 const expectations = {
-  oethApies: e([]),
+  oethApies: e([
+    {
+      id: '2023-05-21',
+      blockNumber: 17308770,
+      timestamp: '2023-05-21T15:56:35.000000Z',
+      apr: 0.1176475,
+      apy: 0.12482622,
+      apy14DayAvg: 0.13925279,
+      apy30DayAvg: 23.49825734,
+      apy7DayAvg: 0.13852897,
+      rebasingCreditsPerToken: '973558594004638273359591150',
+      txHash:
+        '0x51f29d85120bcfd778966df4e48b76a3c71c9c234cf7b25686e4ac91db412d8c',
+    },
+    {
+      id: '2023-07-10',
+      blockNumber: 17665600,
+      timestamp: '2023-07-10T20:21:35.000000Z',
+      apr: 0.09370518,
+      apy: 0.09822272,
+      apy14DayAvg: 0.0906063,
+      apy30DayAvg: 0.09352583,
+      apy7DayAvg: 0.09085593,
+      rebasingCreditsPerToken: '961364244058751780406499058',
+      txHash:
+        '0x6f4bdbbe1ae933cd140a0d438c7e5f4c68b9deead2768263d7641e90d4a0a097',
+    },
+    {
+      id: '2023-07-11',
+      blockNumber: 17670987,
+      timestamp: '2023-07-11T14:32:35.000000Z',
+      apr: 0.08226324,
+      apy: 0.08573153,
+      apy14DayAvg: 0.09048091,
+      apy30DayAvg: 0.09361911,
+      apy7DayAvg: 0.09035239,
+      rebasingCreditsPerToken: '961147770054335281101637566',
+      txHash:
+        '0x8f7bf364b8f76174643efc8b32f301d1e2face0f076f1b01f65b8c9f01d408c5',
+    },
+    {
+      id: '2023-09-17',
+      blockNumber: 18154149,
+      timestamp: '2023-09-17T06:59:47.000000Z',
+      apr: 0.07639744,
+      apy: 0.07938286,
+      apy14DayAvg: 0.0806931,
+      apy30DayAvg: 0.07938612,
+      apy7DayAvg: 0.08108131,
+      rebasingCreditsPerToken: '947758663109881526211028768',
+      txHash:
+        '0xa4533cc844d8e5a52f444bc32dba546b404860cafa642c210973be6a12242aeb',
+    },
+    {
+      id: '2023-10-25',
+      blockNumber: 18425626,
+      timestamp: '2023-10-25T07:00:11.000000Z',
+      apr: 0.03307518,
+      apy: 0.0336267,
+      apy14DayAvg: 0.04734976,
+      apy30DayAvg: 0.06023904,
+      apy7DayAvg: 0.04300473,
+      rebasingCreditsPerToken: '941364114470046460777492892',
+      txHash:
+        '0x67ef6bda379e51a3983f7c2822b39538a40fb93b1d26f66b687da41657f17239',
+    },
+  ]),
   oethHistories: e([
     {
       balance: '4994819891394470874',
