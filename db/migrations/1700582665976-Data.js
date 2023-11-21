@@ -1,5 +1,5 @@
-module.exports = class Data1699908714070 {
-    name = 'Data1699908714070'
+module.exports = class Data1700582665976 {
+    name = 'Data1700582665976'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -66,6 +66,10 @@ module.exports = class Data1699908714070 {
         await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_81a9fa43ae4a6ae63e4103127b" ON "oeth_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d36c78b9c3e9d737f067638bc4" ON "oeth_reward_token_collected" ("block_number") `)
+        await db.query(`CREATE TABLE "oeth_activity" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "call_data_last4_bytes" text NOT NULL, "address" text, "sighash" text, "action" text, "exchange" text, "interface" text, "from_symbol" text, "to_symbol" text, "amount" numeric, CONSTRAINT "PK_8938e7a05e2377cb6dc46e6980c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_701369d638018e8f191b7c048d" ON "oeth_activity" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_e3037b99481023edd17b98cd78" ON "oeth_activity" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_6537c67233447c5152bc7318f8" ON "oeth_activity" ("tx_hash") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2418a8b8b92b2f5977be761cf9" ON "ogv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_b8f20bcf48e4aa77e0f48d77db" ON "ogv" ("block_number") `)
@@ -135,6 +139,10 @@ module.exports = class Data1699908714070 {
         await db.query(`CREATE TABLE "ousd_convex_lusd_plus3_crv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "dai" numeric NOT NULL, "usdt" numeric NOT NULL, "usdc" numeric NOT NULL, CONSTRAINT "PK_47290aa5dfa3cc5595f468e2f39" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_0783af95efb35fb3f13cde1656" ON "ousd_convex_lusd_plus3_crv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_74ae01fb596a4f2733087ba454" ON "ousd_convex_lusd_plus3_crv" ("block_number") `)
+        await db.query(`CREATE TABLE "ousd_activity" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "call_data_last4_bytes" text NOT NULL, "address" text, "sighash" text, "action" text, "exchange" text, "interface" text, "from_symbol" text, "to_symbol" text, "amount" numeric, CONSTRAINT "PK_0f830a098aea9c70d8e8a626933" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_87dcf07f9e54c132535acf47a4" ON "ousd_activity" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_e80a0f99e9f31fe69ac50b5a4c" ON "ousd_activity" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_2af2ad9975c024d1aa3535928f" ON "ousd_activity" ("tx_hash") `)
         await db.query(`ALTER TABLE "oeth_history" ADD CONSTRAINT "FK_94e47c4c49128c78f60b185b46b" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase" ADD CONSTRAINT "FK_3331819842173de7c27c046547a" FOREIGN KEY ("apy_id") REFERENCES "oethapy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase_option" ADD CONSTRAINT "FK_034428879698039839b4ba6ffe8" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -218,6 +226,10 @@ module.exports = class Data1699908714070 {
         await db.query(`DROP TABLE "oeth_reward_token_collected"`)
         await db.query(`DROP INDEX "public"."IDX_81a9fa43ae4a6ae63e4103127b"`)
         await db.query(`DROP INDEX "public"."IDX_d36c78b9c3e9d737f067638bc4"`)
+        await db.query(`DROP TABLE "oeth_activity"`)
+        await db.query(`DROP INDEX "public"."IDX_701369d638018e8f191b7c048d"`)
+        await db.query(`DROP INDEX "public"."IDX_e3037b99481023edd17b98cd78"`)
+        await db.query(`DROP INDEX "public"."IDX_6537c67233447c5152bc7318f8"`)
         await db.query(`DROP TABLE "ogv"`)
         await db.query(`DROP INDEX "public"."IDX_2418a8b8b92b2f5977be761cf9"`)
         await db.query(`DROP INDEX "public"."IDX_b8f20bcf48e4aa77e0f48d77db"`)
@@ -287,6 +299,10 @@ module.exports = class Data1699908714070 {
         await db.query(`DROP TABLE "ousd_convex_lusd_plus3_crv"`)
         await db.query(`DROP INDEX "public"."IDX_0783af95efb35fb3f13cde1656"`)
         await db.query(`DROP INDEX "public"."IDX_74ae01fb596a4f2733087ba454"`)
+        await db.query(`DROP TABLE "ousd_activity"`)
+        await db.query(`DROP INDEX "public"."IDX_87dcf07f9e54c132535acf47a4"`)
+        await db.query(`DROP INDEX "public"."IDX_e80a0f99e9f31fe69ac50b5a4c"`)
+        await db.query(`DROP INDEX "public"."IDX_2af2ad9975c024d1aa3535928f"`)
         await db.query(`ALTER TABLE "oeth_history" DROP CONSTRAINT "FK_94e47c4c49128c78f60b185b46b"`)
         await db.query(`ALTER TABLE "oeth_rebase" DROP CONSTRAINT "FK_3331819842173de7c27c046547a"`)
         await db.query(`ALTER TABLE "oeth_rebase_option" DROP CONSTRAINT "FK_034428879698039839b4ba6ffe8"`)
