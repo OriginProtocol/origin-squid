@@ -259,6 +259,11 @@ export const createOTokenProcessor = (params: {
             }),
           )
           address.credits = BigInt(credits[0]) // token credits
+          if (address.balance === 0n && newBalance > 0n) {
+            otokenObject.holderCount += 1
+          } else if (address.balance > 0n && newBalance === 0n) {
+            otokenObject.holderCount -= 1
+          }
           address.balance = newBalance // token balance
         }),
       )
@@ -355,10 +360,10 @@ export const createOTokenProcessor = (params: {
     const data = otoken.events.TotalSupplyUpdatedHighres.decode(log)
 
     // OToken Object
-    const oethObject = await getLatestOTokenObject(ctx, result, block)
-    oethObject.totalSupply = data.totalSupply
-    oethObject.rebasingSupply =
-      oethObject.totalSupply - oethObject.nonRebasingSupply
+    const otokenObject = await getLatestOTokenObject(ctx, result, block)
+    otokenObject.totalSupply = data.totalSupply
+    otokenObject.rebasingSupply =
+      otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
     if (!result.lastYieldDistributionEvent) {
       throw new Error('lastYieldDistributionEvent is not set')
@@ -376,7 +381,11 @@ export const createOTokenProcessor = (params: {
       result.lastYieldDistributionEvent,
     )
 
+    otokenObject.holderCount = 0
     for (const address of owners!.values()) {
+      if (address.balance > 0n) {
+        otokenObject.holderCount += 1
+      }
       if (
         !address.credits ||
         address.rebasingOption === RebasingOption.OptOut
@@ -499,6 +508,7 @@ export const createOTokenProcessor = (params: {
         totalSupply: latest?.totalSupply ?? 0n,
         rebasingSupply: latest?.rebasingSupply ?? 0n,
         nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
+        holderCount: latest?.holderCount ?? 0,
       })
       result.otokens.push(otokenObject)
     }

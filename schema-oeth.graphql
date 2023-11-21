@@ -8,6 +8,7 @@ type OETH @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+  holderCount: Int!
 }
 
 """

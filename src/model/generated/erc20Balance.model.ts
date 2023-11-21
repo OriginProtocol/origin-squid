@@ -1,15 +1,15 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The OUSD entity tracks the change in total supply of OUSD over time.
- */
 @Entity_()
-export class OUSD {
-    constructor(props?: Partial<OUSD>) {
+export class ERC20Balance {
+    constructor(props?: Partial<ERC20Balance>) {
         Object.assign(this, props)
     }
 
+    /**
+     * Format: 'address:account:blockNumber'
+     */
     @PrimaryColumn_()
     id!: string
 
@@ -21,15 +21,12 @@ export class OUSD {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupply!: bigint
+    @Column_("text", {nullable: false})
+    address!: string
+
+    @Column_("text", {nullable: false})
+    account!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    rebasingSupply!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    nonRebasingSupply!: bigint
-
-    @Column_("int4", {nullable: false})
-    holderCount!: number
+    balance!: bigint
 }
