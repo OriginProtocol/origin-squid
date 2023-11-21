@@ -170,6 +170,17 @@
       ],
       "hidden": true
     },
+    "process:ogv:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-ogv.js"
+      ],
+      "hidden": true
+    },
     "process:other:prod": {
       "description": "Start the squid processor",
       "deps": [

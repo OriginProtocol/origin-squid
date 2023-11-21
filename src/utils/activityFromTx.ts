@@ -276,22 +276,12 @@ export async function activityFromTx(
 }
 
 function decodeOethZapperTx(transaction: Transaction) {
-  try {
-    const data = decodeFunctionData({
-      abi: oethZapperAbi.ABI_JSON,
-      data: transaction.input as '0x${string}',
-    })
-
-    return {
-      callDataLast4Bytes: transaction?.input.slice(-8),
-      exchange: 'OETHZapper',
-      action: 'Swap',
-      fromSymbol: 'ETH',
-      toSymbol: 'OETH',
-    }
-  } catch (e) {
-    console.log('Error decoding OETHZapper tx', e)
-    return
+  return {
+    callDataLast4Bytes: transaction?.input.slice(-8),
+    exchange: 'OETHZapper',
+    action: 'Swap',
+    fromSymbol: 'ETH',
+    toSymbol: 'OETH',
   }
 }
 

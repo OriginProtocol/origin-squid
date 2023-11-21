@@ -15,19 +15,19 @@ deploy:
     #      RPC_ENV: RPC_ENDPOINT_999
     ################################
     - name: oeth-processor
-      cmd: [ "node", "lib/main-oeth" ]
+      cmd: [ "sqd", "process:oeth:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_999
     - name: ousd-processor
-      cmd: [ "node", "lib/main-ousd" ]
+      cmd: [ "sqd", "process:ousd:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_999
     - name: ogv-processor
-      cmd: [ "node", "lib/main-ogv" ]
+      cmd: [ "sqd", "process:ogv:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_999
     - name: other-processor
-      cmd: [ "node", "lib/main-other" ]
+      cmd: [ "sqd", "process:other:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_999
   api:
