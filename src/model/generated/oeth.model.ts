@@ -29,4 +29,7 @@ export class OETH {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     nonRebasingSupply!: bigint
+
+    @Column_("int4", {nullable: false})
+    holderCount!: number
 }

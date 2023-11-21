@@ -83,3 +83,46 @@ type StrategyDailyYield @entity {
   apr: Float!
   apy: Float!
 }
+
+type ERC20 @entity {
+  """
+  Format: 'address'
+  """
+  id: ID!
+  address: String!
+  name: String!
+  decimals: Int!
+  symbol: String!
+}
+
+type ERC20Holder @entity {
+  """
+  Format: 'address:account'
+  """
+  id: ID!
+  address: String!
+  account: String!
+}
+
+type ERC20Supply @entity {
+  """
+  Format: 'address:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  totalSupply: BigInt!
+}
+
+type ERC20Balance @entity {
+  """
+  Format: 'address:account:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  account: String!
+  balance: BigInt!
+}
