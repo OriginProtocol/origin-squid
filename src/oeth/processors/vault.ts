@@ -9,9 +9,9 @@ import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates
 import {
   FRXETH_ADDRESS,
   OETH_VAULT_ADDRESS,
+  OETH_VAULT_ERC20_ADDRESSES,
   RETH_ADDRESS,
   STETH_ADDRESS,
-  VAULT_ERC20_ADDRESSES,
   WETH_ADDRESS,
 } from '../../utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '../../utils/utils'
@@ -25,13 +25,13 @@ export const from = 17067001 // https://etherscan.io/tx/0x0b81a0e2b7d824ce493465
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
-    address: VAULT_ERC20_ADDRESSES,
+    address: OETH_VAULT_ERC20_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic1: [pad(OETH_VAULT_ADDRESS)],
     range: { from },
   })
   processor.addLog({
-    address: VAULT_ERC20_ADDRESSES,
+    address: OETH_VAULT_ERC20_ADDRESSES,
     topic0: [erc20.events.Transfer.topic],
     topic2: [pad(OETH_VAULT_ADDRESS)],
     range: { from },
@@ -85,7 +85,7 @@ const processTransfer = async (
     await trackAddressBalances({
       log,
       address: OETH_VAULT_ADDRESS,
-      tokens: VAULT_ERC20_ADDRESSES,
+      tokens: OETH_VAULT_ERC20_ADDRESSES,
       fn: async ({ token, change }) => {
         const { vault } = await getLatestOETHVault(ctx, result, block)
         if (token === WETH_ADDRESS) {

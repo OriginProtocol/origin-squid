@@ -51,3 +51,35 @@ type StrategyBalance @entity {
   asset: String!
   balance: BigInt!
 }
+
+type StrategyYield @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+  balanceWeight: Float!
+  earnings: BigInt!
+  earningsChange: BigInt!
+}
+
+type StrategyDailyYield @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+  balanceWeight: Float!
+  earnings: BigInt!
+  earningsChange: BigInt!
+  apr: Float!
+  apy: Float!
+}

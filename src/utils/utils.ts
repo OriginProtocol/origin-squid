@@ -5,6 +5,24 @@ import { pad } from 'viem'
 import * as erc20 from '../abi/erc20'
 import { Context } from '../processor'
 
+export const max = (values: bigint[], start = 0n) => {
+  return values.reduce((max, v) => (max > v ? max : v), start)
+}
+
+export const lastExcept = <
+  T extends {
+    id: string
+  },
+>(
+  arr: T[] | undefined,
+  id: string,
+) =>
+  arr
+    ? arr[arr.length - 1]?.id === id
+      ? arr[arr.length - 2]
+      : arr[arr.length - 1]
+    : undefined
+
 export const trackAddressBalances = async ({
   log,
   address,
@@ -73,4 +91,10 @@ export const getOrCreate = async <T extends Entity>(
   memory.push(value)
 
   return value
+}
+
+export const convertDecimals = (from: number, to: number, value: bigint) => {
+  const fromFactor = 10n ** BigInt(from)
+  const toFactor = 10n ** BigInt(to)
+  return (value * toFactor) / fromFactor
 }

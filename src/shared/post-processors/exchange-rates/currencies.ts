@@ -1,3 +1,7 @@
+import { invert, mapKeys } from 'lodash'
+
+import { ExchangeRate } from '../../../model'
+
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
   ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Chainlink Denominations.ETH
@@ -8,6 +12,31 @@ export const currencies = {
   rETH: '0xae78736cd615f374d3085123a210448e74fc6393',
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
+  CRV: '0xD533a949740bb3306d119CC777fa900bA034cd52',
 } as const
 
-export type Currency = keyof typeof currencies
+export const currenciesByAddress = mapKeys(invert(currencies), (v, k) =>
+  k.toLowerCase(),
+) as Record<string, Currency>
+
+const eth1 = 1000000000000000000n
+export const convertRate = (
+  rates: Pick<ExchangeRate, 'base' | 'quote' | 'rate'>[],
+  base: Currency,
+  quote: Currency,
+  balance: bigint,
+) => {
+  base = currenciesByAddress[base.toLowerCase() as CurrencyAddress] ?? base
+  quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress] ?? quote
+  const rate = rates.find((r) => r.base === base && r.quote === quote)
+  if (rate) {
+    return (balance * rate.rate) / eth1
+  } else {
+    return 0n
+  }
+}
+
+export type CurrencySymbol = keyof typeof currencies
+export type CurrencyAddress = (typeof currencies)[keyof typeof currencies]
+
+export type Currency = CurrencySymbol | CurrencyAddress

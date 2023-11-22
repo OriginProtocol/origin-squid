@@ -52,6 +52,38 @@ type StrategyBalance @entity {
   strategy: String!
   asset: String!
   balance: BigInt!
+}
+
+type StrategyYield @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+  balanceWeight: Float!
+  earnings: BigInt!
+  earningsChange: BigInt!
+}
+
+type StrategyDailyYield @entity {
+  """
+  Format: 'strategy:asset:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategy: String!
+  asset: String!
+  balance: BigInt!
+  balanceWeight: Float!
+  earnings: BigInt!
+  earningsChange: BigInt!
+  apr: Float!
+  apy: Float!
 }type CurvePoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -318,6 +350,7 @@ type OETHRewardTokenCollected @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  strategy: String!
   recipient: String!
   rewardToken: String!
   amount: BigInt!

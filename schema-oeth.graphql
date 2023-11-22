@@ -255,6 +255,7 @@ type OETHRewardTokenCollected @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  strategy: String!
   recipient: String!
   rewardToken: String!
   amount: BigInt!

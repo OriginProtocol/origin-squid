@@ -1,3 +1,4 @@
+import { compact } from 'lodash'
 import {
   GetTransactionReceiptReturnType,
   decodeEventLog,
@@ -27,6 +28,14 @@ const WrappedOETHAbi = parseAbi([
   'event Withdraw(address indexed caller, address indexed receiver, address indexed owner, uint256 assets, uint256 shares)',
 ])
 
+const tryDecodeEventLog = (...params: Parameters<typeof decodeEventLog>) => {
+  try {
+    return decodeEventLog(...params)
+  } catch (err: unknown) {
+    return undefined
+  }
+}
+
 export interface Transaction {
   to: string
   from: string
@@ -54,17 +63,19 @@ export async function activityFromTx(
   const activity = []
   if (!transaction) return
 
-  const curveEvents = logs
-    .filter((l) =>
-      addressEq(l.address, '0x94B17476A93b3262d87B9a326965D1E91f9c13E7'),
-    )
-    .map((log) => {
-      return decodeEventLog({
-        abi: curveLpAbi.ABI_JSON,
-        data: log.data,
-        topics: log.topics,
-      })
-    })
+  const curveEvents = compact(
+    logs
+      .filter((l) =>
+        addressEq(l.address, '0x94B17476A93b3262d87B9a326965D1E91f9c13E7'),
+      )
+      .map((log) =>
+        tryDecodeEventLog({
+          abi: curveLpAbi.ABI_JSON,
+          data: log.data,
+          topics: log.topics,
+        }),
+      ),
+  )
 
   const sansGnosisSafeEvents = logs.filter(({ data, topics }) => {
     try {
@@ -80,71 +91,76 @@ export async function activityFromTx(
     }
   })
 
-  const oethEvents = logs
-    .filter((l) => l.address === OETH_ADDRESS)
-    .map((log) => {
-      return decodeEventLog({
-        abi: oethAbi.ABI_JSON,
-        data: log.data,
-        topics: log.topics,
-      })
-    })
+  const oethEvents = compact(
+    logs
+      .filter((l) => l.address === OETH_ADDRESS)
+      .map((log) => {
+        return tryDecodeEventLog({
+          abi: oethAbi.ABI_JSON,
+          data: log.data,
+          topics: log.topics,
+        })
+      }),
+  )
 
-  const balancerVaultEvents = logs
-    .filter((l) =>
-      addressEq(l.address, '0xBA12222222228d8Ba445958a75a0704d566BF2C8'),
-    )
-    .map((log) => {
-      return decodeEventLog({
-        abi: balancerVaultAbi.ABI_JSON,
-        data: log.data,
-        topics: log.topics,
-      })
-    })
+  const balancerVaultEvents = compact(
+    logs
+      .filter((l) =>
+        addressEq(l.address, '0xBA12222222228d8Ba445958a75a0704d566BF2C8'),
+      )
+      .map((log) => {
+        return tryDecodeEventLog({
+          abi: balancerVaultAbi.ABI_JSON,
+          data: log.data,
+          topics: log.topics,
+        })
+      }),
+  )
 
-  const oethVaultEvents = logs
-    .filter((l) => l.address === OETH_VAULT_ADDRESS)
-    .map((log) => {
-      return decodeEventLog({
-        abi: oethVaultAbi.ABI_JSON,
-        data: log.data,
-        topics: log.topics,
-      })
-    })
+  const oethVaultEvents = compact(
+    logs
+      .filter((l) => l.address === OETH_VAULT_ADDRESS)
+      .map((log) => {
+        return tryDecodeEventLog({
+          abi: oethVaultAbi.ABI_JSON,
+          data: log.data,
+          topics: log.topics,
+        })
+      }),
+  )
 
-  const woethEvents = logs
-    .filter((l) =>
-      addressEq(l.address, '0xdcee70654261af21c44c093c300ed3bb97b78192'),
-    )
-    .map(({ data, topics }) => {
-      try {
-        return decodeEventLog({ abi: WrappedOETHAbi, data, topics })
-      } catch (e) {
-        /* Ignore */
-      }
-    })
-    .filter(Boolean)
+  const woethEvents = compact(
+    logs
+      .filter((l) =>
+        addressEq(l.address, '0xdcee70654261af21c44c093c300ed3bb97b78192'),
+      )
+      .map(({ data, topics }) =>
+        tryDecodeEventLog({ abi: WrappedOETHAbi, data, topics }),
+      ),
+  )
 
   const oneInchEvents = logs.filter((l) =>
     addressEq(l.address, '0x1111111254eeb25477b68fb85ed929f73a960582'),
   )
-  const uniswapWethEvents = logs
-    .filter((l) =>
-      addressEq(l.address, '0x52299416c469843f4e0d54688099966a6c7d720f'),
-    )
-    .map((log) =>
-      decodeEventLog({
-        abi: UniswapV3SwapAbi,
-        data: log.data,
-        topics: log.topics,
-      }),
-    )
+  const uniswapWethEvents = compact(
+    logs
+      .filter((l) =>
+        addressEq(l.address, '0x52299416c469843f4e0d54688099966a6c7d720f'),
+      )
+      .map((log) =>
+        tryDecodeEventLog({
+          abi: UniswapV3SwapAbi,
+          data: log.data,
+          topics: log.topics,
+        }),
+      ),
+  )
 
   const frxEthOETHCurvePoolEvents = logs.filter((l) =>
     addressEq(l.address, '0xfa0bbb0a5815f6648241c9221027b70914dd8949'),
   )
 
-  const oethTransfers = oethEvents.filter(
+  const oethTransfers = compact(oethEvents).filter(
     (log) => log.eventName === 'Transfer',
   ) as Transfer[]
 
@@ -276,22 +292,12 @@ export async function activityFromTx(
 }
 
 function decodeOethZapperTx(transaction: Transaction) {
-  try {
-    const data = decodeFunctionData({
-      abi: oethZapperAbi.ABI_JSON,
-      data: transaction.input as '0x${string}',
-    })
-
-    return {
-      callDataLast4Bytes: transaction?.input.slice(-8),
-      exchange: 'OETHZapper',
-      action: 'Swap',
-      fromSymbol: 'ETH',
-      toSymbol: 'OETH',
-    }
-  } catch (e) {
-    console.log('Error decoding OETHZapper tx', e)
-    return
+  return {
+    callDataLast4Bytes: transaction?.input.slice(-8),
+    exchange: 'OETHZapper',
+    action: 'Swap',
+    fromSymbol: 'ETH',
+    toSymbol: 'OETH',
   }
 }
 

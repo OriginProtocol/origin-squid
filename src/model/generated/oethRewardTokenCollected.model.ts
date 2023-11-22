@@ -19,6 +19,9 @@ export class OETHRewardTokenCollected {
     blockNumber!: number
 
     @Column_("text", {nullable: false})
+    strategy!: string
+
+    @Column_("text", {nullable: false})
     recipient!: string
 
     @Column_("text", {nullable: false})

@@ -12,7 +12,7 @@ import * as validateOeth from './oeth/validators/validate-oeth'
 import { run } from './processor'
 import * as exchangeRatesPostProcessor from './shared/post-processors/exchange-rates'
 
-run({
+export const processor = {
   stateSchema: 'oeth-processor',
   processors: [
     oeth,
@@ -27,4 +27,9 @@ run({
   ],
   postProcessors: [exchangeRatesPostProcessor, dailyStats],
   validators: [validateOeth],
-})
+}
+export default processor
+
+if (require.main === module) {
+  run(processor)
+}

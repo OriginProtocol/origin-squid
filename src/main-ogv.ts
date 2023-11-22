@@ -1,11 +1,16 @@
-import { run } from './processor'
+import * as governance from './ogv/post-processors/governance'
 import * as ogv from './ogv/processors/ogv'
 import * as ogvSupply from './ogv/processors/ogv-supply'
-import * as governance from './ogv/post-processors/governance'
+import { run } from './processor'
 
-run({
+export const processor = {
   stateSchema: 'ogv-processor',
   processors: [ogvSupply, ogv],
   postProcessors: [governance],
   validators: [],
-})
+}
+export default processor
+
+if (require.main === module) {
+  run(processor)
+}

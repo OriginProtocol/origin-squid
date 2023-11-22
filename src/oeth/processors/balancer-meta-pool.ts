@@ -6,7 +6,7 @@ import * as metaStablePool from '../../abi/meta-stable-pool'
 import { OETHBalancerMetaPoolStrategy } from '../../model'
 import { Context } from '../../processor'
 import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
-import { getBalancerStrategyHoldings } from '../../shared/processor-templates/strategy'
+import { getBalancerStrategyHoldings } from '../../shared/processor-templates/strategy/strategy-balancer'
 import { RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 import { getLatestEntity } from '../../utils/utils'
 import { oethStrategies } from './strategies'
@@ -120,14 +120,16 @@ export const updateValues = async (
       result.strategies,
       timestampId,
     ),
-    getBalancerStrategyHoldings(ctx, block, strategyData).then((holdings) => {
-      return {
-        rETH: holdings.find((h) => h.asset.toLowerCase() === RETH_ADDRESS)!
-          .balance,
-        weth: holdings.find((h) => h.asset.toLowerCase() === WETH_ADDRESS)!
-          .balance,
-      }
-    }),
+    getBalancerStrategyHoldings(ctx, block.header, strategyData).then(
+      (holdings) => {
+        return {
+          rETH: holdings.find((h) => h.asset.toLowerCase() === RETH_ADDRESS)!
+            .balance,
+          weth: holdings.find((h) => h.asset.toLowerCase() === WETH_ADDRESS)!
+            .balance,
+        }
+      },
+    ),
   ])
 
   if (!current) {

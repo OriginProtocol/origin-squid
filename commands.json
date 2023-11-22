@@ -88,6 +88,18 @@
         "--multicall"
       ]
     },
+    "process": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build",
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "lib/main.js"
+      ]
+    },
     "process:oeth": {
       "description": "Load .env and start the squid processor",
       "deps": [
@@ -155,6 +167,17 @@
       "cmd": [
         "node",
         "lib/main-ousd.js"
+      ],
+      "hidden": true
+    },
+    "process:ogv:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-ogv.js"
       ],
       "hidden": true
     },

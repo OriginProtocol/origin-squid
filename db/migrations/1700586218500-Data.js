@@ -1,5 +1,5 @@
-module.exports = class Data1700582665976 {
-    name = 'Data1700582665976'
+module.exports = class Data1700586218500 {
+    name = 'Data1700586218500'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -11,6 +11,12 @@ module.exports = class Data1700582665976 {
         await db.query(`CREATE TABLE "strategy_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_ca6f93229d1392e9546d01dae4f" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_0113bf0b63183bea0d22cd0d08" ON "strategy_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a88065dcd92011698bbe7df7b1" ON "strategy_balance" ("block_number") `)
+        await db.query(`CREATE TABLE "strategy_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, CONSTRAINT "PK_e87c46575e870fe2202190c2728" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_5108f2a2563d5665892d0c06b0" ON "strategy_yield" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_41c3567c9d43c598e07a0029c5" ON "strategy_yield" ("block_number") `)
+        await db.query(`CREATE TABLE "strategy_daily_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_b0dd2686bc95bb032ff532b3a0e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_0ba1974747f1906e0c102cd2cd" ON "strategy_daily_yield" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_df364fb6e82d1feeed2a5dfffa" ON "strategy_daily_yield" ("block_number") `)
         await db.query(`CREATE TABLE "curve_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_40412750bb910ca560aa084dd88" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ffb0d0f86f03faacef7cb3e092" ON "curve_pool_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_db5522c865eb8ed76fa7aeb4a8" ON "curve_pool_balance" ("block_number") `)
@@ -63,7 +69,7 @@ module.exports = class Data1700582665976 {
         await db.query(`CREATE TABLE "oeth_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "revenue" numeric NOT NULL, "revenue7_day_avg" numeric NOT NULL, "revenue7_day_total" numeric NOT NULL, "revenue_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_9144a02ab13b1baa818a7d5eae5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98d9001013aa37425ca47b7126" ON "oeth_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_c3e66051c7df4efd6a8fa8f9c1" ON "oeth_daily_stat" ("timestamp") `)
-        await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_81a9fa43ae4a6ae63e4103127b" ON "oeth_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d36c78b9c3e9d737f067638bc4" ON "oeth_reward_token_collected" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_activity" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "call_data_last4_bytes" text NOT NULL, "address" text, "sighash" text, "action" text, "exchange" text, "interface" text, "from_symbol" text, "to_symbol" text, "amount" numeric, CONSTRAINT "PK_8938e7a05e2377cb6dc46e6980c" PRIMARY KEY ("id"))`)
@@ -171,6 +177,12 @@ module.exports = class Data1700582665976 {
         await db.query(`DROP TABLE "strategy_balance"`)
         await db.query(`DROP INDEX "public"."IDX_0113bf0b63183bea0d22cd0d08"`)
         await db.query(`DROP INDEX "public"."IDX_a88065dcd92011698bbe7df7b1"`)
+        await db.query(`DROP TABLE "strategy_yield"`)
+        await db.query(`DROP INDEX "public"."IDX_5108f2a2563d5665892d0c06b0"`)
+        await db.query(`DROP INDEX "public"."IDX_41c3567c9d43c598e07a0029c5"`)
+        await db.query(`DROP TABLE "strategy_daily_yield"`)
+        await db.query(`DROP INDEX "public"."IDX_0ba1974747f1906e0c102cd2cd"`)
+        await db.query(`DROP INDEX "public"."IDX_df364fb6e82d1feeed2a5dfffa"`)
         await db.query(`DROP TABLE "curve_pool_balance"`)
         await db.query(`DROP INDEX "public"."IDX_ffb0d0f86f03faacef7cb3e092"`)
         await db.query(`DROP INDEX "public"."IDX_db5522c865eb8ed76fa7aeb4a8"`)
