@@ -98,6 +98,7 @@ export const run = ({
     new TypeormDatabase({
       stateSchema,
       supportHotBlocks: true,
+      isolationLevel: 'READ COMMITTED',
     }),
     async (_ctx) => {
       const ctx = _ctx as Context
