@@ -13,8 +13,7 @@ import {
 import { Block, Context, Log } from '../../processor'
 import { GOVERNANCE_ADDRESS } from '../../utils/addresses'
 
-export const from = 14439231 // https://etherscan.io/tx/0x9295cac246169f06a3d4ec33fdbd87fced7a9e19ea61177cae75034e45ae66f4
-export const governanceFrom = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
+export const from = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
 
 interface IProcessResult {
   addresses: Map<string, OGVAddress>
@@ -27,19 +26,21 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
     address: [GOVERNANCE_ADDRESS],
     topic0: [
-      governanceAbi.events.ProposalCreated,
-      governanceAbi.events.ProposalExecuted,
-      governanceAbi.events.ProposalExtended,
-      governanceAbi.events.ProposalQueued,
-      governanceAbi.events.ProposalCanceled,
-      governanceAbi.events.VoteCast,
-      governanceAbi.events.VoteCastWithParams,
-    ].map((ev) => ev.topic),
-    range: { from: governanceFrom },
+      governanceAbi.events.ProposalCreated.topic,
+      governanceAbi.events.ProposalExecuted.topic,
+      governanceAbi.events.ProposalExtended.topic,
+      governanceAbi.events.ProposalQueued.topic,
+      governanceAbi.events.ProposalCanceled.topic,
+      governanceAbi.events.VoteCast.topic,
+      governanceAbi.events.VoteCastWithParams.topic,
+    ],
+    range: { from },
   })
 }
 
 export const process = async (ctx: Context) => {
+  if (ctx.blocks[ctx.blocks.length - 1]?.header.height < from) return
+
   const result: IProcessResult = {
     addresses: new Map<string, OGVAddress>(),
     proposals: new Map<string, OGVProposal>(),
@@ -49,12 +50,9 @@ export const process = async (ctx: Context) => {
 
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
+      if (log.address !== GOVERNANCE_ADDRESS) continue
+
       const firstTopic = log.topics[0]
-
-      if (log.address !== GOVERNANCE_ADDRESS) {
-        return
-      }
-
       if (firstTopic == governanceAbi.events.ProposalCreated.topic) {
         await _processProposalCreated(ctx, result, block, log)
       } else if (firstTopic == governanceAbi.events.ProposalExtended.topic) {
@@ -90,6 +88,7 @@ const _processProposalCreated = async (
   block: Block,
   log: Log,
 ) => {
+  // ctx.log.info('_processProposalCreated')
   const {
     proposalId,
     proposer: proposerAddr,
@@ -136,17 +135,23 @@ const proposalStateMap = [
 
 const eventMapper = {
   [governanceAbi.events.ProposalQueued.topic]: {
-    decode: governanceAbi.events.ProposalQueued.decode,
+    decode: governanceAbi.events.ProposalQueued.decode.bind(
+      governanceAbi.events.ProposalQueued,
+    ),
     status: OGVProposalState.Queued,
     event: OGVProposalEvent.Queued,
   },
   [governanceAbi.events.ProposalCanceled.topic]: {
-    decode: governanceAbi.events.ProposalCanceled.decode,
+    decode: governanceAbi.events.ProposalCanceled.decode.bind(
+      governanceAbi.events.ProposalCanceled,
+    ),
     status: OGVProposalState.Canceled,
     event: OGVProposalEvent.Canceled,
   },
   [governanceAbi.events.ProposalExecuted.topic]: {
-    decode: governanceAbi.events.ProposalExecuted.decode,
+    decode: governanceAbi.events.ProposalExecuted.decode.bind(
+      governanceAbi.events.ProposalExecuted,
+    ),
     status: OGVProposalState.Executed,
     event: OGVProposalEvent.Executed,
   },
@@ -158,6 +163,7 @@ const _processProposalEvents = async (
   block: Block,
   log: Log,
 ) => {
+  // ctx.log.info('_processProposalEvents')
   const { decode, status, event } = eventMapper[log.topics[0]]!
 
   const { proposalId } = decode(log)
@@ -183,6 +189,7 @@ const _processProposalExtended = async (
   block: Block,
   log: Log,
 ) => {
+  // ctx.log.info('_processProposalExtended')
   const { proposalId, extendedDeadline } =
     governanceAbi.events.ProposalExtended.decode(log)
   const blockTimestamp = new Date(block.header.timestamp)
@@ -208,11 +215,15 @@ const _processVoteCast = async (
   block: Block,
   log: Log,
 ) => {
-  const decode =
-    log.topics[0] == governanceAbi.events.VoteCast.topic
-      ? governanceAbi.events.VoteCast.decode
-      : governanceAbi.events.VoteCastWithParams.decode
-  const { proposalId, voter: voterAddr, weight, support } = decode(log)
+  // ctx.log.info('_processVoteCast')
+  const {
+    proposalId,
+    voter: voterAddr,
+    weight,
+    support,
+  } = log.topics[0] == governanceAbi.events.VoteCast.topic
+    ? governanceAbi.events.VoteCast.decode(log)
+    : governanceAbi.events.VoteCastWithParams.decode(log)
   const blockTimestamp = new Date(block.header.timestamp)
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
