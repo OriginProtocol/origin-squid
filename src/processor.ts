@@ -80,7 +80,7 @@ export const run = ({
 }: {
   stateSchema?: string
   processors: Processor[]
-  postProcessors?: Pick<Processor, 'process' | 'name'>[]
+  postProcessors?: Pick<Processor, 'process' | 'name' | 'setup' | 'from'>[]
   validators?: Pick<Processor, 'process' | 'name'>[]
 }) => {
   const processor = createSquidProcessor()
@@ -90,10 +90,14 @@ export const run = ({
       ? Number(process.env.BLOCK_FROM)
       : Math.min(
           ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+          ...((postProcessors ?? [])
+            .map((p) => p.from)
+            .filter((x) => x) as number[]),
         ),
     to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
   processors.forEach((p) => p.setup?.(processor))
+  postProcessors?.forEach((p) => p.setup?.(processor))
   processor.run(
     new TypeormDatabase({
       stateSchema,
