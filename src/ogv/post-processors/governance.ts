@@ -1,33 +1,31 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
-import * as erc20Abi from '../../abi/erc20'
 import * as governanceAbi from '../../abi/governance'
-import { OGVAddress, OGVProposal, OGVProposalEvent, OGVProposalState, OGVProposalTxLog, OGVProposalVote, OGVVoteType } from '../../model'
-import { Block, Context, Log } from '../../processor'
 import {
-  GOVERNANCE_ADDRESS,
-  OGV_ADDRESS,
-  VEOGV_ADDRESS,
-} from '../../utils/addresses'
+  OGVAddress,
+  OGVProposal,
+  OGVProposalEvent,
+  OGVProposalState,
+  OGVProposalTxLog,
+  OGVProposalVote,
+  OGVVoteType,
+} from '../../model'
+import { Block, Context, Log } from '../../processor'
+import { GOVERNANCE_ADDRESS } from '../../utils/addresses'
 
 export const from = 14439231 // https://etherscan.io/tx/0x9295cac246169f06a3d4ec33fdbd87fced7a9e19ea61177cae75034e45ae66f4
-export const veogvFrom = 15089597 // https://etherscan.io/tx/0x70c582e56ea1c49b7e9df70a0b40ddbfac9362b8b172cb527c329c2302d7d48a
+export const governanceFrom = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
 
 interface IProcessResult {
-  addresses: Map<string, OGVAddress>,
-  proposals: Map<string, OGVProposal>,
-  proposalLogs: OGVProposalTxLog[],
-  votes: OGVProposalVote[],
+  addresses: Map<string, OGVAddress>
+  proposals: Map<string, OGVProposal>
+  proposalLogs: OGVProposalTxLog[]
+  votes: OGVProposalVote[]
 }
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
-    address: [OGV_ADDRESS],
-    topic0: [erc20Abi.events.Transfer.topic],
-    range: { from },
-  })
-  processor.addLog({
-    address: [VEOGV_ADDRESS],
+    address: [GOVERNANCE_ADDRESS],
     topic0: [
       governanceAbi.events.ProposalCreated,
       governanceAbi.events.ProposalExecuted,
@@ -36,8 +34,8 @@ export const setup = (processor: EvmBatchProcessor) => {
       governanceAbi.events.ProposalCanceled,
       governanceAbi.events.VoteCast,
       governanceAbi.events.VoteCastWithParams,
-    ].map(ev => ev.topic),
-    range: { from: veogvFrom },
+    ].map((ev) => ev.topic),
+    range: { from: governanceFrom },
   })
 }
 
@@ -46,24 +44,35 @@ export const process = async (ctx: Context) => {
     addresses: new Map<string, OGVAddress>(),
     proposals: new Map<string, OGVProposal>(),
     proposalLogs: [],
-    votes: []
+    votes: [],
   }
 
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       const firstTopic = log.topics[0]
 
-      if (![VEOGV_ADDRESS, OGV_ADDRESS].includes(log.address)) {
+      if (log.address !== GOVERNANCE_ADDRESS) {
         return
       }
 
       if (firstTopic == governanceAbi.events.ProposalCreated.topic) {
-        await _processProposalCreated(ctx, result, block, log);
+        await _processProposalCreated(ctx, result, block, log)
       } else if (firstTopic == governanceAbi.events.ProposalExtended.topic) {
-        await _processProposalExtended(ctx, result, block, log);
-      } else if ([governanceAbi.events.ProposalQueued.topic, governanceAbi.events.ProposalCanceled.topic, governanceAbi.events.ProposalExecuted.topic].includes(firstTopic)) {
-        await _processProposalEvents(ctx, result, block, log);
-      } else if ([governanceAbi.events.VoteCast.topic, governanceAbi.events.VoteCastWithParams.topic].includes(firstTopic)) {
+        await _processProposalExtended(ctx, result, block, log)
+      } else if (
+        [
+          governanceAbi.events.ProposalQueued.topic,
+          governanceAbi.events.ProposalCanceled.topic,
+          governanceAbi.events.ProposalExecuted.topic,
+        ].includes(firstTopic)
+      ) {
+        await _processProposalEvents(ctx, result, block, log)
+      } else if (
+        [
+          governanceAbi.events.VoteCast.topic,
+          governanceAbi.events.VoteCastWithParams.topic,
+        ].includes(firstTopic)
+      ) {
         await _processVoteCast(ctx, result, block, log)
       }
     }
@@ -79,9 +88,15 @@ const _processProposalCreated = async (
   ctx: Context,
   result: IProcessResult,
   block: Block,
-  log: Log
+  log: Log,
 ) => {
-  const { proposalId, proposer: proposerAddr, description, startBlock, endBlock } = governanceAbi.events.ProposalCreated.decode(log)
+  const {
+    proposalId,
+    proposer: proposerAddr,
+    description,
+    startBlock,
+    endBlock,
+  } = governanceAbi.events.ProposalCreated.decode(log)
   const proposer = await _getAddress(ctx, proposerAddr, result)
   const blockTimestamp = new Date(block.header.timestamp)
 
@@ -93,7 +108,7 @@ const _processProposalCreated = async (
     startBlock,
     endBlock,
     lastUpdated: new Date(),
-    status: OGVProposalState.Pending
+    status: OGVProposalState.Pending,
   })
 
   const proposalTxLog = new OGVProposalTxLog({
@@ -123,17 +138,17 @@ const eventMapper = {
   [governanceAbi.events.ProposalQueued.topic]: {
     decode: governanceAbi.events.ProposalQueued.decode,
     status: OGVProposalState.Queued,
-    event: OGVProposalEvent.Queued
+    event: OGVProposalEvent.Queued,
   },
   [governanceAbi.events.ProposalCanceled.topic]: {
     decode: governanceAbi.events.ProposalCanceled.decode,
     status: OGVProposalState.Canceled,
-    event: OGVProposalEvent.Canceled
+    event: OGVProposalEvent.Canceled,
   },
   [governanceAbi.events.ProposalExecuted.topic]: {
     decode: governanceAbi.events.ProposalExecuted.decode,
     status: OGVProposalState.Executed,
-    event: OGVProposalEvent.Executed
+    event: OGVProposalEvent.Executed,
   },
 }
 
@@ -141,7 +156,7 @@ const _processProposalEvents = async (
   ctx: Context,
   result: IProcessResult,
   block: Block,
-  log: Log
+  log: Log,
 ) => {
   const { decode, status, event } = eventMapper[log.topics[0]]!
 
@@ -149,8 +164,7 @@ const _processProposalEvents = async (
   const blockTimestamp = new Date(block.header.timestamp)
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
-  proposal.status = status;
-
+  proposal.status = status
 
   const proposalTxLog = new OGVProposalTxLog({
     id: `${proposalId}:${log.transactionHash}:${log.logIndex}`,
@@ -167,9 +181,10 @@ const _processProposalExtended = async (
   ctx: Context,
   result: IProcessResult,
   block: Block,
-  log: Log
+  log: Log,
 ) => {
-  const { proposalId, extendedDeadline } = governanceAbi.events.ProposalExtended.decode(log)
+  const { proposalId, extendedDeadline } =
+    governanceAbi.events.ProposalExtended.decode(log)
   const blockTimestamp = new Date(block.header.timestamp)
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
@@ -191,9 +206,12 @@ const _processVoteCast = async (
   ctx: Context,
   result: IProcessResult,
   block: Block,
-  log: Log
+  log: Log,
 ) => {
-  const decode = (log.topics[0] == governanceAbi.events.VoteCast.topic) ? governanceAbi.events.VoteCast.decode : governanceAbi.events.VoteCastWithParams.decode
+  const decode =
+    log.topics[0] == governanceAbi.events.VoteCast.topic
+      ? governanceAbi.events.VoteCast.decode
+      : governanceAbi.events.VoteCastWithParams.decode
   const { proposalId, voter: voterAddr, weight, support } = decode(log)
   const blockTimestamp = new Date(block.header.timestamp)
 
@@ -207,20 +225,36 @@ const _processVoteCast = async (
     txHash: log.transactionHash,
     timestamp: blockTimestamp,
     weight,
-    type: [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][parseInt(support.toString())]
+    type: [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][
+      parseInt(support.toString())
+    ],
   })
 
   result.votes.push(proposalVote)
 }
 
-const _getProposalState = async (ctx: Context, block: Block, proposalId: bigint): Promise<OGVProposalState> => {
-  const governance = new governanceAbi.Contract(ctx, block.header, GOVERNANCE_ADDRESS)
-  return proposalStateMap[
-    parseInt((await governance.state(proposalId)).toString())
-  ] || OGVProposalState.Pending;
+const _getProposalState = async (
+  ctx: Context,
+  block: Block,
+  proposalId: bigint,
+): Promise<OGVProposalState> => {
+  const governance = new governanceAbi.Contract(
+    ctx,
+    block.header,
+    GOVERNANCE_ADDRESS,
+  )
+  return (
+    proposalStateMap[
+      parseInt((await governance.state(proposalId)).toString())
+    ] || OGVProposalState.Pending
+  )
 }
 
-const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Promise<OGVAddress> => {
+const _getAddress = async (
+  ctx: Context,
+  id: string,
+  result: IProcessResult,
+): Promise<OGVAddress> => {
   id = id.toLowerCase()
   const { addresses } = result
 
@@ -229,7 +263,7 @@ const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Pr
   }
 
   const address = await ctx.store.findOneByOrFail(OGVAddress, {
-    id
+    id,
   })
 
   addresses.set(id, address)
@@ -237,7 +271,11 @@ const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Pr
   return address
 }
 
-const _getProposal = async (ctx: Context, id: string, result: IProcessResult): Promise<OGVProposal> => {
+const _getProposal = async (
+  ctx: Context,
+  id: string,
+  result: IProcessResult,
+): Promise<OGVProposal> => {
   const { proposals } = result
 
   if (proposals.has(id)) {
@@ -245,7 +283,7 @@ const _getProposal = async (ctx: Context, id: string, result: IProcessResult): P
   }
 
   const proposal = await ctx.store.findOneByOrFail(OGVProposal, {
-    id
+    id,
   })
 
   proposals.set(id, proposal)
