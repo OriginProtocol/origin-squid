@@ -2,7 +2,6 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
-import { formatEther } from 'viem'
 
 import {
   ExchangeRate,
@@ -134,20 +133,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
     return null
   }
 
-  console.log({
-    lastWrappedOETHHistory
-  })
-
-  // console.log({
-  //   lastApy,
-  //   lastOeth,
-  //   lastCurve,
-  //   lastVault,
-  //   lastBalancer,
-  //   lastFrax,
-  //   lastMorpho,
-  // })
-
   const entityManager = (
     ctx.store as unknown as {
       em: () => EntityManager
@@ -170,7 +155,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
   })
 
   const id = date.toISOString().substring(0, 10)
-  // ctx.log.info({ date, id })
 
   const dailyStat = new OETHDailyStat({
     id,
@@ -218,25 +202,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const sfrxETH = lastFrax?.sfrxETH || 0n
   const convertedSfrxEth =
     (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n
-  const frxETH = (lastVault?.frxETH || 0n) + convertedSfrxEth
-
-  const totalCollateral = ETH + WETH + frxETH + stETH + rETH
-
-  // console.log(`Day: ${date}`)
-  // log([
-  //   ['Total Supply', dailyStat.totalSupply],
-  //   ['Circulating Supply', dailyStat.totalSupply - OETHOwned],
-  //   ['Total Collateral', totalCollateral],
-  //   ['Difference', dailyStat.totalSupply - OETHOwned - totalCollateral],
-  //   ['Total ETH', ETH],
-  //   ['Total WETH', WETH],
-  //   ['Total stETH', stETH],
-  //   ['Total rETH', rETH],
-  //   ['Total frxETH', frxETH],
-  //   ['', null],
-  //   ['Vault frxETH', lastVault?.frxETH || 0n],
-  //   ['Total sfrxETH', sfrxETH],
-  // ])
 
   // Strategy totals
   const vaultTotal =
@@ -409,25 +374,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
   }
 }
 
-function getStartOfDays(startTimestamp: number, endTimestamp: number): Date[] {
-  const dayMilliseconds = 24 * 60 * 60 * 1000 // Number of milliseconds in a day
-  let startTimestampStart = new Date(startTimestamp)
-  startTimestampStart.setUTCHours(0, 0, 0, 0)
-
-  let currentTimestamp = startTimestampStart.getTime()
-  let dates: Date[] = []
-
-  while (currentTimestamp <= endTimestamp) {
-    let date = new Date(currentTimestamp)
-    date.setUTCHours(0, 0, 0, 0) // Set to start of the day
-    dates.push(date)
-
-    currentTimestamp += dayMilliseconds // Move to the next day
-  }
-
-  return dates
-}
-
 const yieldStatsQuery = `
 -- Results for 1 day
 SELECT '1 day' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
@@ -448,21 +394,3 @@ SELECT 'all time' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_y
 FROM oeth_rebase
 WHERE timestamp <= $1::timestamp
 `
-
-function log(entries: [string, bigint | null][]): void {
-  if (!entries) {
-    console.log('')
-    return
-  }
-  // Find the longest label for alignment
-  const maxLength = Math.max(...entries.map((entry) => entry[0].length))
-
-  const lines = entries.map(([label, value]) => {
-    // Format the value
-    const formattedValue = value ? Number(formatEther(value)).toFixed(3) : ''
-    // Right-align the label and value
-    return `${label.padEnd(maxLength)} ${formattedValue.padStart(10)}`
-  })
-
-  console.log(`${lines.join('\n')}\n`)
-}
