@@ -14,6 +14,7 @@ import {
   OETHDailyStat,
   OETHDripper,
   OETHFraxStaking,
+  OETHHistory,
   OETHMorphoAave,
   OETHStrategyDailyStat,
   OETHStrategyHoldingDailyStat,
@@ -89,6 +90,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastDripper,
     lastRethRate,
     lastSfrxEthRate,
+    lastWrappedOETHHistory,
   ] = await Promise.all([
     ctx.store.findOne(OETHAPY, queryParams),
     ctx.store.findOne(OETH, queryParams),
@@ -104,6 +106,13 @@ async function updateDailyStats(ctx: Context, date: Date) {
     }),
     ctx.store.findOne(ExchangeRate, {
       where: { timestamp: LessThanOrEqual(date), pair: 'ETH_sfrxETH' },
+      order: { timestamp: 'desc' as FindOptionsOrderValue },
+    }),
+    ctx.store.findOne(OETHHistory, {
+      where: {
+        timestamp: LessThanOrEqual(date),
+        address: { id: '0xdcee70654261af21c44c093c300ed3bb97b78192' },
+      },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
   ])
@@ -124,6 +133,10 @@ async function updateDailyStats(ctx: Context, date: Date) {
   if (![lastApy, lastOeth].every((entity) => !!entity)) {
     return null
   }
+
+  console.log({
+    lastWrappedOETHHistory
+  })
 
   // console.log({
   //   lastApy,
@@ -176,6 +189,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     nonRebasingSupply: lastOeth?.nonRebasingSupply || 0n,
     amoSupply: lastCurve?.oethOwned || 0n,
     dripperWETH: lastDripper?.weth || 0n,
+    wrappedSupply: lastWrappedOETHHistory?.balance || 0n,
 
     yield: yieldStats[0].total_yield || 0n,
     fees: yieldStats[0].total_fees || 0n,
