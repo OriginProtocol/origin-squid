@@ -65,7 +65,7 @@ export const getChainlinkPrice = async (
       currencies[quote as CurrencySymbol] ?? quote,
     )
   } catch (err: any) {
-    if (err.message === 'execution reverted: Feed not found') {
+    if (err.message.match(/: Feed not found/)) {
       return 0n
     }
     throw err
