@@ -271,6 +271,7 @@ type OETHDailyStat @entity {
   nonRebasingSupply: BigInt!
   amoSupply: BigInt!
   dripperWETH: BigInt!
+  wrappedSupply: BigInt!
 
   yield: BigInt!
   fees: BigInt!
