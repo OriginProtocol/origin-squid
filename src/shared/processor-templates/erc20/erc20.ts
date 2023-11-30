@@ -2,10 +2,13 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { chunk } from 'lodash'
 
 import * as abi from '../../../abi/erc20'
+import { Multicall } from '../../../abi/multicall'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20Supply } from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO } from '../../../utils/addresses'
 import { LogFilter, logFilter } from '../../../utils/logFilter'
+
+const MULTICALL_CONTRACT = '0x5ba1e12693dc8f9c48aad8770482f4739beed696'
 
 export const createERC20Tracker = ({
   from,
@@ -52,7 +55,15 @@ export const createERC20Tracker = ({
         symbol,
         decimals,
       })
+      const supply = new ERC20Supply({
+        id: `${block.header.height}:${address}`,
+        address,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        totalSupply: await contract.totalSupply(),
+      })
       await ctx.store.insert(erc20)
+      await ctx.store.insert(supply)
     }
   }
   return {
@@ -72,20 +83,37 @@ export const createERC20Tracker = ({
       for (const block of ctx.blocks) {
         if (block.header.height < from) continue
         const contract = new abi.Contract(ctx, block.header, address)
-        const updateBalances = async (...accounts: string[]) => {
-          accounts = accounts.filter((account) => account !== ADDRESS_ZERO)
-          const balances = await Promise.all(
-            accounts.map((account) => contract.balanceOf(account)),
+        const updateSupply = async () => {
+          const id = `${block.header.height}:${address}`
+          const supply = new ERC20Supply({
+            id,
+            address,
+            timestamp: new Date(block.header.timestamp),
+            blockNumber: block.header.height,
+            totalSupply: await contract.totalSupply(),
+          })
+          result.supplies.set(id, supply)
+        }
+        const updateBalances = async (
+          accounts: string[],
+          forceUpdateSupply = false,
+        ) => {
+          const multicall = new Multicall(ctx, block.header, MULTICALL_CONTRACT)
+          const balances = await multicall.tryAggregate(
+            abi.functions.balanceOf,
+            address,
+            accounts.map((account) => [account]),
           )
           accounts.forEach((account, i) => {
-            const id = `${address}:${account}:${block.header.height}`
+            if (account === ADDRESS_ZERO) return
+            const id = `${block.header.height}:${address}:${account}`
             const balance = new ERC20Balance({
               id,
               timestamp: new Date(block.header.timestamp),
               blockNumber: block.header.height,
               address,
               account: account.toLowerCase(),
-              balance: balances[i],
+              balance: balances[i].value,
             })
             result.balances.set(id, balance)
             if (balance.balance === 0n) {
@@ -103,34 +131,31 @@ export const createERC20Tracker = ({
               result.removedHolders.delete(`${address}:${account}`)
             }
           })
-          if (accounts.includes(ADDRESS_ZERO)) {
-            const id = `${address}:${block.header.height}`
-            const supply = new ERC20Supply({
-              id,
-              address,
-              timestamp: new Date(block.header.timestamp),
-              blockNumber: block.header.height,
-              totalSupply: await contract.totalSupply(),
-            })
-            result.supplies.set(id, supply)
+          if (forceUpdateSupply || accounts.includes(ADDRESS_ZERO)) {
+            await updateSupply()
           }
         }
+        const accounts = new Set<string>()
+        let haveRebase = false
         for (const log of block.logs) {
           const isTransferLog = transferLogFilters.find((l) => l.matches(log))
           if (isTransferLog) {
             const transfer = abi.events.Transfer.decode(log)
-            await updateBalances(transfer.from, transfer.to)
+            accounts.add(transfer.from)
+            accounts.add(transfer.to)
           }
           const isRebaseLog = rebaseFilters.find((l) => l.matches(log))
           if (isRebaseLog) {
+            haveRebase = true
             const holders = await ctx.store.find(ERC20Holder, {
               where: { address },
             })
-            for (const chunks of chunk(holders, 10)) {
-              await updateBalances(...chunks.map((h) => h.account))
+            for (const holder of holders) {
+              accounts.add(holder.account)
             }
           }
         }
+        await updateBalances([...accounts], haveRebase)
       }
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
