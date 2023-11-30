@@ -52,6 +52,8 @@ type OUSDRebase @entity {
   apy: OUSDAPY!
   fee: BigInt!
   yield: BigInt!
+  feeConverted: BigInt!
+  yieldConverted: BigInt!
 }
 
 """
@@ -191,4 +193,68 @@ type OUSDActivity @entity {
   fromSymbol: String
   toSymbol: String
   amount: BigInt
+}
+
+type OUSDDailyStat @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  apr: Float!
+  apy: Float!
+  apy7DayAvg: Float!
+  apy14DayAvg: Float!
+  apy30DayAvg: Float!
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
+  amoSupply: BigInt!
+  dripperWETH: BigInt!
+  wrappedSupply: BigInt!
+
+  yield: BigInt!
+  fees: BigInt!
+  revenue: BigInt!
+  revenue7DayAvg: BigInt!
+  revenue7DayTotal: BigInt!
+  revenueAllTime: BigInt!
+
+  yieldConverted: BigInt!
+  feesConverted: BigInt!
+  revenueConverted: BigInt!
+  revenue7DayAvgConverted: BigInt!
+  revenue7DayTotalConverted: BigInt!
+  revenueAllTimeConverted: BigInt!
+
+  pegPrice: BigInt!
+  strategies: [OUSDStrategyDailyStat] @derivedFrom(field: "dailyStatId")
+  collateral: [OUSDCollateralDailyStat] @derivedFrom(field: "dailyStatId")
+}
+
+type OUSDStrategyDailyStat @entity {
+  id: ID!
+  dailyStatId: OUSDDailyStat!
+  name: String!
+  total: BigInt!
+  tvl: BigInt!
+  holdings: [OUSDStrategyHoldingDailyStat]
+  @derivedFrom(field: "strategyDailyStatId")
+}
+
+type OUSDStrategyHoldingDailyStat @entity {
+  id: ID!
+  strategyDailyStatId: OUSDStrategyDailyStat!
+  symbol: String!
+  amount: BigInt!
+  value: BigInt!
+}
+
+type OUSDCollateralDailyStat @entity {
+  id: ID!
+  dailyStatId: OUSDDailyStat! @index
+  symbol: String!
+  amount: BigInt!
+  price: BigInt!
+  value: BigInt!
 }

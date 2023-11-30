@@ -44,4 +44,10 @@ export class OETHRebase {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yield!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    feeConverted!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yieldConverted!: bigint
 }

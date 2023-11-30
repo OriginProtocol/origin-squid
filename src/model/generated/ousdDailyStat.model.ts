@@ -1,34 +1,25 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
-import {OETHStrategyDailyStat} from "./oethStrategyDailyStat.model"
-import {OETHCollateralDailyStat} from "./oethCollateralDailyStat.model"
+import {OUSDStrategyDailyStat} from "./ousdStrategyDailyStat.model"
+import {OUSDCollateralDailyStat} from "./ousdCollateralDailyStat.model"
 
 @Entity_()
-export class OETHDailyStat {
-    constructor(props?: Partial<OETHDailyStat>) {
+export class OUSDDailyStat {
+    constructor(props?: Partial<OUSDDailyStat>) {
         Object.assign(this, props)
     }
 
     @PrimaryColumn_()
     id!: string
 
-    /**
-     * Timestamp, eg 2023-10-17
-     */
     @Index_()
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    /**
-     * Last block number stats were updated
-     */
     @Index_()
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
 
-    /**
-     * Timestamp of block number stats were updated
-     */
     @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
     apr!: number
 
@@ -104,12 +95,9 @@ export class OETHDailyStat {
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     pegPrice!: bigint
 
-    /**
-     * Price of OETH in ETH
-     */
-    @OneToMany_(() => OETHStrategyDailyStat, e => e.dailyStatId)
-    strategies!: OETHStrategyDailyStat[]
+    @OneToMany_(() => OUSDStrategyDailyStat, e => e.dailyStatId)
+    strategies!: OUSDStrategyDailyStat[]
 
-    @OneToMany_(() => OETHCollateralDailyStat, e => e.dailyStatId)
-    collateral!: OETHCollateralDailyStat[]
+    @OneToMany_(() => OUSDCollateralDailyStat, e => e.dailyStatId)
+    collateral!: OUSDCollateralDailyStat[]
 }

@@ -128,7 +128,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastDripper,
     lastRethRate,
     lastSfrxEthRate,
-  ]
+  ].filter(Boolean)
   if (![lastApy, lastOeth].every((entity) => !!entity)) {
     return null
   }
@@ -146,6 +146,9 @@ async function updateDailyStats(ctx: Context, date: Date) {
       total_yield: bigint
       total_fees: bigint
       total_revenue: bigint
+      total_yield_converted: bigint
+      total_fees_converted: bigint
+      total_revenue_converted: bigint
     }[]
   >(yieldStatsQuery, [end])
 
@@ -181,6 +184,13 @@ async function updateDailyStats(ctx: Context, date: Date) {
     revenue7DayAvg: BigInt(yieldStats[1].total_revenue || 0n) / 7n,
     revenue7DayTotal: yieldStats[1].total_revenue || 0n,
     revenueAllTime: yieldStats[2].total_revenue || 0n,
+
+    yieldConverted: yieldStats[0].total_yield_converted || 0n,
+    feesConverted: yieldStats[0].total_fees_converted || 0n,
+    revenueConverted: yieldStats[0].total_revenue_converted || 0n,
+    revenue7DayAvgConverted: BigInt(yieldStats[1].total_revenue_converted || 0n) / 7n,
+    revenue7DayTotalConverted: yieldStats[1].total_revenue_converted || 0n,
+    revenueAllTimeConverted: yieldStats[2].total_revenue_converted || 0n,
 
     pegPrice: 0n,
   })
@@ -376,21 +386,45 @@ async function updateDailyStats(ctx: Context, date: Date) {
 
 const yieldStatsQuery = `
 -- Results for 1 day
-SELECT '1 day' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
+SELECT '1 day' as period,
+  SUM(fee) as total_fees,
+  SUM(yield - fee) as total_yield,
+  SUM(yield) as total_revenue,
+
+  SUM(fee_converted) as total_fees_converted,
+  SUM(yield_converted - fee_converted) as total_yield_converted,
+  SUM(yield_converted) as total_revenue_converted
+
 FROM oeth_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
 
 UNION ALL
 
 -- Results for 7 days
-SELECT '7 days' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
+SELECT '7 days' as period,
+  SUM(fee) as total_fees,
+  SUM(yield - fee) as total_yield,
+  SUM(yield) as total_revenue,
+
+  SUM(fee_converted) as total_fees_converted,
+  SUM(yield_converted - fee_converted) as total_yield_converted,
+  SUM(yield_converted) as total_revenue_converted
+
 FROM oeth_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
 
 UNION ALL
 
 -- Results for all time up to the end date
-SELECT 'all time' as period, SUM(fee) as total_fees, SUM(yield - fee) as total_yield, SUM(yield) as total_revenue
+SELECT 'all time' as period,
+  SUM(fee) as total_fees,
+  SUM(yield - fee) as total_yield,
+  SUM(yield) as total_revenue,
+
+  SUM(fee_converted) as total_fees_converted,
+  SUM(yield_converted - fee_converted) as total_yield_converted,
+  SUM(yield_converted) as total_revenue_converted
+
 FROM oeth_rebase
 WHERE timestamp <= $1::timestamp
 `

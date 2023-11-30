@@ -52,6 +52,8 @@ type OETHRebase @entity {
   apy: OETHAPY!
   fee: BigInt!
   yield: BigInt!
+  feeConverted: BigInt!
+  yieldConverted: BigInt!
 }
 
 """
@@ -184,6 +186,13 @@ type OETHDailyStat @entity {
   revenue7DayAvg: BigInt!
   revenue7DayTotal: BigInt!
   revenueAllTime: BigInt!
+
+  yieldConverted: BigInt!
+  feesConverted: BigInt!
+  revenueConverted: BigInt!
+  revenue7DayAvgConverted: BigInt!
+  revenue7DayTotalConverted: BigInt!
+  revenueAllTimeConverted: BigInt!
 
   pegPrice: BigInt!
   """
