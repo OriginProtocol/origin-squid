@@ -104,7 +104,7 @@ type ERC20Holder @entity {
   account: String!
 }
 
-type ERC20Supply @entity {
+type ERC20State @entity {
   """
   Format: 'address:blockNumber'
   """
@@ -113,6 +113,7 @@ type ERC20Supply @entity {
   blockNumber: Int! @index
   address: String!
   totalSupply: BigInt!
+  holderCount: Int!
 }
 
 type ERC20Balance @entity {

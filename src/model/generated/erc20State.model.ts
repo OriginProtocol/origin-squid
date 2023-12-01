@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class ERC20Supply {
-    constructor(props?: Partial<ERC20Supply>) {
+export class ERC20State {
+    constructor(props?: Partial<ERC20State>) {
         Object.assign(this, props)
     }
 
@@ -26,4 +26,7 @@ export class ERC20Supply {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     totalSupply!: bigint
+
+    @Column_("int4", {nullable: false})
+    holderCount!: number
 }

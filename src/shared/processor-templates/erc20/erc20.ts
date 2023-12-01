@@ -3,7 +3,7 @@ import { chunk } from 'lodash'
 
 import * as abi from '../../../abi/erc20'
 import { Multicall } from '../../../abi/multicall'
-import { ERC20, ERC20Balance, ERC20Holder, ERC20Supply } from '../../../model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State } from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO } from '../../../utils/addresses'
 import { LogFilter, logFilter } from '../../../utils/logFilter'
@@ -41,29 +41,25 @@ export const createERC20Tracker = ({
     const block = ctx.blocks.find((b) => b.header.height >= from)
     if (!block) return
     erc20 = await ctx.store.findOne(ERC20, { where: { address } })
-    if (!erc20) {
-      const contract = new abi.Contract(ctx, block.header, address)
-      const [name, symbol, decimals] = await Promise.all([
-        contract.name(),
-        contract.symbol(),
-        contract.decimals(),
-      ])
-      erc20 = new ERC20({
-        id: address,
-        address,
-        name,
-        symbol,
-        decimals,
-      })
-      const supply = new ERC20Supply({
-        id: `${block.header.height}:${address}`,
-        address,
-        timestamp: new Date(block.header.timestamp),
-        blockNumber: block.header.height,
-        totalSupply: await contract.totalSupply(),
-      })
-      await ctx.store.insert(erc20)
-      await ctx.store.insert(supply)
+    try {
+      if (!erc20) {
+        const contract = new abi.Contract(ctx, block.header, address)
+        const [name, symbol, decimals] = await Promise.all([
+          contract.name(),
+          contract.symbol(),
+          contract.decimals(),
+        ])
+        erc20 = new ERC20({
+          id: address,
+          address,
+          name,
+          symbol,
+          decimals,
+        })
+        await ctx.store.insert(erc20)
+      }
+    } catch (err) {
+      ctx.log.error({ height: block.header.height, err })
     }
   }
   return {
@@ -75,7 +71,7 @@ export const createERC20Tracker = ({
     async process(ctx: Context) {
       await initialize(ctx)
       const result = {
-        supplies: new Map<string, ERC20Supply>(),
+        states: new Map<string, ERC20State>(),
         balances: new Map<string, ERC20Balance>(),
         holders: new Map<string, ERC20Holder>(),
         removedHolders: new Set<string>(),
@@ -85,14 +81,19 @@ export const createERC20Tracker = ({
         const contract = new abi.Contract(ctx, block.header, address)
         const updateSupply = async () => {
           const id = `${block.header.height}:${address}`
-          const supply = new ERC20Supply({
+          const [holderCount, totalSupply] = await Promise.all([
+            ctx.store.countBy(ERC20Holder, { address }),
+            contract.totalSupply(),
+          ])
+          const supply = new ERC20State({
             id,
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
-            totalSupply: await contract.totalSupply(),
+            totalSupply,
+            holderCount,
           })
-          result.supplies.set(id, supply)
+          result.states.set(id, supply)
         }
         const updateBalances = async (
           accounts: string[],
@@ -159,7 +160,7 @@ export const createERC20Tracker = ({
       }
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
-        ctx.store.insert([...result.supplies.values()]),
+        ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.remove(
           [...result.removedHolders.values()].map(

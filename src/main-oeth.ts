@@ -29,14 +29,14 @@ export const processor = {
     // strategies,
     // exchangeRates,
     createERC20Tracker({
-      from: 17278579,
+      from: 16935276,
       address: OETH_ADDRESS,
       rebaseFilters: [
         logFilter({
           address: [OETH_ADDRESS],
           topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
           transaction: true,
-          range: { from: 17278579 },
+          range: { from: 16935276 },
         }),
       ],
     }),

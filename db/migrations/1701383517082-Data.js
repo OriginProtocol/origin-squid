@@ -1,5 +1,5 @@
-module.exports = class Data1701365519732 {
-    name = 'Data1701365519732'
+module.exports = class Data1701383517082 {
+    name = 'Data1701383517082'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -19,9 +19,9 @@ module.exports = class Data1701365519732 {
         await db.query(`CREATE INDEX "IDX_df364fb6e82d1feeed2a5dfffa" ON "strategy_daily_yield" ("block_number") `)
         await db.query(`CREATE TABLE "erc20" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "decimals" integer NOT NULL, "symbol" text NOT NULL, CONSTRAINT "PK_8d43ce15401ba044c55a72a8ceb" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "erc20_holder" ("id" character varying NOT NULL, "address" text NOT NULL, "account" text NOT NULL, CONSTRAINT "PK_3adce7edbac4bcb03c662c3a1ac" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "erc20_supply" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "total_supply" numeric NOT NULL, CONSTRAINT "PK_567cc17fb1937c33a947e86d846" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_8dea1999c10d01adf70cf22db9" ON "erc20_supply" ("timestamp") `)
-        await db.query(`CREATE INDEX "IDX_48986fcc929e3d76ea43abac97" ON "erc20_supply" ("block_number") `)
+        await db.query(`CREATE TABLE "erc20_state" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "total_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_eac1124b07bbdedafd4fff2f7b7" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_c3d08eb2dafe4b5b188924d835" ON "erc20_state" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_29e8edc6ba8cc37c0c16ff0baf" ON "erc20_state" ("block_number") `)
         await db.query(`CREATE TABLE "erc20_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_069b6549e7a9938cc89f32063a6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c9fbe21a3411d93ea586af2a4c" ON "erc20_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d1f50dc39003331b76fad8a640" ON "erc20_balance" ("block_number") `)
@@ -193,9 +193,9 @@ module.exports = class Data1701365519732 {
         await db.query(`DROP INDEX "public"."IDX_df364fb6e82d1feeed2a5dfffa"`)
         await db.query(`DROP TABLE "erc20"`)
         await db.query(`DROP TABLE "erc20_holder"`)
-        await db.query(`DROP TABLE "erc20_supply"`)
-        await db.query(`DROP INDEX "public"."IDX_8dea1999c10d01adf70cf22db9"`)
-        await db.query(`DROP INDEX "public"."IDX_48986fcc929e3d76ea43abac97"`)
+        await db.query(`DROP TABLE "erc20_state"`)
+        await db.query(`DROP INDEX "public"."IDX_c3d08eb2dafe4b5b188924d835"`)
+        await db.query(`DROP INDEX "public"."IDX_29e8edc6ba8cc37c0c16ff0baf"`)
         await db.query(`DROP TABLE "erc20_balance"`)
         await db.query(`DROP INDEX "public"."IDX_c9fbe21a3411d93ea586af2a4c"`)
         await db.query(`DROP INDEX "public"."IDX_d1f50dc39003331b76fad8a640"`)
