@@ -1,4 +1,3 @@
-import * as otoken from './abi/otoken'
 import * as dailyStats from './oeth/post-processors/daily-stats'
 import * as oeth from './oeth/processors'
 import * as balancerMetaPoolStrategy from './oeth/processors/balancer-meta-pool'
@@ -12,39 +11,22 @@ import * as vault from './oeth/processors/vault'
 import * as validateOeth from './oeth/validators/validate-oeth'
 import { run } from './processor'
 import * as exchangeRatesPostProcessor from './shared/post-processors/exchange-rates'
-import { createERC20Tracker } from './shared/processor-templates/erc20'
-import { OETH_ADDRESS } from './utils/addresses'
-import { logFilter } from './utils/logFilter'
 
 export const processor = {
   stateSchema: 'oeth-processor',
   processors: [
-    // oeth,
-    // vault,
-    // fraxStaking,
-    // morphoAave,
-    // dripper,
-    // curveLp,
-    // balancerMetaPoolStrategy,
-    // strategies,
-    // exchangeRates,
-    createERC20Tracker({
-      from: 16935276,
-      address: OETH_ADDRESS,
-      rebaseFilters: [
-        logFilter({
-          address: [OETH_ADDRESS],
-          topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
-          transaction: true,
-          range: { from: 16935276 },
-        }),
-      ],
-    }),
+    oeth,
+    vault,
+    fraxStaking,
+    morphoAave,
+    dripper,
+    curveLp,
+    balancerMetaPoolStrategy,
+    strategies,
+    exchangeRates,
   ],
-  postProcessors: [],
-  validators: [],
-  // postProcessors: [exchangeRatesPostProcessor, dailyStats],
-  // validators: [validateOeth],
+  postProcessors: [exchangeRatesPostProcessor, dailyStats],
+  validators: [validateOeth],
 }
 export default processor
 

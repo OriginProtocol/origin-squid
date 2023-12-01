@@ -37,6 +37,10 @@ export const createERC20Tracker = ({
     : undefined
 
   let erc20: ERC20 | undefined
+  // Keep an in-memory record of what our current holders are.
+  // TODO: Consider doing this differently?
+  //       Eventually memory may become a constraint.
+  let holders: Set<string>
   const transferLogFilters = [
     logFilter({
       address: [address.toLowerCase()],
@@ -89,34 +93,38 @@ export const createERC20Tracker = ({
     },
     async process(ctx: Context) {
       await initialize(ctx)
+      if (!holders) {
+        const holdersArray = await ctx.store.findBy(ERC20Holder, { address })
+        holders = new Set<string>()
+        for (const holder of holdersArray) {
+          holders.add(holder.account)
+        }
+      }
       const result = {
         states: new Map<string, ERC20State>(),
         balances: new Map<string, ERC20Balance>(),
-        holders: new Map<string, ERC20Holder>(),
+        newHolders: new Map<string, ERC20Holder>(),
         removedHolders: new Set<string>(),
       }
       for (const block of ctx.blocks) {
         if (block.header.height < from) continue
         const contract = new abi.Contract(ctx, block.header, address)
-        const updateSupply = async () => {
+        const updateState = async () => {
           const id = `${block.header.height}:${address}`
-          const [holderCount, totalSupply] = await Promise.all([
-            ctx.store.countBy(ERC20Holder, { address }),
-            contract.totalSupply(),
-          ])
-          const supply = new ERC20State({
+          const totalSupply = await contract.totalSupply()
+          const state = new ERC20State({
             id,
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
             totalSupply,
-            holderCount,
+            holderCount: holders.size,
           })
-          result.states.set(id, supply)
+          result.states.set(id, state)
         }
         const updateBalances = async (
           accounts: string[],
-          forceUpdateSupply = false,
+          doStateUpdate = false,
         ) => {
           if (accountFilterSet) {
             accounts = accounts.filter((a) => accountFilterSet.has(a))
@@ -142,23 +150,27 @@ export const createERC20Tracker = ({
               })
               result.balances.set(id, balance)
               if (balance.balance === 0n) {
-                result.holders.delete(`${address}:${account}`)
+                doStateUpdate = true
+                holders.delete(account)
+                result.newHolders.delete(`${address}:${account}`)
                 result.removedHolders.add(`${address}:${account}`)
-              } else {
-                result.holders.set(
-                  `${address}:${account}`,
-                  new ERC20Holder({
-                    id: `${address}:${account}`,
-                    address,
-                    account,
-                  }),
-                )
+              } else if (!holders.has(account)) {
+                const newHolder = new ERC20Holder({
+                  id: `${address}:${account}`,
+                  address,
+                  account,
+                })
+                if (!holders.has(account)) {
+                  doStateUpdate = true
+                  holders.add(account)
+                }
+                result.newHolders.set(`${address}:${account}`, newHolder)
                 result.removedHolders.delete(`${address}:${account}`)
               }
             })
           }
-          if (forceUpdateSupply || accounts.includes(ADDRESS_ZERO)) {
-            await updateSupply()
+          if (doStateUpdate) {
+            await updateState()
           }
         }
         const accounts = new Set<string>()
@@ -188,7 +200,7 @@ export const createERC20Tracker = ({
         await updateBalances([...accounts], haveRebase)
       }
       await Promise.all([
-        ctx.store.upsert([...result.holders.values()]),
+        ctx.store.upsert([...result.newHolders.values()]),
         ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.remove(
