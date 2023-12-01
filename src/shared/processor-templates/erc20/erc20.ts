@@ -1,26 +1,41 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { chunk } from 'lodash'
 
 import * as abi from '../../../abi/erc20'
-import { Multicall } from '../../../abi/multicall'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State } from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO } from '../../../utils/addresses'
+import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '../../../utils/logFilter'
+import { multicall } from '../../../utils/multicall'
 
-const MULTICALL_CONTRACT = '0x5ba1e12693dc8f9c48aad8770482f4739beed696'
+const duplicateTracker = new Set<string>()
 
 export const createERC20Tracker = ({
   from,
   address,
   accountFilter = undefined,
   rebaseFilters = [],
+  intervalTracking = false,
 }: {
   from: number
   address: string
   accountFilter?: string[]
   rebaseFilters?: LogFilter[]
+  intervalTracking?: boolean // To be used *with* `accountFilter`.
 }) => {
+  address = address.toLowerCase()
+  if (duplicateTracker.has(address)) {
+    throw new Error('An ERC20 tracker was already created for: ' + address)
+  }
+  duplicateTracker.add(address)
+  const accountFilterSet = accountFilter
+    ? new Set(accountFilter.map((account) => account.toLowerCase()))
+    : undefined
+
+  const intervalTracker = intervalTracking
+    ? blockFrequencyTracker({ from })
+    : undefined
+
   let erc20: ERC20 | undefined
   const transferLogFilters = [
     logFilter({
@@ -65,7 +80,11 @@ export const createERC20Tracker = ({
   return {
     from,
     setup(processor: EvmBatchProcessor) {
-      transferLogFilters.forEach((filter) => processor.addLog(filter.value))
+      if (intervalTracker) {
+        processor.includeAllBlocks({ from })
+      } else {
+        transferLogFilters.forEach((filter) => processor.addLog(filter.value))
+      }
       rebaseFilters.forEach((filter) => processor.addLog(filter.value))
     },
     async process(ctx: Context) {
@@ -99,45 +118,55 @@ export const createERC20Tracker = ({
           accounts: string[],
           forceUpdateSupply = false,
         ) => {
-          const multicall = new Multicall(ctx, block.header, MULTICALL_CONTRACT)
-          const balances = await multicall.tryAggregate(
-            abi.functions.balanceOf,
-            address,
-            accounts.map((account) => [account]),
-          )
-          accounts.forEach((account, i) => {
-            if (account === ADDRESS_ZERO) return
-            const id = `${block.header.height}:${address}:${account}`
-            const balance = new ERC20Balance({
-              id,
-              timestamp: new Date(block.header.timestamp),
-              blockNumber: block.header.height,
+          if (accountFilterSet) {
+            accounts = accounts.filter((a) => accountFilterSet.has(a))
+          }
+          if (accounts.length > 0) {
+            const balances = await multicall(
+              ctx,
+              block.header,
+              abi.functions.balanceOf,
               address,
-              account: account.toLowerCase(),
-              balance: balances[i].value,
+              accounts.map((account) => [account]),
+            )
+            accounts.forEach((account, i) => {
+              if (account === ADDRESS_ZERO) return
+              const id = `${block.header.height}:${address}:${account}`
+              const balance = new ERC20Balance({
+                id,
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                address,
+                account: account.toLowerCase(),
+                balance: balances[i],
+              })
+              result.balances.set(id, balance)
+              if (balance.balance === 0n) {
+                result.holders.delete(`${address}:${account}`)
+                result.removedHolders.add(`${address}:${account}`)
+              } else {
+                result.holders.set(
+                  `${address}:${account}`,
+                  new ERC20Holder({
+                    id: `${address}:${account}`,
+                    address,
+                    account,
+                  }),
+                )
+                result.removedHolders.delete(`${address}:${account}`)
+              }
             })
-            result.balances.set(id, balance)
-            if (balance.balance === 0n) {
-              result.holders.delete(`${address}:${account}`)
-              result.removedHolders.add(`${address}:${account}`)
-            } else {
-              result.holders.set(
-                `${address}:${account}`,
-                new ERC20Holder({
-                  id: `${address}:${account}`,
-                  address,
-                  account,
-                }),
-              )
-              result.removedHolders.delete(`${address}:${account}`)
-            }
-          })
+          }
           if (forceUpdateSupply || accounts.includes(ADDRESS_ZERO)) {
             await updateSupply()
           }
         }
         const accounts = new Set<string>()
         let haveRebase = false
+        if (intervalTracker && intervalTracker(ctx, block) && accountFilter) {
+          await updateBalances(accountFilter)
+        }
+
         for (const log of block.logs) {
           const isTransferLog = transferLogFilters.find((l) => l.matches(log))
           if (isTransferLog) {
