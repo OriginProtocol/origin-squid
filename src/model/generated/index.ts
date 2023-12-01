@@ -1,5 +1,4 @@
 export * from "./exchangeRate.model"
-export * from "./balance.model"
 export * from "./strategyBalance.model"
 export * from "./strategyYield.model"
 export * from "./strategyDailyYield.model"

@@ -16,18 +16,6 @@ type ExchangeRate @entity {
   rate: BigInt!
 }
 
-type Balance @entity {
-  """
-  Format: 'token:address:blockNumber'
-  """
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  token: String!
-  address: String!
-  balance: BigInt!
-}
-
 enum RebasingOption {
   OptIn
   OptOut
