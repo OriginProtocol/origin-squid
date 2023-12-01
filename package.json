@@ -7,7 +7,7 @@
     "build": "rm -rf lib && tsc",
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json",
-    "prepare": "sqd down && sqd up && sleep 2 && sqd migration:apply",
+    "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
