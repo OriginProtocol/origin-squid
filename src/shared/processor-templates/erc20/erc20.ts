@@ -24,6 +24,7 @@ export const createERC20Tracker = ({
   intervalTracking?: boolean // To be used *with* `accountFilter`.
 }) => {
   address = address.toLowerCase()
+  accountFilter = accountFilter?.map((a) => a.toLowerCase())
   if (duplicateTracker.has(address)) {
     throw new Error('An ERC20 tracker was already created for: ' + address)
   }
