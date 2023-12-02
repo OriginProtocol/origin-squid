@@ -1,5 +1,5 @@
-module.exports = class Data1701462147102 {
-    name = 'Data1701462147102'
+module.exports = class Data1701549374637 {
+    name = 'Data1701549374637'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -25,6 +25,9 @@ module.exports = class Data1701462147102 {
         await db.query(`CREATE TABLE "curve_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_40412750bb910ca560aa084dd88" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ffb0d0f86f03faacef7cb3e092" ON "curve_pool_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_db5522c865eb8ed76fa7aeb4a8" ON "curve_pool_balance" ("block_number") `)
+        await db.query(`CREATE TABLE "balancer_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_441c7de293266414608c8e9de4c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_642115282f1c3026edbc4bc2a7" ON "balancer_pool_balance" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_eecdc2d6132041e3806d77c7b4" ON "balancer_pool_balance" ("block_number") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -196,6 +199,9 @@ module.exports = class Data1701462147102 {
         await db.query(`DROP TABLE "curve_pool_balance"`)
         await db.query(`DROP INDEX "public"."IDX_ffb0d0f86f03faacef7cb3e092"`)
         await db.query(`DROP INDEX "public"."IDX_db5522c865eb8ed76fa7aeb4a8"`)
+        await db.query(`DROP TABLE "balancer_pool_balance"`)
+        await db.query(`DROP INDEX "public"."IDX_642115282f1c3026edbc4bc2a7"`)
+        await db.query(`DROP INDEX "public"."IDX_eecdc2d6132041e3806d77c7b4"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)

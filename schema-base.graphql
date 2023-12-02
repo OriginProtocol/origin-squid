@@ -115,3 +115,23 @@ type ERC20Balance @entity {
   account: String!
   balance: BigInt!
 }
+
+type CurvePoolBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  balance0: BigInt!
+  balance1: BigInt!
+  balance2: BigInt!
+}
+
+type BalancerPoolBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  balance0: BigInt!
+  balance1: BigInt!
+  balance2: BigInt!
+}
