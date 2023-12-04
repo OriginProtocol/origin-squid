@@ -159,7 +159,6 @@ type OETH @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
-  holderCount: Int!
 }
 
 """
@@ -541,7 +540,6 @@ type OUSD @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
-  holderCount: Int!
 }
 
 """

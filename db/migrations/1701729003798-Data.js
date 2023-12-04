@@ -1,5 +1,5 @@
-module.exports = class Data1701712957890 {
-    name = 'Data1701712957890'
+module.exports = class Data1701729003798 {
+    name = 'Data1701729003798'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -31,7 +31,7 @@ module.exports = class Data1701712957890 {
         await db.query(`CREATE TABLE "balancer_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "rate0" numeric NOT NULL, "rate1" numeric NOT NULL, "rate2" numeric NOT NULL, "rate3" numeric NOT NULL, CONSTRAINT "PK_3ca9825db8d15c7850b715d9121" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_b1656f8d048f72b38bb637ea24" ON "balancer_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c55345ef048232dfe36e60e4c5" ON "balancer_pool_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
         await db.query(`CREATE TABLE "oeth_history" ("id" character varying NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(8) NOT NULL, "address_id" character varying, CONSTRAINT "PK_2c7e7571cd9ea02b07a27a303f3" PRIMARY KEY ("id"))`)
@@ -104,7 +104,7 @@ module.exports = class Data1701712957890 {
         await db.query(`CREATE TABLE "ogv_proposal_vote" ("id" character varying NOT NULL, "weight" numeric NOT NULL, "type" character varying(7) NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "proposal_id" character varying, "voter_id" character varying, CONSTRAINT "PK_93c03f35b95221586cb8b83f523" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_58d732bc6523c2609d2725cc0a" ON "ogv_proposal_vote" ("proposal_id") `)
         await db.query(`CREATE INDEX "IDX_2fd621aea353448fb3f17721bc" ON "ogv_proposal_vote" ("voter_id") `)
-        await db.query(`CREATE TABLE "ousd" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_acecae4a20bc14b22d9f6738d8d" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ousd" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_acecae4a20bc14b22d9f6738d8d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c8d1e285213b445b088805ac7c" ON "ousd" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_806949dd853b7e8acab5d03b81" ON "ousd" ("block_number") `)
         await db.query(`CREATE TABLE "ousd_history" ("id" character varying NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(8) NOT NULL, "address_id" character varying, CONSTRAINT "PK_dcbe3223b67f92d9ad4cffe8a7c" PRIMARY KEY ("id"))`)
