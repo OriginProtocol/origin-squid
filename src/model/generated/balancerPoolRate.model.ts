@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class BalancerPoolBalance {
-    constructor(props?: Partial<BalancerPoolBalance>) {
+export class BalancerPoolRate {
+    constructor(props?: Partial<BalancerPoolRate>) {
         Object.assign(this, props)
     }
 
@@ -22,14 +22,14 @@ export class BalancerPoolBalance {
     address!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance0!: bigint
+    rate0!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance1!: bigint
+    rate1!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance2!: bigint
+    rate2!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance3!: bigint
+    rate3!: bigint
 }

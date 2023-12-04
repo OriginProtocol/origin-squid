@@ -87,9 +87,9 @@ export const ensureExchangeRatesAverages = async (
           const pair = `${base}_${quote}`
           const rate =
             rates.reduce((sum, r) => sum + r.rate, 0n) / BigInt(rates.length)
-          ctx.log.info(
-            `Created average exchange rate of ${rate} using ${rates.length} rates`,
-          )
+          // ctx.log.info(
+          //   `Created average exchange rate of ${rate} using ${rates.length} rates`,
+          // )
           return new ExchangeRate({
             base: rates[0].base,
             quote: rates[0].quote,

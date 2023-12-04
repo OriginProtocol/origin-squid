@@ -134,4 +134,16 @@ type BalancerPoolBalance @entity {
   balance0: BigInt!
   balance1: BigInt!
   balance2: BigInt!
+  balance3: BigInt!
+}
+
+type BalancerPoolRate @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  rate0: BigInt!
+  rate1: BigInt!
+  rate2: BigInt!
+  rate3: BigInt!
 }
