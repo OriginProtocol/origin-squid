@@ -12,7 +12,7 @@
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:other": "sqd process:other",
-    "process": "sqd migration:apply && npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
+    "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",
