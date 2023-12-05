@@ -40,16 +40,10 @@ export class OUSDRebase {
     apy!: OUSDAPY
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    fee!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     feeETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     feeUSD!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yield!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldETH!: bigint

@@ -181,7 +181,9 @@ type OETHDailyStat @entity {
   wrappedSupply: BigInt!
 
   yieldETH: BigInt!
+  yieldETHAllTime: BigInt!
   yieldUSD: BigInt!
+  yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
   feesETH7Day: BigInt!

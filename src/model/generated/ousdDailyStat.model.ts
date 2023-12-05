@@ -60,7 +60,13 @@ export class OUSDDailyStat {
     yieldETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yieldETHAllTime!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldUSD!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yieldUSDAllTime!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     feesETH!: bigint

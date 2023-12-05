@@ -332,7 +332,9 @@ type OETHDailyStat @entity {
   wrappedSupply: BigInt!
 
   yieldETH: BigInt!
+  yieldETHAllTime: BigInt!
   yieldUSD: BigInt!
+  yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
   feesETH7Day: BigInt!
@@ -587,10 +589,8 @@ type OUSDRebase @entity {
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
   apy: OUSDAPY!
-  fee: BigInt!
   feeETH: BigInt!
   feeUSD: BigInt!
-  yield: BigInt!
   yieldETH: BigInt!
   yieldUSD: BigInt!
 }
@@ -753,7 +753,9 @@ type OUSDDailyStat @entity {
   wrappedSupply: BigInt!
 
   yieldETH: BigInt!
+  yieldETHAllTime: BigInt!
   yieldUSD: BigInt!
+  yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
   feesETH7Day: BigInt!

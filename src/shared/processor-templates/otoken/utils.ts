@@ -64,19 +64,22 @@ export async function createRebaseAPY<
   },
   exchangeRate: ExchangeRate,
 ) {
-  const fee = lastYieldDistributionEvent.fee
-  const yieldValue = lastYieldDistributionEvent.yield
+  let feeETH = 0n
+  let yieldETH = 0n
+  let feeUSD = 0n
+  let yieldUSD = 0n
+  const rate = exchangeRate.rate
 
-  let feeConverted = 0n
-  let yieldConverted = 0n
   if (OTokenAPY.name === 'OUSDAPY') {
-    feeConverted =
-      (fee * 1000000000000000000n) / exchangeRate.rate / 10000000000n
-    yieldConverted =
-      (yieldValue * 1000000000000000000n) / exchangeRate.rate / 10000000000n
+    feeUSD = lastYieldDistributionEvent.fee
+    yieldUSD = lastYieldDistributionEvent.yield
+    feeETH = (feeUSD * 1000000000000000000n) / rate / 10000000000n
+    yieldETH = (yieldUSD * 1000000000000000000n) / rate / 10000000000n
   } else {
-    feeConverted = (fee * exchangeRate.rate) / 100000000n
-    yieldConverted = (yieldValue * exchangeRate.rate) / 100000000n
+    feeETH = lastYieldDistributionEvent.fee
+    yieldETH = lastYieldDistributionEvent.yield
+    feeUSD = (feeETH * exchangeRate.rate) / 100000000n
+    yieldUSD = (yieldETH * exchangeRate.rate) / 100000000n
   }
 
   const rebase = new OTokenRebase({
@@ -87,10 +90,10 @@ export async function createRebaseAPY<
     rebasingCredits: rebaseEvent.rebasingCredits,
     rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     totalSupply: rebaseEvent.totalSupply,
-    fee,
-    yield: yieldValue,
-    feeConverted,
-    yieldConverted,
+    feeUSD,
+    yieldUSD,
+    feeETH,
+    yieldETH,
   })
 
   // use date as id for APY

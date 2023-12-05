@@ -104,12 +104,10 @@ async function updateDailyStats(ctx: Context, date: Date) {
   const yieldStats = await entityManager.query<
     {
       period: string
-      total_yield: bigint
-      total_fees: bigint
-      total_revenue: bigint
-      total_yield_converted: bigint
-      total_fees_converted: bigint
-      total_revenue_converted: bigint
+      total_yield_usd: bigint
+      total_yield_eth: bigint
+      total_fees_usd: bigint
+      total_fees_eth: bigint
     }[]
   >(yieldStatsQuery, [end])
 
@@ -143,19 +141,16 @@ async function updateDailyStats(ctx: Context, date: Date) {
     dripperWETH: 0n,
     wrappedSupply: lastWrappedOUSDHistory?.balance || 0n,
 
-    yield: yieldStats[0].total_yield || 0n,
-    fees: yieldStats[0].total_fees || 0n,
-    revenue: yieldStats[0].total_revenue || 0n,
-    revenue7DayAvg: BigInt(yieldStats[1].total_revenue || 0n) / 7n,
-    revenue7DayTotal: yieldStats[1].total_revenue || 0n,
-    revenueAllTime: yieldStats[2].total_revenue || 0n,
-
-    yieldConverted: yieldStats[0].total_yield_converted || 0n,
-    feesConverted: yieldStats[0].total_fees_converted || 0n,
-    revenueConverted: yieldStats[0].total_revenue_converted || 0n,
-    revenue7DayAvgConverted: BigInt(yieldStats[1].total_revenue_converted || 0n) / 7n,
-    revenue7DayTotalConverted: yieldStats[1].total_revenue_converted || 0n,
-    revenueAllTimeConverted: yieldStats[2].total_revenue_converted || 0n,
+    yieldUSD: yieldStats[0].total_yield_usd || 0n,
+    yieldUSDAllTime: yieldStats[2].total_yield_usd || 0n,
+    yieldETH: yieldStats[0].total_yield_eth || 0n,
+    yieldETHAllTime: yieldStats[2].total_yield_eth || 0n,
+    feesUSD: yieldStats[0].total_fees_usd || 0n,
+    feesUSD7Day: yieldStats[1].total_fees_usd || 0n,
+    feesUSDAllTime: yieldStats[2].total_fees_usd || 0n,
+    feesETH: yieldStats[0].total_fees_eth || 0n,
+    feesETH7Day: yieldStats[1].total_fees_eth || 0n,
+    feesETHAllTime: yieldStats[2].total_fees_eth || 0n,
 
     pegPrice: 0n,
   })
@@ -202,44 +197,35 @@ async function updateDailyStats(ctx: Context, date: Date) {
 const yieldStatsQuery = `
 -- Results for 1 day
 SELECT '1 day' as period,
-  SUM(fee) as total_fees,
-  SUM(yield - fee) as total_yield,
-  SUM(yield) as total_revenue,
+  SUM(fee_usd) as total_fees_usd,
+  SUM(yield_usd - fee_usd) as total_yield_usd,
+  SUM(fee_eth) as total_fees_eth,
+  SUM(yield_eth - fee_eth) as total_yield_eth
 
-  SUM(fee_converted) as total_fees_converted,
-  SUM(yield_converted - fee_converted) as total_yield_converted,
-  SUM(yield_converted) as total_revenue_converted
-
-FROM oeth_rebase
+FROM ousd_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
 
 UNION ALL
 
 -- Results for 7 days
 SELECT '7 days' as period,
-  SUM(fee) as total_fees,
-  SUM(yield - fee) as total_yield,
-  SUM(yield) as total_revenue,
+  SUM(fee_usd) as total_fees_usd,
+  SUM(yield_usd - fee_usd) as total_yield_usd,
+  SUM(fee_eth) as total_fees_eth,
+  SUM(yield_eth - fee_eth) as total_yield_eth
 
-  SUM(fee_converted) as total_fees_converted,
-  SUM(yield_converted - fee_converted) as total_yield_converted,
-  SUM(yield_converted) as total_revenue_converted
-
-FROM oeth_rebase
+FROM ousd_rebase
 WHERE timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
 
 UNION ALL
 
 -- Results for all time up to the end date
 SELECT 'all time' as period,
-  SUM(fee) as total_fees,
-  SUM(yield - fee) as total_yield,
-  SUM(yield) as total_revenue,
+  SUM(fee_usd) as total_fees_usd,
+  SUM(yield_usd - fee_usd) as total_yield_usd,
+  SUM(fee_eth) as total_fees_eth,
+  SUM(yield_eth - fee_eth) as total_yield_eth
 
-  SUM(fee_converted) as total_fees_converted,
-  SUM(yield_converted - fee_converted) as total_yield_converted,
-  SUM(yield_converted) as total_revenue_converted
-
-FROM oeth_rebase
+FROM ousd_rebase
 WHERE timestamp <= $1::timestamp
 `
