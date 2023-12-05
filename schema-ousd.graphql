@@ -51,9 +51,11 @@ type OUSDRebase @entity {
   rebasingCreditsPerToken: BigInt!
   apy: OUSDAPY!
   fee: BigInt!
+  feeETH: BigInt!
+  feeUSD: BigInt!
   yield: BigInt!
-  feeConverted: BigInt!
-  yieldConverted: BigInt!
+  yieldETH: BigInt!
+  yieldUSD: BigInt!
 }
 
 """
@@ -213,19 +215,16 @@ type OUSDDailyStat @entity {
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
 
-  yield: BigInt!
-  fees: BigInt!
-  revenue: BigInt!
-  revenue7DayAvg: BigInt!
-  revenue7DayTotal: BigInt!
-  revenueAllTime: BigInt!
+  yieldETH: BigInt!
+  yieldUSD: BigInt!
 
-  yieldConverted: BigInt!
-  feesConverted: BigInt!
-  revenueConverted: BigInt!
-  revenue7DayAvgConverted: BigInt!
-  revenue7DayTotalConverted: BigInt!
-  revenueAllTimeConverted: BigInt!
+  feesETH: BigInt!
+  feesETH7Day: BigInt!
+  feesETHAllTime: BigInt!
+
+  feesUSD: BigInt!
+  feesUSD7Day: BigInt!
+  feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
   strategies: [OUSDStrategyDailyStat] @derivedFrom(field: "dailyStatId")
@@ -239,7 +238,7 @@ type OUSDStrategyDailyStat @entity {
   total: BigInt!
   tvl: BigInt!
   holdings: [OUSDStrategyHoldingDailyStat]
-  @derivedFrom(field: "strategyDailyStatId")
+    @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OUSDStrategyHoldingDailyStat @entity {

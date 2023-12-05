@@ -50,10 +50,10 @@ type OETHRebase @entity {
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
   apy: OETHAPY!
-  fee: BigInt!
-  yield: BigInt!
-  feeConverted: BigInt!
-  yieldConverted: BigInt!
+  feeETH: BigInt!
+  feeUSD: BigInt!
+  yieldETH: BigInt!
+  yieldUSD: BigInt!
 }
 
 """
@@ -180,19 +180,16 @@ type OETHDailyStat @entity {
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
 
-  yield: BigInt!
-  fees: BigInt!
-  revenue: BigInt!
-  revenue7DayAvg: BigInt!
-  revenue7DayTotal: BigInt!
-  revenueAllTime: BigInt!
+  yieldETH: BigInt!
+  yieldUSD: BigInt!
 
-  yieldConverted: BigInt!
-  feesConverted: BigInt!
-  revenueConverted: BigInt!
-  revenue7DayAvgConverted: BigInt!
-  revenue7DayTotalConverted: BigInt!
-  revenueAllTimeConverted: BigInt!
+  feesETH: BigInt!
+  feesETH7Day: BigInt!
+  feesETHAllTime: BigInt!
+
+  feesUSD: BigInt!
+  feesUSD7Day: BigInt!
+  feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
   """
@@ -215,7 +212,7 @@ type OETHStrategyDailyStat @entity {
   Total ETH value
   """
   holdings: [OETHStrategyHoldingDailyStat]
-  @derivedFrom(field: "strategyDailyStatId")
+    @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {
@@ -288,4 +285,3 @@ type OETHActivity @entity {
   toSymbol: String
   amount: BigInt
 }
-
