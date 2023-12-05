@@ -356,10 +356,10 @@ export const createOTokenProcessor = (params: {
     const data = otoken.events.TotalSupplyUpdatedHighres.decode(log)
 
     // OToken Object
-    const oethObject = await getLatestOTokenObject(ctx, result, block)
-    oethObject.totalSupply = data.totalSupply
-    oethObject.rebasingSupply =
-      oethObject.totalSupply - oethObject.nonRebasingSupply
+    const otokenObject = await getLatestOTokenObject(ctx, result, block)
+    otokenObject.totalSupply = data.totalSupply
+    otokenObject.rebasingSupply =
+      otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
     if (!result.lastYieldDistributionEvent) {
       throw new Error('lastYieldDistributionEvent is not set')

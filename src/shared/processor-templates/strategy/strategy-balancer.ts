@@ -14,6 +14,7 @@ import {
   WETH_ADDRESS,
 } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { getBalancePoolRateProviders } from '../../post-processors/exchange-rates/price-routing'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -58,7 +59,27 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     data.push(...results)
   })
   await ctx.store.insert(data)
-  await processStrategyEarnings(ctx, strategyData, getBalancerStrategyHoldings)
+  await processStrategyEarnings(ctx, strategyData, getStrategyETHBalance)
+}
+
+export const getStrategyETHBalance = async (
+  ctx: Context,
+  block: { height: number },
+  strategyData: IStrategyData,
+) => {
+  const { address } = strategyData
+  const strategy = new balancerMetaStablePoolStrategyAbi.Contract(
+    ctx,
+    block,
+    address,
+  )
+  return [
+    {
+      address,
+      asset: WETH_ADDRESS,
+      balance: await strategy['checkBalance()'](),
+    },
+  ]
 }
 
 export const getBalancerStrategyHoldings = async (
@@ -69,7 +90,7 @@ export const getBalancerStrategyHoldings = async (
   const { address, balancerPoolInfo } = strategyData
   const { poolAddress, poolId } = balancerPoolInfo!
 
-  const rateProviders = await _getBalancePoolRateProviders(
+  const rateProviders = await getBalancePoolRateProviders(
     ctx,
     block,
     poolAddress,
@@ -127,12 +148,3 @@ export const getBalancerStrategyHoldings = async (
     return { address, asset: asset.toLowerCase(), balance }
   })
 }
-
-const _getBalancePoolRateProviders = memoize(
-  async (ctx: Context, block: { height: number }, address: string) => {
-    const pool = new balancerMetaStablePoolAbi.Contract(ctx, block, address)
-    const rateProviders = await pool.getRateProviders()
-    return rateProviders
-  },
-  (_ctx, _block, address) => address.toLowerCase(),
-)

@@ -40,14 +40,14 @@ export class OETHRebase {
     apy!: OETHAPY
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    fee!: bigint
+    feeETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yield!: bigint
+    feeUSD!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    feeConverted!: bigint
+    yieldETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yieldConverted!: bigint
+    yieldUSD!: bigint
 }

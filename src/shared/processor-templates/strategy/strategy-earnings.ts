@@ -1,14 +1,11 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import { LessThan } from 'typeorm'
-import { formatEther, pad, parseEther, parseUnits } from 'viem'
+import { formatEther, pad } from 'viem'
 
-import * as aaveLendingPool from '../../../abi/aave-lending-pool'
-import * as aToken from '../../../abi/aave-token'
 import * as baseRewardPool from '../../../abi/base-reward-pool'
 import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
-import * as otoken from '../../../abi/otoken'
 import { OETH, StrategyYield } from '../../../model'
 import { Block, Context } from '../../../processor'
 import {
@@ -25,7 +22,7 @@ import {
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { logFilter } from '../../../utils/logFilter'
 import { convertDecimals, lastExcept } from '../../../utils/utils'
-import { ensureExchangeRatesAverages } from '../../post-processors/exchange-rates'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import {
   Currency,
   convertRate,
@@ -219,18 +216,6 @@ export const processStrategyEarnings = async (
         balances,
       )
     }
-    const balanceTrackingUpdateBalancerMetaStablePool = async () => {
-      // ctx.log.info(`balanceTrackingUpdateBalancerMetaStablePool`)
-      didUpdate = true
-      const balances = await getBalances()
-      await processDepositWithdrawal(
-        ctx,
-        strategyData,
-        block,
-        strategyYields,
-        balances,
-      )
-    }
 
     if (
       strategyData.balanceUpdateTraceFilters &&
@@ -290,7 +275,7 @@ export const processStrategyEarnings = async (
         baseRewardPoolTopics.has(log.topics[0]) &&
         log.topics[1] === pad(strategyData.address as `0x${string}`)
       ) {
-        await balanceTrackingUpdateBalancerMetaStablePool()
+        await balanceTrackingUpdate()
       } else if (
         strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))
       ) {
@@ -300,13 +285,13 @@ export const processStrategyEarnings = async (
         strategyData.earnings?.passiveByDepositWithdrawal &&
         depositWithdrawalTopics.has(log.topics[0])
       ) {
-        ctx.log.info({
-          type:
-            log.topics[0] === abstractStrategyAbi.events.Deposit.topic
-              ? 'Deposit'
-              : 'Withdrawal',
-          transactionHash: log.transactionHash,
-        })
+        // ctx.log.info({
+        //   type:
+        //     log.topics[0] === abstractStrategyAbi.events.Deposit.topic
+        //       ? 'Deposit'
+        //       : 'Withdrawal',
+        //   transactionHash: log.transactionHash,
+        // })
         await balanceTrackingUpdate()
       } else if (
         log.address === strategyData.address &&
@@ -411,13 +396,7 @@ const processDepositWithdrawal = async (
     const desiredRates = strategyData.assets
       .filter((a) => a.convertTo)
       .map((a) => [a.convertTo!.address, a.address]) as [Currency, Currency][]
-    const rates = await ensureExchangeRatesAverages(
-      ctx,
-      block,
-      dayjs.utc(block.header.timestamp).subtract(21, 'days').toDate(),
-      new Date(block.header.timestamp),
-      desiredRates,
-    )
+    const rates = await ensureExchangeRates(ctx, block, desiredRates)
     const previousBalance = assets.reduce((sum, a, index) => {
       const asset = strategyData.assets[index]
       const compareBalance = asset.convertTo
@@ -465,17 +444,17 @@ const processDepositWithdrawal = async (
       earningsChange,
       earnings: (latest?.earnings ?? 0n) + earningsChange,
     })
-    ctx.log.info(
-      `${block.header.height} Setting balance: ${formatEther(
-        balance,
-      )}, last balance: ${formatEther(
-        latest?.balance ?? 0n,
-      )}, previous block balance: ${formatEther(
-        previousBalance,
-      )}, perceived earnings: ${formatEther(
-        earningsChange,
-      )}, total earnings: ${formatEther(current.earnings)}`,
-    )
+    // ctx.log.info(
+    //   `${block.header.height} Setting balance: ${formatEther(
+    //     balance,
+    //   )}, last balance: ${formatEther(
+    //     latest?.balance ?? 0n,
+    //   )}, previous block balance: ${formatEther(
+    //     previousBalance,
+    //   )}, perceived earnings: ${formatEther(
+    //     earningsChange,
+    //   )}, total earnings: ${formatEther(current.earnings)}`,
+    // )
 
     if (earningsChange < 0) {
       ctx.log.warn('WARNING: earnings change is negative')

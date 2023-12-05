@@ -57,40 +57,28 @@ export class OUSDDailyStat {
     wrappedSupply!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yield!: bigint
+    yieldETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    fees!: bigint
+    yieldUSD!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenue!: bigint
+    feesETH!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenue7DayAvg!: bigint
+    feesETH7Day!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenue7DayTotal!: bigint
+    feesETHAllTime!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenueAllTime!: bigint
+    feesUSD!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yieldConverted!: bigint
+    feesUSD7Day!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    feesConverted!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenueConverted!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenue7DayAvgConverted!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenue7DayTotalConverted!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    revenueAllTimeConverted!: bigint
+    feesUSDAllTime!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     pegPrice!: bigint
