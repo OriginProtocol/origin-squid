@@ -103,8 +103,7 @@
     "process:oeth": {
       "description": "Load .env and start the squid processor",
       "deps": [
-        "build",
-        "migration:apply"
+        "build"
       ],
       "cmd": [
         "node",
@@ -115,8 +114,7 @@
     "process:ousd": {
       "description": "Load .env and start the squid processor",
       "deps": [
-        "build",
-        "migration:apply"
+        "build"
       ],
       "cmd": [
         "node",
@@ -127,8 +125,7 @@
     "process:ogv": {
       "description": "Load .env and start the squid processor",
       "deps": [
-        "build",
-        "migration:apply"
+        "build"
       ],
       "cmd": [
         "node",
@@ -139,8 +136,7 @@
     "process:other": {
       "description": "Load .env and start the squid processor",
       "deps": [
-        "build",
-        "migration:apply"
+        "build"
       ],
       "cmd": [
         "node",

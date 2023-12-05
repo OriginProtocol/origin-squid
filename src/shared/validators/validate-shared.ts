@@ -2,12 +2,12 @@ import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import assert from 'assert'
 import { sortBy } from 'lodash'
 
-import { StrategyYield } from '../../../model'
-import { Block, Context } from '../../../processor'
-import { env } from '../../../utils/env'
-import { jsonify } from '../../../utils/jsonify'
+import { ERC20Balance } from '../../model'
+import { Block, Context } from '../../processor'
+import { env } from '../../utils/env'
+import { jsonify } from '../../utils/jsonify'
 
-export const name = 'validate-ousd'
+export const name = 'validate-shared'
 
 let firstBlock = true
 
@@ -17,8 +17,8 @@ export const process = async (ctx: Context) => {
     await validateExpectations(
       ctx,
       block,
-      StrategyYield,
-      expectations.strategyYields,
+      ERC20Balance,
+      expectations.erc20Balances,
     )
     firstBlock = false
   }
@@ -91,39 +91,13 @@ const e = (arr: any[]) => {
 }
 
 const expectations = {
-  strategyYields: e([
-    // {
-    //   id: '16421264:0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x0000000000000000000000000000000000000348',
-    //   timestamp: '2023-01-16T18:52:35.000000Z',
-    //   blockNumber: 16421264,
-    //   strategy: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
-    //   asset: '0x0000000000000000000000000000000000000348',
-    //   balance: '1494000000000000000000000',
-    //   balanceWeight: 1,
-    //   earnings: '0',
-    //   earningsChange: '0',
-    // },
-    // {
-    //   id: '16421590:0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x0000000000000000000000000000000000000348',
-    //   timestamp: '2023-01-16T19:57:59.000000Z',
-    //   blockNumber: 16421590,
-    //   strategy: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
-    //   asset: '0x0000000000000000000000000000000000000348',
-    //   balance: '1494005405114000000000000',
-    //   balanceWeight: 1,
-    //   earnings: '5405114000000000000',
-    //   earningsChange: '5405114000000000000',
-    // },
-    // {
-    //   id: '16427826:0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x0000000000000000000000000000000000000348',
-    //   timestamp: '2023-01-17T16:50:23.000000Z',
-    //   blockNumber: 16427826,
-    //   strategy: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
-    //   asset: '0x0000000000000000000000000000000000000348',
-    //   balance: '1513111416702000000000000',
-    //   balanceWeight: 1,
-    //   earnings: '111399765000000000000',
-    //   earningsChange: '105994651000000000000',
-    // },
+  erc20Balances: e([
+    {
+      id: '11424000:0x6b175474e89094c44da98b954eedeac495271d0f:0x028171bca77440897b824ca71d1c56cac55b68a3',
+      blockNumber: 11424000,
+      address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+      account: '0x028171bca77440897b824ca71d1c56cac55b68a3',
+      balance: '345330738036343186917749',
+    },
   ]),
 } as const

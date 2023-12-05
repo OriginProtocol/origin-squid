@@ -1,16 +1,11 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { pad } from 'viem'
 
 import * as curvePool from '../../../abi/curve-lp-token'
 import * as erc20 from '../../../abi/erc20'
 import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import { StrategyBalance } from '../../../model'
 import { Block, Context } from '../../../processor'
-import {
-  ETH_ADDRESS,
-  OETH_ADDRESS,
-  WETH_ADDRESS,
-} from '../../../utils/addresses'
+import { ETH_ADDRESS, WETH_ADDRESS } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
 import {
@@ -124,7 +119,7 @@ export const getConvexEthMetaStrategyBalances = async (
         pTokenAddresses.add(pTokenAddr)
         const pToken = new erc20.Contract(ctx, block, pTokenAddr)
         const pTokenBalance = await pToken.balanceOf(address)
-        ctx.log.info({ height: block.height, pTokenAddr, pTokenBalance })
+        // ctx.log.info({ height: block.height, pTokenAddr, pTokenBalance })
         unstakedBalance += pTokenBalance
       }
     }

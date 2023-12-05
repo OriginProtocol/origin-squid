@@ -1,6 +1,9 @@
+import { memoize } from 'lodash'
+
+import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as chainlinkFeedRegistry from '../../../abi/chainlink-feed-registry'
-import * as eacAggregatorProxy from '../../../abi/eac-aggregator-proxy'
 import * as frxEthFraxOracle from '../../../abi/frx-eth-frax-oracle'
+import * as balancerMetaStablePoolAbi from '../../../abi/meta-stable-pool'
 import * as oethOracleRouter from '../../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../../abi/sfrx-eth'
 import { Context } from '../../../processor'
@@ -36,15 +39,21 @@ export const getPrice = async (
   return getChainlinkPrice(ctx, height, base, quote)
 }
 
-const rETHRegistryAddress = '0x536218f9E9Eb48863970252233c8F271f554C2d0'
-export const getRETHPrice = (ctx: Context, height: number) => {
-  if (height < 16700133) return undefined
-  const registry = new eacAggregatorProxy.Contract(
+export const getRETHPrice = async (ctx: Context, height: number) => {
+  if (height < 13846138) return undefined
+  // Balancer rETH Stable Pool Rate Provider
+  const rateProvider = await getBalancePoolRateProviders(
     ctx,
     { height },
-    rETHRegistryAddress,
+    '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
   )
-  return registry.latestAnswer()
+  // Balancer Vault `getPoolTokens` https://etherscan.io/address/0xba12222222228d8ba445958a75a0704d566bf2c8#readContract#F10
+  const provider = new balancerRateProvider.Contract(
+    ctx,
+    { height },
+    rateProvider[0], // rETH Rate
+  )
+  return await provider.getRate()
 }
 
 const registryAddress = '0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf'
@@ -106,3 +115,11 @@ export const getFrxEthPrice = (ctx: Context, height: number) => {
   )
   return frxEth.latestRoundData().then((lrd) => lrd.answer)
 }
+
+export const getBalancePoolRateProviders = memoize(
+  async (ctx: Context, block: { height: number }, address: string) => {
+    const pool = new balancerMetaStablePoolAbi.Contract(ctx, block, address)
+    return await pool.getRateProviders()
+  },
+  (_ctx, _block, address) => address.toLowerCase(),
+)

@@ -5,6 +5,7 @@ import {
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import assert from 'assert'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
@@ -83,6 +84,11 @@ export const run = ({
   postProcessors?: Pick<Processor, 'process' | 'name' | 'setup' | 'from'>[]
   validators?: Pick<Processor, 'process' | 'name'>[]
 }) => {
+  assert(
+    !processors.find((p) => p.from === undefined),
+    'All processors must have a `from` defined',
+  )
+
   const processor = createSquidProcessor()
 
   processor.setBlockRange({

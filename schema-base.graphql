@@ -16,18 +16,6 @@ type ExchangeRate @entity {
   rate: BigInt!
 }
 
-type Balance @entity {
-  """
-  Format: 'token:address:blockNumber'
-  """
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  token: String!
-  address: String!
-  balance: BigInt!
-}
-
 enum RebasingOption {
   OptIn
   OptOut
@@ -82,4 +70,80 @@ type StrategyDailyYield @entity {
   earningsChange: BigInt!
   apr: Float!
   apy: Float!
+}
+
+type ERC20 @entity {
+  """
+  Format: 'address'
+  """
+  id: ID!
+  address: String!
+  name: String!
+  decimals: Int!
+  symbol: String!
+}
+
+type ERC20Holder @entity {
+  """
+  Format: 'address:account'
+  """
+  id: ID!
+  address: String!
+  account: String!
+}
+
+type ERC20State @entity {
+  """
+  Format: 'address:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  totalSupply: BigInt!
+  holderCount: Int!
+}
+
+type ERC20Balance @entity {
+  """
+  Format: 'address:account:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  account: String!
+  balance: BigInt!
+}
+
+type CurvePoolBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  balance0: BigInt!
+  balance1: BigInt!
+  balance2: BigInt!
+}
+
+type BalancerPoolBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  balance0: BigInt!
+  balance1: BigInt!
+  balance2: BigInt!
+  balance3: BigInt!
+}
+
+type BalancerPoolRate @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  rate0: BigInt!
+  rate1: BigInt!
+  rate2: BigInt!
+  rate3: BigInt!
 }

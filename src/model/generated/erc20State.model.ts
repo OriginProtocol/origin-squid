@@ -2,13 +2,13 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class Balance {
-    constructor(props?: Partial<Balance>) {
+export class ERC20State {
+    constructor(props?: Partial<ERC20State>) {
         Object.assign(this, props)
     }
 
     /**
-     * Format: 'token:address:blockNumber'
+     * Format: 'address:blockNumber'
      */
     @PrimaryColumn_()
     id!: string
@@ -22,11 +22,11 @@ export class Balance {
     blockNumber!: number
 
     @Column_("text", {nullable: false})
-    token!: string
-
-    @Column_("text", {nullable: false})
     address!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance!: bigint
+    totalSupply!: bigint
+
+    @Column_("int4", {nullable: false})
+    holderCount!: number
 }

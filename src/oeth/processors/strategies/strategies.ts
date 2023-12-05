@@ -71,11 +71,24 @@ export const oethStrategies: readonly IStrategyData[] = [
     oTokenAddress: OETH_ADDRESS,
     kind: 'BalancerMetaStablePool',
     base: { address: currencies.ETH, decimals: 18 },
-    assets: [WETH_ADDRESS, RETH_ADDRESS].map((address) => ({
-      address,
-      decimals: 18,
-    })),
-    earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
+    assets: [
+      {
+        address: WETH_ADDRESS,
+        decimals: 18,
+      },
+      {
+        address: RETH_ADDRESS,
+        decimals: 18,
+        convertTo: {
+          address: ETH_ADDRESS,
+          decimals: 18,
+        },
+      },
+    ],
+    earnings: {
+      rewardTokenCollected: true,
+      passiveByDepositWithdrawal: true,
+    },
     balancerPoolInfo: {
       poolId:
         '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
