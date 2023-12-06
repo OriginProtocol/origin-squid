@@ -12,6 +12,7 @@ import {
 } from '../../model'
 import { Block, Context, Log } from '../../processor'
 import { GOVERNANCE_ADDRESS } from '../../utils/addresses'
+import { env } from '../../utils/env'
 
 export const from = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
 
@@ -53,25 +54,32 @@ export const process = async (ctx: Context) => {
       if (log.address !== GOVERNANCE_ADDRESS) continue
 
       const firstTopic = log.topics[0]
-      if (firstTopic == governanceAbi.events.ProposalCreated.topic) {
-        await _processProposalCreated(ctx, result, block, log)
-      } else if (firstTopic == governanceAbi.events.ProposalExtended.topic) {
-        await _processProposalExtended(ctx, result, block, log)
-      } else if (
-        [
-          governanceAbi.events.ProposalQueued.topic,
-          governanceAbi.events.ProposalCanceled.topic,
-          governanceAbi.events.ProposalExecuted.topic,
-        ].includes(firstTopic)
-      ) {
-        await _processProposalEvents(ctx, result, block, log)
-      } else if (
-        [
-          governanceAbi.events.VoteCast.topic,
-          governanceAbi.events.VoteCastWithParams.topic,
-        ].includes(firstTopic)
-      ) {
-        await _processVoteCast(ctx, result, block, log)
+      try {
+        if (firstTopic == governanceAbi.events.ProposalCreated.topic) {
+          await _processProposalCreated(ctx, result, block, log)
+        } else if (firstTopic == governanceAbi.events.ProposalExtended.topic) {
+          await _processProposalExtended(ctx, result, block, log)
+        } else if (
+          [
+            governanceAbi.events.ProposalQueued.topic,
+            governanceAbi.events.ProposalCanceled.topic,
+            governanceAbi.events.ProposalExecuted.topic,
+          ].includes(firstTopic)
+        ) {
+          await _processProposalEvents(ctx, result, block, log)
+        } else if (
+          [
+            governanceAbi.events.VoteCast.topic,
+            governanceAbi.events.VoteCastWithParams.topic,
+          ].includes(firstTopic)
+        ) {
+          await _processVoteCast(ctx, result, block, log)
+        }
+      } catch (e) {
+        if (!env.BLOCK_FROM) {
+          throw e
+        }
+        ctx.log.error('Could not process governance event')
       }
     }
   }

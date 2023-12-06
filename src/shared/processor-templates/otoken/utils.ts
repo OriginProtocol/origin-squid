@@ -4,6 +4,7 @@ import { LessThan, MoreThanOrEqual } from 'typeorm'
 
 import * as otoken from '../../../abi/otoken'
 import {
+  ExchangeRate,
   OETHAPY,
   OETHAddress,
   OETHRebase,
@@ -61,7 +62,26 @@ export async function createRebaseAPY<
     fee: bigint
     yield: bigint
   },
+  exchangeRate: ExchangeRate,
 ) {
+  let feeETH = 0n
+  let yieldETH = 0n
+  let feeUSD = 0n
+  let yieldUSD = 0n
+  const rate = exchangeRate.rate
+
+  if (OTokenAPY.name === 'OUSDAPY') {
+    feeUSD = lastYieldDistributionEvent.fee
+    yieldUSD = lastYieldDistributionEvent.yield
+    feeETH = (feeUSD * 1000000000000000000n) / rate / 10000000000n
+    yieldETH = (yieldUSD * 1000000000000000000n) / rate / 10000000000n
+  } else {
+    feeETH = lastYieldDistributionEvent.fee
+    yieldETH = lastYieldDistributionEvent.yield
+    feeUSD = (feeETH * exchangeRate.rate) / 100000000n
+    yieldUSD = (yieldETH * exchangeRate.rate) / 100000000n
+  }
+
   const rebase = new OTokenRebase({
     id: log.id,
     blockNumber: block.header.height,
@@ -70,8 +90,10 @@ export async function createRebaseAPY<
     rebasingCredits: rebaseEvent.rebasingCredits,
     rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     totalSupply: rebaseEvent.totalSupply,
-    fee: lastYieldDistributionEvent.fee,
-    yield: lastYieldDistributionEvent.yield,
+    feeUSD,
+    yieldUSD,
+    feeETH,
+    yieldETH,
   })
 
   // use date as id for APY

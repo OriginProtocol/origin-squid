@@ -28,6 +28,7 @@ import { ADDRESS_ZERO } from '../../../utils/addresses'
 import { DECIMALS_18 } from '../../../utils/constants'
 import { EntityClassT, InstanceTypeOfConstructor } from '../../../utils/type'
 import { getLatestEntity } from '../../../utils/utils'
+import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
@@ -364,6 +365,11 @@ export const createOTokenProcessor = (params: {
       throw new Error('lastYieldDistributionEvent is not set')
     }
 
+    const exchangeRate = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
+    if (!exchangeRate) {
+      throw new Error('Could not fetch ETH/USD exchange rate')
+    }
+
     // Rebase events
     let rebase = createRebaseAPY(
       params.OTokenAPY,
@@ -374,6 +380,7 @@ export const createOTokenProcessor = (params: {
       log,
       data,
       result.lastYieldDistributionEvent,
+      exchangeRate,
     )
 
     for (const address of owners!.values()) {

@@ -1,5 +1,5 @@
-module.exports = class Data1701729003798 {
-    name = 'Data1701729003798'
+module.exports = class Data1701813557098 {
+    name = 'Data1701813557098'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -43,7 +43,7 @@ module.exports = class Data1701729003798 {
         await db.query(`CREATE INDEX "IDX_b1a448045d1ed9d655b679a371" ON "oethapy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_6b8a7a706a0701e659a7d81508" ON "oethapy" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_c0c03168bb0139e3cffda4f00e" ON "oethapy" ("tx_hash") `)
-        await db.query(`CREATE TABLE "oeth_rebase" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee" numeric NOT NULL, "yield" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_5f8f4dd071caf685b4ac2d54de3" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_rebase" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee_eth" numeric NOT NULL, "fee_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_usd" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_5f8f4dd071caf685b4ac2d54de3" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_fbb7b3f2fff9896eb683b86de7" ON "oeth_rebase" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d3255d02d9407bba89380d01fa" ON "oeth_rebase" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8b6bb0243472af88612fe6a01f" ON "oeth_rebase" ("tx_hash") `)
@@ -77,7 +77,7 @@ module.exports = class Data1701729003798 {
         await db.query(`CREATE INDEX "IDX_6c7096c96a000d8471256ca8fc" ON "oeth_strategy_daily_stat" ("daily_stat_id_id") `)
         await db.query(`CREATE TABLE "oeth_collateral_daily_stat" ("id" character varying NOT NULL, "symbol" text NOT NULL, "amount" numeric NOT NULL, "price" numeric NOT NULL, "value" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_5fb23d7bae30dffe4543e7aa069" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a90045de50406be7bd56efd3ea" ON "oeth_collateral_daily_stat" ("daily_stat_id_id") `)
-        await db.query(`CREATE TABLE "oeth_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "revenue" numeric NOT NULL, "revenue7_day_avg" numeric NOT NULL, "revenue7_day_total" numeric NOT NULL, "revenue_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_9144a02ab13b1baa818a7d5eae5" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "oeth_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_eth_all_time" numeric NOT NULL, "yield_usd" numeric NOT NULL, "yield_usd_all_time" numeric NOT NULL, "fees_eth" numeric NOT NULL, "fees_eth7_day" numeric NOT NULL, "fees_eth_all_time" numeric NOT NULL, "fees_usd" numeric NOT NULL, "fees_usd7_day" numeric NOT NULL, "fees_usd_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_9144a02ab13b1baa818a7d5eae5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98d9001013aa37425ca47b7126" ON "oeth_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_c3e66051c7df4efd6a8fa8f9c1" ON "oeth_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
@@ -116,7 +116,7 @@ module.exports = class Data1701729003798 {
         await db.query(`CREATE INDEX "IDX_c514963f42908ce84d65a84a77" ON "ousdapy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_4f606414b3b5ce1a366bd0fbf6" ON "ousdapy" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_0e84a81a109b66fe6f01f77c74" ON "ousdapy" ("tx_hash") `)
-        await db.query(`CREATE TABLE "ousd_rebase" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee" numeric NOT NULL, "yield" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_04cf0de72399a99798dde61b237" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ousd_rebase" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee_eth" numeric NOT NULL, "fee_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_usd" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_04cf0de72399a99798dde61b237" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f8eb4a16ce58a146b3227ee21a" ON "ousd_rebase" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_3fb03b1a410e64c7367226d0b6" ON "ousd_rebase" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_1a76c478199672aaeec340f619" ON "ousd_rebase" ("tx_hash") `)
@@ -160,6 +160,15 @@ module.exports = class Data1701729003798 {
         await db.query(`CREATE INDEX "IDX_87dcf07f9e54c132535acf47a4" ON "ousd_activity" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_e80a0f99e9f31fe69ac50b5a4c" ON "ousd_activity" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_2af2ad9975c024d1aa3535928f" ON "ousd_activity" ("tx_hash") `)
+        await db.query(`CREATE TABLE "ousd_strategy_holding_daily_stat" ("id" character varying NOT NULL, "symbol" text NOT NULL, "amount" numeric NOT NULL, "value" numeric NOT NULL, "strategy_daily_stat_id_id" character varying, CONSTRAINT "PK_ef2f51867e1d465c554262efd1b" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_e1a93bab3d12271dc114234d3a" ON "ousd_strategy_holding_daily_stat" ("strategy_daily_stat_id_id") `)
+        await db.query(`CREATE TABLE "ousd_strategy_daily_stat" ("id" character varying NOT NULL, "name" text NOT NULL, "total" numeric NOT NULL, "tvl" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_ac65d3f28f290211ddeb950e157" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_3edda581683682257159cb0863" ON "ousd_strategy_daily_stat" ("daily_stat_id_id") `)
+        await db.query(`CREATE TABLE "ousd_collateral_daily_stat" ("id" character varying NOT NULL, "symbol" text NOT NULL, "amount" numeric NOT NULL, "price" numeric NOT NULL, "value" numeric NOT NULL, "daily_stat_id_id" character varying, CONSTRAINT "PK_85a804677f14a0784914e27b7b9" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_78be9d3f3dc1f31cf17ae810fe" ON "ousd_collateral_daily_stat" ("daily_stat_id_id") `)
+        await db.query(`CREATE TABLE "ousd_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_eth_all_time" numeric NOT NULL, "yield_usd" numeric NOT NULL, "yield_usd_all_time" numeric NOT NULL, "fees_eth" numeric NOT NULL, "fees_eth7_day" numeric NOT NULL, "fees_eth_all_time" numeric NOT NULL, "fees_usd" numeric NOT NULL, "fees_usd7_day" numeric NOT NULL, "fees_usd_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, CONSTRAINT "PK_f8adaf321a99f2b4b877c262880" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_f9020d89932aad2d0de8923490" ON "ousd_daily_stat" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_0bb5f72bf5fa59ce8c232caa4c" ON "ousd_daily_stat" ("timestamp") `)
         await db.query(`ALTER TABLE "oeth_history" ADD CONSTRAINT "FK_94e47c4c49128c78f60b185b46b" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase" ADD CONSTRAINT "FK_3331819842173de7c27c046547a" FOREIGN KEY ("apy_id") REFERENCES "oethapy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase_option" ADD CONSTRAINT "FK_034428879698039839b4ba6ffe8" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -176,6 +185,9 @@ module.exports = class Data1701729003798 {
         await db.query(`ALTER TABLE "ousd_history" ADD CONSTRAINT "FK_70291ea600c0c4d67d9bfe6a6bf" FOREIGN KEY ("address_id") REFERENCES "ousd_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "ousd_rebase" ADD CONSTRAINT "FK_427468c97f9838b804efd6c8e55" FOREIGN KEY ("apy_id") REFERENCES "ousdapy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "ousd_rebase_option" ADD CONSTRAINT "FK_b04173f9349ddd991a3b60e914a" FOREIGN KEY ("address_id") REFERENCES "ousd_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "ousd_strategy_holding_daily_stat" ADD CONSTRAINT "FK_e1a93bab3d12271dc114234d3ae" FOREIGN KEY ("strategy_daily_stat_id_id") REFERENCES "ousd_strategy_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "ousd_strategy_daily_stat" ADD CONSTRAINT "FK_3edda581683682257159cb08638" FOREIGN KEY ("daily_stat_id_id") REFERENCES "ousd_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "ousd_collateral_daily_stat" ADD CONSTRAINT "FK_78be9d3f3dc1f31cf17ae810fee" FOREIGN KEY ("daily_stat_id_id") REFERENCES "ousd_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
     }
 
     async down(db) {
@@ -337,6 +349,15 @@ module.exports = class Data1701729003798 {
         await db.query(`DROP INDEX "public"."IDX_87dcf07f9e54c132535acf47a4"`)
         await db.query(`DROP INDEX "public"."IDX_e80a0f99e9f31fe69ac50b5a4c"`)
         await db.query(`DROP INDEX "public"."IDX_2af2ad9975c024d1aa3535928f"`)
+        await db.query(`DROP TABLE "ousd_strategy_holding_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_e1a93bab3d12271dc114234d3a"`)
+        await db.query(`DROP TABLE "ousd_strategy_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_3edda581683682257159cb0863"`)
+        await db.query(`DROP TABLE "ousd_collateral_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_78be9d3f3dc1f31cf17ae810fe"`)
+        await db.query(`DROP TABLE "ousd_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_f9020d89932aad2d0de8923490"`)
+        await db.query(`DROP INDEX "public"."IDX_0bb5f72bf5fa59ce8c232caa4c"`)
         await db.query(`ALTER TABLE "oeth_history" DROP CONSTRAINT "FK_94e47c4c49128c78f60b185b46b"`)
         await db.query(`ALTER TABLE "oeth_rebase" DROP CONSTRAINT "FK_3331819842173de7c27c046547a"`)
         await db.query(`ALTER TABLE "oeth_rebase_option" DROP CONSTRAINT "FK_034428879698039839b4ba6ffe8"`)
@@ -353,5 +374,8 @@ module.exports = class Data1701729003798 {
         await db.query(`ALTER TABLE "ousd_history" DROP CONSTRAINT "FK_70291ea600c0c4d67d9bfe6a6bf"`)
         await db.query(`ALTER TABLE "ousd_rebase" DROP CONSTRAINT "FK_427468c97f9838b804efd6c8e55"`)
         await db.query(`ALTER TABLE "ousd_rebase_option" DROP CONSTRAINT "FK_b04173f9349ddd991a3b60e914a"`)
+        await db.query(`ALTER TABLE "ousd_strategy_holding_daily_stat" DROP CONSTRAINT "FK_e1a93bab3d12271dc114234d3ae"`)
+        await db.query(`ALTER TABLE "ousd_strategy_daily_stat" DROP CONSTRAINT "FK_3edda581683682257159cb08638"`)
+        await db.query(`ALTER TABLE "ousd_collateral_daily_stat" DROP CONSTRAINT "FK_78be9d3f3dc1f31cf17ae810fee"`)
     }
 }
