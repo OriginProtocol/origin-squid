@@ -109,7 +109,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       total_fees_usd: bigint
       total_fees_eth: bigint
     }[]
-  >(yieldStatsQuery, [end])
+  >(yieldStatsQuery, [end.toJSON()])
 
   const mostRecentEntity = allEntities.reduce((highest, current) => {
     if (!highest || !current) return current
