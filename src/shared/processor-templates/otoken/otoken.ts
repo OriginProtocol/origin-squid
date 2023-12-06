@@ -212,8 +212,6 @@ export const createOTokenProcessor = (params: {
       addressSub.lastUpdated = new Date(block.header.timestamp)
       addressAdd.lastUpdated = new Date(block.header.timestamp)
 
-      const isSwap = [data.from, data.to].includes(ADDRESS_ZERO)
-
       /**
        * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
        * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
@@ -241,11 +239,8 @@ export const createOTokenProcessor = (params: {
             change = newBalance - address.balance
           }
           if (change === 0n) return
-          const type = isSwap
-            ? HistoryType.Swap
-            : addressSub === address
-              ? HistoryType.Sent
-              : HistoryType.Received
+          const type =
+            addressSub === address ? HistoryType.Sent : HistoryType.Received
           result.history.push(
             new params.OTokenHistory({
               // we can't use {t.id} because it's not unique

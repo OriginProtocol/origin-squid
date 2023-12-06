@@ -288,7 +288,7 @@ const expectations = {
       timestamp: '2023-04-29T06:48:11.000000Z',
       txHash:
         '0x4af5c7b310ae8c814ae6e5415da99f9c9f414e6b4ca8257cd1dea1a6d9067b36',
-      type: 'Swap',
+      type: 'Received',
       value: '49999999999999999',
     },
     {
@@ -298,7 +298,7 @@ const expectations = {
       timestamp: '2023-05-17T09:47:23.000000Z',
       txHash:
         '0xd9a0e30f23956cb91293cb44a6e54b6d6bbe772e3d70b5e68a1760b28c8f78ef',
-      type: 'Swap',
+      type: 'Received',
       value: '375433998881638354',
     },
     {
@@ -308,7 +308,7 @@ const expectations = {
       timestamp: '2023-05-18T12:49:35.000000Z',
       txHash:
         '0xcd68e7d50fcb683add60e71253673af2ff2547e6375d40ffc4639a1410bc3104',
-      type: 'Swap',
+      type: 'Received',
       value: '1499066120128420574',
     },
     {
@@ -318,7 +318,7 @@ const expectations = {
       timestamp: '2023-07-06T07:00:11.000000Z',
       txHash:
         '0x97db34103137321f032b4a54ccaed3112d054bc1204125ac862a0b81fb3f3279',
-      type: 'Swap',
+      type: 'Received',
       value: '1273337667112407520',
     },
     {
@@ -328,7 +328,7 @@ const expectations = {
       timestamp: '2023-05-20T08:19:59.000000Z',
       txHash:
         '0x787fbdec5e65927b0e1b48601d891f48d7671db88fc4c11ac74f8e874e667936',
-      type: 'Swap',
+      type: 'Received',
       value: '1049118249013688',
     },
     {
