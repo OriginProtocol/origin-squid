@@ -9,7 +9,7 @@ const tracks: Parameters<typeof createERC20Tracker>[0][] = [
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
     accountFilter: [
       '0x3ed3b47dd13ec9a98b44e6204a523e766b225811', // aUSDT
-      '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9', // aUSDT
+      '0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9', // cUSDT
     ],
     intervalTracking: true,
   },
