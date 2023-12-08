@@ -9,6 +9,7 @@ deploy:
   secrets:
     - RPC_ENDPOINT
     - RPC_ENDPOINT_999
+    - RPC_BACKUP
   processor:
     #    cmd: [ "node", "lib/main" ]
     #    env:
@@ -44,4 +45,3 @@ deploy:
       - '1000'
 scale:
   dedicated: true
-  
