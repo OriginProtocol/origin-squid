@@ -1,3 +1,4 @@
+import './fetch-polyfill'
 import { GraphQLResolveInfo } from 'graphql'
 import 'reflect-metadata'
 import { Field, Info, ObjectType, Query, Resolver } from 'type-graphql'
