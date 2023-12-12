@@ -62,6 +62,12 @@ const processors = pools.map((pool) =>
     pool.poolId.toLowerCase(),
     pool.poolType,
     pool.from,
+    [
+      [
+        '0xba100000625a3754423978a60c9317c58a424e3d',
+        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+      ],
+    ],
   ),
 )
 

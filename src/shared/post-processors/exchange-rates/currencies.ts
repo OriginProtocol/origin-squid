@@ -13,6 +13,7 @@ export const currencies = {
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
   CRV: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+  BAL: '0xba100000625a3754423978a60c9317c58a424e3d',
 } as const
 
 export const currenciesByAddress = mapKeys(invert(currencies), (v, k) =>
