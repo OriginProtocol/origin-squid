@@ -1,9 +1,9 @@
 import { memoize } from 'lodash'
 
+import * as balancerMetaStablePoolAbi from '../../../abi/balancer-meta-stable-pool'
 import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as chainlinkFeedRegistry from '../../../abi/chainlink-feed-registry'
 import * as frxEthFraxOracle from '../../../abi/frx-eth-frax-oracle'
-import * as balancerMetaStablePoolAbi from '../../../abi/meta-stable-pool'
 import * as oethOracleRouter from '../../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../../abi/sfrx-eth'
 import { Context } from '../../../processor'

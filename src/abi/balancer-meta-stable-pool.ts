@@ -1,6 +1,6 @@
 import * as ethers from 'ethers'
 import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './meta-stable-pool.abi'
+import {ABI_JSON} from './balancer-meta-stable-pool.abi'
 
 export const abi = new ethers.Interface(ABI_JSON);
 

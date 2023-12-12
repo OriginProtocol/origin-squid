@@ -1,8 +1,8 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import * as balancerMetaPoolStrategy from '../../abi/balancer-meta-pool-strategy'
+import * as metaStablePool from '../../abi/balancer-meta-stable-pool'
 import * as baseRewardPool4626 from '../../abi/base-reward-pool-4626'
-import * as metaStablePool from '../../abi/meta-stable-pool'
 import { OETHBalancerMetaPoolStrategy } from '../../model'
 import { Context } from '../../processor'
 import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'

@@ -1,8 +1,10 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
+import * as balancerComposableStablePool from '../../../abi/balancer-composable-stable-pool'
+import * as balancerMetaStablePoolAbi from '../../../abi/balancer-meta-stable-pool'
 import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as balancerVaultAbi from '../../../abi/balancer-vault'
-import * as balancerMetaStablePoolAbi from '../../../abi/meta-stable-pool'
+import * as balancerWeightedPool from '../../../abi/balancer-weighted-pool-2-token'
 import { BalancerPoolBalance, BalancerPoolRate } from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO, BALANCER_VAULT } from '../../../utils/addresses'
@@ -53,7 +55,58 @@ export const createBalancerProcessor = (
       })
       result.balancerPoolBalances.push(balance)
 
-      if (poolType === 'MetaStable') {
+      if (poolType === 'Weighted') {
+        const balancerPool = new balancerWeightedPool.Contract(
+          ctx,
+          block.header,
+          poolAddress,
+        )
+        const rates: bigint[] = [await balancerPool.getRate()]
+        const rate = new BalancerPoolRate({
+          id: `${poolAddress}-${block.header.height}`,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          address: poolAddress,
+          rate0: rates[0],
+          rate1: rates[1] ?? 0n,
+          rate2: rates[2] ?? 0n,
+          rate3: rates[3] ?? 0n,
+        })
+        result.balancerPoolRates.push(rate)
+      } else if (poolType === 'ComposableStable') {
+        const balancerPool = new balancerComposableStablePool.Contract(
+          ctx,
+          block.header,
+          poolAddress,
+        )
+        const rateProviders = await balancerPool.getRateProviders()
+        const rates: bigint[] = []
+        for (let i = 0; i < tokens.length; i++) {
+          // ctx.log.info(`${rateProviders[i]}`)
+          if (rateProviders[i] === ADDRESS_ZERO) {
+            rates.push(eth1)
+          } else {
+            const provider = new balancerRateProvider.Contract(
+              ctx,
+              block.header,
+              rateProviders[i],
+            )
+            const rate = await provider.getRate()
+            rates.push(rate)
+          }
+        }
+        const rate = new BalancerPoolRate({
+          id: `${poolAddress}-${block.header.height}`,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          address: poolAddress,
+          rate0: rates[0],
+          rate1: rates[1],
+          rate2: rates[2] ?? 0n,
+          rate3: rates[3] ?? 0n,
+        })
+        result.balancerPoolRates.push(rate)
+      } else if (poolType === 'MetaStable') {
         const balancerPool = new balancerMetaStablePoolAbi.Contract(
           ctx,
           block.header,
