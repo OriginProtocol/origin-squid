@@ -1,10 +1,8 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { memoize } from 'lodash'
 
 import * as balancerMetaStablePoolStrategyAbi from '../../../abi/balancer-meta-pool-strategy'
 import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as balancerVaultAbi from '../../../abi/balancer-vault'
-import * as balancerMetaStablePoolAbi from '../../../abi/meta-stable-pool'
 import { StrategyBalance } from '../../../model'
 import { Context } from '../../../processor'
 import {
