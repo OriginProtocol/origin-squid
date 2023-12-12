@@ -9,6 +9,8 @@ import { BalancerPoolBalance, BalancerPoolRate } from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO, BALANCER_VAULT } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
+import { Currency } from '../../post-processors/exchange-rates/currencies'
 
 const eth1 = BigInt('1000000000000000000')
 
@@ -29,6 +31,7 @@ export const createBalancerProcessor = (
   poolId: string,
   poolType: 'MetaStable' | 'ComposableStable' | 'Weighted',
   from: number,
+  rates?: [Currency, Currency][],
 ) => {
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
@@ -37,6 +40,9 @@ export const createBalancerProcessor = (
       balancerPoolRates: [],
     }
     await update(ctx, async (ctx, block) => {
+      if (rates) {
+        await ensureExchangeRates(ctx, block, rates)
+      }
       const balancerVault = new balancerVaultAbi.Contract(
         ctx,
         block.header,

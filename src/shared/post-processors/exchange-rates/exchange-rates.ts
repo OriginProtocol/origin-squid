@@ -24,8 +24,10 @@ export const ensureExchangeRate = async (
   base: Currency,
   quote: Currency,
 ) => {
-  if (currenciesByAddress[base]) base = currenciesByAddress[base]
-  if (currenciesByAddress[quote]) quote = currenciesByAddress[quote]
+  if (currenciesByAddress[base.toLowerCase()])
+    base = currenciesByAddress[base.toLowerCase()]
+  if (currenciesByAddress[quote.toLowerCase()])
+    quote = currenciesByAddress[quote.toLowerCase()]
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height
