@@ -128,6 +128,15 @@ type CurvePoolBalance @entity {
   balance2: BigInt!
 }
 
+type CurvePoolRate @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  name: String!
+  rate: BigInt!
+}
+
 type BalancerPoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -159,6 +168,12 @@ type OETH @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+}
+
+type OETHAsset @entity {
+  id: ID! @index
+  address: String! @index
+  symbol: String!
 }
 
 """
@@ -365,7 +380,7 @@ type OETHStrategyDailyStat @entity {
   Total ETH value
   """
   holdings: [OETHStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {
@@ -437,8 +452,7 @@ type OETHActivity @entity {
   fromSymbol: String
   toSymbol: String
   amount: BigInt
-}
-type OGV @entity {
+}type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -547,6 +561,12 @@ type OUSD @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+}
+
+type OUSDAsset @entity {
+  id: ID! @index
+  address: String! @index
+  symbol: String!
 }
 
 """
@@ -777,7 +797,7 @@ type OUSDStrategyDailyStat @entity {
   total: BigInt!
   tvl: BigInt!
   holdings: [OUSDStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OUSDStrategyHoldingDailyStat @entity {

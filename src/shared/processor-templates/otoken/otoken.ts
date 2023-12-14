@@ -10,6 +10,7 @@ import {
   OETHAPY,
   OETHActivity,
   OETHAddress,
+  OETHAsset,
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
@@ -17,6 +18,7 @@ import {
   OUSDAPY,
   OUSDActivity,
   OUSDAddress,
+  OUSDAsset,
   OUSDHistory,
   OUSDRebase,
   OUSDRebaseOption,
@@ -32,6 +34,7 @@ import { ensureExchangeRate } from '../../post-processors/exchange-rates'
 import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
+type OTokenAsset = EntityClassT<OETHAsset> | EntityClassT<OUSDAsset>
 type OTokenAPY = EntityClassT<OETHAPY> | EntityClassT<OUSDAPY>
 type OTokenActivity = EntityClassT<OETHActivity> | EntityClassT<OUSDActivity>
 type OTokenAddress = EntityClassT<OETHAddress> | EntityClassT<OUSDAddress>
@@ -82,7 +85,9 @@ export const createOTokenProcessor = (params: {
   Upgrade_CreditsBalanceOfHighRes?: number
   OTOKEN_ADDRESS: string
   OTOKEN_VAULT_ADDRESS: string
+  oTokenAssets: { asset: string; symbol: string }[]
   OToken: OToken
+  OTokenAsset: OTokenAsset
   OTokenAPY: OTokenAPY
   OTokenAddress: OTokenAddress
   OTokenHistory: OTokenHistory
@@ -94,6 +99,7 @@ export const createOTokenProcessor = (params: {
     initialized: boolean
     initialize: () => Promise<void>
     otokens: InstanceTypeOfConstructor<OToken>[]
+    assets: InstanceTypeOfConstructor<OTokenAsset>[]
     history: InstanceTypeOfConstructor<OTokenHistory>[]
     rebases: InstanceTypeOfConstructor<OTokenRebase>[]
     rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
@@ -132,8 +138,25 @@ export const createOTokenProcessor = (params: {
             params.OTokenAddress as any,
           )
           .then((q) => new Map(q.map((i) => [i.id, i])))
+
+        const assetsCount = await ctx.store.count<
+          InstanceTypeOfConstructor<OTokenAsset>
+        >(params.OTokenAsset as any)
+        if (assetsCount === 0) {
+          result.assets.push(
+            ...params.oTokenAssets.map(
+              ({ asset, symbol }) =>
+                new params.OTokenAsset({
+                  id: asset,
+                  address: asset,
+                  symbol: symbol,
+                }),
+            ),
+          )
+        }
       },
       otokens: [],
+      assets: [],
       history: [],
       rebases: [],
       rebaseOptions: [],
@@ -159,6 +182,7 @@ export const createOTokenProcessor = (params: {
     await Promise.all([
       ctx.store.upsert(result.apies),
       ctx.store.insert(result.otokens),
+      ctx.store.insert(result.assets),
       ctx.store.insert(result.history),
       ctx.store.insert(result.rebases),
       ctx.store.insert(result.rebaseOptions),

@@ -126,6 +126,15 @@ type CurvePoolBalance @entity {
   balance2: BigInt!
 }
 
+type CurvePoolRate @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  name: String!
+  rate: BigInt!
+}
+
 type BalancerPoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
