@@ -10,6 +10,12 @@ type OETH @entity {
   nonRebasingSupply: BigInt!
 }
 
+type OETHAsset @entity {
+  id: ID! @index
+  address: String! @index
+  symbol: String!
+}
+
 """
 The OETH balance, history and other information for a given address.
 """
@@ -214,7 +220,7 @@ type OETHStrategyDailyStat @entity {
   Total ETH value
   """
   holdings: [OETHStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {

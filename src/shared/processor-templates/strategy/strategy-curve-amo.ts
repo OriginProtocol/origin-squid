@@ -98,23 +98,16 @@ export const getConvexEthMetaStrategyBalances = async (
   const poolAssets: string[] = []
   const assetBalances: bigint[] = []
   let totalPoolValue = BigInt(0)
-  let coins: Record<string, string> = {}
   for (let i = 0; i < assets.length; i++) {
     const balance = await pool.balances(BigInt(i))
     assetBalances.push(balance)
     totalPoolValue += balance
 
     let coin = (await pool.coins(BigInt(i))).toLowerCase()
-    if (coin == ETH_ADDRESS) {
-      // Vault only deals in WETH not ETH
-      coin = WETH_ADDRESS
-      coins[i] = WETH_ADDRESS
-    } else {
-      coins[i] = coin
-    }
-
     if (coin !== strategyData.oTokenAddress) {
-      const pTokenAddr = await strategy.assetToPToken(assets[i].address)
+      const pTokenAddr = await strategy.assetToPToken(
+        assets[i].address === ETH_ADDRESS ? WETH_ADDRESS : assets[i].address,
+      )
       if (!pTokenAddresses.has(pTokenAddr)) {
         pTokenAddresses.add(pTokenAddr)
         const pToken = new erc20.Contract(ctx, block, pTokenAddr)
@@ -134,6 +127,6 @@ export const getConvexEthMetaStrategyBalances = async (
   return poolAssets.map((asset, i) => {
     const poolAssetSplit = (eth1 * assetBalances[i]) / totalPoolValue
     const balance = (totalStrategyLPBalance * poolAssetSplit) / eth1
-    return { address, asset: coins[i].toLowerCase(), balance }
+    return { address, asset, balance }
   })
 }

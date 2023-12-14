@@ -5,6 +5,22 @@ import { createERC20Tracker } from '../processor-templates/erc20'
 
 const tracks: Parameters<typeof createERC20Tracker>[0][] = [
   {
+    from: 15350225, // 6436154,
+    address: '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26', // OGN
+    accountFilter: [
+      '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
+    ],
+    intervalTracking: true,
+  },
+  {
+    from: 15350225, // 14439231,
+    address: '0x9c354503c38481a7a7a51629142963f98ecc12d0', // OGV
+    accountFilter: [
+      '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
+    ],
+    intervalTracking: true,
+  },
+  {
     from: 11362821,
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
     accountFilter: [

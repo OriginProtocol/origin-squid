@@ -10,6 +10,12 @@ type OUSD @entity {
   nonRebasingSupply: BigInt!
 }
 
+type OUSDAsset @entity {
+  id: ID! @index
+  address: String! @index
+  symbol: String!
+}
+
 """
 The OUSD balance, history and other information for a given address.
 """
@@ -238,7 +244,7 @@ type OUSDStrategyDailyStat @entity {
   total: BigInt!
   tvl: BigInt!
   holdings: [OUSDStrategyHoldingDailyStat]
-    @derivedFrom(field: "strategyDailyStatId")
+  @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OUSDStrategyHoldingDailyStat @entity {
