@@ -1,4 +1,5 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { formatEther } from 'viem'
 
 import * as governanceAbi from '../../abi/governance'
 import {
@@ -106,6 +107,11 @@ const _processProposalCreated = async (
   } = governanceAbi.events.ProposalCreated.decode(log)
   const proposer = await _getAddress(ctx, proposerAddr, result)
   const blockTimestamp = new Date(block.header.timestamp)
+  const governance = new governanceAbi.Contract(
+    ctx,
+    block.header,
+    GOVERNANCE_ADDRESS,
+  )
 
   const proposal = new OGVProposal({
     id: proposalId.toString(),
@@ -116,6 +122,9 @@ const _processProposalCreated = async (
     endBlock,
     lastUpdated: new Date(),
     status: OGVProposalState.Pending,
+    quorum: await governance.quorum(BigInt(block.header.height - 1)),
+    choices: [],
+    scores: [],
   })
 
   const proposalTxLog = new OGVProposalTxLog({
@@ -237,6 +246,9 @@ const _processVoteCast = async (
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
   const voter = await _getAddress(ctx, voterAddr, result)
 
+  const voteType = [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][
+    parseInt(support.toString())
+  ]
   const proposalVote = new OGVProposalVote({
     id: `${proposalId.toString()}:${log.transactionHash}:${voter.id}`,
     proposal,
@@ -244,10 +256,17 @@ const _processVoteCast = async (
     txHash: log.transactionHash,
     timestamp: blockTimestamp,
     weight,
-    type: [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][
-      parseInt(support.toString())
-    ],
+    type: voteType,
   })
+
+  const weightN = Number(formatEther(weight))
+  const choiceIndex = proposal.choices.indexOf(voteType)
+  if (choiceIndex >= 0) {
+    proposal.scores[choiceIndex]! += weightN
+  } else {
+    proposal.choices.push(voteType)
+    proposal.scores.push(weightN)
+  }
 
   result.votes.push(proposalVote)
 }

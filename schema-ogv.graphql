@@ -86,6 +86,9 @@ type OGVProposal @entity {
   lastUpdated: DateTime!
   status: OGVProposalState!
   logs: [OGVProposalTxLog]! @derivedFrom(field: "proposal")
+  quorum: BigInt!
+  choices: [String]!
+  scores: [Float]!
 }
 
 type OGVProposalVote @entity {

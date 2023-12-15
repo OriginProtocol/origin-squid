@@ -37,4 +37,13 @@ export class OGVProposal {
 
     @OneToMany_(() => OGVProposalTxLog, e => e.proposal)
     logs!: OGVProposalTxLog[]
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    quorum!: bigint
+
+    @Column_("text", {array: true, nullable: false})
+    choices!: (string | undefined | null)[]
+
+    @Column_("numeric", {array: true, nullable: false})
+    scores!: (number | undefined | null)[]
 }
