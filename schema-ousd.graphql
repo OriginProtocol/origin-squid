@@ -218,10 +218,14 @@ type OUSDDailyStat @entity {
   amoSupply: BigInt!
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
+  tradingVolumeUSD: Float!
 
   yieldETH: BigInt!
+  yieldETH7Day: BigInt!
   yieldETHAllTime: BigInt!
+
   yieldUSD: BigInt!
+  yieldUSD7Day: BigInt!
   yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
@@ -233,6 +237,8 @@ type OUSDDailyStat @entity {
   feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
+  marketCapUSD: Float!
+  holdersOverThreshold: Int!
   strategies: [OUSDStrategyDailyStat] @derivedFrom(field: "dailyStatId")
   collateral: [OUSDCollateralDailyStat] @derivedFrom(field: "dailyStatId")
 }
