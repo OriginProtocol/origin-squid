@@ -43,6 +43,7 @@ export const process = createOTokenProcessor({
     { asset: RETH_ADDRESS, symbol: 'rETH' },
     { asset: STETH_ADDRESS, symbol: 'stETH' },
     { asset: WSTETH_ADDRESS, symbol: 'wstETH' },
+    { asset: OETH_ADDRESS, symbol: 'OETH' },
   ],
   OToken: OETH,
   OTokenAsset: OETHAsset,

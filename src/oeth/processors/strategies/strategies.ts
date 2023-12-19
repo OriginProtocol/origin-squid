@@ -125,6 +125,19 @@ export const oethStrategies: readonly IStrategyData[] = [
       decimals: 18,
     })),
   },
+  {
+    from: 17067232,
+    name: 'OETH Vault (WETH)',
+    contractName: 'VaultCore',
+    address: OETH_VAULT_ADDRESS,
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'Vault',
+    base: { address: ETH_ADDRESS, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({
+      address,
+      decimals: 18,
+    })),
+  },
 ]
 
 const strategies = oethStrategies
@@ -133,17 +146,21 @@ export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {
   strategies.forEach((s) => createStrategySetup(s)(processor))
-  strategies.forEach((s) => createStrategyRewardSetup(s)(processor))
+  strategies
+    .filter((s) => s.kind !== 'Vault')
+    .forEach((s) => createStrategyRewardSetup(s)(processor))
 }
 
 const processors = [
   ...strategies.map(createStrategyProcessor),
-  ...strategies.map((strategy) =>
-    createStrategyRewardProcessor({
-      ...strategy,
-      OTokenRewardTokenCollected: OETHRewardTokenCollected,
-    }),
-  ),
+  ...strategies
+    .filter((s) => s.kind !== 'Vault')
+    .map((strategy) =>
+      createStrategyRewardProcessor({
+        ...strategy,
+        OTokenRewardTokenCollected: OETHRewardTokenCollected,
+      }),
+    ),
 ]
 
 export const process = async (ctx: Context) => {
