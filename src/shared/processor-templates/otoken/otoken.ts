@@ -28,6 +28,7 @@ import { Context } from '../../../processor'
 import { type Transaction, activityFromTx } from '../../../utils/activityFromTx'
 import { ADDRESS_ZERO } from '../../../utils/addresses'
 import { DECIMALS_18 } from '../../../utils/constants'
+import { multicall } from '../../../utils/multicall'
 import { EntityClassT, InstanceTypeOfConstructor } from '../../../utils/type'
 import { getLatestEntity } from '../../../utils/utils'
 import { ensureExchangeRate } from '../../post-processors/exchange-rates'
@@ -225,67 +226,86 @@ export const createOTokenProcessor = (params: {
         params.OTOKEN_ADDRESS,
       )
       // Transfer events
-      let addressSub = owners!.get(data.from)
-      let addressAdd = owners!.get(data.to)
 
-      if (addressSub == null) {
-        addressSub = await createAddress(params.OTokenAddress, ctx, data.from)
-        owners!.set(addressSub.id, addressSub)
-      }
-      if (addressAdd == null) {
-        addressAdd = await createAddress(params.OTokenAddress, ctx, data.to)
-        owners!.set(addressAdd.id, addressAdd)
+      const ensureAddress = async (address: string) => {
+        let entity = owners!.get(address)
+        if (!entity) {
+          entity = await createAddress(params.OTokenAddress, ctx, address)
+          owners!.set(entity.id, entity)
+        }
+        entity.lastUpdated = new Date(block.header.timestamp)
+        return entity
       }
 
-      addressSub.lastUpdated = new Date(block.header.timestamp)
-      addressAdd.lastUpdated = new Date(block.header.timestamp)
+      const afterHighResUpgrade =
+        block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+      const [
+        addressSub,
+        addressAdd,
+        [fromCreditsBalanceOf, toCreditsBalanceOf],
+      ] = await Promise.all([
+        ensureAddress(data.from),
+        ensureAddress(data.to),
+        multicall(
+          ctx,
+          block.header,
+          afterHighResUpgrade
+            ? otoken.functions.creditsBalanceOfHighres
+            : (otoken.functions
+                .creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
+          params.OTOKEN_ADDRESS,
+          [[data.from], [data.to]],
+        ).then((results) => {
+          if (afterHighResUpgrade) {
+            return results.map((r) => [r[0], r[1]])
+          } else {
+            return results.map((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
+          }
+        }) as Promise<[bigint, bigint][]>,
+      ])
 
       /**
        * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
        * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
        */
 
-      // update the address balance
-      await Promise.all(
-        [addressSub, addressAdd].map(async (address) => {
-          let credits: [bigint, bigint]
-          let newBalance: bigint
-          let change: bigint
-          if (
-            block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
-          ) {
-            credits = await token
-              .creditsBalanceOfHighres(address.id)
-              .then((r) => [r[0], r[1]])
-            newBalance = (credits[0] * DECIMALS_18) / credits[1]
-            change = newBalance - address.balance
-          } else {
-            credits = await token
-              .creditsBalanceOf(address.id)
-              .then((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
-            newBalance = (credits[0] * DECIMALS_18) / credits[1]
-            change = newBalance - address.balance
-          }
-          if (change === 0n) return
-          const type =
-            addressSub === address ? HistoryType.Sent : HistoryType.Received
-          result.history.push(
-            new params.OTokenHistory({
-              // we can't use {t.id} because it's not unique
-              id: getUniqueId(`${log.id}-${address.id}`),
-              address: address,
-              value: change,
-              balance: newBalance,
-              timestamp: new Date(block.header.timestamp),
-              blockNumber: block.header.height,
-              txHash: log.transactionHash,
-              type,
-            }),
-          )
-          address.credits = BigInt(credits[0]) // token credits
-          address.balance = newBalance // token balance
-        }),
-      )
+      const updateAddressBalance = ({
+        address,
+        credits,
+      }: {
+        address: InstanceTypeOfConstructor<OTokenAddress>
+        credits: [bigint, bigint]
+      }) => {
+        const newBalance = (credits[0] * DECIMALS_18) / credits[1]
+        const change = newBalance - address.balance
+        if (change === 0n) return
+        const type =
+          addressSub === address ? HistoryType.Sent : HistoryType.Received
+        result.history.push(
+          new params.OTokenHistory({
+            // we can't use {t.id} because it's not unique
+            id: getUniqueId(`${log.id}-${address.id}`),
+            address: address,
+            value: change,
+            balance: newBalance,
+            timestamp: new Date(block.header.timestamp),
+            blockNumber: block.header.height,
+            txHash: log.transactionHash,
+            type,
+          }),
+        )
+        address.credits = BigInt(credits[0]) // token credits
+        address.balance = newBalance // token balance
+      }
+
+      updateAddressBalance({
+        address: addressSub,
+        credits: fromCreditsBalanceOf,
+      })
+      updateAddressBalance({
+        address: addressAdd,
+        credits: toCreditsBalanceOf,
+      })
 
       if (
         addressAdd.rebasingOption === RebasingOption.OptOut &&

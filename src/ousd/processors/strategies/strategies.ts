@@ -1,9 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
-import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
 import { OETHRewardTokenCollected } from '../../../model'
 import { Context } from '../../../processor'
-import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import {
   IStrategyData,
   createStrategyProcessor,
@@ -13,8 +11,6 @@ import {
   createStrategyRewardProcessor,
   createStrategyRewardSetup,
 } from '../../../shared/processor-templates/strategy-rewards'
-import { OUSD_ADDRESS } from '../../../utils/addresses'
-import { traceFilter } from '../../../utils/traceFilter'
 import { aaveStrategy } from './aave-strategy'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'
@@ -29,7 +25,7 @@ const ousdStrategies: readonly IStrategyData[] = [
   morphoAave,
   fluxStrategy,
   makerDsrStrategy,
-  
+
   // Deprecated
   // {
   //   from: 13369299,
