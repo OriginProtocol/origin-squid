@@ -3,8 +3,11 @@ import durationPlugin from 'dayjs/plugin/duration'
 
 import { Context } from '../../../processor'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '../../../utils/addresses'
+import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { LogFilter } from '../../../utils/logFilter'
 import { TraceFilter } from '../../../utils/traceFilter'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
+import { CurrencyAddress } from '../../post-processors/exchange-rates/currencies'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'
@@ -91,7 +94,23 @@ export const createStrategyProcessor = (strategyData: IStrategyData) => {
   const { kind } = strategyData
   const processor = processors[kind]
   if (processor) {
-    return (ctx: Context) => processor.process(ctx, strategyData)
+    const exchangeRateUpdate = blockFrequencyUpdater(strategyData)
+    return async (ctx: Context) => {
+      await Promise.all([
+        exchangeRateUpdate(ctx, async (ctx, block) => {
+          await ensureExchangeRates(
+            ctx,
+            block,
+            strategyData.assets.map((asset) =>
+              strategyData.oTokenAddress === OETH_ADDRESS
+                ? ['ETH', asset.address as CurrencyAddress]
+                : [asset.address as CurrencyAddress, 'USD'],
+            ),
+          )
+        }),
+        processor.process(ctx, strategyData),
+      ])
+    }
   } else {
     throw new Error(`Unsupported strategy kind: ${kind}`)
   }

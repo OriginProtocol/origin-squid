@@ -4,6 +4,8 @@ import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strate
 import { StrategyBalance } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { ensureExchangeRates } from '../../post-processors/exchange-rates'
+import { CurrencyAddress } from '../../post-processors/exchange-rates/currencies'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -29,6 +31,14 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
   const blockFrequencyUpdate = trackers.get(strategyData.address)!
   const strategyBalances: StrategyBalance[] = []
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
+    await ensureExchangeRates(
+      ctx,
+      block,
+      strategyData.assets.map((asset) => [
+        'ETH',
+        asset.address as CurrencyAddress,
+      ]),
+    )
     const results = await getStrategyHoldings(ctx, block, strategyData)
     strategyBalances.push(...results)
   })

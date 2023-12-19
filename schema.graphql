@@ -158,6 +158,15 @@ type BalancerPoolRate @entity {
   rate2: BigInt!
   rate3: BigInt!
 }
+
+type MaverickPoolBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  binBalanceA: BigInt!
+  binBalanceB: BigInt!
+}
 """
 The OETH entity tracks the change in total supply of OETH over time.
 """

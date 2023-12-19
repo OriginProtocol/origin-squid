@@ -29,7 +29,7 @@ export const createBalancerSetup = (
 export const createBalancerProcessor = (
   poolAddress: string,
   poolId: string,
-  poolType: 'MetaStable' | 'ComposableStable' | 'Weighted',
+  poolType: 'MetaStable' | 'ComposableStable' | 'Weighted' | 'Gyroscope',
   from: number,
   rates?: [Currency, Currency][],
 ) => {
