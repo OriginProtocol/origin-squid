@@ -9,9 +9,9 @@ import {
 } from 'typeorm'
 import { parseEther } from 'viem'
 
-import { OGV, OGVAddress, OGVDailyStat } from '../../model'
+import { OGV, OGVDailyStat } from '../../model'
 import { Context } from '../../processor'
-import { processCoingeckoData } from '../../utils/coingecko'
+import { applyCoingeckoData } from '../../utils/coingecko'
 
 dayjs.extend(utc)
 
@@ -50,33 +50,16 @@ export const process = async (ctx: Context) => {
   }
 
   if (ctx.isHead) {
-    const statsWithNoPrice = await ctx.store.findBy(OGVDailyStat, {
-      priceUSD: 0,
-      timestamp: LessThanOrEqual(getStartOfDayTimestamp()),
-    })
-    if (statsWithNoPrice.length > 0) {
-      console.log(`Found ${statsWithNoPrice.length} stats with no price`)
-      const coingeckoURL = `https://api.coingecko.com/api/v3/coins/origin-dollar-governance/market_chart?vs_currency=usd&days=max&interval=daily&precision=18`
-      const coingeckoResponse = await fetch(coingeckoURL)
-      const coingeckoJson = await coingeckoResponse.json()
+    const updatedStats = (await applyCoingeckoData(ctx, {
+      Entity: OGVDailyStat,
+      coinId: 'origin-dollar-governance',
+      // startTimestamp: Date.UTC(2023, 4, 17),
+    })) as OGVDailyStat[]
 
-      if (!coingeckoJson) {
-        console.log('Could not fetch coingecko data')
-      } else {
-        const coingeckData = processCoingeckoData(coingeckoJson)
-        for (const dayId in coingeckData) {
-          const stat = statsWithNoPrice.find((s) => s.id === dayId)
-          const day = coingeckData[dayId]
-
-          if (stat && day.prices) {
-            stat.tradingVolumeUSD = day.total_volumes || 0
-            stat.marketCapUSD = day.market_caps || 0
-            stat.priceUSD = day.prices
-            dailyStats.push(stat)
-          }
-        }
-      }
-    }
+    const existingIds = dailyStats.map((stat) => stat.id)
+    dailyStats.push(
+      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
+    )
   }
 
   await ctx.store.upsert(dailyStats)
@@ -90,7 +73,6 @@ async function updateDailyStats(ctx: Context, date: Date) {
 
   const [lastOgv] = await Promise.all([ctx.store.findOne(OGV, queryParams)])
 
-  // Do we have any useful data yet?
   const allEntities = [lastOgv].filter(Boolean)
   if (!lastOgv) {
     return null
@@ -137,9 +119,3 @@ SELECT COUNT(*) as holders_over_threshold
 FROM ogv_address
 WHERE balance > 100000000000000000000
 `
-
-function getStartOfDayTimestamp(): Date {
-  const utcDate = new Date()
-  utcDate.setUTCHours(0, 0, 0, 0)
-  return utcDate
-}

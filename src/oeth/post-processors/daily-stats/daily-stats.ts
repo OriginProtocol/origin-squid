@@ -1,12 +1,18 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
+import {
+  EntityManager,
+  FindOptionsOrderValue,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from 'typeorm'
 
 import {
   ExchangeRate,
   OETH,
   OETHAPY,
+  OETHAddress,
   OETHBalancerMetaPoolStrategy,
   OETHCollateralDailyStat,
   OETHCurveLP,
@@ -20,6 +26,7 @@ import {
   OETHVault,
 } from '../../../model'
 import { Context } from '../../../processor'
+import { applyCoingeckoData } from '../../../utils/coingecko'
 
 dayjs.extend(utc)
 
@@ -64,6 +71,18 @@ export const process = async (ctx: Context) => {
     }
   }
 
+  if (ctx.isHead) {
+    const updatedStats = (await applyCoingeckoData(ctx, {
+      Entity: OETHDailyStat,
+      coinId: 'origin-ether',
+      startTimestamp: Date.UTC(2023, 4, 17),
+    })) as OETHDailyStat[]
+    const existingIds = dailyStats.map((stat) => stat.id)
+    dailyStats.push(
+      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
+    )
+  }
+
   await ctx.store.upsert(dailyStats)
   await Promise.all([
     ctx.store.upsert(dailyCollateralStats),
@@ -90,6 +109,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastRethRate,
     lastSfrxEthRate,
     lastWrappedOETHHistory,
+    holdersOverThreshold,
   ] = await Promise.all([
     ctx.store.findOne(OETHAPY, queryParams),
     ctx.store.findOne(OETH, queryParams),
@@ -114,6 +134,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
       },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
+    ctx.store.countBy(OETHAddress, { balance: MoreThanOrEqual(10n ** 17n) }),
   ])
 
   // Do we have any useful data yet?
@@ -175,19 +196,27 @@ async function updateDailyStats(ctx: Context, date: Date) {
     amoSupply: lastCurve?.oethOwned || 0n,
     dripperWETH: lastDripper?.weth || 0n,
     wrappedSupply: lastWrappedOETHHistory?.balance || 0n,
+    tradingVolumeUSD: 0,
+
+    yieldETH: yieldStats[0].total_yield_eth || 0n,
+    yieldETH7Day: yieldStats[1].total_yield_eth || 0n,
+    yieldETHAllTime: yieldStats[2].total_yield_eth || 0n,
 
     yieldUSD: yieldStats[0].total_yield_usd || 0n,
+    yieldUSD7Day: yieldStats[1].total_yield_usd || 0n,
     yieldUSDAllTime: yieldStats[2].total_yield_usd || 0n,
-    yieldETH: yieldStats[0].total_yield_eth || 0n,
-    yieldETHAllTime: yieldStats[2].total_yield_eth || 0n,
-    feesUSD: yieldStats[0].total_fees_usd || 0n,
-    feesUSD7Day: yieldStats[1].total_fees_usd || 0n,
-    feesUSDAllTime: yieldStats[2].total_fees_usd || 0n,
+
     feesETH: yieldStats[0].total_fees_eth || 0n,
     feesETH7Day: yieldStats[1].total_fees_eth || 0n,
     feesETHAllTime: yieldStats[2].total_fees_eth || 0n,
 
+    feesUSD: yieldStats[0].total_fees_usd || 0n,
+    feesUSD7Day: yieldStats[1].total_fees_usd || 0n,
+    feesUSDAllTime: yieldStats[2].total_fees_usd || 0n,
+
     pegPrice: 0n,
+    marketCapUSD: 0,
+    holdersOverThreshold,
   })
 
   // Collateral totals

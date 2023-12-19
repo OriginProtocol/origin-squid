@@ -352,7 +352,7 @@ type OETHDailyStat @entity {
   yieldETHAllTime: BigInt!
 
   yieldUSD: BigInt!
-  yieldUSD7day: BigInt!
+  yieldUSD7Day: BigInt!
   yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!

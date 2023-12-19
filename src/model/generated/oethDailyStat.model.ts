@@ -81,7 +81,7 @@ export class OETHDailyStat {
     yieldUSD!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    yieldUSD7day!: bigint
+    yieldUSD7Day!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldUSDAllTime!: bigint
