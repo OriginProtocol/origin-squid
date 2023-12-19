@@ -4,6 +4,9 @@ import { ExchangeRate } from '../../../model'
 
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
+  DAI: '0x6b175474e89094c44da98b954eedeac495271d0f',
+  USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+  USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
   WETH: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
