@@ -354,10 +354,14 @@ type OETHDailyStat @entity {
   amoSupply: BigInt!
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
+  tradingVolumeUSD: Float!
 
   yieldETH: BigInt!
+  yieldETH7Day: BigInt!
   yieldETHAllTime: BigInt!
+
   yieldUSD: BigInt!
+  yieldUSD7Day: BigInt!
   yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
@@ -369,9 +373,8 @@ type OETHDailyStat @entity {
   feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
-  """
-  Price of OETH in ETH
-  """
+  marketCapUSD: Float!
+  holdersOverThreshold: Int!
   strategies: [OETHStrategyDailyStat] @derivedFrom(field: "dailyStatId")
   collateral: [OETHCollateralDailyStat] @derivedFrom(field: "dailyStatId")
 }
@@ -563,7 +566,20 @@ type OGVProposalVote @entity {
   txHash: String!
   timestamp: DateTime!
 }
-"""
+
+type OGVDailyStat @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  totalStaked: BigInt!
+  tradingVolumeUSD: Float!
+  marketCapUSD: Float!
+  priceUSD: Float!
+  holdersOverThreshold: Int!
+}"""
 The OUSD entity tracks the change in total supply of OUSD over time.
 """
 type OUSD @entity {
@@ -783,10 +799,14 @@ type OUSDDailyStat @entity {
   amoSupply: BigInt!
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
+  tradingVolumeUSD: Float!
 
   yieldETH: BigInt!
+  yieldETH7Day: BigInt!
   yieldETHAllTime: BigInt!
+
   yieldUSD: BigInt!
+  yieldUSD7Day: BigInt!
   yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
@@ -798,6 +818,8 @@ type OUSDDailyStat @entity {
   feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
+  marketCapUSD: Float!
+  holdersOverThreshold: Int!
   strategies: [OUSDStrategyDailyStat] @derivedFrom(field: "dailyStatId")
   collateral: [OUSDCollateralDailyStat] @derivedFrom(field: "dailyStatId")
 }

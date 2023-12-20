@@ -1,12 +1,17 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { EntityManager, FindOptionsOrderValue, LessThanOrEqual } from 'typeorm'
+import {
+  EntityManager,
+  FindOptionsOrderValue,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from 'typeorm'
 
 import {
-  ExchangeRate,
   OUSD,
   OUSDAPY,
+  OUSDAddress,
   OUSDCollateralDailyStat,
   OUSDDailyStat,
   OUSDHistory,
@@ -16,6 +21,7 @@ import {
   OUSDVault,
 } from '../../../model'
 import { Context } from '../../../processor'
+import { applyCoingeckoData } from '../../../utils/coingecko'
 
 dayjs.extend(utc)
 
@@ -59,6 +65,18 @@ export const process = async (ctx: Context) => {
     }
   }
 
+  if (ctx.isHead) {
+    const updatedStats = (await applyCoingeckoData(ctx, {
+      Entity: OUSDDailyStat,
+      coinId: 'origin-dollar',
+      // startTimestamp: Date.UTC(2023, 4, 17),
+    })) as OUSDDailyStat[]
+    const existingIds = dailyStats.map((stat) => stat.id)
+    dailyStats.push(
+      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
+    )
+  }
+
   await ctx.store.upsert(dailyStats)
   await Promise.all([
     ctx.store.upsert(dailyCollateralStats),
@@ -73,20 +91,27 @@ async function updateDailyStats(ctx: Context, date: Date) {
     order: { timestamp: 'desc' as FindOptionsOrderValue },
   }
 
-  const [lastApy, lastOusd, lastVault, lastMorpho, lastWrappedOUSDHistory] =
-    await Promise.all([
-      ctx.store.findOne(OUSDAPY, queryParams),
-      ctx.store.findOne(OUSD, queryParams),
-      ctx.store.findOne(OUSDVault, queryParams),
-      ctx.store.findOne(OUSDMorphoAave, queryParams),
-      ctx.store.findOne(OUSDHistory, {
-        where: {
-          timestamp: LessThanOrEqual(date),
-          address: { id: '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62' },
-        },
-        order: { timestamp: 'desc' as FindOptionsOrderValue },
-      }),
-    ])
+  const [
+    lastApy,
+    lastOusd,
+    lastVault,
+    lastMorpho,
+    lastWrappedOUSDHistory,
+    holdersOverThreshold,
+  ] = await Promise.all([
+    ctx.store.findOne(OUSDAPY, queryParams),
+    ctx.store.findOne(OUSD, queryParams),
+    ctx.store.findOne(OUSDVault, queryParams),
+    ctx.store.findOne(OUSDMorphoAave, queryParams),
+    ctx.store.findOne(OUSDHistory, {
+      where: {
+        timestamp: LessThanOrEqual(date),
+        address: { id: '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62' },
+      },
+      order: { timestamp: 'desc' as FindOptionsOrderValue },
+    }),
+    ctx.store.countBy(OUSDAddress, { balance: MoreThanOrEqual(10n ** 20n) }), // $100
+  ])
 
   // Do we have any useful data yet?
   const allEntities = [lastApy, lastOusd, lastVault, lastMorpho].filter(Boolean)
@@ -140,19 +165,27 @@ async function updateDailyStats(ctx: Context, date: Date) {
     amoSupply: 0n,
     dripperWETH: 0n,
     wrappedSupply: lastWrappedOUSDHistory?.balance || 0n,
+    tradingVolumeUSD: 0,
+
+    yieldETH: yieldStats[0].total_yield_eth || 0n,
+    yieldETH7Day: yieldStats[1].total_yield_eth || 0n,
+    yieldETHAllTime: yieldStats[2].total_yield_eth || 0n,
 
     yieldUSD: yieldStats[0].total_yield_usd || 0n,
+    yieldUSD7Day: yieldStats[1].total_yield_usd || 0n,
     yieldUSDAllTime: yieldStats[2].total_yield_usd || 0n,
-    yieldETH: yieldStats[0].total_yield_eth || 0n,
-    yieldETHAllTime: yieldStats[2].total_yield_eth || 0n,
-    feesUSD: yieldStats[0].total_fees_usd || 0n,
-    feesUSD7Day: yieldStats[1].total_fees_usd || 0n,
-    feesUSDAllTime: yieldStats[2].total_fees_usd || 0n,
+
     feesETH: yieldStats[0].total_fees_eth || 0n,
     feesETH7Day: yieldStats[1].total_fees_eth || 0n,
     feesETHAllTime: yieldStats[2].total_fees_eth || 0n,
 
+    feesUSD: yieldStats[0].total_fees_usd || 0n,
+    feesUSD7Day: yieldStats[1].total_fees_usd || 0n,
+    feesUSDAllTime: yieldStats[2].total_fees_usd || 0n,
+
     pegPrice: 0n,
+    marketCapUSD: 0,
+    holdersOverThreshold,
   })
 
   const dailyStrategyStats: OUSDStrategyDailyStat[] = [

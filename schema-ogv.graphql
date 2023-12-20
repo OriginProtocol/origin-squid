@@ -100,3 +100,17 @@ type OGVProposalVote @entity {
   txHash: String!
   timestamp: DateTime!
 }
+
+type OGVDailyStat @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  totalStaked: BigInt!
+  tradingVolumeUSD: Float!
+  marketCapUSD: Float!
+  priceUSD: Float!
+  holdersOverThreshold: Int!
+}
