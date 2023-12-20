@@ -31,6 +31,10 @@ import { DECIMALS_18 } from '../../../utils/constants'
 import { EntityClassT, InstanceTypeOfConstructor } from '../../../utils/type'
 import { getLatestEntity } from '../../../utils/utils'
 import { ensureExchangeRate } from '../../post-processors/exchange-rates'
+import {
+  CurrencyAddress,
+  CurrencySymbol,
+} from '../../post-processors/exchange-rates/currencies'
 import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
@@ -85,7 +89,7 @@ export const createOTokenProcessor = (params: {
   Upgrade_CreditsBalanceOfHighRes?: number
   OTOKEN_ADDRESS: string
   OTOKEN_VAULT_ADDRESS: string
-  oTokenAssets: { asset: string; symbol: string }[]
+  oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   OToken: OToken
   OTokenAsset: OTokenAsset
   OTokenAPY: OTokenAPY

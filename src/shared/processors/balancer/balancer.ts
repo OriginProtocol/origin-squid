@@ -46,6 +46,15 @@ const pools = [
       '0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014',
     from: Math.max(12370000, oethDeployFrom),
   },
+  {
+    name: 'Gyroscope ECLP wstETH/wETH',
+    poolSymbol: 'ECLP-wstETH-wETH',
+    poolAddress: '0xf01b0684c98cd7ada480bfdf6e43876422fa1fc1',
+    poolId:
+      '0xf01b0684c98cd7ada480bfdf6e43876422fa1fc10002000000000000000005de',
+    poolType: 'Gyroscope',
+    from: Math.max(18015100, oethDeployFrom),
+  },
 ] as const
 
 export const from = Math.min(...pools.map((p) => p.from))
@@ -65,7 +74,7 @@ const processors = pools.map((pool) =>
     [
       [
         '0xba100000625a3754423978a60c9317c58a424e3d',
-        '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+        '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
       ],
     ],
   ),

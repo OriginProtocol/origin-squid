@@ -4,7 +4,10 @@ import { ExchangeRate } from '../../../model'
 
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
-  ETH: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // Chainlink Denominations.ETH
+  DAI: '0x6b175474e89094c44da98b954eedeac495271d0f',
+  USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+  USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
   WETH: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   stETH: '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
@@ -12,7 +15,7 @@ export const currencies = {
   rETH: '0xae78736cd615f374d3085123a210448e74fc6393',
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
-  CRV: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+  CRV: '0xd533a949740bb3306d119cc777fa900ba034cd52',
   BAL: '0xba100000625a3754423978a60c9317c58a424e3d',
 } as const
 

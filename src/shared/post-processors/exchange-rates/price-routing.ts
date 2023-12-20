@@ -7,6 +7,7 @@ import * as frxEthFraxOracle from '../../../abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '../../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../../abi/sfrx-eth'
 import { Context } from '../../../processor'
+import { STETH_ADDRESS } from '../../../utils/addresses'
 import { Currency, CurrencySymbol, currencies } from './currencies'
 
 export const getPrice = async (
@@ -69,6 +70,20 @@ export const getChainlinkPrice = async (
     registryAddress,
   )
   try {
+    base = currencies[base as CurrencySymbol] ?? base
+    quote = currencies[quote as CurrencySymbol] ?? quote
+
+    if (quote === STETH_ADDRESS) {
+      // This registry if flipped.
+      return await registry
+        .latestAnswer(
+          currencies[quote as CurrencySymbol] ?? quote,
+          currencies[base as CurrencySymbol] ?? base,
+        )
+        // Invert so we get the proper direction.
+        .then((result) => 1_000000000_000000000_000000000_000000000n / result)
+    }
+
     return await registry.latestAnswer(
       currencies[base as CurrencySymbol] ?? base,
       currencies[quote as CurrencySymbol] ?? quote,
