@@ -69,6 +69,8 @@ export async function createRebaseAPY<
   let feeUSD = 0n
   let yieldUSD = 0n
   const rate = exchangeRate.rate
+  const generateId = (date: dayjs.Dayjs | string | Date | number) =>
+    dayjs.utc(date).toISOString().substring(0, 10)
 
   if (OTokenAPY.name === 'OUSDAPY') {
     feeUSD = lastYieldDistributionEvent.fee
@@ -98,7 +100,7 @@ export async function createRebaseAPY<
 
   // use date as id for APY
   const date = new Date(block.header.timestamp)
-  const dateId = date.toISOString().substring(0, 10)
+  const dateId = generateId(date)
 
   // get last APY to compare with current one
   let lastApy =
@@ -163,36 +165,38 @@ export async function createRebaseAPY<
 
   const last7daysDateId = {
     key: 'apy7DayAvg' as const,
-    value: dayjs.utc(date).subtract(6, 'days').toISOString().substring(0, 10),
+    value: generateId(dayjs.utc(date).subtract(6, 'days')),
     days: 7,
   }
   const last14daysDateId = {
     key: 'apy14DayAvg' as const,
-    value: dayjs.utc(date).subtract(13, 'days').toISOString().substring(0, 10),
+    value: generateId(dayjs.utc(date).subtract(13, 'days')),
     days: 14,
   }
   const last30daysDateId = {
     key: 'apy30DayAvg' as const,
-    value: dayjs.utc(date).subtract(29, 'days').toISOString().substring(0, 10),
+    value: generateId(dayjs.utc(date).subtract(29, 'days')),
     days: 30,
   }
 
-  // calculate average APY for the last 7, 14 and 30 days
-  await Promise.all(
-    [last7daysDateId, last14daysDateId, last30daysDateId].map(async (i) => {
-      const pastAPYs = await ctx.store
-        .find(OTokenAPY, {
-          where: {
-            id: MoreThanOrEqual(i.value),
-          },
-          order: { id: 'asc' },
-        })
-        .then((r) => r.slice(0, i.days - 1))
-      apy![i.key] =
-        pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) /
-        (pastAPYs.length + 1)
-    }),
-  )
+  const last30daysAPYs = await ctx.store.find(OTokenAPY, {
+    where: {
+      id: MoreThanOrEqual(last30daysDateId.value),
+    },
+    order: { id: 'asc' },
+  })
+
+  const blockDateId = generateId(block.header.timestamp)
+  for (const i of [last7daysDateId, last14daysDateId, last30daysDateId]) {
+    const pastAPYs = last30daysAPYs.filter((a) => {
+      const dateId = generateId(a.timestamp)
+      return dateId >= i.value && dateId < blockDateId
+    })
+    // console.log(i.days, pastAPYs.length)
+    apy![i.key] =
+      pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) /
+      (pastAPYs.length + 1)
+  }
 
   return rebase
 }
