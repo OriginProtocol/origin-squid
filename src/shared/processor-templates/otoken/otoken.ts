@@ -219,14 +219,6 @@ export const createOTokenProcessor = (params: {
         otokenObject.totalSupply -= data.value
       }
 
-      // Bind the token contract to the block number
-      const token = new otoken.Contract(
-        ctx,
-        block.header,
-        params.OTOKEN_ADDRESS,
-      )
-      // Transfer events
-
       const ensureAddress = async (address: string) => {
         let entity = owners!.get(address)
         if (!entity) {

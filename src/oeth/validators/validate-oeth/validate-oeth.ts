@@ -121,7 +121,7 @@ const expectations = {
       apr: 0.1176475,
       apy: 0.12482622,
       apy14DayAvg: 0.13925279,
-      apy30DayAvg: 23.49825734,
+      apy30DayAvg: 24.47691924,
       apy7DayAvg: 0.13852897,
       rebasingCreditsPerToken: '973558594004638273359591150',
       txHash:
