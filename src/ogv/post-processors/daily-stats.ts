@@ -2,14 +2,12 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import {
-  EntityManager,
   FindOptionsOrderValue,
   LessThanOrEqual,
-  MoreThan,
+  MoreThanOrEqual,
 } from 'typeorm'
-import { parseEther } from 'viem'
 
-import { OGV, OGVDailyStat } from '../../model'
+import { OGV, OGVAddress, OGVDailyStat } from '../../model'
 import { Context } from '../../processor'
 import { applyCoingeckoData } from '../../utils/coingecko'
 
@@ -71,24 +69,15 @@ async function updateDailyStats(ctx: Context, date: Date) {
     order: { timestamp: 'desc' as FindOptionsOrderValue },
   }
 
-  const [lastOgv] = await Promise.all([ctx.store.findOne(OGV, queryParams)])
+  const [lastOgv, holdersOverThreshold] = await Promise.all([
+    ctx.store.findOne(OGV, queryParams),
+    ctx.store.countBy(OGVAddress, { balance: MoreThanOrEqual(10n ** 20n) }), // 100 OGV
+  ])
 
   const allEntities = [lastOgv].filter(Boolean)
   if (!lastOgv) {
     return null
   }
-
-  const entityManager = (
-    ctx.store as unknown as {
-      em: () => EntityManager
-    }
-  ).em()
-
-  const holderStats = await entityManager.query<
-    {
-      holders_over_threshold: number
-    }[]
-  >(holderStatsQuery)
 
   const mostRecentEntity = allEntities.reduce((highest, current) => {
     if (!highest || !current) return current
@@ -108,14 +97,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
     tradingVolumeUSD: 0,
     marketCapUSD: 0,
     priceUSD: 0,
-    holdersOverThreshold: holderStats[0]?.holders_over_threshold || 0,
+    holdersOverThreshold,
   })
 
   return { dailyStat }
 }
-
-const holderStatsQuery = `
-SELECT COUNT(*) as holders_over_threshold
-FROM ogv_address
-WHERE balance > 100000000000000000000
-`

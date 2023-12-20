@@ -3,6 +3,12 @@ import { parseEther } from 'viem'
 
 import { OETHDailyStat, OGVDailyStat, OUSDDailyStat } from '../model'
 import { Context } from '../processor'
+import { EntityClassT } from '../utils/type'
+
+type DailyStat =
+  | EntityClassT<OETHDailyStat>
+  | EntityClassT<OGVDailyStat>
+  | EntityClassT<OUSDDailyStat>
 
 export interface CoingeckoDataInput {
   prices: [number, number][]
@@ -62,7 +68,7 @@ export function getStartOfDayTimestamp(): Date {
 export async function applyCoingeckoData(
   ctx: Context,
   props: {
-    Entity: any
+    Entity: DailyStat
     coinId: string
     startTimestamp?: number
   },
@@ -88,7 +94,7 @@ export async function applyCoingeckoData(
 
   if (statsWithNoPrice.length > 0) {
     console.log(`Found ${statsWithNoPrice.length} stats with no price`)
-    console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
+    // console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
     const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=max&interval=daily&precision=18`
     const coingeckoResponse = await fetch(coingeckoURL)
     const coingeckoJson = await coingeckoResponse.json()
