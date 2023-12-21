@@ -25,9 +25,9 @@ export class BalancerPool {
     @Column_("text", {nullable: false})
     token1!: string
 
-    @Column_("text", {nullable: false})
-    token2!: string
+    @Column_("text", {nullable: true})
+    token2!: string | undefined | null
 
-    @Column_("text", {nullable: false})
-    token3!: string
+    @Column_("text", {nullable: true})
+    token3!: string | undefined | null
 }

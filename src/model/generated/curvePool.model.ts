@@ -25,6 +25,6 @@ export class CurvePool {
     @Column_("text", {nullable: false})
     token1!: string
 
-    @Column_("text", {nullable: false})
-    token2!: string
+    @Column_("text", {nullable: true})
+    token2!: string | undefined | null
 }

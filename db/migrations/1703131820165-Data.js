@@ -1,5 +1,5 @@
-module.exports = class Data1703119593815 {
-    name = 'Data1703119593815'
+module.exports = class Data1703131820165 {
+    name = 'Data1703131820165'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -22,7 +22,7 @@ module.exports = class Data1703119593815 {
         await db.query(`CREATE TABLE "erc20_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_069b6549e7a9938cc89f32063a6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c9fbe21a3411d93ea586af2a4c" ON "erc20_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d1f50dc39003331b76fad8a640" ON "erc20_balance" ("block_number") `)
-        await db.query(`CREATE TABLE "curve_pool" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "token_count" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "token2" text NOT NULL, CONSTRAINT "PK_c04bba36a8aa877d6efa4eafd6c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "curve_pool" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "token_count" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "token2" text, CONSTRAINT "PK_c04bba36a8aa877d6efa4eafd6c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_76c9202c1160ce818f7a29d131" ON "curve_pool" ("address") `)
         await db.query(`CREATE TABLE "curve_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, CONSTRAINT "PK_40412750bb910ca560aa084dd88" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ffb0d0f86f03faacef7cb3e092" ON "curve_pool_balance" ("timestamp") `)
@@ -30,7 +30,7 @@ module.exports = class Data1703119593815 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "balancer_pool" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "token_count" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "token2" text NOT NULL, "token3" text NOT NULL, CONSTRAINT "PK_d7d096bf445ae226ec938f8bb6a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "balancer_pool" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "token_count" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "token2" text, "token3" text, CONSTRAINT "PK_d7d096bf445ae226ec938f8bb6a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_0c5b4cc12b9d8b80ac5d983848" ON "balancer_pool" ("address") `)
         await db.query(`CREATE TABLE "balancer_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, "balance3" numeric NOT NULL, CONSTRAINT "PK_441c7de293266414608c8e9de4c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_642115282f1c3026edbc4bc2a7" ON "balancer_pool_balance" ("timestamp") `)

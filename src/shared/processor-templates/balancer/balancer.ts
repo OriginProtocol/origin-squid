@@ -53,7 +53,7 @@ export const createBalancerInitializer = ({
     )
   }
   return async (ctx: Context) => {
-    const pool = ctx.store.findOneBy(BalancerPool, { id: poolAddress })
+    const pool = await ctx.store.findOneBy(BalancerPool, { id: poolAddress })
     if (!pool) {
       await ctx.store.insert(
         new BalancerPool({

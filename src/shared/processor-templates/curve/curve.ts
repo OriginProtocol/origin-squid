@@ -38,7 +38,7 @@ export const createCurveInitializer = ({
     registerLiquiditySource(address, LiquiditySourceType.CurvePool, token)
   }
   return async (ctx: Context) => {
-    const pool = ctx.store.findOneBy(CurvePool, { id: address })
+    const pool = await ctx.store.findOneBy(CurvePool, { id: address })
     if (!pool) {
       await ctx.store.insert(
         new CurvePool({

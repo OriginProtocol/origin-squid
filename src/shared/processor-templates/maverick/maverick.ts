@@ -38,7 +38,7 @@ export const createMaverickInitializer = ({
     registerLiquiditySource(address, LiquiditySourceType.MaverickPool, token)
   }
   return async (ctx: Context) => {
-    const pool = ctx.store.findOneBy(MaverickPool, { id: address })
+    const pool = await ctx.store.findOneBy(MaverickPool, { id: address })
     if (!pool) {
       await ctx.store.insert(
         new MaverickPool({
