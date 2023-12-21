@@ -89,7 +89,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 const initializers = pools.map((pool) => createBalancerInitializer(pool))
 
 export const initialize = async (ctx: Context) => {
-  await Promise.all(processors.map((p) => p(ctx)))
+  await Promise.all(initializers.map((p) => p(ctx)))
 }
 
 const processors = pools.map((pool) =>
