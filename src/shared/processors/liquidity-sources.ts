@@ -8,10 +8,8 @@ export const registerLiquiditySource = (
   type: LiquiditySourceType,
   token: string,
 ) => {
-  sources.set(
-    address,
-    new LiquiditySource({ id: address, address, type, token }),
-  )
+  const id = `${address}-${token}`
+  sources.set(id, new LiquiditySource({ id, address, type, token }))
 }
 
 export const from = Number.MAX_SAFE_INTEGER // does not apply here
