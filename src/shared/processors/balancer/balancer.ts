@@ -42,7 +42,12 @@ const pools: {
     poolAddress: '0x42ed016f826165c2e5976fe5bc3df540c5ad0af7',
     poolId:
       '0x42ed016f826165c2e5976fe5bc3df540c5ad0af700000000000000000000058b',
-    tokens: [tokens.wstETH, tokens.rETH, tokens.sfrxETH],
+    tokens: [
+      '0x42ed016f826165c2e5976fe5bc3df540c5ad0af7',
+      tokens.wstETH,
+      tokens.sfrxETH,
+      tokens.rETH,
+    ],
     from: Math.max(17680000, oethDeployFrom),
   },
   {
@@ -52,7 +57,11 @@ const pools: {
     poolAddress: '0x93d199263632a4ef4bb438f1feb99e57b4b5f0bd',
     poolId:
       '0x93d199263632a4ef4bb438f1feb99e57b4b5f0bd0000000000000000000005c2',
-    tokens: [tokens.wstETH, tokens.WETH],
+    tokens: [
+      tokens.wstETH,
+      '0x93d199263632a4EF4Bb438F1feB99e57b4b5f0BD',
+      tokens.WETH,
+    ],
     from: Math.max(17920000, oethDeployFrom),
   },
   {
