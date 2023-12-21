@@ -1,9 +1,15 @@
 import * as otoken from '../../abi/otoken'
+import { LiquiditySourceType } from '../../model'
 import { OETH_ADDRESS } from '../../utils/addresses'
 import { logFilter } from '../../utils/logFilter'
 import { createERC20Tracker } from '../processor-templates/erc20'
+import { registerLiquiditySource } from './liquidity-sources'
+
+// TODO: Would be nice if interested parties could register their desires here from other parts of the code,
+//  allowing multiple declarations of need without issue.
 
 const tracks: Parameters<typeof createERC20Tracker>[0][] = [
+  // Origin Specific
   {
     from: 15350225, // 6436154,
     address: '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26', // OGN
@@ -20,6 +26,7 @@ const tracks: Parameters<typeof createERC20Tracker>[0][] = [
     ],
     intervalTracking: true,
   },
+  // OUSD Related
   {
     from: 11362821,
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
@@ -44,6 +51,32 @@ const tracks: Parameters<typeof createERC20Tracker>[0][] = [
     accountFilter: [
       '0x028171bca77440897b824ca71d1c56cac55b68a3', // aDAI
       '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643', // cDAI
+    ],
+    intervalTracking: true,
+  },
+  // OETH Related
+  {
+    from: 16933090, // oeth deploy date
+    address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
+    accountFilter: [
+      '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap wstETH/WETH
+      '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap rETH/WETH
+    ],
+    intervalTracking: true,
+  },
+  {
+    from: 16933090, // oeth deploy date
+    address: '0xae78736cd615f374d3085123a210448e74fc6393', // rETH
+    accountFilter: [
+      '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap rETH/WETH
+    ],
+    intervalTracking: true,
+  },
+  {
+    from: 16933090, // oeth deploy date
+    address: '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // wstETH
+    accountFilter: [
+      '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap wstETH/WETH
     ],
     intervalTracking: true,
   },
