@@ -1,10 +1,17 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import * as curveLpToken from '../../../abi/curve-lp-token'
-import { CurvePoolBalance, CurvePoolRate } from '../../../model'
+import {
+  CurvePool,
+  CurvePoolBalance,
+  CurvePoolRate,
+  LiquiditySource,
+  LiquiditySourceType,
+} from '../../../model'
 import { Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { range } from '../../../utils/range'
+import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]
@@ -18,17 +25,47 @@ export const createCurveSetup = (
   processor.includeAllBlocks({ from })
 }
 
+export const createCurveInitializer = ({
+  name,
+  address,
+  tokens,
+}: {
+  name: string
+  address: string
+  tokens: [string, string] | [string, string, string]
+}) => {
+  for (const token of tokens) {
+    registerLiquiditySource(address, LiquiditySourceType.CurvePool, token)
+  }
+  return async (ctx: Context) => {
+    const pool = await ctx.store.findOneBy(CurvePool, { id: address })
+    if (!pool) {
+      await ctx.store.insert(
+        new CurvePool({
+          id: address,
+          address,
+          name,
+          tokenCount: tokens.length,
+          token0: tokens[0],
+          token1: tokens[1],
+          token2: tokens[2],
+        }),
+      )
+    }
+  }
+}
+
 export const createCurveProcessor = ({
   name,
   address,
-  count,
   from,
+  tokens,
   ratesToPull,
 }: {
   name: string
   address: string
-  count: number
   from: number
+  tokens: string[]
   ratesToPull?: { i: bigint; j: bigint; dx: bigint }[] | undefined
 }) => {
   const update = blockFrequencyUpdater({ from })
@@ -44,7 +81,9 @@ export const createCurveProcessor = ({
 
       // TODO: use `get_balances()` where possible
       const [balances, rates] = await Promise.all([
-        Promise.all(range(count).map((n) => contract.balances(BigInt(n)))),
+        Promise.all(
+          range(tokens.length).map((n) => contract.balances(BigInt(n))),
+        ),
         Promise.all(
           (ratesToPull ?? []).map(async ({ i, j, dx }) => {
             return {

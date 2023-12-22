@@ -118,6 +118,16 @@ type ERC20Balance @entity {
   balance: BigInt!
 }
 
+type CurvePool @entity {
+  id: ID!
+  address: String! @index
+  name: String!
+  tokenCount: Int!
+  token0: String!
+  token1: String!
+  token2: String
+}
+
 type CurvePoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -135,6 +145,17 @@ type CurvePoolRate @entity {
   address: String!
   name: String!
   rate: BigInt!
+}
+
+type BalancerPool @entity {
+  id: ID!
+  address: String! @index
+  name: String!
+  tokenCount: Int!
+  token0: String!
+  token1: String!
+  token2: String
+  token3: String
 }
 
 type BalancerPoolBalance @entity {
@@ -159,6 +180,14 @@ type BalancerPoolRate @entity {
   rate3: BigInt!
 }
 
+type MaverickPool @entity {
+  id: ID!
+  address: String! @index
+  name: String!
+  tokenA: String!
+  tokenB: String!
+}
+
 type MaverickPoolBalance @entity {
   id: ID!
   timestamp: DateTime! @index
@@ -167,6 +196,23 @@ type MaverickPoolBalance @entity {
   binBalanceA: BigInt!
   binBalanceB: BigInt!
 }
+
+enum LiquiditySourceType {
+  CurvePool
+  BalancerPool
+  MaverickPool
+  UniswapPool
+  Aave
+  Compound
+}
+
+type LiquiditySource @entity {
+  id: ID!
+  address: String!
+  type: LiquiditySourceType!
+  token: String!
+}
+
 """
 The OETH entity tracks the change in total supply of OETH over time.
 """

@@ -1,9 +1,16 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { add } from 'lodash'
 
 import * as maverickPool from '../../../abi/maverick-pool'
-import { MaverickPoolBalance } from '../../../model'
+import {
+  LiquiditySource,
+  LiquiditySourceType,
+  MaverickPool,
+  MaverickPoolBalance,
+} from '../../../model'
 import { Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
 
@@ -16,6 +23,34 @@ export const createMaverickSetup = (
   processor: EvmBatchProcessor,
 ) => {
   processor.includeAllBlocks({ from })
+}
+
+export const createMaverickInitializer = ({
+  name,
+  address,
+  tokens,
+}: {
+  name: string
+  address: string
+  tokens: [string, string]
+}) => {
+  for (const token of tokens) {
+    registerLiquiditySource(address, LiquiditySourceType.MaverickPool, token)
+  }
+  return async (ctx: Context) => {
+    const pool = await ctx.store.findOneBy(MaverickPool, { id: address })
+    if (!pool) {
+      await ctx.store.insert(
+        new MaverickPool({
+          id: address,
+          address,
+          name,
+          tokenA: tokens[0],
+          tokenB: tokens[1],
+        }),
+      )
+    }
+  }
 }
 
 export const createMaverickProcessor = ({

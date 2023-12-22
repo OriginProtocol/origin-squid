@@ -5,12 +5,19 @@ import * as balancerMetaStablePoolAbi from '../../../abi/balancer-meta-stable-po
 import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
 import * as balancerVaultAbi from '../../../abi/balancer-vault'
 import * as balancerWeightedPool from '../../../abi/balancer-weighted-pool-2-token'
-import { BalancerPoolBalance, BalancerPoolRate } from '../../../model'
+import {
+  BalancerPool,
+  BalancerPoolBalance,
+  BalancerPoolRate,
+  LiquiditySource,
+  LiquiditySourceType,
+} from '../../../model'
 import { Context } from '../../../processor'
 import { ADDRESS_ZERO, BALANCER_VAULT } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Currency } from '../../post-processors/exchange-rates/currencies'
+import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 const eth1 = BigInt('1000000000000000000')
 
@@ -24,6 +31,44 @@ export const createBalancerSetup = (
   processor: EvmBatchProcessor,
 ) => {
   processor.includeAllBlocks({ from })
+}
+
+export const createBalancerInitializer = ({
+  name,
+  poolAddress,
+  tokens,
+}: {
+  name: string
+  poolAddress: string
+  tokens:
+    | [string, string]
+    | [string, string, string]
+    | [string, string, string, string]
+}) => {
+  for (const token of tokens) {
+    registerLiquiditySource(
+      poolAddress,
+      LiquiditySourceType.BalancerPool,
+      token,
+    )
+  }
+  return async (ctx: Context) => {
+    const pool = await ctx.store.findOneBy(BalancerPool, { id: poolAddress })
+    if (!pool) {
+      await ctx.store.insert(
+        new BalancerPool({
+          id: poolAddress,
+          address: poolAddress,
+          name,
+          tokenCount: tokens.length,
+          token0: tokens[0],
+          token1: tokens[1],
+          token2: tokens[2],
+          token3: tokens[3],
+        }),
+      )
+    }
+  }
 }
 
 export const createBalancerProcessor = (
