@@ -38,6 +38,23 @@ export const setup = (processor: EvmBatchProcessor) => {
     ],
     range: { from },
   })
+  processor.includeAllBlocks({ from })
+}
+
+let pendingProposals: OGVProposal[] = []
+let activeProposals: OGVProposal[] = []
+let goActiveBlock = 0
+let goFinishedBlock = 0
+
+export const initialize = async (ctx: Context) => {
+  const pending = await ctx.store.findBy(OGVProposal, {
+    status: OGVProposalState.Pending,
+  })
+  const active = await ctx.store.findBy(OGVProposal, {
+    status: OGVProposalState.Active,
+  })
+  pendingProposals.push(...pending)
+  activeProposals.push(...active)
 }
 
 export const process = async (ctx: Context) => {
@@ -50,6 +67,7 @@ export const process = async (ctx: Context) => {
     votes: [],
   }
 
+  _updateStatusBlocks()
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       if (log.address !== GOVERNANCE_ADDRESS) continue
@@ -83,6 +101,13 @@ export const process = async (ctx: Context) => {
         ctx.log.error('Could not process governance event')
       }
     }
+    await _updateProposalStatuses(
+      ctx,
+      result,
+      block,
+      goActiveBlock,
+      goFinishedBlock,
+    )
   }
 
   await ctx.store.upsert(Array.from(result.addresses.values()))
@@ -126,6 +151,8 @@ const _processProposalCreated = async (
     choices: [],
     scores: [],
   })
+
+  pendingProposals.push(proposal)
 
   const proposalTxLog = new OGVProposalTxLog({
     id: `${proposalId}:${log.transactionHash}:${log.logIndex}`,
@@ -174,6 +201,77 @@ const eventMapper = {
   },
 }
 
+const _updateStatusBlocks = () => {
+  goActiveBlock = Number(
+    pendingProposals.reduce(
+      (min, p) => (p.startBlock < min ? p.startBlock : min),
+      BigInt(Number.MAX_SAFE_INTEGER),
+    ),
+  )
+  goFinishedBlock = Number(
+    activeProposals.reduce(
+      (min, p) => (p.endBlock < min ? p.endBlock : min),
+      BigInt(Number.MAX_SAFE_INTEGER),
+    ),
+  )
+}
+
+const _updateProposalStatuses = async (
+  ctx: Context,
+  result: IProcessResult,
+  block: Block,
+  goActiveBlock: number,
+  goFinishedBlock: number,
+) => {
+  // Update for Active and post-Active statuses.
+  if (block.header.height > goActiveBlock) {
+    ctx.log.info('block.header.height > goActiveBlock')
+    for (const proposal of pendingProposals.filter(
+      (p) => block.header.height > Number(p.startBlock),
+    )) {
+      await _updateProposalStatus(ctx, result, block, proposal.id)
+    }
+    pendingProposals = pendingProposals.filter(
+      (p) => block.header.height <= Number(p.startBlock),
+    )
+  }
+  if (block.header.height > goFinishedBlock) {
+    ctx.log.info('block.header.height > goFinishedBlock')
+    for (const proposal of activeProposals.filter(
+      (p) => block.header.height > Number(p.endBlock),
+    )) {
+      await _updateProposalStatus(ctx, result, block, proposal.id)
+    }
+    activeProposals = activeProposals.filter(
+      (p) => block.header.height <= Number(p.endBlock),
+    )
+  }
+  _updateStatusBlocks()
+}
+
+const _updateProposalStatus = async (
+  ctx: Context,
+  result: IProcessResult,
+  block: Block,
+  proposalId: string,
+) => {
+  const proposal = await _getProposal(ctx, proposalId, result)
+  proposal.status = await _getProposalState(ctx, block, BigInt(proposalId))
+  ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
+  if (
+    proposal.status === OGVProposalState.Pending &&
+    !pendingProposals.find((p) => p.id === proposal.id)
+  ) {
+    pendingProposals.push(proposal)
+  }
+  if (
+    proposal.status === OGVProposalState.Active &&
+    !activeProposals.find((p) => p.id === proposal.id)
+  ) {
+    activeProposals.push(proposal)
+  }
+}
+
 const _processProposalEvents = async (
   ctx: Context,
   result: IProcessResult,
@@ -187,7 +285,7 @@ const _processProposalEvents = async (
   const blockTimestamp = new Date(block.header.timestamp)
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
-  proposal.status = status
+  await _updateProposalStatus(ctx, result, block, proposalId.toString())
 
   const proposalTxLog = new OGVProposalTxLog({
     id: `${proposalId}:${log.transactionHash}:${log.logIndex}`,
@@ -213,7 +311,7 @@ const _processProposalExtended = async (
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
   proposal.endBlock = extendedDeadline
-  proposal.status = await _getProposalState(ctx, block, proposalId)
+  await _updateProposalStatus(ctx, result, block, proposalId.toString())
 
   const proposalTxLog = new OGVProposalTxLog({
     id: `${proposalId}:${log.transactionHash}:${log.logIndex}`,

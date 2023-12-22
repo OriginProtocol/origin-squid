@@ -81,7 +81,7 @@ export const run = ({
 }: {
   stateSchema?: string
   processors: Processor[]
-  postProcessors?: Pick<Processor, 'process' | 'name' | 'setup' | 'from'>[]
+  postProcessors?: Processor[]
   validators?: Pick<Processor, 'process' | 'name'>[]
 }) => {
   assert(
@@ -132,15 +132,22 @@ export const run = ({
           initialized = true
           ctx.log.info(`initializing`)
           start = Date.now()
-          const times = await Promise.all(
-            processors
+          const times = await Promise.all([
+            ...processors
               .filter((p) => p.initialize)
               .map((p, index) =>
                 p.initialize!(ctx).then(
                   time(p.name ?? `initializing processor-${index}`),
                 ),
               ),
-          )
+            ...(postProcessors ?? [])
+              .filter((p) => p.initialize)
+              .map((p, index) =>
+                p.initialize!(ctx).then(
+                  time(p.name ?? `initializing postProcessors-${index}`),
+                ),
+              ),
+          ])
           times.forEach((t) => t())
         }
 
