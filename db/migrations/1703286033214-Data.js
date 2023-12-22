@@ -1,10 +1,5 @@
-<<<<<<<< HEAD:db/migrations/1703131820165-Data.js
-module.exports = class Data1703131820165 {
-    name = 'Data1703131820165'
-========
-module.exports = class Data1703090085308 {
-    name = 'Data1703090085308'
->>>>>>>> main:db/migrations/1703090085308-Data.js
+module.exports = class Data1703286033214 {
+    name = 'Data1703286033214'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
