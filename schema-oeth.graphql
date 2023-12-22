@@ -185,10 +185,14 @@ type OETHDailyStat @entity {
   amoSupply: BigInt!
   dripperWETH: BigInt!
   wrappedSupply: BigInt!
+  tradingVolumeUSD: Float!
 
   yieldETH: BigInt!
+  yieldETH7Day: BigInt!
   yieldETHAllTime: BigInt!
+
   yieldUSD: BigInt!
+  yieldUSD7Day: BigInt!
   yieldUSDAllTime: BigInt!
 
   feesETH: BigInt!
@@ -200,9 +204,8 @@ type OETHDailyStat @entity {
   feesUSDAllTime: BigInt!
 
   pegPrice: BigInt!
-  """
-  Price of OETH in ETH
-  """
+  marketCapUSD: Float!
+  holdersOverThreshold: Int!
   strategies: [OETHStrategyDailyStat] @derivedFrom(field: "dailyStatId")
   collateral: [OETHCollateralDailyStat] @derivedFrom(field: "dailyStatId")
 }

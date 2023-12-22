@@ -56,14 +56,23 @@ export class OUSDDailyStat {
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     wrappedSupply!: bigint
 
+    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    tradingVolumeUSD!: number
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldETH!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yieldETH7Day!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldETHAllTime!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldUSD!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    yieldUSD7Day!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     yieldUSDAllTime!: bigint
@@ -88,6 +97,12 @@ export class OUSDDailyStat {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     pegPrice!: bigint
+
+    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    marketCapUSD!: number
+
+    @Column_("int4", {nullable: false})
+    holdersOverThreshold!: number
 
     @OneToMany_(() => OUSDStrategyDailyStat, e => e.dailyStatId)
     strategies!: OUSDStrategyDailyStat[]
