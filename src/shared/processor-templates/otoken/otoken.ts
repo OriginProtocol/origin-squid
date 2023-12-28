@@ -516,7 +516,10 @@ export const createOTokenProcessor = (params: {
         status: owner.rebasingOption,
       })
       result.rebaseOptions.push(rebaseOption)
-      if (trace.action.sighash === otoken.functions.rebaseOptIn.sighash) {
+      if (
+        trace.action.sighash === otoken.functions.rebaseOptIn.sighash ||
+        trace.action.sighash === otoken.functions.governanceRebaseOptIn.sighash
+      ) {
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
         otokenObject.nonRebasingSupply -= owner.balance
