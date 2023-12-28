@@ -5,6 +5,12 @@ import {ABI_JSON} from './otoken.abi'
 export const abi = new ethers.Interface(ABI_JSON);
 
 export const events = {
+    AccountRebasingDisabled: new LogEvent<([account: string] & {account: string})>(
+        abi, '0x201ace89ad3f5ab7428b91989f6a50d1998791c7b94a0fa812fd64a57687165e'
+    ),
+    AccountRebasingEnabled: new LogEvent<([account: string] & {account: string})>(
+        abi, '0x19a249fa2050bac8314ac10e3ad420bd9825574bf750f58810c3c7adfc7b1c6f'
+    ),
     Approval: new LogEvent<([owner: string, spender: string, value: bigint] & {owner: string, spender: string, value: bigint})>(
         abi, '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
     ),
@@ -55,6 +61,9 @@ export const functions = {
     ),
     decreaseAllowance: new Func<[_spender: string, _subtractedValue: bigint], {_spender: string, _subtractedValue: bigint}, boolean>(
         abi, '0xa457c2d7'
+    ),
+    governanceRebaseOptIn: new Func<[_account: string], {_account: string}, []>(
+        abi, '0xbaa9c9db'
     ),
     governor: new Func<[], {}, string>(
         abi, '0x0c340a24'

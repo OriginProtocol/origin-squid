@@ -2,6 +2,30 @@ export const ABI_JSON = [
     {
         "type": "event",
         "anonymous": false,
+        "name": "AccountRebasingDisabled",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "account",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "AccountRebasingEnabled",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "account",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
         "name": "Approval",
         "inputs": [
             {
@@ -300,6 +324,19 @@ export const ABI_JSON = [
                 "name": ""
             }
         ]
+    },
+    {
+        "type": "function",
+        "name": "governanceRebaseOptIn",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "_account"
+            }
+        ],
+        "outputs": []
     },
     {
         "type": "function",
