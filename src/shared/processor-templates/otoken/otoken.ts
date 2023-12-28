@@ -340,7 +340,7 @@ export const createOTokenProcessor = (params: {
         // OToken transactions.
         const txReceipt = await ctx._chain.client.call(
           'eth_getTransactionReceipt',
-          [log.transactionHash, 'latest'],
+          [log.transactionHash],
         )
 
         const activity = await activityFromTx(
