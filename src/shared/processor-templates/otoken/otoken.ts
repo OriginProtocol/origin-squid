@@ -1,6 +1,6 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { groupBy } from 'lodash'
-import { GetTransactionReceiptReturnType } from 'viem'
+import { GetTransactionReceiptReturnType, pad, trim } from 'viem'
 
 import * as otoken from '../../../abi/otoken'
 import * as otokenVault from '../../../abi/otoken-vault'
@@ -485,9 +485,16 @@ export const createOTokenProcessor = (params: {
       const blockNumber = block.header.height
       const address =
         trace.action.sighash === otoken.functions.governanceRebaseOptIn.sighash
-          ? otoken.functions.governanceRebaseOptIn.decode(trace.action.input)
-              ._account
+          ? pad(
+              trim(
+                otoken.functions.governanceRebaseOptIn.decode(
+                  trace.action.input,
+                )._account as `0x${string}`,
+              ),
+              { size: 20 },
+            ).toLowerCase()
           : trace.action.from.toLowerCase()
+      console.log(address)
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       let owner = owners!.get(address)
       if (!owner) {
