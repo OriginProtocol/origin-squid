@@ -13,8 +13,11 @@ import utc from 'dayjs/plugin/utc'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
-export const createSquidProcessor = () =>
-  new EvmBatchProcessor()
+export const createSquidProcessor = () => {
+  const url =
+    process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'] ||
+    'http://localhost:8545'
+  return new EvmBatchProcessor()
     .setDataSource({
       // Change the Archive endpoints for run the squid
       // against the other EVM networks
@@ -27,12 +30,10 @@ export const createSquidProcessor = () =>
       // chain: 'https://rpc.ankr.com/eth',
       // chain: "https://mainnet.infura.io/v3/03b96dfbb4904c5c89c04680dd480064",
       chain: {
-        url:
-          process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'] ||
-          'http://localhost:8545',
+        url,
         // Alchemy is deprecating `eth_getBlockReceipts` https://docs.alchemy.com/reference/eth-getblockreceipts
         // so we need to set `maxBatchCallSize` 1 to avoid using this method
-        maxBatchCallSize: 10,
+        maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
       },
     })
     .setFinalityConfirmation(10)
@@ -62,6 +63,7 @@ export const createSquidProcessor = () =>
         createResultAddress: true,
       },
     })
+}
 
 interface Processor {
   name?: string
