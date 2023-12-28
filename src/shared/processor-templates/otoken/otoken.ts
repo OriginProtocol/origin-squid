@@ -66,6 +66,7 @@ export const createOTokenSetup =
       callSighash: [
         otoken.functions.rebaseOptOut.sighash,
         otoken.functions.rebaseOptIn.sighash,
+        otoken.functions.governanceRebaseOptIn.sighash,
       ],
       transaction: true,
       range: { from },
@@ -474,13 +475,19 @@ export const createOTokenProcessor = (params: {
     if (
       trace.type === 'call' &&
       params.OTOKEN_ADDRESS === trace.action.to &&
-      (trace.action.sighash === otoken.functions.rebaseOptIn.sighash ||
+      (trace.action.sighash ===
+        otoken.functions.governanceRebaseOptIn.sighash ||
+        trace.action.sighash === otoken.functions.rebaseOptIn.sighash ||
         trace.action.sighash === otoken.functions.rebaseOptOut.sighash)
     ) {
       await result.initialize()
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
-      const address = trace.action.from.toLowerCase()
+      const address =
+        trace.action.sighash === otoken.functions.governanceRebaseOptIn.sighash
+          ? otoken.functions.governanceRebaseOptIn.decode(trace.action.input)
+              ._account
+          : trace.action.from.toLowerCase()
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       let owner = owners!.get(address)
       if (!owner) {
