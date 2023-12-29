@@ -17,6 +17,7 @@ export const createSquidProcessor = () => {
   const url =
     process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'] ||
     'http://localhost:8545'
+  console.log(`RPC URL: ${url}`)
   return new EvmBatchProcessor()
     .setDataSource({
       // Change the Archive endpoints for run the squid
