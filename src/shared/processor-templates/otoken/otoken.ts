@@ -494,7 +494,6 @@ export const createOTokenProcessor = (params: {
               { size: 20 },
             ).toLowerCase()
           : trace.action.from.toLowerCase()
-      console.log(address)
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       let owner = owners!.get(address)
       if (!owner) {
