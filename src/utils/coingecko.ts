@@ -98,9 +98,8 @@ export async function applyCoingeckoData(
     const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=max&interval=daily&precision=18`
     let coingeckoResponse = await fetch(coingeckoURL)
     while (coingeckoResponse.status === 429) {
-      let retryAfter = Number(
-        coingeckoResponse.headers.get('retry-after') ?? 60000,
-      )
+      let retryAfterStr = coingeckoResponse.headers.get('retry-after')
+      let retryAfter = retryAfterStr ? Number(retryAfterStr) * 1000 : 60000
       console.log(`Coingecko 429 (retry-after: ${retryAfter}): ${coingeckoURL}`)
       await new Promise((resolve) => setTimeout(resolve, retryAfter))
       coingeckoResponse = await fetch(coingeckoURL)
