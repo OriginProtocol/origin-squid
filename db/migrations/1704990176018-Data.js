@@ -1,5 +1,5 @@
-module.exports = class Data1703286033214 {
-    name = 'Data1703286033214'
+module.exports = class Data1704990176018 {
+    name = 'Data1704990176018'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -110,7 +110,7 @@ module.exports = class Data1703286033214 {
         await db.query(`CREATE TABLE "ogv_lockup" ("id" character varying NOT NULL, "lockup_id" text NOT NULL, "amount" numeric NOT NULL, "end" TIMESTAMP WITH TIME ZONE NOT NULL, "veogv" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address_id" character varying, CONSTRAINT "PK_6b6d5ed3a004dd3f546c1b11fa4" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_8114101b53d9d6bc26fe80838a" ON "ogv_lockup" ("lockup_id") `)
         await db.query(`CREATE INDEX "IDX_8be94cd63e35b91adf1301a156" ON "ogv_lockup" ("address_id") `)
-        await db.query(`CREATE TABLE "ogv_lockup_tx_log" ("id" character varying NOT NULL, "hash" text NOT NULL, "event" character varying(8) NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "ogv_lockup_id" character varying, CONSTRAINT "PK_1c4a8425ce42f0c9da10056adee" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ogv_lockup_tx_log" ("id" character varying NOT NULL, "hash" text NOT NULL, "event" character varying(8) NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "ogv_lockup_id" character varying, CONSTRAINT "PK_1c4a8425ce42f0c9da10056adee" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_b49fca291c97d9b55cd91f935f" ON "ogv_lockup_tx_log" ("ogv_lockup_id") `)
         await db.query(`CREATE TABLE "ogv_proposal" ("id" character varying NOT NULL, "description" text, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "start_block" numeric NOT NULL, "end_block" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "status" character varying(9) NOT NULL, "quorum" numeric NOT NULL, "choices" text array NOT NULL, "scores" numeric array NOT NULL, "proposer_id" character varying, CONSTRAINT "PK_b06db02b26fa37882e013579407" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c62be3f16dfb3e4a09525c85af" ON "ogv_proposal" ("proposer_id") `)

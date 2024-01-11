@@ -28,6 +28,8 @@ type OGVLockupTxLog @entity {
   hash: String!
   event: OGVLockupEventType!
   timestamp: DateTime!
+  blockNumber: Int!
+  totalSupply: BigInt!
   ogvLockup: OGVLockup!
 }
 

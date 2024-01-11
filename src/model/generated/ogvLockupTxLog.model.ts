@@ -1,4 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
+import * as marshal from "./marshal"
 import {OGVLockupEventType} from "./_ogvLockupEventType"
 import {OGVLockup} from "./ogvLockup.model"
 
@@ -19,6 +20,12 @@ export class OGVLockupTxLog {
 
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
+
+    @Column_("int4", {nullable: false})
+    blockNumber!: number
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    totalSupply!: bigint
 
     @Index_()
     @ManyToOne_(() => OGVLockup, {nullable: true})
