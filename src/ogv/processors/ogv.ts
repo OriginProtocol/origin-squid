@@ -187,7 +187,7 @@ const _processStake = async (
     // If it exists, it's an extend
     result.lockupEvents[unstakeIndex].event = OGVLockupEventType.Extended
   } else {
-    const ogvToken = new erc20Abi.Contract(ctx, block.header, OGV_ADDRESS)
+    const veOgvToken = new erc20Abi.Contract(ctx, block.header, VEOGV_ADDRESS)
     // If not, it's just a new stake
     result.lockupEvents.push(
       new OGVLockupTxLog({
@@ -196,7 +196,7 @@ const _processStake = async (
         event: OGVLockupEventType.Staked,
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
-        totalSupply: await ogvToken.totalSupply(),
+        totalSupply: await veOgvToken.totalSupply(),
         ogvLockup: lockup,
       }),
     )
@@ -216,8 +216,8 @@ const _processUnstake = async (
   const { lockupId, user, amount } = veogvAbi.events.Unstake.decode(log)
   const address = await _getAddress(ctx, user, result)
   const lockup = await _getLockup(ctx, lockupId.toString(), address, result)
-  const ogvToken = new erc20Abi.Contract(ctx, block.header, OGV_ADDRESS)
-  
+  const veOgvToken = new erc20Abi.Contract(ctx, block.header, VEOGV_ADDRESS)
+
   result.lockupEvents.push(
     new OGVLockupTxLog({
       id: `${log.transactionHash}:${log.logIndex}`,
@@ -225,7 +225,7 @@ const _processUnstake = async (
       event: OGVLockupEventType.Unstaked,
       timestamp: new Date(block.header.timestamp),
       blockNumber: block.header.height,
-      totalSupply: await ogvToken.totalSupply(),
+      totalSupply: await veOgvToken.totalSupply(),
       ogvLockup: lockup,
     }),
   )
