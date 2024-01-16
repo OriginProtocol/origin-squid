@@ -532,6 +532,12 @@ export const createOTokenProcessor = (params: {
     }
   }
 
+  const rebaseEventTopics = {
+    [otoken.events.AccountRebasingEnabled.topic]:
+      otoken.events.AccountRebasingEnabled,
+    [otoken.events.AccountRebasingDisabled.topic]:
+      otoken.events.AccountRebasingDisabled,
+  }
   const processRebaseOptEvent = async (
     ctx: Context,
     result: ProcessResult,
@@ -539,14 +545,11 @@ export const createOTokenProcessor = (params: {
     log: Context['blocks']['0']['logs']['0'],
   ) => {
     if (log.address !== params.OTOKEN_ADDRESS) return
-    if (
-      log.topics[0] === otoken.events.AccountRebasingEnabled.topic ||
-      log.topics[0] === otoken.events.AccountRebasingDisabled.topic
-    ) {
+    if (rebaseEventTopics[log.topics[0]]) {
       await result.initialize()
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
-      const data = otoken.events.AccountRebasingEnabled.decode(log)
+      const data = rebaseEventTopics[log.topics[0]].decode(log)
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       const address = data.account.toLowerCase()
       let owner = owners!.get(address)
