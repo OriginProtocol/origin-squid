@@ -30,6 +30,9 @@ export const setup = createOTokenSetup({
   address: OETH_ADDRESS,
   vaultAddress: OETH_VAULT_ADDRESS,
   from,
+  upgrades: {
+    rebaseOptEvents: 18872285,
+  },
 })
 
 export const process = createOTokenProcessor({

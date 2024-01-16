@@ -54,10 +54,14 @@ export const createOTokenSetup =
     address,
     vaultAddress,
     from,
+    upgrades,
   }: {
     address: string
     vaultAddress: string
     from: number
+    upgrades?: {
+      rebaseOptEvents: number
+    }
   }) =>
   (processor: EvmBatchProcessor) => {
     processor.addTrace({
@@ -66,16 +70,17 @@ export const createOTokenSetup =
       callSighash: [
         otoken.functions.rebaseOptOut.sighash,
         otoken.functions.rebaseOptIn.sighash,
-        otoken.functions.governanceRebaseOptIn.sighash,
       ],
       transaction: true,
-      range: { from },
+      range: { from, to: upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
     })
     processor.addLog({
       address: [address],
       topic0: [
         otoken.events.Transfer.topic,
         otoken.events.TotalSupplyUpdatedHighres.topic,
+        otoken.events.AccountRebasingEnabled.topic,
+        otoken.events.AccountRebasingDisabled.topic,
       ],
       transaction: true,
       range: { from },
@@ -178,6 +183,7 @@ export const createOTokenProcessor = (params: {
         await processTransfer(ctx, result, block, log)
         await processYieldDistribution(ctx, result, block, log)
         await processTotalSupplyUpdatedHighres(ctx, result, block, log)
+        await processRebaseOptEvent(ctx, result, block, log)
       }
       await processActivity(ctx, result, block)
     }
@@ -517,6 +523,60 @@ export const createOTokenProcessor = (params: {
           otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
       if (trace.action.sighash === otoken.functions.rebaseOptOut.sighash) {
+        owner.rebasingOption = RebasingOption.OptOut
+        rebaseOption.status = RebasingOption.OptOut
+        otokenObject.nonRebasingSupply += owner.balance
+        otokenObject.rebasingSupply =
+          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+      }
+    }
+  }
+
+  const processRebaseOptEvent = async (
+    ctx: Context,
+    result: ProcessResult,
+    block: Context['blocks']['0'],
+    log: Context['blocks']['0']['logs']['0'],
+  ) => {
+    if (log.address !== params.OTOKEN_ADDRESS) return
+    if (
+      log.topics[0] === otoken.events.AccountRebasingEnabled.topic ||
+      log.topics[0] === otoken.events.AccountRebasingDisabled.topic
+    ) {
+      await result.initialize()
+      const timestamp = new Date(block.header.timestamp)
+      const blockNumber = block.header.height
+      const { account: address } =
+        otoken.events.AccountRebasingEnabled.decode(log)
+      const otokenObject = await getLatestOTokenObject(ctx, result, block)
+      let owner = owners!.get(address)
+      if (!owner) {
+        owner = await createAddress(
+          params.OTokenAddress,
+          ctx,
+          address,
+          timestamp,
+        )
+        owners!.set(address, owner)
+      }
+
+      let rebaseOption = new params.OTokenRebaseOption({
+        id: getUniqueId(`${log.transactionHash!}-${owner.id}`),
+        timestamp,
+        blockNumber,
+        txHash: log.transactionHash,
+        address: owner,
+        status: owner.rebasingOption,
+      })
+      result.rebaseOptions.push(rebaseOption)
+      if (log.topics[0] === otoken.events.AccountRebasingEnabled.topic) {
+        owner.rebasingOption = RebasingOption.OptIn
+        rebaseOption.status = RebasingOption.OptIn
+        otokenObject.nonRebasingSupply -= owner.balance
+        otokenObject.rebasingSupply =
+          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+      }
+      if (log.topics[0] === otoken.events.AccountRebasingDisabled.topic) {
         owner.rebasingOption = RebasingOption.OptOut
         rebaseOption.status = RebasingOption.OptOut
         otokenObject.nonRebasingSupply += owner.balance
