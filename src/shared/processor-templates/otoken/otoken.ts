@@ -546,9 +546,9 @@ export const createOTokenProcessor = (params: {
       await result.initialize()
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
-      const { account: address } =
-        otoken.events.AccountRebasingEnabled.decode(log)
+      const data = otoken.events.AccountRebasingEnabled.decode(log)
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
+      const address = data.account.toLowerCase()
       let owner = owners!.get(address)
       if (!owner) {
         owner = await createAddress(
