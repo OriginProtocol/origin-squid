@@ -1,5 +1,4 @@
 // Lowercase Addresses
-
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
@@ -30,24 +29,6 @@ export const FRXETH_ADDRESS = '0x5e8422345238f34275888049021821e8e08caa1f'
 export const SFRXETH_ADDRESS = '0xac3e018457b222d93114458476f3e3416abbe38f'
 
 export const BAL_ADDRESS = '0xba100000625a3754423978a60c9317c58a424e3d'
-
-export const tokens = {
-  ETH: ETH_ADDRESS,
-  OUSD: OUSD_ADDRESS,
-  DAI: DAI_ADDRESS,
-  USDT: USDT_ADDRESS,
-  USDC: USDC_ADDRESS,
-  LUSD: LUSD_ADDRESS,
-  CRV3: CRV3_ADDRESS,
-  OETH: OETH_ADDRESS,
-  WETH: WETH_ADDRESS,
-  stETH: STETH_ADDRESS,
-  wstETH: WSTETH_ADDRESS,
-  rETH: RETH_ADDRESS,
-  frxETH: FRXETH_ADDRESS,
-  sfrxETH: SFRXETH_ADDRESS,
-  BAL: BAL_ADDRESS,
-}
 
 export const OUSD_VAULT_ERC20_ADDRESSES = [
   DAI_ADDRESS,
@@ -90,3 +71,95 @@ export const OGN_ADDRESS = '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26'
 export const OGV_ADDRESS = '0x9c354503c38481a7a7a51629142963f98ecc12d0'
 
 export const VEOGV_ADDRESS = '0x0c4576ca1c365868e162554af8e385dc3e7c66d9'
+
+// Token Helper Objects & Types
+export const tokens: Record<string, Lowercase<`0x${string}`>> = {
+  // Origin ERC20 Tokens
+  OGN: OGN_ADDRESS,
+  OGV: OGV_ADDRESS,
+  veOGV: VEOGV_ADDRESS,
+
+  // Origin OTokens
+  OETH: OETH_ADDRESS,
+  OUSD: OUSD_ADDRESS,
+
+  // Dollar
+  DAI: DAI_ADDRESS,
+  USDT: USDT_ADDRESS,
+  USDC: USDC_ADDRESS,
+  LUSD: LUSD_ADDRESS,
+  CRV3: CRV3_ADDRESS,
+
+  // Ether
+  ETH: ETH_ADDRESS,
+  WETH: WETH_ADDRESS,
+  stETH: STETH_ADDRESS,
+  wstETH: WSTETH_ADDRESS,
+  rETH: RETH_ADDRESS,
+  frxETH: FRXETH_ADDRESS,
+  sfrxETH: SFRXETH_ADDRESS,
+
+  // Non-stable
+  BAL: BAL_ADDRESS,
+} as const
+export type TokenSymbol = keyof typeof tokens
+export type TokenAddress = (typeof tokens)[TokenSymbol]
+
+// Strategy Helper Objects & Types
+export const strategies = {
+  oeth: {
+    ConvexEthMetaStrategy: '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63',
+    FraxETHStrategy: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
+    MorphoAaveStrategy: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
+    BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
+  },
+  ousd: {
+    ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
+    AaveStrategy: '0x5e3646a1db86993f73e6b74a57d8640b69f7e259',
+    MorphoCompoundStrategy: '0x5a4eee58744d1430876d5ca93cab5ccb763c037d',
+    MorphoAaveStrategy: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
+    FluxStrategy: '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44',
+    Generalized4626Strategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
+    CompoundStrategy: '0x9c459eeb3fa179a40329b81c1635525e9a0ef094', // Deprecated
+    ConvexStrategy: '0xea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3', // Deprecated
+    LUSDMetaStrategy: '0x7A192DD9Cc4Ea9bdEdeC9992df74F1DA55e60a19', // Deprecated
+  },
+} as const
+
+export type OETHStrategyKey = keyof typeof strategies.oeth
+export type OETHStrategyAddress = (typeof strategies.oeth)[OETHStrategyKey]
+export const oethStrategyArray = Object.values(strategies.oeth)
+export type OUSDStrategyKey = keyof typeof strategies.ousd
+export type OUSDStrategyAddress = (typeof strategies.ousd)[OUSDStrategyKey]
+export const ousdStrategyArray = Object.values(strategies.ousd)
+
+export const oeth = {
+  address: OETH_ADDRESS,
+  vault: OETH_VAULT_ADDRESS,
+  dripper: OETH_DRIPPER_ADDRESS,
+  zapper: OETH_ZAPPER_ADDRESS,
+  harvester: OETH_HARVESTER_ADDRESS,
+  vaultTokens: OETH_VAULT_ERC20_ADDRESSES,
+}
+
+export const ousd = {
+  address: OUSD_ADDRESS,
+  vault: OUSD_VAULT_ADDRESS,
+  dripper: OUSD_DRIPPER_ADDRESS,
+  harvester: OUSD_HARVESTER_ADDRESS,
+  vaultTokens: OUSD_VAULT_ERC20_ADDRESSES,
+}
+
+export const ogv = {
+  ogv: OGV_ADDRESS,
+  veOGV: VEOGV_ADDRESS,
+  governance: GOVERNANCE_ADDRESS,
+}
+
+export const addresses = {
+  tokens,
+  strategies,
+  oeth,
+  ousd,
+  ogv,
+}

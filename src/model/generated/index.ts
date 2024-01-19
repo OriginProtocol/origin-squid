@@ -1,3 +1,4 @@
+export * from "./processingStatus.model"
 export * from "./exchangeRate.model"
 export * from "./strategyBalance.model"
 export * from "./strategyYield.model"

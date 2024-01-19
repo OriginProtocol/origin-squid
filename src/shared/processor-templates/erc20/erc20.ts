@@ -3,7 +3,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import * as abi from '../../../abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State } from '../../../model'
 import { Context } from '../../../processor'
-import { ADDRESS_ZERO } from '../../../utils/addresses'
+import { ADDRESS_ZERO, TokenAddress } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '../../../utils/logFilter'
 import { multicall } from '../../../utils/multicall'
@@ -18,12 +18,11 @@ export const createERC20Tracker = ({
   intervalTracking = false,
 }: {
   from: number
-  address: string
+  address: TokenAddress
   accountFilter?: string[]
   rebaseFilters?: LogFilter[]
   intervalTracking?: boolean // To be used *with* `accountFilter`.
 }) => {
-  address = address.toLowerCase()
   accountFilter = accountFilter?.map((a) => a.toLowerCase())
   if (duplicateTracker.has(address)) {
     throw new Error('An ERC20 tracker was already created for: ' + address)

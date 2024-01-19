@@ -1,5 +1,11 @@
 # GENERATED, DO NOT MODIFY
 
+type ProcessingStatus @entity {
+  id: ID!
+  timestamp: DateTime!
+  blockNumber: Int!
+}
+
 """
 Any entity which has a price associated with it should have that price go in here.
 Prices can change very frequently and we don't want those changes on the same track

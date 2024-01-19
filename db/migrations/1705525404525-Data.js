@@ -1,7 +1,8 @@
-module.exports = class Data1704990176018 {
-    name = 'Data1704990176018'
+module.exports = class Data1705525404525 {
+    name = 'Data1705525404525'
 
     async up(db) {
+        await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c61a93768eed9e58ce399bbe01" ON "exchange_rate" ("block_number") `)
@@ -211,6 +212,7 @@ module.exports = class Data1704990176018 {
     }
 
     async down(db) {
+        await db.query(`DROP TABLE "processing_status"`)
         await db.query(`DROP TABLE "exchange_rate"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)
         await db.query(`DROP INDEX "public"."IDX_c61a93768eed9e58ce399bbe01"`)

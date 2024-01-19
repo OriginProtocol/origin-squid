@@ -20,6 +20,7 @@ import {
   RETH_ADDRESS,
   STETH_ADDRESS,
   WETH_ADDRESS,
+  addresses,
 } from '../../../utils/addresses'
 
 export const oethStrategies: readonly IStrategyData[] = [
@@ -27,7 +28,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     from: 17249899,
     name: 'OETH Convex ETH+OETH (AMO)',
     contractName: 'ConvexEthMetaStrategy',
-    address: '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63',
+    address: addresses.strategies.oeth.ConvexEthMetaStrategy,
     oTokenAddress: OETH_ADDRESS,
     kind: 'CurveAMO',
     curvePoolInfo: {
@@ -45,7 +46,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     from: 17067232,
     name: 'OETH Frax Staking',
     contractName: 'FraxETHStrategy',
-    address: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
+    address: addresses.strategies.oeth.FraxETHStrategy,
     oTokenAddress: OETH_ADDRESS,
     kind: 'Generic',
     base: { address: currencies.ETH, decimals: 18 },
@@ -67,7 +68,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     from: 18156225,
     name: 'OETH Aura rETH/WETH',
     contractName: 'BalancerMetaPoolStrategy',
-    address: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
+    address: addresses.strategies.oeth.BalancerMetaPoolStrategy,
     oTokenAddress: OETH_ADDRESS,
     kind: 'BalancerMetaStablePool',
     base: { address: currencies.ETH, decimals: 18 },
