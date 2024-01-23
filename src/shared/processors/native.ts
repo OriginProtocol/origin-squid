@@ -11,6 +11,11 @@ import {
 import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 import { getNativeBalances } from '../../utils/nativeBalance'
 
+/**
+ * We end up with a lot of initial 0 balance entities.
+ * This isn't ideal but probably not worth improving.
+ */
+
 const tracks = [
   ...ousdStrategyArray,
   OUSD_VAULT_ADDRESS,
