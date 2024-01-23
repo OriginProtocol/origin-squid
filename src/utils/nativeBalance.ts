@@ -17,6 +17,7 @@ export const getNativeBalances = async (
   addresses: string[],
   block: Context['blocks']['0'],
 ) => {
+  if (!addresses.length) return []
   return await ctx._chain.client
     .batchCall(
       addresses.map((address) => ({

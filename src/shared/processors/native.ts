@@ -1,4 +1,5 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { minBy } from 'lodash'
 
 import { NativeBalance } from '../../model'
 import { Context } from '../../processor'
@@ -17,16 +18,18 @@ import { getNativeBalances } from '../../utils/nativeBalance'
  */
 
 const tracks = [
-  ...ousdStrategyArray,
-  OUSD_VAULT_ADDRESS,
-  ...oethStrategyArray,
-  OETH_VAULT_ADDRESS,
+  {
+    from: 19072024, // As of this block, none of these addresses have ever held ETH.
+    addresses: [
+      ...ousdStrategyArray,
+      OUSD_VAULT_ADDRESS,
+      ...oethStrategyArray,
+      OETH_VAULT_ADDRESS,
+    ],
+  },
 ]
 
-const ousdFrom = 11362821
-const oethFrom = 16935276
-
-export const from = Math.min(ousdFrom, oethFrom)
+export const from = minBy(tracks, 'from')?.from ?? 19072024
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.includeAllBlocks({ from })
@@ -36,9 +39,12 @@ const updater = blockFrequencyUpdater({ from })
 export const process = async (ctx: Context) => {
   const results: NativeBalance[] = []
   await updater(ctx, async (ctx: Context, block: Context['blocks'][number]) => {
-    const balances = await getNativeBalances(ctx, tracks, block)
+    const addresses = tracks
+      .filter((track) => track.from <= block.header.height)
+      .flatMap((track) => track.addresses)
+    const balances = await getNativeBalances(ctx, addresses, block)
     results.push(
-      ...tracks.map(
+      ...addresses.map(
         (account, index) =>
           new NativeBalance({
             id: `${account}:${block.header.height}`,
