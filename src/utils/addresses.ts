@@ -73,7 +73,7 @@ export const OGV_ADDRESS = '0x9c354503c38481a7a7a51629142963f98ecc12d0'
 export const VEOGV_ADDRESS = '0x0c4576ca1c365868e162554af8e385dc3e7c66d9'
 
 // Token Helper Objects & Types
-export const tokens: Record<string, Lowercase<`0x${string}`>> = {
+export const tokens = {
   // Origin ERC20 Tokens
   OGN: OGN_ADDRESS,
   OGV: OGV_ADDRESS,

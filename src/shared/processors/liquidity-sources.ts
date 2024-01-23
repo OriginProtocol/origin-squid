@@ -54,15 +54,3 @@ registerLiquiditySource(
   LiquiditySourceType.Compound,
   '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
 )
-
-registerLiquiditySource(
-  '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap rETH/WETH
-  LiquiditySourceType.UniswapPool,
-  '0xae78736cd615f374d3085123a210448e74fc6393', // rETH
-)
-
-registerLiquiditySource(
-  '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap wstETH/WETH
-  LiquiditySourceType.UniswapPool,
-  '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0', // wstETH
-)

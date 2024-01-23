@@ -78,6 +78,17 @@ type StrategyDailyYield @entity {
   apy: Float!
 }
 
+type NativeBalance @entity {
+  """
+  Format: 'account:blockNumber'
+  """
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  account: String!
+  balance: BigInt!
+}
+
 type ERC20 @entity {
   """
   Format: 'address'
