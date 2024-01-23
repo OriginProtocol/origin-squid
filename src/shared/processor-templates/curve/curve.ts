@@ -5,12 +5,12 @@ import {
   CurvePool,
   CurvePoolBalance,
   CurvePoolRate,
-  LiquiditySource,
   LiquiditySourceType,
 } from '../../../model'
 import { Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { range } from '../../../utils/range'
+import { updateLiquidityBalances } from '../../post-processors/liquidity'
 import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 interface ProcessResult {
@@ -101,6 +101,11 @@ export const createCurveProcessor = ({
         balance0: balances[0] ?? 0n,
         balance1: balances[1] ?? 0n,
         balance2: balances[2] ?? 0n,
+      })
+      updateLiquidityBalances(ctx, block, {
+        address,
+        tokens,
+        balances,
       })
       result.curvePoolBalances.push(curve)
       result.curvePoolRates.push(

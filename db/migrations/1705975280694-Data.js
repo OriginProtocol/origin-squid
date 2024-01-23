@@ -1,5 +1,5 @@
-module.exports = class Data1705525404525 {
-    name = 'Data1705525404525'
+module.exports = class Data1705975280694 {
+    name = 'Data1705975280694'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -45,6 +45,9 @@ module.exports = class Data1705525404525 {
         await db.query(`CREATE INDEX "IDX_e8046e8a298610b97bea2e6241" ON "maverick_pool_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_6034a437728a8ccb3b49f4a348" ON "maverick_pool_balance" ("block_number") `)
         await db.query(`CREATE TABLE "liquidity_source" ("id" character varying NOT NULL, "address" text NOT NULL, "type" character varying(12) NOT NULL, "token" text NOT NULL, CONSTRAINT "PK_5d25173fd367a0a7a901ee2f738" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "liquidity_daily_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "token" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_bf1de97f9815d851f7b4abca9ca" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_c5116bd4f5406fc2848552f0ba" ON "liquidity_daily_balance" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_58d14205a5e9ad1d05f94d7bb6" ON "liquidity_daily_balance" ("block_number") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -255,6 +258,9 @@ module.exports = class Data1705525404525 {
         await db.query(`DROP INDEX "public"."IDX_e8046e8a298610b97bea2e6241"`)
         await db.query(`DROP INDEX "public"."IDX_6034a437728a8ccb3b49f4a348"`)
         await db.query(`DROP TABLE "liquidity_source"`)
+        await db.query(`DROP TABLE "liquidity_daily_balance"`)
+        await db.query(`DROP INDEX "public"."IDX_c5116bd4f5406fc2848552f0ba"`)
+        await db.query(`DROP INDEX "public"."IDX_58d14205a5e9ad1d05f94d7bb6"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)

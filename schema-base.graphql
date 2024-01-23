@@ -217,3 +217,12 @@ type LiquiditySource @entity {
   token: String!
 }
 
+type LiquidityDailyBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  token: String!
+  balance: BigInt!
+}
+

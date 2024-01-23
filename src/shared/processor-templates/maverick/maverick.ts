@@ -10,6 +10,7 @@ import {
 } from '../../../model'
 import { Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { updateLiquidityBalances } from '../../post-processors/liquidity'
 import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
@@ -57,10 +58,12 @@ export const createMaverickProcessor = ({
   name,
   address,
   from,
+  tokens,
 }: {
   name: string
   address: string
   from: number
+  tokens: [string, string]
 }) => {
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
@@ -86,6 +89,11 @@ export const createMaverickProcessor = ({
         binBalanceB: binBalanceB ?? 0n,
       })
       result.maverickPoolBalances.push(curve)
+      updateLiquidityBalances(ctx, block, {
+        address,
+        tokens,
+        balances: [binBalanceA, binBalanceB],
+      })
     })
     await ctx.store.insert(result.maverickPoolBalances)
   }

@@ -219,6 +219,15 @@ type LiquiditySource @entity {
   token: String!
 }
 
+type LiquidityDailyBalance @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  token: String!
+  balance: BigInt!
+}
+
 """
 The OETH entity tracks the change in total supply of OETH over time.
 """

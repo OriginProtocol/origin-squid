@@ -17,6 +17,7 @@ import { ADDRESS_ZERO, BALANCER_VAULT } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { Currency } from '../../post-processors/exchange-rates/currencies'
+import { updateLiquidityBalances } from '../../post-processors/liquidity'
 import { registerLiquiditySource } from '../../processors/liquidity-sources'
 
 const eth1 = BigInt('1000000000000000000')
@@ -104,6 +105,12 @@ export const createBalancerProcessor = (
         balance2: balances.length > 2 ? balances[2] : 0n,
         balance3: balances.length > 3 ? balances[3] : 0n,
       })
+      updateLiquidityBalances(ctx, block, {
+        address: poolAddress,
+        tokens,
+        balances,
+      })
+
       result.balancerPoolBalances.push(balance)
 
       if (poolType === 'Weighted') {

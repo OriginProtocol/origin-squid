@@ -1,5 +1,6 @@
 import { run } from './processor'
 import * as exchangeRates from './shared/post-processors/exchange-rates'
+import * as liquidity from './shared/post-processors/liquidity'
 import { processStatus } from './shared/processor-templates/processor-status'
 import * as balancer from './shared/processors/balancer'
 import * as curve from './shared/processors/curve'
@@ -10,7 +11,7 @@ import * as maverick from './shared/processors/maverick'
 export const processor = {
   stateSchema: 'other-processor',
   processors: [balancer, curve, maverick, ...erc20s(), liquiditySources],
-  postProcessors: [exchangeRates, processStatus('other')],
+  postProcessors: [exchangeRates, liquidity, processStatus('other')],
   validators: [],
 }
 export default processor
