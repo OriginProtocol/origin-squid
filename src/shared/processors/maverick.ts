@@ -26,6 +26,12 @@ const pools: (Parameters<typeof createMaverickProcessor>['0'] &
     from: Math.max(17216790, oethDeployFrom),
     tokens: [tokens.rETH, tokens.ETH],
   },
+  {
+    name: 'OETH-ETH',
+    address: '0xa51822839bfa4685b27ad60305264a37eae28a68',
+    from: Math.max(17444830, oethDeployFrom),
+    tokens: [tokens.OETH, tokens.ETH],
+  },
 ]
 
 export const setup = (processor: EvmBatchProcessor) => {

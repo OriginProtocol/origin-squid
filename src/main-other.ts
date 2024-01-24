@@ -8,6 +8,11 @@ import { erc20s } from './shared/processors/erc20s'
 import * as liquiditySources from './shared/processors/liquidity-sources'
 import * as maverick from './shared/processors/maverick'
 import * as native from './shared/processors/native'
+import * as sushiswap from './shared/processors/sushiswap'
+import * as uniswap from './shared/processors/uniswap'
+
+sushiswap.initialize()
+uniswap.initialize()
 
 export const processor = {
   stateSchema: 'other-processor',

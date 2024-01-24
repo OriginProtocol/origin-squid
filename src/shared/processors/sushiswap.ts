@@ -5,19 +5,7 @@ import { registerLiquiditySource } from './liquidity-sources'
 
 const pools = [
   {
-    address: '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613',
-    tokens: ['rETH', 'WETH'],
-  },
-  {
-    address: '0x553e9c493678d8606d6a5ba284643db2110df823',
-    tokens: ['rETH', 'WETH'],
-  },
-  {
-    address: '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa',
-    tokens: ['wstETH', 'WETH'],
-  },
-  {
-    address: '0x52299416c469843f4e0d54688099966a6c7d720f',
+    address: '0xf3e920bd7665d5e8e408dc4a3a765ade52314aaf',
     tokens: ['OETH', 'WETH'],
   },
 ] as const

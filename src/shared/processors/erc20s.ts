@@ -15,6 +15,8 @@ import { createERC20Tracker } from '../processor-templates/erc20'
 // TODO: Would be nice if interested parties could register their desires here from other parts of the code,
 //  allowing multiple declarations of need without issue.
 
+let initialized = false
+
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   // Origin Specific
   OGN: {
@@ -128,12 +130,19 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
 }
 
 // This is a function to allow others to subscribe to balance tracking
-export const erc20s = () => Object.values(tracks).map(createERC20Tracker)
+export const erc20s = () => {
+  initialized = true
+  return Object.values(tracks).map(createERC20Tracker)
+}
 
 export const addERC20Processing = (symbol: TokenSymbol, account: string) => {
+  if (initialized) {
+    throw new Error('erc20s already initialized, check load order')
+  }
   const track = tracks[symbol]
-  if (track && track.accountFilter) {
-    track.accountFilter.push(account)
+  if (track) {
+    // If there is no `accountFilter` then it is OK to have this as a noop. (we already want everything)
+    track.accountFilter?.push(account)
   } else {
     throw new Error(`Symbol ${symbol} not added to \`tracks\``)
   }
