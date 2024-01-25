@@ -10,6 +10,7 @@ import * as maverick from './shared/processors/maverick'
 import * as native from './shared/processors/native'
 import * as sushiswap from './shared/processors/sushiswap'
 import * as uniswap from './shared/processors/uniswap'
+import * as validate from './shared/validators/validate-shared'
 
 sushiswap.initialize()
 uniswap.initialize()
@@ -25,7 +26,7 @@ export const processor = {
     liquiditySources,
   ],
   postProcessors: [exchangeRates, liquidity, processStatus('other')],
-  validators: [],
+  validators: [validate],
 }
 export default processor
 
