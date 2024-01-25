@@ -301,6 +301,6 @@ function decodeOethZapperTx(transaction: Transaction) {
   }
 }
 
-function addressEq(a: string, b: string) {
-  return a.toLowerCase() === b.toLowerCase()
+function addressEq(a: string | undefined, b: string | undefined) {
+  return a?.toLowerCase() === b?.toLowerCase()
 }
