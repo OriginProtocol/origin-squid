@@ -10,6 +10,8 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 
+import { calculateBPS } from './utils/calculateBPS'
+
 dayjs.extend(duration)
 dayjs.extend(utc)
 
@@ -118,10 +120,8 @@ export const run = ({
       try {
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length > 1) {
-          const timespan =
-            ctx.blocks[ctx.blocks.length - 1].header.timestamp -
-            ctx.blocks[0].header.timestamp
-          ctx.bps = timespan / (ctx.blocks.length - 1) / 1000
+          ctx.bps = await calculateBPS(ctx)
+          // ctx.log.info({ bps: ctx.bps, length: ctx.blocks.length })
         }
 
         let start: number
