@@ -240,7 +240,7 @@ const expectations = {
       account: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
     },
     {
-      id: '17904321:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0x9283099A29556fCF8fFF5b2Cea2D4F67CB7A7A8b',
+      id: '17904321:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0x9283099a29556fcf8fff5b2cea2d4f67cb7a7a8b',
       timestamp: '2023-08-13T07:02:47.000000Z',
       blockNumber: 17904321,
       balance: '4081205214585785457',
@@ -248,7 +248,7 @@ const expectations = {
       account: '0x9283099a29556fcf8fff5b2cea2d4f67cb7a7a8b',
     },
     {
-      id: '17904321:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0x46d13D72dB5D05Bd2671312e321867AB8b30D9f6',
+      id: '17904321:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0x46d13d72db5d05bd2671312e321867ab8b30d9f6',
       timestamp: '2023-08-13T07:02:47.000000Z',
       blockNumber: 17904321,
       balance: '4081198559585393770',

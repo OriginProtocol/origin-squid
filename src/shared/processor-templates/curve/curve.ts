@@ -1,6 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import * as curveLpToken from '../../../abi/curve-lp-token'
+import * as curveLpToken2 from '../../../abi/curve-lp-token-2'
 import {
   CurvePool,
   CurvePoolBalance,
@@ -66,7 +67,9 @@ export const createCurveProcessor = ({
   address: string
   from: number
   tokens: string[]
-  ratesToPull?: { i: bigint; j: bigint; dx: bigint }[] | undefined
+  ratesToPull?:
+    | { i: bigint; j: bigint; dx: bigint; version?: 'int128' | 'uint256' }[]
+    | undefined
 }) => {
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
@@ -85,14 +88,21 @@ export const createCurveProcessor = ({
           range(tokens.length).map((n) => contract.balances(BigInt(n))),
         ),
         Promise.all(
-          (ratesToPull ?? []).map(async ({ i, j, dx }) => {
+          (ratesToPull ?? []).map(async ({ i, j, dx, version }) => {
+            const rateContract =
+              version === 'uint256'
+                ? new curveLpToken2.Contract(ctx, block.header, address)
+                : contract
             return {
               name: `${i}-${j}-${dx}`,
-              data: await contract.get_dy(i, j, dx),
+              data: await rateContract.get_dy(i, j, dx),
             }
           }),
         ),
-      ])
+      ]).catch((err) => {
+        ctx.log.error({ name, address })
+        throw err
+      })
       const curve = new CurvePoolBalance({
         id: `${address}-${timestampId}`,
         blockNumber: block.header.height,

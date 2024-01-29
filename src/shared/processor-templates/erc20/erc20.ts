@@ -109,6 +109,7 @@ export const createERC20Tracker = ({
       for (const block of ctx.blocks) {
         if (block.header.height < from) continue
         const contract = new abi.Contract(ctx, block.header, address)
+        const accounts = new Set<string>()
         const updateState = async () => {
           const id = `${block.header.height}:${address}`
           const totalSupply = await contract.totalSupply()
@@ -137,7 +138,8 @@ export const createERC20Tracker = ({
               address,
               accounts.map((account) => [account]),
             )
-            accounts.forEach((account, i) => {
+            accounts.forEach((_account, i) => {
+              const account = _account.toLowerCase()
               if (account === ADDRESS_ZERO) return
               const id = `${block.header.height}:${address}:${account}`
               const balance = new ERC20Balance({
@@ -145,7 +147,7 @@ export const createERC20Tracker = ({
                 timestamp: new Date(block.header.timestamp),
                 blockNumber: block.header.height,
                 address,
-                account: account.toLowerCase(),
+                account,
                 balance: balances[i],
               })
               result.balances.set(id, balance)
@@ -173,9 +175,8 @@ export const createERC20Tracker = ({
             await updateState()
           }
         }
-        const accounts = new Set<string>()
         let haveRebase = false
-        if (intervalTracker && intervalTracker(ctx, block) && accountFilter) {
+        if (accountFilter && intervalTracker && intervalTracker(ctx, block)) {
           await updateBalances(accountFilter)
         }
 
@@ -183,8 +184,8 @@ export const createERC20Tracker = ({
           const isTransferLog = transferLogFilters.find((l) => l.matches(log))
           if (isTransferLog) {
             const transfer = abi.events.Transfer.decode(log)
-            accounts.add(transfer.from)
-            accounts.add(transfer.to)
+            accounts.add(transfer.from.toLowerCase())
+            accounts.add(transfer.to.toLowerCase())
           }
           const isRebaseLog = rebaseFilters.find((l) => l.matches(log))
           if (isRebaseLog) {
