@@ -3,6 +3,10 @@ import { Context } from '../../processor'
 
 const sources = new Map<string, LiquiditySource>()
 
+export const initialize = async (ctx: Context) => {
+  await ctx.store.upsert([...sources.values()])
+}
+
 export const registerLiquiditySource = (
   address: string,
   type: LiquiditySourceType,
@@ -11,12 +15,6 @@ export const registerLiquiditySource = (
   const id = `${address}-${token}`
   sources.set(id, new LiquiditySource({ id, address, type, token }))
 }
-
-export const from = Number.MAX_SAFE_INTEGER // does not apply here
-export const initialize = async (ctx: Context) => {
-  await ctx.store.upsert([...sources.values()])
-}
-export const process = () => Promise.resolve()
 
 // Liquidity Source Definitions
 registerLiquiditySource(

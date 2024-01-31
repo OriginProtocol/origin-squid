@@ -13,6 +13,7 @@ import {
 } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { getBalancePoolRateProviders } from '../../post-processors/exchange-rates/price-routing'
+import { updateStrategyBalance } from '../../post-processors/liquidity-depth'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -44,6 +45,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
       strategyData,
     ).then((holdings) =>
       holdings.map(({ address, asset, balance }) => {
+        updateStrategyBalance(ctx, block, { token: asset, balance })
         return new StrategyBalance({
           id: `${address}:${asset}:${block.header.height}`,
           strategy: address,

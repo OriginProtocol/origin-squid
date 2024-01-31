@@ -19,24 +19,24 @@ const oneDayAgo = dayjs.utc().subtract(1, 'day').valueOf()
 const oneHourAgo = dayjs.utc().subtract(1, 'hour').valueOf()
 
 const getFrequency = (bps: number, timestamp: number) => {
-  let frequency = 1
   if (timestamp < oneYearAgo) {
-    frequency = (SECONDS_PER_WEEK / bps) ^ 0 // Older than one year ago
+    return (SECONDS_PER_WEEK / bps) ^ 0 // Older than one year ago
   } else if (timestamp < oneMonthAgo) {
-    frequency = (SECONDS_PER_DAY / bps) ^ 0 // Older than one month ago
+    return (SECONDS_PER_DAY / bps) ^ 0 // Older than one month ago
   } else if (timestamp < oneWeekAgo) {
-    frequency = (SECONDS_PER_DAY / bps / 4) ^ 0 // Older than one week ago
+    return (SECONDS_PER_DAY / bps / 4) ^ 0 // Older than one week ago
   } else if (timestamp < oneDayAgo) {
-    frequency = (SECONDS_PER_DAY / bps / 24) ^ 0 // Older than one day ago
+    return (SECONDS_PER_DAY / bps / 24) ^ 0 // Older than one day ago
   } else if (timestamp < oneHourAgo) {
-    frequency = ((SECONDS_PER_MINUTE * 5) / bps) ^ 0 // Older than one hour ago
-  } else {
-    frequency = (SECONDS_PER_MINUTE / bps) ^ 0
+    return ((SECONDS_PER_MINUTE * 5) / bps) ^ 0 // Older than one hour ago
   }
-  return frequency || 1
+  return (SECONDS_PER_MINUTE / bps) ^ 0
 }
 
-export const blockFrequencyTracker = (params: { from: number }) => {
+export const blockFrequencyTracker = (params: {
+  from: number
+  staticFrequency?: number
+}) => {
   let nextBlockToProcess = params.from
   const shouldProcess = (b: Block, frequency: number) => {
     let result = b.header.height >= nextBlockToProcess
@@ -49,12 +49,16 @@ export const blockFrequencyTracker = (params: { from: number }) => {
   return (ctx: Context, block: Block) => {
     if (block.header.height < params.from) return
     const { bps } = ctx
-    const frequency: number = getFrequency(bps, block.header.timestamp)
+    const frequency: number =
+      params.staticFrequency ?? getFrequency(bps, block.header.timestamp)
     return shouldProcess(block, frequency)
   }
 }
 
-export const blockFrequencyUpdater = (params: { from: number }) => {
+export const blockFrequencyUpdater = (params: {
+  from: number
+  staticFrequency?: number
+}) => {
   let nextBlockToProcess = params.from
   const shouldProcess = (b: Block) => {
     return b.header.height >= nextBlockToProcess
@@ -66,14 +70,18 @@ export const blockFrequencyUpdater = (params: { from: number }) => {
     if (!ctx.blocks.length) return
     // If we're not at head, determine our frequency and then process.
     const { bps } = ctx
-    let frequency: number = getFrequency(bps, ctx.blocks[0].header.timestamp)
+    let frequency: number =
+      params.staticFrequency ??
+      getFrequency(bps, ctx.blocks[0].header.timestamp)
+
     for (let i = 0; i < ctx.blocks.length; i += frequency) {
       const block = ctx.blocks[i]
       if (!shouldProcess(block)) continue
       await fn(ctx, block)
       nextBlockToProcess =
         Math.floor((block.header.height + frequency) / frequency) * frequency
-      frequency = getFrequency(bps, block.header.timestamp)
+      frequency =
+        params.staticFrequency ?? getFrequency(bps, block.header.timestamp)
     }
   }
 }

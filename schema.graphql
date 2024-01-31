@@ -239,7 +239,17 @@ type LiquidityDailyBalance @entity {
   balance: BigInt!
 }
 
-"""
+type LiquidityDepth @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  name: String! @index
+  from: String! @index
+  fromAmount: BigInt!
+  to: String! @index
+  toAmount: BigInt!
+}"""
 The OETH entity tracks the change in total supply of OETH over time.
 """
 type OETH @entity {

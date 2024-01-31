@@ -6,6 +6,7 @@ import { Block, Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { ensureExchangeRates } from '../../post-processors/exchange-rates'
 import { CurrencyAddress } from '../../post-processors/exchange-rates/currencies'
+import { updateStrategyBalance } from '../../post-processors/liquidity-depth'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -54,6 +55,9 @@ const getStrategyHoldings = async (
   const { assets, address } = strategyData
   const promises = assets.map(async (asset) => {
     const balances = await getStrategyBalances(ctx, block.header, strategyData)
+    const balance =
+      balances.find((b) => b.asset === asset.address)?.balance ?? 0n
+    updateStrategyBalance(ctx, block, { token: asset.address, balance })
     return new StrategyBalance({
       id: `${address}:${asset.address}:${block.header.height}`,
       strategy: address,

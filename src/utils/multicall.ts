@@ -26,5 +26,8 @@ export const multicall = async <Args extends any[], R>(
     ],
   }))
   const results = await ctx._chain.client.batchCall(batchCalls)
-  return results.map((r) => func.decodeResult(r))
+  return results.map((r) => {
+    ctx.log.info({ r })
+    return func.decodeResult(r)
+  })
 }

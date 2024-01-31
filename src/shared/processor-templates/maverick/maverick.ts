@@ -10,8 +10,10 @@ import {
 } from '../../../model'
 import { Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
-import { updateLiquidityBalances } from '../../post-processors/liquidity'
-import { registerLiquiditySource } from '../../processors/liquidity-sources'
+import {
+  registerLiquiditySource,
+  updateLiquidityBalances,
+} from '../../liquidity'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
 

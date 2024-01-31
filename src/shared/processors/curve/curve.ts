@@ -13,7 +13,7 @@ const oethDeployFrom = 16933090
 
 export const from = Math.min(ousdResetFrom, oethDeployFrom)
 
-const pools: (Parameters<typeof createCurveInitializer>['0'] &
+export const curvePools: (Parameters<typeof createCurveInitializer>['0'] &
   Parameters<typeof createCurveProcessor>['0'])[] = [
   // Curve (OUSD)
   {
@@ -76,9 +76,8 @@ const pools: (Parameters<typeof createCurveInitializer>['0'] &
     address: '0x0f3159811670c117c372428d4e69ac32325e4d0f',
     from: Math.max(16615906, oethDeployFrom),
     tokens: [tokens.ETH, tokens.rETH],
-    ratesToPull: [
-      { i: 1n, j: 0n, dx: 1_000000000_000000000n, version: 'uint256' },
-    ],
+    version_get_dy: 'uint256',
+    ratesToPull: [{ i: 1n, j: 0n, dx: 1_000000000_000000000n }],
   },
   {
     name: 'factory-v2-274: stETH/frxETH',
@@ -109,40 +108,41 @@ const pools: (Parameters<typeof createCurveInitializer>['0'] &
     address: '0xe7c6e0a739021cdba7aac21b4b728779eef974d9',
     from: Math.max(16684327, oethDeployFrom),
     tokens: [tokens.rETH, tokens.frxETH],
+    version_get_dy: 'uint256',
     ratesToPull: [
-      { i: 0n, j: 1n, dx: 1_000000000_000000000n, version: 'uint256' },
-      { i: 1n, j: 0n, dx: 1_000000000_000000000n, version: 'uint256' },
+      { i: 0n, j: 1n, dx: 1_000000000_000000000n },
+      { i: 1n, j: 0n, dx: 1_000000000_000000000n },
     ],
   },
   {
     name: 'factory-tricrypto-14: wstETH/rETH/sfrxETH',
     address: '0x2570f1bd5d2735314fc102eb12fc1afe9e6e7193',
-    from: Math.max(18084222, oethDeployFrom),
+    from: Math.max(18148430, oethDeployFrom),
     tokens: [tokens.wstETH, tokens.rETH, tokens.sfrxETH],
     ratesToPull: [
-      { i: 0n, j: 1n, dx: 1_000000000_000000000n },
-      { i: 0n, j: 2n, dx: 1_000000000_000000000n },
-      { i: 1n, j: 0n, dx: 1_000000000_000000000n },
-      { i: 1n, j: 2n, dx: 1_000000000_000000000n },
-      { i: 2n, j: 0n, dx: 1_000000000_000000000n },
-      { i: 2n, j: 1n, dx: 1_000000000_000000000n },
+      // { i: 0n, j: 1n, dx: 1_000000000_000000000n },
+      // { i: 0n, j: 2n, dx: 1_000000000_000000000n },
+      // { i: 1n, j: 0n, dx: 1_000000000_000000000n },
+      // { i: 1n, j: 2n, dx: 1_000000000_000000000n },
+      // { i: 2n, j: 0n, dx: 1_000000000_000000000n },
+      // { i: 2n, j: 1n, dx: 1_000000000_000000000n },
     ],
   },
 ]
 
 export const setup = (processor: EvmBatchProcessor) => {
-  for (const pool of pools) {
+  for (const pool of curvePools) {
     createCurveSetup(pool.from, processor)
   }
 }
 
-const initializers = pools.map((pool) => createCurveInitializer(pool))
+const initializers = curvePools.map((pool) => createCurveInitializer(pool))
 
 export const initialize = async (ctx: Context) => {
   await Promise.all(initializers.map((p) => p(ctx)))
 }
 
-const processors = pools.map((pool) => createCurveProcessor(pool))
+const processors = curvePools.map((pool) => createCurveProcessor(pool))
 
 export const process = async (ctx: Context) => {
   await Promise.all(processors.map((p) => p(ctx)))

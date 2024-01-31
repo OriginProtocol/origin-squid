@@ -11,6 +11,7 @@ import * as vault from './oeth/processors/vault'
 import * as validateOeth from './oeth/validators/validate-oeth'
 import { run } from './processor'
 import * as exchangeRatesPostProcessor from './shared/post-processors/exchange-rates'
+import * as liquidityDepthPostProcessor from './shared/post-processors/liquidity-depth'
 import { processStatus } from './shared/processor-templates/processor-status'
 
 export const processor = {
@@ -28,6 +29,7 @@ export const processor = {
   ],
   postProcessors: [
     exchangeRatesPostProcessor,
+    liquidityDepthPostProcessor,
     dailyStats,
     processStatus('oeth'),
   ],

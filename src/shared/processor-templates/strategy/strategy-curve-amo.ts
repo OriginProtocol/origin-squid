@@ -7,6 +7,7 @@ import { StrategyBalance } from '../../../model'
 import { Block, Context } from '../../../processor'
 import { ETH_ADDRESS, WETH_ADDRESS } from '../../../utils/addresses'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
+import { updateStrategyBalance } from '../../post-processors/liquidity-depth'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -46,6 +47,7 @@ const getCurveAMOStrategyHoldings = async (
 ): Promise<StrategyBalance[]> => {
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
   return balances.map(({ address, asset, balance }) => {
+    updateStrategyBalance(ctx, block, { token: asset, balance })
     return new StrategyBalance({
       id: `${address}:${asset}:${block.header.height}`,
       strategy: address,

@@ -1,23 +1,30 @@
 import dayjs from 'dayjs'
 
 import { LiquidityDailyBalance } from '../../model'
-import { Context } from '../../processor'
+import { Block, Context } from '../../processor'
 import { useProcessorState } from '../../utils/state'
 
-const useLiquidityDailyBalance = (ctx: Context) =>
-  useProcessorState(
-    ctx,
-    'liquidity-daily-balance',
-    new Map<string, LiquidityDailyBalance>(),
-  )
-
-export const process = async (ctx: Context) => {
+export const postProcess = async (ctx: Context) => {
   const [ldb] = useLiquidityDailyBalance(ctx)
   if (ldb.size > 0) {
     ctx.log.debug({ count: ldb.size }, 'liquidity-daily-balance')
     await ctx.store.upsert([...ldb.values()])
   }
 }
+
+export const useLiquidityDailyBalance = (ctx: Context) =>
+  useProcessorState(
+    ctx,
+    'liquidity-daily-balance',
+    new Map<string, LiquidityDailyBalance>(),
+  )
+
+export const useLiquidityBalance = (ctx: Context) =>
+  useProcessorState(
+    ctx,
+    'liquidity-balance',
+    {} as Record<string, bigint | undefined>,
+  )
 
 export const updateLiquidityBalances = (
   ctx: Context,
@@ -29,17 +36,33 @@ export const updateLiquidityBalances = (
   },
 ) => {
   for (let i = 0; i < params.tokens.length; i++) {
-    updateLiquidityBalance(ctx, block, {
+    const updateParams = {
       address: params.address,
       token: params.tokens[0],
       balance: params.balances[0],
-    })
+    }
+    updateLiquidityBalance(ctx, block, updateParams)
+    updateLiquidityDailyBalance(ctx, block, updateParams)
   }
 }
 
 export const updateLiquidityBalance = (
   ctx: Context,
-  block: Context['blocks'][number],
+  block: Block,
+  params: {
+    address: string
+    token: string
+    balance: bigint
+  },
+) => {
+  const [liquidityBalances] = useLiquidityBalance(ctx)
+  const key = `${block.header.height}:${params.token}`
+  liquidityBalances[key] = (liquidityBalances[key] ?? 0n) + params.balance
+}
+
+export const updateLiquidityDailyBalance = (
+  ctx: Context,
+  block: Block,
   params: Pick<LiquidityDailyBalance, 'address' | 'token' | 'balance'>,
 ) => {
   const [ldb] = useLiquidityDailyBalance(ctx)

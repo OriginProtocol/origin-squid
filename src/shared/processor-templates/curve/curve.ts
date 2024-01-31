@@ -8,11 +8,13 @@ import {
   CurvePoolRate,
   LiquiditySourceType,
 } from '../../../model'
-import { Context } from '../../../processor'
+import { Block, Context } from '../../../processor'
 import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
 import { range } from '../../../utils/range'
-import { updateLiquidityBalances } from '../../post-processors/liquidity'
-import { registerLiquiditySource } from '../../processors/liquidity-sources'
+import {
+  registerLiquiditySource,
+  updateLiquidityBalances,
+} from '../../liquidity'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]
@@ -35,7 +37,8 @@ export const createCurveInitializer = ({
   address: string
   tokens: [string, string] | [string, string, string]
 }) => {
-  for (const token of tokens) {
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i]
     registerLiquiditySource(address, LiquiditySourceType.CurvePool, token)
   }
   return async (ctx: Context) => {
@@ -61,15 +64,15 @@ export const createCurveProcessor = ({
   address,
   from,
   tokens,
+  version_get_dy,
   ratesToPull,
 }: {
   name: string
   address: string
   from: number
   tokens: string[]
-  ratesToPull?:
-    | { i: bigint; j: bigint; dx: bigint; version?: 'int128' | 'uint256' }[]
-    | undefined
+  version_get_dy?: 'int128' | 'uint256'
+  ratesToPull?: { i: bigint; j: bigint; dx: bigint }[] | undefined
 }) => {
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
@@ -80,7 +83,7 @@ export const createCurveProcessor = ({
     await update(ctx, async (ctx, block) => {
       const timestamp = new Date(block.header.timestamp)
       const timestampId = timestamp.toISOString()
-      const contract = new curveLpToken.Contract(ctx, block.header, address)
+      const contract = getCurveContract(ctx, block, address, version_get_dy)
 
       // TODO: use `get_balances()` where possible
       const [balances, rates] = await Promise.all([
@@ -88,14 +91,10 @@ export const createCurveProcessor = ({
           range(tokens.length).map((n) => contract.balances(BigInt(n))),
         ),
         Promise.all(
-          (ratesToPull ?? []).map(async ({ i, j, dx, version }) => {
-            const rateContract =
-              version === 'uint256'
-                ? new curveLpToken2.Contract(ctx, block.header, address)
-                : contract
+          (ratesToPull ?? []).map(async ({ i, j, dx }) => {
             return {
               name: `${i}-${j}-${dx}`,
-              data: await rateContract.get_dy(i, j, dx),
+              data: await contract.get_dy(i, j, dx),
             }
           }),
         ),
@@ -135,4 +134,15 @@ export const createCurveProcessor = ({
     await ctx.store.insert(result.curvePoolBalances)
     await ctx.store.insert(result.curvePoolRates)
   }
+}
+
+export const getCurveContract = (
+  ctx: Context,
+  block: Block,
+  address: string,
+  version_get_dy?: 'int128' | 'uint256',
+) => {
+  return version_get_dy === 'uint256'
+    ? new curveLpToken2.Contract(ctx, block.header, address)
+    : new curveLpToken.Contract(ctx, block.header, address)
 }

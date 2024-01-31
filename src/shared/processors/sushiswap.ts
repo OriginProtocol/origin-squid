@@ -1,7 +1,7 @@
 import { LiquiditySourceType } from '../../model'
 import { addresses } from '../../utils/addresses'
+import { registerLiquiditySource } from '../liquidity'
 import { addERC20Processing } from './erc20s'
-import { registerLiquiditySource } from './liquidity-sources'
 
 const pools = [
   {
