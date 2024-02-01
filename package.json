@@ -12,6 +12,7 @@
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:other": "sqd process:other",
+    "process:lrt": "sqd process:lrt",
     "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
   },
   "dependencies": {
