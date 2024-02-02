@@ -9,19 +9,20 @@ type LRTDeposit @entity {
   referralId: String!
 }
 
-type LRTDepositorPointData @entity {
+type LRTPointData @entity {
   id: ID! @index
-  depositor: LRTDepositor! @index
+  recipient: LRTPointRecipient! @index
   name: String!
+  staticPoints: BigInt!
   balance: BigInt!
-  startDate: DateTime!
-  endDate: DateTime
+  startDate: DateTime! @index
+  endDate: DateTime @index
 }
 
 
-type LRTDepositor @entity {
+type LRTPointRecipient @entity {
   id: ID! @index
-  pointData: [LRTDepositorPointData]! @derivedFrom(field: "depositor")
+  pointData: [LRTPointData]! @derivedFrom(field: "recipient")
 }
 
 type LRTPointDataAggregate @entity {

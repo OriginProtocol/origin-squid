@@ -2,7 +2,7 @@ import { Arg, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 
 import { calculatePoints } from '../lrt'
-import { LRTDepositorPointData, LRTPointDataAggregate } from '../model'
+import { LRTPointData, LRTPointDataAggregate } from '../model'
 
 @Resolver()
 export class LRTResolver {
@@ -12,14 +12,15 @@ export class LRTResolver {
   async lrtDepositorPoints(@Arg('address') address: string): Promise<bigint> {
     const manager = await this.tx()
     const results = await manager
-      .getRepository(LRTDepositorPointData)
-      .find({ where: { depositor: { id: address.toLowerCase() } } })
+      .getRepository(LRTPointData)
+      .find({ where: { recipient: { id: address.toLowerCase() } } })
     console.log(address.toLowerCase())
     console.log(results)
     if (!results.length) return 0n
     return results.reduce((sum, data) => {
       return (
         sum +
+        data.staticPoints +
         calculatePoints(
           data.startDate.getTime(),
           (data.endDate ?? new Date()).getTime(),

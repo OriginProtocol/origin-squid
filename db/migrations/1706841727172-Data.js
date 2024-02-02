@@ -1,5 +1,5 @@
-module.exports = class Data1706818014963 {
-    name = 'Data1706818014963'
+module.exports = class Data1706841727172 {
+    name = 'Data1706841727172'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -54,9 +54,11 @@ module.exports = class Data1706818014963 {
         await db.query(`CREATE TABLE "lrt_deposit" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "depositor" text NOT NULL, "asset" text NOT NULL, "deposit_amount" numeric NOT NULL, "amount_received" numeric NOT NULL, "referral_id" text NOT NULL, CONSTRAINT "PK_ad21ac1aaeea740bd658dd5b7f5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1710650fa59a4c8ff61af698b3" ON "lrt_deposit" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_14fae3388d6cb222f07f3d2584" ON "lrt_deposit" ("block_number") `)
-        await db.query(`CREATE TABLE "lrt_depositor" ("id" character varying NOT NULL, CONSTRAINT "PK_26c35c81edf344a02c2d30857f0" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "lrt_depositor_point_data" ("id" character varying NOT NULL, "name" text NOT NULL, "balance" numeric NOT NULL, "start_date" TIMESTAMP WITH TIME ZONE NOT NULL, "end_date" TIMESTAMP WITH TIME ZONE, "depositor_id" character varying, CONSTRAINT "PK_ea8bb9858c30c7613771e2e2e8c" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_5c028cad09397598393970aa5e" ON "lrt_depositor_point_data" ("depositor_id") `)
+        await db.query(`CREATE TABLE "lrt_point_recipient" ("id" character varying NOT NULL, CONSTRAINT "PK_d92d1946162990fb7f6e9418211" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "lrt_point_data" ("id" character varying NOT NULL, "name" text NOT NULL, "static_points" numeric NOT NULL, "balance" numeric NOT NULL, "start_date" TIMESTAMP WITH TIME ZONE NOT NULL, "end_date" TIMESTAMP WITH TIME ZONE, "recipient_id" character varying, CONSTRAINT "PK_3e89f6ffe2053dd5918ec35328a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_7581a8879db0e18a03123e4caa" ON "lrt_point_data" ("recipient_id") `)
+        await db.query(`CREATE INDEX "IDX_86a36a41c48b61e67f52622d85" ON "lrt_point_data" ("start_date") `)
+        await db.query(`CREATE INDEX "IDX_5f4917548924b528f8c39aa178" ON "lrt_point_data" ("end_date") `)
         await db.query(`CREATE TABLE "lrt_point_data_aggregate" ("id" character varying NOT NULL, "name" text NOT NULL, "balance" numeric NOT NULL, "start_date" TIMESTAMP WITH TIME ZONE NOT NULL, "end_date" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_a945211c5018b5f814baeae6f82" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ce5674964929ce0237e9bbc84b" ON "lrt_point_data_aggregate" ("name") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
@@ -204,7 +206,7 @@ module.exports = class Data1706818014963 {
         await db.query(`CREATE TABLE "ousd_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_eth7_day" numeric NOT NULL, "yield_eth_all_time" numeric NOT NULL, "yield_usd" numeric NOT NULL, "yield_usd7_day" numeric NOT NULL, "yield_usd_all_time" numeric NOT NULL, "fees_eth" numeric NOT NULL, "fees_eth7_day" numeric NOT NULL, "fees_eth_all_time" numeric NOT NULL, "fees_usd" numeric NOT NULL, "fees_usd7_day" numeric NOT NULL, "fees_usd_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_f8adaf321a99f2b4b877c262880" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f9020d89932aad2d0de8923490" ON "ousd_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_0bb5f72bf5fa59ce8c232caa4c" ON "ousd_daily_stat" ("timestamp") `)
-        await db.query(`ALTER TABLE "lrt_depositor_point_data" ADD CONSTRAINT "FK_5c028cad09397598393970aa5e8" FOREIGN KEY ("depositor_id") REFERENCES "lrt_depositor"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "lrt_point_data" ADD CONSTRAINT "FK_7581a8879db0e18a03123e4caae" FOREIGN KEY ("recipient_id") REFERENCES "lrt_point_recipient"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_history" ADD CONSTRAINT "FK_94e47c4c49128c78f60b185b46b" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase" ADD CONSTRAINT "FK_3331819842173de7c27c046547a" FOREIGN KEY ("apy_id") REFERENCES "oethapy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase_option" ADD CONSTRAINT "FK_034428879698039839b4ba6ffe8" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -279,9 +281,11 @@ module.exports = class Data1706818014963 {
         await db.query(`DROP TABLE "lrt_deposit"`)
         await db.query(`DROP INDEX "public"."IDX_1710650fa59a4c8ff61af698b3"`)
         await db.query(`DROP INDEX "public"."IDX_14fae3388d6cb222f07f3d2584"`)
-        await db.query(`DROP TABLE "lrt_depositor"`)
-        await db.query(`DROP TABLE "lrt_depositor_point_data"`)
-        await db.query(`DROP INDEX "public"."IDX_5c028cad09397598393970aa5e"`)
+        await db.query(`DROP TABLE "lrt_point_recipient"`)
+        await db.query(`DROP TABLE "lrt_point_data"`)
+        await db.query(`DROP INDEX "public"."IDX_7581a8879db0e18a03123e4caa"`)
+        await db.query(`DROP INDEX "public"."IDX_86a36a41c48b61e67f52622d85"`)
+        await db.query(`DROP INDEX "public"."IDX_5f4917548924b528f8c39aa178"`)
         await db.query(`DROP TABLE "lrt_point_data_aggregate"`)
         await db.query(`DROP INDEX "public"."IDX_ce5674964929ce0237e9bbc84b"`)
         await db.query(`DROP TABLE "oeth"`)
@@ -429,7 +433,7 @@ module.exports = class Data1706818014963 {
         await db.query(`DROP TABLE "ousd_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_f9020d89932aad2d0de8923490"`)
         await db.query(`DROP INDEX "public"."IDX_0bb5f72bf5fa59ce8c232caa4c"`)
-        await db.query(`ALTER TABLE "lrt_depositor_point_data" DROP CONSTRAINT "FK_5c028cad09397598393970aa5e8"`)
+        await db.query(`ALTER TABLE "lrt_point_data" DROP CONSTRAINT "FK_7581a8879db0e18a03123e4caae"`)
         await db.query(`ALTER TABLE "oeth_history" DROP CONSTRAINT "FK_94e47c4c49128c78f60b185b46b"`)
         await db.query(`ALTER TABLE "oeth_rebase" DROP CONSTRAINT "FK_3331819842173de7c27c046547a"`)
         await db.query(`ALTER TABLE "oeth_rebase_option" DROP CONSTRAINT "FK_034428879698039839b4ba6ffe8"`)
