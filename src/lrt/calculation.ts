@@ -16,7 +16,9 @@ export const calculateRecipientsPoints = (
 ) => {
   let totalPoints = 0n
   for (const recipient of recipients) {
-    totalPoints += calculatePoints(timestamp, recipient.balanceData)
+    recipient.points = calculatePoints(timestamp, recipient.balanceData)
+    recipient.pointsDate = new Date(timestamp)
+    totalPoints += recipient.points
   }
   return totalPoints
 }

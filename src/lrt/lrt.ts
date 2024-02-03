@@ -1,8 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
-import { countBy } from 'lodash'
+import { countBy, remove } from 'lodash'
 import { MoreThan } from 'typeorm'
-import { parseEther } from 'viem'
 
 import * as erc20 from '../abi/erc20'
 import * as abi from '../abi/lrt-deposit-pool'
@@ -45,8 +44,9 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog(transferFilter.value)
 }
 export const process = async (ctx: Context) => {
+  // ============================
+  // Process chain data
   const [state] = useLrtState(ctx)
-
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       if (depositFilter.matches(log)) {
@@ -58,11 +58,15 @@ export const process = async (ctx: Context) => {
     }
   }
 
+  // ============================
+  // Save
   await ctx.store.insert(state.deposits)
   await ctx.store.upsert([...state.recipients.values()])
   await ctx.store.insert(state.balanceData)
   await ctx.store.insert(state.balanceCondition)
 
+  // ============================
+  // Do point calculations, maybe
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
   const lastSummary = await ctx.store
     .find(LRTSummary, {
@@ -99,6 +103,7 @@ export const process = async (ctx: Context) => {
       points: calculateRecipientsPoints(lastBlock.header.timestamp, recipients),
     })
     await ctx.store.insert(summary)
+    await ctx.store.save(recipients)
 
     // Save Updated Balance Data (from `calculateRecipientsPoints`)
     const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
@@ -118,6 +123,9 @@ export const process = async (ctx: Context) => {
         countBy(expiredConditions, 'name'),
         'Removing expired conditions',
       )
+      if (expiredConditions.length < 20) {
+        ctx.log.info(expiredConditions)
+      }
     }
     await ctx.store.remove(expiredConditions)
   }
@@ -146,6 +154,7 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
   state.deposits.push(deposit)
   await addPoints(ctx, {
     log,
+    depositAsset: deposit.asset,
     recipient: deposit.depositor,
     timestamp: deposit.timestamp,
     balance: deposit.amountReceived,
@@ -170,6 +179,7 @@ const addPoints = async (
     timestamp: Date
     recipient: string
     balance: bigint
+    depositAsset?: string
     conditionNameFilter?: string
   },
 ) => {
@@ -187,25 +197,27 @@ const addPoints = async (
   recipient.balanceData.push(balanceData)
   state.balanceData.push(balanceData)
 
-  for (const condition of pointConditions.filter(
-    (c) => !params.conditionNameFilter || c.name === params.conditionNameFilter,
-  )) {
-    if (!condition.endDate || params.timestamp < condition.endDate) {
-      const balanceCondition = new LRTBalanceCondition({
-        balanceData,
-        id: `${params.log.id}:${condition.name}`,
-        name: condition.name,
-        multiplier: condition.multiplier,
-        startDate: params.timestamp,
-        endDate: condition.endDate,
-      })
-      balanceData.conditions.push(balanceCondition)
-      state.balanceCondition.push(balanceCondition)
+  const conditions = pointConditions.filter(
+    (c) =>
+      (!params.conditionNameFilter || c.name === params.conditionNameFilter) &&
+      (!c.asset || params.depositAsset === c.asset) &&
+      (!c.endDate || params.timestamp < c.endDate),
+  )
+  for (const condition of conditions) {
+    const balanceCondition = new LRTBalanceCondition({
+      balanceData,
+      id: `${params.log.id}:${condition.name}`,
+      name: condition.name,
+      multiplier: condition.multiplier,
+      startDate: params.timestamp,
+      endDate: condition.endDate,
+    })
+    balanceData.conditions.push(balanceCondition)
+    state.balanceCondition.push(balanceCondition)
 
-      // ctx.log.info(
-      //   `Added ${points.balance} from ${condition.name} points for ${recipient.id}`,
-      // )
-    }
+    // ctx.log.info(
+    //   `Added ${points.balance} from ${condition.name} points for ${recipient.id}`,
+    // )
   }
 }
 
@@ -218,6 +230,7 @@ const removePoints = async (
     balance: bigint
   },
 ) => {
+  const [state] = useLrtState(ctx)
   const recipient = await getRecipient(ctx, params.recipient)
   recipient.balance -= params.balance
   let amountToRemove = params.balance
@@ -245,6 +258,12 @@ const removePoints = async (
       } else {
         data.balance -= amountToRemove
         amountToRemove = 0n
+      }
+    }
+    if (data.balance === 0n && data.staticPoints === 0n) {
+      remove(state.balanceData, data)
+      for (const condition of data.conditions) {
+        remove(state.balanceCondition, condition)
       }
     }
   }

@@ -1,15 +1,22 @@
-import { tokens } from '../utils/addresses'
+import { TokenAddress, tokens } from '../utils/addresses'
 
 const eth = (val: bigint) => val * 1_000000000_000000000n
 
-export const pointConditions = [
-  { name: 'oeth-2x', asset: tokens.OETH, endDate: null, multiplier: 100n },
+interface PointCondition {
+  name: string
+  multiplier: bigint
+  asset?: TokenAddress
+  endDate?: Date
+}
+
+export const pointConditions: PointCondition[] = [
+  { name: 'oeth-2x', asset: tokens.OETH, multiplier: 100n },
   { name: 'week1-5x', endDate: new Date('2024-01-06'), multiplier: 100n },
   { name: 'week1-4x', endDate: new Date('2024-01-07'), multiplier: 100n },
   { name: 'week1-3x', endDate: new Date('2024-01-08'), multiplier: 100n },
   { name: 'week1-2x', endDate: new Date('2024-01-09'), multiplier: 100n },
-  { name: 'standard', endDate: null, multiplier: 100n },
-] as const
+  { name: 'standard', multiplier: 100n },
+]
 
 // Maintain Order
 export const balanceBonuses = [
