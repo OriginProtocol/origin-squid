@@ -5,6 +5,7 @@ import {
   LRTBalanceCondition,
   LRTBalanceData,
   LRTDeposit,
+  LRTNodeDelegator,
   LRTPointRecipient,
 } from '../model'
 import { Context } from '../processor'
@@ -12,11 +13,12 @@ import { useProcessorState } from '../utils/state'
 
 export const useLrtState = (ctx: Context) =>
   useProcessorState(ctx, 'lrt-processor', {
-    deposits: [] as LRTDeposit[],
+    deposits: new Map<string, LRTDeposit>(),
     recipients: new Map<string, LRTPointRecipient>(),
-    balanceData: [] as LRTBalanceData[],
-    balanceCondition: [] as LRTBalanceCondition[],
-  })
+    balanceData: new Map<string, LRTBalanceData>(),
+    balanceCondition: new Map<string, LRTBalanceCondition>(),
+    nodeDelegators: new Map<string, LRTNodeDelegator>(),
+  })[0]
 
 export const getBalanceDataForRecipient = async (
   ctx: Context,
@@ -44,8 +46,8 @@ export const getBalanceDataForRecipient = async (
       },
     ],
   })
-  const [state] = useLrtState(ctx)
-  const localResults = state.balanceData.filter((d) => {
+  const state = useLrtState(ctx)
+  const localResults = Array.from(state.balanceData.values()).filter((d) => {
     return (
       d.recipient.id === recipient &&
       d.balance > 0n &&
@@ -58,7 +60,7 @@ export const getBalanceDataForRecipient = async (
 }
 
 export const getRecipient = async (ctx: Context, id: string) => {
-  const [state] = useLrtState(ctx)
+  const state = useLrtState(ctx)
   let depositor = state.recipients.get(id)
   if (!depositor) {
     depositor = await ctx.store.get(LRTPointRecipient, {

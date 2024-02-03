@@ -11,10 +11,10 @@ interface PointCondition {
 
 export const pointConditions: PointCondition[] = [
   { name: 'oeth-2x', asset: tokens.OETH, multiplier: 100n },
-  { name: 'week1-5x', endDate: new Date('2024-01-06'), multiplier: 100n },
-  { name: 'week1-4x', endDate: new Date('2024-01-07'), multiplier: 100n },
-  { name: 'week1-3x', endDate: new Date('2024-01-08'), multiplier: 100n },
-  { name: 'week1-2x', endDate: new Date('2024-01-09'), multiplier: 100n },
+  { name: 'week1-5x', endDate: new Date('2024-02-06'), multiplier: 100n },
+  { name: 'week1-4x', endDate: new Date('2024-02-07'), multiplier: 100n },
+  { name: 'week1-3x', endDate: new Date('2024-02-08'), multiplier: 100n },
+  { name: 'week1-2x', endDate: new Date('2024-02-09'), multiplier: 100n },
   { name: 'standard', multiplier: 100n },
 ]
 

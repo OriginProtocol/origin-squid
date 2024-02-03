@@ -1,8 +1,8 @@
 import { Arg, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 
-import { calculatePoints } from '../lrt/calculation'
-import { LRTBalanceData } from '../model'
+import { calculateRecipientsPoints } from '../lrt/calculation'
+import { LRTPointRecipient } from '../model'
 
 @Resolver()
 export class LRTResolver {
@@ -11,11 +11,14 @@ export class LRTResolver {
   @Query(() => BigInt)
   async lrtDepositorPoints(@Arg('address') address: string): Promise<bigint> {
     const manager = await this.tx()
-    const balanceData = await manager.getRepository(LRTBalanceData).find({
-      where: { recipient: { id: address.toLowerCase() } },
-      relations: { recipient: true, conditions: true },
+    const recipients = await manager.getRepository(LRTPointRecipient).find({
+      where: { id: address.toLowerCase() },
+      relations: {
+        balanceData: {
+          conditions: true,
+        },
+      },
     })
-
-    return calculatePoints(Date.now(), balanceData)
+    return calculateRecipientsPoints(Date.now(), recipients)
   }
 }

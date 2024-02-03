@@ -3,8 +3,9 @@ import dayjs from 'dayjs'
 import { countBy, remove } from 'lodash'
 import { MoreThan } from 'typeorm'
 
-import * as erc20 from '../abi/erc20'
-import * as abi from '../abi/lrt-deposit-pool'
+import * as abiNodeDelegator from '../abi/el-node-delegator'
+import * as abiErc20 from '../abi/erc20'
+import * as abiDepositPool from '../abi/lrt-deposit-pool'
 import {
   LRTBalanceCondition,
   LRTBalanceData,
@@ -15,38 +16,71 @@ import {
 import { Block, Context, Log } from '../processor'
 import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
-import {
-  balanceMultiplier,
-  calculateRecipientsPoints,
-  calculateTimespanEarned,
-} from './calculation'
-import { balanceBonuses, pointConditions } from './config'
+import { calculateRecipientsPoints } from './calculation'
+import { pointConditions } from './config'
 import { getBalanceDataForRecipient, getRecipient, useLrtState } from './state'
 
-export const depositPoolAddress = '0x036676389e48133b63a802f8635ad39e752d375d'
+// LRT Addresses: https://github.com/oplabs/primestaked-eth/blob/main/README.md
+export const addresses = {
+  primeETH: '0x6ef3D766Dfe02Dc4bF04aAe9122EB9A0Ded25615',
+  lrtDepositPools: '0xA479582c8b64533102F6F528774C536e354B8d32',
+  nodeDelegators: ['0x8bBBCB5F4D31a6db3201D40F478f30Dc4F704aE2'],
+}
 
-export const from = 18758282 // Contract Deploy: 0x036676389e48133b63a802f8635ad39e752d375d
+// export const nodeDelegators = [
+//   '0x07b96Cf1183C9BFf2E43Acf0E547a8c4E4429473',
+//   '0x429554411C8f0ACEEC899100D3aacCF2707748b3',
+//   '0x92B4f5b9ffa1b5DB3b976E89A75E87B332E6e388',
+//   '0x9d2Fc9287e1c3A1A814382B40AAB13873031C4ad',
+//   '0xe8038228ff1aEfD007D7A22C9f08DDaadF8374E4',
+// ]
+
+const lsts = {
+  '0xbe9895146f7af43049ca1c1ae358b0541ea49704': 'cbETH',
+  '0xe95a203b1a91a908f9b9ce46459d101078c2c3cb': 'ankrETH',
+  '0xae78736cd615f374d3085123a210448e74fc6393': 'rETH',
+  '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3': 'OETH',
+  '0xf951e335afb289353dc249e82926178eac7ded78': 'swETH',
+  '0x8c1bed5b9a0928467c9b1341da1d7bd5e10b6549': 'lsETH',
+  '0xf1c9acdc66974dfb6decb12aa385b9cd01190e38': 'osETH',
+  '0xa35b1b31ce002fbf2058d22f30f95d405200a15b': 'ETHx',
+  '0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa': 'mETH',
+  '0xac3e018457b222d93114458476f3e3416abbe38f': 'sfrxETH',
+  '0xa2e3356610840701bdf5611a53974510ae27e2e1': 'wBETH',
+  '0xae7ab96520de3a18e5e111b5eaab095312d7fe84': 'stETH',
+}
+
+export const from = 19143860 // Contract Deploy: 0xA479582c8b64533102F6F528774C536e354B8d32
 
 const depositFilter = logFilter({
-  address: [depositPoolAddress],
-  topic0: [abi.events.AssetDeposit.topic],
+  address: [addresses.lrtDepositPools],
+  topic0: [abiDepositPool.events.AssetDeposit.topic],
   range: { from },
 })
 
 const transferFilter = logFilter({
   address: [tokens.primeETH],
-  topic0: [erc20.events.Transfer.topic],
+  topic0: [abiErc20.events.Transfer.topic],
   range: { from },
 })
+
+const assetDepositIntoStrategyFilter = logFilter({
+  address: addresses.nodeDelegators,
+  topic0: [abiNodeDelegator.events.AssetDepositIntoStrategy.topic],
+  range: { from },
+})
+
+// AssetDepositIntoStrategy
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog(depositFilter.value)
   processor.addLog(transferFilter.value)
+  processor.addLog(assetDepositIntoStrategyFilter.value)
 }
 export const process = async (ctx: Context) => {
   // ============================
   // Process chain data
-  const [state] = useLrtState(ctx)
+  const state = useLrtState(ctx)
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       if (depositFilter.matches(log)) {
@@ -55,15 +89,19 @@ export const process = async (ctx: Context) => {
       if (transferFilter.matches(log)) {
         await processTransfer(ctx, block, log)
       }
+      if (assetDepositIntoStrategyFilter.matches(log)) {
+        await processAssetDepositIntoStrategy(ctx, block, log)
+      }
     }
   }
 
   // ============================
   // Save
-  await ctx.store.insert(state.deposits)
+  await ctx.store.insert([...state.deposits.values()])
   await ctx.store.upsert([...state.recipients.values()])
-  await ctx.store.insert(state.balanceData)
-  await ctx.store.insert(state.balanceCondition)
+  await ctx.store.insert([...state.balanceData.values()])
+  await ctx.store.insert([...state.balanceCondition.values()])
+  await ctx.store.upsert([...state.nodeDelegators.values()])
 
   // ============================
   // Do point calculations, maybe
@@ -132,14 +170,17 @@ export const process = async (ctx: Context) => {
 }
 
 const processDeposit = async (ctx: Context, block: Block, log: Log) => {
-  const [state] = useLrtState(ctx)
+  const state = useLrtState(ctx)
   const {
     depositor: depositorAddress,
     asset,
     depositAmount,
-    rsethMintAmount,
+    primeEthMintAmount,
     referralId,
-  } = abi.events.AssetDeposit.decode(log)
+  } = abiDepositPool.events.AssetDeposit.decode(log)
+  ctx.log.info(
+    `${block.header.height} processDeposit: ${depositorAddress} ${log.transactionHash}`,
+  )
   const timestamp = new Date(block.header.timestamp)
   const deposit = new LRTDeposit({
     id: log.id,
@@ -148,10 +189,10 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
     asset: asset.toLowerCase(),
     depositor: depositorAddress.toLowerCase(),
     depositAmount,
-    amountReceived: rsethMintAmount,
+    amountReceived: primeEthMintAmount,
     referralId,
   })
-  state.deposits.push(deposit)
+  state.deposits.set(deposit.id, deposit)
   await addPoints(ctx, {
     log,
     depositAsset: deposit.asset,
@@ -162,7 +203,10 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
 }
 
 const processTransfer = async (ctx: Context, block: Block, log: Log) => {
-  const data = erc20.events.Transfer.decode(log)
+  const data = abiErc20.events.Transfer.decode(log)
+  ctx.log.info(
+    `${block.header.height} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
+  )
   await transferPoints(ctx, {
     log,
     timestamp: new Date(block.header.timestamp),
@@ -171,6 +215,12 @@ const processTransfer = async (ctx: Context, block: Block, log: Log) => {
     amount: data.value,
   })
 }
+
+const processAssetDepositIntoStrategy = async (
+  ctx: Context,
+  block: Block,
+  log: Log,
+) => {}
 
 const addPoints = async (
   ctx: Context,
@@ -183,7 +233,7 @@ const addPoints = async (
     conditionNameFilter?: string
   },
 ) => {
-  const [state] = useLrtState(ctx)
+  const state = useLrtState(ctx)
   const recipient = await getRecipient(ctx, params.recipient.toLowerCase())
   recipient.balance += params.balance
   const balanceData = new LRTBalanceData({
@@ -195,7 +245,7 @@ const addPoints = async (
     conditions: [],
   })
   recipient.balanceData.push(balanceData)
-  state.balanceData.push(balanceData)
+  state.balanceData.set(balanceData.id, balanceData)
 
   const conditions = pointConditions.filter(
     (c) =>
@@ -213,7 +263,7 @@ const addPoints = async (
       endDate: condition.endDate,
     })
     balanceData.conditions.push(balanceCondition)
-    state.balanceCondition.push(balanceCondition)
+    state.balanceCondition.set(balanceCondition.id, balanceCondition)
 
     // ctx.log.info(
     //   `Added ${points.balance} from ${condition.name} points for ${recipient.id}`,
@@ -230,8 +280,9 @@ const removePoints = async (
     balance: bigint
   },
 ) => {
-  const [state] = useLrtState(ctx)
+  const state = useLrtState(ctx)
   const recipient = await getRecipient(ctx, params.recipient)
+  calculateRecipientsPoints(params.timestamp.getTime(), [recipient])
   recipient.balance -= params.balance
   let amountToRemove = params.balance
   const balanceData = await getBalanceDataForRecipient(
@@ -244,26 +295,17 @@ const removePoints = async (
   }
   for (const data of balanceData) {
     if (amountToRemove === 0n) return
-    for (const condition of data.conditions) {
-      data.staticPoints = calculateTimespanEarned(
-        condition.startDate.getTime(),
-        params.timestamp.getTime(),
-        data.balance,
-        condition.multiplier + balanceMultiplier(recipient.balance),
-      )
-      condition.startDate = params.timestamp
-      if (amountToRemove > data.balance) {
-        amountToRemove -= data.balance
-        data.balance = 0n
-      } else {
-        data.balance -= amountToRemove
-        amountToRemove = 0n
-      }
+    if (amountToRemove > data.balance) {
+      amountToRemove -= data.balance
+      data.balance = 0n
+    } else {
+      data.balance -= amountToRemove
+      amountToRemove = 0n
     }
     if (data.balance === 0n && data.staticPoints === 0n) {
-      remove(state.balanceData, data)
+      state.balanceData.delete(data.id)
       for (const condition of data.conditions) {
-        remove(state.balanceCondition, condition)
+        state.balanceCondition.delete(condition.id)
       }
     }
   }

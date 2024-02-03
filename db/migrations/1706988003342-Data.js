@@ -1,5 +1,5 @@
-module.exports = class Data1706923873688 {
-    name = 'Data1706923873688'
+module.exports = class Data1706988003342 {
+    name = 'Data1706988003342'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -65,6 +65,13 @@ module.exports = class Data1706923873688 {
         await db.query(`CREATE TABLE "lrt_summary" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, CONSTRAINT "PK_20cc1ddd92e29b97d990c95c130" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68e45ce3e1da597d030f27acf6" ON "lrt_summary" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_82cd3e23b0a7a65b75773ae865" ON "lrt_summary" ("block_number") `)
+        await db.query(`CREATE TABLE "lrt_node_delegator_holdings" ("id" character varying NOT NULL, "asset" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, "delegator_id" character varying, CONSTRAINT "PK_b16c26b07feb23b5ae8778f09b3" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_f4f758f6162648ea2de3faefbd" ON "lrt_node_delegator_holdings" ("delegator_id") `)
+        await db.query(`CREATE INDEX "IDX_4e8663d1dc6a5623dbfb4de947" ON "lrt_node_delegator_holdings" ("asset") `)
+        await db.query(`CREATE TABLE "lrt_node_delegator" ("id" character varying NOT NULL, "node" text NOT NULL, "amount" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_00c9b979aed504224511fe1719a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_d5f6eb2d98dca0ff8eef1d9c7b" ON "lrt_node_delegator" ("node") `)
+        await db.query(`CREATE INDEX "IDX_74a1123cf49f717c876f5384e5" ON "lrt_node_delegator" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_c3f45d1d8bdc99417e40baca58" ON "lrt_node_delegator" ("block_number") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -212,6 +219,7 @@ module.exports = class Data1706923873688 {
         await db.query(`CREATE INDEX "IDX_0bb5f72bf5fa59ce8c232caa4c" ON "ousd_daily_stat" ("timestamp") `)
         await db.query(`ALTER TABLE "lrt_balance_condition" ADD CONSTRAINT "FK_4773dd4ec6b4a8922924d8f9ae5" FOREIGN KEY ("balance_data_id") REFERENCES "lrt_balance_data"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "lrt_balance_data" ADD CONSTRAINT "FK_61e40cacf71c10157332c95dc20" FOREIGN KEY ("recipient_id") REFERENCES "lrt_point_recipient"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "lrt_node_delegator_holdings" ADD CONSTRAINT "FK_f4f758f6162648ea2de3faefbd5" FOREIGN KEY ("delegator_id") REFERENCES "lrt_node_delegator"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_history" ADD CONSTRAINT "FK_94e47c4c49128c78f60b185b46b" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase" ADD CONSTRAINT "FK_3331819842173de7c27c046547a" FOREIGN KEY ("apy_id") REFERENCES "oethapy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_rebase_option" ADD CONSTRAINT "FK_034428879698039839b4ba6ffe8" FOREIGN KEY ("address_id") REFERENCES "oeth_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -297,6 +305,13 @@ module.exports = class Data1706923873688 {
         await db.query(`DROP TABLE "lrt_summary"`)
         await db.query(`DROP INDEX "public"."IDX_68e45ce3e1da597d030f27acf6"`)
         await db.query(`DROP INDEX "public"."IDX_82cd3e23b0a7a65b75773ae865"`)
+        await db.query(`DROP TABLE "lrt_node_delegator_holdings"`)
+        await db.query(`DROP INDEX "public"."IDX_f4f758f6162648ea2de3faefbd"`)
+        await db.query(`DROP INDEX "public"."IDX_4e8663d1dc6a5623dbfb4de947"`)
+        await db.query(`DROP TABLE "lrt_node_delegator"`)
+        await db.query(`DROP INDEX "public"."IDX_d5f6eb2d98dca0ff8eef1d9c7b"`)
+        await db.query(`DROP INDEX "public"."IDX_74a1123cf49f717c876f5384e5"`)
+        await db.query(`DROP INDEX "public"."IDX_c3f45d1d8bdc99417e40baca58"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)
@@ -444,6 +459,7 @@ module.exports = class Data1706923873688 {
         await db.query(`DROP INDEX "public"."IDX_0bb5f72bf5fa59ce8c232caa4c"`)
         await db.query(`ALTER TABLE "lrt_balance_condition" DROP CONSTRAINT "FK_4773dd4ec6b4a8922924d8f9ae5"`)
         await db.query(`ALTER TABLE "lrt_balance_data" DROP CONSTRAINT "FK_61e40cacf71c10157332c95dc20"`)
+        await db.query(`ALTER TABLE "lrt_node_delegator_holdings" DROP CONSTRAINT "FK_f4f758f6162648ea2de3faefbd5"`)
         await db.query(`ALTER TABLE "oeth_history" DROP CONSTRAINT "FK_94e47c4c49128c78f60b185b46b"`)
         await db.query(`ALTER TABLE "oeth_rebase" DROP CONSTRAINT "FK_3331819842173de7c27c046547a"`)
         await db.query(`ALTER TABLE "oeth_rebase_option" DROP CONSTRAINT "FK_034428879698039839b4ba6ffe8"`)

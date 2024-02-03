@@ -78,7 +78,7 @@ export const tokens = {
   OGN: OGN_ADDRESS,
   OGV: OGV_ADDRESS,
   veOGV: VEOGV_ADDRESS,
-  primeETH: '0xa1290d69c65a6fe4df752f95823fae25cb99e5a7', // TODO: Update me
+  primeETH: '0x6ef3D766Dfe02Dc4bF04aAe9122EB9A0Ded25615',
 
   // Origin OTokens
   OETH: OETH_ADDRESS,

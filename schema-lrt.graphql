@@ -42,3 +42,20 @@ type LRTSummary @entity {
   balance: BigInt!
   points: BigInt!
 }
+
+type LRTNodeDelegator @entity {
+  id: ID! @index
+  node: String! @index
+  amount: BigInt!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  holdings: [LRTNodeDelegatorHoldings]! @derivedFrom(field: "delegator")
+}
+
+type LRTNodeDelegatorHoldings @entity {
+  id: ID! @index
+  delegator: LRTNodeDelegator! @index
+  asset: String! @index
+  amount: BigInt!
+  points: BigInt!
+}

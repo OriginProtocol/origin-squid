@@ -1,7 +1,9 @@
 import { parseEther } from 'viem'
 
 import { LRTBalanceData, LRTPointRecipient } from '../model'
+import { Context } from '../processor'
 import { balanceBonuses } from './config'
+import { useLrtState } from './state'
 
 const dayMs = 86400000
 
@@ -13,10 +15,18 @@ const sum = (vs: bigint[]) => vs.reduce((sum, v) => sum + v, 0n)
 export const calculateRecipientsPoints = (
   timestamp: number,
   recipients: LRTPointRecipient[],
+  ctx?: Context,
 ) => {
+  const state = ctx && useLrtState(ctx)
   let totalPoints = 0n
   for (const recipient of recipients) {
-    recipient.points = calculatePoints(timestamp, recipient.balanceData)
+    state?.recipients.set(recipient.id, recipient)
+    recipient.points = calculatePoints(
+      timestamp,
+      recipient,
+      recipient.balanceData,
+      ctx,
+    )
     recipient.pointsDate = new Date(timestamp)
     totalPoints += recipient.points
   }
@@ -26,13 +36,17 @@ export const calculateRecipientsPoints = (
 /**
  * This will update entity data, which you will have to save later if you want to keep.
  */
-export const calculatePoints = (
+const calculatePoints = (
   timestamp: number,
+  recipient: LRTPointRecipient,
   balanceData: LRTBalanceData[],
+  ctx?: Context,
 ) => {
+  const state = ctx && useLrtState(ctx)
   let totalPoints = 0n
   for (const data of balanceData) {
-    const balanceMult = balanceMultiplier(data.recipient.balance)
+    state?.balanceData.set(data.id, data)
+    const balanceMult = balanceMultiplier(recipient.balance)
     const conditionPoints = data.conditions.map((c) => {
       const startTime = Math.max(
         data.staticPointsDate.getTime(),
@@ -60,7 +74,7 @@ export const calculatePoints = (
 /**
  * How many points have been earned since the depositor has had `amount` at `timestamp`.
  */
-export const calculateTimespanEarned = (
+const calculateTimespanEarned = (
   startTimestamp: number,
   endTimestamp: number,
   amount: bigint,
@@ -74,6 +88,6 @@ export const calculateTimespanEarned = (
   )
 }
 
-export const balanceMultiplier = (balance: bigint) => {
+const balanceMultiplier = (balance: bigint) => {
   return balanceBonuses.find((b) => balance >= b.gte)?.multiplier ?? 0n
 }

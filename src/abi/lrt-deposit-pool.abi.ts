@@ -47,6 +47,25 @@ export const ABI_JSON = [
     },
     {
         "type": "error",
+        "name": "NodeDelegatorHasAssetBalance",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "assetAddress"
+            },
+            {
+                "type": "uint256",
+                "name": "assetBalance"
+            }
+        ]
+    },
+    {
+        "type": "error",
+        "name": "NodeDelegatorNotFound",
+        "inputs": []
+    },
+    {
+        "type": "error",
         "name": "NotEnoughAssetToTransfer",
         "inputs": []
     },
@@ -82,7 +101,61 @@ export const ABI_JSON = [
             },
             {
                 "type": "uint256",
-                "name": "rsethMintAmount",
+                "name": "primeEthMintAmount",
+                "indexed": false
+            },
+            {
+                "type": "string",
+                "name": "referralId",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "AssetSwapped",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "fromAsset",
+                "indexed": true
+            },
+            {
+                "type": "address",
+                "name": "toAsset",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "fromAssetAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "toAssetAmount",
+                "indexed": false
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "ETHDeposit",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "depositor",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "depositAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "primeEthMintAmount",
                 "indexed": false
             },
             {
@@ -131,11 +204,23 @@ export const ABI_JSON = [
     {
         "type": "event",
         "anonymous": false,
-        "name": "NodeDelegatorAddedinQueue",
+        "name": "NodeDelegatorAddedInQueue",
         "inputs": [
             {
                 "type": "address[]",
                 "name": "nodeDelegatorContracts"
+            }
+        ]
+    },
+    {
+        "type": "event",
+        "anonymous": false,
+        "name": "NodeDelegatorRemovedFromQueue",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "nodeDelegatorContracts",
+                "indexed": false
             }
         ]
     },
@@ -204,7 +289,25 @@ export const ABI_JSON = [
             },
             {
                 "type": "uint256",
-                "name": "minRSETHAmountToReceive"
+                "name": "minPrimeETH"
+            },
+            {
+                "type": "string",
+                "name": "referralId"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "depositETH",
+        "constant": false,
+        "stateMutability": "payable",
+        "payable": true,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "minPrimeETHAmountExpected"
             },
             {
                 "type": "string",
@@ -261,21 +364,29 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
-        "name": "getNodeDelegatorQueue",
+        "name": "getETHDistributionData",
         "constant": true,
         "stateMutability": "view",
         "payable": false,
         "inputs": [],
         "outputs": [
             {
-                "type": "address[]",
-                "name": ""
+                "type": "uint256",
+                "name": "ethLyingInDepositPool"
+            },
+            {
+                "type": "uint256",
+                "name": "ethLyingInNDCs"
+            },
+            {
+                "type": "uint256",
+                "name": "ethStakedInEigenLayer"
             }
         ]
     },
     {
         "type": "function",
-        "name": "getRsETHAmountToMint",
+        "name": "getMintAmount",
         "constant": true,
         "stateMutability": "view",
         "payable": false,
@@ -292,7 +403,48 @@ export const ABI_JSON = [
         "outputs": [
             {
                 "type": "uint256",
-                "name": "rsethAmountToMint"
+                "name": "primeEthAmount"
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getNodeDelegatorQueue",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+            {
+                "type": "address[]",
+                "name": ""
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "name": "getSwapAssetReturnAmount",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "fromAsset"
+            },
+            {
+                "type": "address",
+                "name": "toAsset"
+            },
+            {
+                "type": "uint256",
+                "name": "fromAssetAmount"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": "returnAmount"
             }
         ]
     },
@@ -432,6 +584,32 @@ export const ABI_JSON = [
     },
     {
         "type": "function",
+        "name": "removeManyNodeDelegatorContractsFromQueue",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address[]",
+                "name": "nodeDelegatorContracts"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "removeNodeDelegatorContractFromQueue",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "nodeDelegatorAddress"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
         "name": "setMinAmountToDeposit",
         "constant": false,
         "payable": false,
@@ -439,6 +617,31 @@ export const ABI_JSON = [
             {
                 "type": "uint256",
                 "name": "minAmountToDeposit_"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "swapAssetWithinDepositPool",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "address",
+                "name": "fromAsset"
+            },
+            {
+                "type": "address",
+                "name": "toAsset"
+            },
+            {
+                "type": "uint256",
+                "name": "fromAssetAmount"
+            },
+            {
+                "type": "uint256",
+                "name": "minToAssetAmount"
             }
         ],
         "outputs": []
@@ -456,6 +659,23 @@ export const ABI_JSON = [
             {
                 "type": "address",
                 "name": "asset"
+            },
+            {
+                "type": "uint256",
+                "name": "amount"
+            }
+        ],
+        "outputs": []
+    },
+    {
+        "type": "function",
+        "name": "transferETHToNodeDelegator",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "ndcIndex"
             },
             {
                 "type": "uint256",
@@ -497,5 +717,9 @@ export const ABI_JSON = [
             }
         ],
         "outputs": []
+    },
+    {
+        "type": "receive",
+        "stateMutability": "payable"
     }
 ]
