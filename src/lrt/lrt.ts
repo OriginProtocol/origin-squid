@@ -7,7 +7,6 @@ import * as abiNodeDelegator from '../abi/el-node-delegator'
 import * as abiErc20 from '../abi/erc20'
 import * as abiDepositPool from '../abi/lrt-deposit-pool'
 import {
-  LRTBalanceCondition,
   LRTBalanceData,
   LRTDeposit,
   LRTPointRecipient,
@@ -17,7 +16,6 @@ import { Block, Context, Log } from '../processor'
 import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
 import { calculateRecipientsPoints } from './calculation'
-import { pointConditions } from './config'
 import { getBalanceDataForRecipient, getRecipient, useLrtState } from './state'
 
 // LRT Addresses: https://github.com/oplabs/primestaked-eth/blob/main/README.md
@@ -100,7 +98,6 @@ export const process = async (ctx: Context) => {
   await ctx.store.insert([...state.deposits.values()])
   await ctx.store.upsert([...state.recipients.values()])
   await ctx.store.insert([...state.balanceData.values()])
-  await ctx.store.insert([...state.balanceCondition.values()])
   await ctx.store.upsert([...state.nodeDelegators.values()])
 
   // ============================
@@ -127,7 +124,6 @@ export const process = async (ctx: Context) => {
       relations: {
         balanceData: {
           recipient: true,
-          conditions: true,
         },
       },
     })
@@ -146,26 +142,6 @@ export const process = async (ctx: Context) => {
     // Save Updated Balance Data (from `calculateRecipientsPoints`)
     const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
     await ctx.store.save(updatedBalanceData)
-
-    // Clear Expired Conditions
-    const expiredConditions = recipients.flatMap((r) =>
-      r.balanceData.flatMap((bd) =>
-        bd.conditions.filter(
-          (c) => c.endDate && c.endDate < bd.staticPointsDate,
-        ),
-      ),
-    )
-    if (expiredConditions.length) {
-      // TODO: investigate strange output
-      ctx.log.info(
-        countBy(expiredConditions, 'name'),
-        'Removing expired conditions',
-      )
-      if (expiredConditions.length < 20) {
-        ctx.log.info(expiredConditions)
-      }
-    }
-    await ctx.store.remove(expiredConditions)
   }
 }
 
@@ -179,7 +155,7 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
     referralId,
   } = abiDepositPool.events.AssetDeposit.decode(log)
   ctx.log.info(
-    `${block.header.height} processDeposit: ${depositorAddress} ${log.transactionHash}`,
+    `${block.header.timestamp} processDeposit: ${depositorAddress} ${log.transactionHash}`,
   )
   const timestamp = new Date(block.header.timestamp)
   const deposit = new LRTDeposit({
@@ -205,7 +181,7 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
 const processTransfer = async (ctx: Context, block: Block, log: Log) => {
   const data = abiErc20.events.Transfer.decode(log)
   ctx.log.info(
-    `${block.header.height} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
+    `${block.header.timestamp} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
   )
   await transferPoints(ctx, {
     log,
@@ -239,36 +215,14 @@ const addPoints = async (
   const balanceData = new LRTBalanceData({
     id: params.log.id,
     recipient,
+    asset: params.depositAsset,
     balance: params.balance,
+    balanceDate: params.timestamp,
     staticPointsDate: params.timestamp,
     staticPoints: 0n,
-    conditions: [],
   })
   recipient.balanceData.push(balanceData)
   state.balanceData.set(balanceData.id, balanceData)
-
-  const conditions = pointConditions.filter(
-    (c) =>
-      (!params.conditionNameFilter || c.name === params.conditionNameFilter) &&
-      (!c.asset || params.depositAsset === c.asset) &&
-      (!c.endDate || params.timestamp < c.endDate),
-  )
-  for (const condition of conditions) {
-    const balanceCondition = new LRTBalanceCondition({
-      balanceData,
-      id: `${params.log.id}:${condition.name}`,
-      name: condition.name,
-      multiplier: condition.multiplier,
-      startDate: params.timestamp,
-      endDate: condition.endDate,
-    })
-    balanceData.conditions.push(balanceCondition)
-    state.balanceCondition.set(balanceCondition.id, balanceCondition)
-
-    // ctx.log.info(
-    //   `Added ${points.balance} from ${condition.name} points for ${recipient.id}`,
-    // )
-  }
 }
 
 const removePoints = async (
@@ -304,9 +258,6 @@ const removePoints = async (
     }
     if (data.balance === 0n && data.staticPoints === 0n) {
       state.balanceData.delete(data.id)
-      for (const condition of data.conditions) {
-        state.balanceCondition.delete(condition.id)
-      }
     }
   }
 }

@@ -2,10 +2,10 @@ import { parseEther } from 'viem'
 
 import { LRTBalanceData, LRTPointRecipient } from '../model'
 import { Context } from '../processor'
-import { balanceBonuses } from './config'
+import { balanceBonuses, pointConditions } from './config'
 import { useLrtState } from './state'
 
-const dayMs = 86400000
+const hourMs = 3600000
 
 const sum = (vs: bigint[]) => vs.reduce((sum, v) => sum + v, 0n)
 
@@ -47,10 +47,11 @@ const calculatePoints = (
   for (const data of balanceData) {
     state?.balanceData.set(data.id, data)
     const balanceMult = balanceMultiplier(recipient.balance)
-    const conditionPoints = data.conditions.map((c) => {
+    const conditionPoints = pointConditions.map((c) => {
       const startTime = Math.max(
         data.staticPointsDate.getTime(),
         c.startDate.getTime(),
+        data.balanceDate.getTime(),
       )
       if (timestamp < startTime) return 0n
 
@@ -80,10 +81,10 @@ const calculateTimespanEarned = (
   amount: bigint,
   multiplier: bigint,
 ): bigint => {
-  const daysSinceUpdate = (endTimestamp - startTimestamp) / dayMs
+  const hours = (endTimestamp - startTimestamp) / hourMs
   const multipliedAmount = (amount * multiplier) / 100n
   return (
-    (parseEther(daysSinceUpdate.toString()) * multipliedAmount * 10_000n) /
+    (parseEther(hours.toString()) * multipliedAmount * 10_000n) /
     1_000000000_000000000n
   )
 }

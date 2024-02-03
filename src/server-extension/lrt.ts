@@ -14,9 +14,7 @@ export class LRTResolver {
     const recipients = await manager.getRepository(LRTPointRecipient).find({
       where: { id: address.toLowerCase() },
       relations: {
-        balanceData: {
-          conditions: true,
-        },
+        balanceData: true,
       },
     })
     return calculateRecipientsPoints(Date.now(), recipients)

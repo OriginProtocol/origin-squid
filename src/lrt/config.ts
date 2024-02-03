@@ -6,16 +6,43 @@ interface PointCondition {
   name: string
   multiplier: bigint
   asset?: TokenAddress
+  startDate: Date
   endDate?: Date
 }
 
+const launchDate = new Date('2024-01-05')
 export const pointConditions: PointCondition[] = [
-  { name: 'oeth-2x', asset: tokens.OETH, multiplier: 100n },
-  { name: 'week1-5x', endDate: new Date('2024-02-06'), multiplier: 100n },
-  { name: 'week1-4x', endDate: new Date('2024-02-07'), multiplier: 100n },
-  { name: 'week1-3x', endDate: new Date('2024-02-08'), multiplier: 100n },
-  { name: 'week1-2x', endDate: new Date('2024-02-09'), multiplier: 100n },
-  { name: 'standard', multiplier: 100n },
+  {
+    name: 'oeth-2x',
+    startDate: launchDate,
+    asset: tokens.OETH,
+    multiplier: 100n,
+  },
+  {
+    name: 'week1-5x',
+    startDate: launchDate,
+    endDate: new Date('2024-02-06'),
+    multiplier: 100n,
+  },
+  {
+    name: 'week1-4x',
+    startDate: launchDate,
+    endDate: new Date('2024-02-07'),
+    multiplier: 100n,
+  },
+  {
+    name: 'week1-3x',
+    startDate: launchDate,
+    endDate: new Date('2024-02-08'),
+    multiplier: 100n,
+  },
+  {
+    name: 'week1-2x',
+    startDate: launchDate,
+    endDate: new Date('2024-02-09'),
+    multiplier: 100n,
+  },
+  { name: 'standard', startDate: launchDate, multiplier: 100n },
 ]
 
 // Maintain Order

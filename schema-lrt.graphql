@@ -14,17 +14,9 @@ type LRTBalanceData @entity {
   recipient: LRTPointRecipient! @index
   staticPointsDate: DateTime!
   staticPoints: BigInt!
+  asset: String
   balance: BigInt!
-  conditions: [LRTBalanceCondition]! @derivedFrom(field: "balanceData")
-}
-
-type LRTBalanceCondition @entity {
-  id: ID! @index
-  balanceData: LRTBalanceData! @index
-  name: String!
-  multiplier: BigInt!
-  startDate: DateTime! @index
-  endDate: DateTime @index
+  balanceDate: DateTime!
 }
 
 type LRTPointRecipient @entity {

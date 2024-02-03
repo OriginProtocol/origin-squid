@@ -1,7 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 import {LRTPointRecipient} from "./lrtPointRecipient.model"
-import {LRTBalanceCondition} from "./lrtBalanceCondition.model"
 
 @Entity_()
 export class LRTBalanceData {
@@ -22,9 +21,12 @@ export class LRTBalanceData {
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     staticPoints!: bigint
 
+    @Column_("text", {nullable: true})
+    asset!: string | undefined | null
+
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     balance!: bigint
 
-    @OneToMany_(() => LRTBalanceCondition, e => e.balanceData)
-    conditions!: LRTBalanceCondition[]
+    @Column_("timestamp with time zone", {nullable: false})
+    balanceDate!: Date
 }

@@ -2,7 +2,6 @@ import { sortBy, uniqBy } from 'lodash'
 import { IsNull, LessThanOrEqual, MoreThan } from 'typeorm'
 
 import {
-  LRTBalanceCondition,
   LRTBalanceData,
   LRTDeposit,
   LRTNodeDelegator,
@@ -16,7 +15,6 @@ export const useLrtState = (ctx: Context) =>
     deposits: new Map<string, LRTDeposit>(),
     recipients: new Map<string, LRTPointRecipient>(),
     balanceData: new Map<string, LRTBalanceData>(),
-    balanceCondition: new Map<string, LRTBalanceCondition>(),
     nodeDelegators: new Map<string, LRTNodeDelegator>(),
   })[0]
 
@@ -26,35 +24,16 @@ export const getBalanceDataForRecipient = async (
   recipient: string,
 ) => {
   const dbResults = await ctx.store.find(LRTBalanceData, {
-    relations: { conditions: true },
     where: [
       {
         recipient: { id: recipient },
         balance: MoreThan(0n),
-        conditions: {
-          startDate: LessThanOrEqual(timestamp),
-          endDate: IsNull(),
-        },
-      },
-      {
-        recipient: { id: recipient },
-        balance: MoreThan(0n),
-        conditions: {
-          startDate: LessThanOrEqual(timestamp),
-          endDate: MoreThan(timestamp),
-        },
       },
     ],
   })
   const state = useLrtState(ctx)
   const localResults = Array.from(state.balanceData.values()).filter((d) => {
-    return (
-      d.recipient.id === recipient &&
-      d.balance > 0n &&
-      d.conditions.find((c) => {
-        return c.startDate <= timestamp && (!c.endDate || c.endDate > timestamp)
-      })
-    )
+    return d.recipient.id === recipient && d.balance > 0n
   })
   return sortBy(uniqBy([...localResults, ...dbResults], 'id'), 'id') // order pref for local
 }
