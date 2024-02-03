@@ -169,7 +169,7 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
     referralId,
   })
   state.deposits.set(deposit.id, deposit)
-  await addPoints(ctx, {
+  await addBalance(ctx, {
     log,
     depositAsset: deposit.asset,
     recipient: deposit.depositor,
@@ -183,7 +183,7 @@ const processTransfer = async (ctx: Context, block: Block, log: Log) => {
   ctx.log.info(
     `${block.header.timestamp} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
   )
-  await transferPoints(ctx, {
+  await transferBalance(ctx, {
     log,
     timestamp: new Date(block.header.timestamp),
     from: data.from.toLowerCase(),
@@ -198,7 +198,7 @@ const processAssetDepositIntoStrategy = async (
   log: Log,
 ) => {}
 
-const addPoints = async (
+const addBalance = async (
   ctx: Context,
   params: {
     log: Log
@@ -225,7 +225,7 @@ const addPoints = async (
   state.balanceData.set(balanceData.id, balanceData)
 }
 
-const removePoints = async (
+const removeBalance = async (
   ctx: Context,
   params: {
     log: Log
@@ -262,7 +262,7 @@ const removePoints = async (
   }
 }
 
-const transferPoints = async (
+const transferBalance = async (
   ctx: Context,
   params: {
     log: Log
@@ -274,7 +274,7 @@ const transferPoints = async (
 ) => {
   // ctx.log.info({ from: params.from, to: params.to }, 'transferPoints')
   if (params.from === '0x0000000000000000000000000000000000000000') return
-  await removePoints(ctx, {
+  await removeBalance(ctx, {
     log: params.log,
     timestamp: params.timestamp,
     recipient: params.from,
@@ -290,7 +290,7 @@ const transferPoints = async (
   //   },
   //   'processTransfer',
   // )
-  await addPoints(ctx, {
+  await addBalance(ctx, {
     log: params.log,
     timestamp: params.timestamp,
     recipient: params.to,
