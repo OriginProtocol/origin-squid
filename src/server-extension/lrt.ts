@@ -1,8 +1,8 @@
 import { Arg, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 
-import { calculatePoints } from '../lrt'
-import { LRTPointData, LRTPointDataAggregate } from '../model'
+import { calculatePoints } from '../lrt/calculation'
+import { LRTBalanceData } from '../model'
 
 @Resolver()
 export class LRTResolver {
@@ -11,39 +11,11 @@ export class LRTResolver {
   @Query(() => BigInt)
   async lrtDepositorPoints(@Arg('address') address: string): Promise<bigint> {
     const manager = await this.tx()
-    const results = await manager
-      .getRepository(LRTPointData)
-      .find({ where: { recipient: { id: address.toLowerCase() } } })
-    console.log(address.toLowerCase())
-    console.log(results)
-    if (!results.length) return 0n
-    return results.reduce((sum, data) => {
-      return (
-        sum +
-        data.staticPoints +
-        calculatePoints(
-          data.startDate.getTime(),
-          (data.endDate ?? new Date()).getTime(),
-          data.balance,
-        )
-      )
-    }, 0n)
-  }
+    const balanceData = await manager.getRepository(LRTBalanceData).find({
+      where: { recipient: { id: address.toLowerCase() } },
+      relations: { recipient: true, conditions: true },
+    })
 
-  @Query(() => BigInt)
-  async lrtPointsAggregate(): Promise<bigint> {
-    const manager = await this.tx()
-    const results = await manager.getRepository(LRTPointDataAggregate).find()
-    if (!results.length) return 0n
-    return results.reduce((sum, data) => {
-      return (
-        sum +
-        calculatePoints(
-          data.startDate.getTime(),
-          (data.endDate ?? new Date()).getTime(),
-          data.balance,
-        )
-      )
-    }, 0n)
+    return calculatePoints(Date.now(), balanceData)
   }
 }

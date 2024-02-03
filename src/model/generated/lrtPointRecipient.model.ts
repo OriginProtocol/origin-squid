@@ -1,5 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
-import {LRTPointData} from "./lrtPointData.model"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
+import * as marshal from "./marshal"
+import {LRTBalanceData} from "./lrtBalanceData.model"
 
 @Entity_()
 export class LRTPointRecipient {
@@ -10,6 +11,16 @@ export class LRTPointRecipient {
     @PrimaryColumn_()
     id!: string
 
-    @OneToMany_(() => LRTPointData, e => e.recipient)
-    pointData!: LRTPointData[]
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    points!: bigint
+
+    @Index_()
+    @Column_("timestamp with time zone", {nullable: false})
+    pointsDate!: Date
+
+    @OneToMany_(() => LRTBalanceData, e => e.recipient)
+    balanceData!: LRTBalanceData[]
 }
