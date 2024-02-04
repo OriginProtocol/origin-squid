@@ -34,6 +34,7 @@ export const from = config.startBlock
 // CONSTANTS
 const RANGE = { from: config.startBlock }
 const HOUR_MS = 3600000
+const MINUTE5_MS = 300000
 
 // FILTERS
 const depositFilter = logFilter({
@@ -62,6 +63,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 // we use this variable to keep track of the last hour we processed
 // this increases every time we process a block that is in a new hour
+let lastMinute5Processed = 0
 let lastHourProcessed = 0
 let haveNodeDelegatorInstance = false
 export const initialize = async (ctx: Context) => {
@@ -105,6 +107,10 @@ export const process = async (ctx: Context) => {
       }
     }
     await processHourly(ctx, block)
+  }
+  if (ctx.isHead) {
+    // If we're at the latest block, process summary every 5 minutes.
+    await processMinute5(ctx, ctx.blocks[ctx.blocks.length - 1])
   }
   await saveAndResetState(ctx)
 }
@@ -172,6 +178,27 @@ const processHourly = async (ctx: Context, block: Block) => {
       ])
     }
     lastHourProcessed = blockHour
+  }
+}
+
+const processMinute5 = async (ctx: Context, block: Block) => {
+  const blockMinute5 = Math.floor(block.header.timestamp / MINUTE5_MS)
+  if (lastMinute5Processed !== blockMinute5) {
+    ctx.log.info(
+      `Processing minute 5: ${blockMinute5} ${new Date(
+        block.header.timestamp,
+      )}`,
+    )
+
+    // ensure that we don't miss any hours
+    const minute5Passed = blockMinute5 - lastMinute5Processed
+    if (lastMinute5Processed !== 0 && minute5Passed !== 1) {
+      throw new Error('Something is wrong. We should trigger once per hour.')
+    }
+
+    await saveAndResetState(ctx)
+    await createSummary(ctx, block)
+    lastMinute5Processed = minute5Passed
   }
 }
 
