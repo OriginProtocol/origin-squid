@@ -144,6 +144,11 @@ const processHourly = async (ctx: Context, block: Block) => {
     // ensure that we don't miss any hours
     const hoursPassed = blockHour - lastHourProcessed
     if (lastHourProcessed !== 0 && hoursPassed !== 1) {
+      ctx.log.info({
+        lastHourProcessed,
+        hoursPassed,
+        blockHour,
+      })
       throw new Error('Something is wrong. We should trigger once per hour.')
     }
 
@@ -191,33 +196,44 @@ const processMinute5 = async (ctx: Context, block: Block) => {
     )
 
     // ensure that we don't miss any hours
-    const minute5Passed = blockMinute5 - lastMinute5Processed
-    if (lastMinute5Processed !== 0 && minute5Passed !== 1) {
-      throw new Error('Something is wrong. We should trigger once per hour.')
-    }
+    // const minute5Passed = blockMinute5 - lastMinute5Processed
+    // if (lastMinute5Processed !== 0 && minute5Passed !== 1) {
+    //   ctx.log.info({
+    //     lastMinute5Processed,
+    //     minute5Passed,
+    //     blockMinute5,
+    //   })
+    //   throw new Error(
+    //     'Something is wrong. We should trigger once per 5 minutes.',
+    //   )
+    // }
 
     await saveAndResetState(ctx)
     await createSummary(ctx, block)
-    lastMinute5Processed = minute5Passed
+    lastMinute5Processed = blockMinute5
   }
 }
 
 const createSummary = async (ctx: Context, block: Block) => {
   const state = useLrtState()
-  const lastBlock = block
   const lastSummary = await getLastSummary(ctx)
 
   // This is a big update - we load everything!
   // Can iterate through this in batches later if needed.
   const recipients = [...state.recipients.values()]
 
+  if (lastSummary?.id === block.header.id) {
+    // The hourly run likely already created this.
+    return { summary: lastSummary, recipients }
+  }
+
   // Create Summary
   const summary = new LRTSummary({
-    id: lastBlock.header.id,
-    timestamp: new Date(lastBlock.header.timestamp),
-    blockNumber: lastBlock.header.height,
+    id: block.header.id,
+    timestamp: new Date(block.header.timestamp),
+    blockNumber: block.header.height,
     balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
-    points: calculateRecipientsPoints(lastBlock.header.timestamp, recipients),
+    points: calculateRecipientsPoints(block.header.timestamp, recipients),
     elPoints: lastSummary?.elPoints ?? 0n,
   })
   const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
