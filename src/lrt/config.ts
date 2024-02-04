@@ -1,1 +1,1 @@
-export * from './rs-config'
+export * from './prime-config'

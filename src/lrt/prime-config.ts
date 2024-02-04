@@ -2,6 +2,9 @@ import { TokenAddress, tokens } from '../utils/addresses'
 
 export const from = 19143860 // Contract Deploy: 0xA479582c8b64533102F6F528774C536e354B8d32
 
+const hourMs = 3600000
+export const pointInterval = hourMs
+
 const eth = (val: bigint) => val * 1_000000000_000000000n
 
 interface PointCondition {
@@ -10,6 +13,7 @@ interface PointCondition {
   asset?: TokenAddress
   startDate: Date
   endDate?: Date
+  duration?: number // Days
 }
 
 const launchDate = new Date('2024-01-05')

@@ -15,7 +15,6 @@ import {
   LRTSummary,
 } from '../model'
 import { Block, Context, Log } from '../processor'
-import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
 import { multicall } from '../utils/multicall'
 import { calculateRecipientsPoints } from './calculation'
@@ -36,7 +35,7 @@ const depositFilter = logFilter({
 })
 
 const transferFilter = logFilter({
-  address: [tokens.primeETH],
+  address: [addresses.primeETH],
   topic0: [abiErc20.events.Transfer.topic],
   range: { from },
 })
@@ -93,7 +92,7 @@ export const process = async (ctx: Context) => {
   // Save
   await ctx.store.insert([...state.deposits.values()])
   await ctx.store.upsert([...state.recipients.values()])
-  await ctx.store.insert([...state.balanceData.values()])
+  await ctx.store.upsert([...state.balanceData.values()])
   await ctx.store.upsert([...state.nodeDelegators.values()])
   await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
 
@@ -155,14 +154,34 @@ const processHourly = async (ctx: Context, block: Block) => {
     if (haveNodeDelegatorInstance) {
       // Calculate EL POINTS!
       // First write any unwritten data
+      await ctx.store.upsert([...state.recipients.values()])
       await ctx.store.upsert([...state.nodeDelegators.values()])
       await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
+      state.recipients.clear()
       state.nodeDelegators.clear()
       state.nodeDelegatorHoldings.clear()
 
+      const recipients = await ctx.store.find(LRTPointRecipient, {
+        where: { balance: MoreThan(0n) },
+      })
+      const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
+      let totalPointsEarned = 0n
       for (const node of addresses.nodeDelegators) {
-        await createLRTNodeDelegator(ctx, block, node, true)
+        const { pointsEarned } = await createLRTNodeDelegator(
+          ctx,
+          block,
+          node,
+          true,
+        )
+        totalPointsEarned += pointsEarned
       }
+      for (const recipient of recipients) {
+        recipient.elPoints +=
+          (recipient.balance * totalPointsEarned) / totalBalance
+      }
+      await ctx.store.save(recipients)
+      await ctx.store.upsert([...state.nodeDelegators.values()])
+      await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
     }
     lastHourProcessed = blockHour
   }
@@ -177,9 +196,9 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
     primeEthMintAmount,
     referralId,
   } = abiDepositPool.events.AssetDeposit.decode(log)
-  ctx.log.info(
-    `${block.header.timestamp} processDeposit: ${depositorAddress} ${log.transactionHash}`,
-  )
+  // ctx.log.info(
+  //   `${block.header.timestamp} processDeposit: ${depositorAddress} ${log.transactionHash}`,
+  // )
   const timestamp = new Date(block.header.timestamp)
   const deposit = new LRTDeposit({
     id: log.id,
@@ -203,9 +222,9 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
 
 const processTransfer = async (ctx: Context, block: Block, log: Log) => {
   const data = abiErc20.events.Transfer.decode(log)
-  ctx.log.info(
-    `${block.header.timestamp} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
-  )
+  // ctx.log.info(
+  //   `${block.header.timestamp} processTransfer: ${data.from} ${data.to} ${log.transactionHash}`,
+  // )
   await transferBalance(ctx, {
     log,
     timestamp: new Date(block.header.timestamp),
@@ -293,6 +312,7 @@ const createLRTNodeDelegator = async (
 
   state.nodeDelegators.set(nodeDelegator.id, nodeDelegator)
   haveNodeDelegatorInstance = true
+  return { nodeDelegator, pointsEarned }
 }
 
 const addBalance = async (
@@ -338,7 +358,9 @@ const removeBalance = async (
   let amountToRemove = params.balance
   const balanceData = await getBalanceDataForRecipient(ctx, params.recipient)
   if (!balanceData.length) {
-    throw new Error('should have results here')
+    throw new Error(
+      `should have results here for ${params.recipient}, tx ${params.log.transactionHash}`,
+    )
   }
   for (const data of balanceData) {
     if (amountToRemove === 0n) return
@@ -351,6 +373,8 @@ const removeBalance = async (
     }
     if (data.balance === 0n && data.staticPoints === 0n) {
       state.balanceData.delete(data.id)
+    } else {
+      state.balanceData.set(data.id, data)
     }
   }
 }

@@ -31,6 +31,7 @@ export const getBalanceDataForRecipient = async (
         balance: MoreThan(0n),
       },
     ],
+    relations: { recipient: true },
   })
   const state = useLrtState(ctx)
   const localResults = Array.from(state.balanceData.values()).filter((d) => {

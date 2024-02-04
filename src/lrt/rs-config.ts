@@ -2,6 +2,10 @@ import { TokenAddress, tokens } from '../utils/addresses'
 
 export const from = 18758282 // Contract Deploy: 0x036676389e48133b63a802f8635ad39e752d375d
 
+const hourMs = 3600000
+const dayMs = hourMs * 24
+export const pointInterval = dayMs
+
 const eth = (val: bigint) => val * 1_000000000_000000000n
 
 interface PointCondition {
@@ -10,11 +14,20 @@ interface PointCondition {
   asset?: TokenAddress
   startDate: Date
   endDate?: Date
+  duration?: number // Days
 }
 
-const launchDate = new Date('2024-01-05')
+const launchDate = new Date('2023-12-12')
 export const pointConditions: PointCondition[] = [
   { name: 'standard', startDate: launchDate, multiplier: 100n },
+  // Points calculation doesn't handle `duration`
+  // {
+  //   name: 'early',
+  //   startDate: new Date('2023-12-12'),
+  //   endDate: new Date('2024-01-01'),
+  //   duration: 90,
+  //   multiplier: 25n,
+  // },
 ]
 
 interface BalanceBonus {
