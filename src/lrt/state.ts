@@ -32,7 +32,6 @@ export const getBalanceDataForRecipient = async (
         balance: MoreThan(0n),
       },
     ],
-    order: { id: 'asc' },
     relations: { recipient: true },
   })
   const state = useLrtState()

@@ -15,6 +15,7 @@ import {
   LRTSummary,
 } from '../model'
 import { Block, Context, Log } from '../processor'
+import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
 import { multicall } from '../utils/multicall'
 import { calculateRecipientsPoints } from './calculation'
@@ -380,6 +381,17 @@ const removeBalance = async (
       `should have results here for ${params.recipient}, tx ${params.log.transactionHash}`,
     )
   }
+  // - Prefer not to remove balance from OETH deposits.
+  // - Prefer to remove balance from recent balances.
+  balanceData.sort((a, b) => {
+    if (a.asset === tokens.OETH && b.asset !== tokens.OETH) {
+      return 1
+    } else if (a.asset !== tokens.OETH && b.asset === tokens.OETH) {
+      return -1
+    } else {
+      return a.id > b.id ? -1 : 1
+    }
+  })
   for (const data of balanceData) {
     if (amountToRemove === 0n) return
     if (amountToRemove > data.balance) {
