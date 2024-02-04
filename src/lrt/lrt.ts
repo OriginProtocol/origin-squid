@@ -18,7 +18,7 @@ import { Block, Context, Log } from '../processor'
 import { logFilter } from '../utils/logFilter'
 import { multicall } from '../utils/multicall'
 import { calculateRecipientsPoints } from './calculation'
-import { addresses, from } from './config'
+import * as config from './config'
 import {
   getBalanceDataForRecipient,
   getLastSummary,
@@ -27,45 +27,49 @@ import {
   useLrtState,
 } from './state'
 
-export { from } from './config'
+// Export
+export const from = config.startBlock
 
+// CONSTANTS
+const RANGE = { from: config.startBlock }
+const HOUR_MS = 3600000
+
+// FILTERS
 const depositFilter = logFilter({
-  address: [addresses.lrtDepositPool],
+  address: [config.addresses.lrtDepositPool],
   topic0: [abiDepositPool.events.AssetDeposit.topic],
-  range: { from },
+  range: RANGE,
 })
-
 const transferFilter = logFilter({
-  address: [addresses.primeETH],
+  address: [config.addresses.lrtToken],
   topic0: [abiErc20.events.Transfer.topic],
-  range: { from },
+  range: RANGE,
 })
-
 const assetDepositIntoStrategyFilter = logFilter({
-  address: addresses.nodeDelegators,
+  address: config.addresses.nodeDelegators,
   topic0: [abiNodeDelegator.events.AssetDepositIntoStrategy.topic],
-  range: { from },
+  range: RANGE,
 })
 
 // AssetDepositIntoStrategy
-
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog(depositFilter.value)
   processor.addLog(transferFilter.value)
   processor.addLog(assetDepositIntoStrategyFilter.value)
-  processor.includeAllBlocks({ from })
+  processor.includeAllBlocks(RANGE) // need for the hourly processing
 }
 
-const hourMs = 3600000
+// we use this variable to keep track of the last hour we processed
+// this increases every time we process a block that is in a new hour
 let lastHourProcessed = 0
 let haveNodeDelegatorInstance = false
 export const initialize = async (ctx: Context) => {
   const nodeDelegator = await getLatestNodeDelegator(
     ctx,
-    addresses.nodeDelegators[0],
+    config.addresses.nodeDelegators[0],
   )
   lastHourProcessed = nodeDelegator
-    ? Math.floor(nodeDelegator.timestamp.getTime() / hourMs)
+    ? Math.floor(nodeDelegator.timestamp.getTime() / HOUR_MS)
     : 0
   haveNodeDelegatorInstance = !!nodeDelegator
 }
@@ -98,6 +102,7 @@ export const process = async (ctx: Context) => {
   await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
 
   // ============================
+  // FIXME: Should all the code below be on `processHourly`?
   // Do Prime Staking XP calculations, maybe
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
   const lastSummary = await getLastSummary(ctx)
@@ -139,10 +144,13 @@ export const process = async (ctx: Context) => {
 }
 
 const processHourly = async (ctx: Context, block: Block) => {
-  const blockHour = Math.floor(block.header.timestamp / hourMs)
+  const blockHour = Math.floor(block.header.timestamp / HOUR_MS)
   const state = useLrtState(ctx)
+
   if (lastHourProcessed !== blockHour) {
     ctx.log.info(`Processing hour: ${blockHour}`)
+
+    // ensure that we don't miss any hours
     const hoursPassed = blockHour - lastHourProcessed
     if (lastHourProcessed !== 0 && hoursPassed !== 1) {
       throw new Error('Something is wrong. We should trigger once per hour.')
@@ -163,7 +171,7 @@ const processHourly = async (ctx: Context, block: Block) => {
       })
       const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
       let totalPointsEarned = 0n
-      for (const node of addresses.nodeDelegators) {
+      for (const node of config.addresses.nodeDelegators) {
         const { pointsEarned } = await createLRTNodeDelegator(
           ctx,
           block,
@@ -241,6 +249,7 @@ const processTransfer = async (ctx: Context, block: Block, log: Log) => {
   })
 }
 
+// FIXME: should we call this getLRTPoolDeposits?
 const createLRTNodeDelegator = async (
   ctx: Context,
   block: Block,
@@ -260,21 +269,26 @@ const createLRTNodeDelegator = async (
       // TODO remove
       return [[], []]
     })
+
+  // Get the rates for the assets
   const rates = await multicall(
     ctx,
     block.header,
     abiOracle.functions.getAssetPrice,
-    addresses.lrtOracle,
+    config.addresses.lrtOracle,
     assets.map((asset) => [asset]),
   )
+  // Convert the balances to ETH
   const ethBalances = balances.map(
     (balance, i) => (balance * rates[i]) / 1_000000000_000000000n,
   )
+  // Sum the ETH balances
   const totalAmount = ethBalances.reduce(
     (sum, ethBalance) => sum + ethBalance,
     0n,
   )
 
+  // FIXME: why get latest?
   const lastNodeDelegatorEntry = await getLatestNodeDelegator(
     ctx,
     node.toLowerCase(),
@@ -285,9 +299,9 @@ const createLRTNodeDelegator = async (
       ethAmount * BigInt(hours)
     if (lastNodeDelegatorEntry) {
       const lastHour = Math.floor(
-        lastNodeDelegatorEntry.timestamp.getTime() / hourMs,
+        lastNodeDelegatorEntry.timestamp.getTime() / HOUR_MS,
       )
-      const currentHour = Math.floor(block.header.timestamp / hourMs)
+      const currentHour = Math.floor(block.header.timestamp / HOUR_MS)
       const hours = currentHour - lastHour
       pointsEarned = calcPoints(totalAmount, hours)
     }
@@ -360,6 +374,7 @@ const removeBalance = async (
 ) => {
   const state = useLrtState(ctx)
   const recipient = await getRecipient(ctx, params.recipient)
+  // FIXME: do we need to calculate points here?
   calculateRecipientsPoints(params.timestamp.getTime(), [recipient])
   recipient.balance -= params.balance
   let amountToRemove = params.balance
