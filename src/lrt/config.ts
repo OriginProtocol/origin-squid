@@ -1,2 +1,2 @@
-// export * from './prime-config'
-export * from './rs-config'
+export * from './prime-config'
+// export * from './rs-config'

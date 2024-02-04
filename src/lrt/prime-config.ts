@@ -17,7 +17,7 @@ interface PointCondition {
   duration?: number // Days
 }
 
-const launchDate = new Date('2024-01-05')
+const launchDate = new Date('2024-01-05 12:00 PM PST') // TODO set to Feb 5
 export const pointConditions: PointCondition[] = [
   {
     name: 'oeth-2x',
