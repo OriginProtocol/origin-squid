@@ -5,10 +5,12 @@ import {
   LRTBalanceData,
   LRTDeposit,
   LRTNodeDelegator,
+  LRTNodeDelegatorHoldings,
   LRTPointRecipient,
 } from '../model'
-import { Context } from '../processor'
+import { Block, Context } from '../processor'
 import { useProcessorState } from '../utils/state'
+import { addresses } from './config'
 
 export const useLrtState = (ctx: Context) =>
   useProcessorState(ctx, 'lrt-processor', {
@@ -16,11 +18,11 @@ export const useLrtState = (ctx: Context) =>
     recipients: new Map<string, LRTPointRecipient>(),
     balanceData: new Map<string, LRTBalanceData>(),
     nodeDelegators: new Map<string, LRTNodeDelegator>(),
+    nodeDelegatorHoldings: new Map<string, LRTNodeDelegatorHoldings>(),
   })[0]
 
 export const getBalanceDataForRecipient = async (
   ctx: Context,
-  timestamp: Date,
   recipient: string,
 ) => {
   const dbResults = await ctx.store.find(LRTBalanceData, {
@@ -58,4 +60,20 @@ export const getRecipient = async (ctx: Context, id: string) => {
     state.recipients.set(id, depositor)
   }
   return depositor
+}
+
+export const getLatestNodeDelegators = async (ctx: Context) => {
+  return await Promise.all(
+    addresses.nodeDelegators.map((node) => getLatestNodeDelegator(ctx, node)),
+  )
+}
+
+export const getLatestNodeDelegator = async (ctx: Context, node: string) => {
+  return await ctx.store.findOne(LRTNodeDelegator, {
+    order: { id: 'desc' },
+    where: { node },
+    relations: {
+      holdings: true,
+    },
+  })
 }

@@ -1,5 +1,5 @@
-module.exports = class Data1706990910298 {
-    name = 'Data1706990910298'
+module.exports = class Data1707001526165 {
+    name = 'Data1707001526165'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -54,7 +54,7 @@ module.exports = class Data1706990910298 {
         await db.query(`CREATE TABLE "lrt_deposit" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "depositor" text NOT NULL, "asset" text NOT NULL, "deposit_amount" numeric NOT NULL, "amount_received" numeric NOT NULL, "referral_id" text NOT NULL, CONSTRAINT "PK_ad21ac1aaeea740bd658dd5b7f5" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1710650fa59a4c8ff61af698b3" ON "lrt_deposit" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_14fae3388d6cb222f07f3d2584" ON "lrt_deposit" ("block_number") `)
-        await db.query(`CREATE TABLE "lrt_point_recipient" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, "points_date" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_d92d1946162990fb7f6e9418211" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "lrt_point_recipient" ("id" character varying NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, "points_date" TIMESTAMP WITH TIME ZONE NOT NULL, "el_points" numeric NOT NULL, CONSTRAINT "PK_d92d1946162990fb7f6e9418211" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_806e89bce71b9c55c6160e32fd" ON "lrt_point_recipient" ("points_date") `)
         await db.query(`CREATE TABLE "lrt_balance_data" ("id" character varying NOT NULL, "static_points_date" TIMESTAMP WITH TIME ZONE NOT NULL, "static_points" numeric NOT NULL, "asset" text, "balance" numeric NOT NULL, "balance_date" TIMESTAMP WITH TIME ZONE NOT NULL, "recipient_id" character varying, CONSTRAINT "PK_0ea0b2d704eb121ed0f6061531b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_61e40cacf71c10157332c95dc2" ON "lrt_balance_data" ("recipient_id") `)
@@ -64,10 +64,10 @@ module.exports = class Data1706990910298 {
         await db.query(`CREATE TABLE "lrt_node_delegator_holdings" ("id" character varying NOT NULL, "asset" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, "delegator_id" character varying, CONSTRAINT "PK_b16c26b07feb23b5ae8778f09b3" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f4f758f6162648ea2de3faefbd" ON "lrt_node_delegator_holdings" ("delegator_id") `)
         await db.query(`CREATE INDEX "IDX_4e8663d1dc6a5623dbfb4de947" ON "lrt_node_delegator_holdings" ("asset") `)
-        await db.query(`CREATE TABLE "lrt_node_delegator" ("id" character varying NOT NULL, "node" text NOT NULL, "amount" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_00c9b979aed504224511fe1719a" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_d5f6eb2d98dca0ff8eef1d9c7b" ON "lrt_node_delegator" ("node") `)
+        await db.query(`CREATE TABLE "lrt_node_delegator" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "node" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, CONSTRAINT "PK_00c9b979aed504224511fe1719a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_74a1123cf49f717c876f5384e5" ON "lrt_node_delegator" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c3f45d1d8bdc99417e40baca58" ON "lrt_node_delegator" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_d5f6eb2d98dca0ff8eef1d9c7b" ON "lrt_node_delegator" ("node") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -300,9 +300,9 @@ module.exports = class Data1706990910298 {
         await db.query(`DROP INDEX "public"."IDX_f4f758f6162648ea2de3faefbd"`)
         await db.query(`DROP INDEX "public"."IDX_4e8663d1dc6a5623dbfb4de947"`)
         await db.query(`DROP TABLE "lrt_node_delegator"`)
-        await db.query(`DROP INDEX "public"."IDX_d5f6eb2d98dca0ff8eef1d9c7b"`)
         await db.query(`DROP INDEX "public"."IDX_74a1123cf49f717c876f5384e5"`)
         await db.query(`DROP INDEX "public"."IDX_c3f45d1d8bdc99417e40baca58"`)
+        await db.query(`DROP INDEX "public"."IDX_d5f6eb2d98dca0ff8eef1d9c7b"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)

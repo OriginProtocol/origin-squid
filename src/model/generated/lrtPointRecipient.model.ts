@@ -21,6 +21,9 @@ export class LRTPointRecipient {
     @Column_("timestamp with time zone", {nullable: false})
     pointsDate!: Date
 
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    elPoints!: bigint
+
     @OneToMany_(() => LRTBalanceData, e => e.recipient)
     balanceData!: LRTBalanceData[]
 }

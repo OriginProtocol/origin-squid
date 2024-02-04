@@ -24,6 +24,7 @@ type LRTPointRecipient @entity {
   balance: BigInt!
   points: BigInt!
   pointsDate: DateTime! @index
+  elPoints: BigInt!
   balanceData: [LRTBalanceData]! @derivedFrom(field: "recipient")
 }
 
@@ -37,10 +38,12 @@ type LRTSummary @entity {
 
 type LRTNodeDelegator @entity {
   id: ID! @index
-  node: String! @index
-  amount: BigInt!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  blockHour: Int!
+  node: String! @index
+  amount: BigInt!
+  points: BigInt!
   holdings: [LRTNodeDelegatorHoldings]! @derivedFrom(field: "delegator")
 }
 

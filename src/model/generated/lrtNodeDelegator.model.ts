@@ -12,19 +12,22 @@ export class LRTNodeDelegator {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
-    node!: string
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    amount!: bigint
-
-    @Index_()
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
 
     @Index_()
     @Column_("int4", {nullable: false})
     blockNumber!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    node!: string
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    amount!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    points!: bigint
 
     @OneToMany_(() => LRTNodeDelegatorHoldings, e => e.delegator)
     holdings!: LRTNodeDelegatorHoldings[]

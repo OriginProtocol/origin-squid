@@ -1,29 +1,32 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
-import { countBy, remove } from 'lodash'
 import { MoreThan } from 'typeorm'
 
 import * as abiNodeDelegator from '../abi/el-node-delegator'
 import * as abiErc20 from '../abi/erc20'
 import * as abiDepositPool from '../abi/lrt-deposit-pool'
+import * as abiOracle from '../abi/lrt-oracle'
 import {
   LRTBalanceData,
   LRTDeposit,
+  LRTNodeDelegator,
+  LRTNodeDelegatorHoldings,
   LRTPointRecipient,
   LRTSummary,
 } from '../model'
 import { Block, Context, Log } from '../processor'
 import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
+import { multicall } from '../utils/multicall'
 import { calculateRecipientsPoints } from './calculation'
-import { getBalanceDataForRecipient, getRecipient, useLrtState } from './state'
-
-// LRT Addresses: https://github.com/oplabs/primestaked-eth/blob/main/README.md
-export const addresses = {
-  primeETH: '0x6ef3D766Dfe02Dc4bF04aAe9122EB9A0Ded25615',
-  lrtDepositPools: '0xA479582c8b64533102F6F528774C536e354B8d32',
-  nodeDelegators: ['0x8bBBCB5F4D31a6db3201D40F478f30Dc4F704aE2'],
-}
+import { addresses } from './config'
+import {
+  getBalanceDataForRecipient,
+  getLatestNodeDelegator,
+  getLatestNodeDelegators,
+  getRecipient,
+  useLrtState,
+} from './state'
 
 // export const nodeDelegators = [
 //   '0x07b96Cf1183C9BFf2E43Acf0E547a8c4E4429473',
@@ -33,25 +36,10 @@ export const addresses = {
 //   '0xe8038228ff1aEfD007D7A22C9f08DDaadF8374E4',
 // ]
 
-const lsts = {
-  '0xbe9895146f7af43049ca1c1ae358b0541ea49704': 'cbETH',
-  '0xe95a203b1a91a908f9b9ce46459d101078c2c3cb': 'ankrETH',
-  '0xae78736cd615f374d3085123a210448e74fc6393': 'rETH',
-  '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3': 'OETH',
-  '0xf951e335afb289353dc249e82926178eac7ded78': 'swETH',
-  '0x8c1bed5b9a0928467c9b1341da1d7bd5e10b6549': 'lsETH',
-  '0xf1c9acdc66974dfb6decb12aa385b9cd01190e38': 'osETH',
-  '0xa35b1b31ce002fbf2058d22f30f95d405200a15b': 'ETHx',
-  '0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa': 'mETH',
-  '0xac3e018457b222d93114458476f3e3416abbe38f': 'sfrxETH',
-  '0xa2e3356610840701bdf5611a53974510ae27e2e1': 'wBETH',
-  '0xae7ab96520de3a18e5e111b5eaab095312d7fe84': 'stETH',
-}
-
 export const from = 19143860 // Contract Deploy: 0xA479582c8b64533102F6F528774C536e354B8d32
 
 const depositFilter = logFilter({
-  address: [addresses.lrtDepositPools],
+  address: [addresses.lrtDepositPool],
   topic0: [abiDepositPool.events.AssetDeposit.topic],
   range: { from },
 })
@@ -74,7 +62,18 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog(depositFilter.value)
   processor.addLog(transferFilter.value)
   processor.addLog(assetDepositIntoStrategyFilter.value)
+  processor.includeAllBlocks({ from })
 }
+
+const hourMs = 3600000
+let lastHourProcessed = 0
+export const initialize = async (ctx: Context) => {
+  lastHourProcessed = await getLatestNodeDelegator(
+    ctx,
+    addresses.nodeDelegators[0],
+  ).then((d) => (d?.timestamp.getTime() ?? 0) % hourMs)
+}
+
 export const process = async (ctx: Context) => {
   // ============================
   // Process chain data
@@ -88,9 +87,10 @@ export const process = async (ctx: Context) => {
         await processTransfer(ctx, block, log)
       }
       if (assetDepositIntoStrategyFilter.matches(log)) {
-        await processAssetDepositIntoStrategy(ctx, block, log)
+        await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
+    await processHourly(ctx, block)
   }
 
   // ============================
@@ -99,9 +99,10 @@ export const process = async (ctx: Context) => {
   await ctx.store.upsert([...state.recipients.values()])
   await ctx.store.insert([...state.balanceData.values()])
   await ctx.store.upsert([...state.nodeDelegators.values()])
+  await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
 
   // ============================
-  // Do point calculations, maybe
+  // Do Prime Staking XP calculations, maybe
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
   const lastSummary = await ctx.store
     .find(LRTSummary, {
@@ -142,6 +143,29 @@ export const process = async (ctx: Context) => {
     // Save Updated Balance Data (from `calculateRecipientsPoints`)
     const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
     await ctx.store.save(updatedBalanceData)
+  }
+}
+
+const processHourly = async (ctx: Context, block: Block) => {
+  const state = useLrtState(ctx)
+  const blockHour = block.header.timestamp % hourMs
+  if (lastHourProcessed !== blockHour) {
+    const hoursPassed = blockHour - lastHourProcessed
+    if (hoursPassed !== 1) {
+      throw new Error('Something is wrong. We should trigger once per hour.')
+    }
+
+    // First write any unwritten data
+    await ctx.store.upsert([...state.nodeDelegators.values()])
+    await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
+    state.nodeDelegators.clear()
+    state.nodeDelegatorHoldings.clear()
+
+    // Calculate EL POINTS!
+    ctx.log.info('Process EL Points')
+    for (const node of addresses.nodeDelegators) {
+      await createLRTNodeDelegator(ctx, block, node)
+    }
   }
 }
 
@@ -192,11 +216,79 @@ const processTransfer = async (ctx: Context, block: Block, log: Log) => {
   })
 }
 
-const processAssetDepositIntoStrategy = async (
+const createLRTNodeDelegator = async (
   ctx: Context,
   block: Block,
-  log: Log,
-) => {}
+  node: string,
+  calculatePoints: boolean = false,
+) => {
+  const state = useLrtState(ctx)
+  const delegatorContract = new abiNodeDelegator.Contract(
+    ctx,
+    block.header,
+    node,
+  )
+  const [assets, balances] = await delegatorContract.getAssetBalances()
+  const rates = await multicall(
+    ctx,
+    block.header,
+    abiOracle.functions.getAssetPrice,
+    addresses.lrtOracle,
+    assets.map((asset) => [asset]),
+  )
+  const ethBalances = balances.map(
+    (balance, i) => (balance * rates[i]) / 1_000000000_000000000n,
+  )
+  const totalAmount = ethBalances.reduce(
+    (sum, ethBalance) => sum + ethBalance,
+    0n,
+  )
+
+  const lastNodeDelegatorEntry = await ctx.store.findOne(LRTNodeDelegator, {
+    order: { id: 'desc' },
+    where: { node: node.toLowerCase() },
+    relations: {
+      holdings: true,
+    },
+  })
+  let pointsEarned = 0n
+  if (calculatePoints) {
+    const calcPoints = (ethAmount: bigint, hours: number) =>
+      ethAmount * BigInt(hours)
+    if (lastNodeDelegatorEntry) {
+      const lastHour = lastNodeDelegatorEntry.timestamp.getTime()
+      const currentHour = block.header.timestamp % hourMs
+      const hours = currentHour - lastHour
+      pointsEarned = calcPoints(totalAmount, hours)
+    }
+  }
+    
+  const nodeDelegator = new LRTNodeDelegator({
+    id: `${block.header.height}:${node}`,
+    blockNumber: block.header.height,
+    timestamp: new Date(block.header.timestamp),
+    node: node.toLowerCase(),
+    amount: totalAmount,
+    points: (lastNodeDelegatorEntry?.points ?? 0n) + pointsEarned,
+    holdings: [],
+  })
+  nodeDelegator.holdings = assets.map((asset, i) => {
+    const lastHolding = lastNodeDelegatorEntry?.holdings.find(
+      (h) => h.asset === asset.toLowerCase(),
+    )
+    const holding = new LRTNodeDelegatorHoldings({
+      id: `${block.header.height}:${node}:${asset.toLowerCase()}`,
+      asset: asset.toLowerCase(),
+      delegator: nodeDelegator,
+      amount: ethBalances[i],
+      points: lastHolding?.points ?? 0n,
+    })
+    state.nodeDelegatorHoldings.set(holding.id, holding)
+    return holding
+  })
+
+  state.nodeDelegators.set(nodeDelegator.id, nodeDelegator)
+}
 
 const addBalance = async (
   ctx: Context,
@@ -239,11 +331,7 @@ const removeBalance = async (
   calculateRecipientsPoints(params.timestamp.getTime(), [recipient])
   recipient.balance -= params.balance
   let amountToRemove = params.balance
-  const balanceData = await getBalanceDataForRecipient(
-    ctx,
-    params.timestamp,
-    params.recipient,
-  )
+  const balanceData = await getBalanceDataForRecipient(ctx, params.recipient)
   if (!balanceData.length) {
     throw new Error('should have results here')
   }
@@ -273,7 +361,10 @@ const transferBalance = async (
   },
 ) => {
   // ctx.log.info({ from: params.from, to: params.to }, 'transferPoints')
-  if (params.from === '0x0000000000000000000000000000000000000000') return
+  if (params.from === '0x0000000000000000000000000000000000000000') {
+    // We don't need to reach `addBalance` here because it is added in the deposit handler.
+    return
+  }
   await removeBalance(ctx, {
     log: params.log,
     timestamp: params.timestamp,
@@ -281,15 +372,6 @@ const transferBalance = async (
     balance: params.amount,
   })
   if (params.to === '0x0000000000000000000000000000000000000000') return
-  // ctx.log.info(
-  //   {
-  //     timestamp: params.timestamp,
-  //     from: params.from,
-  //     to: params.to,
-  //     amount: params.amount,
-  //   },
-  //   'processTransfer',
-  // )
   await addBalance(ctx, {
     log: params.log,
     timestamp: params.timestamp,
