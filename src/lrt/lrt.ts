@@ -19,24 +19,15 @@ import { tokens } from '../utils/addresses'
 import { logFilter } from '../utils/logFilter'
 import { multicall } from '../utils/multicall'
 import { calculateRecipientsPoints } from './calculation'
-import { addresses } from './config'
+import { addresses, from } from './config'
 import {
   getBalanceDataForRecipient,
   getLatestNodeDelegator,
-  getLatestNodeDelegators,
   getRecipient,
   useLrtState,
 } from './state'
 
-// export const nodeDelegators = [
-//   '0x07b96Cf1183C9BFf2E43Acf0E547a8c4E4429473',
-//   '0x429554411C8f0ACEEC899100D3aacCF2707748b3',
-//   '0x92B4f5b9ffa1b5DB3b976E89A75E87B332E6e388',
-//   '0x9d2Fc9287e1c3A1A814382B40AAB13873031C4ad',
-//   '0xe8038228ff1aEfD007D7A22C9f08DDaadF8374E4',
-// ]
-
-export const from = 19143860 // Contract Deploy: 0xA479582c8b64533102F6F528774C536e354B8d32
+export { from } from './config'
 
 const depositFilter = logFilter({
   address: [addresses.lrtDepositPool],
@@ -67,11 +58,16 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 const hourMs = 3600000
 let lastHourProcessed = 0
+let haveNodeDelegatorInstance = false
 export const initialize = async (ctx: Context) => {
-  lastHourProcessed = await getLatestNodeDelegator(
+  const nodeDelegator = await getLatestNodeDelegator(
     ctx,
     addresses.nodeDelegators[0],
-  ).then((d) => (d?.timestamp.getTime() ?? 0) % hourMs)
+  )
+  lastHourProcessed = nodeDelegator
+    ? Math.floor(nodeDelegator.timestamp.getTime() / hourMs)
+    : 0
+  haveNodeDelegatorInstance = !!nodeDelegator
 }
 
 export const process = async (ctx: Context) => {
@@ -147,25 +143,28 @@ export const process = async (ctx: Context) => {
 }
 
 const processHourly = async (ctx: Context, block: Block) => {
+  const blockHour = Math.floor(block.header.timestamp / hourMs)
   const state = useLrtState(ctx)
-  const blockHour = block.header.timestamp % hourMs
   if (lastHourProcessed !== blockHour) {
+    ctx.log.info(`Processing hour: ${blockHour}`)
     const hoursPassed = blockHour - lastHourProcessed
-    if (hoursPassed !== 1) {
+    if (lastHourProcessed !== 0 && hoursPassed !== 1) {
       throw new Error('Something is wrong. We should trigger once per hour.')
     }
 
-    // First write any unwritten data
-    await ctx.store.upsert([...state.nodeDelegators.values()])
-    await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
-    state.nodeDelegators.clear()
-    state.nodeDelegatorHoldings.clear()
+    if (haveNodeDelegatorInstance) {
+      // Calculate EL POINTS!
+      // First write any unwritten data
+      await ctx.store.upsert([...state.nodeDelegators.values()])
+      await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
+      state.nodeDelegators.clear()
+      state.nodeDelegatorHoldings.clear()
 
-    // Calculate EL POINTS!
-    ctx.log.info('Process EL Points')
-    for (const node of addresses.nodeDelegators) {
-      await createLRTNodeDelegator(ctx, block, node)
+      for (const node of addresses.nodeDelegators) {
+        await createLRTNodeDelegator(ctx, block, node, true)
+      }
     }
+    lastHourProcessed = blockHour
   }
 }
 
@@ -228,7 +227,13 @@ const createLRTNodeDelegator = async (
     block.header,
     node,
   )
-  const [assets, balances] = await delegatorContract.getAssetBalances()
+  const [assets, balances] = await delegatorContract
+    .getAssetBalances()
+    .catch((err) => {
+      // ignore this for testing
+      // TODO remove
+      return [[], []]
+    })
   const rates = await multicall(
     ctx,
     block.header,
@@ -244,25 +249,24 @@ const createLRTNodeDelegator = async (
     0n,
   )
 
-  const lastNodeDelegatorEntry = await ctx.store.findOne(LRTNodeDelegator, {
-    order: { id: 'desc' },
-    where: { node: node.toLowerCase() },
-    relations: {
-      holdings: true,
-    },
-  })
+  const lastNodeDelegatorEntry = await getLatestNodeDelegator(
+    ctx,
+    node.toLowerCase(),
+  )
   let pointsEarned = 0n
   if (calculatePoints) {
     const calcPoints = (ethAmount: bigint, hours: number) =>
       ethAmount * BigInt(hours)
     if (lastNodeDelegatorEntry) {
-      const lastHour = lastNodeDelegatorEntry.timestamp.getTime()
-      const currentHour = block.header.timestamp % hourMs
+      const lastHour = Math.floor(
+        lastNodeDelegatorEntry.timestamp.getTime() / hourMs,
+      )
+      const currentHour = Math.floor(block.header.timestamp / hourMs)
       const hours = currentHour - lastHour
       pointsEarned = calcPoints(totalAmount, hours)
     }
   }
-    
+
   const nodeDelegator = new LRTNodeDelegator({
     id: `${block.header.height}:${node}`,
     blockNumber: block.header.height,
@@ -288,6 +292,7 @@ const createLRTNodeDelegator = async (
   })
 
   state.nodeDelegators.set(nodeDelegator.id, nodeDelegator)
+  haveNodeDelegatorInstance = true
 }
 
 const addBalance = async (

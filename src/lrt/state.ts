@@ -1,5 +1,5 @@
 import { sortBy, uniqBy } from 'lodash'
-import { IsNull, LessThanOrEqual, MoreThan } from 'typeorm'
+import { MoreThan } from 'typeorm'
 
 import {
   LRTBalanceData,
@@ -8,9 +8,8 @@ import {
   LRTNodeDelegatorHoldings,
   LRTPointRecipient,
 } from '../model'
-import { Block, Context } from '../processor'
+import { Context } from '../processor'
 import { useProcessorState } from '../utils/state'
-import { addresses } from './config'
 
 export const useLrtState = (ctx: Context) =>
   useProcessorState(ctx, 'lrt-processor', {
@@ -53,6 +52,7 @@ export const getRecipient = async (ctx: Context, id: string) => {
         id,
         balance: 0n,
         points: 0n,
+        elPoints: 0n,
         pointsDate: new Date(0),
         balanceData: [],
       })
@@ -60,12 +60,6 @@ export const getRecipient = async (ctx: Context, id: string) => {
     state.recipients.set(id, depositor)
   }
   return depositor
-}
-
-export const getLatestNodeDelegators = async (ctx: Context) => {
-  return await Promise.all(
-    addresses.nodeDelegators.map((node) => getLatestNodeDelegator(ctx, node)),
-  )
 }
 
 export const getLatestNodeDelegator = async (ctx: Context, node: string) => {

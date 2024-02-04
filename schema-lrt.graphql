@@ -40,7 +40,6 @@ type LRTNodeDelegator @entity {
   id: ID! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  blockHour: Int!
   node: String! @index
   amount: BigInt!
   points: BigInt!
