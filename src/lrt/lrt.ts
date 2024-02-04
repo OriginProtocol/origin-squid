@@ -46,7 +46,7 @@ const transferFilter = logFilter({
   range: RANGE,
 })
 const assetDepositIntoStrategyFilter = logFilter({
-  address: config.addresses.nodeDelegators,
+  address: config.addresses.nodeDelegators.map((n) => n.address),
   topic0: [abiNodeDelegator.events.AssetDepositIntoStrategy.topic],
   range: RANGE,
 })
@@ -66,7 +66,7 @@ let haveNodeDelegatorInstance = false
 export const initialize = async (ctx: Context) => {
   const nodeDelegator = await getLatestNodeDelegator(
     ctx,
-    config.addresses.nodeDelegators[0],
+    config.addresses.nodeDelegators[0].address,
   )
   lastHourProcessed = nodeDelegator
     ? Math.floor(nodeDelegator.timestamp.getTime() / HOUR_MS)
@@ -77,7 +77,6 @@ export const initialize = async (ctx: Context) => {
 export const process = async (ctx: Context) => {
   // ============================
   // Process chain data
-  const state = useLrtState(ctx)
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
       if (depositFilter.matches(log)) {
@@ -92,55 +91,20 @@ export const process = async (ctx: Context) => {
     }
     await processHourly(ctx, block)
   }
+}
 
-  // ============================
-  // Save
+const saveAndResetState = async (ctx: Context) => {
+  const state = useLrtState(ctx)
   await ctx.store.insert([...state.deposits.values()])
   await ctx.store.upsert([...state.recipients.values()])
   await ctx.store.upsert([...state.balanceData.values()])
   await ctx.store.upsert([...state.nodeDelegators.values()])
   await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
-
-  // ============================
-  // FIXME: Should all the code below be on `processHourly`?
-  // Do Prime Staking XP calculations, maybe
-  const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-  const lastSummary = await getLastSummary(ctx)
-  const lastBlockDate = dayjs.utc(lastBlock.header.timestamp)
-  const lastSummaryDate = dayjs.utc(lastSummary?.timestamp ?? 0)
-  const shouldUpdateSummary = lastBlockDate.isAfter(
-    lastSummaryDate.add(1, 'hour'),
-  )
-
-  // TODO: Could update more precisely at the beginning of the hour.
-  // This is a big update - we load everything!
-  // Can iterate through this in batches later if needed.
-  if (shouldUpdateSummary) {
-    const recipients = await ctx.store.find(LRTPointRecipient, {
-      where: { balance: MoreThan(0n) },
-      relations: {
-        balanceData: {
-          recipient: true,
-        },
-      },
-    })
-
-    // Create Summary
-    const summary = new LRTSummary({
-      id: lastBlock.header.id,
-      timestamp: new Date(lastBlock.header.timestamp),
-      blockNumber: lastBlock.header.height,
-      balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
-      points: calculateRecipientsPoints(lastBlock.header.timestamp, recipients),
-      elPoints: lastSummary?.elPoints ?? 0n,
-    })
-    await ctx.store.insert(summary)
-    await ctx.store.save(recipients)
-
-    // Save Updated Balance Data (from `calculateRecipientsPoints`)
-    const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
-    await ctx.store.save(updatedBalanceData)
-  }
+  state.deposits.clear()
+  state.recipients.clear()
+  state.balanceData.clear()
+  state.nodeDelegators.clear()
+  state.nodeDelegatorHoldings.clear()
 }
 
 const processHourly = async (ctx: Context, block: Block) => {
@@ -156,26 +120,20 @@ const processHourly = async (ctx: Context, block: Block) => {
       throw new Error('Something is wrong. We should trigger once per hour.')
     }
 
+    await saveAndResetState(ctx)
+    const { summary, recipients } = await createSummary(ctx, block)
+
     if (haveNodeDelegatorInstance) {
       // Calculate EL POINTS!
-      // First write any unwritten data
-      await ctx.store.upsert([...state.recipients.values()])
-      await ctx.store.upsert([...state.nodeDelegators.values()])
-      await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
-      state.recipients.clear()
-      state.nodeDelegators.clear()
-      state.nodeDelegatorHoldings.clear()
-
-      const recipients = await ctx.store.find(LRTPointRecipient, {
-        where: { balance: MoreThan(0n) },
-      })
       const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
       let totalPointsEarned = 0n
-      for (const node of config.addresses.nodeDelegators) {
+      for (const node of config.addresses.nodeDelegators.filter(
+        (n) => n.blockNumber > block.header.height,
+      )) {
         const { pointsEarned } = await createLRTNodeDelegator(
           ctx,
           block,
-          node,
+          node.address,
           true,
         )
         totalPointsEarned += pointsEarned
@@ -184,22 +142,48 @@ const processHourly = async (ctx: Context, block: Block) => {
         recipient.elPoints +=
           (recipient.balance * totalPointsEarned) / totalBalance
       }
-      const lastSummary = await getLastSummary(ctx)
-      const summary = new LRTSummary({
-        id: block.header.id,
-        timestamp: new Date(block.header.timestamp),
-        blockNumber: block.header.height,
-        balance: lastSummary?.balance ?? 0n,
-        points: lastSummary?.points ?? 0n,
-        elPoints: (lastSummary?.elPoints ?? 0n) + totalPointsEarned,
-      })
-      await ctx.store.insert(summary)
+      summary.elPoints += totalPointsEarned
+      await ctx.store.save(summary)
       await ctx.store.save(recipients)
       await ctx.store.upsert([...state.nodeDelegators.values()])
       await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])
     }
     lastHourProcessed = blockHour
   }
+}
+
+const createSummary = async (ctx: Context, block: Block) => {
+  const lastBlock = block
+  const lastSummary = await getLastSummary(ctx)
+
+  // This is a big update - we load everything!
+  // Can iterate through this in batches later if needed.
+  const recipients = await ctx.store.find(LRTPointRecipient, {
+    where: { balance: MoreThan(0n) },
+    relations: {
+      balanceData: {
+        recipient: true,
+      },
+    },
+  })
+
+  // Create Summary
+  const summary = new LRTSummary({
+    id: lastBlock.header.id,
+    timestamp: new Date(lastBlock.header.timestamp),
+    blockNumber: lastBlock.header.height,
+    balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
+    points: calculateRecipientsPoints(lastBlock.header.timestamp, recipients),
+    elPoints: lastSummary?.elPoints ?? 0n,
+  })
+  await ctx.store.insert(summary)
+  await ctx.store.save(recipients)
+
+  // Save Updated Balance Data (from `calculateRecipientsPoints`)
+  const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
+  await ctx.store.save(updatedBalanceData)
+
+  return { summary, recipients }
 }
 
 const processDeposit = async (ctx: Context, block: Block, log: Log) => {
@@ -262,13 +246,7 @@ const createLRTNodeDelegator = async (
     block.header,
     node,
   )
-  const [assets, balances] = await delegatorContract
-    .getAssetBalances()
-    .catch((err) => {
-      // ignore this for testing
-      // TODO remove
-      return [[], []]
-    })
+  const [assets, balances] = await delegatorContract.getAssetBalances()
 
   // Get the rates for the assets
   const rates = await multicall(
@@ -374,7 +352,6 @@ const removeBalance = async (
 ) => {
   const state = useLrtState(ctx)
   const recipient = await getRecipient(ctx, params.recipient)
-  // FIXME: do we need to calculate points here?
   calculateRecipientsPoints(params.timestamp.getTime(), [recipient])
   recipient.balance -= params.balance
   let amountToRemove = params.balance

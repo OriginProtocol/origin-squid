@@ -81,5 +81,10 @@ export const addresses = {
   lrtToken: '0x6ef3D766Dfe02Dc4bF04aAe9122EB9A0Ded25615',
   lrtDepositPool: '0xA479582c8b64533102F6F528774C536e354B8d32',
   lrtOracle: '0xA755c18CD2376ee238daA5Ce88AcF17Ea74C1c32',
-  nodeDelegators: ['0x8bBBCB5F4D31a6db3201D40F478f30Dc4F704aE2'],
+  nodeDelegators: [
+    {
+      address: '0x8bBBCB5F4D31a6db3201D40F478f30Dc4F704aE2',
+      blockNumber: 19143860,
+    },
+  ],
 }
