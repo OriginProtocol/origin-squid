@@ -21,6 +21,7 @@ import { calculateRecipientsPoints } from './calculation'
 import { addresses, from } from './config'
 import {
   getBalanceDataForRecipient,
+  getLastSummary,
   getLatestNodeDelegator,
   getRecipient,
   useLrtState,
@@ -99,12 +100,7 @@ export const process = async (ctx: Context) => {
   // ============================
   // Do Prime Staking XP calculations, maybe
   const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-  const lastSummary = await ctx.store
-    .find(LRTSummary, {
-      take: 1,
-      order: { id: 'desc' },
-    })
-    .then((r) => r[0])
+  const lastSummary = await getLastSummary(ctx)
   const lastBlockDate = dayjs.utc(lastBlock.header.timestamp)
   const lastSummaryDate = dayjs.utc(lastSummary?.timestamp ?? 0)
   const shouldUpdateSummary = lastBlockDate.isAfter(
@@ -131,6 +127,7 @@ export const process = async (ctx: Context) => {
       blockNumber: lastBlock.header.height,
       balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
       points: calculateRecipientsPoints(lastBlock.header.timestamp, recipients),
+      elPoints: lastSummary?.elPoints ?? 0n,
     })
     await ctx.store.insert(summary)
     await ctx.store.save(recipients)
@@ -179,6 +176,16 @@ const processHourly = async (ctx: Context, block: Block) => {
         recipient.elPoints +=
           (recipient.balance * totalPointsEarned) / totalBalance
       }
+      const lastSummary = await getLastSummary(ctx)
+      const summary = new LRTSummary({
+        id: block.header.id,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        balance: lastSummary?.balance ?? 0n,
+        points: lastSummary?.points ?? 0n,
+        elPoints: (lastSummary?.elPoints ?? 0n) + totalPointsEarned,
+      })
+      await ctx.store.insert(summary)
       await ctx.store.save(recipients)
       await ctx.store.upsert([...state.nodeDelegators.values()])
       await ctx.store.upsert([...state.nodeDelegatorHoldings.values()])

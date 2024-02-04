@@ -32,6 +32,9 @@ export class LRTResolver {
         balanceData: true,
       },
     })
+    if (recipients.length === 0) {
+      return { points: 0n, elPoints: 0n }
+    }
     return {
       points: calculateRecipientsPoints(Date.now(), recipients),
       elPoints: recipients[0].elPoints,

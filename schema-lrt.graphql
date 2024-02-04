@@ -34,6 +34,7 @@ type LRTSummary @entity {
   blockNumber: Int! @index
   balance: BigInt!
   points: BigInt!
+  elPoints: BigInt!
 }
 
 type LRTNodeDelegator @entity {

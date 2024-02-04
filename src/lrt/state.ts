@@ -7,6 +7,7 @@ import {
   LRTNodeDelegator,
   LRTNodeDelegatorHoldings,
   LRTPointRecipient,
+  LRTSummary,
 } from '../model'
 import { Context } from '../processor'
 import { useProcessorState } from '../utils/state'
@@ -71,4 +72,13 @@ export const getLatestNodeDelegator = async (ctx: Context, node: string) => {
       holdings: true,
     },
   })
+}
+
+export const getLastSummary = async (ctx: Context) => {
+  return await ctx.store
+    .find(LRTSummary, {
+      take: 1,
+      order: { id: 'desc' },
+    })
+    .then((r) => r[0])
 }

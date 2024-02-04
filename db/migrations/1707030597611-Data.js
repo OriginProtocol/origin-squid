@@ -1,5 +1,5 @@
-module.exports = class Data1707008695606 {
-    name = 'Data1707008695606'
+module.exports = class Data1707030597611 {
+    name = 'Data1707030597611'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -58,7 +58,7 @@ module.exports = class Data1707008695606 {
         await db.query(`CREATE INDEX "IDX_806e89bce71b9c55c6160e32fd" ON "lrt_point_recipient" ("points_date") `)
         await db.query(`CREATE TABLE "lrt_balance_data" ("id" character varying NOT NULL, "static_points_date" TIMESTAMP WITH TIME ZONE NOT NULL, "static_points" numeric NOT NULL, "asset" text, "balance" numeric NOT NULL, "balance_date" TIMESTAMP WITH TIME ZONE NOT NULL, "recipient_id" character varying, CONSTRAINT "PK_0ea0b2d704eb121ed0f6061531b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_61e40cacf71c10157332c95dc2" ON "lrt_balance_data" ("recipient_id") `)
-        await db.query(`CREATE TABLE "lrt_summary" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, CONSTRAINT "PK_20cc1ddd92e29b97d990c95c130" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "lrt_summary" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, "el_points" numeric NOT NULL, CONSTRAINT "PK_20cc1ddd92e29b97d990c95c130" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68e45ce3e1da597d030f27acf6" ON "lrt_summary" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_82cd3e23b0a7a65b75773ae865" ON "lrt_summary" ("block_number") `)
         await db.query(`CREATE TABLE "lrt_node_delegator_holdings" ("id" character varying NOT NULL, "asset" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, "delegator_id" character varying, CONSTRAINT "PK_b16c26b07feb23b5ae8778f09b3" PRIMARY KEY ("id"))`)

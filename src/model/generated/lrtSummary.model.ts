@@ -23,4 +23,7 @@ export class LRTSummary {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     points!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    elPoints!: bigint
 }
