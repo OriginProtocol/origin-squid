@@ -15,7 +15,7 @@ export const calculateRecipientsPoints = (
   recipients: LRTPointRecipient[],
   ctx?: Context,
 ) => {
-  const state = ctx && useLrtState(ctx)
+  const state = ctx && useLrtState()
   let totalPoints = 0n
   for (const recipient of recipients) {
     state?.recipients.set(recipient.id, recipient)
@@ -40,7 +40,7 @@ const calculatePoints = (
   balanceData: LRTBalanceData[],
   ctx?: Context,
 ) => {
-  const state = ctx && useLrtState(ctx)
+  const state = ctx && useLrtState()
   let totalPoints = 0n
   for (const data of balanceData) {
     state?.balanceData.set(data.id, data)

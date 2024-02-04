@@ -10,16 +10,16 @@ import {
   LRTSummary,
 } from '../model'
 import { Context } from '../processor'
-import { useProcessorState } from '../utils/state'
 
-export const useLrtState = (ctx: Context) =>
-  useProcessorState(ctx, 'lrt-processor', {
-    deposits: new Map<string, LRTDeposit>(),
-    recipients: new Map<string, LRTPointRecipient>(),
-    balanceData: new Map<string, LRTBalanceData>(),
-    nodeDelegators: new Map<string, LRTNodeDelegator>(),
-    nodeDelegatorHoldings: new Map<string, LRTNodeDelegatorHoldings>(),
-  })[0]
+const state = {
+  deposits: new Map<string, LRTDeposit>(),
+  recipients: new Map<string, LRTPointRecipient>(),
+  balanceData: new Map<string, LRTBalanceData>(),
+  nodeDelegators: new Map<string, LRTNodeDelegator>(),
+  nodeDelegatorHoldings: new Map<string, LRTNodeDelegatorHoldings>(),
+}
+
+export const useLrtState = () => state
 
 export const getBalanceDataForRecipient = async (
   ctx: Context,
@@ -34,7 +34,7 @@ export const getBalanceDataForRecipient = async (
     ],
     relations: { recipient: true },
   })
-  const state = useLrtState(ctx)
+  const state = useLrtState()
   const localResults = Array.from(state.balanceData.values()).filter((d) => {
     return d.recipient.id === recipient && d.balance > 0n
   })
@@ -42,15 +42,15 @@ export const getBalanceDataForRecipient = async (
 }
 
 export const getRecipient = async (ctx: Context, id: string) => {
-  const state = useLrtState(ctx)
-  let depositor = state.recipients.get(id)
-  if (!depositor) {
-    depositor = await ctx.store.get(LRTPointRecipient, {
+  const state = useLrtState()
+  let recipient = state.recipients.get(id)
+  if (!recipient) {
+    recipient = await ctx.store.get(LRTPointRecipient, {
       where: { id },
       relations: { balanceData: true },
     })
-    if (!depositor) {
-      depositor = new LRTPointRecipient({
+    if (!recipient) {
+      recipient = new LRTPointRecipient({
         id,
         balance: 0n,
         points: 0n,
@@ -59,9 +59,9 @@ export const getRecipient = async (ctx: Context, id: string) => {
         balanceData: [],
       })
     }
-    state.recipients.set(id, depositor)
+    state.recipients.set(id, recipient)
   }
-  return depositor
+  return recipient
 }
 
 export const getLatestNodeDelegator = async (ctx: Context, node: string) => {
