@@ -17,7 +17,13 @@ interface PointCondition {
   duration?: number // Days
 }
 
-const launchDate = new Date('2024-01-05 12:00 PM PST') // TODO set to Feb 5
+interface BalanceBonus {
+  name: string
+  gte: bigint
+  multiplier: bigint
+}
+
+const launchDate = new Date('2024-02-05 12:00 PM PST')
 export const pointConditions: PointCondition[] = [
   {
     name: 'oeth-2x',
@@ -52,13 +58,7 @@ export const pointConditions: PointCondition[] = [
   { name: 'standard', startDate: launchDate, multiplier: 100n },
 ]
 
-interface BalanceBonus {
-  name: string
-  gte: bigint
-  multiplier: bigint
-}
-
-// Maintain Order
+// Maintain Order - Only one gets applied.
 export const balanceBonuses: BalanceBonus[] = [
   { name: 'gte2000', gte: eth(2000n), multiplier: 20n },
   { name: 'gte1000', gte: eth(1000n), multiplier: 15n },
