@@ -1,6 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import { MoreThan } from 'typeorm'
+import { formatEther, parseEther } from 'viem'
 
 import * as abiNodeDelegator from '../abi/el-node-delegator'
 import * as abiErc20 from '../abi/erc20'
@@ -103,6 +104,7 @@ export const process = async (ctx: Context) => {
         await processTransfer(ctx, block, log)
       }
       if (assetDepositIntoStrategyFilter.matches(log)) {
+        haveNodeDelegatorInstance = true
         await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
@@ -154,34 +156,7 @@ const processHourly = async (ctx: Context, block: Block) => {
 
     await saveAndResetState(ctx)
     const { summary, recipients } = await createSummary(ctx, block)
-
-    if (haveNodeDelegatorInstance) {
-      // Calculate EL POINTS!
-      const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
-      let totalPointsEarned = 0n
-      for (const node of config.addresses.nodeDelegators.filter(
-        (n) => n.blockNumber <= block.header.height,
-      )) {
-        const { pointsEarned } = await createLRTNodeDelegator(
-          ctx,
-          block,
-          node.address,
-          true,
-        )
-        totalPointsEarned += pointsEarned
-      }
-      for (const recipient of recipients) {
-        recipient.elPoints +=
-          (recipient.balance * totalPointsEarned) / totalBalance
-      }
-      summary.elPoints += totalPointsEarned
-      await Promise.all([
-        ctx.store.save(summary),
-        ctx.store.save(recipients),
-        ctx.store.upsert([...state.nodeDelegators.values()]),
-        ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
-      ])
-    }
+    await calculateELPoints(ctx, block, summary, recipients)
     lastHourProcessed = blockHour
   }
 }
@@ -209,7 +184,8 @@ const processMinute5 = async (ctx: Context, block: Block) => {
     // }
 
     await saveAndResetState(ctx)
-    await createSummary(ctx, block)
+    const { summary, recipients } = await createSummary(ctx, block)
+    await calculateELPoints(ctx, block, summary, recipients)
     lastMinute5Processed = blockMinute5
   }
 }
@@ -247,6 +223,42 @@ const createSummary = async (ctx: Context, block: Block) => {
   ])
 
   return { summary, recipients }
+}
+
+async function calculateELPoints(
+  ctx: Context,
+  block: Block,
+  summary: LRTSummary,
+  recipients: LRTPointRecipient[],
+) {
+  if (haveNodeDelegatorInstance) {
+    const state = useLrtState()
+    const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
+    let totalPointsEarned = 0n
+    let totalPoints = 0n
+    for (const node of config.addresses.nodeDelegators.filter(
+      (n) => n.blockNumber <= block.header.height,
+    )) {
+      const { pointsEarned, nodeDelegator } = await createLRTNodeDelegator(
+        ctx,
+        block,
+        node.address,
+      )
+      totalPointsEarned += pointsEarned
+      totalPoints += nodeDelegator.points
+    }
+    for (const recipient of recipients) {
+      recipient.elPoints +=
+        (recipient.balance * totalPointsEarned) / totalBalance
+    }
+    summary.elPoints = totalPoints
+    await Promise.all([
+      ctx.store.save(summary),
+      ctx.store.save(recipients),
+      ctx.store.upsert([...state.nodeDelegators.values()]),
+      ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
+    ])
+  }
 }
 
 const processDeposit = async (ctx: Context, block: Block, log: Log) => {
@@ -301,7 +313,6 @@ const createLRTNodeDelegator = async (
   ctx: Context,
   block: Block,
   node: string,
-  calculatePoints: boolean = false,
 ) => {
   const state = useLrtState()
   const delegatorContract = new abiNodeDelegator.Contract(
@@ -310,42 +321,22 @@ const createLRTNodeDelegator = async (
     node,
   )
   const [assets, balances] = await delegatorContract.getAssetBalances()
-
-  // Get the rates for the assets
-  const rates = await multicall(
-    ctx,
-    block.header,
-    abiOracle.functions.getAssetPrice,
-    config.addresses.lrtOracle,
-    assets.map((asset) => [asset]),
-  )
-  // Convert the balances to ETH
-  const ethBalances = balances.map(
-    (balance, i) => (balance * rates[i]) / 1_000000000_000000000n,
-  )
-  // Sum the ETH balances
-  const ethTotalAmount = ethBalances.reduce(
-    (sum, ethBalance) => sum + ethBalance,
-    0n,
-  )
-
-  // FIXME: why get latest?
+  const totalBalance = balances.reduce((sum, balance) => sum + balance, 0n)
   const lastNodeDelegatorEntry = await getLatestNodeDelegator(
     ctx,
     node.toLowerCase(),
   )
   let pointsEarned = 0n
-  if (calculatePoints) {
-    const calcPoints = (ethAmount: bigint, hours: number) =>
-      ethAmount * BigInt(hours)
-    if (lastNodeDelegatorEntry) {
-      const lastHour = Math.floor(
-        lastNodeDelegatorEntry.timestamp.getTime() / HOUR_MS,
-      )
-      const currentHour = Math.floor(block.header.timestamp / HOUR_MS)
-      const hours = currentHour - lastHour
-      pointsEarned = calcPoints(ethTotalAmount, hours)
-    }
+  const calcPoints = (ethAmount: bigint, hours: bigint) =>
+    (ethAmount * hours) / 1_000000000_000000000n
+  if (lastNodeDelegatorEntry) {
+    const from = parseEther(
+      lastNodeDelegatorEntry.timestamp.getTime().toString(),
+    )
+    const to = parseEther(block.header.timestamp.toString())
+    const hourLength =
+      ((to - from) * 1_000000000_000000000n) / parseEther('3600000')
+    pointsEarned = calcPoints(totalBalance, hourLength)
   }
 
   const nodeDelegator = new LRTNodeDelegator({
@@ -353,10 +344,16 @@ const createLRTNodeDelegator = async (
     blockNumber: block.header.height,
     timestamp: new Date(block.header.timestamp),
     node: node.toLowerCase(),
-    amount: ethTotalAmount,
+    amount: totalBalance,
     points: (lastNodeDelegatorEntry?.points ?? 0n) + pointsEarned,
     holdings: [],
   })
+  ctx.log.info({
+    lastNodeDelegatorEntry: !!lastNodeDelegatorEntry,
+    timestamp: nodeDelegator.timestamp,
+    pointsEarned: formatEther(nodeDelegator.points),
+  })
+
   nodeDelegator.holdings = assets.map((asset, i) => {
     const lastHolding = lastNodeDelegatorEntry?.holdings.find(
       (h) => h.asset === asset.toLowerCase(),
@@ -365,15 +362,17 @@ const createLRTNodeDelegator = async (
       id: `${block.header.height}:${node}:${asset.toLowerCase()}`,
       asset: asset.toLowerCase(),
       delegator: nodeDelegator,
-      amount: ethBalances[i],
-      points: lastHolding?.points ?? 0n,
+      amount: balances[i],
+      points:
+        (lastHolding?.points ?? 0n) +
+        (pointsEarned * balances[i]) / totalBalance,
     })
     state.nodeDelegatorHoldings.set(holding.id, holding)
     return holding
   })
 
   state.nodeDelegators.set(nodeDelegator.id, nodeDelegator)
-  haveNodeDelegatorInstance = true
+  await ctx.store.upsert(nodeDelegator)
   return { nodeDelegator, pointsEarned }
 }
 
