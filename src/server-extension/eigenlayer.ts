@@ -9,7 +9,12 @@ export class EigenLayerResolver {
 
   @Query(() => BigInt)
   async totalEigenLayerPoints(): Promise<bigint> {
-    return await fetchEigenLayerPoints().then((r) => parseEther(r.g.toString()))
+    return await fetchEigenLayerPoints()
+      .then((r) => parseEther(r.g.toString()))
+      .catch((err) => {
+        console.log(err)
+        return 0n
+      })
   }
 }
 
