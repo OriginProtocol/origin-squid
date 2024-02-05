@@ -3,14 +3,28 @@ import { Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { parseEther } from 'viem'
 
+let resultCache: bigint | undefined = undefined
+let resultCacheDate: number | undefined = undefined
+
 @Resolver()
 export class EigenLayerResolver {
   constructor(private tx: () => Promise<EntityManager>) {}
 
   @Query(() => BigInt)
   async totalEigenLayerPoints(): Promise<bigint> {
+    if (
+      resultCache &&
+      resultCacheDate &&
+      Date.now() - resultCacheDate < 60000 * 5
+    ) {
+      return resultCache
+    }
     return await fetchEigenLayerPoints()
-      .then((r) => parseEther(r.g.toString()))
+      .then((r) => {
+        resultCache = parseEther(r.g.toString())
+        resultCacheDate = Date.now()
+        return resultCache
+      })
       .catch((err) => {
         console.log(err)
         return 0n
