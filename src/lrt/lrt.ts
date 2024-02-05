@@ -336,7 +336,7 @@ const createLRTNodeDelegator = async (
     const to = parseEther(block.header.timestamp.toString())
     const hourLength =
       ((to - from) * 1_000000000_000000000n) / parseEther('3600000')
-    pointsEarned = calcPoints(totalBalance, hourLength)
+    pointsEarned = calcPoints(lastNodeDelegatorEntry.amount, hourLength)
   }
 
   const nodeDelegator = new LRTNodeDelegator({
