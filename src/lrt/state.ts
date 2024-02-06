@@ -68,9 +68,6 @@ export const getLatestNodeDelegator = async (ctx: Context, node: string) => {
   return await ctx.store.findOne(LRTNodeDelegator, {
     order: { id: 'desc' },
     where: { node },
-    relations: {
-      holdings: true,
-    },
   })
 }
 

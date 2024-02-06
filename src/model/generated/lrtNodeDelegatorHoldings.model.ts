@@ -21,7 +21,4 @@ export class LRTNodeDelegatorHoldings {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     amount!: bigint
-
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    points!: bigint
 }

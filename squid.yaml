@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
-name: origin-squid
-version: 69420
-description: 'Origin Protocol 🦑'
+name: prime-eth-squid
+version: 1
+description: 'Prime Staked ETH 🦑'
 build:
 deploy:
   addons:

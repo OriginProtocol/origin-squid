@@ -1,5 +1,5 @@
-module.exports = class Data1707069304149 {
-    name = 'Data1707069304149'
+module.exports = class Data1707260098781 {
+    name = 'Data1707260098781'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -61,7 +61,7 @@ module.exports = class Data1707069304149 {
         await db.query(`CREATE TABLE "lrt_summary" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "points" numeric NOT NULL, "el_points" numeric NOT NULL, CONSTRAINT "PK_20cc1ddd92e29b97d990c95c130" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68e45ce3e1da597d030f27acf6" ON "lrt_summary" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_82cd3e23b0a7a65b75773ae865" ON "lrt_summary" ("block_number") `)
-        await db.query(`CREATE TABLE "lrt_node_delegator_holdings" ("id" character varying NOT NULL, "asset" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, "delegator_id" character varying, CONSTRAINT "PK_b16c26b07feb23b5ae8778f09b3" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "lrt_node_delegator_holdings" ("id" character varying NOT NULL, "asset" text NOT NULL, "amount" numeric NOT NULL, "delegator_id" character varying, CONSTRAINT "PK_b16c26b07feb23b5ae8778f09b3" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f4f758f6162648ea2de3faefbd" ON "lrt_node_delegator_holdings" ("delegator_id") `)
         await db.query(`CREATE INDEX "IDX_4e8663d1dc6a5623dbfb4de947" ON "lrt_node_delegator_holdings" ("asset") `)
         await db.query(`CREATE TABLE "lrt_node_delegator" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "node" text NOT NULL, "amount" numeric NOT NULL, "points" numeric NOT NULL, CONSTRAINT "PK_00c9b979aed504224511fe1719a" PRIMARY KEY ("id"))`)

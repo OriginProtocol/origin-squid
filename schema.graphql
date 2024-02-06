@@ -293,7 +293,6 @@ type LRTNodeDelegatorHoldings @entity {
   delegator: LRTNodeDelegator! @index
   asset: String! @index
   amount: BigInt!
-  points: BigInt!
 }
 """
 The OETH entity tracks the change in total supply of OETH over time.

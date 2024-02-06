@@ -52,5 +52,4 @@ type LRTNodeDelegatorHoldings @entity {
   delegator: LRTNodeDelegator! @index
   asset: String! @index
   amount: BigInt!
-  points: BigInt!
 }
