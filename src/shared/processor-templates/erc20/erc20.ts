@@ -2,7 +2,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import * as abi from '../../../abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State } from '../../../model'
-import { Context } from '../../../processor'
+import { Block, Context } from '../../../processor'
 import { ADDRESS_ZERO, TokenAddress } from '../../../utils/addresses'
 import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '../../../utils/logFilter'
@@ -16,12 +16,18 @@ export const createERC20Tracker = ({
   accountFilter = undefined,
   rebaseFilters = [],
   intervalTracking = false,
+  onBalanceChange = undefined,
 }: {
   from: number
   address: TokenAddress
   accountFilter?: string[]
   rebaseFilters?: LogFilter[]
   intervalTracking?: boolean // To be used *with* `accountFilter`.
+  onBalanceChange?: (
+    ctx: Context,
+    block: Block,
+    balance: ERC20Balance,
+  ) => Promise<void>
 }) => {
   accountFilter = accountFilter?.map((a) => a.toLowerCase())
   if (duplicateTracker.has(address)) {
@@ -137,7 +143,7 @@ export const createERC20Tracker = ({
               address,
               accounts.map((account) => [account]),
             )
-            accounts.forEach((account, i) => {
+            const newBalances = accounts.map((account, i) => {
               if (account === ADDRESS_ZERO) return
               const id = `${block.header.height}:${address}:${account}`
               const balance = new ERC20Balance({
@@ -167,7 +173,13 @@ export const createERC20Tracker = ({
                 result.newHolders.set(`${address}:${account}`, newHolder)
                 result.removedHolders.delete(`${address}:${account}`)
               }
+              return balance
             })
+            for (const newBalance of newBalances) {
+              if (onBalanceChange && newBalance) {
+                await onBalanceChange(ctx, block, newBalance)
+              }
+            }
           }
           if (doStateUpdate) {
             await updateState()

@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 999
+version: 69420
 description: 'Origin Protocol 🦑'
 build:
 deploy:
@@ -16,20 +16,24 @@ deploy:
     #    env:
     #      RPC_ENV: RPC_ENDPOINT_999
     ################################
-    - name: oeth-processor
-      cmd: [ "sqd", "process:oeth:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: ousd-processor
-      cmd: [ "sqd", "process:ousd:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: ogv-processor
-      cmd: [ "sqd", "process:ogv:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: other-processor
-      cmd: [ "sqd", "process:other:prod" ]
+    #- name: oeth-processor
+    #  cmd: [ "sqd", "process:oeth:prod" ]
+    #  env:
+    #    RPC_ENV: RPC_ENDPOINT_RETH
+    #- name: ousd-processor
+    #  cmd: [ "sqd", "process:ousd:prod" ]
+    #  env:
+    #    RPC_ENV: RPC_ENDPOINT_RETH
+    #- name: ogv-processor
+    #  cmd: [ "sqd", "process:ogv:prod" ]
+    #  env:
+    #    RPC_ENV: RPC_ENDPOINT_RETH
+    #- name: other-processor
+    #  cmd: [ "sqd", "process:other:prod" ]
+    #  env:
+    #    RPC_ENV: RPC_ENDPOINT_RETH
+    - name: lrt-processor
+      cmd: [ "sqd", "process:lrt:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
   api:
@@ -39,10 +43,10 @@ deploy:
       - '--dumb-cache'
       - in-memory
       - '--dumb-cache-ttl'
-      - '1000'
+      - '5000'
       - '--dumb-cache-size'
       - '100'
       - '--dumb-cache-max-age'
-      - '1000'
+      - '5000'
 scale:
   dedicated: true

@@ -239,6 +239,62 @@ type LiquidityDailyBalance @entity {
   balance: BigInt!
 }
 
+type LRTDeposit @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  depositor: String!
+  asset: String!
+  depositAmount: BigInt!
+  amountReceived: BigInt!
+  referralId: String!
+}
+
+type LRTBalanceData @entity {
+  id: ID! @index
+  recipient: LRTPointRecipient! @index
+  staticPointsDate: DateTime!
+  staticPoints: BigInt!
+  asset: String
+  balance: BigInt!
+  balanceDate: DateTime!
+}
+
+type LRTPointRecipient @entity {
+  id: ID! @index
+  balance: BigInt!
+  points: BigInt!
+  pointsDate: DateTime! @index
+  elPoints: BigInt!
+  balanceData: [LRTBalanceData]! @derivedFrom(field: "recipient")
+}
+
+type LRTSummary @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  balance: BigInt!
+  points: BigInt!
+  elPoints: BigInt!
+}
+
+type LRTNodeDelegator @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  node: String! @index
+  amount: BigInt!
+  points: BigInt!
+  holdings: [LRTNodeDelegatorHoldings]! @derivedFrom(field: "delegator")
+}
+
+type LRTNodeDelegatorHoldings @entity {
+  id: ID! @index
+  delegator: LRTNodeDelegator! @index
+  asset: String! @index
+  amount: BigInt!
+  points: BigInt!
+}
 """
 The OETH entity tracks the change in total supply of OETH over time.
 """
