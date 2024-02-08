@@ -123,6 +123,11 @@ export const referrerList: ReferrerData[] = [
     address: '0xdead000000000000000000000000000000000002',
     referrerMultiplier: 20n,
   },
+  {
+    referralId: 'exodus',
+    address: '0xdB2e6ef9a200D4F7330C900623382a14F1cE091C',
+    referrerMultiplier: 20n,
+  },
 ].map((o) => ({ ...o, address: o.address.toLowerCase() }))
 
 export const getReferralDataForRecipient = (recipient: string) => {
