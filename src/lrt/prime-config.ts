@@ -32,6 +32,12 @@ export const pointConditions: PointCondition[] = [
     multiplier: 100n,
   },
   {
+    name: 'reth-1.1x',
+    startDate: new Date('2024-02-08T18:00:00.000Z'),
+    asset: tokens.rETH,
+    multiplier: 10n,
+  },
+  {
     name: 'week1-5x',
     startDate: launchDate,
     endDate: new Date('2024-02-06'),
