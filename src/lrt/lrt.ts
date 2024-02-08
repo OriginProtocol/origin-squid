@@ -1,6 +1,6 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { MoreThan } from 'typeorm'
-import { formatEther, parseEther } from 'viem'
+import { parseEther } from 'viem'
 
 import * as abiNodeDelegator from '../abi/el-node-delegator'
 import * as abiStrategyManager from '../abi/el-strategy-manager'
@@ -24,6 +24,7 @@ import {
   getLastSummary,
   getLatestNodeDelegator,
   getRecipient,
+  saveAndResetState,
   useLrtState,
 } from './state'
 
@@ -106,30 +107,13 @@ export const process = async (ctx: Context) => {
         await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
-    await processHourly(ctx, block)
+    // await processHourly(ctx, block)
   }
   if (ctx.isHead) {
     // If we're at the latest block, process summary every 5 minutes.
     await processMinute5(ctx, ctx.blocks[ctx.blocks.length - 1])
   }
   await saveAndResetState(ctx)
-}
-
-const saveAndResetState = async (ctx: Context) => {
-  const state = useLrtState()
-  await Promise.all([
-    ctx.store.insert([...state.deposits.values()]),
-    ctx.store.upsert([...state.recipients.values()]).then(() => {
-      return ctx.store.upsert([...state.balanceData.values()])
-    }),
-    ctx.store.upsert([...state.nodeDelegators.values()]),
-    ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
-  ])
-  state.deposits.clear()
-  // state.recipients.clear() // We don't want to clear the recipients because they give us faster summary updates.
-  state.balanceData.clear()
-  state.nodeDelegators.clear()
-  state.nodeDelegatorHoldings.clear()
 }
 
 const processHourly = async (ctx: Context, block: Block) => {
@@ -201,24 +185,23 @@ const createSummary = async (ctx: Context, block: Block) => {
     return { summary: lastSummary, recipients }
   }
 
+  const calculationResult = await calculateRecipientsPoints(
+    ctx,
+    block.header.timestamp,
+    recipients,
+  )
+
   // Create Summary
   const summary = new LRTSummary({
     id: block.header.id,
     timestamp: new Date(block.header.timestamp),
     blockNumber: block.header.height,
     balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
-    points: calculateRecipientsPoints(block.header.timestamp, recipients),
+    points: calculationResult.totalPoints,
     elPoints: lastSummary?.elPoints ?? 0n,
   })
-  const updatedBalanceData = recipients.flatMap((r) => r.balanceData)
 
-  await Promise.all([
-    ctx.store.insert(summary),
-    ctx.store.save(recipients).then(() => {
-      // Save Updated Balance Data (from `calculateRecipientsPoints`)
-      return ctx.store.save(updatedBalanceData)
-    }),
-  ])
+  await saveAndResetState(ctx)
 
   return { summary, recipients }
 }
@@ -287,6 +270,7 @@ const processDeposit = async (ctx: Context, block: Block, log: Log) => {
     log,
     depositAsset: deposit.asset,
     recipient: deposit.depositor,
+    referralId: deposit.referralId,
     timestamp: deposit.timestamp,
     balance: deposit.amountReceived,
   })
@@ -348,11 +332,11 @@ const createLRTNodeDelegator = async (
     points: (lastNodeDelegatorEntry?.points ?? 0n) + pointsEarned,
     holdings: [],
   })
-  ctx.log.info({
-    lastNodeDelegatorEntry: !!lastNodeDelegatorEntry,
-    timestamp: nodeDelegator.timestamp,
-    pointsEarned: formatEther(nodeDelegator.points),
-  })
+  // ctx.log.info({
+  //   lastNodeDelegatorEntry: !!lastNodeDelegatorEntry,
+  //   timestamp: nodeDelegator.timestamp,
+  //   pointsEarned: formatEther(nodeDelegator.points),
+  // })
 
   nodeDelegator.holdings = assets.map((asset, i) => {
     const holding = new LRTNodeDelegatorHoldings({
@@ -376,6 +360,7 @@ const addBalance = async (
     log: Log
     timestamp: Date
     recipient: string
+    referralId?: string
     balance: bigint
     depositAsset?: string
     conditionNameFilter?: string
@@ -387,11 +372,13 @@ const addBalance = async (
   const balanceData = new LRTBalanceData({
     id: params.log.id,
     recipient,
+    referralId: params.referralId,
     asset: params.depositAsset,
     balance: params.balance,
     balanceDate: params.timestamp,
     staticPointsDate: params.timestamp,
     staticPoints: 0n,
+    staticReferralPointsBase: 0n,
   })
   recipient.balanceData.push(balanceData)
   state.balanceData.set(balanceData.id, balanceData)
@@ -408,7 +395,14 @@ const removeBalance = async (
 ) => {
   const state = useLrtState()
   const recipient = await getRecipient(ctx, params.recipient)
-  calculateRecipientsPoints(params.timestamp.getTime(), [recipient])
+
+  const calculationResult = await calculateRecipientsPoints(
+    ctx,
+    params.timestamp.getTime(),
+    [recipient],
+  )
+  console.log('Calculation count: ' + calculationResult.count)
+
   recipient.balance -= params.balance
   let amountToRemove = params.balance
   const balanceData = await getBalanceDataForRecipient(ctx, params.recipient)

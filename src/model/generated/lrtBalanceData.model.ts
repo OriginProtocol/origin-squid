@@ -15,11 +15,18 @@ export class LRTBalanceData {
     @ManyToOne_(() => LRTPointRecipient, {nullable: true})
     recipient!: LRTPointRecipient
 
+    @Index_()
+    @Column_("text", {nullable: true})
+    referralId!: string | undefined | null
+
     @Column_("timestamp with time zone", {nullable: false})
     staticPointsDate!: Date
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     staticPoints!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    staticReferralPointsBase!: bigint
 
     @Column_("text", {nullable: true})
     asset!: string | undefined | null

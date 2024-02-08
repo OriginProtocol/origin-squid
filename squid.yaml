@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: prime-eth-squid
-version: 2
+version: 3
 description: 'Prime Staked ETH 🦑'
 build:
 deploy:
