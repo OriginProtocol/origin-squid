@@ -107,7 +107,7 @@ export const process = async (ctx: Context) => {
         await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
-    // await processHourly(ctx, block)
+    await processHourly(ctx, block)
   }
   if (ctx.isHead) {
     // If we're at the latest block, process summary every 5 minutes.
