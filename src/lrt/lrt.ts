@@ -24,6 +24,7 @@ import {
   getLastSummary,
   getLatestNodeDelegator,
   getRecipient,
+  saveAndResetState,
   useLrtState,
 } from './state'
 
@@ -106,30 +107,13 @@ export const process = async (ctx: Context) => {
         await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
-    await processHourly(ctx, block)
+    // await processHourly(ctx, block)
   }
   if (ctx.isHead) {
     // If we're at the latest block, process summary every 5 minutes.
     await processMinute5(ctx, ctx.blocks[ctx.blocks.length - 1])
   }
   await saveAndResetState(ctx)
-}
-
-const saveAndResetState = async (ctx: Context) => {
-  const state = useLrtState()
-  await Promise.all([
-    ctx.store.insert([...state.deposits.values()]),
-    ctx.store.upsert([...state.recipients.values()]).then(() => {
-      return ctx.store.upsert([...state.balanceData.values()])
-    }),
-    ctx.store.upsert([...state.nodeDelegators.values()]),
-    ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
-  ])
-  state.deposits.clear()
-  // state.recipients.clear() // We don't want to clear the recipients because they give us faster summary updates.
-  state.balanceData.clear()
-  state.nodeDelegators.clear()
-  state.nodeDelegatorHoldings.clear()
 }
 
 const processHourly = async (ctx: Context, block: Block) => {

@@ -16,8 +16,6 @@ import {
   LRTSummary,
 } from '../model'
 import { Context } from '../processor'
-import { encodeAddress } from './encoding'
-import { referrerList } from './referals'
 
 const state = {
   deposits: new Map<string, LRTDeposit>(),
@@ -28,6 +26,23 @@ const state = {
 }
 
 export const useLrtState = () => state
+
+export const saveAndResetState = async (ctx: Context) => {
+  const state = useLrtState()
+  await Promise.all([
+    ctx.store.insert([...state.deposits.values()]),
+    ctx.store.upsert([...state.recipients.values()]).then(() => {
+      return ctx.store.upsert([...state.balanceData.values()])
+    }),
+    ctx.store.upsert([...state.nodeDelegators.values()]),
+    ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
+  ])
+  state.deposits.clear()
+  // state.recipients.clear() // We don't want to clear the recipients because they give us faster summary updates.
+  state.balanceData.clear()
+  state.nodeDelegators.clear()
+  state.nodeDelegatorHoldings.clear()
+}
 
 export const getBalanceDataForRecipient = async (
   ctx: Context,

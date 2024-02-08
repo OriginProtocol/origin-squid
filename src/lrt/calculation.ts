@@ -53,13 +53,15 @@ export const calculateRecipientsPoints = async (
       referralPoints.map((r) => r.referralPointsBase),
     )
     recipient.referralCount = referralPoints.length
-    recipient.points = points
+    recipient.points = points + referralPointsBase / 10n
     recipient.referralPoints = referralPointsBase / 10n // 10% of point base generated from referrals
     recipient.pointsDate = new Date(timestamp)
     totalPoints += points
 
     // =========================
+    // =========================
     // Determine incoming points
+    // =========================
     const recipientReferralData = getReferralDataForRecipient(recipient.id)
     const recipientReferralCodes = [
       ...recipientReferralData.map((d) => d.referralId),
@@ -104,22 +106,6 @@ export const calculateRecipientsPoints = async (
       }
     }
 
-    // torrential thoughts
-    // bob refers carol
-    // carol refers tom
-    // tom refers bob
-    // tom wants to know what his points are
-    // toms points = 100, + 10 boost for referee, + 10 boost to carol for referral
-    // tom referred bob so we check bob's points so we know how much to give tom
-    // bobs points = 50, + 5 boost for referee, + 5 boost to tom for referral
-    // do we need to dive deeper into bob's reference to carol?
-    //  maybe yes because we just calculated some of bob's points and updated our calculation date of those points
-    //  we're not going to do that again so any of the points earned there need to be distributed to eligible receivers
-    //  we need to go both ways with that for bob, referrers and referees
-    //  this creates a web, which could potentially be quite sprawling, and even circular.
-    //  so now we calculate carols' points and how they affect bob, and then it circles back to tom
-    //  ...and now it seems we need to memoize who we've calculated - so we know when to stop
-
     recipient.referrerCount = referrerCount
     recipient.points += totalIncomingReferralPoints
     recipient.referralPoints += totalIncomingReferralPoints
@@ -143,7 +129,7 @@ const calculatePoints = (
   for (const data of balanceData) {
     state?.balanceData.set(data.id, data)
     const balanceMult = balanceMultiplier(recipient.balance)
-    let timespanEarnedForReferrals = 0n
+    let referralBalanceEarned = 0n
     const conditionPoints = pointConditions.map((c) => {
       const startTime = Math.max(
         data.staticPointsDate.getTime(),
@@ -159,15 +145,17 @@ const calculatePoints = (
         startTime,
         endTime,
         data.balance,
-        c.multiplier + balanceMult,
+        c.multiplier,
       )
       if (c.name === 'standard') {
-        timespanEarnedForReferrals = timespanEarned
+        referralBalanceEarned = timespanEarned
       }
       return timespanEarned
     })
-    data.staticPoints += sum(conditionPoints)
-    data.staticReferralPointsBase += timespanEarnedForReferrals
+    const conditionPointsEarned = sum(conditionPoints)
+    const balanceMultEarned = (conditionPointsEarned * balanceMult) / 100n
+    data.staticPoints += sum(conditionPoints) + balanceMultEarned
+    data.staticReferralPointsBase += referralBalanceEarned
     data.staticPointsDate = new Date(timestamp)
     points += data.staticPoints
     if (
@@ -193,6 +181,7 @@ const calculateTimespanEarned = (
   amount: bigint,
   multiplier: bigint,
 ): bigint => {
+  // TODO: Convert to total `bigint` calculation
   const intervals = (endTimestamp - startTimestamp) / pointInterval
   const multipliedAmount = (amount * multiplier) / 100n
   return (
