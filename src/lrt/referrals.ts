@@ -65,7 +65,7 @@ export const referrerList: ReferrerData[] = [
   },
   {
     referralId: 'salazar',
-    address: '0xe6a036ca5ac86aff806f255c38789fd7f0297ece',
+    address: '0x9Ef9e304E1f8E9792005aBf5d01241b1E9CEDD1b',
     referrerMultiplier: 20n,
   },
   {
@@ -106,6 +106,21 @@ export const referrerList: ReferrerData[] = [
   {
     referralId: 'stacymuur',
     address: '0xaA9543F2eFF0e7A4b267F839612945841172B02F',
+    referrerMultiplier: 20n,
+  },
+  {
+    referralId: 'shoal',
+    address: '0x0E99f7d366711f8cCf05Eaf871f72D37AbEC1937',
+    referrerMultiplier: 20n,
+  },
+  {
+    referralId: 'rethboost',
+    address: '0xdead000000000000000000000000000000000001',
+    referrerMultiplier: 20n,
+  },
+  {
+    referralId: 'ethxboost',
+    address: '0xdead000000000000000000000000000000000002',
     referrerMultiplier: 20n,
   },
 ].map((o) => ({ ...o, address: o.address.toLowerCase() }))

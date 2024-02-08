@@ -10,7 +10,7 @@ import {
   getReferralDataForRecipient,
   isReferralSelfReferencing,
   isValidReferralId,
-} from './referals'
+} from './referrals'
 import { find, useLrtState } from './state'
 
 const sum = (vs: bigint[]) => vs.reduce((sum, v) => sum + v, 0n)
