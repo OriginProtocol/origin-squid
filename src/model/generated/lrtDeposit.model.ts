@@ -18,6 +18,11 @@ export class LRTDeposit {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @Column_("text", {nullable: false})
+    referralId!: string
+
+    @Index_()
     @Column_("text", {nullable: false})
     depositor!: string
 
@@ -29,7 +34,4 @@ export class LRTDeposit {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     amountReceived!: bigint
-
-    @Column_("text", {nullable: false})
-    referralId!: string
 }

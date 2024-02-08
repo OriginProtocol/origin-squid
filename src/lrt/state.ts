@@ -1,5 +1,11 @@
+import {
+  Entity,
+  EntityClass,
+  FindManyOptions,
+  FindOneOptions,
+} from '@subsquid/typeorm-store/src/store'
 import { sortBy, uniqBy } from 'lodash'
-import { MoreThan } from 'typeorm'
+import { EntityManager, In, IsNull, MoreThan, Not, Repository } from 'typeorm'
 
 import {
   LRTBalanceData,
@@ -10,6 +16,8 @@ import {
   LRTSummary,
 } from '../model'
 import { Context } from '../processor'
+import { encodeAddress } from './encoding'
+import { referrerList } from './referals'
 
 const state = {
   deposits: new Map<string, LRTDeposit>(),
@@ -41,22 +49,56 @@ export const getBalanceDataForRecipient = async (
   return sortBy(uniqBy([...localResults, ...dbResults], 'id'), 'id') // order pref for local
 }
 
-export const getRecipient = async (ctx: Context, id: string) => {
+export const find = <E extends Entity>(
+  ctxOrEm: Context | EntityManager,
+  entityClass: EntityClass<E>,
+  options?: FindManyOptions<E>,
+) => {
+  return 'store' in ctxOrEm
+    ? ctxOrEm.store.find(entityClass, options)
+    : ctxOrEm.find(entityClass, options)
+}
+
+export const findOne = <E extends Entity>(
+  ctxOrEm: Context | EntityManager,
+  entityClass: EntityClass<E>,
+  options: FindOneOptions<E>,
+) => {
+  return 'store' in ctxOrEm
+    ? ctxOrEm.store.findOne(entityClass, options)
+    : ctxOrEm.findOne(entityClass, options)
+}
+
+export const getRecipient = async (
+  ctxOrEm: Context | EntityManager,
+  id: string,
+) => {
   const state = useLrtState()
   let recipient = state.recipients.get(id)
   if (!recipient) {
-    recipient = await ctx.store.get(LRTPointRecipient, {
-      where: { id },
-      relations: { balanceData: true },
-    })
+    if ('store' in ctxOrEm) {
+      recipient = await ctxOrEm.store.get(LRTPointRecipient, {
+        where: { id },
+        relations: { balanceData: true },
+      })
+    } else {
+      recipient =
+        (await ctxOrEm.findOne(LRTPointRecipient, {
+          where: { id },
+          relations: { balanceData: true },
+        })) ?? undefined
+    }
     if (!recipient) {
       recipient = new LRTPointRecipient({
         id,
         balance: 0n,
         points: 0n,
-        elPoints: 0n,
         pointsDate: new Date(0),
+        referralPoints: 0n,
+        elPoints: 0n,
         balanceData: [],
+        referrerCount: 0,
+        referralCount: 0,
       })
     }
     state.recipients.set(id, recipient)

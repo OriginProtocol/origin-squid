@@ -243,18 +243,20 @@ type LRTDeposit @entity {
   id: ID! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  depositor: String!
+  referralId: String! @index
+  depositor: String! @index
   asset: String!
   depositAmount: BigInt!
   amountReceived: BigInt!
-  referralId: String!
 }
 
 type LRTBalanceData @entity {
   id: ID! @index
   recipient: LRTPointRecipient! @index
+  referralId: String @index
   staticPointsDate: DateTime!
   staticPoints: BigInt!
+  staticReferralPointsBase: BigInt!
   asset: String
   balance: BigInt!
   balanceDate: DateTime!
@@ -265,8 +267,11 @@ type LRTPointRecipient @entity {
   balance: BigInt!
   points: BigInt!
   pointsDate: DateTime! @index
+  referralPoints: BigInt!
   elPoints: BigInt!
   balanceData: [LRTBalanceData]! @derivedFrom(field: "recipient")
+  referralCount: Int!
+  referrerCount: Int!
 }
 
 type LRTSummary @entity {

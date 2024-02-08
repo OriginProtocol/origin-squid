@@ -10,6 +10,9 @@ export class LRTPointRecipientStats {
   points!: bigint
 
   @Field(() => BigInt, { nullable: false })
+  referralPoints!: bigint
+
+  @Field(() => BigInt, { nullable: false })
   elPoints!: bigint
 
   constructor(props: Partial<LRTPointRecipientStats>) {
@@ -22,9 +25,11 @@ export class LRTResolver {
   constructor(private tx: () => Promise<EntityManager>) {}
 
   @Query(() => LRTPointRecipientStats)
-  async lrtPointRecipientStats(
-    @Arg('address') address: string,
-  ): Promise<{ points: bigint; elPoints: bigint }> {
+  async lrtPointRecipientStats(@Arg('address') address: string): Promise<{
+    points: bigint
+    referralPoints: bigint
+    elPoints: bigint
+  }> {
     const manager = await this.tx()
     const recipients = await manager.getRepository(LRTPointRecipient).find({
       where: { id: address.toLowerCase() },
@@ -33,10 +38,19 @@ export class LRTResolver {
       },
     })
     if (recipients.length === 0) {
-      return { points: 0n, elPoints: 0n }
+      return { points: 0n, referralPoints: 0n, elPoints: 0n }
     }
+
+    const calculationResult = await calculateRecipientsPoints(
+      manager,
+      Date.now(),
+      recipients,
+    )
+    console.log('Calculation count: ' + calculationResult.count)
+
     return {
-      points: calculateRecipientsPoints(Date.now(), recipients),
+      points: recipients[0].points,
+      referralPoints: recipients[0].referralPoints,
       elPoints: recipients[0].elPoints,
     }
   }

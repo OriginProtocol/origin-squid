@@ -22,8 +22,17 @@ export class LRTPointRecipient {
     pointsDate!: Date
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    referralPoints!: bigint
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     elPoints!: bigint
 
     @OneToMany_(() => LRTBalanceData, e => e.recipient)
     balanceData!: LRTBalanceData[]
+
+    @Column_("int4", {nullable: false})
+    referralCount!: number
+
+    @Column_("int4", {nullable: false})
+    referrerCount!: number
 }
