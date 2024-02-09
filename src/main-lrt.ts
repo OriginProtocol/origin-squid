@@ -1,9 +1,11 @@
 import * as lrt from './lrt'
+import * as validate from './lrt/validate'
 import { run } from './processor'
 
 export const processor = {
-  stateSchema: 'lrt-processor',
   processors: [lrt],
+  postProcessors: [],
+  validators: [validate],
 }
 export default processor
 

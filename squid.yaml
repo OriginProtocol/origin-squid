@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: prime-eth-squid
-version: 4
+version: 5
 description: 'Prime Staked ETH 🦑'
 build:
 deploy:
@@ -12,26 +12,6 @@ deploy:
     - RPC_ENDPOINT_RETH
     - RPC_BACKUP
   processor:
-    #    cmd: [ "node", "lib/main" ]
-    #    env:
-    #      RPC_ENV: RPC_ENDPOINT_999
-    ################################
-    #- name: oeth-processor
-    #  cmd: [ "sqd", "process:oeth:prod" ]
-    #  env:
-    #    RPC_ENV: RPC_ENDPOINT_RETH
-    #- name: ousd-processor
-    #  cmd: [ "sqd", "process:ousd:prod" ]
-    #  env:
-    #    RPC_ENV: RPC_ENDPOINT_RETH
-    #- name: ogv-processor
-    #  cmd: [ "sqd", "process:ogv:prod" ]
-    #  env:
-    #    RPC_ENV: RPC_ENDPOINT_RETH
-    #- name: other-processor
-    #  cmd: [ "sqd", "process:other:prod" ]
-    #  env:
-    #    RPC_ENV: RPC_ENDPOINT_RETH
     - name: lrt-processor
       cmd: [ "sqd", "process:lrt:prod" ]
       env:

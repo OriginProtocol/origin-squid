@@ -8,12 +8,8 @@
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
-    "process:oeth": "sqd process:oeth",
-    "process:ousd": "sqd process:ousd",
-    "process:ogv": "sqd process:ogv",
-    "process:other": "sqd process:other",
     "process:lrt": "sqd process:lrt",
-    "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
+    "process": "npm-run-all --parallel sqd process:lrt"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",

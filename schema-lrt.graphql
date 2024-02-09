@@ -33,6 +33,19 @@ type LRTPointRecipient @entity {
   referrerCount: Int!
 }
 
+type LRTPointRecipientHistory @entity {
+  id: ID! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  balance: BigInt!
+  points: BigInt!
+  pointsDate: DateTime! @index
+  referralPoints: BigInt!
+  elPoints: BigInt!
+  referralCount: Int!
+  referrerCount: Int!
+}
+
 type LRTSummary @entity {
   id: ID! @index
   timestamp: DateTime! @index

@@ -12,6 +12,7 @@ import {
   LRTNodeDelegator,
   LRTNodeDelegatorHoldings,
   LRTPointRecipient,
+  LRTPointRecipientHistory,
   LRTSummary,
 } from '../model'
 import { Block, Context, Log } from '../processor'
@@ -118,7 +119,6 @@ export const process = async (ctx: Context) => {
 
 const processHourly = async (ctx: Context, block: Block) => {
   const blockHour = Math.floor(block.header.timestamp / HOUR_MS)
-  const state = useLrtState()
 
   if (lastHourProcessed !== blockHour) {
     ctx.log.info(
@@ -191,12 +191,33 @@ const createSummary = async (ctx: Context, block: Block) => {
     recipients,
   )
 
+  let totalBalance = 0n
+  for (const recipient of recipients) {
+    totalBalance += recipient.balance
+    const id = `${block.header.height}:${recipient.id}`
+    state.recipientHistory.set(
+      id,
+      new LRTPointRecipientHistory({
+        id,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        balance: recipient.balance,
+        points: recipient.points,
+        pointsDate: recipient.pointsDate,
+        elPoints: recipient.elPoints,
+        referralPoints: recipient.referralPoints,
+        referrerCount: recipient.referrerCount,
+        referralCount: recipient.referralCount,
+      }),
+    )
+  }
+
   // Create Summary
   const summary = new LRTSummary({
     id: block.header.id,
     timestamp: new Date(block.header.timestamp),
     blockNumber: block.header.height,
-    balance: recipients.reduce((sum, r) => sum + r.balance, 0n),
+    balance: totalBalance,
     points: calculationResult.totalPoints,
     elPoints: lastSummary?.elPoints ?? 0n,
   })

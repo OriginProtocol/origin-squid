@@ -2,8 +2,8 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class OETHCurveLP {
-    constructor(props?: Partial<OETHCurveLP>) {
+export class LRTPointRecipientHistory {
+    constructor(props?: Partial<LRTPointRecipientHistory>) {
         Object.assign(this, props)
     }
 
@@ -19,20 +19,24 @@ export class OETHCurveLP {
     blockNumber!: number
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupply!: bigint
+    balance!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    eth!: bigint
+    points!: bigint
+
+    @Index_()
+    @Column_("timestamp with time zone", {nullable: false})
+    pointsDate!: Date
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    oeth!: bigint
+    referralPoints!: bigint
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    totalSupplyOwned!: bigint
+    elPoints!: bigint
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    ethOwned!: bigint
+    @Column_("int4", {nullable: false})
+    referralCount!: number
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    oethOwned!: bigint
+    @Column_("int4", {nullable: false})
+    referrerCount!: number
 }

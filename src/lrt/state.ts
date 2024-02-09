@@ -13,6 +13,7 @@ import {
   LRTNodeDelegator,
   LRTNodeDelegatorHoldings,
   LRTPointRecipient,
+  LRTPointRecipientHistory,
   LRTSummary,
 } from '../model'
 import { Context } from '../processor'
@@ -21,6 +22,7 @@ const state = {
   deposits: new Map<string, LRTDeposit>(),
   recipients: new Map<string, LRTPointRecipient>(),
   balanceData: new Map<string, LRTBalanceData>(),
+  recipientHistory: new Map<string, LRTPointRecipientHistory>(),
   nodeDelegators: new Map<string, LRTNodeDelegator>(),
   nodeDelegatorHoldings: new Map<string, LRTNodeDelegatorHoldings>(),
 }
@@ -34,6 +36,7 @@ export const saveAndResetState = async (ctx: Context) => {
     ctx.store.upsert([...state.recipients.values()]).then(() => {
       return ctx.store.upsert([...state.balanceData.values()])
     }),
+    ctx.store.upsert([...state.recipientHistory.values()]),
     ctx.store.upsert([...state.nodeDelegators.values()]),
     ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
   ])
