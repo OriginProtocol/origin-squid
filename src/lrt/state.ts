@@ -43,6 +43,7 @@ export const saveAndResetState = async (ctx: Context) => {
   state.deposits.clear()
   // state.recipients.clear() // We don't want to clear the recipients because they give us faster summary updates.
   state.balanceData.clear()
+  state.recipientHistory.clear()
   state.nodeDelegators.clear()
   state.nodeDelegatorHoldings.clear()
 }

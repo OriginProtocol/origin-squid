@@ -34,8 +34,6 @@ export const from = config.startBlock
 
 // CONSTANTS
 const RANGE = { from: config.startBlock }
-const HOUR_MS = 3600000
-const MINUTE5_MS = 300000
 
 // FILTERS
 const depositFilter = logFilter({
@@ -54,6 +52,8 @@ const assetDepositIntoStrategyFilter = logFilter({
   range: RANGE,
 })
 
+let shouldCalculate = false
+
 // AssetDepositIntoStrategy
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog(depositFilter.value)
@@ -62,10 +62,12 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.includeAllBlocks(RANGE) // need for the hourly processing
 }
 
-// we use this variable to keep track of the last hour we processed
-// this increases every time we process a block that is in a new hour
-let lastMinute5Processed = 0
-let lastHourProcessed = 0
+let intervalProcessed = false
+const lastIntervalProcessed = {
+  '240': 0,
+  '15': 0,
+  '5': 0,
+}
 let haveNodeDelegatorInstance = false
 export const initialize = async (ctx: Context) => {
   const nodeDelegator = await ctx.store
@@ -74,9 +76,13 @@ export const initialize = async (ctx: Context) => {
   haveNodeDelegatorInstance = !!nodeDelegator
 
   const summary = await getLastSummary(ctx)
-  lastHourProcessed = summary
-    ? Math.floor(summary.timestamp.getTime() / HOUR_MS)
-    : 0
+  for (const key of Object.keys(
+    lastIntervalProcessed,
+  ) as (keyof typeof lastIntervalProcessed)[]) {
+    lastIntervalProcessed[key] = summary
+      ? Math.floor(summary.timestamp.getTime() / (Number(key) * 60000))
+      : 0
+  }
 
   const state = useLrtState()
   const recipients = await ctx.store.find(LRTPointRecipient, {
@@ -96,6 +102,7 @@ export const process = async (ctx: Context) => {
   // ============================
   // Process chain data
   for (const block of ctx.blocks) {
+    intervalProcessed = false
     for (const log of block.logs) {
       if (depositFilter.matches(log)) {
         await processDeposit(ctx, block, log)
@@ -108,68 +115,44 @@ export const process = async (ctx: Context) => {
         await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
       }
     }
-    await processHourly(ctx, block)
+    // await processHourly(ctx, block)
+    await processInterval(ctx, block, '240', true)
+    await processInterval(ctx, block, '15')
   }
   if (ctx.isHead) {
-    // If we're at the latest block, process summary every 5 minutes.
-    await processMinute5(ctx, ctx.blocks[ctx.blocks.length - 1])
+    await processInterval(ctx, ctx.blocks[ctx.blocks.length - 1], '5')
   }
   await saveAndResetState(ctx)
 }
 
-const processHourly = async (ctx: Context, block: Block) => {
-  const blockHour = Math.floor(block.header.timestamp / HOUR_MS)
-
-  if (lastHourProcessed !== blockHour) {
-    ctx.log.info(
-      `Processing hour: ${blockHour} ${new Date(block.header.timestamp)}`,
-    )
-
-    // ensure that we don't miss any hours
-    const hoursPassed = blockHour - lastHourProcessed
-    if (lastHourProcessed !== 0 && hoursPassed !== 1) {
-      ctx.log.info({
-        lastHourProcessed,
-        hoursPassed,
-        blockHour,
-      })
-      throw new Error('Something is wrong. We should trigger once per hour.')
+const processInterval = async (
+  ctx: Context,
+  block: Block,
+  interval: keyof typeof lastIntervalProcessed,
+  forceCalculate = false,
+) => {
+  const blockInterval = Math.floor(
+    block.header.timestamp / (Number(interval) * 60000),
+  )
+  if (intervalProcessed) {
+    lastIntervalProcessed[interval] = blockInterval
+    return
+  }
+  if (lastIntervalProcessed[interval] !== blockInterval) {
+    if (shouldCalculate || forceCalculate) {
+      await saveAndResetState(ctx)
+      await calculatePoints(ctx, block)
+      shouldCalculate = false
+      intervalProcessed = true
     }
-
-    await saveAndResetState(ctx)
-    const { summary, recipients } = await createSummary(ctx, block)
-    await calculateELPoints(ctx, block, summary, recipients)
-    lastHourProcessed = blockHour
+    lastIntervalProcessed[interval] = blockInterval
   }
 }
 
-const processMinute5 = async (ctx: Context, block: Block) => {
-  const blockMinute5 = Math.floor(block.header.timestamp / MINUTE5_MS)
-  if (lastMinute5Processed !== blockMinute5) {
-    ctx.log.info(
-      `Processing minute 5: ${blockMinute5} ${new Date(
-        block.header.timestamp,
-      )}`,
-    )
-
-    // ensure that we don't miss any hours
-    // const minute5Passed = blockMinute5 - lastMinute5Processed
-    // if (lastMinute5Processed !== 0 && minute5Passed !== 1) {
-    //   ctx.log.info({
-    //     lastMinute5Processed,
-    //     minute5Passed,
-    //     blockMinute5,
-    //   })
-    //   throw new Error(
-    //     'Something is wrong. We should trigger once per 5 minutes.',
-    //   )
-    // }
-
-    await saveAndResetState(ctx)
-    const { summary, recipients } = await createSummary(ctx, block)
-    await calculateELPoints(ctx, block, summary, recipients)
-    lastMinute5Processed = blockMinute5
-  }
+const calculatePoints = async (ctx: Context, block: Block) => {
+  ctx.log.info(`Calculating points: ${new Date(block.header.timestamp)}`)
+  const { summary, recipients } = await createSummary(ctx, block)
+  await calculateELPoints(ctx, block, summary, recipients)
 }
 
 const createSummary = async (ctx: Context, block: Block) => {
@@ -222,17 +205,15 @@ const createSummary = async (ctx: Context, block: Block) => {
     elPoints: lastSummary?.elPoints ?? 0n,
   })
 
-  await saveAndResetState(ctx)
-
   return { summary, recipients }
 }
 
-async function calculateELPoints(
+const calculateELPoints = async (
   ctx: Context,
   block: Block,
   summary: LRTSummary,
   recipients: LRTPointRecipient[],
-) {
+) => {
   if (haveNodeDelegatorInstance) {
     const state = useLrtState()
     const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
@@ -254,12 +235,6 @@ async function calculateELPoints(
         (recipient.balance * totalPointsEarned) / totalBalance
     }
     summary.elPoints = totalPoints
-    await Promise.all([
-      ctx.store.save(summary),
-      ctx.store.save(recipients),
-      ctx.store.upsert([...state.nodeDelegators.values()]),
-      ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
-    ])
   }
 }
 
@@ -403,6 +378,7 @@ const addBalance = async (
   })
   recipient.balanceData.push(balanceData)
   state.balanceData.set(balanceData.id, balanceData)
+  shouldCalculate = true
 }
 
 const removeBalance = async (
@@ -422,7 +398,6 @@ const removeBalance = async (
     params.timestamp.getTime(),
     [recipient],
   )
-  console.log('Calculation count: ' + calculationResult.count)
 
   recipient.balance -= params.balance
   let amountToRemove = params.balance
@@ -458,6 +433,7 @@ const removeBalance = async (
       state.balanceData.set(data.id, data)
     }
   }
+  shouldCalculate = true
 }
 
 const transferBalance = async (

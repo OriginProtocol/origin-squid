@@ -182,10 +182,13 @@ const calculateTimespanEarned = (
   multiplier: bigint,
 ): bigint => {
   // TODO: Convert to total `bigint` calculation
-  const intervals = (endTimestamp - startTimestamp) / pointInterval
+  const intervals =
+    (BigInt(endTimestamp - startTimestamp) * 1_000000000_000000000n) /
+    BigInt(pointInterval)
   const multipliedAmount = (amount * multiplier) / 100n
   return (
     (parseEther(intervals.toString()) * multipliedAmount * 10_000n) /
+    1_000000000_000000000n /
     1_000000000_000000000n
   )
 }

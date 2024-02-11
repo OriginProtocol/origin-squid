@@ -41,12 +41,7 @@ export class LRTResolver {
       return { points: 0n, referralPoints: 0n, elPoints: 0n }
     }
 
-    const calculationResult = await calculateRecipientsPoints(
-      manager,
-      Date.now(),
-      recipients,
-    )
-    console.log('Calculation count: ' + calculationResult.count)
+    await calculateRecipientsPoints(manager, Date.now(), recipients)
 
     return {
       points: recipients[0].points,
