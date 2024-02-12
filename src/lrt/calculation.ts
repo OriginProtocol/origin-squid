@@ -68,16 +68,12 @@ export const calculateRecipientsPoints = async (
       recipient.id,
       encodeAddress(recipient.id),
     ]
-    const referringRecipients = await find(ctxOrEm, LRTPointRecipient, {
-      where: {
-        balanceData: {
-          referralId: In(recipientReferralCodes),
-        },
-      },
-      relations: {
-        balanceData: { recipient: true },
-      },
-    })
+
+    const referringRecipients = recipients.filter((r) =>
+      r.balanceData.find(
+        (bd) => bd.referralId && recipientReferralCodes.includes(bd.referralId),
+      ),
+    )
 
     const { totalReferralPoints: referrersTotalReferrerPoints } =
       await calculateRecipientsPoints(
