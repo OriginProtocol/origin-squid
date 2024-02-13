@@ -64,7 +64,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 let intervalProcessed = false
 const lastIntervalProcessed = {
-  '240': 0,
+  '60': 0,
   '15': 0,
   '5': 0,
 }
@@ -104,20 +104,27 @@ export const process = async (ctx: Context) => {
   for (const block of ctx.blocks) {
     intervalProcessed = false
     for (const log of block.logs) {
+      if (
+        !haveNodeDelegatorInstance &&
+        block.logs.find((log) => assetDepositIntoStrategyFilter.matches(log))
+      ) {
+        // We don't want to process certain things until we've seen our first assetDepositIntoStrategy.
+        haveNodeDelegatorInstance = true
+      }
       if (depositFilter.matches(log)) {
+        await processInterval(ctx, block, '5')
         await processDeposit(ctx, block, log)
       }
       if (transferFilter.matches(log)) {
+        await processInterval(ctx, block, '5')
         await processTransfer(ctx, block, log)
       }
       if (assetDepositIntoStrategyFilter.matches(log)) {
-        haveNodeDelegatorInstance = true
-        await createLRTNodeDelegator(ctx, block, log.address.toLowerCase())
+        await processInterval(ctx, block, '5')
       }
     }
     // await processHourly(ctx, block)
-    await processInterval(ctx, block, '240', true)
-    await processInterval(ctx, block, '15')
+    await processInterval(ctx, block, '60')
   }
   if (ctx.isHead) {
     await processInterval(ctx, ctx.blocks[ctx.blocks.length - 1], '5')
@@ -129,7 +136,6 @@ const processInterval = async (
   ctx: Context,
   block: Block,
   interval: keyof typeof lastIntervalProcessed,
-  forceCalculate = false,
 ) => {
   const blockInterval = Math.floor(
     block.header.timestamp / (Number(interval) * 60000),
@@ -139,12 +145,9 @@ const processInterval = async (
     return
   }
   if (lastIntervalProcessed[interval] !== blockInterval) {
-    if (shouldCalculate || forceCalculate) {
-      await saveAndResetState(ctx)
-      await calculatePoints(ctx, block)
-      shouldCalculate = false
-      intervalProcessed = true
-    }
+    await saveAndResetState(ctx)
+    await calculatePoints(ctx, block)
+    intervalProcessed = true
     lastIntervalProcessed[interval] = blockInterval
   }
 }
@@ -184,6 +187,7 @@ const createSummary = async (ctx: Context, block: Block) => {
         id,
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
+        recipient: recipient.id,
         balance: recipient.balance,
         points: recipient.points,
         pointsDate: recipient.pointsDate,
@@ -204,6 +208,7 @@ const createSummary = async (ctx: Context, block: Block) => {
     points: calculationResult.totalPoints,
     elPoints: lastSummary?.elPoints ?? 0n,
   })
+  state.summaries.set(summary.id, summary)
 
   return { summary, recipients }
 }
@@ -215,7 +220,6 @@ const calculateELPoints = async (
   recipients: LRTPointRecipient[],
 ) => {
   if (haveNodeDelegatorInstance) {
-    const state = useLrtState()
     const totalBalance = recipients.reduce((sum, r) => sum + r.balance, 0n)
     let totalPointsEarned = 0n
     let totalPoints = 0n
@@ -301,6 +305,7 @@ const createLRTNodeDelegator = async (
   const totalBalance = balances.reduce((sum, balance) => sum + balance, 0n)
   const lastNodeDelegatorEntry = await getLatestNodeDelegator(
     ctx,
+    block,
     node.toLowerCase(),
   )
 
@@ -328,6 +333,13 @@ const createLRTNodeDelegator = async (
     points: (lastNodeDelegatorEntry?.points ?? 0n) + pointsEarned,
     holdings: [],
   })
+
+  if (lastNodeDelegatorEntry?.id === nodeDelegator.id) {
+    throw new Error(
+      `Already created an LRTNodeDelegator with id ${nodeDelegator.id}`,
+    )
+  }
+
   // ctx.log.info({
   //   lastNodeDelegatorEntry: !!lastNodeDelegatorEntry,
   //   timestamp: nodeDelegator.timestamp,
@@ -346,7 +358,6 @@ const createLRTNodeDelegator = async (
   })
 
   state.nodeDelegators.set(nodeDelegator.id, nodeDelegator)
-  await ctx.store.upsert(nodeDelegator)
   return { nodeDelegator, pointsEarned }
 }
 
@@ -393,11 +404,7 @@ const removeBalance = async (
   const state = useLrtState()
   const recipient = await getRecipient(ctx, params.recipient)
 
-  const calculationResult = await calculateRecipientsPoints(
-    ctx,
-    params.timestamp.getTime(),
-    [recipient],
-  )
+  await calculateRecipientsPoints(ctx, params.timestamp.getTime(), [recipient])
 
   recipient.balance -= params.balance
   let amountToRemove = params.balance

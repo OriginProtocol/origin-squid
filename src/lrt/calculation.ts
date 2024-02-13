@@ -69,7 +69,7 @@ export const calculateRecipientsPoints = async (
       encodeAddress(recipient.id),
     ]
 
-    const referringRecipients = recipients.filter((r) =>
+    const referringRecipients = [...state.recipients.values()].filter((r) =>
       r.balanceData.find(
         (bd) => bd.referralId && recipientReferralCodes.includes(bd.referralId),
       ),
@@ -177,7 +177,6 @@ const calculateTimespanEarned = (
   amount: bigint,
   multiplier: bigint,
 ): bigint => {
-  // TODO: Convert to total `bigint` calculation
   const intervals =
     (BigInt(endTimestamp - startTimestamp) * 1_000000000_000000000n) /
     BigInt(pointInterval)

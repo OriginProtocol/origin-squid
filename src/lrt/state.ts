@@ -16,9 +16,10 @@ import {
   LRTPointRecipientHistory,
   LRTSummary,
 } from '../model'
-import { Context } from '../processor'
+import { Block, Context } from '../processor'
 
 const state = {
+  summaries: new Map<string, LRTSummary>(),
   deposits: new Map<string, LRTDeposit>(),
   recipients: new Map<string, LRTPointRecipient>(),
   balanceData: new Map<string, LRTBalanceData>(),
@@ -32,6 +33,7 @@ export const useLrtState = () => state
 export const saveAndResetState = async (ctx: Context) => {
   const state = useLrtState()
   await Promise.all([
+    ctx.store.insert([...state.summaries.values()]),
     ctx.store.insert([...state.deposits.values()]),
     ctx.store.upsert([...state.recipients.values()]).then(() => {
       return ctx.store.upsert([...state.balanceData.values()])
@@ -40,6 +42,7 @@ export const saveAndResetState = async (ctx: Context) => {
     ctx.store.upsert([...state.nodeDelegators.values()]),
     ctx.store.upsert([...state.nodeDelegatorHoldings.values()]),
   ])
+  state.summaries.clear()
   state.deposits.clear()
   // state.recipients.clear() // We don't want to clear the recipients because they give us faster summary updates.
   state.balanceData.clear()
@@ -125,11 +128,18 @@ export const getRecipient = async (
   return recipient
 }
 
-export const getLatestNodeDelegator = async (ctx: Context, node: string) => {
-  return await ctx.store.findOne(LRTNodeDelegator, {
-    order: { id: 'desc' },
-    where: { node },
-  })
+export const getLatestNodeDelegator = async (
+  ctx: Context,
+  block: Block,
+  node: string,
+) => {
+  return (
+    state.nodeDelegators.get(`${block.header.height}:${node}`) ??
+    (await ctx.store.findOne(LRTNodeDelegator, {
+      order: { id: 'desc' },
+      where: { node },
+    }))
+  )
 }
 
 export const getLastSummary = async (ctx: Context) => {

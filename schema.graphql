@@ -1,5 +1,3 @@
-# GENERATED, DO NOT MODIFY
-
 type LRTDeposit @entity {
   id: ID! @index
   timestamp: DateTime! @index
@@ -39,6 +37,7 @@ type LRTPointRecipientHistory @entity {
   id: ID! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  recipient: String!
   balance: BigInt!
   points: BigInt!
   pointsDate: DateTime! @index

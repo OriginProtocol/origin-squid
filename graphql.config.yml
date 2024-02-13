@@ -1,8 +1,6 @@
 projects:
-  combined:
-    schema: schema.graphql
   lrt:
-    schema: schema-lrt.graphql
+    schema: schema.graphql
     include:
       - schema-base.graphql
       - types.graphql
