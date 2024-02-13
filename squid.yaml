@@ -46,3 +46,6 @@ deploy:
       - '1000'
 scale:
   dedicated: true
+  addons:
+    postgres:
+      storage: 20G
