@@ -2,6 +2,24 @@
 
 ### [Design Decisions Notion Document](https://www.notion.so/originprotocol/Subsquid-Design-Decisions-04ef82ae0d6848d1b14de893e9929ce4#d8e8d367069c4a619809e926f72db074)
 
+## Release Checklist
+
+Ensure we don't miss anything on a release by following this checklist.
+
+- [ ] Create version branch (e.g. `v25`)
+- [ ] Update squid.yaml version
+- [ ] Deploy (`sqd deploy .`)
+- [ ] Commit & Push
+- [ ] Wait for processing to complete
+- [ ] Set to production at https://app.subsquid.io/squids
+- [ ] Check functionality of front-ends
+- [ ] Update Grafana Subsquid datasource: https://origindefi.grafana.net/connections/datasources
+- [ ] Notify in #defi-data if important
+- [ ] Hibernate previous version(s)
+- [ ] Delete old versions (keep recently hibernated version as a backup)
+
+If a version has issues in deployment, fix it in the branch and later *cherry-pick* those fixes back to `main`.
+
 ## Env Options
 
 ```shell
