@@ -77,7 +77,10 @@ export const processStrategyDailyEarnings = async (
     const balance = max(yields.map((y) => y.balance)) // Use the highest balance in the last day. (conservative approach)
     const balanceWeight = // Use the lowest balance weight in the last day. (conservative approach)
       Math.min(1, ...yields.map((y) => y.balanceWeight))
-    const earnings = yields[yields.length - 1]?.earnings ?? 0n
+
+    // The sum of perpetual earnings, so we want to use whatever is latest.
+    const earnings = yields[0]?.earnings ?? 0n
+    // The sum of the earnings change per record.
     const earningsChange = todayYields.reduce(
       (sum, y) => sum + y.earningsChange,
       0n,

@@ -94,6 +94,7 @@ export const oethStrategies: readonly IStrategyData[] = [
       poolId:
         '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
       poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
+      rewardPoolAddress: '0xdd1fe5ad401d4777ce89959b7fa587e569bf125d',
     },
   },
   {

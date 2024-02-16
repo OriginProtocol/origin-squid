@@ -16,6 +16,7 @@ import * as strategyVault from './strategy-vault'
 export type IBalancerPoolInfo = {
   poolId: string
   poolAddress: string
+  rewardPoolAddress: string
 }
 
 export type ICurveAMOInfo = {
