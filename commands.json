@@ -144,6 +144,17 @@
         "lib/main-other.js"
       ]
     },
+    "process:staking": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "lib/main-staking.js"
+      ]
+    },
     "process:oeth:prod": {
       "description": "Start the squid processor",
       "deps": [
@@ -185,6 +196,17 @@
       "cmd": [
         "node",
         "lib/main-other.js"
+      ],
+      "hidden": true
+    },
+    "process:staking:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-staking.js"
       ],
       "hidden": true
     },

@@ -32,6 +32,10 @@ deploy:
       cmd: [ "sqd", "process:other:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+    - name: staking-processor
+      cmd: [ "sqd", "process:staking:prod" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_RETH
   api:
     cmd:
       - npx

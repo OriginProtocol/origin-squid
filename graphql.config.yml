@@ -20,5 +20,10 @@ projects:
     include:
       - schema-base.graphql
       - types.graphql
+  staking:
+    schema: schema-staking.graphql
+    include:
+      - schema-base.graphql
+      - types.graphql
 include:
   - types.graphql

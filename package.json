@@ -12,7 +12,9 @@
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:other": "sqd process:other",
-    "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
+    "process:staking": "sqd process:staking",
+    "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other process:staking",
+    "generate": "npm-run-all codegen migration:generate"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",
