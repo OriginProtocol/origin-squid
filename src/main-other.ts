@@ -17,16 +17,9 @@ uniswap.initialize()
 
 export const processor = {
   stateSchema: 'other-processor',
-  processors: [
-    balancer,
-    curve,
-    maverick,
-    native,
-    ...erc20s(),
-    liquiditySources,
-  ],
-  postProcessors: [exchangeRates, liquidity, processStatus('other')],
-  validators: [validate],
+  processors: [curve],
+  postProcessors: [exchangeRates],
+  validators: [],
 }
 export default processor
 

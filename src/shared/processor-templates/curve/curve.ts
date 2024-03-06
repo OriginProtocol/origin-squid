@@ -66,7 +66,9 @@ export const createCurveProcessor = ({
   address: string
   from: number
   tokens: string[]
-  ratesToPull?: { i: bigint; j: bigint; dx: bigint }[] | undefined
+  ratesToPull?:
+    | { i: bigint; j: bigint; dx: bigint; name?: string; decimals?: number }[]
+    | undefined
 }) => {
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
@@ -85,10 +87,14 @@ export const createCurveProcessor = ({
           range(tokens.length).map((n) => contract.balances(BigInt(n))),
         ),
         Promise.all(
-          (ratesToPull ?? []).map(async ({ i, j, dx }) => {
+          (ratesToPull ?? []).map(async ({ name, decimals, i, j, dx }) => {
             return {
-              name: `${i}-${j}-${dx}`,
-              data: await contract.get_dy(i, j, dx),
+              name: name ?? `${i}-${j}-${dx}`,
+              data: await contract
+                .get_dy(i, j, dx)
+                .then((rate) =>
+                  decimals ? rate * 10n ** (18n - BigInt(decimals)) : rate,
+                ),
             }
           }),
         ),

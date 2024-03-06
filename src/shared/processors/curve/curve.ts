@@ -21,6 +21,11 @@ const pools: (Parameters<typeof createCurveInitializer>['0'] &
     address: '0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7'.toLowerCase(),
     from: Math.max(10809473, ousdResetFrom),
     tokens: [tokens.DAI, tokens.USDC, tokens.USDT],
+    ratesToPull: [
+      { name: 'USDC_DAI', i: 1n, j: 0n, dx: 1000000n }, // Result in 1e18
+      { name: 'USDT_DAI', i: 2n, j: 0n, dx: 1000000n }, // Result in 1e18
+      { name: 'USDT_USDC', i: 2n, j: 1n, dx: 1000000n, decimals: 6 }, // Result in 1e6
+    ],
   },
   {
     name: 'OUSDMetapool',

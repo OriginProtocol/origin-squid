@@ -16,18 +16,6 @@ deploy:
     #    env:
     #      RPC_ENV: RPC_ENDPOINT_999
     ################################
-    - name: oeth-processor
-      cmd: [ "sqd", "process:oeth:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: ousd-processor
-      cmd: [ "sqd", "process:ousd:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: ogv-processor
-      cmd: [ "sqd", "process:ogv:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
     - name: other-processor
       cmd: [ "sqd", "process:other:prod" ]
       env:
