@@ -6,6 +6,7 @@ import * as chainlinkFeedRegistry from '../../../abi/chainlink-feed-registry'
 import * as frxEthFraxOracle from '../../../abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '../../../abi/oeth-oracle-router'
 import * as stakedFraxEth from '../../../abi/sfrx-eth'
+import * as woethAbi from '../../../abi/woeth'
 import { Context } from '../../../processor'
 import { STETH_ADDRESS } from '../../../utils/addresses'
 import { Currency, CurrencySymbol, currencies } from './currencies'
@@ -33,6 +34,9 @@ export const getPrice = async (
   }
   if (base === 'ETH' && quote === 'frxETH') {
     return getFrxEthPrice(ctx, height)
+  }
+  if (base === 'wOETH' && quote === 'OETH') {
+    return getPrice_wOETH_OETH(ctx, height)
   }
   if (base === 'ETH' && oethOracleCurrencies.has(quote) && height >= 18032298) {
     return getOethOraclePrice(ctx, height, quote)
@@ -138,3 +142,9 @@ export const getBalancePoolRateProviders = memoize(
   },
   (_ctx, _block, address) => address.toLowerCase(),
 )
+
+export const getPrice_wOETH_OETH = (ctx: Context, height: number) => {
+  if (height < 17141658) return 1_000_000_000_000_000_000n
+  const woeth = new woethAbi.Contract(ctx, { height }, currencies.wOETH)
+  return woeth.previewRedeem(1_000_000_000_000_000_000n)
+}

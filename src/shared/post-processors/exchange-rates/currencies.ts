@@ -9,6 +9,7 @@ export const currencies = {
   USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
+  wOETH: '0xdcee70654261af21c44c093c300ed3bb97b78192',
   WETH: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   stETH: '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
   wstETH: '0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0',
