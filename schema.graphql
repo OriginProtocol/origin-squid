@@ -239,7 +239,27 @@ type LiquidityDailyBalance @entity {
   balance: BigInt!
 }
 
-"""
+type BridgeTransfer @entity {
+  id: ID! # chain + log id
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  messageId: String! @index
+  bridge: String! @index
+  sender: String! @index
+  receiver: String! @index
+  chainIn: Int! @index
+  chainOut: Int!
+  tokenIn: String!
+  tokenOut: String!
+  amountIn: BigInt!
+  amountOut: BigInt!
+}
+
+type BridgeTransferState @entity {
+  id: ID!
+  state: Int!
+}"""
 The OETH entity tracks the change in total supply of OETH over time.
 """
 type OETH @entity {

@@ -2,23 +2,23 @@ projects:
   combined:
     schema: schema.graphql
   base:
-    schema: schema-base.graphql
+    schema: schema-general.graphql
     include:
       - types.graphql
   oeth:
     schema: schema-oeth.graphql
     include:
-      - schema-base.graphql
+      - schema-general.graphql
       - types.graphql
   ousd:
     schema: schema-ousd.graphql
     include:
-      - schema-base.graphql
+      - schema-general.graphql
       - types.graphql
   ogv:
     schema: schema-ogv.graphql
     include:
-      - schema-base.graphql
+      - schema-general.graphql
       - types.graphql
 include:
   - types.graphql

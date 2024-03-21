@@ -8,11 +8,12 @@
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
+    "process:arbitrum": "sqd process:arbitrum",
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:other": "sqd process:other",
-    "process": "npm-run-all --parallel process:oeth process:ousd process:ogv process:other"
+    "process": "npm-run-all --parallel process:arbitrum process:oeth process:ousd process:ogv process:other"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",

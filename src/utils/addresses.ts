@@ -20,6 +20,7 @@ export const OETH_VAULT_ADDRESS = '0x39254033945aa2e4809cc2977e7087bee48bd7ab'
 export const OETH_HARVESTER_ADDRESS = `0x0d017afa83eace9f10a8ec5b6e13941664a6785c`
 export const OETH_ZAPPER_ADDRESS = '0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66'
 export const OETH_DRIPPER_ADDRESS = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
+export const WOETH_ADDRESS = '0xdcee70654261af21c44c093c300ed3bb97b78192'
 
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const STETH_ADDRESS = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'
@@ -82,6 +83,7 @@ export const tokens = {
   // Origin OTokens
   OETH: OETH_ADDRESS,
   OUSD: OUSD_ADDRESS,
+  wOETH: WOETH_ADDRESS,
 
   // Dollar
   DAI: DAI_ADDRESS,

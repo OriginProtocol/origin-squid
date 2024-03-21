@@ -1,4 +1,5 @@
 import { lookupArchive } from '@subsquid/archive-registry'
+import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
 import {
   DataHandlerContext,
   EvmBatchProcessor,
@@ -15,10 +16,11 @@ import { calculateBPS } from './utils/calculateBPS'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
-export const createSquidProcessor = () => {
-  const url =
-    process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'] ||
-    'http://localhost:8545'
+export const createSquidProcessor = (
+  archive: KnownArchives = 'eth-mainnet',
+  rpc_env = process.env.RPC_ENV ?? 'RPC_ENDPOINT',
+) => {
+  const url = process.env[rpc_env] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
   return new EvmBatchProcessor()
     .setDataSource({
@@ -26,7 +28,7 @@ export const createSquidProcessor = () => {
       // against the other EVM networks
       // For a full list of supported networks and config options
       // see https://docs.subsquid.io/evm-indexing/
-      archive: lookupArchive('eth-mainnet'),
+      archive: lookupArchive(archive),
 
       // Must be set for RPC ingestion (https://docs.subsquid.io/evm-indexing/evm-processor/)
       // OR to enable contract state queries (https://docs.subsquid.io/evm-indexing/query-state/)
@@ -79,11 +81,15 @@ interface Processor {
 let initialized = false
 
 export const run = ({
+  archive,
+  rpcEnv,
   stateSchema,
   processors,
   postProcessors,
   validators,
 }: {
+  archive?: KnownArchives
+  rpcEnv?: string
   stateSchema?: string
   processors: Processor[]
   postProcessors?: Processor[]
@@ -94,7 +100,7 @@ export const run = ({
     'All processors must have a `from` defined',
   )
 
-  const processor = createSquidProcessor()
+  const processor = createSquidProcessor(archive, rpcEnv)
 
   processor.setBlockRange({
     from: process.env.BLOCK_FROM

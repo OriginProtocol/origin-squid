@@ -1,6 +1,7 @@
 import * as dailyStats from './oeth/post-processors/daily-stats'
 import * as oeth from './oeth/processors'
 import * as balancerMetaPoolStrategy from './oeth/processors/balancer-meta-pool'
+import { ccip } from './oeth/processors/ccip'
 import * as curveLp from './oeth/processors/curve-lp'
 import * as dripper from './oeth/processors/dripper'
 import * as exchangeRates from './oeth/processors/exchange-rates'
@@ -16,6 +17,7 @@ import { processStatus } from './shared/processor-templates/processor-status'
 export const processor = {
   stateSchema: 'oeth-processor',
   processors: [
+    ccip({ chainId: 1 }),
     oeth,
     vault,
     fraxStaking,

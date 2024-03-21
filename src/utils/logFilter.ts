@@ -20,6 +20,7 @@ export const logFilter = (
     topic2: filter.topic2?.map(prepare),
     topic3: filter.topic3?.map(prepare),
     range: filter.range,
+    transaction: filter.transaction,
   }
   return {
     value: filter,

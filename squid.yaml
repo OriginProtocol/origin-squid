@@ -16,6 +16,10 @@ deploy:
     #    env:
     #      RPC_ENV: RPC_ENDPOINT_999
     ################################
+    - name: arbitrum-processor
+      cmd: [ "sqd", "process:arbitrum:prod" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_RETH
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]
       env:

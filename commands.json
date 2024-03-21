@@ -100,6 +100,17 @@
         "lib/main.js"
       ]
     },
+    "process:arbitrum": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "lib/main-arbitrum.js"
+      ]
+    },
     "process:oeth": {
       "description": "Load .env and start the squid processor",
       "deps": [
@@ -143,6 +154,17 @@
         "--require=dotenv/config",
         "lib/main-other.js"
       ]
+    },
+    "process:arbitrum:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "lib/main-arbitrum.js"
+      ],
+      "hidden": true
     },
     "process:oeth:prod": {
       "description": "Start the squid processor",
