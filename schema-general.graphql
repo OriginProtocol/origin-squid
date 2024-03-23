@@ -256,5 +256,7 @@ type BridgeTransfer @entity {
 
 type BridgeTransferState @entity {
   id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   state: Int!
 }

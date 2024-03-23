@@ -258,6 +258,8 @@ type BridgeTransfer @entity {
 
 type BridgeTransferState @entity {
   id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   state: Int!
 }"""
 The OETH entity tracks the change in total supply of OETH over time.

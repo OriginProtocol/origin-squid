@@ -1,5 +1,5 @@
-module.exports = class Data1710988098670 {
-    name = 'Data1710988098670'
+module.exports = class Data1711138172444 {
+    name = 'Data1711138172444'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -60,7 +60,9 @@ module.exports = class Data1710988098670 {
         await db.query(`CREATE INDEX "IDX_3cbd3eea30bc62ebc91c276e73" ON "bridge_transfer" ("sender") `)
         await db.query(`CREATE INDEX "IDX_54f4abe8f2eb80204637ce328e" ON "bridge_transfer" ("receiver") `)
         await db.query(`CREATE INDEX "IDX_12fa326ec2496a964493f2a7bc" ON "bridge_transfer" ("chain_in") `)
-        await db.query(`CREATE TABLE "bridge_transfer_state" ("id" character varying NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_00ca26906171755e6fc01882c68" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bridge_transfer_state" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_00ca26906171755e6fc01882c68" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_374659ae3bd149042388e132be" ON "bridge_transfer_state" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_74f93b10ec560e63792dcc877e" ON "bridge_transfer_state" ("block_number") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -287,6 +289,8 @@ module.exports = class Data1710988098670 {
         await db.query(`DROP INDEX "public"."IDX_54f4abe8f2eb80204637ce328e"`)
         await db.query(`DROP INDEX "public"."IDX_12fa326ec2496a964493f2a7bc"`)
         await db.query(`DROP TABLE "bridge_transfer_state"`)
+        await db.query(`DROP INDEX "public"."IDX_374659ae3bd149042388e132be"`)
+        await db.query(`DROP INDEX "public"."IDX_74f93b10ec560e63792dcc877e"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)

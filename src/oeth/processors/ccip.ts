@@ -103,6 +103,8 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
           const data = ccipOffRampAbi.events.ExecutionStateChanged.decode(log)
           const state = new BridgeTransferState({
             id: data.messageId,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
             state: data.state,
           })
           result.bridgeTransferStates.set(state.id, state)
