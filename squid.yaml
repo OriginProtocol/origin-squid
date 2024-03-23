@@ -11,6 +11,8 @@ deploy:
     - RPC_ENDPOINT_999
     - RPC_ENDPOINT_RETH
     - RPC_BACKUP
+    - RPC_ARBITRUM_ENDPOINT
+    - RPC_ARBITRUM_ENV
   processor:
     #    cmd: [ "node", "lib/main" ]
     #    env:
