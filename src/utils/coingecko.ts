@@ -102,7 +102,7 @@ export async function applyCoingeckoData(
   if (statsWithNoPrice.length > 0) {
     console.log(`Found ${statsWithNoPrice.length} stats with no price`)
     // console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
-    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=max&interval=daily&precision=18`
+    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=365&interval=daily&precision=18`
     const coingeckoResponse = await fetch(coingeckoURL)
     if (coingeckoResponse.status === 429) {
       console.log('Coingecko rate limited')
