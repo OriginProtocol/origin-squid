@@ -516,13 +516,20 @@ export const createOTokenProcessor = (params: {
       })
       result.rebaseOptions.push(rebaseOption)
       if (trace.action.sighash === otoken.functions.rebaseOptIn.sighash) {
-        owner.credits = await new otoken.Contract(
+        const afterHighResUpgrade =
+          block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+        const otokenContract = new otoken.Contract(
           ctx,
           block.header,
           params.OTOKEN_ADDRESS,
         )
-          .creditsBalanceOfHighres(owner.id)
-          .then((c) => c[0])
+        owner.credits = afterHighResUpgrade
+          ? await otokenContract
+              .creditsBalanceOfHighres(owner.id)
+              .then((c) => c[0])
+          : await otokenContract
+              .creditsBalanceOf(owner.id)
+              .then((c) => c[0] * 1000000000n)
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
         otokenObject.nonRebasingSupply -= owner.balance
