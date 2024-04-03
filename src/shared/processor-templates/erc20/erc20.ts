@@ -142,6 +142,7 @@ export const createERC20Tracker = ({
             )
             accounts.forEach((account, i) => {
               if (account === ADDRESS_ZERO) return
+              account = account.toLowerCase()
               const id = `${block.header.height}:${address}:${account}`
               const balance = new ERC20Balance({
                 id,
@@ -186,8 +187,8 @@ export const createERC20Tracker = ({
           const isTransferLog = transferLogFilters.find((l) => l.matches(log))
           if (isTransferLog) {
             const transfer = abi.events.Transfer.decode(log)
-            accounts.add(transfer.from)
-            accounts.add(transfer.to)
+            accounts.add(transfer.from.toLowerCase())
+            accounts.add(transfer.to.toLowerCase())
           }
           const isRebaseLog = rebaseFilters.find((l) => l.matches(log))
           if (isRebaseLog) {
@@ -196,7 +197,7 @@ export const createERC20Tracker = ({
               where: { address },
             })
             for (const holder of holders) {
-              accounts.add(holder.account)
+              accounts.add(holder.account.toLowerCase())
             }
           }
         }
