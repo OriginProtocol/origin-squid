@@ -184,7 +184,7 @@ const expectations = {
     {
       balance: '4994819891394470874',
       blockNumber: 17684499,
-      id: '0017684499-000297-32534-0x0ad9ea110bdd131683c0d36df8ba80cd3ed1a5fb-1',
+      id: '0017684499-32534-000297-0x0ad9ea110bdd131683c0d36df8ba80cd3ed1a5fb-1',
       timestamp: '2023-07-13T12:12:23.000000Z',
       txHash:
         '0x51dc5890e7057aa049a8ee3675e9f5a2d1df8afae3ccf1aae7991d2141b082bb',
@@ -194,7 +194,7 @@ const expectations = {
     {
       balance: '989',
       blockNumber: 17780803,
-      id: '0017780803-000424-d030b-0x24902aa0cf0000a08c0ea0b003b0c0bf600000e0-1',
+      id: '0017780803-d030b-000424-0x24902aa0cf0000a08c0ea0b003b0c0bf600000e0-1',
       timestamp: '2023-07-27T00:22:23.000000Z',
       txHash:
         '0x723583207fa4221d4ad6d606b43927019e088c93c0edcbcd89a62c6327e1925f',
@@ -204,7 +204,7 @@ const expectations = {
     {
       balance: '3620809167086458796690',
       blockNumber: 18161346,
-      id: '0018161346-000161-142ff-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
+      id: '0018161346-142ff-000161-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
       timestamp: '2023-09-18T07:27:11.000000Z',
       txHash:
         '0xa66fbf3fb92fc8d44e2790a1692ce5e9f10139f0bf728da2533c8d5e7b4a1a70',
@@ -214,7 +214,7 @@ const expectations = {
     {
       balance: '30999999999999',
       blockNumber: 18412140,
-      id: '0018412140-000178-00f48-0xc69bfa6ab78853a4addb9b6c553102c7e62ada15-1',
+      id: '0018412140-00f48-000178-0xc69bfa6ab78853a4addb9b6c553102c7e62ada15-1',
       timestamp: '2023-10-23T09:41:23.000000Z',
       txHash:
         '0xc1cdeca03c9214546cf820a725ed6c730860479197c19c6fa1836f1d92a9eb09',
@@ -224,7 +224,7 @@ const expectations = {
     {
       balance: '199908452113059508',
       blockNumber: 18229171,
-      id: '0018229171-000263-264de-0x018abc2b6bc71013efd9f98f2104ca53132db615-1',
+      id: '0018229171-264de-000263-0x018abc2b6bc71013efd9f98f2104ca53132db615-1',
       timestamp: '2023-09-27T19:26:47.000000Z',
       txHash:
         '0x4dfaca9c52226b02c6ebd16f97bab0159370bf3e9f252a48ff965700e27f4653',
@@ -234,7 +234,7 @@ const expectations = {
     {
       balance: '70007164149821693',
       blockNumber: 17130412,
-      id: '0017130412-000118-770f2-0x94b17476a93b3262d87b9a326965d1e91f9c13e7-1',
+      id: '0017130412-770f2-000118-0x94b17476a93b3262d87b9a326965d1e91f9c13e7-1',
       timestamp: '2023-04-26T12:30:59.000000Z',
       txHash:
         '0xf9498f5b8d65e7f7252a515edcc3af4cd3b0e96ee841ef82f11de349ded5f330',
@@ -244,7 +244,7 @@ const expectations = {
     {
       balance: '0',
       blockNumber: 17542358,
-      id: '0017542358-000170-8207a-0x9ffd0a5b5438b95861167422e745d34d151bcc3b-1',
+      id: '0017542358-8207a-000170-0x9ffd0a5b5438b95861167422e745d34d151bcc3b-1',
       timestamp: '2023-06-23T12:46:47.000000Z',
       txHash:
         '0x02d96712bdceff945b568905980bc747e920b58cab2191b6ac04a6f0223efd6d',
@@ -254,7 +254,7 @@ const expectations = {
     {
       balance: '0',
       blockNumber: 18202824,
-      id: '0018202824-000167-52e26-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
+      id: '0018202824-52e26-000167-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
       timestamp: '2023-09-24T02:55:59.000000Z',
       txHash:
         '0x427dd09882a59b6906d40b5031029fbd34e4ebc747b4429cc8cad1aefb9e62c5',
@@ -264,7 +264,7 @@ const expectations = {
     {
       balance: '0',
       blockNumber: 18260101,
-      id: '0018260101-000216-20cba-0xe4bac3e44e8080e1491c11119197d33e396ea82b-1',
+      id: '0018260101-20cba-000216-0xe4bac3e44e8080e1491c11119197d33e396ea82b-1',
       timestamp: '2023-10-02T03:16:23.000000Z',
       txHash:
         '0xb8b8a275a004ccfbc4159989cec584b266c148153dd37658b8a26966d39d18de',
@@ -274,7 +274,7 @@ const expectations = {
     {
       balance: '35811706077256008074',
       blockNumber: 18154738,
-      id: '0018154738-000203-13b93-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
+      id: '0018154738-13b93-000203-0x9c51ff53e842eeec93f9d5efbf52f6a02591755c-1',
       timestamp: '2023-09-17T09:00:35.000000Z',
       txHash:
         '0x931e5cea2e7d4551691988867947489594d30cdef7acd0906fd7607e887e5aae',
@@ -284,7 +284,7 @@ const expectations = {
     {
       balance: '49999999999999999',
       blockNumber: 17150073,
-      id: '0017150073-000306-0f425-0x58890a9cb27586e83cb51d2d26bbe18a1a647245-1',
+      id: '0017150073-0f425-000306-0x58890a9cb27586e83cb51d2d26bbe18a1a647245-1',
       timestamp: '2023-04-29T06:48:11.000000Z',
       txHash:
         '0x4af5c7b310ae8c814ae6e5415da99f9c9f414e6b4ca8257cd1dea1a6d9067b36',
@@ -294,7 +294,7 @@ const expectations = {
     {
       balance: '375433998881638354',
       blockNumber: 17278567,
-      id: '0017278567-000195-1f61f-0x79b664dba8015e3aa505fa4507f0d64df7e451e2-1',
+      id: '0017278567-1f61f-000195-0x79b664dba8015e3aa505fa4507f0d64df7e451e2-1',
       timestamp: '2023-05-17T09:47:23.000000Z',
       txHash:
         '0xd9a0e30f23956cb91293cb44a6e54b6d6bbe772e3d70b5e68a1760b28c8f78ef',
@@ -304,7 +304,7 @@ const expectations = {
     {
       balance: '1499066120128420574',
       blockNumber: 17286539,
-      id: '0017286539-000156-4976c-0x938500c0df0fdc138c28ddf4bc4289107c7354ce-1',
+      id: '0017286539-4976c-000156-0x938500c0df0fdc138c28ddf4bc4289107c7354ce-1',
       timestamp: '2023-05-18T12:49:35.000000Z',
       txHash:
         '0xcd68e7d50fcb683add60e71253673af2ff2547e6375d40ffc4639a1410bc3104',
@@ -314,7 +314,7 @@ const expectations = {
     {
       balance: '5384270268711162736',
       blockNumber: 17633180,
-      id: '0017633180-000408-d89c5-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
+      id: '0017633180-d89c5-000408-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
       timestamp: '2023-07-06T07:00:11.000000Z',
       txHash:
         '0x97db34103137321f032b4a54ccaed3112d054bc1204125ac862a0b81fb3f3279',
@@ -324,7 +324,7 @@ const expectations = {
     {
       balance: '674774321229336771',
       blockNumber: 17299409,
-      id: '0017299409-000434-9ce80-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
+      id: '0017299409-9ce80-000434-0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc-1',
       timestamp: '2023-05-20T08:19:59.000000Z',
       txHash:
         '0x787fbdec5e65927b0e1b48601d891f48d7671db88fc4c11ac74f8e874e667936',
@@ -334,7 +334,7 @@ const expectations = {
     {
       balance: '32292882396504207',
       blockNumber: 17275137,
-      id: '0017275137-000516-66451-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
+      id: '0017275137-66451-000516-0xdcee70654261af21c44c093c300ed3bb97b78192-1',
       timestamp: '2023-05-16T22:12:35.000000Z',
       txHash:
         '0x24d1f4ff2ad45826b91206594d706af0866bca1f5d20377d070679599a2dbe55',
@@ -344,7 +344,7 @@ const expectations = {
     {
       balance: '10070499668604762317',
       blockNumber: 17276891,
-      id: '0017276891-000052-12fd3-0x57b0dd7967955c92b6e34a038b47fee63e1efd1a-1',
+      id: '0017276891-12fd3-000052-0x57b0dd7967955c92b6e34a038b47fee63e1efd1a-1',
       timestamp: '2023-05-17T04:08:11.000000Z',
       txHash:
         '0x76fe3dc19782ba2e1274f81dd4347dcacc151960918b1b52bb91582a9d49ab50',
@@ -354,7 +354,7 @@ const expectations = {
     {
       balance: '100429877759821',
       blockNumber: 17277099,
-      id: '0017277099-000273-05d64-0xd6415162f48140d6090959cb8068174c68e81705-1',
+      id: '0017277099-05d64-000273-0xd6415162f48140d6090959cb8068174c68e81705-1',
       timestamp: '2023-05-17T04:49:59.000000Z',
       txHash:
         '0xeec79549578a28e024ce86def3784830d28c26b8fe1bfe4bde093f4854b32cde',
@@ -364,7 +364,7 @@ const expectations = {
     {
       balance: '1025746659014252',
       blockNumber: 17283304,
-      id: '0017283304-000280-32e6f-0xfd9e6005187f448957a0972a7d0c0a6da2911236-1',
+      id: '0017283304-32e6f-000280-0xfd9e6005187f448957a0972a7d0c0a6da2911236-1',
       timestamp: '2023-05-18T01:54:23.000000Z',
       txHash:
         '0xaa9c72db7346ea7de332196f6df85d4f47c6fe42e3b7f7fcdc0965933486b128',
@@ -374,7 +374,7 @@ const expectations = {
     {
       balance: '261226340935297362',
       blockNumber: 17283378,
-      id: '0017283378-000634-fde11-0x2f19980c3acd87f6d9468663c9a9839c12456a14-1',
+      id: '0017283378-fde11-000634-0x2f19980c3acd87f6d9468663c9a9839c12456a14-1',
       timestamp: '2023-05-18T02:09:23.000000Z',
       txHash:
         '0xda99a68fd12da72f11d68e5997fa1cccea120a4e5a5b71d2e660785ddf5251ab',
@@ -384,7 +384,7 @@ const expectations = {
   ]),
   oethRebases: e([
     {
-      id: '0017305345-000456-5f62d',
+      id: '0017305345-5f62d-000456',
       blockNumber: 17305345,
       timestamp: '2023-05-21T04:22:11.000000Z',
       feeETH: '6000055597516131',
@@ -398,7 +398,7 @@ const expectations = {
       yieldUSD: '54581905765044493913',
     },
     {
-      id: '0017331591-000369-f9f77',
+      id: '0017331591-f9f77-000369',
       blockNumber: 17331591,
       timestamp: '2023-05-24T21:02:59.000000Z',
       feeETH: '6492737577781034',
@@ -412,7 +412,7 @@ const expectations = {
       yieldUSD: '58635661471359380845',
     },
     {
-      id: '0017583331-000121-dccba',
+      id: '0017583331-dccba-000121',
       blockNumber: 17583331,
       timestamp: '2023-06-29T07:00:23.000000Z',
       feeETH: '577769460917579313',
@@ -426,7 +426,7 @@ const expectations = {
       yieldUSD: '5312387973825820632114',
     },
     {
-      id: '0018139997-000303-52abd',
+      id: '0018139997-52abd-000303',
       blockNumber: 18139997,
       timestamp: '2023-09-15T06:59:59.000000Z',
       feeETH: '1190995054063049444',
@@ -440,7 +440,7 @@ const expectations = {
       yieldUSD: '9709765827507120051257',
     },
     {
-      id: '0018404209-000053-b6b49',
+      id: '0018404209-b6b49-000053',
       blockNumber: 18404209,
       timestamp: '2023-10-22T06:59:47.000000Z',
       feeETH: '885619331985372380',
