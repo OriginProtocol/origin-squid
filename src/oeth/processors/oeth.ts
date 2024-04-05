@@ -7,6 +7,7 @@ import {
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
+  WOETHHistory,
 } from '../../model'
 import {
   createOTokenProcessor,
@@ -21,6 +22,7 @@ import {
   SFRXETH_ADDRESS,
   STETH_ADDRESS,
   WETH_ADDRESS,
+  WOETH_ADDRESS,
   WSTETH_ADDRESS,
 } from '../../utils/addresses'
 
@@ -28,6 +30,7 @@ export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec
 
 export const setup = createOTokenSetup({
   address: OETH_ADDRESS,
+  wrappedAddress: WOETH_ADDRESS,
   vaultAddress: OETH_VAULT_ADDRESS,
   from,
   upgrades: {
@@ -37,6 +40,7 @@ export const setup = createOTokenSetup({
 
 export const process = createOTokenProcessor({
   OTOKEN_ADDRESS: OETH_ADDRESS,
+  WOTOKEN_ADDRESS: WOETH_ADDRESS,
   OTOKEN_VAULT_ADDRESS: OETH_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: ETH_ADDRESS, symbol: 'ETH' },
@@ -52,6 +56,7 @@ export const process = createOTokenProcessor({
   OTokenAsset: OETHAsset,
   OTokenAddress: OETHAddress,
   OTokenHistory: OETHHistory,
+  WOTokenHistory: WOETHHistory,
   OTokenAPY: OETHAPY,
   OTokenRebase: OETHRebase,
   OTokenRebaseOption: OETHRebaseOption,

@@ -30,7 +30,6 @@ enum RebasingOption {
 }
 
 enum HistoryType {
-  Swap
   Sent
   Received
   Yield
@@ -301,6 +300,19 @@ type OETHHistory @entity {
   address: OETHAddress! @index
   value: BigInt!
   balance: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: HistoryType!
+}
+
+"""
+The History entity tracks events that change the balance of OETH for an address.
+"""
+type WOETHHistory @entity {
+  id: ID!
+  address: String! @index
+  value: BigInt!
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index

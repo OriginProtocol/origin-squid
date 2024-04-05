@@ -8,6 +8,7 @@
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
+    "serve": "sqd serve",
     "process:arbitrum": "sqd process:arbitrum",
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",

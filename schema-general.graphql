@@ -28,7 +28,6 @@ enum RebasingOption {
 }
 
 enum HistoryType {
-  Swap
   Sent
   Received
   Yield

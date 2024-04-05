@@ -45,6 +45,19 @@ type OETHHistory @entity {
 }
 
 """
+The History entity tracks events that change the balance of OETH for an address.
+"""
+type WOETHHistory @entity {
+  id: ID!
+  address: String! @index
+  value: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: HistoryType!
+}
+
+"""
 The Rebase entity tracks historical rebase events on the OETH contract.
 """
 type OETHRebase @entity {

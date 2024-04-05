@@ -1,5 +1,5 @@
-module.exports = class Data1711138172444 {
-    name = 'Data1711138172444'
+module.exports = class Data1712281391762 {
+    name = 'Data1712281391762'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -73,6 +73,10 @@ module.exports = class Data1711138172444 {
         await db.query(`CREATE INDEX "IDX_96956b1c8d29eb7066a97d5ea7" ON "oeth_history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b14170bdb7fbc0775bf55df15d" ON "oeth_history" ("tx_hash") `)
         await db.query(`CREATE TABLE "oeth_address" ("id" character varying NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(6) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_92a966afe47d584af73ce77a1cd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "woeth_history" ("id" character varying NOT NULL, "address" text NOT NULL, "value" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(8) NOT NULL, CONSTRAINT "PK_078ca80778522886c3ce9dcf1cf" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_2b694747dde9f6915fc2106862" ON "woeth_history" ("address") `)
+        await db.query(`CREATE INDEX "IDX_a5642ab77eff35d76c2a9584e7" ON "woeth_history" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_49c09d8924e121e762ba96e5f3" ON "woeth_history" ("tx_hash") `)
         await db.query(`CREATE TABLE "oethapy" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, CONSTRAINT "PK_8dbb4d04591848361200f18f62a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_b1a448045d1ed9d655b679a371" ON "oethapy" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_6b8a7a706a0701e659a7d81508" ON "oethapy" ("block_number") `)
@@ -301,6 +305,10 @@ module.exports = class Data1711138172444 {
         await db.query(`DROP INDEX "public"."IDX_96956b1c8d29eb7066a97d5ea7"`)
         await db.query(`DROP INDEX "public"."IDX_b14170bdb7fbc0775bf55df15d"`)
         await db.query(`DROP TABLE "oeth_address"`)
+        await db.query(`DROP TABLE "woeth_history"`)
+        await db.query(`DROP INDEX "public"."IDX_2b694747dde9f6915fc2106862"`)
+        await db.query(`DROP INDEX "public"."IDX_a5642ab77eff35d76c2a9584e7"`)
+        await db.query(`DROP INDEX "public"."IDX_49c09d8924e121e762ba96e5f3"`)
         await db.query(`DROP TABLE "oethapy"`)
         await db.query(`DROP INDEX "public"."IDX_b1a448045d1ed9d655b679a371"`)
         await db.query(`DROP INDEX "public"."IDX_6b8a7a706a0701e659a7d81508"`)
