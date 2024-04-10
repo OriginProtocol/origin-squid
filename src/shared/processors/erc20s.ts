@@ -24,6 +24,7 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     address: tokens.OGN,
     accountFilter: [
       '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
+      '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // Origin: Investor Wallet
     ],
     intervalTracking: true,
   },
@@ -32,6 +33,7 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     address: tokens.OGV,
     accountFilter: [
       '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
+      '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // Origin: Investor Wallet
     ],
     intervalTracking: true,
   },
