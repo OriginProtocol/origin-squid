@@ -11,7 +11,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 
-import { calculateBPS } from './utils/calculateBPS'
+import { calculateBlockRate } from './utils/calculateBlockRate'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
@@ -126,7 +126,7 @@ export const run = ({
       try {
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length > 1) {
-          ctx.bps = await calculateBPS(ctx)
+          ctx.blockRate = await calculateBlockRate(ctx)
           // ctx.log.info({ bps: ctx.bps, length: ctx.blocks.length })
         }
 
@@ -223,7 +223,8 @@ export type Fields = EvmBatchProcessorFields<
   ReturnType<typeof createSquidProcessor>
 >
 export type Context = DataHandlerContext<Store, Fields> & {
-  bps: number
+  chain: Chain
+  blockRate: number
   __state: Map<string, unknown>
 }
 export type Block = Context['blocks']['0']

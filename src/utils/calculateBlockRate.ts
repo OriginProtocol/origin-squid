@@ -5,7 +5,7 @@ import { Context } from '../processor'
 let lastBpsFrom = 0
 let lastResult = 0
 
-export const calculateBPS = async (ctx: Context) => {
+export const calculateBlockRate = async (ctx: Context) => {
   const lastBlockNumber = ctx.blocks[ctx.blocks.length - 1].header.height
   const bpsTestRange = 100_000
   const bpsFrom = Math.max(
