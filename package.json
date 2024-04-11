@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat schema-*.graphql >> schema.graphql && sqd codegen && git add src/model/generated/*",
-    "migration:generate": "sqd down && sqd up && sqd migration:generate",
+    "migration:generate": "sqd down && sqd up && sqd migration:generate && git add db/migrations/*",
+    "generate": "npm-run-all codegen migration:generate",
     "build": "rm -rf lib && tsc",
     "prettier-check": "prettier --check **/*.ts **/*.json",
     "prettier-fix": "prettier --write **/*.ts **/*.json",
@@ -13,8 +14,8 @@
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
-    "process:other": "sqd process:other",
-    "process": "npm-run-all --parallel process:arbitrum process:oeth process:ousd process:ogv process:other"
+    "process:mainnet": "sqd process:mainnet",
+    "process": "sqd process"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",

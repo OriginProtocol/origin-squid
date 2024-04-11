@@ -144,7 +144,7 @@
         "lib/main-ogv.js"
       ]
     },
-    "process:other": {
+    "process:mainnet": {
       "description": "Load .env and start the squid processor",
       "deps": [
         "build"
@@ -152,7 +152,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
-        "lib/main-other.js"
+        "lib/main-mainnet.js"
       ]
     },
     "process:arbitrum:prod": {
@@ -199,14 +199,14 @@
       ],
       "hidden": true
     },
-    "process:other:prod": {
+    "process:mainnet:prod": {
       "description": "Start the squid processor",
       "deps": [
         "migration:apply"
       ],
       "cmd": [
         "node",
-        "lib/main-other.js"
+        "lib/main-mainnet.js"
       ],
       "hidden": true
     },

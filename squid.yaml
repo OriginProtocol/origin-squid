@@ -35,7 +35,7 @@ deploy:
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
     - name: other-processor
-      cmd: [ "sqd", "process:other:prod" ]
+      cmd: [ "sqd", "process:mainnet:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
   api:

@@ -108,17 +108,17 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             state: data.state,
           })
           result.bridgeTransferStates.set(state.id, state)
-          console.log(state)
+          // console.log(state)
         }
         if (transfersToLockReleasePool.matches(log)) {
-          console.log('match transfersToOnramp')
+          // console.log('match transfersToOnramp')
           const logSendRequested = block.logs.find(
             (l) =>
               log.transactionHash === l.transactionHash &&
               ccipSendRequested.matches(l),
           )
           if (logSendRequested) {
-            console.log('match ccipSendRequested')
+            // console.log('match ccipSendRequested')
             const data =
               ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
             const message = data.message
@@ -146,7 +146,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 sender: message.sender.toLowerCase(),
                 receiver: message.receiver.toLowerCase(),
               })
-              console.log(transfer)
+              // console.log(transfer)
               result.transfers.set(transfer.id, transfer)
             }
           }

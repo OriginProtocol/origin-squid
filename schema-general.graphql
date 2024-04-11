@@ -93,7 +93,8 @@ type ERC20 @entity {
   Format: 'address'
   """
   id: ID!
-  address: String!
+  chainId: Int! @index
+  address: String! @index
   name: String!
   decimals: Int!
   symbol: String!
@@ -104,6 +105,7 @@ type ERC20Holder @entity {
   Format: 'address:account'
   """
   id: ID!
+  chainId: Int! @index
   address: String!
   account: String!
 }
@@ -113,6 +115,7 @@ type ERC20State @entity {
   Format: 'address:blockNumber'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String!
@@ -125,11 +128,24 @@ type ERC20Balance @entity {
   Format: 'address:account:blockNumber'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String!
   account: String!
   balance: BigInt!
+}
+
+type ERC20Transfer @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String!
+  blockNumber: Int!
+  timestamp: DateTime!
+  address: String! @index
+  from: String! @index
+  to: String! @index
+  value: BigInt!
 }
 
 type CurvePool @entity {

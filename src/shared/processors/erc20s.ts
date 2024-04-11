@@ -5,6 +5,7 @@ import {
   OETH_VAULT_ADDRESS,
   OUSD_VAULT_ADDRESS,
   TokenSymbol,
+  WOETH_ADDRESS,
   oethStrategyArray,
   ousdStrategyArray,
   tokens,
@@ -48,6 +49,10 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
         range: { from: 16935276 },
       }),
     ],
+  },
+  wOETH: {
+    from: 16933090,
+    address: WOETH_ADDRESS,
   },
   // OUSD Related
   USDT: {
@@ -96,39 +101,39 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     ],
     intervalTracking: true,
   },
-  rETH: {
-    from: 16933090, // oeth deploy date
-    address: tokens.rETH,
-    accountFilter: [
-      ...oethStrategyArray,
-      OETH_VAULT_ADDRESS,
-      '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap rETH/WETH
-      '0x553e9c493678d8606d6a5ba284643db2110df823', // Uniswap rETH/WETH
-    ],
-    intervalTracking: true,
-  },
-  wstETH: {
-    from: 16933090, // oeth deploy date
-    address: tokens.wstETH,
-    accountFilter: [
-      ...oethStrategyArray,
-      OETH_VAULT_ADDRESS,
-      '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap wstETH/WETH
-    ],
-    intervalTracking: true,
-  },
-  stETH: {
-    from: 16933090, // oeth deploy date
-    address: tokens.stETH,
-    accountFilter: [...oethStrategyArray, OETH_VAULT_ADDRESS],
-    intervalTracking: true,
-  },
-  frxETH: {
-    from: 16933090, // oeth deploy date
-    address: tokens.frxETH,
-    accountFilter: [...oethStrategyArray, OETH_VAULT_ADDRESS],
-    intervalTracking: true,
-  },
+  // rETH: {
+  //   from: 16933090, // oeth deploy date
+  //   address: tokens.rETH,
+  //   accountFilter: [
+  //     ...oethStrategyArray,
+  //     OETH_VAULT_ADDRESS,
+  //     '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap rETH/WETH
+  //     '0x553e9c493678d8606d6a5ba284643db2110df823', // Uniswap rETH/WETH
+  //   ],
+  //   intervalTracking: true,
+  // },
+  // wstETH: {
+  //   from: 16933090, // oeth deploy date
+  //   address: tokens.wstETH,
+  //   accountFilter: [
+  //     ...oethStrategyArray,
+  //     OETH_VAULT_ADDRESS,
+  //     '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap wstETH/WETH
+  //   ],
+  //   intervalTracking: true,
+  // },
+  // stETH: {
+  //   from: 16933090, // oeth deploy date
+  //   address: tokens.stETH,
+  //   accountFilter: [...oethStrategyArray, OETH_VAULT_ADDRESS],
+  //   intervalTracking: true,
+  // },
+  // frxETH: {
+  //   from: 16933090, // oeth deploy date
+  //   address: tokens.frxETH,
+  //   accountFilter: [...oethStrategyArray, OETH_VAULT_ADDRESS],
+  //   intervalTracking: true,
+  // },
 }
 
 // This is a function to allow others to subscribe to balance tracking

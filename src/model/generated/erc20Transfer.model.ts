@@ -2,14 +2,11 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class ERC20Balance {
-    constructor(props?: Partial<ERC20Balance>) {
+export class ERC20Transfer {
+    constructor(props?: Partial<ERC20Transfer>) {
         Object.assign(this, props)
     }
 
-    /**
-     * Format: 'address:account:blockNumber'
-     */
     @PrimaryColumn_()
     id!: string
 
@@ -17,20 +14,27 @@ export class ERC20Balance {
     @Column_("int4", {nullable: false})
     chainId!: number
 
-    @Index_()
+    @Column_("text", {nullable: false})
+    txHash!: string
+
+    @Column_("int4", {nullable: false})
+    blockNumber!: number
+
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
 
     @Index_()
-    @Column_("int4", {nullable: false})
-    blockNumber!: number
-
     @Column_("text", {nullable: false})
     address!: string
 
+    @Index_()
     @Column_("text", {nullable: false})
-    account!: string
+    from!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    to!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
-    balance!: bigint
+    value!: bigint
 }

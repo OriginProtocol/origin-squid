@@ -1,13 +1,13 @@
-import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
+import { arbitrum } from 'viem/chains'
 
+import { transfers } from './arbitrum'
 import { ccip } from './oeth/processors/ccip'
 import { run } from './processor'
 
 export const processor = {
-  archive: 'arbitrum' as KnownArchives,
-  rpcEnv: process.env.RPC_ARBITRUM_ENV,
+  chainId: arbitrum.id,
   stateSchema: 'arbitrum-processor',
-  processors: [ccip({ chainId: 42161 })],
+  processors: [transfers, ccip({ chainId: arbitrum.id })],
   postProcessors: [],
   validators: [],
 }

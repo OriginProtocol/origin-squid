@@ -7,7 +7,6 @@ import {
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
-  WOETHHistory,
 } from '../../model'
 import {
   createOTokenProcessor,
@@ -56,7 +55,6 @@ export const process = createOTokenProcessor({
   OTokenAsset: OETHAsset,
   OTokenAddress: OETHAddress,
   OTokenHistory: OETHHistory,
-  WOTokenHistory: WOETHHistory,
   OTokenAPY: OETHAPY,
   OTokenRebase: OETHRebase,
   OTokenRebaseOption: OETHRebaseOption,

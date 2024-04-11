@@ -1,6 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { groupBy } from 'lodash'
 import { GetTransactionReceiptReturnType } from 'viem'
+import { mainnet } from 'viem/chains'
 
 import * as erc20 from '../../../abi/erc20'
 import * as otoken from '../../../abi/otoken'
@@ -24,7 +25,6 @@ import {
   OUSDRebase,
   OUSDRebaseOption,
   RebasingOption,
-  WOETHHistory,
 } from '../../../model'
 import { Context } from '../../../processor'
 import { type Transaction, activityFromTx } from '../../../utils/activityFromTx'
@@ -46,7 +46,6 @@ type OTokenAPY = EntityClassT<OETHAPY> | EntityClassT<OUSDAPY>
 type OTokenActivity = EntityClassT<OETHActivity> | EntityClassT<OUSDActivity>
 type OTokenAddress = EntityClassT<OETHAddress> | EntityClassT<OUSDAddress>
 type OTokenHistory = EntityClassT<OETHHistory> | EntityClassT<OUSDHistory>
-type WOTokenHistory = EntityClassT<WOETHHistory>
 type OTokenRebase = EntityClassT<OETHRebase> | EntityClassT<OUSDRebase>
 type OTokenRebaseOption =
   | EntityClassT<OETHRebaseOption>
@@ -115,7 +114,6 @@ export const createOTokenProcessor = (params: {
   OTokenAPY: OTokenAPY
   OTokenAddress: OTokenAddress
   OTokenHistory: OTokenHistory
-  WOTokenHistory?: WOTokenHistory
   OTokenActivity: OTokenActivity
   OTokenRebase: OTokenRebase
   OTokenRebaseOption: OTokenRebaseOption
@@ -126,7 +124,6 @@ export const createOTokenProcessor = (params: {
     otokens: InstanceTypeOfConstructor<OToken>[]
     assets: InstanceTypeOfConstructor<OTokenAsset>[]
     history: InstanceTypeOfConstructor<OTokenHistory>[]
-    wrappedHistory: InstanceTypeOfConstructor<WOTokenHistory>[]
     rebases: InstanceTypeOfConstructor<OTokenRebase>[]
     rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
     apies: InstanceTypeOfConstructor<OTokenAPY>[]
@@ -184,7 +181,6 @@ export const createOTokenProcessor = (params: {
       otokens: [],
       assets: [],
       history: [],
-      wrappedHistory: [],
       rebases: [],
       rebaseOptions: [],
       apies: [],
@@ -197,7 +193,6 @@ export const createOTokenProcessor = (params: {
       }
       for (const log of block.logs) {
         await processTransfer(ctx, result, block, log)
-        await processTransferWOETH(ctx, result, block, log)
         await processYieldDistribution(ctx, result, block, log)
         await processTotalSupplyUpdatedHighres(ctx, result, block, log)
         await processRebaseOptEvent(ctx, result, block, log)
@@ -213,7 +208,6 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.otokens),
       ctx.store.insert(result.assets),
       ctx.store.insert(result.history),
-      ctx.store.insert(result.wrappedHistory),
       ctx.store.insert(result.rebases),
       ctx.store.insert(result.rebaseOptions),
       ctx.store.insert(result.activity),
@@ -357,45 +351,6 @@ export const createOTokenProcessor = (params: {
       // Update rebasing supply in all cases
       otokenObject.rebasingSupply =
         otokenObject.totalSupply - otokenObject.nonRebasingSupply
-    }
-  }
-
-  const processTransferWOETH = async (
-    ctx: Context,
-    result: ProcessResult,
-    block: Context['blocks']['0'],
-    log: Context['blocks']['0']['logs']['0'],
-  ) => {
-    if (!params.WOTokenHistory) return
-    if (log.address !== params.WOTOKEN_ADDRESS) return
-    if (log.topics[0] === otoken.events.Transfer.topic) {
-      const dataRaw = otoken.events.Transfer.decode(log)
-      const data = {
-        from: dataRaw.from.toLowerCase(),
-        to: dataRaw.to.toLowerCase(),
-        value: dataRaw.value,
-      }
-
-      result.wrappedHistory.push(
-        new params.WOTokenHistory({
-          id: getUniqueId(`${log.id}-${params.WOTOKEN_ADDRESS}`),
-          address: data.from,
-          value: -data.value,
-          timestamp: new Date(block.header.timestamp),
-          blockNumber: block.header.height,
-          txHash: log.transactionHash,
-          type: HistoryType.Sent,
-        }),
-        new params.WOTokenHistory({
-          id: getUniqueId(`${log.id}-${params.WOTOKEN_ADDRESS}`),
-          address: data.to,
-          value: data.value,
-          timestamp: new Date(block.header.timestamp),
-          blockNumber: block.header.height,
-          txHash: log.transactionHash,
-          type: HistoryType.Received,
-        }),
-      )
     }
   }
 

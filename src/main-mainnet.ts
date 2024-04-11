@@ -5,26 +5,14 @@ import { processStatus } from './shared/processor-templates/processor-status'
 import * as balancer from './shared/processors/balancer'
 import * as curve from './shared/processors/curve'
 import { erc20s } from './shared/processors/erc20s'
-import * as liquiditySources from './shared/processors/liquidity-sources'
 import * as maverick from './shared/processors/maverick'
 import * as native from './shared/processors/native'
-import * as sushiswap from './shared/processors/sushiswap'
-import * as uniswap from './shared/processors/uniswap'
 import * as validate from './shared/validators/validate-shared'
-
-sushiswap.initialize()
-uniswap.initialize()
+import { WOETH_ADDRESS } from './utils/addresses'
 
 export const processor = {
-  stateSchema: 'other-processor',
-  processors: [
-    balancer,
-    curve,
-    maverick,
-    native,
-    ...erc20s(),
-    liquiditySources,
-  ],
+  stateSchema: 'mainnet-processor',
+  processors: [balancer, curve, maverick, native, ...erc20s()],
   postProcessors: [exchangeRates, liquidity, processStatus('other')],
   validators: [validate],
 }

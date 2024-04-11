@@ -10,6 +10,8 @@ import assert from 'assert'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
+import { Chain } from 'viem'
+import { arbitrum, mainnet } from 'viem/chains'
 
 import { calculateBlockRate } from './utils/calculateBlockRate'
 
@@ -74,22 +76,36 @@ interface Processor {
   name?: string
   from?: number
   initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createSquidProcessor>) => void
+  setup?: (p: ReturnType<typeof createSquidProcessor>, chain: Chain) => void
   process: (ctx: Context) => Promise<void>
 }
 
 let initialized = false
 
+const chainConfigs: Record<
+  number,
+  { chain: Chain; archive: KnownArchives; rpcEnv: string } | undefined
+> = {
+  [mainnet.id]: {
+    chain: mainnet,
+    archive: 'eth-mainnet',
+    rpcEnv: process.env.RPC_ENV ?? 'RPC_ENDPOINT',
+  },
+  [arbitrum.id]: {
+    chain: arbitrum,
+    archive: 'arbitrum',
+    rpcEnv: process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT',
+  },
+}
+
 export const run = ({
-  archive,
-  rpcEnv,
+  chainId = 1,
   stateSchema,
   processors,
   postProcessors,
   validators,
 }: {
-  archive?: KnownArchives
-  rpcEnv?: string
+  chainId?: number
   stateSchema?: string
   processors: Processor[]
   postProcessors?: Processor[]
@@ -100,7 +116,9 @@ export const run = ({
     'All processors must have a `from` defined',
   )
 
-  const processor = createSquidProcessor(archive, rpcEnv)
+  const config = chainConfigs[chainId]
+  if (!config) throw new Error('No chain configuration found.')
+  const processor = createSquidProcessor(config.archive, config.rpcEnv)
 
   processor.setBlockRange({
     from: process.env.BLOCK_FROM
@@ -113,8 +131,8 @@ export const run = ({
         ),
     to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
-  processors.forEach((p) => p.setup?.(processor))
-  postProcessors?.forEach((p) => p.setup?.(processor))
+  processors.forEach((p) => p.setup?.(processor, config.chain))
+  postProcessors?.forEach((p) => p.setup?.(processor, config.chain))
   processor.run(
     new TypeormDatabase({
       stateSchema,
@@ -124,6 +142,7 @@ export const run = ({
     async (_ctx) => {
       const ctx = _ctx as Context
       try {
+        ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length > 1) {
           ctx.blockRate = await calculateBlockRate(ctx)
