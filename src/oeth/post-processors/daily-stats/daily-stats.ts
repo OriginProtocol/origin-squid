@@ -76,6 +76,7 @@ export const process = async (ctx: Context) => {
       Entity: OETHDailyStat,
       coinId: 'origin-ether',
       startTimestamp: Date.UTC(2023, 4, 17),
+      vsCurrency: 'eth'
     })) as OETHDailyStat[]
     const existingIds = dailyStats.map((stat) => stat.id)
     dailyStats.push(

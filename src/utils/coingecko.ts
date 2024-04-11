@@ -75,6 +75,7 @@ export async function applyCoingeckoData(
   props: {
     Entity: DailyStat
     coinId: string
+    vsCurrency?: string
     startTimestamp?: number
   },
 ) {
@@ -105,9 +106,10 @@ export async function applyCoingeckoData(
   const statsWithNoPrice = await ctx.store.findBy(Entity as any, whereClause)
 
   if (statsWithNoPrice.length > 0) {
+    const vsCurrency = props.vsCurrency || 'usd'
     console.log(`Found ${statsWithNoPrice.length} stats with no price`)
     // console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
-    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=usd&days=365&interval=daily&precision=18`
+    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=${vsCurrency}&days=365&interval=daily&precision=18`
     const coingeckoResponse = await fetch(coingeckoURL)
     if (coingeckoResponse.status === 429) {
       console.log('Coingecko rate limited')
