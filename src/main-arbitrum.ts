@@ -1,13 +1,13 @@
 import { arbitrum } from 'viem/chains'
 
-import { transfers } from './arbitrum'
+import { erc20 } from './arbitrum'
 import { ccip } from './oeth/processors/ccip'
 import { run } from './processor'
 
 export const processor = {
   chainId: arbitrum.id,
   stateSchema: 'arbitrum-processor',
-  processors: [transfers, ccip({ chainId: arbitrum.id })],
+  processors: [erc20, ccip({ chainId: arbitrum.id })],
   postProcessors: [],
   validators: [],
 }

@@ -6,7 +6,7 @@ import ousd from './main-ousd'
 import { run } from './processor'
 
 run(mainnet)
+run(arbitrum)
 // run(oeth)
 // run(ogv)
 // run(ousd)
-// run(arbitrum)

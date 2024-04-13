@@ -12,8 +12,8 @@ import { WOETH_ADDRESS } from './utils/addresses'
 
 export const processor = {
   stateSchema: 'mainnet-processor',
-  processors: [balancer, curve, maverick, native, ...erc20s()],
-  postProcessors: [exchangeRates, liquidity, processStatus('other')],
+  processors: [curve, ...erc20s()],
+  postProcessors: [exchangeRates, processStatus('other')],
   validators: [validate],
 }
 export default processor

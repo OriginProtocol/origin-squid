@@ -25,23 +25,14 @@ export const createSquidProcessor = (
   const url = process.env[rpc_env] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
   return new EvmBatchProcessor()
-    .setDataSource({
-      // Change the Archive endpoints for run the squid
-      // against the other EVM networks
-      // For a full list of supported networks and config options
-      // see https://docs.subsquid.io/evm-indexing/
-      archive: lookupArchive(archive),
-
-      // Must be set for RPC ingestion (https://docs.subsquid.io/evm-indexing/evm-processor/)
-      // OR to enable contract state queries (https://docs.subsquid.io/evm-indexing/query-state/)
-      // chain: 'https://rpc.ankr.com/eth',
-      // chain: "https://mainnet.infura.io/v3/03b96dfbb4904c5c89c04680dd480064",
-      chain: {
-        url,
-        // Alchemy is deprecating `eth_getBlockReceipts` https://docs.alchemy.com/reference/eth-getblockreceipts
-        // so we need to set `maxBatchCallSize` 1 to avoid using this method
-        maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
-      },
+    .setGateway(lookupArchive(archive))
+    .setRpcEndpoint({
+      url,
+      maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
+    })
+    .setRpcDataIngestionSettings({
+      disabled: archive === 'arbitrum',
+      headPollInterval: 30000,
     })
     .setFinalityConfirmation(10)
     .setFields({

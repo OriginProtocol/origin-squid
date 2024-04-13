@@ -21,10 +21,10 @@ const tracks = [
   {
     from: 19072024, // As of this block, none of these addresses have ever held ETH.
     addresses: [
-      ...ousdStrategyArray,
-      OUSD_VAULT_ADDRESS,
-      ...oethStrategyArray,
-      OETH_VAULT_ADDRESS,
+      // ...ousdStrategyArray,
+      // OUSD_VAULT_ADDRESS,
+      // ...oethStrategyArray,
+      // OETH_VAULT_ADDRESS,
     ],
   },
 ]
@@ -32,11 +32,13 @@ const tracks = [
 export const from = minBy(tracks, 'from')?.from ?? 19072024
 
 export const setup = (processor: EvmBatchProcessor) => {
+  if (!tracks.length) return
   processor.includeAllBlocks({ from })
 }
 
 const updater = blockFrequencyUpdater({ from })
 export const process = async (ctx: Context) => {
+  if (!tracks.length) return
   const results: NativeBalance[] = []
   await updater(ctx, async (ctx: Context, block: Context['blocks'][number]) => {
     const addresses = tracks

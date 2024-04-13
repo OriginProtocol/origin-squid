@@ -17,66 +17,69 @@ const oneMonthAgo = dayjs.utc().subtract(1, 'month').valueOf()
 const oneWeekAgo = dayjs.utc().subtract(1, 'week').valueOf()
 const oneDayAgo = dayjs.utc().subtract(1, 'day').valueOf()
 const oneHourAgo = dayjs.utc().subtract(1, 'hour').valueOf()
+const fifteenMinutesAgo = dayjs.utc().subtract(15, 'minutes').valueOf()
 
-const getFrequency = (bps: number, timestamp: number) => {
-  let frequency = 1
+const getFrequency = (blockRate: number, timestamp: number) => {
   if (timestamp < oneYearAgo) {
-    frequency = (SECONDS_PER_WEEK / bps) ^ 0 // Older than one year ago
+    return (SECONDS_PER_WEEK / blockRate) ^ 0 // Older than one year ago
   } else if (timestamp < oneMonthAgo) {
-    frequency = (SECONDS_PER_DAY / bps) ^ 0 // Older than one month ago
+    return (SECONDS_PER_DAY / blockRate) ^ 0 // Older than one month ago
   } else if (timestamp < oneWeekAgo) {
-    frequency = (SECONDS_PER_DAY / bps / 4) ^ 0 // Older than one week ago
+    return (SECONDS_PER_DAY / blockRate / 4) ^ 0 // Older than one week ago
   } else if (timestamp < oneDayAgo) {
-    frequency = (SECONDS_PER_DAY / bps / 24) ^ 0 // Older than one day ago
+    return (SECONDS_PER_DAY / blockRate / 12) ^ 0 // Older than one day ago
   } else if (timestamp < oneHourAgo) {
-    frequency = ((SECONDS_PER_MINUTE * 5) / bps) ^ 0 // Older than one hour ago
+    return ((SECONDS_PER_MINUTE * 30) / blockRate) ^ 0 // Older than one hour ago
+  } else if (timestamp < fifteenMinutesAgo) {
+    return ((SECONDS_PER_MINUTE * 5) / blockRate) ^ 0 // Older than 15 minutes ago
   } else {
-    frequency = (SECONDS_PER_MINUTE / bps) ^ 0
+    return (SECONDS_PER_MINUTE / blockRate) ^ 0
   }
-  return frequency || 1
 }
 
 export const blockFrequencyTracker = (params: { from: number }) => {
-  let nextBlockToProcess = params.from
-  const shouldProcess = (b: Block, frequency: number) => {
-    let result = b.header.height >= nextBlockToProcess
-    if (result) {
-      nextBlockToProcess =
-        Math.floor((b.header.height + frequency) / frequency) * frequency
-    }
-    return result
-  }
   return (ctx: Context, block: Block) => {
     if (block.header.height < params.from) return
-    const { blockRate } = ctx
-    const frequency: number = getFrequency(blockRate, block.header.timestamp)
-    return shouldProcess(block, frequency)
+    const frequency: number = getFrequency(
+      ctx.blockRate,
+      block.header.timestamp,
+    )
+    return block.header.height % frequency === 0
   }
 }
 
 export const blockFrequencyUpdater = (params: { from: number }) => {
-  let nextBlockToProcess = params.from
-  const shouldProcess = (b: Block) => {
-    return b.header.height >= nextBlockToProcess
-  }
   return async (
     ctx: Context,
     fn: (ctx: Context, block: Block) => Promise<void>,
   ) => {
     if (!ctx.blocks.length) return
-    // If we're not at head, determine our frequency and then process.
-    const { blockRate } = ctx
+    if (ctx.blocks[ctx.blocks.length - 1].header.height < params.from) {
+      // No applicable blocks in current context.
+      return
+    }
     let frequency: number = getFrequency(
-      blockRate,
+      ctx.blockRate,
       ctx.blocks[0].header.timestamp,
     )
-    for (let i = 0; i < ctx.blocks.length; i += frequency) {
+    for (
+      let i = ctx.blocks.findIndex(
+        (b) =>
+          b.header.height % frequency === 0 && b.header.height >= params.from,
+      );
+      i < ctx.blocks.length;
+      i += frequency
+    ) {
       const block = ctx.blocks[i]
-      if (!shouldProcess(block)) continue
+      if (!block) break
+      if (block.header.height % frequency !== 0) {
+        throw new Error(
+          'This should never happen. Ensure you are passing all blocks through here.',
+        )
+      }
       await fn(ctx, block)
-      nextBlockToProcess =
-        Math.floor((block.header.height + frequency) / frequency) * frequency
-      frequency = getFrequency(blockRate, block.header.timestamp)
+      frequency = getFrequency(ctx.blockRate, block.header.timestamp)
+      i -= ctx.blocks[i].header.height % frequency
     }
   }
 }

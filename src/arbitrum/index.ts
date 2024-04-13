@@ -1,1 +1,1 @@
-export * as transfers from './erc20'
+export * as erc20 from './erc20'

@@ -21,7 +21,8 @@ let initialized = false
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   // Origin Specific
   OGN: {
-    from: 15350225, // 6436154,
+    // from: 15350225, // 6436154,
+    from: 16933090, // oeth deploy date
     address: tokens.OGN,
     accountFilter: [
       '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
@@ -30,7 +31,8 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     intervalTracking: true,
   },
   OGV: {
-    from: 15350225, // 14439231,
+    // from: 15350225, // 14439231,
+    from: 16933090, // oeth deploy date
     address: tokens.OGV,
     accountFilter: [
       '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
@@ -56,7 +58,8 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   },
   // OUSD Related
   USDT: {
-    from: 11362821,
+    // from: 11362821,
+    from: 16933090, // oeth deploy date
     address: tokens.USDT,
     accountFilter: [
       ...ousdStrategyArray,
@@ -67,7 +70,8 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     intervalTracking: true,
   },
   USDC: {
-    from: 11367200,
+    // from: 11367200,
+    from: 16933090, // oeth deploy date
     address: tokens.USDC,
     accountFilter: [
       ...ousdStrategyArray,
@@ -78,7 +82,8 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
     intervalTracking: true,
   },
   DAI: {
-    from: 11367184,
+    // from: 11367184,
+    from: 16933090, // oeth deploy date
     address: tokens.DAI,
     accountFilter: [
       ...ousdStrategyArray,
@@ -96,8 +101,8 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
       ...oethStrategyArray,
       OETH_VAULT_ADDRESS,
       OETH_DRIPPER_ADDRESS,
-      '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap wstETH/WETH
-      '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap rETH/WETH
+      // '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap wstETH/WETH
+      // '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap rETH/WETH
     ],
     intervalTracking: true,
   },
