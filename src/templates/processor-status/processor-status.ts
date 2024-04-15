@@ -1,4 +1,5 @@
-import { ProcessingStatus } from '../../model'
+import { ProcessingStatus } from '@model'
+
 import { Context } from '../../processor'
 
 const processorIds = new Set<string>()

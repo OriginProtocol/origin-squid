@@ -7,18 +7,15 @@ import {
   OUSDHistory,
   OUSDRebase,
   OUSDRebaseOption,
-} from '../../../model'
-import {
-  createOTokenProcessor,
-  createOTokenSetup,
-} from '../../../processor-templates/otoken'
+} from '@model'
+import { createOTokenProcessor, createOTokenSetup } from '@templates/otoken'
 import {
   DAI_ADDRESS,
   OUSD_ADDRESS,
   OUSD_VAULT_ADDRESS,
   USDC_ADDRESS,
   USDT_ADDRESS,
-} from '../../../utils/addresses'
+} from '@utils/addresses'
 
 // export const from = 10884563 // https://etherscan.io/tx/0x9141921f5ebf072e58c00fe56332b6bee0c02f0ae4f54c42999b8a3a88662681
 export const from = 11585978 // OUSDReset

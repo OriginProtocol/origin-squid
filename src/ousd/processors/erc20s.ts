@@ -1,9 +1,5 @@
-import { createERC20Tracker } from '../../processor-templates/erc20'
-import {
-  OUSD_VAULT_ADDRESS,
-  ousdStrategyArray,
-  tokens,
-} from '../../utils/addresses'
+import { createERC20Tracker } from '@templates/erc20'
+import { OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   // OUSD Related

@@ -1,10 +1,6 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { groupBy } from 'lodash'
-import { GetTransactionReceiptReturnType } from 'viem'
-
-import * as erc20 from '../../abi/erc20'
-import * as otoken from '../../abi/otoken'
-import * as otokenVault from '../../abi/otoken-vault'
+import * as erc20 from '@abi/erc20'
+import * as otoken from '@abi/otoken'
+import * as otokenVault from '@abi/otoken-vault'
 import {
   HistoryType,
   OETH,
@@ -24,19 +20,23 @@ import {
   OUSDRebase,
   OUSDRebaseOption,
   RebasingOption,
-} from '../../model'
-import { Context } from '../../processor'
-import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
+} from '@model'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import {
   CurrencyAddress,
   CurrencySymbol,
-} from '../../shared/post-processors/exchange-rates/currencies'
-import { type Transaction, activityFromTx } from '../../utils/activityFromTx'
-import { ADDRESS_ZERO } from '../../utils/addresses'
-import { DECIMALS_18 } from '../../utils/constants'
-import { multicall } from '../../utils/multicall'
-import { EntityClassT, InstanceTypeOfConstructor } from '../../utils/type'
-import { getLatestEntity } from '../../utils/utils'
+} from '@shared/post-processors/exchange-rates/currencies'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { type Transaction, activityFromTx } from '@utils/activityFromTx'
+import { ADDRESS_ZERO } from '@utils/addresses'
+import { DECIMALS_18 } from '@utils/constants'
+import { multicall } from '@utils/multicall'
+import { EntityClassT, InstanceTypeOfConstructor } from '@utils/type'
+import { getLatestEntity } from '@utils/utils'
+import { groupBy } from 'lodash'
+import { GetTransactionReceiptReturnType } from 'viem'
+
+import { Context } from '../../processor'
 import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
@@ -424,7 +424,7 @@ export const createOTokenProcessor = (params: {
     }
 
     // Rebase events
-    let rebase = createRebaseAPY(
+    const rebase = createRebaseAPY(
       params.OTokenAPY,
       params.OTokenRebase,
       ctx,
@@ -517,7 +517,7 @@ export const createOTokenProcessor = (params: {
         owners!.set(address, owner)
       }
 
-      let rebaseOption = new params.OTokenRebaseOption({
+      const rebaseOption = new params.OTokenRebaseOption({
         id: getUniqueId(`${trace.transaction?.hash!}-${owner.id}`),
         timestamp,
         blockNumber,
@@ -588,7 +588,7 @@ export const createOTokenProcessor = (params: {
         owners!.set(address, owner)
       }
 
-      let rebaseOption = new params.OTokenRebaseOption({
+      const rebaseOption = new params.OTokenRebaseOption({
         id: getUniqueId(`${log.transactionHash!}-${owner.id}`),
         timestamp,
         blockNumber,

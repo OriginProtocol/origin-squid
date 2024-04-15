@@ -1,10 +1,10 @@
+import * as erc20 from '@abi/erc20'
+import { StrategyBalance } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { convertDecimals } from '@utils/utils'
 
-import * as erc20 from '../../abi/erc20'
-import { StrategyBalance } from '../../model'
 import { Block, Context } from '../../processor'
-import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
-import { convertDecimals } from '../../utils/utils'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

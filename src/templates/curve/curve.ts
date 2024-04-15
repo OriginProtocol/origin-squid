@@ -1,17 +1,17 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import * as curveLpToken from '../../abi/curve-lp-token'
-import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
+import * as curveLpToken from '@abi/curve-lp-token'
 import {
   CurvePool,
   CurvePoolBalance,
   CurvePoolRate,
   LiquiditySourceType,
-} from '../../model'
+} from '@model'
+import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { range } from '@utils/range'
+
+import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 import { Context } from '../../processor'
-import { updateLiquidityBalances } from '../../shared/post-processors/liquidity'
-import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
-import { range } from '../../utils/range'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]

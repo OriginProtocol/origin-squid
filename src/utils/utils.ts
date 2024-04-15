@@ -1,8 +1,8 @@
+import * as erc20 from '@abi/erc20'
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
 import { pad } from 'viem'
 
-import * as erc20 from '../abi/erc20'
 import { Context } from '../processor'
 
 export const max = (values: bigint[], start = 0n) => {

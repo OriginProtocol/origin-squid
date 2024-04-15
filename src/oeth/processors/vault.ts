@@ -1,11 +1,8 @@
+import * as erc20 from '@abi/erc20'
+import * as lido from '@abi/lido'
+import { OETHVault } from '@model'
+import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { pad } from 'viem'
-
-import * as erc20 from '../../abi/erc20'
-import * as lido from '../../abi/lido'
-import { OETHVault } from '../../model'
-import { Context } from '../../processor'
-import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
 import {
   FRXETH_ADDRESS,
   OETH_VAULT_ADDRESS,
@@ -13,8 +10,11 @@ import {
   RETH_ADDRESS,
   STETH_ADDRESS,
   WETH_ADDRESS,
-} from '../../utils/addresses'
-import { getLatestEntity, trackAddressBalances } from '../../utils/utils'
+} from '@utils/addresses'
+import { getLatestEntity, trackAddressBalances } from '@utils/utils'
+import { pad } from 'viem'
+
+import { Context } from '../../processor'
 
 interface ProcessResult {
   vaults: OETHVault[]

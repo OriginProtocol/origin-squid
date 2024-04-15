@@ -1,8 +1,4 @@
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import { LessThan, MoreThanOrEqual } from 'typeorm'
-
-import * as otoken from '../../abi/otoken'
+import * as otoken from '@abi/otoken'
 import {
   ExchangeRate,
   OETHAPY,
@@ -12,9 +8,13 @@ import {
   OUSDAddress,
   OUSDRebase,
   RebasingOption,
-} from '../../model'
+} from '@model'
+import { calculateAPY } from '@utils/calculateAPY'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import { LessThan, MoreThanOrEqual } from 'typeorm'
+
 import { Context } from '../../processor'
-import { calculateAPY } from '../../utils/calculateAPY'
 
 dayjs.extend(utc)
 

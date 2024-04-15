@@ -1,5 +1,5 @@
-import * as otoken from '../../abi/otoken'
-import { createERC20Tracker } from '../../processor-templates/erc20'
+import * as otoken from '@abi/otoken'
+import { createERC20Tracker } from '@templates/erc20'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
@@ -10,8 +10,8 @@ import {
   oethStrategyArray,
   ousdStrategyArray,
   tokens,
-} from '../../utils/addresses'
-import { logFilter } from '../../utils/logFilter'
+} from '@utils/addresses'
+import { logFilter } from '@utils/logFilter'
 
 // TODO: Would be nice if interested parties could register their desires here from other parts of the code,
 //  allowing multiple declarations of need without issue.

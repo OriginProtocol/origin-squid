@@ -1,14 +1,14 @@
+import * as balancerMetaPoolStrategy from '@abi/balancer-meta-pool-strategy'
+import * as metaStablePool from '@abi/balancer-meta-stable-pool'
+import * as baseRewardPool4626 from '@abi/base-reward-pool-4626'
+import { OETHBalancerMetaPoolStrategy } from '@model'
+import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { getBalancerStrategyHoldings } from '@templates/strategy/strategy-balancer'
+import { RETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
+import { getLatestEntity } from '@utils/utils'
 
-import * as balancerMetaPoolStrategy from '../../abi/balancer-meta-pool-strategy'
-import * as metaStablePool from '../../abi/balancer-meta-stable-pool'
-import * as baseRewardPool4626 from '../../abi/base-reward-pool-4626'
-import { OETHBalancerMetaPoolStrategy } from '../../model'
 import { Context } from '../../processor'
-import { getBalancerStrategyHoldings } from '../../processor-templates/strategy/strategy-balancer'
-import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
-import { RETH_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import { getLatestEntity } from '../../utils/utils'
 import { oethStrategies } from './strategies'
 
 const strategyDeployBlock = 18156219

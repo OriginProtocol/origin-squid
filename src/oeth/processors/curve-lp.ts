@@ -1,16 +1,16 @@
+import * as baseRewardPool from '@abi/base-reward-pool'
+import * as curveLpToken from '@abi/curve-lp-token'
+import { OETHCurveLP } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { pad } from 'viem'
-
-import * as baseRewardPool from '../../abi/base-reward-pool'
-import * as curveLpToken from '../../abi/curve-lp-token'
-import { OETHCurveLP } from '../../model'
-import { Context } from '../../processor'
 import {
   OETH_CONVEX_ADDRESS,
   OETH_CURVE_LP_ADDRESS,
   OETH_CURVE_REWARD_LP_ADDRESS,
-} from '../../utils/addresses'
-import { getLatestEntity } from '../../utils/utils'
+} from '@utils/addresses'
+import { getLatestEntity } from '@utils/utils'
+import { pad } from 'viem'
+
+import { Context } from '../../processor'
 
 interface ProcessResult {
   curveLPs: OETHCurveLP[]

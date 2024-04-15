@@ -1,18 +1,18 @@
+import * as balancerMetaStablePoolStrategyAbi from '@abi/balancer-meta-pool-strategy'
+import * as balancerRateProvider from '@abi/balancer-rate-provider'
+import * as balancerVaultAbi from '@abi/balancer-vault'
+import { StrategyBalance } from '@model'
+import { getBalancePoolRateProviders } from '@shared/post-processors/exchange-rates/price-routing'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import * as balancerMetaStablePoolStrategyAbi from '../../abi/balancer-meta-pool-strategy'
-import * as balancerRateProvider from '../../abi/balancer-rate-provider'
-import * as balancerVaultAbi from '../../abi/balancer-vault'
-import { StrategyBalance } from '../../model'
-import { Context } from '../../processor'
-import { getBalancePoolRateProviders } from '../../shared/post-processors/exchange-rates/price-routing'
 import {
   ADDRESS_ZERO,
   BALANCER_VAULT,
   ETH_ADDRESS,
   WETH_ADDRESS,
-} from '../../utils/addresses'
-import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
+} from '@utils/addresses'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+
+import { Context } from '../../processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,
@@ -104,7 +104,7 @@ export const getBalancerStrategyHoldings = async (
     block,
     BALANCER_VAULT,
   )
-  let [poolAssets, balances] = await balancerVault.getPoolTokens(poolId)
+  const [poolAssets, balances] = await balancerVault.getPoolTokens(poolId)
 
   const totalStrategyBalance = await strategy['checkBalance()']() // in WETH
   const eth1 = BigInt('1000000000000000000')

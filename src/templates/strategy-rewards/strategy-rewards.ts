@@ -1,9 +1,9 @@
+import * as iat from '@abi/initializable-abstract-strategy'
+import { OETHRewardTokenCollected } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { EntityClassT } from '@utils/type'
 
-import * as iat from '../../abi/initializable-abstract-strategy'
-import { OETHRewardTokenCollected } from '../../model'
 import { Context } from '../../processor'
-import { EntityClassT } from '../../utils/type'
 
 export const createStrategyRewardSetup = ({
   address,

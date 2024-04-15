@@ -1,11 +1,11 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import { Context } from '../../../processor'
 import {
   createCurveInitializer,
   createCurveProcessor,
   createCurveSetup,
-} from '../../../processor-templates/curve'
+} from '@templates/curve'
+
+import { Context } from '../../../processor'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090

@@ -1,7 +1,4 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { formatEther } from 'viem'
-
-import * as governanceAbi from '../../abi/governance'
+import * as governanceAbi from '@abi/governance'
 import {
   OGVAddress,
   OGVProposal,
@@ -10,10 +7,13 @@ import {
   OGVProposalTxLog,
   OGVProposalVote,
   OGVVoteType,
-} from '../../model'
+} from '@model'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { GOVERNANCE_ADDRESS } from '@utils/addresses'
+import { env } from '@utils/env'
+import { formatEther } from 'viem'
+
 import { Block, Context, Log } from '../../processor'
-import { GOVERNANCE_ADDRESS } from '../../utils/addresses'
-import { env } from '../../utils/env'
 
 export const from = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
 

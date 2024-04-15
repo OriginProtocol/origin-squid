@@ -1,12 +1,12 @@
+import * as erc20 from '@abi/erc20'
+import * as initializableAbstractStrategy from '@abi/initializable-abstract-strategy'
+import { OETHMorphoAave } from '@model'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { pad } from 'viem'
 
-import * as erc20 from '../../abi/erc20'
-import * as initializableAbstractStrategy from '../../abi/initializable-abstract-strategy'
-import { OETHMorphoAave } from '../../model'
 import { Context } from '../../processor'
-import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
-import { OETH_MORPHO_AAVE_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
 
 interface ProcessResult {
   morphoAaves: OETHMorphoAave[]

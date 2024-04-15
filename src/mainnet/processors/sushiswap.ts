@@ -1,5 +1,6 @@
-import { LiquiditySourceType } from '../../model'
-import { addresses } from '../../utils/addresses'
+import { LiquiditySourceType } from '@model'
+import { addresses } from '@utils/addresses'
+
 import { addERC20Processing } from './erc20s'
 import { registerLiquiditySource } from './liquidity-sources'
 

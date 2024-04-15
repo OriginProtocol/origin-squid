@@ -1,6 +1,7 @@
-import { IStrategyData } from '../../../processor-templates/strategy'
-import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
-import { OUSD_ADDRESS } from '../../../utils/addresses'
+import { currencies } from '@shared/post-processors/exchange-rates/currencies'
+import { IStrategyData } from '@templates/strategy'
+import { OUSD_ADDRESS } from '@utils/addresses'
+
 import { DAI, USDC, USDT } from './const'
 
 export const fluxStrategy: IStrategyData = {

@@ -1,12 +1,12 @@
+import * as ccipOffRampAbi from '@abi/ccip-evm2evmofframp'
+import * as ccipOnRampAbi from '@abi/ccip-evm2evmonramp'
+import * as ccipRouter from '@abi/ccip-router'
+import * as erc20Abi from '@abi/erc20'
+import { BridgeTransfer, BridgeTransferState } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { logFilter } from '@utils/logFilter'
 
-import * as ccipOffRampAbi from '../../abi/ccip-evm2evmofframp'
-import * as ccipOnRampAbi from '../../abi/ccip-evm2evmonramp'
-import * as ccipRouter from '../../abi/ccip-router'
-import * as erc20Abi from '../../abi/erc20'
-import { BridgeTransfer, BridgeTransferState } from '../../model'
 import { Context } from '../../processor'
-import { logFilter } from '../../utils/logFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
 // https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/typescript/src/get-status.ts

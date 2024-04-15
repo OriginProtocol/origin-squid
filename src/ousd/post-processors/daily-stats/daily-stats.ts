@@ -1,13 +1,3 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import {
-  EntityManager,
-  FindOptionsOrderValue,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm'
-
 import {
   OUSD,
   OUSDAPY,
@@ -19,9 +9,19 @@ import {
   OUSDStrategyDailyStat,
   OUSDStrategyHoldingDailyStat,
   OUSDVault,
-} from '../../../model'
+} from '@model'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { applyCoingeckoData } from '@utils/coingecko'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+import {
+  EntityManager,
+  FindOptionsOrderValue,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+} from 'typeorm'
+
 import { Context } from '../../../processor'
-import { applyCoingeckoData } from '../../../utils/coingecko'
 
 dayjs.extend(utc)
 

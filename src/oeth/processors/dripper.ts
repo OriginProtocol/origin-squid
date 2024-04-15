@@ -1,13 +1,13 @@
+import * as dripperAbi from '@abi/dripper'
+import * as erc20 from '@abi/erc20'
+import { OETHDripper } from '@model'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
+import { getLatestEntity, trackAddressBalances } from '@utils/utils'
 import { pad } from 'viem'
 
-import * as dripperAbi from '../../abi/dripper'
-import * as erc20 from '../../abi/erc20'
-import { OETHDripper } from '../../model'
 import { Context } from '../../processor'
-import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
-import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '../../utils/addresses'
-import { getLatestEntity, trackAddressBalances } from '../../utils/utils'
 
 interface ProcessResult {
   drippers: OETHDripper[]

@@ -1,18 +1,13 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import dayjs from 'dayjs'
-import { LessThan } from 'typeorm'
-import { formatEther } from 'viem'
-
-import * as baseRewardPool from '../../abi/base-reward-pool'
-import * as erc20 from '../../abi/erc20'
-import * as abstractStrategyAbi from '../../abi/initializable-abstract-strategy'
-import { StrategyYield } from '../../model'
-import { Block, Context } from '../../processor'
-import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
+import * as baseRewardPool from '@abi/base-reward-pool'
+import * as erc20 from '@abi/erc20'
+import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
+import { StrategyYield } from '@model'
+import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import {
   Currency,
   convertRate,
-} from '../../shared/post-processors/exchange-rates/currencies'
+} from '@shared/post-processors/exchange-rates/currencies'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
@@ -22,10 +17,15 @@ import {
   OUSD_HARVESTER_ADDRESS,
   USDT_ADDRESS,
   WETH_ADDRESS,
-} from '../../utils/addresses'
-import { blockFrequencyTracker } from '../../utils/blockFrequencyUpdater'
-import { logFilter } from '../../utils/logFilter'
-import { convertDecimals, lastExcept } from '../../utils/utils'
+} from '@utils/addresses'
+import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
+import { logFilter } from '@utils/logFilter'
+import { convertDecimals, lastExcept } from '@utils/utils'
+import dayjs from 'dayjs'
+import { LessThan } from 'typeorm'
+import { formatEther } from 'viem'
+
+import { Block, Context } from '../../processor'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 
@@ -499,7 +499,7 @@ const getLatest = async (
     results = []
     resultMap.set(asset, results)
   }
-  let latest =
+  const latest =
     lastExcept(resultMap.get(asset), id) ??
     (await ctx.store.findOne(StrategyYield, {
       order: { blockNumber: 'desc' },
@@ -509,6 +509,6 @@ const getLatest = async (
         asset,
       },
     }))
-  let current = resultMap.get(asset)?.find((l) => l.id === id)
+  const current = resultMap.get(asset)?.find((l) => l.id === id)
   return { latest, current, results }
 }
