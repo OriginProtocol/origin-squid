@@ -1,8 +1,8 @@
+import { erc20s } from './mainnet/processors/erc20s'
+import * as validate from './mainnet/validators/validate-shared'
 import { run } from './processor'
+import { processStatus } from './processor-templates/processor-status'
 import * as exchangeRates from './shared/post-processors/exchange-rates'
-import { processStatus } from './shared/processor-templates/processor-status'
-import { erc20s } from './shared/processors/erc20s'
-import * as validate from './shared/validators/validate-shared'
 
 export const processor = {
   stateSchema: 'mainnet-processor',

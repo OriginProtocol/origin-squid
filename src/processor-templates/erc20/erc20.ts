@@ -1,18 +1,18 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
-import * as abi from '../../../abi/erc20'
+import * as abi from '../../abi/erc20'
 import {
   ERC20,
   ERC20Balance,
   ERC20Holder,
   ERC20State,
   ERC20Transfer,
-} from '../../../model'
-import { Context } from '../../../processor'
-import { ADDRESS_ZERO, TokenAddress } from '../../../utils/addresses'
-import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
-import { LogFilter, logFilter } from '../../../utils/logFilter'
-import { multicall } from '../../../utils/multicall'
+} from '../../model'
+import { Context } from '../../processor'
+import { ADDRESS_ZERO, TokenAddress } from '../../utils/addresses'
+import { blockFrequencyTracker } from '../../utils/blockFrequencyUpdater'
+import { LogFilter, logFilter } from '../../utils/logFilter'
+import { multicall } from '../../utils/multicall'
 
 const duplicateTracker = new Set<string>()
 

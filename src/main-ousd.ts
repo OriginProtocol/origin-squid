@@ -5,8 +5,8 @@ import * as ousd from './ousd/processors/ousd'
 import * as strategies from './ousd/processors/strategies/strategies'
 import * as validateOusd from './ousd/validators/validate-ousd'
 import { run } from './processor'
+import { processStatus } from './processor-templates/processor-status'
 import * as exchangeRates from './shared/post-processors/exchange-rates'
-import { processStatus } from './shared/processor-templates/processor-status'
 
 export const processor = {
   stateSchema: 'ousd-processor',

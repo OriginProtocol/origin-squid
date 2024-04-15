@@ -11,7 +11,7 @@ import {
 import {
   createOTokenProcessor,
   createOTokenSetup,
-} from '../../../shared/processor-templates/otoken'
+} from '../../../processor-templates/otoken'
 import {
   DAI_ADDRESS,
   OUSD_ADDRESS,

@@ -6,11 +6,11 @@ import {
   IStrategyData,
   createStrategyProcessor,
   createStrategySetup,
-} from '../../../shared/processor-templates/strategy'
+} from '../../../processor-templates/strategy'
 import {
   createStrategyRewardProcessor,
   createStrategyRewardSetup,
-} from '../../../shared/processor-templates/strategy-rewards'
+} from '../../../processor-templates/strategy-rewards'
 import { aaveStrategy } from './aave-strategy'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'

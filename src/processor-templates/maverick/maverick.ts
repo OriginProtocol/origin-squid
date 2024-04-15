@@ -1,17 +1,17 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { add } from 'lodash'
 
-import * as maverickPool from '../../../abi/maverick-pool'
+import * as maverickPool from '../../abi/maverick-pool'
+import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 import {
   LiquiditySource,
   LiquiditySourceType,
   MaverickPool,
   MaverickPoolBalance,
-} from '../../../model'
-import { Context } from '../../../processor'
-import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
-import { updateLiquidityBalances } from '../../post-processors/liquidity'
-import { registerLiquiditySource } from '../../processors/liquidity-sources'
+} from '../../model'
+import { Context } from '../../processor'
+import { updateLiquidityBalances } from '../../shared/post-processors/liquidity'
+import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
 

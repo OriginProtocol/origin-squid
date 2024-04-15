@@ -1,18 +1,18 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
-import * as balancerMetaStablePoolStrategyAbi from '../../../abi/balancer-meta-pool-strategy'
-import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
-import * as balancerVaultAbi from '../../../abi/balancer-vault'
-import { StrategyBalance } from '../../../model'
-import { Context } from '../../../processor'
+import * as balancerMetaStablePoolStrategyAbi from '../../abi/balancer-meta-pool-strategy'
+import * as balancerRateProvider from '../../abi/balancer-rate-provider'
+import * as balancerVaultAbi from '../../abi/balancer-vault'
+import { StrategyBalance } from '../../model'
+import { Context } from '../../processor'
+import { getBalancePoolRateProviders } from '../../shared/post-processors/exchange-rates/price-routing'
 import {
   ADDRESS_ZERO,
   BALANCER_VAULT,
   ETH_ADDRESS,
   WETH_ADDRESS,
-} from '../../../utils/addresses'
-import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
-import { getBalancePoolRateProviders } from '../../post-processors/exchange-rates/price-routing'
+} from '../../utils/addresses'
+import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

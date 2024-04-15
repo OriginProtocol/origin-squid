@@ -1,4 +1,4 @@
-import { createERC20Tracker } from '../shared/processor-templates/erc20'
+import { createERC20Tracker } from '../processor-templates/erc20'
 import { WOETH_ARBITRUM_ADDRESS } from '../utils/addresses'
 
 const woethTransferProcessor = createERC20Tracker({

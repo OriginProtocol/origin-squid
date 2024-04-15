@@ -5,7 +5,7 @@ import {
   createCurveInitializer,
   createCurveProcessor,
   createCurveSetup,
-} from '../../../shared/processor-templates/curve'
+} from '../../../processor-templates/curve'
 import { tokens } from '../../../utils/addresses'
 
 const ousdResetFrom = 11585978

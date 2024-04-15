@@ -1,12 +1,12 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { Context } from '../../processor'
-import { tokens } from '../../utils/addresses'
 import {
   createMaverickInitializer,
   createMaverickProcessor,
   createMaverickSetup,
-} from '../processor-templates/maverick'
+} from '../../processor-templates/maverick'
+import { tokens } from '../../utils/addresses'
 
 const oethDeployFrom = 16933090
 

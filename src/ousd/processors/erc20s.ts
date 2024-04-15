@@ -1,4 +1,4 @@
-import { createERC20Tracker } from '../../shared/processor-templates/erc20'
+import { createERC20Tracker } from '../../processor-templates/erc20'
 import {
   OUSD_VAULT_ADDRESS,
   ousdStrategyArray,

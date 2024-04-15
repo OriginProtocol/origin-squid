@@ -1,24 +1,24 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
-import * as balancerComposableStablePool from '../../../abi/balancer-composable-stable-pool'
-import * as balancerMetaStablePoolAbi from '../../../abi/balancer-meta-stable-pool'
-import * as balancerRateProvider from '../../../abi/balancer-rate-provider'
-import * as balancerVaultAbi from '../../../abi/balancer-vault'
-import * as balancerWeightedPool from '../../../abi/balancer-weighted-pool-2-token'
+import * as balancerComposableStablePool from '../../abi/balancer-composable-stable-pool'
+import * as balancerMetaStablePoolAbi from '../../abi/balancer-meta-stable-pool'
+import * as balancerRateProvider from '../../abi/balancer-rate-provider'
+import * as balancerVaultAbi from '../../abi/balancer-vault'
+import * as balancerWeightedPool from '../../abi/balancer-weighted-pool-2-token'
+import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 import {
   BalancerPool,
   BalancerPoolBalance,
   BalancerPoolRate,
   LiquiditySource,
   LiquiditySourceType,
-} from '../../../model'
-import { Context } from '../../../processor'
-import { ADDRESS_ZERO, BALANCER_VAULT } from '../../../utils/addresses'
-import { blockFrequencyUpdater } from '../../../utils/blockFrequencyUpdater'
-import { ensureExchangeRates } from '../../post-processors/exchange-rates'
-import { Currency } from '../../post-processors/exchange-rates/currencies'
-import { updateLiquidityBalances } from '../../post-processors/liquidity'
-import { registerLiquiditySource } from '../../processors/liquidity-sources'
+} from '../../model'
+import { Context } from '../../processor'
+import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
+import { Currency } from '../../shared/post-processors/exchange-rates/currencies'
+import { updateLiquidityBalances } from '../../shared/post-processors/liquidity'
+import { ADDRESS_ZERO, BALANCER_VAULT } from '../../utils/addresses'
+import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
 
 const eth1 = BigInt('1000000000000000000')
 

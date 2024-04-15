@@ -2,16 +2,16 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { OETHRewardTokenCollected } from '../../../model'
 import { Context } from '../../../processor'
-import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import {
   IStrategyData,
   createStrategyProcessor,
   createStrategySetup,
-} from '../../../shared/processor-templates/strategy'
+} from '../../../processor-templates/strategy'
 import {
   createStrategyRewardProcessor,
   createStrategyRewardSetup,
-} from '../../../shared/processor-templates/strategy-rewards'
+} from '../../../processor-templates/strategy-rewards'
+import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,

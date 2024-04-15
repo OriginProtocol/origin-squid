@@ -1,15 +1,19 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import { LessThan } from 'typeorm'
-import { formatEther, pad } from 'viem'
+import { formatEther } from 'viem'
 
-import * as baseRewardPool from '../../../abi/base-reward-pool'
-import * as erc20 from '../../../abi/erc20'
-import * as abstractStrategyAbi from '../../../abi/initializable-abstract-strategy'
-import { StrategyYield } from '../../../model'
-import { Block, Context } from '../../../processor'
+import * as baseRewardPool from '../../abi/base-reward-pool'
+import * as erc20 from '../../abi/erc20'
+import * as abstractStrategyAbi from '../../abi/initializable-abstract-strategy'
+import { StrategyYield } from '../../model'
+import { Block, Context } from '../../processor'
+import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
 import {
-  AURA_REWARDS_POOL_ADDRESS,
+  Currency,
+  convertRate,
+} from '../../shared/post-processors/exchange-rates/currencies'
+import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_HARVESTER_ADDRESS,
@@ -18,15 +22,10 @@ import {
   OUSD_HARVESTER_ADDRESS,
   USDT_ADDRESS,
   WETH_ADDRESS,
-} from '../../../utils/addresses'
-import { blockFrequencyTracker } from '../../../utils/blockFrequencyUpdater'
-import { logFilter } from '../../../utils/logFilter'
-import { convertDecimals, lastExcept } from '../../../utils/utils'
-import { ensureExchangeRates } from '../../post-processors/exchange-rates'
-import {
-  Currency,
-  convertRate,
-} from '../../post-processors/exchange-rates/currencies'
+} from '../../utils/addresses'
+import { blockFrequencyTracker } from '../../utils/blockFrequencyUpdater'
+import { logFilter } from '../../utils/logFilter'
+import { convertDecimals, lastExcept } from '../../utils/utils'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 

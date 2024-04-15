@@ -1,8 +1,8 @@
 import { pad as viemPad } from 'viem'
 
 import * as aaveLendingPool from '../../../abi/aave-lending-pool'
+import { IStrategyData } from '../../../processor-templates/strategy'
 import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
-import { IStrategyData } from '../../../shared/processor-templates/strategy'
 import { OUSD_ADDRESS } from '../../../utils/addresses'
 import { logFilter } from '../../../utils/logFilter'
 import { DAI, USDT } from './const'

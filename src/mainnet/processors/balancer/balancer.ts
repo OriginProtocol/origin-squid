@@ -1,13 +1,13 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { Context } from '../../../processor'
-import { tokens } from '../../../utils/addresses'
-import { CurrencyAddress } from '../../post-processors/exchange-rates/currencies'
 import {
   createBalancerInitializer,
   createBalancerProcessor,
   createBalancerSetup,
-} from '../../processor-templates/balancer'
+} from '../../../processor-templates/balancer'
+import { CurrencyAddress } from '../../../shared/post-processors/exchange-rates/currencies'
+import { tokens } from '../../../utils/addresses'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090
