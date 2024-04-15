@@ -15,26 +15,6 @@ export const from = Math.min(ousdResetFrom, oethDeployFrom)
 
 const pools: (Parameters<typeof createCurveInitializer>['0'] &
   Parameters<typeof createCurveProcessor>['0'])[] = [
-  // Curve (OUSD)
-  {
-    name: 'ThreePool',
-    address: '0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7'.toLowerCase(),
-    from: Math.max(10809473, ousdResetFrom),
-    tokens: [tokens.DAI, tokens.USDC, tokens.USDT],
-  },
-  {
-    name: 'OUSDMetapool',
-    address: '0x87650d7bbfc3a9f10587d7778206671719d9910d'.toLowerCase(),
-    from: Math.max(12860905, ousdResetFrom),
-    tokens: [tokens.OUSD, tokens.CRV3],
-  },
-  {
-    name: 'LUSDMetapool',
-    address: '0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca'.toLowerCase(),
-    from: Math.max(12184843, ousdResetFrom),
-    tokens: [tokens.LUSD, tokens.CRV3],
-  },
-
   // Curve (OETH)
   // {
   //   name: 'factory-v2-298: ETH/OETH',

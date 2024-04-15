@@ -1,7 +1,7 @@
 manifestVersion: subsquid.io/v0.1
-name: origin-squid
+name: origin-ousd
 version: 999
-description: 'Origin Protocol 🦑'
+description: 'Origin OUSD 🦑'
 build:
 deploy:
   addons:
@@ -14,24 +14,8 @@ deploy:
     - RPC_ARBITRUM_ENDPOINT
     - RPC_ARBITRUM_ENV
   processor:
-    #    cmd: [ "node", "lib/main" ]
-    #    env:
-    #      RPC_ENV: RPC_ENDPOINT_999
-    ################################
-    - name: arbitrum-processor
-      cmd: [ "sqd", "process:arbitrum:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: oeth-processor
-      cmd: [ "sqd", "process:oeth:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: ogv-processor
-      cmd: [ "sqd", "process:ogv:prod" ]
-      env:
-        RPC_ENV: RPC_ENDPOINT_RETH
-    - name: other-processor
-      cmd: [ "sqd", "process:mainnet:prod" ]
+    - name: ousd-processor
+      cmd: [ "sqd", "process:ousd:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
   api:
