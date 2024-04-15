@@ -1,7 +1,7 @@
+import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 import { Context } from '../../processor'
-import { ensureExchangeRates } from '../../shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '../../shared/post-processors/exchange-rates/currencies'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '../../utils/addresses'
 import { blockFrequencyUpdater } from '../../utils/blockFrequencyUpdater'
