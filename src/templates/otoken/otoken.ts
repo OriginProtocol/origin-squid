@@ -27,7 +27,7 @@ import {
   CurrencySymbol,
 } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { type Transaction, activityFromTx } from '@utils/activityFromTx'
+import { activityFromTx, type Transaction } from '@utils/activityFromTx'
 import { ADDRESS_ZERO } from '@utils/addresses'
 import { DECIMALS_18 } from '@utils/constants'
 import { multicall } from '@utils/multicall'
@@ -36,7 +36,7 @@ import { getLatestEntity } from '@utils/utils'
 import { groupBy } from 'lodash'
 import { GetTransactionReceiptReturnType } from 'viem'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 import { createAddress, createRebaseAPY } from './utils'
 
 type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
@@ -202,8 +202,8 @@ export const createOTokenProcessor = (params: {
     if (owners) {
       await ctx.store.upsert([...owners.values()])
     }
+    await ctx.store.upsert(result.apies)
     await Promise.all([
-      ctx.store.upsert(result.apies),
       ctx.store.insert(result.otokens),
       ctx.store.insert(result.assets),
       ctx.store.insert(result.history),
