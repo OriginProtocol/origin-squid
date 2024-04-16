@@ -7,6 +7,6 @@ import { run } from './processor'
 
 run(mainnet)
 run(arbitrum)
-// run(oeth)
+run(oeth)
 // run(ogv)
 // run(ousd)

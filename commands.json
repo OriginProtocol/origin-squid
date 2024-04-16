@@ -97,6 +97,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main.js"
       ]
     },
@@ -108,6 +109,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main-arbitrum.js"
       ]
     },
@@ -119,6 +121,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main-oeth.js"
       ]
     },
@@ -130,6 +133,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main-ousd.js"
       ]
     },
@@ -141,6 +145,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main-ogv.js"
       ]
     },
@@ -152,6 +157,7 @@
       "cmd": [
         "node",
         "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
         "lib/main-mainnet.js"
       ]
     },
@@ -162,6 +168,7 @@
       ],
       "cmd": [
         "node",
+        "--require=tsconfig-paths/register",
         "lib/main-arbitrum.js"
       ],
       "hidden": true
@@ -173,6 +180,7 @@
       ],
       "cmd": [
         "node",
+        "--require=tsconfig-paths/register",
         "lib/main-oeth.js"
       ],
       "hidden": true
@@ -184,6 +192,7 @@
       ],
       "cmd": [
         "node",
+        "--require=tsconfig-paths/register",
         "lib/main-ousd.js"
       ],
       "hidden": true
@@ -195,6 +204,7 @@
       ],
       "cmd": [
         "node",
+        "--require=tsconfig-paths/register",
         "lib/main-ogv.js"
       ],
       "hidden": true
@@ -206,6 +216,7 @@
       ],
       "cmd": [
         "node",
+        "--require=tsconfig-paths/register",
         "lib/main-mainnet.js"
       ],
       "hidden": true
