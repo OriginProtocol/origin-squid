@@ -2,7 +2,7 @@ import { LiquidityDailyBalance } from '@model'
 import { useProcessorState } from '@utils/state'
 import dayjs from 'dayjs'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 const useLiquidityDailyBalance = (ctx: Context) =>
   useProcessorState(

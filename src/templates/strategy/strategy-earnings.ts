@@ -25,7 +25,7 @@ import dayjs from 'dayjs'
 import { LessThan } from 'typeorm'
 import { formatEther } from 'viem'
 
-import { Block, Context } from '../../processor'
+import { Block, Context } from '@processor'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 

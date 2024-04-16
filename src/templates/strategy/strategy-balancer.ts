@@ -12,7 +12,7 @@ import {
 } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

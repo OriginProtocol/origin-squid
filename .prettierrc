@@ -3,9 +3,17 @@
   "trailingComma": "all",
   "tabWidth": 2,
   "semi": false,
-  "importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^@",
+    "^[./]"
+  ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
-  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
-  "plugins": ["@trivago/prettier-plugin-sort-imports"]
+  "importOrderParserPlugins": [
+    "typescript"
+  ],
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports"
+  ]
 }

@@ -1,6 +1,6 @@
 import { hexToNumber, numberToHex } from 'viem'
 
-import { Context } from '../processor'
+import { Context } from '@processor'
 
 let lastBpsFrom = 0
 let lastResult = 0

@@ -14,7 +14,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 dayjs.extend(utc)
 

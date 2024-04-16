@@ -1,3 +1,6 @@
+import 'tsconfig-paths/register'
+
+import { run } from '@processor'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 
@@ -7,7 +10,6 @@ import { erc20s } from './ousd/processors/erc20s'
 import * as ousd from './ousd/processors/ousd'
 import * as strategies from './ousd/processors/strategies/strategies'
 import * as validateOusd from './ousd/validators/validate-ousd'
-import { run } from './processor'
 
 export const processor = {
   stateSchema: 'ousd-processor',

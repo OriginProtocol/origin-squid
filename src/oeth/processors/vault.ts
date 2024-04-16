@@ -14,7 +14,7 @@ import {
 import { getLatestEntity, trackAddressBalances } from '@utils/utils'
 import { pad } from 'viem'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 interface ProcessResult {
   vaults: OETHVault[]

@@ -13,7 +13,7 @@ import { GOVERNANCE_ADDRESS } from '@utils/addresses'
 import { env } from '@utils/env'
 import { formatEther } from 'viem'
 
-import { Block, Context, Log } from '../../processor'
+import { Block, Context, Log } from '@processor'
 
 export const from = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
 

@@ -10,8 +10,8 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { range } from '@utils/range'
 
+import { Context } from '@processor'
 import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
-import { Context } from '../../processor'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]

@@ -3,7 +3,7 @@ import { Multicall } from '@abi/multicall'
 import { toHex } from 'viem'
 import { arbitrum, mainnet } from 'viem/chains'
 
-import { Block, Context } from '../processor'
+import { Block, Context } from '@processor'
 
 const MULTICALL_CONTRACTS: Record<
   number,

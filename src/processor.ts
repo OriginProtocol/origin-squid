@@ -1,3 +1,10 @@
+import assert from 'assert'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
+import { Chain } from 'viem'
+import { arbitrum, mainnet } from 'viem/chains'
+
 import { lookupArchive } from '@subsquid/archive-registry'
 import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
 import {
@@ -6,14 +13,7 @@ import {
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import assert from 'assert'
-import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import utc from 'dayjs/plugin/utc'
-import { Chain } from 'viem'
-import { arbitrum, mainnet } from 'viem/chains'
-
-import { calculateBlockRate } from './utils/calculateBlockRate'
+import { calculateBlockRate } from '@utils/calculateBlockRate'
 
 dayjs.extend(duration)
 dayjs.extend(utc)

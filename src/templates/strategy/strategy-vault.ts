@@ -4,7 +4,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { convertDecimals } from '@utils/utils'
 
-import { Block, Context } from '../../processor'
+import { Block, Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

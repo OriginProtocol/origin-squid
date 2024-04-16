@@ -3,7 +3,7 @@ import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { LessThanOrEqual } from 'typeorm'
 import { pad } from 'viem'
 
-import { Context } from '../processor'
+import { Context } from '@processor'
 
 export const max = (values: bigint[], start = 0n) => {
   return values.reduce((max, v) => (max > v ? max : v), start)

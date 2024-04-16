@@ -5,7 +5,7 @@ import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currenci
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Block, Context } from '../../processor'
+import { Block, Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

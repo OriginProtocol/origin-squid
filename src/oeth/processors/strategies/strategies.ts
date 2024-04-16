@@ -21,7 +21,7 @@ import {
   addresses,
 } from '@utils/addresses'
 
-import { Context } from '../../../processor'
+import { Context } from '@processor'
 
 export const oethStrategies: readonly IStrategyData[] = [
   {

@@ -7,9 +7,9 @@ import {
   BalancerPool,
   BalancerPoolBalance,
   BalancerPoolRate,
-  LiquiditySource,
   LiquiditySourceType,
 } from '@model'
+import { Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { Currency } from '@shared/post-processors/exchange-rates/currencies'
 import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
@@ -18,7 +18,6 @@ import { ADDRESS_ZERO, BALANCER_VAULT } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
 import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
-import { Context } from '../../processor'
 
 const eth1 = BigInt('1000000000000000000')
 

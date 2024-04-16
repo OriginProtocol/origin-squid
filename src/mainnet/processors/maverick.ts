@@ -4,9 +4,8 @@ import {
   createMaverickProcessor,
   createMaverickSetup,
 } from '@templates/maverick'
-import { tokens } from '@utils/addresses'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 const oethDeployFrom = 16933090
 

@@ -21,7 +21,7 @@ import {
   MoreThanOrEqual,
 } from 'typeorm'
 
-import { Context } from '../../../processor'
+import { Context } from '@processor'
 
 dayjs.extend(utc)
 

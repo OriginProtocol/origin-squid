@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 
-import { Block, Context } from '../processor'
+import { Block, Context } from '@processor'
 
 dayjs.extend(duration)
 dayjs.extend(utc)

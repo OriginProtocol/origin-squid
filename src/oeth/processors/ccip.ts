@@ -6,7 +6,7 @@ import { BridgeTransfer, BridgeTransferState } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { logFilter } from '@utils/logFilter'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
 // https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/typescript/src/get-status.ts

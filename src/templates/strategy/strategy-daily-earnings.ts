@@ -5,7 +5,7 @@ import dayjs from 'dayjs'
 import { Between, LessThan, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
-import { Block, Context } from '../../processor'
+import { Block, Context } from '@processor'
 import { IStrategyData } from './strategy'
 
 const eth1 = 1000000000000000000n

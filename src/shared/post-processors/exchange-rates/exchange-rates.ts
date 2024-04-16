@@ -3,7 +3,7 @@ import { useProcessorState } from '@utils/state'
 import { compact } from 'lodash'
 import { Between } from 'typeorm'
 
-import { Block, Context } from '../../../processor'
+import { Block, Context } from '@processor'
 import { Currency, currenciesByAddress } from './currencies'
 import { getPrice } from './price-routing'
 

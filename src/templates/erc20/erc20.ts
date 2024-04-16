@@ -12,7 +12,7 @@ import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 const duplicateTracker = new Set<string>()
 

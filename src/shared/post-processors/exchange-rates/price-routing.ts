@@ -8,7 +8,7 @@ import * as woethAbi from '@abi/woeth'
 import { STETH_ADDRESS } from '@utils/addresses'
 import { memoize } from 'lodash'
 
-import { Context } from '../../../processor'
+import { Context } from '@processor'
 import { Currency, CurrencySymbol, currencies } from './currencies'
 
 export const getPrice = async (

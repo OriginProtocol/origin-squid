@@ -5,7 +5,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OETH_FRAX_STAKING_ADDRESS, SFRXETH_ADDRESS } from '@utils/addresses'
 import { pad } from 'viem'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 interface ProcessResult {
   fraxStakings: OETHFraxStaking[]

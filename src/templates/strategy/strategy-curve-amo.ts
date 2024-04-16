@@ -6,7 +6,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Block, Context } from '../../processor'
+import { Block, Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

@@ -7,7 +7,7 @@ import { OETH_DRIPPER_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '@utils/utils'
 import { pad } from 'viem'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 interface ProcessResult {
   drippers: OETHDripper[]

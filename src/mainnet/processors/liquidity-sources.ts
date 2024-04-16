@@ -1,6 +1,6 @@
 import { LiquiditySource, LiquiditySourceType } from '@model'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 const sources = new Map<string, LiquiditySource>()
 

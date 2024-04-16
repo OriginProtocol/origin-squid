@@ -22,19 +22,25 @@ deploy:
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
     - name: ogv-processor
       cmd: [ "sqd", "process:ogv:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
     - name: other-processor
       cmd: [ "sqd", "process:mainnet:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
   api:
+    env:
+      TS_NODE_BASEURL: './lib'
     cmd:
       - npx
       - squid-graphql-server

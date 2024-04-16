@@ -20,6 +20,9 @@
       "@model": [
         "model"
       ],
+      "@processor": [
+        "processor"
+      ],
       "@shared/*": [
         "shared/*"
       ],

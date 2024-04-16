@@ -1,4 +1,4 @@
-import { Context } from '../processor'
+import { Context } from '@processor'
 
 export const useProcessorState = <T>(
   ctx: Context,

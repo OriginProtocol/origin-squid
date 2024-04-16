@@ -18,7 +18,10 @@ deploy:
       cmd: [ "sqd", "process:ousd:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
   api:
+    env:
+      TS_NODE_BASEURL: './lib'
     cmd:
       - npx
       - squid-graphql-server

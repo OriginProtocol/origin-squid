@@ -3,7 +3,7 @@ import { EntityClassT } from '@utils/type'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
-import { Context } from '../processor'
+import { Context } from '@processor'
 
 type DailyStat =
   | EntityClassT<OETHDailyStat>

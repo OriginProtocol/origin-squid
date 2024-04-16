@@ -3,7 +3,7 @@ import { OETHRewardTokenCollected } from '@model'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { EntityClassT } from '@utils/type'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 
 export const createStrategyRewardSetup = ({
   address,

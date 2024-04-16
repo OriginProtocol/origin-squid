@@ -1,3 +1,6 @@
+import 'tsconfig-paths/register'
+
+import { run } from '@processor'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 
@@ -13,7 +16,6 @@ import * as morphoAave from './oeth/processors/morpho-aave'
 import * as strategies from './oeth/processors/strategies'
 import * as vault from './oeth/processors/vault'
 import * as validateOeth from './oeth/validators/validate-oeth'
-import { run } from './processor'
 
 export const processor = {
   stateSchema: 'oeth-processor',

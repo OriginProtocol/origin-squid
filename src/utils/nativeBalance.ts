@@ -1,6 +1,6 @@
 import { hexToBigInt } from 'viem'
 
-import { Context } from '../processor'
+import { Context } from '@processor'
 
 export const getNativeBalance = async (
   ctx: Context,

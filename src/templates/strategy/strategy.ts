@@ -6,7 +6,7 @@ import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { LogFilter } from '@utils/logFilter'
 import { TraceFilter } from '@utils/traceFilter'
 
-import { Context } from '../../processor'
+import { Context } from '@processor'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'

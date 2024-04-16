@@ -1,7 +1,7 @@
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad as viemPad } from 'viem'
 
-import { Log } from '../processor'
+import { Log } from '@processor'
 
 const pad = (hex: string) => viemPad(hex as `0x${string}`)
 const lower = (hex: string) => hex.toLowerCase()
