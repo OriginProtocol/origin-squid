@@ -1,8 +1,7 @@
+import { Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-
-import { Context } from '@processor'
 
 export const from = 16933090 // OETH Deploy
 

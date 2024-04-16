@@ -6,13 +6,12 @@ import {
   ERC20State,
   ERC20Transfer,
 } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
-
-import { Context } from '@processor'
 
 const duplicateTracker = new Set<string>()
 

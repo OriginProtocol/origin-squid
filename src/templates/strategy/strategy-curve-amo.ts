@@ -2,11 +2,11 @@ import * as curvePool from '@abi/curve-lp-token'
 import * as erc20 from '@abi/erc20'
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
+import { Block, Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Block, Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

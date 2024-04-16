@@ -6,10 +6,9 @@ import {
   OGVLockupEventType,
   OGVLockupTxLog,
 } from '@model'
+import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
-
-import { Block, Context, Log } from '@processor'
 
 export const from = 14439231 // https://etherscan.io/tx/0x9295cac246169f06a3d4ec33fdbd87fced7a9e19ea61177cae75034e45ae66f4
 export const veogvFrom = 15089597 // https://etherscan.io/tx/0x70c582e56ea1c49b7e9df70a0b40ddbfac9362b8b172cb527c329c2302d7d48a

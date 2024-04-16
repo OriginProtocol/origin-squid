@@ -1,10 +1,10 @@
 import * as maverickPool from '@abi/maverick-pool'
 import { LiquiditySourceType, MaverickPool, MaverickPoolBalance } from '@model'
+import { Context } from '@processor'
 import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Context } from '@processor'
 import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool

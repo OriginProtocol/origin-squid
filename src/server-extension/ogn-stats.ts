@@ -1,5 +1,3 @@
-import * as Erc20ABI from '@abi/erc20.abi'
-import { OGN_ADDRESS } from '@utils/addresses'
 import { GraphQLResolveInfo } from 'graphql'
 import 'reflect-metadata'
 import { Field, Info, ObjectType, Query, Resolver } from 'type-graphql'
@@ -13,6 +11,9 @@ import {
   parseAbi,
 } from 'viem'
 import { mainnet } from 'viem/chains'
+
+import * as Erc20ABI from '@abi/erc20.abi'
+import { OGN_ADDRESS } from '@utils/addresses'
 
 import './fetch-polyfill'
 

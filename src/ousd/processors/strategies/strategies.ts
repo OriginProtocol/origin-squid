@@ -1,4 +1,5 @@
 import { OETHRewardTokenCollected } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   IStrategyData,
@@ -10,7 +11,6 @@ import {
   createStrategyRewardSetup,
 } from '@templates/strategy-rewards'
 
-import { Context } from '@processor'
 import { aaveStrategy } from './aave-strategy'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'

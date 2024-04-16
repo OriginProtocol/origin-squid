@@ -1,4 +1,5 @@
 import { OETHRewardTokenCollected } from '@model'
+import { Context } from '@processor'
 import { currencies } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
@@ -20,8 +21,6 @@ import {
   WETH_ADDRESS,
   addresses,
 } from '@utils/addresses'
-
-import { Context } from '@processor'
 
 export const oethStrategies: readonly IStrategyData[] = [
   {

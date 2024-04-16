@@ -5,12 +5,12 @@ import {
   CurvePoolRate,
   LiquiditySourceType,
 } from '@model'
+import { Context } from '@processor'
 import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { range } from '@utils/range'
 
-import { Context } from '@processor'
 import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 
 interface ProcessResult {

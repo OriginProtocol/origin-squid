@@ -1,5 +1,8 @@
+import { pad } from 'viem'
+
 import * as erc20 from '@abi/erc20'
 import { OUSDVault } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   DAI_ADDRESS,
@@ -9,9 +12,6 @@ import {
   USDT_ADDRESS,
 } from '@utils/addresses'
 import { getLatestEntity, trackAddressBalances } from '@utils/utils'
-import { pad } from 'viem'
-
-import { Context } from '@processor'
 
 interface ProcessResult {
   vaults: OUSDVault[]

@@ -1,11 +1,11 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
+import { Block, Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Block, Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

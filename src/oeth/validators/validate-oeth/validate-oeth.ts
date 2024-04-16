@@ -1,3 +1,6 @@
+import assert from 'assert'
+import { sortBy } from 'lodash'
+
 import {
   OETHAPY,
   OETHHistory,
@@ -6,13 +9,10 @@ import {
   OETHVault,
   StrategyBalance,
 } from '@model'
+import { Block, Context } from '@processor'
 import { Entity, EntityClass } from '@subsquid/typeorm-store'
 import { env } from '@utils/env'
 import { jsonify } from '@utils/jsonify'
-import assert from 'assert'
-import { sortBy } from 'lodash'
-
-import { Block, Context } from '@processor'
 
 export const name = 'validate-oeth'
 

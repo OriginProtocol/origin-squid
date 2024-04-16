@@ -1,10 +1,9 @@
 import * as erc20Abi from '@abi/erc20'
 import { OGV } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-
-import { Context } from '@processor'
 
 export const from = 14439231 // https://etherscan.io/tx/0x9295cac246169f06a3d4ec33fdbd87fced7a9e19ea61177cae75034e45ae66f4
 

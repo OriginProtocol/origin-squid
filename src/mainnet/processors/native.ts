@@ -1,10 +1,10 @@
+import { minBy } from 'lodash'
+
 import { NativeBalance } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { getNativeBalances } from '@utils/nativeBalance'
-import { minBy } from 'lodash'
-
-import { Context } from '@processor'
 
 /**
  * We end up with a lot of initial 0 balance entities.

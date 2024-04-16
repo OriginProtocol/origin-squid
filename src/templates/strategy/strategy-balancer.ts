@@ -2,6 +2,7 @@ import * as balancerMetaStablePoolStrategyAbi from '@abi/balancer-meta-pool-stra
 import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import { StrategyBalance } from '@model'
+import { Context } from '@processor'
 import { getBalancePoolRateProviders } from '@shared/post-processors/exchange-rates/price-routing'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
@@ -12,7 +13,6 @@ import {
 } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
-import { Context } from '@processor'
 import { IStrategyData } from './index'
 import {
   processStrategyEarnings,

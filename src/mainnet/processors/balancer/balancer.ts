@@ -1,3 +1,4 @@
+import { Context } from '@processor'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
@@ -5,8 +6,6 @@ import {
   createBalancerProcessor,
   createBalancerSetup,
 } from '@templates/balancer'
-
-import { Context } from '@processor'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090

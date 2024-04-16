@@ -1,7 +1,12 @@
+import dayjs from 'dayjs'
+import { LessThan } from 'typeorm'
+import { formatEther } from 'viem'
+
 import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
+import { Block, Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import {
   Currency,
@@ -21,11 +26,7 @@ import {
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 import { convertDecimals, lastExcept } from '@utils/utils'
-import dayjs from 'dayjs'
-import { LessThan } from 'typeorm'
-import { formatEther } from 'viem'
 
-import { Block, Context } from '@processor'
 import { IStrategyData } from './strategy'
 import { processStrategyDailyEarnings } from './strategy-daily-earnings'
 

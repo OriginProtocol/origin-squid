@@ -1,11 +1,11 @@
-import { StrategyYield } from '@model'
-import { Entity, EntityClass } from '@subsquid/typeorm-store'
-import { env } from '@utils/env'
-import { jsonify } from '@utils/jsonify'
 import assert from 'assert'
 import { sortBy } from 'lodash'
 
+import { StrategyYield } from '@model'
 import { Block, Context } from '@processor'
+import { Entity, EntityClass } from '@subsquid/typeorm-store'
+import { env } from '@utils/env'
+import { jsonify } from '@utils/jsonify'
 
 export const name = 'validate-ousd'
 
