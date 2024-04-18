@@ -14,10 +14,11 @@ deploy:
     - RPC_ARBITRUM_ENDPOINT
     - RPC_ARBITRUM_ENV
   processor:
-    #    cmd: [ "node", "lib/main" ]
-    #    env:
-    #      RPC_ENV: RPC_ENDPOINT_999
-    ################################
+    - name: mainnet-processor
+      cmd: [ "sqd", "process:mainnet:prod" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
     - name: arbitrum-processor
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
@@ -33,8 +34,8 @@ deploy:
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
         TS_NODE_BASEURL: './lib'
-    - name: other-processor
-      cmd: [ "sqd", "process:mainnet:prod" ]
+    - name: ousd-processor
+      cmd: [ "sqd", "process:ousd:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
         TS_NODE_BASEURL: './lib'
