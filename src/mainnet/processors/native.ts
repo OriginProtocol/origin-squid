@@ -3,6 +3,12 @@ import { minBy } from 'lodash'
 import { NativeBalance } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import {
+  OETH_VAULT_ADDRESS,
+  OUSD_VAULT_ADDRESS,
+  oethStrategyArray,
+  ousdStrategyArray,
+} from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { getNativeBalances } from '@utils/nativeBalance'
 
@@ -15,10 +21,10 @@ const tracks = [
   {
     from: 19072024, // As of this block, none of these addresses have ever held ETH.
     addresses: [
-      // ...ousdStrategyArray,
-      // OUSD_VAULT_ADDRESS,
-      // ...oethStrategyArray,
-      // OETH_VAULT_ADDRESS,
+      ...ousdStrategyArray,
+      OUSD_VAULT_ADDRESS,
+      ...oethStrategyArray,
+      OETH_VAULT_ADDRESS,
     ],
   },
 ]
