@@ -135,7 +135,7 @@ export const run = ({
       try {
         ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
-        if (ctx.blocks.length > 1) {
+        if (ctx.blocks.length >= 1) {
           ctx.blockRate = await calculateBlockRate(ctx)
           // ctx.log.info({ bps: ctx.bps, length: ctx.blocks.length })
         }

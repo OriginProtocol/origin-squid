@@ -2,34 +2,34 @@ import { hexToNumber, numberToHex } from 'viem'
 
 import { Context } from '@processor'
 
-let lastBpsFrom = 0
+let lastRateFrom = 0
 let lastResult = 0
 
 export const calculateBlockRate = async (ctx: Context) => {
   const lastBlockNumber = ctx.blocks[ctx.blocks.length - 1].header.height
-  const bpsTestRange = 100_000
-  const bpsFrom = Math.max(
+  const rateTestRange = 100_000
+  const rateFrom = Math.max(
     1,
-    Math.floor(lastBlockNumber / bpsTestRange) * bpsTestRange - bpsTestRange,
+    Math.floor(lastBlockNumber / rateTestRange) * rateTestRange - rateTestRange,
   )
-  if (bpsFrom === lastBpsFrom) {
+  if (rateFrom === lastRateFrom) {
     return lastResult
   }
-  const bpsTo = bpsFrom + bpsTestRange
-  const [bpsBlockFrom, bpsBlockTo] = (await ctx._chain.client.batchCall([
+  const rateTo = Math.min(rateFrom + rateTestRange, lastBlockNumber)
+  const [rateBlockFrom, rateBlockTo] = (await ctx._chain.client.batchCall([
     {
       method: 'eth_getBlockByNumber',
-      params: [numberToHex(bpsFrom), false],
+      params: [numberToHex(rateFrom), false],
     },
     {
       method: 'eth_getBlockByNumber',
-      params: [numberToHex(bpsTo), false],
+      params: [numberToHex(rateTo), false],
     },
   ])) as { timestamp: `0x${string}` }[]
 
   const seconds =
-    hexToNumber(bpsBlockTo.timestamp) - hexToNumber(bpsBlockFrom.timestamp)
-  const result = seconds / bpsTestRange
+    hexToNumber(rateBlockTo.timestamp) - hexToNumber(rateBlockFrom.timestamp)
+  const result = seconds / rateTestRange
   lastResult = result
   return result
 }
