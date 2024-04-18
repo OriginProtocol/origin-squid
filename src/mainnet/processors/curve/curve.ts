@@ -5,6 +5,7 @@ import {
   createCurveProcessor,
   createCurveSetup,
 } from '@templates/curve'
+import { tokens } from '@utils/addresses'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090
@@ -14,13 +15,13 @@ export const from = Math.min(ousdResetFrom, oethDeployFrom)
 const pools: (Parameters<typeof createCurveInitializer>['0'] &
   Parameters<typeof createCurveProcessor>['0'])[] = [
   // Curve (OETH)
-  // {
-  //   name: 'factory-v2-298: ETH/OETH',
-  //   address: '0x94B17476A93b3262d87B9a326965D1E91f9c13E7'.toLowerCase(),
-  //   from: Math.max(17130500, oethDeployFrom),
-  //   tokens: [tokens.ETH, tokens.OETH],
-  //   ratesToPull: [{ i: 1n, j: 0n, dx: 1000000000000000000n }],
-  // },
+  {
+    name: 'factory-v2-298: ETH/OETH',
+    address: '0x94B17476A93b3262d87B9a326965D1E91f9c13E7'.toLowerCase(),
+    from: Math.max(17130500, oethDeployFrom),
+    tokens: [tokens.ETH, tokens.OETH],
+    ratesToPull: [{ i: 1n, j: 0n, dx: 1000000000000000000n }],
+  },
   // {
   //   name: 'factory-crvusd-15: WETH/frxETH',
   //   address: '0x9c3b46c0ceb5b9e304fcd6d88fc50f7dd24b31bc',

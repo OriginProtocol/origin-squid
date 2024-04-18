@@ -258,7 +258,8 @@ type BridgeTransfer @entity {
   id: ID! # chain + log id
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
+  txHashIn: String!
+  txHashOut: String # Initially null
   messageId: String! @index
   bridge: String! @index
   sender: String! @index
@@ -269,6 +270,7 @@ type BridgeTransfer @entity {
   tokenOut: String!
   amountIn: BigInt!
   amountOut: BigInt!
+  state: Int!
 }
 
 type BridgeTransferState @entity {

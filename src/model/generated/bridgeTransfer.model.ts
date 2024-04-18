@@ -18,9 +18,11 @@ export class BridgeTransfer {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
-    @Index_()
     @Column_("text", {nullable: false})
-    txHash!: string
+    txHashIn!: string
+
+    @Column_("text", {nullable: true})
+    txHashOut!: string | undefined | null
 
     @Index_()
     @Column_("text", {nullable: false})
@@ -56,4 +58,7 @@ export class BridgeTransfer {
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     amountOut!: bigint
+
+    @Column_("int4", {nullable: false})
+    state!: number
 }

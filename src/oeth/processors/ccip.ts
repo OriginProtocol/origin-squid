@@ -107,6 +107,16 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             state: data.state,
           })
           result.bridgeTransferStates.set(state.id, state)
+
+          // A `BridgeTransfer` may already exist. If so, we should update it.
+          const bridgeTransfer = await ctx.store.findOneBy(BridgeTransfer, {
+            messageId: data.messageId,
+          })
+          if (bridgeTransfer) {
+            bridgeTransfer.txHashOut = log.transactionHash
+            bridgeTransfer.state = data.state
+            result.transfers.set(state.id, bridgeTransfer)
+          }
           // console.log(state)
         }
         if (transfersToLockReleasePool.matches(log)) {
@@ -125,12 +135,21 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
               logSendRequested.transaction!.input,
             )
 
-            for (const tokenAmount of message.tokenAmounts) {
+            // A `BridgeTransferState` may already exist.
+            //  If so, we should pull the `state` for it.
+            const bridgeTransferState = await ctx.store.get(
+              BridgeTransferState,
+              message.messageId,
+            )
+
+            for (let i = 0; i < message.tokenAmounts.length; i++) {
+              const tokenAmount = message.tokenAmounts[i]
               const transfer = new BridgeTransfer({
-                id: `${params.chainId}-${log.id}`,
+                id: `${message.messageId}-${i}`,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),
-                txHash: log.transactionHash,
+                txHashIn: log.transactionHash,
+                txHashOut: null,
                 messageId: message.messageId,
                 bridge: 'ccip',
                 chainIn: params.chainId,
@@ -144,6 +163,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 amountOut: tokenAmount.amount,
                 sender: message.sender.toLowerCase(),
                 receiver: message.receiver.toLowerCase(),
+                state: bridgeTransferState?.state ?? 0,
               })
               // console.log(transfer)
               result.transfers.set(transfer.id, transfer)
@@ -153,7 +173,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
       }
     }
 
-    await ctx.store.insert([...result.transfers.values()])
+    await ctx.store.upsert([...result.transfers.values()])
     await ctx.store.upsert([...result.bridgeTransferStates.values()])
   }
 
