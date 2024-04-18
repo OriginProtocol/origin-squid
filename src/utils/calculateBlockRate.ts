@@ -1,11 +1,20 @@
 import { hexToNumber, numberToHex } from 'viem'
+import { arbitrum, mainnet } from 'viem/chains'
 
 import { Context } from '@processor'
 
 let lastRateFrom = 0
 let lastResult = 0
 
+const blockRates: Record<number, number> = {
+  [mainnet.id]: 12,
+  [arbitrum.id]: 0.26,
+}
+
 export const calculateBlockRate = async (ctx: Context) => {
+  if (ctx.isHead && blockRates[ctx.chain.id]) {
+    return blockRates[ctx.chain.id]
+  }
   const lastBlockNumber = ctx.blocks[ctx.blocks.length - 1].header.height
   const rateTestRange = 100_000
   const rateFrom = Math.max(
