@@ -12,5 +12,5 @@ import ogv from './main-ogv'
 run(mainnet)
 run(arbitrum)
 run(oeth)
-run(ogv)
+// run(ogv)
 // run(ousd)

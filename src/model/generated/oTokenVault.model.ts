@@ -1,8 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import * as marshal from "./marshal"
 
 @Entity_()
-export class BridgeTransferState {
-    constructor(props?: Partial<BridgeTransferState>) {
+export class OTokenVault {
+    constructor(props?: Partial<OTokenVault>) {
         Object.assign(this, props)
     }
 
@@ -18,9 +19,13 @@ export class BridgeTransferState {
     blockNumber!: number
 
     @Index_()
-    @Column_("text", {nullable: false})
-    txHash!: string
-
     @Column_("int4", {nullable: false})
-    state!: number
+    chainId!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    address!: string
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    totalValue!: bigint
 }

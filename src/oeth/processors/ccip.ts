@@ -104,6 +104,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             id: data.messageId,
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
+            txHash: log.transactionHash,
             state: data.state,
           })
           result.bridgeTransferStates.set(state.id, state)

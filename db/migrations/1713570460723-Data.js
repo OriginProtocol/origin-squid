@@ -1,5 +1,5 @@
-module.exports = class Data1713394436715 {
-    name = 'Data1713394436715'
+module.exports = class Data1713570460723 {
+    name = 'Data1713570460723'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -69,9 +69,10 @@ module.exports = class Data1713394436715 {
         await db.query(`CREATE INDEX "IDX_3cbd3eea30bc62ebc91c276e73" ON "bridge_transfer" ("sender") `)
         await db.query(`CREATE INDEX "IDX_54f4abe8f2eb80204637ce328e" ON "bridge_transfer" ("receiver") `)
         await db.query(`CREATE INDEX "IDX_12fa326ec2496a964493f2a7bc" ON "bridge_transfer" ("chain_in") `)
-        await db.query(`CREATE TABLE "bridge_transfer_state" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_00ca26906171755e6fc01882c68" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bridge_transfer_state" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_00ca26906171755e6fc01882c68" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_374659ae3bd149042388e132be" ON "bridge_transfer_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_74f93b10ec560e63792dcc877e" ON "bridge_transfer_state" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_df99bdbf11d4ed57bec0e6c511" ON "bridge_transfer_state" ("tx_hash") `)
         await db.query(`CREATE TABLE "oeth" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_de1d885501070dbd1ab6f8577ba" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5b81a67229bac2d68e0dc92cc4" ON "oeth" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_408e5f79f83093aa5cf2b0ea32" ON "oeth" ("block_number") `)
@@ -150,6 +151,11 @@ module.exports = class Data1713394436715 {
         await db.query(`CREATE TABLE "ogv_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_69bc6d866711151e2712481794c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c974bde87107cacae6d3654972" ON "ogv_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b62fa80951183bb0acf8a5e8b9" ON "ogv_daily_stat" ("timestamp") `)
+        await db.query(`CREATE TABLE "o_token_vault" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "total_value" numeric NOT NULL, CONSTRAINT "PK_90bb3a4df699017439cd6a44a0c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_091cfbe0d977006e05144bd1fe" ON "o_token_vault" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_fa92b36d011441a02d9a231860" ON "o_token_vault" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_6990f4cd71ea8db6d9d27a0db5" ON "o_token_vault" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_3a2bfb2808c1d7cbb0a568910c" ON "o_token_vault" ("address") `)
         await db.query(`CREATE TABLE "ousd" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, CONSTRAINT "PK_acecae4a20bc14b22d9f6738d8d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c8d1e285213b445b088805ac7c" ON "ousd" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_806949dd853b7e8acab5d03b81" ON "ousd" ("block_number") `)
@@ -309,6 +315,7 @@ module.exports = class Data1713394436715 {
         await db.query(`DROP TABLE "bridge_transfer_state"`)
         await db.query(`DROP INDEX "public"."IDX_374659ae3bd149042388e132be"`)
         await db.query(`DROP INDEX "public"."IDX_74f93b10ec560e63792dcc877e"`)
+        await db.query(`DROP INDEX "public"."IDX_df99bdbf11d4ed57bec0e6c511"`)
         await db.query(`DROP TABLE "oeth"`)
         await db.query(`DROP INDEX "public"."IDX_5b81a67229bac2d68e0dc92cc4"`)
         await db.query(`DROP INDEX "public"."IDX_408e5f79f83093aa5cf2b0ea32"`)
@@ -387,6 +394,11 @@ module.exports = class Data1713394436715 {
         await db.query(`DROP TABLE "ogv_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_c974bde87107cacae6d3654972"`)
         await db.query(`DROP INDEX "public"."IDX_b62fa80951183bb0acf8a5e8b9"`)
+        await db.query(`DROP TABLE "o_token_vault"`)
+        await db.query(`DROP INDEX "public"."IDX_091cfbe0d977006e05144bd1fe"`)
+        await db.query(`DROP INDEX "public"."IDX_fa92b36d011441a02d9a231860"`)
+        await db.query(`DROP INDEX "public"."IDX_6990f4cd71ea8db6d9d27a0db5"`)
+        await db.query(`DROP INDEX "public"."IDX_3a2bfb2808c1d7cbb0a568910c"`)
         await db.query(`DROP TABLE "ousd"`)
         await db.query(`DROP INDEX "public"."IDX_c8d1e285213b445b088805ac7c"`)
         await db.query(`DROP INDEX "public"."IDX_806949dd853b7e8acab5d03b81"`)

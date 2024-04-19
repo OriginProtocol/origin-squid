@@ -14,6 +14,7 @@ import {
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
+  OTokenVault,
   OUSD,
   OUSDAPY,
   OUSDActivity,
@@ -33,6 +34,7 @@ import {
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { type Transaction, activityFromTx } from '@utils/activityFromTx'
 import { ADDRESS_ZERO } from '@utils/addresses'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { multicall } from '@utils/multicall'
 import { EntityClassT, InstanceTypeOfConstructor } from '@utils/type'
@@ -104,6 +106,7 @@ export const createOTokenSetup =
   }
 
 export const createOTokenProcessor = (params: {
+  from: number
   Upgrade_CreditsBalanceOfHighRes?: number
   OTOKEN_ADDRESS: string
   WOTOKEN_ADDRESS?: string
@@ -128,6 +131,7 @@ export const createOTokenProcessor = (params: {
     rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
     apies: InstanceTypeOfConstructor<OTokenAPY>[]
     activity: InstanceTypeOfConstructor<OTokenActivity>[]
+    vaults: OTokenVault[]
     lastYieldDistributionEvent?: {
       fee: bigint
       yield: bigint
@@ -144,6 +148,7 @@ export const createOTokenProcessor = (params: {
     idMap.set(partialId, nextId)
     return `${partialId}-${nextId}`
   }
+  const frequencyUpdate = blockFrequencyUpdater({ from: params.from })
 
   const process = async (ctx: Context) => {
     idMap = new Map<string, number>()
@@ -185,6 +190,7 @@ export const createOTokenProcessor = (params: {
       rebaseOptions: [],
       apies: [],
       activity: [],
+      vaults: [],
     }
 
     for (const block of ctx.blocks) {
@@ -200,6 +206,24 @@ export const createOTokenProcessor = (params: {
       await processActivity(ctx, result, block)
     }
 
+    await frequencyUpdate(ctx, async (ctx, block) => {
+      const vaultContract = new otokenVault.Contract(
+        ctx,
+        block.header,
+        params.OTOKEN_VAULT_ADDRESS,
+      )
+      result.vaults.push(
+        new OTokenVault({
+          id: `${ctx.chain.id}-${block.header.height}-${params.OTOKEN_VAULT_ADDRESS}`,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          chainId: ctx.chain.id,
+          address: params.OTOKEN_VAULT_ADDRESS,
+          totalValue: await vaultContract.totalValue(),
+        }),
+      )
+    })
+
     if (owners) {
       await ctx.store.upsert([...owners.values()])
     }
@@ -211,6 +235,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.rebases),
       ctx.store.insert(result.rebaseOptions),
       ctx.store.insert(result.activity),
+      ctx.store.insert(result.vaults),
     ])
   }
 

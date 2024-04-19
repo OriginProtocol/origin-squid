@@ -277,8 +277,10 @@ type BridgeTransferState @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   state: Int!
-}"""
+}
+"""
 The OETH entity tracks the change in total supply of OETH over time.
 """
 type OETH @entity {
@@ -575,7 +577,8 @@ type OETHActivity @entity {
   fromSymbol: String
   toSymbol: String
   amount: BigInt
-}type OGV @entity {
+}
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -692,7 +695,16 @@ type OGVDailyStat @entity {
   marketCapUSD: Float!
   priceUSD: Float!
   holdersOverThreshold: Int!
-}"""
+}
+type OTokenVault @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  chainId: Int! @index
+  address: String! @index
+  totalValue: BigInt!
+}
+"""
 The OUSD entity tracks the change in total supply of OUSD over time.
 """
 type OUSD @entity {

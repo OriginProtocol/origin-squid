@@ -1,0 +1,8 @@
+type OTokenVault @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  chainId: Int! @index
+  address: String! @index
+  totalValue: BigInt!
+}
