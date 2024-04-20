@@ -107,6 +107,7 @@ export const createOTokenSetup =
 
 export const createOTokenProcessor = (params: {
   from: number
+  vaultFrom: number
   Upgrade_CreditsBalanceOfHighRes?: number
   OTOKEN_ADDRESS: string
   WOTOKEN_ADDRESS?: string
@@ -148,7 +149,7 @@ export const createOTokenProcessor = (params: {
     idMap.set(partialId, nextId)
     return `${partialId}-${nextId}`
   }
-  const frequencyUpdate = blockFrequencyUpdater({ from: params.from })
+  const frequencyUpdate = blockFrequencyUpdater({ from: params.vaultFrom })
 
   const process = async (ctx: Context) => {
     idMap = new Map<string, number>()

@@ -36,6 +36,7 @@ export const setup = createOTokenSetup({
 
 export const process = createOTokenProcessor({
   from,
+  vaultFrom: 17084107,
   OTOKEN_ADDRESS: OETH_ADDRESS,
   WOTOKEN_ADDRESS: WOETH_ADDRESS,
   OTOKEN_VAULT_ADDRESS: OETH_VAULT_ADDRESS,
