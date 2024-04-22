@@ -1,12 +1,11 @@
+import * as ccipOffRampAbi from '@abi/ccip-evm2evmofframp'
+import * as ccipOnRampAbi from '@abi/ccip-evm2evmonramp'
+import * as ccipRouter from '@abi/ccip-router'
+import * as erc20Abi from '@abi/erc20'
+import { BridgeTransfer, BridgeTransferState } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import * as ccipOffRampAbi from '../../abi/ccip-evm2evmofframp'
-import * as ccipOnRampAbi from '../../abi/ccip-evm2evmonramp'
-import * as ccipRouter from '../../abi/ccip-router'
-import * as erc20Abi from '../../abi/erc20'
-import { BridgeTransfer, BridgeTransferState } from '../../model'
-import { Context } from '../../processor'
-import { logFilter } from '../../utils/logFilter'
+import { logFilter } from '@utils/logFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
 // https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/typescript/src/get-status.ts
@@ -105,20 +104,31 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             id: data.messageId,
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
+            txHash: log.transactionHash,
             state: data.state,
           })
           result.bridgeTransferStates.set(state.id, state)
-          console.log(state)
+
+          // A `BridgeTransfer` may already exist. If so, we should update it.
+          const bridgeTransfer = await ctx.store.findOneBy(BridgeTransfer, {
+            messageId: data.messageId,
+          })
+          if (bridgeTransfer) {
+            bridgeTransfer.txHashOut = log.transactionHash
+            bridgeTransfer.state = data.state
+            result.transfers.set(state.id, bridgeTransfer)
+          }
+          // console.log(state)
         }
         if (transfersToLockReleasePool.matches(log)) {
-          console.log('match transfersToOnramp')
+          // console.log('match transfersToOnramp')
           const logSendRequested = block.logs.find(
             (l) =>
               log.transactionHash === l.transactionHash &&
               ccipSendRequested.matches(l),
           )
           if (logSendRequested) {
-            console.log('match ccipSendRequested')
+            // console.log('match ccipSendRequested')
             const data =
               ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
             const message = data.message
@@ -126,12 +136,21 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
               logSendRequested.transaction!.input,
             )
 
-            for (const tokenAmount of message.tokenAmounts) {
+            // A `BridgeTransferState` may already exist.
+            //  If so, we should pull the `state` for it.
+            const bridgeTransferState = await ctx.store.get(
+              BridgeTransferState,
+              message.messageId,
+            )
+
+            for (let i = 0; i < message.tokenAmounts.length; i++) {
+              const tokenAmount = message.tokenAmounts[i]
               const transfer = new BridgeTransfer({
-                id: `${params.chainId}-${log.id}`,
+                id: `${message.messageId}-${i}`,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),
-                txHash: log.transactionHash,
+                txHashIn: log.transactionHash,
+                txHashOut: null,
                 messageId: message.messageId,
                 bridge: 'ccip',
                 chainIn: params.chainId,
@@ -145,8 +164,9 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 amountOut: tokenAmount.amount,
                 sender: message.sender.toLowerCase(),
                 receiver: message.receiver.toLowerCase(),
+                state: bridgeTransferState?.state ?? 0,
               })
-              console.log(transfer)
+              // console.log(transfer)
               result.transfers.set(transfer.id, transfer)
             }
           }
@@ -154,7 +174,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
       }
     }
 
-    await ctx.store.insert([...result.transfers.values()])
+    await ctx.store.upsert([...result.transfers.values()])
     await ctx.store.upsert([...result.bridgeTransferStates.values()])
   }
 

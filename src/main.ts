@@ -1,28 +1,16 @@
-import { uniq } from 'lodash'
+import 'tsconfig-paths/register'
 
+import { run } from '@processor'
+
+import arbitrum from './main-arbitrum'
+import mainnet from './main-mainnet'
 import oeth from './main-oeth'
 import ogv from './main-ogv'
-import other from './main-other'
-import ousd from './main-ousd'
-import { run } from './processor'
 
-run({
-  processors: uniq([
-    ...oeth.processors,
-    ...ousd.processors,
-    ...ogv.processors,
-    ...other.processors,
-  ]),
-  postProcessors: uniq([
-    ...oeth.postProcessors,
-    ...ousd.postProcessors,
-    ...ogv.postProcessors,
-    ...other.postProcessors,
-  ]),
-  validators: uniq([
-    ...oeth.validators,
-    ...ousd.validators,
-    ...ogv.validators,
-    ...other.validators,
-  ]),
-})
+// import ousd from './main-ousd'
+
+run(mainnet)
+run(arbitrum)
+run(oeth)
+// run(ogv)
+// run(ousd)

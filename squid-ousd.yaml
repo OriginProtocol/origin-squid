@@ -1,0 +1,41 @@
+manifestVersion: subsquid.io/v0.1
+name: origin-ousd
+version: 999
+description: 'Origin OUSD 🦑'
+build:
+deploy:
+  addons:
+    postgres:
+  secrets:
+    - RPC_ENDPOINT
+    - RPC_ENDPOINT_999
+    - RPC_ENDPOINT_RETH
+    - RPC_BACKUP
+    - RPC_ARBITRUM_ENDPOINT
+    - RPC_ARBITRUM_ENV
+  processor:
+    - name: ousd-processor
+      cmd: [ "sqd", "process:ousd:prod" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
+  api:
+    env:
+      TS_NODE_BASEURL: './lib'
+    cmd:
+      - npx
+      - squid-graphql-server
+      - '--dumb-cache'
+      - in-memory
+      - '--dumb-cache-ttl'
+      - '1000'
+      - '--dumb-cache-size'
+      - '100'
+      - '--dumb-cache-max-age'
+      - '1000'
+scale:
+  dedicated: true
+  addons:
+    postgres:
+      storage: 20G
+      profile: medium

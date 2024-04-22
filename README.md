@@ -37,7 +37,7 @@ sqd down               # Bring down squid container
 sqd up                 # Bring up squid container
 sqd process:oeth       # Run OETH processor
 sqd process:ousd       # Run OUSD processor
-sqd process:other      # Run misc processor
+sqd process:mainnet      # Run misc processor
 sqd migration:generate # Generate migration (sqd down && sqd up first)
 ```
 

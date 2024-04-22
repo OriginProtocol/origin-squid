@@ -17,6 +17,10 @@ export class BridgeTransferState {
     @Column_("int4", {nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @Column_("text", {nullable: false})
+    txHash!: string
+
     @Column_("int4", {nullable: false})
     state!: number
 }

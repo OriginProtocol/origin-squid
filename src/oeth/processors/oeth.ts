@@ -7,12 +7,8 @@ import {
   OETHHistory,
   OETHRebase,
   OETHRebaseOption,
-  WOETHHistory,
-} from '../../model'
-import {
-  createOTokenProcessor,
-  createOTokenSetup,
-} from '../../shared/processor-templates/otoken'
+} from '@model'
+import { createOTokenProcessor, createOTokenSetup } from '@templates/otoken'
 import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
@@ -24,7 +20,7 @@ import {
   WETH_ADDRESS,
   WOETH_ADDRESS,
   WSTETH_ADDRESS,
-} from '../../utils/addresses'
+} from '@utils/addresses'
 
 export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
 
@@ -39,6 +35,8 @@ export const setup = createOTokenSetup({
 })
 
 export const process = createOTokenProcessor({
+  from,
+  vaultFrom: 17084107,
   OTOKEN_ADDRESS: OETH_ADDRESS,
   WOTOKEN_ADDRESS: WOETH_ADDRESS,
   OTOKEN_VAULT_ADDRESS: OETH_VAULT_ADDRESS,
@@ -56,7 +54,6 @@ export const process = createOTokenProcessor({
   OTokenAsset: OETHAsset,
   OTokenAddress: OETHAddress,
   OTokenHistory: OETHHistory,
-  WOTokenHistory: WOETHHistory,
   OTokenAPY: OETHAPY,
   OTokenRebase: OETHRebase,
   OTokenRebaseOption: OETHRebaseOption,

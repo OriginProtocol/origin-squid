@@ -95,7 +95,8 @@ type ERC20 @entity {
   Format: 'address'
   """
   id: ID!
-  address: String!
+  chainId: Int! @index
+  address: String! @index
   name: String!
   decimals: Int!
   symbol: String!
@@ -106,6 +107,7 @@ type ERC20Holder @entity {
   Format: 'address:account'
   """
   id: ID!
+  chainId: Int! @index
   address: String!
   account: String!
 }
@@ -115,6 +117,7 @@ type ERC20State @entity {
   Format: 'address:blockNumber'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String!
@@ -127,11 +130,24 @@ type ERC20Balance @entity {
   Format: 'address:account:blockNumber'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String!
   account: String!
   balance: BigInt!
+}
+
+type ERC20Transfer @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String!
+  blockNumber: Int!
+  timestamp: DateTime!
+  address: String! @index
+  from: String! @index
+  to: String! @index
+  value: BigInt!
 }
 
 type CurvePool @entity {
@@ -242,7 +258,8 @@ type BridgeTransfer @entity {
   id: ID! # chain + log id
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
+  txHashIn: String!
+  txHashOut: String # Initially null
   messageId: String! @index
   bridge: String! @index
   sender: String! @index
@@ -253,14 +270,17 @@ type BridgeTransfer @entity {
   tokenOut: String!
   amountIn: BigInt!
   amountOut: BigInt!
+  state: Int!
 }
 
 type BridgeTransferState @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   state: Int!
-}"""
+}
+"""
 The OETH entity tracks the change in total supply of OETH over time.
 """
 type OETH @entity {
@@ -300,19 +320,6 @@ type OETHHistory @entity {
   address: OETHAddress! @index
   value: BigInt!
   balance: BigInt!
-  timestamp: DateTime!
-  blockNumber: Int! @index
-  txHash: String! @index
-  type: HistoryType!
-}
-
-"""
-The History entity tracks events that change the balance of OETH for an address.
-"""
-type WOETHHistory @entity {
-  id: ID!
-  address: String! @index
-  value: BigInt!
   timestamp: DateTime!
   blockNumber: Int! @index
   txHash: String! @index
@@ -570,7 +577,8 @@ type OETHActivity @entity {
   fromSymbol: String
   toSymbol: String
   amount: BigInt
-}type OGV @entity {
+}
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -687,7 +695,16 @@ type OGVDailyStat @entity {
   marketCapUSD: Float!
   priceUSD: Float!
   holdersOverThreshold: Int!
-}"""
+}
+type OTokenVault @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  chainId: Int! @index
+  address: String! @index
+  totalValue: BigInt!
+}
+"""
 The OUSD entity tracks the change in total supply of OUSD over time.
 """
 type OUSD @entity {

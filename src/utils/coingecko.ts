@@ -1,9 +1,9 @@
 import { Between, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
-import { OETHDailyStat, OGVDailyStat, OUSDDailyStat } from '../model'
-import { Context } from '../processor'
-import { EntityClassT } from '../utils/type'
+import { OETHDailyStat, OGVDailyStat, OUSDDailyStat } from '@model'
+import { Context } from '@processor'
+import { EntityClassT } from '@utils/type'
 
 type DailyStat =
   | EntityClassT<OETHDailyStat>

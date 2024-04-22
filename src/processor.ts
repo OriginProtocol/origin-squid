@@ -1,3 +1,10 @@
+import assert from 'assert'
+import dayjs from 'dayjs'
+import duration from 'dayjs/plugin/duration'
+import utc from 'dayjs/plugin/utc'
+import { Chain } from 'viem'
+import { arbitrum, mainnet } from 'viem/chains'
+
 import { lookupArchive } from '@subsquid/archive-registry'
 import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
 import {
@@ -6,12 +13,7 @@ import {
   EvmBatchProcessorFields,
 } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import assert from 'assert'
-import dayjs from 'dayjs'
-import duration from 'dayjs/plugin/duration'
-import utc from 'dayjs/plugin/utc'
-
-import { calculateBPS } from './utils/calculateBPS'
+import { calculateBlockRate } from '@utils/calculateBlockRate'
 
 dayjs.extend(duration)
 dayjs.extend(utc)
@@ -23,23 +25,14 @@ export const createSquidProcessor = (
   const url = process.env[rpc_env] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
   return new EvmBatchProcessor()
-    .setDataSource({
-      // Change the Archive endpoints for run the squid
-      // against the other EVM networks
-      // For a full list of supported networks and config options
-      // see https://docs.subsquid.io/evm-indexing/
-      archive: lookupArchive(archive),
-
-      // Must be set for RPC ingestion (https://docs.subsquid.io/evm-indexing/evm-processor/)
-      // OR to enable contract state queries (https://docs.subsquid.io/evm-indexing/query-state/)
-      // chain: 'https://rpc.ankr.com/eth',
-      // chain: "https://mainnet.infura.io/v3/03b96dfbb4904c5c89c04680dd480064",
-      chain: {
-        url,
-        // Alchemy is deprecating `eth_getBlockReceipts` https://docs.alchemy.com/reference/eth-getblockreceipts
-        // so we need to set `maxBatchCallSize` 1 to avoid using this method
-        maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
-      },
+    .setGateway(lookupArchive(archive))
+    .setRpcEndpoint({
+      url,
+      maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
+    })
+    .setRpcDataIngestionSettings({
+      disabled: archive === 'arbitrum',
+      headPollInterval: 30000,
     })
     .setFinalityConfirmation(10)
     .setFields({
@@ -74,22 +67,36 @@ interface Processor {
   name?: string
   from?: number
   initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createSquidProcessor>) => void
+  setup?: (p: ReturnType<typeof createSquidProcessor>, chain: Chain) => void
   process: (ctx: Context) => Promise<void>
 }
 
 let initialized = false
 
+const chainConfigs: Record<
+  number,
+  { chain: Chain; archive: KnownArchives; rpcEnv: string } | undefined
+> = {
+  [mainnet.id]: {
+    chain: mainnet,
+    archive: 'eth-mainnet',
+    rpcEnv: process.env.RPC_ENV ?? 'RPC_ENDPOINT',
+  },
+  [arbitrum.id]: {
+    chain: arbitrum,
+    archive: 'arbitrum',
+    rpcEnv: process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT',
+  },
+}
+
 export const run = ({
-  archive,
-  rpcEnv,
+  chainId = 1,
   stateSchema,
   processors,
   postProcessors,
   validators,
 }: {
-  archive?: KnownArchives
-  rpcEnv?: string
+  chainId?: number
   stateSchema?: string
   processors: Processor[]
   postProcessors?: Processor[]
@@ -100,7 +107,9 @@ export const run = ({
     'All processors must have a `from` defined',
   )
 
-  const processor = createSquidProcessor(archive, rpcEnv)
+  const config = chainConfigs[chainId]
+  if (!config) throw new Error('No chain configuration found.')
+  const processor = createSquidProcessor(config.archive, config.rpcEnv)
 
   processor.setBlockRange({
     from: process.env.BLOCK_FROM
@@ -113,8 +122,8 @@ export const run = ({
         ),
     to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
-  processors.forEach((p) => p.setup?.(processor))
-  postProcessors?.forEach((p) => p.setup?.(processor))
+  processors.forEach((p) => p.setup?.(processor, config.chain))
+  postProcessors?.forEach((p) => p.setup?.(processor, config.chain))
   processor.run(
     new TypeormDatabase({
       stateSchema,
@@ -124,9 +133,10 @@ export const run = ({
     async (_ctx) => {
       const ctx = _ctx as Context
       try {
+        ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
-        if (ctx.blocks.length > 1) {
-          ctx.bps = await calculateBPS(ctx)
+        if (ctx.blocks.length >= 1) {
+          ctx.blockRate = await calculateBlockRate(ctx)
           // ctx.log.info({ bps: ctx.bps, length: ctx.blocks.length })
         }
 
@@ -223,7 +233,8 @@ export type Fields = EvmBatchProcessorFields<
   ReturnType<typeof createSquidProcessor>
 >
 export type Context = DataHandlerContext<Store, Fields> & {
-  bps: number
+  chain: Chain
+  blockRate: number
   __state: Map<string, unknown>
 }
 export type Block = Context['blocks']['0']

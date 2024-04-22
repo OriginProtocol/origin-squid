@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
-import { LiquidityDailyBalance } from '../../model'
-import { Context } from '../../processor'
-import { useProcessorState } from '../../utils/state'
+import { LiquidityDailyBalance } from '@model'
+import { Context } from '@processor'
+import { useProcessorState } from '@utils/state'
 
 const useLiquidityDailyBalance = (ctx: Context) =>
   useProcessorState(

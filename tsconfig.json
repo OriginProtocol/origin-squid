@@ -11,7 +11,28 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": "./src/",
+    "paths": {
+      "@abi/*": [
+        "abi/*"
+      ],
+      "@model": [
+        "model"
+      ],
+      "@processor": [
+        "processor"
+      ],
+      "@shared/*": [
+        "shared/*"
+      ],
+      "@templates/*": [
+        "templates/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ]
+    }
   },
   "include": [
     "src"

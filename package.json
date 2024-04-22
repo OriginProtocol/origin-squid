@@ -3,18 +3,19 @@
   "private": true,
   "scripts": {
     "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat schema-*.graphql >> schema.graphql && sqd codegen && git add src/model/generated/*",
-    "migration:generate": "sqd down && sqd up && sqd migration:generate",
+    "migration:generate": "sqd down && sqd up && sqd migration:generate && git add db/migrations/*",
+    "generate": "npm-run-all codegen migration:generate",
     "build": "rm -rf lib && tsc",
-    "prettier-check": "prettier --check **/*.ts **/*.json",
-    "prettier-fix": "prettier --write **/*.ts **/*.json",
+    "prettier-check": "prettier --check src",
+    "prettier-fix": "prettier --write src",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
     "serve": "sqd serve",
     "process:arbitrum": "sqd process:arbitrum",
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
-    "process:other": "sqd process:other",
-    "process": "npm-run-all --parallel process:arbitrum process:oeth process:ousd process:ogv process:other"
+    "process:mainnet": "sqd process:mainnet",
+    "process": "sqd process"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.0",
@@ -47,6 +48,7 @@
     "@types/uuid": "^9.0.2",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "~5.1.3"
   }
 }

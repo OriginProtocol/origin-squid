@@ -1,9 +1,10 @@
 import { compact } from 'lodash'
 import { Between } from 'typeorm'
 
-import { ExchangeRate } from '../../../model'
-import { Block, Context } from '../../../processor'
-import { useProcessorState } from '../../../utils/state'
+import { ExchangeRate } from '@model'
+import { Block, Context } from '@processor'
+import { useProcessorState } from '@utils/state'
+
 import { Currency, currenciesByAddress } from './currencies'
 import { getPrice } from './price-routing'
 

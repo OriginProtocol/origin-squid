@@ -1,16 +1,16 @@
+import { OETHRewardTokenCollected } from '@model'
+import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import { OETHRewardTokenCollected } from '../../../model'
-import { Context } from '../../../processor'
 import {
   IStrategyData,
   createStrategyProcessor,
   createStrategySetup,
-} from '../../../shared/processor-templates/strategy'
+} from '@templates/strategy'
 import {
   createStrategyRewardProcessor,
   createStrategyRewardSetup,
-} from '../../../shared/processor-templates/strategy-rewards'
+} from '@templates/strategy-rewards'
+
 import { aaveStrategy } from './aave-strategy'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'

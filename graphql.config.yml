@@ -5,6 +5,11 @@ projects:
     schema: schema-general.graphql
     include:
       - types.graphql
+  otoken:
+    schema: schema-otoken.graphql
+    include:
+      - schema-general.graphql
+      - types.graphql
   oeth:
     schema: schema-oeth.graphql
     include:

@@ -1,17 +1,17 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
-import * as erc20 from '../../abi/erc20'
-import { OUSDVault } from '../../model'
-import { Context } from '../../processor'
+import * as erc20 from '@abi/erc20'
+import { OUSDVault } from '@model'
+import { Context } from '@processor'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   DAI_ADDRESS,
   OUSD_VAULT_ADDRESS,
   OUSD_VAULT_ERC20_ADDRESSES,
   USDC_ADDRESS,
   USDT_ADDRESS,
-} from '../../utils/addresses'
-import { getLatestEntity, trackAddressBalances } from '../../utils/utils'
+} from '@utils/addresses'
+import { getLatestEntity, trackAddressBalances } from '@utils/utils'
 
 interface ProcessResult {
   vaults: OUSDVault[]

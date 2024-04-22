@@ -1,4 +1,3 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import {
@@ -24,9 +23,10 @@ import {
   OETHStrategyDailyStat,
   OETHStrategyHoldingDailyStat,
   OETHVault,
-} from '../../../model'
-import { Context } from '../../../processor'
-import { applyCoingeckoData } from '../../../utils/coingecko'
+} from '@model'
+import { Context } from '@processor'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)
 

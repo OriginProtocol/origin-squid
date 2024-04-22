@@ -1,4 +1,3 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import {
@@ -7,9 +6,10 @@ import {
   MoreThanOrEqual,
 } from 'typeorm'
 
-import { OGV, OGVAddress, OGVDailyStat } from '../../model'
-import { Context } from '../../processor'
-import { applyCoingeckoData } from '../../utils/coingecko'
+import { OGV, OGVAddress, OGVDailyStat } from '@model'
+import { Context } from '@processor'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)
 

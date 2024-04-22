@@ -1,14 +1,11 @@
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { pad } from 'viem'
 
-import * as sfrxETH from '../../abi/sfrx-eth'
-import { OETHFraxStaking } from '../../model'
-import { Context } from '../../processor'
-import { ensureExchangeRate } from '../../shared/post-processors/exchange-rates'
-import {
-  OETH_FRAX_STAKING_ADDRESS,
-  SFRXETH_ADDRESS,
-} from '../../utils/addresses'
+import * as sfrxETH from '@abi/sfrx-eth'
+import { OETHFraxStaking } from '@model'
+import { Context } from '@processor'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OETH_FRAX_STAKING_ADDRESS, SFRXETH_ADDRESS } from '@utils/addresses'
 
 interface ProcessResult {
   fraxStakings: OETHFraxStaking[]

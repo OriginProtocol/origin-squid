@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 
 @Entity_()
 export class ERC20 {
@@ -12,6 +12,11 @@ export class ERC20 {
     @PrimaryColumn_()
     id!: string
 
+    @Index_()
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
     @Column_("text", {nullable: false})
     address!: string
 

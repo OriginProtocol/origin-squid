@@ -1,6 +1,6 @@
 import { invert, mapKeys } from 'lodash'
 
-import { ExchangeRate } from '../../../model'
+import { ExchangeRate } from '@model'
 
 export const currencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD

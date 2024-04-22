@@ -1,16 +1,11 @@
 import { compact } from 'lodash'
-import {
-  GetTransactionReceiptReturnType,
-  decodeEventLog,
-  decodeFunctionData,
-  parseAbi,
-} from 'viem'
+import { GetTransactionReceiptReturnType, decodeEventLog, parseAbi } from 'viem'
 
-import * as balancerVaultAbi from '../abi/balancer-vault.abi'
-import * as curveLpAbi from '../abi/curve-lp-token.abi'
-import * as oethZapperAbi from '../abi/oeth-zapper.abi'
-import * as oethAbi from '../abi/oeth.abi'
-import * as oethVaultAbi from '../abi/otoken-vault.abi'
+import * as balancerVaultAbi from '@abi/balancer-vault.abi'
+import * as curveLpAbi from '@abi/curve-lp-token.abi'
+import * as oethAbi from '@abi/oeth.abi'
+import * as oethVaultAbi from '@abi/otoken-vault.abi'
+
 import {
   OETH_ADDRESS,
   OETH_VAULT_ADDRESS,

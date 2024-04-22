@@ -14,6 +14,10 @@ export class ERC20Balance {
     id!: string
 
     @Index_()
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
     @Column_("timestamp with time zone", {nullable: false})
     timestamp!: Date
 

@@ -1,17 +1,16 @@
+import { OETHRewardTokenCollected } from '@model'
+import { Context } from '@processor'
+import { currencies } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-
-import { OETHRewardTokenCollected } from '../../../model'
-import { Context } from '../../../processor'
-import { currencies } from '../../../shared/post-processors/exchange-rates/currencies'
 import {
   IStrategyData,
   createStrategyProcessor,
   createStrategySetup,
-} from '../../../shared/processor-templates/strategy'
+} from '@templates/strategy'
 import {
   createStrategyRewardProcessor,
   createStrategyRewardSetup,
-} from '../../../shared/processor-templates/strategy-rewards'
+} from '@templates/strategy-rewards'
 import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
@@ -21,7 +20,7 @@ import {
   STETH_ADDRESS,
   WETH_ADDRESS,
   addresses,
-} from '../../../utils/addresses'
+} from '@utils/addresses'
 
 export const oethStrategies: readonly IStrategyData[] = [
   {

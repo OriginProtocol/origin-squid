@@ -1,3 +1,9 @@
+import 'tsconfig-paths/register'
+
+import { run } from '@processor'
+import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { processStatus } from '@templates/processor-status'
+
 import * as dailyStats from './oeth/post-processors/daily-stats'
 import * as oeth from './oeth/processors'
 import * as balancerMetaPoolStrategy from './oeth/processors/balancer-meta-pool'
@@ -10,9 +16,6 @@ import * as morphoAave from './oeth/processors/morpho-aave'
 import * as strategies from './oeth/processors/strategies'
 import * as vault from './oeth/processors/vault'
 import * as validateOeth from './oeth/validators/validate-oeth'
-import { run } from './processor'
-import * as exchangeRatesPostProcessor from './shared/post-processors/exchange-rates'
-import { processStatus } from './shared/processor-templates/processor-status'
 
 export const processor = {
   stateSchema: 'oeth-processor',
