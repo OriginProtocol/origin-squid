@@ -6,23 +6,15 @@ import * as otoken from '@abi/otoken'
 import * as otokenVault from '@abi/otoken-vault'
 import {
   HistoryType,
-  OETH,
-  OETHAPY,
-  OETHActivity,
-  OETHAddress,
-  OETHAsset,
-  OETHHistory,
-  OETHRebase,
-  OETHRebaseOption,
+  OToken,
+  OTokenAPY,
+  OTokenActivity,
+  OTokenAddress,
+  OTokenAsset,
+  OTokenHistory,
+  OTokenRebase,
+  OTokenRebaseOption,
   OTokenVault,
-  OUSD,
-  OUSDAPY,
-  OUSDActivity,
-  OUSDAddress,
-  OUSDAsset,
-  OUSDHistory,
-  OUSDRebase,
-  OUSDRebaseOption,
   RebasingOption,
 } from '@model'
 import { Context } from '@processor'
@@ -37,21 +29,9 @@ import { ADDRESS_ZERO } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { multicall } from '@utils/multicall'
-import { EntityClassT, InstanceTypeOfConstructor } from '@utils/type'
 import { getLatestEntity } from '@utils/utils'
 
 import { createAddress, createRebaseAPY } from './utils'
-
-type OToken = EntityClassT<OETH> | EntityClassT<OUSD>
-type OTokenAsset = EntityClassT<OETHAsset> | EntityClassT<OUSDAsset>
-type OTokenAPY = EntityClassT<OETHAPY> | EntityClassT<OUSDAPY>
-type OTokenActivity = EntityClassT<OETHActivity> | EntityClassT<OUSDActivity>
-type OTokenAddress = EntityClassT<OETHAddress> | EntityClassT<OUSDAddress>
-type OTokenHistory = EntityClassT<OETHHistory> | EntityClassT<OUSDHistory>
-type OTokenRebase = EntityClassT<OETHRebase> | EntityClassT<OUSDRebase>
-type OTokenRebaseOption =
-  | EntityClassT<OETHRebaseOption>
-  | EntityClassT<OUSDRebaseOption>
 
 export const createOTokenSetup =
   ({
@@ -109,29 +89,21 @@ export const createOTokenProcessor = (params: {
   from: number
   vaultFrom: number
   Upgrade_CreditsBalanceOfHighRes?: number
-  OTOKEN_ADDRESS: string
-  WOTOKEN_ADDRESS?: string
-  OTOKEN_VAULT_ADDRESS: string
+  otokenAddress: string
+  wotokenAddress?: string
+  otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
-  OToken: OToken
-  OTokenAsset: OTokenAsset
-  OTokenAPY: OTokenAPY
-  OTokenAddress: OTokenAddress
-  OTokenHistory: OTokenHistory
-  OTokenActivity: OTokenActivity
-  OTokenRebase: OTokenRebase
-  OTokenRebaseOption: OTokenRebaseOption
 }) => {
   interface ProcessResult {
     initialized: boolean
     initialize: () => Promise<void>
-    otokens: InstanceTypeOfConstructor<OToken>[]
-    assets: InstanceTypeOfConstructor<OTokenAsset>[]
-    history: InstanceTypeOfConstructor<OTokenHistory>[]
-    rebases: InstanceTypeOfConstructor<OTokenRebase>[]
-    rebaseOptions: InstanceTypeOfConstructor<OTokenRebaseOption>[]
-    apies: InstanceTypeOfConstructor<OTokenAPY>[]
-    activity: InstanceTypeOfConstructor<OTokenActivity>[]
+    otokens: OToken[]
+    assets: OTokenAsset[]
+    history: OTokenHistory[]
+    rebases: OTokenRebase[]
+    rebaseOptions: OTokenRebaseOption[]
+    apies: OTokenAPY[]
+    activity: OTokenActivity[]
     vaults: OTokenVault[]
     lastYieldDistributionEvent?: {
       fee: bigint
@@ -139,9 +111,7 @@ export const createOTokenProcessor = (params: {
     }
   }
 
-  let owners:
-    | Map<string, InstanceTypeOfConstructor<OTokenAddress>>
-    | undefined = undefined
+  let owners: Map<string, OTokenAddress> | undefined = undefined
 
   let idMap: Map<string, number>
   const getUniqueId = (partialId: string) => {
@@ -163,20 +133,22 @@ export const createOTokenProcessor = (params: {
         // get all addresses from the database.
         // we need this because we increase their balance based on rebase events
         owners = await ctx.store
-          .find<InstanceTypeOfConstructor<OTokenAddress>>(
-            params.OTokenAddress as any,
-          )
-          .then((q) => new Map(q.map((i) => [i.id, i])))
+          .find(OTokenAddress, {
+            where: { chainId: ctx.chain.id, otoken: params.otokenAddress },
+          })
+          .then((q) => new Map(q.map((i) => [i.address, i])))
 
-        const assetsCount = await ctx.store.count<
-          InstanceTypeOfConstructor<OTokenAsset>
-        >(params.OTokenAsset as any)
+        const assetsCount = await ctx.store.count(OTokenAsset, {
+          where: { chainId: ctx.chain.id, otoken: params.otokenAddress },
+        })
         if (assetsCount === 0) {
           result.assets.push(
             ...params.oTokenAssets.map(
               ({ asset, symbol }) =>
-                new params.OTokenAsset({
-                  id: asset,
+                new OTokenAsset({
+                  id: `${ctx.chain.id}-${params.otokenAddress}-${asset}`,
+                  chainId: ctx.chain.id,
+                  otoken: params.otokenAddress,
                   address: asset,
                   symbol: symbol,
                 }),
@@ -211,15 +183,16 @@ export const createOTokenProcessor = (params: {
       const vaultContract = new otokenVault.Contract(
         ctx,
         block.header,
-        params.OTOKEN_VAULT_ADDRESS,
+        params.otokenVaultAddress,
       )
       result.vaults.push(
         new OTokenVault({
-          id: `${ctx.chain.id}-${block.header.height}-${params.OTOKEN_VAULT_ADDRESS}`,
+          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+          chainId: ctx.chain.id,
+          otoken: params.otokenAddress,
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
-          chainId: ctx.chain.id,
-          address: params.OTOKEN_VAULT_ADDRESS,
+          address: params.otokenVaultAddress,
           totalValue: await vaultContract.totalValue(),
         }),
       )
@@ -246,7 +219,7 @@ export const createOTokenProcessor = (params: {
     block: Context['blocks']['0'],
     log: Context['blocks']['0']['logs']['0'],
   ) => {
-    if (log.address !== params.OTOKEN_ADDRESS) return
+    if (log.address !== params.otokenAddress) return
     if (log.topics[0] === otoken.events.Transfer.topic) {
       await result.initialize()
       const dataRaw = otoken.events.Transfer.decode(log)
@@ -267,8 +240,8 @@ export const createOTokenProcessor = (params: {
       const ensureAddress = async (address: string) => {
         let entity = owners!.get(address)
         if (!entity) {
-          entity = await createAddress(params.OTokenAddress, ctx, address)
-          owners!.set(entity.id, entity)
+          entity = await createAddress(ctx, params.otokenAddress, address)
+          owners!.set(entity.address, entity)
         }
         entity.lastUpdated = new Date(block.header.timestamp)
         return entity
@@ -290,7 +263,7 @@ export const createOTokenProcessor = (params: {
             ? otoken.functions.creditsBalanceOfHighres
             : (otoken.functions
                 .creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
-          params.OTOKEN_ADDRESS,
+          params.otokenAddress,
           [[data.from], [data.to]],
         ).then((results) => {
           if (afterHighResUpgrade) {
@@ -310,7 +283,7 @@ export const createOTokenProcessor = (params: {
         address,
         credits,
       }: {
-        address: InstanceTypeOfConstructor<OTokenAddress>
+        address: OTokenAddress
         credits: [bigint, bigint]
       }) => {
         const newBalance = (credits[0] * DECIMALS_18) / credits[1]
@@ -319,9 +292,13 @@ export const createOTokenProcessor = (params: {
         const type =
           addressSub === address ? HistoryType.Sent : HistoryType.Received
         result.history.push(
-          new params.OTokenHistory({
+          new OTokenHistory({
             // we can't use {t.id} because it's not unique
-            id: getUniqueId(`${log.id}-${address.id}`),
+            id: getUniqueId(
+              `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.id}`,
+            ),
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
             address: address,
             value: change,
             balance: newBalance,
@@ -389,7 +366,7 @@ export const createOTokenProcessor = (params: {
     const logs = block.logs
     const groupedLogs = groupBy(logs, (log) => log.transactionHash)
     for (const [txHash, logs] of Object.entries(groupedLogs)) {
-      const log = logs.find((l) => l.address === params.OTOKEN_ADDRESS)
+      const log = logs.find((l) => l.address === params.otokenAddress)
       const transaction = log?.transaction as unknown as Transaction
       if (log && transaction) {
         // We need to get the whole transaction receipt for all related logs.
@@ -407,8 +384,12 @@ export const createOTokenProcessor = (params: {
         if (activity) {
           for (const item of activity) {
             result.activity.push(
-              new params.OTokenActivity({
-                id: getUniqueId(log.id),
+              new OTokenActivity({
+                id: getUniqueId(
+                  `${ctx.chain.id}-${params.otokenAddress}-${log.id}`,
+                ),
+                chainId: ctx.chain.id,
+                otoken: params.otokenAddress,
                 timestamp: new Date(block.header.timestamp),
                 blockNumber: block.header.height,
                 txHash: log.transactionHash,
@@ -429,7 +410,7 @@ export const createOTokenProcessor = (params: {
     block: Context['blocks']['0'],
     log: Context['blocks']['0']['logs']['0'],
   ) => {
-    if (log.address !== params.OTOKEN_ADDRESS) return
+    if (log.address !== params.otokenAddress) return
     if (log.topics[0] !== otoken.events.TotalSupplyUpdatedHighres.topic) return
 
     await result.initialize()
@@ -452,9 +433,8 @@ export const createOTokenProcessor = (params: {
 
     // Rebase events
     const rebase = createRebaseAPY(
-      params.OTokenAPY,
-      params.OTokenRebase,
       ctx,
+      params.otokenAddress,
       result.apies,
       block,
       log,
@@ -476,9 +456,13 @@ export const createOTokenProcessor = (params: {
 
       if (earned === 0n) continue
       result.history.push(
-        new params.OTokenHistory({
-          id: getUniqueId(`${log.id}-${address.id}`),
+        new OTokenHistory({
+          id: getUniqueId(
+            `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.id}`,
+          ),
           // we can't use {t.id} because it's not unique
+          chainId: ctx.chain.id,
+          otoken: params.otokenAddress,
           address: address,
           value: earned,
           balance: newBalance,
@@ -502,7 +486,7 @@ export const createOTokenProcessor = (params: {
     block: Context['blocks']['0'],
     log: Context['blocks']['0']['logs']['0'],
   ) => {
-    if (log.address !== params.OTOKEN_VAULT_ADDRESS) return
+    if (log.address !== params.otokenVaultAddress) return
     if (log.topics[0] !== otokenVault.events.YieldDistribution.topic) return
 
     await result.initialize()
@@ -518,7 +502,7 @@ export const createOTokenProcessor = (params: {
   ) => {
     if (
       trace.type === 'call' &&
-      params.OTOKEN_ADDRESS === trace.action.to &&
+      params.otokenAddress === trace.action.to &&
       (trace.action.sighash ===
         otoken.functions.governanceRebaseOptIn.sighash ||
         trace.action.sighash === otoken.functions.rebaseOptIn.sighash ||
@@ -536,16 +520,21 @@ export const createOTokenProcessor = (params: {
       let owner = owners!.get(address)
       if (!owner) {
         owner = await createAddress(
-          params.OTokenAddress,
           ctx,
+          params.otokenAddress,
           address,
           timestamp,
         )
         owners!.set(address, owner)
       }
 
-      const rebaseOption = new params.OTokenRebaseOption({
-        id: getUniqueId(`${trace.transaction?.hash!}-${owner.id}`),
+      const rebaseOption = new OTokenRebaseOption({
+        id: getUniqueId(
+          `${ctx.chain.id}-${params.otokenAddress}-${trace.transaction
+            ?.hash!}-${owner.address}`,
+        ),
+        chainId: ctx.chain.id,
+        otoken: params.otokenAddress,
         timestamp,
         blockNumber,
         txHash: trace.transaction?.hash,
@@ -559,14 +548,14 @@ export const createOTokenProcessor = (params: {
         const otokenContract = new otoken.Contract(
           ctx,
           block.header,
-          params.OTOKEN_ADDRESS,
+          params.otokenAddress,
         )
         owner.credits = afterHighResUpgrade
           ? await otokenContract
-              .creditsBalanceOfHighres(owner.id)
+              .creditsBalanceOfHighres(owner.address)
               .then((c) => c[0])
           : await otokenContract
-              .creditsBalanceOf(owner.id)
+              .creditsBalanceOf(owner.address)
               .then((c) => c[0] * 1000000000n)
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
@@ -596,7 +585,7 @@ export const createOTokenProcessor = (params: {
     block: Context['blocks']['0'],
     log: Context['blocks']['0']['logs']['0'],
   ) => {
-    if (log.address !== params.OTOKEN_ADDRESS) return
+    if (log.address !== params.otokenAddress) return
     if (rebaseEventTopics[log.topics[0]]) {
       await result.initialize()
       const timestamp = new Date(block.header.timestamp)
@@ -607,16 +596,22 @@ export const createOTokenProcessor = (params: {
       let owner = owners!.get(address)
       if (!owner) {
         owner = await createAddress(
-          params.OTokenAddress,
           ctx,
+          params.otokenAddress,
           address,
           timestamp,
         )
         owners!.set(address, owner)
       }
 
-      const rebaseOption = new params.OTokenRebaseOption({
-        id: getUniqueId(`${log.transactionHash!}-${owner.id}`),
+      const rebaseOption = new OTokenRebaseOption({
+        id: getUniqueId(
+          `${ctx.chain.id}-${params.otokenAddress}-${log.transactionHash!}-${
+            owner.address
+          }`,
+        ),
+        chainId: ctx.chain.id,
+        otoken: params.otokenAddress,
         timestamp,
         blockNumber,
         txHash: log.transactionHash,
@@ -646,18 +641,22 @@ export const createOTokenProcessor = (params: {
     result: ProcessResult,
     block: Context['blocks']['0'],
   ) => {
-    const timestampId = new Date(block.header.timestamp).toISOString()
+    const timestamp = new Date(block.header.timestamp).toISOString()
+    const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp}`
     const { latest, current } = await getLatestEntity(
       ctx,
-      params.OToken as any,
+      OToken,
       result.otokens,
-      timestampId,
+      otokenId,
+      { chainId: ctx.chain.id, otoken: params.otokenAddress },
     )
 
     let otokenObject = current
     if (!otokenObject) {
-      otokenObject = new params.OToken({
-        id: timestampId,
+      otokenObject = new OToken({
+        id: otokenId,
+        chainId: ctx.chain.id,
+        otoken: params.otokenAddress,
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
         totalSupply: latest?.totalSupply ?? 0n,

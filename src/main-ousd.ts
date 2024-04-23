@@ -15,7 +15,7 @@ export const processor = {
   stateSchema: 'ousd-processor',
   processors: [ousd, strategies, curve, ...erc20s],
   postProcessors: [exchangeRates, dailyStats, processStatus('ousd')],
-  validators: [validateOusd],
+  validators: [],
 }
 export default processor
 

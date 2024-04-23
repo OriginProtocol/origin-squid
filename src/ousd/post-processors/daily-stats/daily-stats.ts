@@ -8,12 +8,12 @@ import {
 } from 'typeorm'
 
 import {
-  OUSD,
-  OUSDAPY,
-  OUSDAddress,
+  OToken,
+  OTokenAPY,
+  OTokenAddress,
+  OTokenHistory,
   OUSDCollateralDailyStat,
   OUSDDailyStat,
-  OUSDHistory,
   OUSDMorphoAave,
   OUSDStrategyDailyStat,
   OUSDStrategyHoldingDailyStat,
@@ -21,6 +21,7 @@ import {
 } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OUSD_ADDRESS } from '@utils/addresses'
 import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)
@@ -90,6 +91,14 @@ async function updateDailyStats(ctx: Context, date: Date) {
     where: { timestamp: LessThanOrEqual(date) },
     order: { timestamp: 'desc' as FindOptionsOrderValue },
   }
+  const otokenQueryParams = {
+    ...queryParams,
+    where: {
+      chainId: ctx.chain.id,
+      otoken: OUSD_ADDRESS,
+      ...queryParams.where,
+    },
+  }
 
   const [
     lastApy,
@@ -99,18 +108,24 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastWrappedOUSDHistory,
     holdersOverThreshold,
   ] = await Promise.all([
-    ctx.store.findOne(OUSDAPY, queryParams),
-    ctx.store.findOne(OUSD, queryParams),
+    ctx.store.findOne(OTokenAPY, otokenQueryParams),
+    ctx.store.findOne(OToken, otokenQueryParams),
     ctx.store.findOne(OUSDVault, queryParams),
     ctx.store.findOne(OUSDMorphoAave, queryParams),
-    ctx.store.findOne(OUSDHistory, {
+    ctx.store.findOne(OTokenHistory, {
       where: {
+        chainId: ctx.chain.id,
+        otoken: OUSD_ADDRESS,
         timestamp: LessThanOrEqual(date),
-        address: { id: '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62' },
+        address: { address: '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62' },
       },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
-    ctx.store.countBy(OUSDAddress, { balance: MoreThanOrEqual(10n ** 20n) }), // $100
+    ctx.store.countBy(OTokenAddress, {
+      chainId: ctx.chain.id,
+      otoken: OUSD_ADDRESS,
+      balance: MoreThanOrEqual(10n ** 20n), // $100
+    }),
   ])
 
   // Do we have any useful data yet?
@@ -235,8 +250,8 @@ SELECT '1 day' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM ousd_rebase
-WHERE timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86' AND timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
 
 UNION ALL
 
@@ -247,8 +262,8 @@ SELECT '7 days' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM ousd_rebase
-WHERE timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86' AND timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
 
 UNION ALL
 
@@ -259,6 +274,6 @@ SELECT 'all time' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM ousd_rebase
-WHERE timestamp <= $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86' AND timestamp <= $1::timestamp
 `

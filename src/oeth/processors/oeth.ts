@@ -1,13 +1,3 @@
-import {
-  OETH,
-  OETHAPY,
-  OETHActivity,
-  OETHAddress,
-  OETHAsset,
-  OETHHistory,
-  OETHRebase,
-  OETHRebaseOption,
-} from '@model'
 import { createOTokenProcessor, createOTokenSetup } from '@templates/otoken'
 import {
   ETH_ADDRESS,
@@ -37,9 +27,9 @@ export const setup = createOTokenSetup({
 export const process = createOTokenProcessor({
   from,
   vaultFrom: 17084107,
-  OTOKEN_ADDRESS: OETH_ADDRESS,
-  WOTOKEN_ADDRESS: WOETH_ADDRESS,
-  OTOKEN_VAULT_ADDRESS: OETH_VAULT_ADDRESS,
+  otokenAddress: OETH_ADDRESS,
+  wotokenAddress: WOETH_ADDRESS,
+  otokenVaultAddress: OETH_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: ETH_ADDRESS, symbol: 'ETH' },
     { asset: WETH_ADDRESS, symbol: 'WETH' },
@@ -50,12 +40,4 @@ export const process = createOTokenProcessor({
     { asset: WSTETH_ADDRESS, symbol: 'wstETH' },
     { asset: OETH_ADDRESS, symbol: 'OETH' },
   ],
-  OToken: OETH,
-  OTokenAsset: OETHAsset,
-  OTokenAddress: OETHAddress,
-  OTokenHistory: OETHHistory,
-  OTokenAPY: OETHAPY,
-  OTokenRebase: OETHRebase,
-  OTokenRebaseOption: OETHRebaseOption,
-  OTokenActivity: OETHActivity,
 })

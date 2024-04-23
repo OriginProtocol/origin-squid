@@ -1,18 +1,23 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
-import {OUSDAddress} from "./ousdAddress.model"
+import {OTokenAddress} from "./oTokenAddress.model"
 import {RebasingOption} from "./_rebasingOption"
 
-/**
- * The RebaseOption entity tracks historical rebase option changes by address.
- */
 @Entity_()
-export class OUSDRebaseOption {
-    constructor(props?: Partial<OUSDRebaseOption>) {
+export class OTokenRebaseOption {
+    constructor(props?: Partial<OTokenRebaseOption>) {
         Object.assign(this, props)
     }
 
     @PrimaryColumn_()
     id!: string
+
+    @Index_()
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    otoken!: string
 
     @Index_()
     @Column_("timestamp with time zone", {nullable: false})
@@ -27,8 +32,8 @@ export class OUSDRebaseOption {
     txHash!: string
 
     @Index_()
-    @ManyToOne_(() => OUSDAddress, {nullable: true})
-    address!: OUSDAddress
+    @ManyToOne_(() => OTokenAddress, {nullable: true})
+    address!: OTokenAddress
 
     @Column_("varchar", {length: 6, nullable: false})
     status!: RebasingOption

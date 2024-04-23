@@ -1,19 +1,28 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
 import * as marshal from "./marshal"
 import {RebasingOption} from "./_rebasingOption"
-import {OETHHistory} from "./oethHistory.model"
+import {OTokenHistory} from "./oTokenHistory.model"
 
-/**
- * The OETH balance, history and other information for a given address.
- */
 @Entity_()
-export class OETHAddress {
-    constructor(props?: Partial<OETHAddress>) {
+export class OTokenAddress {
+    constructor(props?: Partial<OTokenAddress>) {
         Object.assign(this, props)
     }
 
     @PrimaryColumn_()
     id!: string
+
+    @Index_()
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    otoken!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    address!: string
 
     @Column_("bool", {nullable: false})
     isContract!: boolean
@@ -33,6 +42,6 @@ export class OETHAddress {
     @Column_("timestamp with time zone", {nullable: false})
     lastUpdated!: Date
 
-    @OneToMany_(() => OETHHistory, e => e.address)
-    history!: OETHHistory[]
+    @OneToMany_(() => OTokenHistory, e => e.address)
+    history!: OTokenHistory[]
 }

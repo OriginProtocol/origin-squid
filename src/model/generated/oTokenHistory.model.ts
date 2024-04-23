@@ -1,14 +1,11 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
 import * as marshal from "./marshal"
-import {OETHAddress} from "./oethAddress.model"
+import {OTokenAddress} from "./oTokenAddress.model"
 import {HistoryType} from "./_historyType"
 
-/**
- * The History entity tracks events that change the balance of OETH for an address.
- */
 @Entity_()
-export class OETHHistory {
-    constructor(props?: Partial<OETHHistory>) {
+export class OTokenHistory {
+    constructor(props?: Partial<OTokenHistory>) {
         Object.assign(this, props)
     }
 
@@ -16,8 +13,16 @@ export class OETHHistory {
     id!: string
 
     @Index_()
-    @ManyToOne_(() => OETHAddress, {nullable: true})
-    address!: OETHAddress
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    otoken!: string
+
+    @Index_()
+    @ManyToOne_(() => OTokenAddress, {nullable: true})
+    address!: OTokenAddress
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     value!: bigint

@@ -1,4 +1,4 @@
-import { LessThanOrEqual } from 'typeorm'
+import { FindOptionsWhere, LessThanOrEqual } from 'typeorm'
 import { pad } from 'viem'
 
 import * as erc20 from '@abi/erc20'
@@ -60,37 +60,16 @@ export const getLatestEntity = async <T extends Entity>(
   entity: EntityClass<T>,
   memory: T[],
   id: string,
+  where?: FindOptionsWhere<T>,
 ) => {
   const current = memory.slice(memory.length - 1).find((v) => v.id === id)
   const latest =
     memory[memory.length - 1] ??
     (await ctx.store.findOne(entity as EntityClass<Entity>, {
-      where: { id: LessThanOrEqual(id) },
+      where: { id: LessThanOrEqual(id), ...where },
       order: { id: 'desc' },
     }))
   return { current, latest }
-}
-
-export const getOrCreate = async <T extends Entity>(
-  ctx: Context,
-  entity: EntityClass<T>,
-  memory: T[],
-  id: string,
-  createNew: (latest: T | undefined) => T,
-) => {
-  const current = memory.slice(memory.length - 1).find((v) => v.id === id)
-  if (current) return current
-  const latest =
-    memory[memory.length - 1] ??
-    (await ctx.store.findOne(entity as EntityClass<Entity>, {
-      where: { id: LessThanOrEqual(id) },
-      order: { id: 'desc' },
-    }))
-
-  const value = createNew(latest)
-  memory.push(value)
-
-  return value
 }
 
 export const convertDecimals = (from: number, to: number, value: bigint) => {

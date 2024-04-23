@@ -1,8 +1,119 @@
-type OTokenVault @entity {
-  id: ID!
+type OToken @entity {
+  id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  totalSupply: BigInt!
+  rebasingSupply: BigInt!
+  nonRebasingSupply: BigInt!
+}
+
+type OTokenAsset @entity {
+  id: ID! @index
   chainId: Int! @index
+  otoken: String! @index
+  address: String! @index
+  symbol: String!
+}
+
+type OTokenAddress @entity {
+  id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
+  address: String! @index
+  isContract: Boolean!
+  rebasingOption: RebasingOption!
+  balance: BigInt!
+  earned: BigInt!
+  credits: BigInt!
+  lastUpdated: DateTime!
+  history: [OTokenHistory!]! @derivedFrom(field: "address")
+}
+
+type OTokenHistory @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  address: OTokenAddress! @index
+  value: BigInt!
+  balance: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: HistoryType!
+}
+
+type OTokenRebase @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  totalSupply: BigInt!
+  rebasingCredits: BigInt!
+  rebasingCreditsPerToken: BigInt!
+  apy: OTokenAPY!
+  feeETH: BigInt!
+  feeUSD: BigInt!
+  yieldETH: BigInt!
+  yieldUSD: BigInt!
+}
+
+type OTokenRebaseOption @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  address: OTokenAddress!
+  status: RebasingOption!
+}
+
+type OTokenAPY @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  date: String! @index
+  apr: Float!
+  apy: Float!
+  apy7DayAvg: Float!
+  apy14DayAvg: Float!
+  apy30DayAvg: Float!
+  rebasingCreditsPerToken: BigInt!
+}
+
+type OTokenVault @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   address: String! @index
   totalValue: BigInt!
+}
+
+type OTokenActivity @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+  address: String
+  sighash: String
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
 }

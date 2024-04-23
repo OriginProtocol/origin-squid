@@ -1,13 +1,3 @@
-import {
-  OUSD,
-  OUSDAPY,
-  OUSDActivity,
-  OUSDAddress,
-  OUSDAsset,
-  OUSDHistory,
-  OUSDRebase,
-  OUSDRebaseOption,
-} from '@model'
 import { createOTokenProcessor, createOTokenSetup } from '@templates/otoken'
 import {
   DAI_ADDRESS,
@@ -31,19 +21,11 @@ export const process = createOTokenProcessor({
   from,
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
-  OTOKEN_ADDRESS: OUSD_ADDRESS,
-  OTOKEN_VAULT_ADDRESS: OUSD_VAULT_ADDRESS,
+  otokenAddress: OUSD_ADDRESS,
+  otokenVaultAddress: OUSD_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: USDC_ADDRESS, symbol: 'USDC' },
     { asset: USDT_ADDRESS, symbol: 'USDT' },
     { asset: DAI_ADDRESS, symbol: 'DAI' },
   ],
-  OToken: OUSD,
-  OTokenAsset: OUSDAsset,
-  OTokenAddress: OUSDAddress,
-  OTokenHistory: OUSDHistory,
-  OTokenAPY: OUSDAPY,
-  OTokenRebase: OUSDRebase,
-  OTokenRebaseOption: OUSDRebaseOption,
-  OTokenActivity: OUSDActivity,
 })

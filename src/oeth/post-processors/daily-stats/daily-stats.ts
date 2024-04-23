@@ -9,23 +9,24 @@ import {
 
 import {
   ExchangeRate,
-  OETH,
-  OETHAPY,
-  OETHAddress,
   OETHBalancerMetaPoolStrategy,
   OETHCollateralDailyStat,
   OETHCurveLP,
   OETHDailyStat,
   OETHDripper,
   OETHFraxStaking,
-  OETHHistory,
   OETHMorphoAave,
   OETHStrategyDailyStat,
   OETHStrategyHoldingDailyStat,
   OETHVault,
+  OToken,
+  OTokenAPY,
+  OTokenAddress,
+  OTokenHistory,
 } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OETH_ADDRESS } from '@utils/addresses'
 import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)
@@ -76,7 +77,7 @@ export const process = async (ctx: Context) => {
       Entity: OETHDailyStat,
       coinId: 'origin-ether',
       startTimestamp: Date.UTC(2023, 4, 17),
-      vsCurrency: 'eth'
+      vsCurrency: 'eth',
     })) as OETHDailyStat[]
     const existingIds = dailyStats.map((stat) => stat.id)
     dailyStats.push(
@@ -97,6 +98,14 @@ async function updateDailyStats(ctx: Context, date: Date) {
     where: { timestamp: LessThanOrEqual(date) },
     order: { timestamp: 'desc' as FindOptionsOrderValue },
   }
+  const otokenQueryParams = {
+    ...queryParams,
+    where: {
+      chainId: ctx.chain.id,
+      otoken: OETH_ADDRESS,
+      ...queryParams.where,
+    },
+  }
 
   const [
     lastApy,
@@ -112,8 +121,8 @@ async function updateDailyStats(ctx: Context, date: Date) {
     lastWrappedOETHHistory,
     holdersOverThreshold,
   ] = await Promise.all([
-    ctx.store.findOne(OETHAPY, queryParams),
-    ctx.store.findOne(OETH, queryParams),
+    ctx.store.findOne(OTokenAPY, otokenQueryParams),
+    ctx.store.findOne(OToken, otokenQueryParams),
     ctx.store.findOne(OETHCurveLP, queryParams),
     ctx.store.findOne(OETHVault, queryParams),
     ctx.store.findOne(OETHBalancerMetaPoolStrategy, queryParams),
@@ -128,14 +137,20 @@ async function updateDailyStats(ctx: Context, date: Date) {
       where: { timestamp: LessThanOrEqual(date), pair: 'ETH_sfrxETH' },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
-    ctx.store.findOne(OETHHistory, {
+    ctx.store.findOne(OTokenHistory, {
       where: {
+        chainId: ctx.chain.id,
+        otoken: OETH_ADDRESS,
         timestamp: LessThanOrEqual(date),
-        address: { id: '0xdcee70654261af21c44c093c300ed3bb97b78192' },
+        address: { address: '0xdcee70654261af21c44c093c300ed3bb97b78192' },
       },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
-    ctx.store.countBy(OETHAddress, { balance: MoreThanOrEqual(10n ** 17n) }),
+    ctx.store.countBy(OTokenAddress, {
+      chainId: ctx.chain.id,
+      otoken: OETH_ADDRESS,
+      balance: MoreThanOrEqual(10n ** 17n),
+    }),
   ])
 
   // Do we have any useful data yet?
@@ -417,8 +432,8 @@ SELECT '1 day' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM oeth_rebase
-WHERE timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3' AND timestamp BETWEEN ($1::timestamp - interval '1 day') AND $1::timestamp
 
 UNION ALL
 
@@ -429,8 +444,8 @@ SELECT '7 days' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM oeth_rebase
-WHERE timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3' AND timestamp BETWEEN ($1::timestamp - interval '7 days') AND $1::timestamp
 
 UNION ALL
 
@@ -441,6 +456,6 @@ SELECT 'all time' as period,
   SUM(fee_eth) as total_fees_eth,
   SUM(yield_eth - fee_eth) as total_yield_eth
 
-FROM oeth_rebase
-WHERE timestamp <= $1::timestamp
+FROM o_token_rebase
+WHERE chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3' AND timestamp <= $1::timestamp
 `

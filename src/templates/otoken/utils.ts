@@ -5,12 +5,9 @@ import { LessThan, MoreThanOrEqual } from 'typeorm'
 import * as otoken from '@abi/otoken'
 import {
   ExchangeRate,
-  OETHAPY,
-  OETHAddress,
-  OETHRebase,
-  OUSDAPY,
-  OUSDAddress,
-  OUSDRebase,
+  OTokenAPY,
+  OTokenAddress,
+  OTokenRebase,
   RebasingOption,
 } from '@model'
 import { Context } from '@processor'
@@ -21,9 +18,12 @@ dayjs.extend(utc)
 /**
  * Create a new Address entity
  */
-export async function createAddress<
-  T extends typeof OETHAddress | typeof OUSDAddress,
->(entity: T, ctx: Context, addr: string, lastUpdated?: Date) {
+export async function createAddress(
+  ctx: Context,
+  otoken: string,
+  addr: string,
+  lastUpdated?: Date,
+) {
   let isContract: boolean = false
   if (addr !== '0x0000000000000000000000000000000000000000') {
     isContract =
@@ -31,8 +31,11 @@ export async function createAddress<
   }
 
   // ctx.log.info(`New address ${rawAddress}`);
-  return new entity({
-    id: addr,
+  return new OTokenAddress({
+    id: `${ctx.chain.id}-${otoken}-${addr}`, // TODO: this change likely affects other behavior
+    chainId: ctx.chain.id,
+    otoken,
+    address: addr,
     balance: 0n,
     earned: 0n,
     credits: 0n,
@@ -45,14 +48,10 @@ export async function createAddress<
 /**
  * Create Rebase entity and set APY
  */
-export async function createRebaseAPY<
-  TOTokenAPY extends typeof OETHAPY | typeof OUSDAPY,
-  TOTokenRebase extends typeof OETHRebase | typeof OUSDRebase,
->(
-  OTokenAPY: TOTokenAPY,
-  OTokenRebase: TOTokenRebase,
+export async function createRebaseAPY(
   ctx: Context,
-  apies: InstanceType<TOTokenAPY>[],
+  otokenAddress: string,
+  apies: OTokenAPY[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
   rebaseEvent: ReturnType<
@@ -85,7 +84,9 @@ export async function createRebaseAPY<
   }
 
   const rebase = new OTokenRebase({
-    id: log.id,
+    id: `${ctx.chain.id}-${otokenAddress}-${log.id}`,
+    chainId: ctx.chain.id,
+    otoken: otokenAddress,
     blockNumber: block.header.height,
     timestamp: new Date(block.header.timestamp),
     txHash: log.transactionHash,
@@ -104,20 +105,26 @@ export async function createRebaseAPY<
 
   // get last APY to compare with current one
   let lastApy =
-    apies.find((apy) => apy.id < dateId) ??
+    apies.find((apy) => apy.date < dateId) ??
     (await ctx.store.findOne(OTokenAPY, {
-      where: { id: LessThan(dateId) },
+      where: {
+        chainId: ctx.chain.id,
+        otoken: otokenAddress,
+        date: LessThan(dateId),
+      },
       order: { id: 'DESC' },
     }))
 
   // check if there is already an APY for the current date
-  let apy: InstanceType<TOTokenAPY> | undefined = apies.find(
-    (apy) => apy.id === dateId,
-  )
+  let apy: OTokenAPY | undefined = apies.find((apy) => apy.date === dateId)
   if (!apy) {
-    apy = (await ctx.store.findOne(OTokenAPY, {
-      where: { id: dateId },
-    })) as InstanceType<TOTokenAPY>
+    apy = await ctx.store.findOne(OTokenAPY, {
+      where: {
+        chainId: ctx.chain.id,
+        otoken: otokenAddress,
+        date: dateId,
+      },
+    })
     if (apy) {
       apies.push(apy)
     }
@@ -126,12 +133,15 @@ export async function createRebaseAPY<
   // create a new APY if it doesn't exist
   if (!apy) {
     apy = new OTokenAPY({
-      id: dateId,
+      id: `${ctx.chain.id}-${otokenAddress}-${dateId}`,
+      chainId: ctx.chain.id,
+      otoken: otokenAddress,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
+      date: dateId,
       txHash: log.transactionHash,
       rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
-    }) as InstanceType<TOTokenAPY>
+    })
     apies.push(apy)
   }
 
@@ -181,7 +191,9 @@ export async function createRebaseAPY<
 
   const last30daysAPYs = await ctx.store.find(OTokenAPY, {
     where: {
-      id: MoreThanOrEqual(last30daysDateId.value),
+      chainId: ctx.chain.id,
+      otoken: otokenAddress,
+      date: MoreThanOrEqual(last30daysDateId.value),
     },
     order: { id: 'asc' },
   })

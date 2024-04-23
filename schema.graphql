@@ -280,98 +280,6 @@ type BridgeTransferState @entity {
   txHash: String! @index
   state: Int!
 }
-"""
-The OETH entity tracks the change in total supply of OETH over time.
-"""
-type OETH @entity {
-  id: ID! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  totalSupply: BigInt!
-  rebasingSupply: BigInt!
-  nonRebasingSupply: BigInt!
-}
-
-type OETHAsset @entity {
-  id: ID! @index
-  address: String! @index
-  symbol: String!
-}
-
-"""
-The OETH balance, history and other information for a given address.
-"""
-type OETHAddress @entity {
-  id: ID! @index
-  isContract: Boolean!
-  rebasingOption: RebasingOption!
-  balance: BigInt!
-  earned: BigInt!
-  credits: BigInt!
-  lastUpdated: DateTime!
-  history: [OETHHistory!]! @derivedFrom(field: "address")
-}
-
-"""
-The History entity tracks events that change the balance of OETH for an address.
-"""
-type OETHHistory @entity {
-  id: ID!
-  address: OETHAddress! @index
-  value: BigInt!
-  balance: BigInt!
-  timestamp: DateTime!
-  blockNumber: Int! @index
-  txHash: String! @index
-  type: HistoryType!
-}
-
-"""
-The Rebase entity tracks historical rebase events on the OETH contract.
-"""
-type OETHRebase @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  totalSupply: BigInt!
-  rebasingCredits: BigInt!
-  rebasingCreditsPerToken: BigInt!
-  apy: OETHAPY!
-  feeETH: BigInt!
-  feeUSD: BigInt!
-  yieldETH: BigInt!
-  yieldUSD: BigInt!
-}
-
-"""
-The RebaseOption entity tracks historical rebase option changes by address.
-"""
-type OETHRebaseOption @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  address: OETHAddress!
-  status: RebasingOption!
-}
-
-"""
-The APY entity tracks historical APY values by day.
-"""
-type OETHAPY @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  apr: Float!
-  apy: Float!
-  apy7DayAvg: Float!
-  apy14DayAvg: Float!
-  apy30DayAvg: Float!
-  rebasingCreditsPerToken: BigInt!
-}
-
 # OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
 """
 The Vault entity tracks the OETH vault balance over time.
@@ -559,26 +467,7 @@ type OETHRewardTokenCollected @entity {
   recipient: String!
   rewardToken: String!
   amount: BigInt!
-}
-
-type OETHActivity @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  callDataLast4Bytes: String!
-  address: String
-  sighash: String
-
-  action: String
-  exchange: String
-  interface: String
-
-  fromSymbol: String
-  toSymbol: String
-  amount: BigInt
-}
-type OGV @entity {
+}type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
@@ -696,19 +585,10 @@ type OGVDailyStat @entity {
   priceUSD: Float!
   holdersOverThreshold: Int!
 }
-type OTokenVault @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  chainId: Int! @index
-  address: String! @index
-  totalValue: BigInt!
-}
-"""
-The OUSD entity tracks the change in total supply of OUSD over time.
-"""
-type OUSD @entity {
+type OToken @entity {
   id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   totalSupply: BigInt!
@@ -716,32 +596,33 @@ type OUSD @entity {
   nonRebasingSupply: BigInt!
 }
 
-type OUSDAsset @entity {
+type OTokenAsset @entity {
   id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
   address: String! @index
   symbol: String!
 }
 
-"""
-The OUSD balance, history and other information for a given address.
-"""
-type OUSDAddress @entity {
+type OTokenAddress @entity {
   id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
+  address: String! @index
   isContract: Boolean!
   rebasingOption: RebasingOption!
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
   lastUpdated: DateTime!
-  history: [OUSDHistory!]! @derivedFrom(field: "address")
+  history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
 
-"""
-The History entity tracks events that change the balance of OUSD for an address.
-"""
-type OUSDHistory @entity {
+type OTokenHistory @entity {
   id: ID!
-  address: OUSDAddress! @index
+  chainId: Int! @index
+  otoken: String! @index
+  address: OTokenAddress! @index
   value: BigInt!
   balance: BigInt!
   timestamp: DateTime!
@@ -750,44 +631,42 @@ type OUSDHistory @entity {
   type: HistoryType!
 }
 
-"""
-The Rebase entity tracks historical rebase events on the OUSD contract.
-"""
-type OUSDRebase @entity {
+type OTokenRebase @entity {
   id: ID!
+  chainId: Int! @index
+  otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index
   totalSupply: BigInt!
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
-  apy: OUSDAPY!
+  apy: OTokenAPY!
   feeETH: BigInt!
   feeUSD: BigInt!
   yieldETH: BigInt!
   yieldUSD: BigInt!
 }
 
-"""
-The RebaseOption entity tracks historical rebase option changes by address.
-"""
-type OUSDRebaseOption @entity {
+type OTokenRebaseOption @entity {
   id: ID!
+  chainId: Int! @index
+  otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index
-  address: OUSDAddress!
+  address: OTokenAddress!
   status: RebasingOption!
 }
 
-"""
-The APY entity tracks historical APY values by day.
-"""
-type OUSDAPY @entity {
+type OTokenAPY @entity {
   id: ID!
+  chainId: Int! @index
+  otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index
+  date: String! @index
   apr: Float!
   apy: Float!
   apy7DayAvg: Float!
@@ -796,6 +675,35 @@ type OUSDAPY @entity {
   rebasingCreditsPerToken: BigInt!
 }
 
+type OTokenVault @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  totalValue: BigInt!
+}
+
+type OTokenActivity @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  callDataLast4Bytes: String!
+  address: String
+  sighash: String
+
+  action: String
+  exchange: String
+  interface: String
+
+  fromSymbol: String
+  toSymbol: String
+  amount: BigInt
+}
 """
 The Vault entity tracks the OUSD vault balance over time.
 """
@@ -887,24 +795,6 @@ type OUSDConvexLUSDPlus3Crv @entity {
   dai: BigInt!
   usdt: BigInt!
   usdc: BigInt!
-}
-
-type OUSDActivity @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  callDataLast4Bytes: String!
-  address: String
-  sighash: String
-
-  action: String
-  exchange: String
-  interface: String
-
-  fromSymbol: String
-  toSymbol: String
-  amount: BigInt
 }
 
 type OUSDDailyStat @entity {

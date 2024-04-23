@@ -1,17 +1,22 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
 
-/**
- * The APY entity tracks historical APY values by day.
- */
 @Entity_()
-export class OETHAPY {
-    constructor(props?: Partial<OETHAPY>) {
+export class OTokenAPY {
+    constructor(props?: Partial<OTokenAPY>) {
         Object.assign(this, props)
     }
 
     @PrimaryColumn_()
     id!: string
+
+    @Index_()
+    @Column_("int4", {nullable: false})
+    chainId!: number
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    otoken!: string
 
     @Index_()
     @Column_("timestamp with time zone", {nullable: false})
@@ -24,6 +29,10 @@ export class OETHAPY {
     @Index_()
     @Column_("text", {nullable: false})
     txHash!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    date!: string
 
     @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
     apr!: number
