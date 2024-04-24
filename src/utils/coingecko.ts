@@ -3,6 +3,7 @@ import { parseEther } from 'viem'
 
 import { OETHDailyStat, OGVDailyStat, OUSDDailyStat } from '@model'
 import { Context } from '@processor'
+import { queryClient } from '@utils/queryClient'
 import { EntityClassT } from '@utils/type'
 
 type DailyStat =
@@ -79,13 +80,6 @@ export async function applyCoingeckoData(
     startTimestamp?: number
   },
 ) {
-  // Avoid rate limit issues in Coingecko by only running once every 20 blocks.
-  if (
-    ctx.blocks.length < 20 &&
-    !ctx.blocks.find((b) => b.header.height % 20 === 0)
-  ) {
-    return []
-  }
   const { Entity } = props
 
   const updatedStats = []
@@ -110,33 +104,40 @@ export async function applyCoingeckoData(
     console.log(`Found ${statsWithNoPrice.length} stats with no price`)
     // console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
     const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=${vsCurrency}&days=365&interval=daily&precision=18`
-    const coingeckoResponse = await fetch(coingeckoURL)
-    if (coingeckoResponse.status === 429) {
-      console.log('Coingecko rate limited')
-    } else {
-      const coingeckoJson = await coingeckoResponse.json()
-      if (!coingeckoJson) {
-        console.log('Could not fetch coingecko data')
-      } else {
-        console.log('Coingecko rates received OK')
-        const coingeckData = processCoingeckoData(coingeckoJson)
-        for (const dayId in coingeckData) {
-          const stat = statsWithNoPrice.find((s) => s.id === dayId) as
-            | OETHDailyStat
-            | OUSDDailyStat
-            | OGVDailyStat
-          const day = coingeckData[dayId]
+    const coingeckoJson = await queryClient.fetchQuery({
+      queryKey: [coingeckoURL],
+      queryFn: async () => {
+        const response = await fetch(coingeckoURL)
+        if (response.status === 429) {
+          throw new Error('Coingecko rate limited')
+        }
+        return await response.json()
+      },
 
-          if (stat && day.prices) {
-            stat.tradingVolumeUSD = day.total_volumes || 0
-            stat.marketCapUSD = day.market_caps || 0
-            if (stat instanceof OGVDailyStat) {
-              stat.priceUSD = day.prices
-            } else {
-              stat.pegPrice = parseEther(String(day.prices))
-            }
-            updatedStats.push(stat)
+      staleTime: 600_000, // 10 minutes
+    })
+
+    if (!coingeckoJson) {
+      console.log('Could not fetch coingecko data')
+    } else {
+      console.log('Coingecko rates received OK')
+      const coingeckData = processCoingeckoData(coingeckoJson)
+      for (const dayId in coingeckData) {
+        const stat = statsWithNoPrice.find((s) => s.id === dayId) as
+          | OETHDailyStat
+          | OUSDDailyStat
+          | OGVDailyStat
+        const day = coingeckData[dayId]
+
+        if (stat && day.prices) {
+          stat.tradingVolumeUSD = day.total_volumes || 0
+          stat.marketCapUSD = day.market_caps || 0
+          if (stat instanceof OGVDailyStat) {
+            stat.priceUSD = day.prices
+          } else {
+            stat.pegPrice = parseEther(String(day.prices))
           }
+          updatedStats.push(stat)
         }
       }
     }

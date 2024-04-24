@@ -1,7 +1,7 @@
 import 'tsconfig-paths/register'
 
 import { run } from '@processor'
-import * as exchangeRates from '@shared/post-processors/exchange-rates'
+import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 
 import * as dailyStats from './ousd/post-processors/daily-stats'
@@ -14,8 +14,12 @@ import * as validateOusd from './ousd/validators/validate-ousd'
 export const processor = {
   stateSchema: 'ousd-processor',
   processors: [ousd, strategies, curve, ...erc20s],
-  postProcessors: [exchangeRates, dailyStats, processStatus('ousd')],
-  validators: [],
+  postProcessors: [
+    exchangeRatesPostProcessor,
+    dailyStats,
+    processStatus('ousd'),
+  ],
+  validators: [validateOusd],
 }
 export default processor
 

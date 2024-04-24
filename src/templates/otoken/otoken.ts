@@ -295,7 +295,7 @@ export const createOTokenProcessor = (params: {
           new OTokenHistory({
             // we can't use {t.id} because it's not unique
             id: getUniqueId(
-              `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.id}`,
+              `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`,
             ),
             chainId: ctx.chain.id,
             otoken: params.otokenAddress,
@@ -458,7 +458,7 @@ export const createOTokenProcessor = (params: {
       result.history.push(
         new OTokenHistory({
           id: getUniqueId(
-            `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.id}`,
+            `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`,
           ),
           // we can't use {t.id} because it's not unique
           chainId: ctx.chain.id,

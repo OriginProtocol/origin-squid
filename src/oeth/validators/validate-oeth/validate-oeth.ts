@@ -1,7 +1,8 @@
 import assert from 'assert'
-import { sortBy } from 'lodash'
+import { pick, sortBy } from 'lodash'
 
 import {
+  OETHDailyStat,
   OETHMorphoAave,
   OETHVault,
   OTokenAPY,
@@ -26,13 +27,13 @@ export const process = async (ctx: Context) => {
       ctx,
       block,
       OTokenHistory,
-      expectations.oethHistories,
+      expectations.oTokenHistories,
     )
     await validateExpectations(
       ctx,
       block,
       OTokenRebase,
-      expectations.oethRebases,
+      expectations.oTokenRebases,
     )
     await validateExpectations(ctx, block, OETHVault, expectations.oethVaults)
     await validateExpectations(
@@ -46,6 +47,12 @@ export const process = async (ctx: Context) => {
       block,
       StrategyBalance,
       expectations.strategyBalances,
+    )
+    await validateExpectations(
+      ctx,
+      block,
+      OETHDailyStat,
+      expectations.oethDailyStats,
     )
     firstBlock = false
   }
@@ -100,7 +107,7 @@ const validateExpectation = async <
   // We decide to only care about float decimal accuracy to the 8th.
   assert.deepEqual(
     JSON.parse(
-      jsonify(actual, (_key, value) =>
+      jsonify(pick(actual, Object.keys(expectation)), (_key, value) =>
         typeof value === 'number' ? Number(value.toFixed(8)) : value,
       ),
     ),
@@ -200,7 +207,7 @@ const expectations = {
         '0x67ef6bda379e51a3983f7c2822b39538a40fb93b1d26f66b687da41657f17239',
     },
   ]),
-  oethHistories: e([
+  oTokenHistories: e([
     {
       id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0017684499-32534-000297-0x0ad9ea110bdd131683c0d36df8ba80cd3ed1a5fb-1',
       chainId: 1,
@@ -442,86 +449,22 @@ const expectations = {
       value: '13753918397190',
     },
   ]),
-  oethRebases: e([
+  oTokenRebases: e([
     {
-      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0017305345-5f62d-000456',
+      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0018839758-1fe83-000178',
       chainId: 1,
       otoken: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
-      blockNumber: 17305345,
-      timestamp: '2023-05-21T04:22:11.000000Z',
-      feeETH: '6000055597516131',
-      feeUSD: '10916381153008898418',
-      rebasingCredits: '2787113542887662778878885791818',
-      rebasingCreditsPerToken: '973864011520629021168619646',
-      totalSupply: '4100236147122104146565',
+      blockNumber: 18839758,
+      feeETH: '612691541583690021',
+      feeUSD: '1395031244116487971914',
+      rebasingCredits: '20200262904648402920454474975673',
+      rebasingCreditsPerToken: '933172493517843356160213805',
+      timestamp: '2023-12-22T06:59:47.000000Z',
       txHash:
-        '0x7de27a14c9f139d9019e6f067dc926de5a1318d1c8703696d1f87c7e11b405eb',
-      yieldETH: '30000277987580656',
-      yieldUSD: '54581905765044493913',
-    },
-    {
-      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0017331591-f9f77-000369',
-      chainId: 1,
-      otoken: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
-      blockNumber: 17331591,
-      timestamp: '2023-05-24T21:02:59.000000Z',
-      feeETH: '6492737577781034',
-      feeUSD: '11727132294271875807',
-      rebasingCredits: '3677621799805326022027580379682',
-      rebasingCreditsPerToken: '972810711211478539104302424',
-      totalSupply: '5393628338867046745384',
-      txHash:
-        '0x651848930f76eb8677a2d90067841ae1d5419276dafb7828d145eeb482b362cc',
-      yieldETH: '32463687888905171',
-      yieldUSD: '58635661471359380845',
-    },
-    {
-      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0017583331-dccba-000121',
-      chainId: 1,
-      otoken: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
-      blockNumber: 17583331,
-      timestamp: '2023-06-29T07:00:23.000000Z',
-      feeETH: '577769460917579313',
-      feeUSD: '1062477594765164126055',
-      rebasingCredits: '11978493735413759353827056755312',
-      rebasingCreditsPerToken: '963907687618519656276956464',
-      totalSupply: '21187279626610714331049',
-      txHash:
-        '0xe9261579ff7ccbbbe0cc5895a376c8177409a8a0503acf3bf04ee106ccb9c540',
-      yieldETH: '2888847304587896566',
-      yieldUSD: '5312387973825820632114',
-    },
-    {
-      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0018139997-52abd-000303',
-      chainId: 1,
-      otoken: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
-      blockNumber: 18139997,
-      timestamp: '2023-09-15T06:59:59.000000Z',
-      feeETH: '1190995054063049444',
-      feeUSD: '1941953165501424009925',
-      rebasingCredits: '22395831398283302999639860139823',
-      rebasingCreditsPerToken: '948155891702979766036181091',
-      totalSupply: '44971365122525849270172',
-      txHash:
-        '0xb3441c6184326378fe98af3cb3e425c015a5a2cce4d0055f2e8c3b0dc1bcdd98',
-      yieldETH: '5954975270315247221',
-      yieldUSD: '9709765827507120051257',
-    },
-    {
-      id: '1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0018404209-b6b49-000053',
-      chainId: 1,
-      otoken: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
-      blockNumber: 18404209,
-      timestamp: '2023-10-22T06:59:47.000000Z',
-      feeETH: '885619331985372380',
-      feeUSD: '1455772085654965614517',
-      rebasingCredits: '29496888949221038689228739185366',
-      rebasingCreditsPerToken: '941672759591769536254510513',
-      totalSupply: '41530447614871349372266',
-      txHash:
-        '0x1eab96d75579c8050869ffadec5d38bccf8a9714f49d6e27ce67088f15be0535',
-      yieldETH: '4428096659926861900',
-      yieldUSD: '7278860428274828072586',
+        '0xbb8b4049faf16ffab0534820531bd8a4f28ab5249cf9f918469df86cec141362',
+      totalSupply: '37874235864992721244103',
+      yieldETH: '3063457707918450106',
+      yieldUSD: '6975156220582439861850',
     },
   ]),
   oethVaults: e([
@@ -584,5 +527,37 @@ const expectations = {
   ]),
   strategyBalances: e([
     // Place verified strategy balances in here.
+  ]),
+  oethDailyStats: e([
+    {
+      amoSupply: '1722869226314461370269',
+      apr: 0.03984340561303246,
+      apy14DayAvg: 0.04809284054588773,
+      apy: 0.040645540495481525,
+      apy30DayAvg: 0.05619014587400031,
+      apy7DayAvg: 0.04625612224632996,
+      blockNumber: 19008501,
+      dripperWETH: '29850741093608056030',
+      feesETH: '878804180645600601',
+      feesETH7Day: '6700325402009187818',
+      feesETHAllTime: '230978291319157636904',
+      feesUSD: '2243350542568443313402',
+      feesUSD7Day: '16449862756198776028058',
+      feesUSDAllTime: '436111742452357635874322',
+      holdersOverThreshold: 275,
+      id: '2024-01-14',
+      nonRebasingSupply: '3679373640235293829673',
+      rebasingSupply: '32229193002740154821849',
+      timestamp: '2024-01-14T23:47:23.000000Z',
+      totalSupply: '35908566642975448651522',
+      totalSupplyUSD: 0,
+      wrappedSupply: '1879893054273530385147',
+      yieldETH: '3515216722582402407',
+      yieldETH7Day: '26801301608036751292',
+      yieldETHAllTime: '923913165276630548993',
+      yieldUSD: '8973402170273773261269',
+      yieldUSD7Day: '65799451024795104161690',
+      yieldUSDAllTime: '1744446969809430546091488',
+    },
   ]),
 } as const

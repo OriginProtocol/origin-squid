@@ -156,24 +156,9 @@ type OETHStrategyHoldingDailyStat @entity {
 type OETHCollateralDailyStat @entity {
   id: ID!
   dailyStatId: OETHDailyStat! @index
-  """
-  Token symbol
-  """
   symbol: String!
-
-  """
-  Amount held
-  """
   amount: BigInt!
-
-  """
-  Price in ETH
-  """
   price: BigInt!
-
-  """
-  Total ETH value
-  """
   value: BigInt!
 }
 

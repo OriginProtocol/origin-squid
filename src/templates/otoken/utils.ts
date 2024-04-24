@@ -11,6 +11,7 @@ import {
   RebasingOption,
 } from '@model'
 import { Context } from '@processor'
+import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { calculateAPY } from '@utils/calculateAPY'
 
 dayjs.extend(utc)
@@ -71,7 +72,7 @@ export async function createRebaseAPY(
   const generateId = (date: dayjs.Dayjs | string | Date | number) =>
     dayjs.utc(date).toISOString().substring(0, 10)
 
-  if (OTokenAPY.name === 'OUSDAPY') {
+  if (OUSD_STABLE_OTOKENS.includes(otokenAddress)) {
     feeUSD = lastYieldDistributionEvent.fee
     yieldUSD = lastYieldDistributionEvent.yield
     feeETH = (feeUSD * 1000000000000000000n) / rate / 10000000000n

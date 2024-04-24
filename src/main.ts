@@ -8,8 +8,8 @@ import oeth from './main-oeth'
 import ogv from './main-ogv'
 import ousd from './main-ousd'
 
-// run(mainnet)
-// run(arbitrum)
+run(mainnet)
+run(arbitrum)
 run(oeth)
 // run(ogv)
 run(ousd)

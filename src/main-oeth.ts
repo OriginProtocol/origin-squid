@@ -36,7 +36,7 @@ export const processor = {
     dailyStats,
     processStatus('oeth'),
   ],
-  validators: [],
+  validators: [validateOeth],
 }
 export default processor
 
