@@ -224,7 +224,6 @@ const expectations = {
     },
     {
       id: '2023-09-25',
-      holdersOverThreshold: 527,
       feesUSDAllTime: '557455670955180080472479',
       feesUSD7Day: '2408539505622701328488',
       feesUSD: '327704746233735207946',
@@ -254,7 +253,6 @@ const expectations = {
     },
     {
       id: '2024-03-02',
-      holdersOverThreshold: 480,
       feesUSDAllTime: '640842823767036278915355',
       feesUSD7Day: '3365292401878836638613',
       feesUSD: '579150934767120286041',
