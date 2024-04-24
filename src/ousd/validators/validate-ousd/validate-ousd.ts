@@ -178,19 +178,17 @@ const expectations = {
   oTokenRebases: e([
     {
       id: '1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-0014883457-a66bb-000005',
-      chainId: 1,
-      otoken: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
       blockNumber: 14883457,
-      feeETH: '346263724854739034559',
-      feeUSD: '670496543700164855741218',
+      feeETH: '178820559593958335',
+      feeUSD: '346263724854739034559',
       rebasingCredits: '28313629639061008328884206782869381',
       rebasingCreditsPerToken: '793786451700174206240401619',
       timestamp: '2022-06-01T06:59:39.000000Z',
       txHash:
         '0xca8bb9f49e9135e81cb7f8c0876bfdce54352bbf45ceeda567144ca488ec1df5',
       totalSupply: '63608906999875802980711462',
-      yieldETH: '3462637248547390345598',
-      yieldUSD: '6704965437001648557427672',
+      yieldETH: '1788205595939583356',
+      yieldUSD: '3462637248547390345598',
     },
   ]),
   ousdDailyStats: e([
