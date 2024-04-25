@@ -1,0 +1,537 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 32,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "panels": [],
+      "title": "LST Details",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "For details on what this is comprised of, see below.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "10.3.0-64399",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "with balances as (\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token3 as token,\n        pb.balance3 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_a as token,\n        pb.bin_balance_a / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_b as token,\n        pb.bin_balance_b / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n),\n     pathways as (\n    select\n        b_entry.time,\n        b_entry.address,\n        b_entry.name,\n        b_entry.token as entry_token,\n        b_entry.balance as entry_balance,\n        b_exit.token as exit_token,\n        b_exit.balance as exit_balance\n    from balances b_entry\n    inner join balances b_exit\n            on b_entry.time = b_exit.time and b_entry.address = b_exit.address and b_entry.token != b_exit.token\n),\n     result as (\n    select\n        date(p.time) as time,\n        ls.type,\n        ls.address,\n        p.name,\n        p.entry_token,\n        entry_a.symbol as entry_symbol,\n        p.entry_balance,\n        p.exit_token,\n        exit_a.symbol as exit_symbol,\n        p.exit_balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY ls.type, ls.address, p.name, entry_a.symbol, exit_a.symbol, DATE(p.time) ORDER BY p.time DESC) as rn\n    from liquidity_source ls\n    inner join pathways p\n            on (ls.token = p.entry_token or ls.token = p.exit_token) and p.address = ls.address\n    inner join oeth_asset entry_a\n            on entry_a.address = p.entry_token\n    inner join oeth_asset exit_a\n            on exit_a.address = p.exit_token\n)\n\nselect\n    time,\n    case\n        when exit_symbol = 'WETH' then 'ETH/WETH'\n        when exit_symbol = 'ETH' then 'ETH/WETH'\n        else exit_symbol end as symbol,\n    sum(exit_balance) as balance\nfrom result\nwhere rn = 1 and $__timeFilter(time) \ngroup by time, symbol\norder by time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "LST Liquidity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "10.3.0-64399",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "with balances as (\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token3 as token,\n        pb.balance3 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_a as token,\n        pb.bin_balance_a / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_b as token,\n        pb.bin_balance_b / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n),\n     pathways as (\n    select\n        b_entry.time,\n        b_entry.address,\n        b_entry.name,\n        b_entry.token as entry_token,\n        b_entry.balance as entry_balance,\n        b_exit.token as exit_token,\n        b_exit.balance as exit_balance\n    from balances b_entry\n    inner join balances b_exit\n            on b_entry.time = b_exit.time and b_entry.address = b_exit.address and b_entry.token != b_exit.token\n),\n     result as (\n    select\n        date(p.time) as time,\n        ls.type,\n        ls.address,\n        p.name,\n        p.entry_token,\n        entry_a.symbol as entry_symbol,\n        p.entry_balance,\n        p.exit_token,\n        exit_a.symbol as exit_symbol,\n        p.exit_balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY ls.type, ls.address, p.name, entry_a.symbol, exit_a.symbol, DATE(p.time) ORDER BY p.time DESC) as rn\n    from liquidity_source ls\n    inner join pathways p\n            on (ls.token = p.entry_token or ls.token = p.exit_token) and p.address = ls.address\n    inner join oeth_asset entry_a\n            on entry_a.address = p.entry_token\n    inner join oeth_asset exit_a\n            on exit_a.address = p.exit_token\n),\n     totals as (\n    select\n        date(time) as time,\n        sum(exit_balance) as total\n    from result\n    where rn = 1\n    group by date(time)\n)\n\n\nselect\n    result.time,\n    case\n        when exit_symbol = 'WETH' then 'ETH/WETH'\n        when exit_symbol = 'ETH' then 'ETH/WETH'\n        else exit_symbol end as symbol,\n    sum(exit_balance) / total as \"%\"\nfrom result\ninner join totals\n        on result.time = totals.time\nwhere rn = 1 and $__timeFilter(result.time) \ngroup by result.time,\n         symbol,\n         totals.total\norder by time",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "LST Liquidity %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "address"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*_balance/"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 18,
+        "x": 0,
+        "y": 10
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "with balances as (\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from curve_pool p\n    inner join curve_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token0 as token,\n        pb.balance0 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token1 as token,\n        pb.balance1 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token2 as token,\n        pb.balance2 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token3 as token,\n        pb.balance3 / 1e18 as balance\n    from balancer_pool p\n    inner join balancer_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_a as token,\n        pb.bin_balance_a / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n    union all\n    select\n        pb.timestamp as time,\n        pb.address,\n        p.name,\n        p.token_b as token,\n        pb.bin_balance_b / 1e18 as balance\n    from maverick_pool p\n    inner join maverick_pool_balance pb\n            on p.address = pb.address\n),\n     pathways as (\n    select\n        b_entry.time,\n        b_entry.address,\n        b_entry.name,\n        b_entry.token as left_token,\n        b_entry.balance as left_balance,\n        b_exit.token as right_token,\n        b_exit.balance as right_balance\n    from balances b_entry\n    inner join balances b_exit\n            on b_entry.time = b_exit.time and b_entry.address = b_exit.address and b_entry.token != b_exit.token\n),\n     result as (\n    select\n        p.time,\n        ls.type,\n        ls.address,\n        p.name,\n        p.left_token,\n        left_a.symbol as left_symbol,\n        p.left_balance,\n        p.right_token,\n        right_a.symbol as right_symbol,\n        p.right_balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY ls.type, ls.address, p.name, left_a.symbol, right_a.symbol, DATE(p.time) ORDER BY p.time DESC) as rn\n    from liquidity_source ls\n    inner join pathways p\n            on (ls.token = p.left_token or ls.token = p.right_token) and p.address = ls.address\n    inner join oeth_asset left_a\n            on left_a.address = p.left_token\n    inner join oeth_asset right_a\n            on right_a.address = p.right_token\n)\n\nselect\n    left_symbol,\n    left_balance,\n    right_symbol,\n    right_balance,\n    type,\n    name,\n    address\nfrom result\nwhere rn = 1\n  and date(time) = current_date\n  and left_symbol not in ('WETH', 'ETH', 'OETH')\norder by left_symbol, right_symbol, address",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Liquidity By Pool",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 6,
+        "x": 18,
+        "y": 10
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "select\n  ls.address,\n  type,\n  symbol\nfrom\n  liquidity_source ls\n  inner join oeth_asset oa on ls.token = oa.address\norder by ls.type, ls.address, symbol",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Liquidity Sources",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ac0aaf4a-7c06-46fe-a735-3cd43be451a8"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 5,
+      "options": {
+        "infinitePan": false,
+        "inlineEditing": true,
+        "panZoom": false,
+        "showAdvancedTypes": true
+      },
+      "pluginVersion": "11.1.0-69622",
+      "type": "canvas"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timeRangeUpdatedDuringEditOrView": false,
+  "timepicker": {},
+  "timezone": "",
+  "title": "OETH Liquidity",
+  "uid": "e45f1fdb-43f2-43b5-b6ce-2a41fda42796",
+  "version": 14,
+  "weekStart": ""
+}

@@ -24,21 +24,151 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 18,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "collapsed": false,
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "id": 47,
+      "panels": [],
+      "title": "OUSD Health",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "Retrieved using `get_dy(a, b, decimals)`",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line+area"
+            }
+          },
+          "decimals": 5,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": 0.996
+              },
+              {
+                "color": "dark-red",
+                "value": 1.004
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 0,
+        "y": 1
+      },
+      "id": 48,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "select\n  timestamp as time,\n  name,\n  rate / 1e18\nfrom\n  curve_pool_rate\nwhere\n  address = '0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7'\n  and $__timeFilter(timestamp)\n  and timestamp > '2021-02-01'\norder by\n  time asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "ThreePool Rates - get_dy(a, b, decimals)",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
       },
       "id": 8,
       "panels": [],
@@ -46,7 +176,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -56,8 +186,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -65,6 +195,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -116,7 +247,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 11
       },
       "id": 2,
       "options": {
@@ -135,14 +266,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  dai / 1000000000000000000 as dai,\n  usdc / 1000000000000000000 as usdc,\n  usdt / 1000000000000000000 as usdt\nFROM ousd_vault\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  dai / 1000000000000000000 as dai,\n  usdc / 1000000000000000000 as usdc,\n  usdt / 1000000000000000000 as usdt\nFROM ousd_vault\n  where $__timeFilter(timestamp)\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -212,8 +343,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -221,6 +352,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisGridShow": true,
@@ -277,7 +409,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 11
       },
       "id": 4,
       "options": {
@@ -296,14 +428,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  total_supply / 1e18 as total_supply,\n  rebasing_supply / 1e18 as rebasing_supply,\n  non_rebasing_supply / 1e18 as non_rebasing_supply\nFROM ousd\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  total_supply / 1e18 as total_supply,\n  rebasing_supply / 1e18 as rebasing_supply,\n  non_rebasing_supply / 1e18 as non_rebasing_supply\nFROM o_token\nWHERE\n  $__timeFilter(\"timestamp\") and chain_id = 1 and otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -365,8 +497,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -374,6 +506,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -452,7 +585,7 @@
         "h": 12,
         "w": 22,
         "x": 0,
-        "y": 10
+        "y": 20
       },
       "id": 6,
       "options": {
@@ -473,14 +606,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy7_day_avg,\n  apy14_day_avg,\n  apy30_day_avg,\n  apy\nFROM ousdapy\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy7_day_avg,\n  apy14_day_avg,\n  apy30_day_avg,\n  apy\nFROM o_token_apy\nWHERE\n  $__timeFilter(\"timestamp\") and chain_id = 1 and otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -550,8 +683,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -580,7 +713,7 @@
         "h": 12,
         "w": 2,
         "x": 22,
-        "y": 10
+        "y": 20
       },
       "id": 39,
       "options": {
@@ -595,19 +728,21 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.1.1",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "select timestamp as time, apy, apy7_day_avg, apy14_day_avg, apy30_day_avg from ousdapy order by id desc limit 1",
+          "rawSql": "select timestamp as time, apy, apy7_day_avg, apy14_day_avg, apy30_day_avg from o_token_apy where chain_id = 1 and otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86' order by id desc limit 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -633,8 +768,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -642,6 +777,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -697,7 +833,7 @@
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 22
+        "y": 32
       },
       "id": 38,
       "options": {
@@ -716,14 +852,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  yield / 1e18 as yield\nFROM ousd_rebase\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  yield_usd / 1e18 as yield\nFROM o_token_rebase\nWHERE\n  $__timeFilter(\"timestamp\") and chain_id = 1 and otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -777,13 +913,12 @@
         }
       ],
       "title": "Yield Accrual",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -791,6 +926,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -846,7 +982,7 @@
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 22
+        "y": 32
       },
       "id": 37,
       "options": {
@@ -865,14 +1001,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  fee / 1e18 as fee\nFROM ousd_rebase\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  fee_usd / 1e18 as fee\nFROM o_token_rebase\nWHERE\n  $__timeFilter(\"timestamp\") and chain_id = 1 and otoken = '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -926,7 +1062,6 @@
         }
       ],
       "title": "Fee Accrual",
-      "transformations": [],
       "type": "timeseries"
     },
     {
@@ -935,7 +1070,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 43
       },
       "id": 46,
       "panels": [],
@@ -944,8 +1079,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -953,6 +1088,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1004,7 +1140,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 44
       },
       "id": 41,
       "options": {
@@ -1015,7 +1151,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1023,12 +1159,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\norder by time, asset",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\n  and $__timeFilter(timestamp)\norder by time",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1069,8 +1205,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1078,6 +1214,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1108,6 +1245,7 @@
               "mode": "off"
             }
           },
+          "decimals": 2,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1129,7 +1267,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 44
       },
       "id": 45,
       "options": {
@@ -1140,7 +1278,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1148,12 +1286,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\norder by timestamp, asset desc",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\n  and $__timeFilter(timestamp)\norder by timestamp, asset desc",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1203,8 +1341,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1212,6 +1350,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1263,7 +1402,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 52
       },
       "id": 40,
       "options": {
@@ -1274,7 +1413,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1282,12 +1421,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\norder by timestamp, asset desc",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\n  and $__timeFilter(timestamp)\norder by timestamp, asset desc",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1337,8 +1476,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1346,6 +1485,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1397,7 +1537,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 52
       },
       "id": 43,
       "options": {
@@ -1408,7 +1548,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1416,12 +1556,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\norder by timestamp, asset desc",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\n  and $__timeFilter(timestamp)\norder by timestamp, asset desc",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1471,8 +1611,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1480,6 +1620,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1531,7 +1672,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 50
+        "y": 60
       },
       "id": 44,
       "options": {
@@ -1542,7 +1683,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1550,12 +1691,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\norder by timestamp, asset desc",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\n  and $__timeFilter(timestamp)\norder by timestamp, asset desc",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1605,8 +1746,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1614,6 +1755,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -1665,7 +1807,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 50
+        "y": 60
       },
       "id": 42,
       "options": {
@@ -1676,7 +1818,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1684,12 +1826,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT \ntimestamp as time, \nasset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\norder by time, asset",
+          "rawSql": "SELECT \ntimestamp as time, \ncase asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 'DAI' \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 'USDT' \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 'USDC' \nend as asset, \nbalance / case asset \n  when '0x6b175474e89094c44da98b954eedeac495271d0f' then 1e18 \n  when '0xdac17f958d2ee523a2206206994597c13d831ec7' then 1e6 \n  when '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48' then 1e6 \nend as balance\nFROM strategy_balance where strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\n  and $__timeFilter(timestamp)\norder by time",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1729,9 +1871,8 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
-  "schemaVersion": 38,
-  "style": "dark",
+  "refresh": "",
+  "schemaVersion": 39,
   "tags": [
     "ousd"
   ],
@@ -1739,13 +1880,14 @@
     "list": []
   },
   "time": {
-    "from": "now-2y",
+    "from": "now-6M",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "OUSD Dashboard",
   "uid": "5RW4zO7Sj",
-  "version": 4,
+  "version": 33,
   "weekStart": ""
 }

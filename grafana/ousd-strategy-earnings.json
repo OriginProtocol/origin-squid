@@ -37,8 +37,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -138,12 +138,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -193,8 +193,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -337,13 +337,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x6b69b755c629590ed59618a2712d8a2957ca98fc'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -390,13 +390,12 @@
         }
       ],
       "title": "OUSD Maker DSR - APY",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -440,14 +439,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -478,8 +479,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -579,12 +580,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -634,8 +635,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -778,13 +779,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -831,13 +832,12 @@
         }
       ],
       "title": "OUSD Flux - APY",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -881,14 +881,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -919,8 +921,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1020,12 +1022,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1075,8 +1077,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1207,13 +1209,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x79f2188ef9350a1dc11a062cca0abe90684b0197'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1260,13 +1262,12 @@
         }
       ],
       "title": "OUSD Morpho Aave - APY",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1310,14 +1311,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -1348,8 +1351,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1449,12 +1452,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1504,8 +1507,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1636,13 +1639,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x5a4eee58744d1430876d5ca93cab5ccb763c037d'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1689,13 +1692,12 @@
         }
       ],
       "title": "OUSD Morpho Compound - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1739,14 +1741,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -1778,7 +1782,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1822,8 +1826,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1878,12 +1881,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1933,8 +1936,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1984,8 +1987,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2066,13 +2068,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2119,13 +2121,12 @@
         }
       ],
       "title": "OUSD Convex OUSD+3Crv (AMO) - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2137,8 +2138,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2169,14 +2169,15 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "10.3.0-63985",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -2208,7 +2209,7 @@
     {
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2252,8 +2253,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2308,12 +2308,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\norder by timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\n  and $__timeFilter(timestamp)\norder by timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2363,8 +2363,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -2413,8 +2413,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2495,13 +2494,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings_change / 1000000000000000000 as earnings_change,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x5e3646a1db86993f73e6b74a57d8640b69f7e259'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2548,13 +2547,12 @@
         }
       ],
       "title": "OUSD Aave - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2566,8 +2564,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2598,14 +2595,15 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "10.3.0-63985",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -2647,10 +2645,11 @@
     "from": "now-6M",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "OUSD Strategy Earnings",
   "uid": "f40d88db-86e6-43c6-933d-e7bc1ad5ced0",
-  "version": 25,
+  "version": 28,
   "weekStart": ""
 }
