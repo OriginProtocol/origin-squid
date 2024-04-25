@@ -30,6 +30,938 @@
         "x": 0,
         "y": 0
       },
+      "id": 43,
+      "panels": [],
+      "title": "Aggregate APY",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "apy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 44,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy\nFROM\n  oeth_daily_stat\nWHERE\n  $__timeFilter(\"timestamp\")\n  and timestamp > '2023-05-29' -- Because prior APY values mess up the chart and are *** nonsense *** to look at. \nORDER BY\n  \"timestamp\" ASC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "alias": "\"time\"",
+                "parameters": [
+                  {
+                    "name": "\"timestamp\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy7_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy14_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy30_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "\"timestamp\""
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            },
+            "orderByDirection": "ASC",
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "aa98bb98-4567-489a-bcde-f18c4a965f07",
+                  "properties": {
+                    "field": "\"timestamp\"",
+                    "fieldSrc": "field",
+                    "operator": "macros",
+                    "value": [
+                      "timeFilter"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "datetime"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "ab89ab9b-0123-4456-b89a-b18c46223bed",
+              "type": "group"
+            },
+            "whereString": "$__timeFilter(\"timestamp\")"
+          },
+          "table": "oeth_daily_stat"
+        }
+      ],
+      "title": "APY",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic",
+            "seriesBy": "last"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 2,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "apy7_day_avg"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "apy14_day_avg"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "apy30_day_avg"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 10
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy7_day_avg,\n  apy14_day_avg,\n  apy30_day_avg\nFROM\n  oeth_daily_stat\nWHERE\n  $__timeFilter(\"timestamp\")\n  and timestamp > '2023-05-29' -- Because prior APY values mess up the chart and are *** nonsense *** to look at. \nORDER BY\n  \"timestamp\" ASC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "alias": "\"time\"",
+                "parameters": [
+                  {
+                    "name": "\"timestamp\"",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy7_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy14_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "apy30_day_avg",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "orderBy": {
+              "property": {
+                "name": [
+                  "\"timestamp\""
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            },
+            "orderByDirection": "ASC",
+            "whereJsonTree": {
+              "children1": [
+                {
+                  "id": "aa98bb98-4567-489a-bcde-f18c4a965f07",
+                  "properties": {
+                    "field": "\"timestamp\"",
+                    "fieldSrc": "field",
+                    "operator": "macros",
+                    "value": [
+                      "timeFilter"
+                    ],
+                    "valueSrc": [
+                      "value"
+                    ],
+                    "valueType": [
+                      "datetime"
+                    ]
+                  },
+                  "type": "rule"
+                }
+              ],
+              "id": "ab89ab9b-0123-4456-b89a-b18c46223bed",
+              "type": "group"
+            },
+            "whereString": "$__timeFilter(\"timestamp\")"
+          },
+          "table": "oeth_daily_stat"
+        }
+      ],
+      "title": "APY Moving Averages",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 53,
+      "panels": [],
+      "title": "Distribution (wip)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "WETH includes ETH",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "id": 51,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH _daily_strategy_balance as (\n    select\n        DATE(timestamp) as date,\n        strategy,\n        case\n            when asset = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' then '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'\n            else asset end as asset,\n        balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY strategy, asset, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from strategy_balance\n    where asset in (\n        select\n            address\n        from o_token_asset\n        where symbol != 'OETH' AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    )\n),\n     _daily_exchange_rate as (\n    select\n        DATE(timestamp) as date,\n        base,\n        quote,\n        rate,\n        ROW_NUMBER()\n        OVER (PARTITION BY base, quote, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from exchange_rate\n),\n     daily_strategy_balance as (\n    select\n        b.date,\n        strategy,\n        symbol,\n        balance * (r.rate / 1e18) as balance,\n        (r.rate / 1e18) as rate\n    from _daily_strategy_balance b\n    inner join o_token_asset oa\n            on b.asset = oa.address AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    left join _daily_exchange_rate r\n            on r.date = b.date and r.base = 'ETH' and r.quote = oa.symbol and r.rn = 1\n    where b.rn = 1\n),\n     daily_total as (\n    select\n        date,\n        sum(balance) as total_balance\n    from daily_strategy_balance\n    group by date\n),\n     daily_strategy_asset_total as (\n    select\n        date,\n        symbol,\n        rate,\n        sum(balance) as asset_balance\n    from daily_strategy_balance\n    group by date, symbol, rate\n)\n\nselect\n    t.date as time,\n    -- t.total_balance,\n    case when a.symbol = 'WETH' then 'ETH / WETH' else a.symbol end as symbol,\n    -- a.asset_balance,\n    a.asset_balance / nullif(t.total_balance, 0) as \"%\"\n    -- a.rate\nfrom daily_total t\ninner join daily_strategy_asset_total a\n        on t.date = a.date\nwhere $__timeFilter(t.date) \norder by t.date asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Asset Distribution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "id": 54,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH _daily_strategy_balance as (\n    select\n        DATE(timestamp) as date,\n        case\n            when strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63' then 'AMO'\n            when strategy = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5' then 'Frax'\n            when strategy = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc' then 'Aura'\n            when strategy = '0xc1fc9e5ec3058921ea5025d703cbe31764756319' then 'Morpho Aave'\n            when strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab'\n                and asset = '0xae78736cd615f374d3085123a210448e74fc6393' then 'Vault rETH'\n            when strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab'\n                and asset = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84' then 'Vault stETH'\n            when strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab'\n                and asset = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' then 'Vault WETH'\n            else strategy\n            end as strategy,\n        asset,\n        balance,\n        ROW_NUMBER() OVER (\n            PARTITION BY strategy,\n                asset,\n                DATE(timestamp)\n            ORDER BY\n                timestamp DESC\n            ) as rn\n    from strategy_balance\n    where asset in (\n        select\n            address\n        from o_token_asset\n        where symbol != 'OETH' AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    )\n),\n     _daily_exchange_rate as (\n    select\n        DATE(timestamp) as date,\n        base,\n        quote,\n        rate,\n        ROW_NUMBER() OVER (\n            PARTITION BY base,\n                quote,\n                DATE(timestamp)\n            ORDER BY\n                timestamp DESC\n            ) as rn\n    from exchange_rate\n),\n     daily_strategy_balance as (\n    select\n        b.date,\n        strategy,\n        balance * coalesce(rate, 1e18) / 1e18 as balance\n    from _daily_strategy_balance b\n    inner join o_token_asset oa\n            on b.asset = oa.address AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    left join _daily_exchange_rate r\n            on r.date = b.date and r.base = 'ETH' and r.quote = oa.symbol and r.rn = 1\n    where b.rn = 1\n),\n     daily_total as (\n    select\n        date,\n        sum(balance) as balance\n    from daily_strategy_balance\n    group by date\n),\n     daily_per_strategy_total as (\n    select\n        date,\n        strategy,\n        sum(balance) as strategy_balance\n    from daily_strategy_balance\n    group by date,\n             strategy\n)\nselect\n    t.date as time,\n    a.strategy,\n    a.strategy_balance / nullif(t.balance, 0) as \"%\"\nfrom daily_total t\ninner join daily_per_strategy_total a\n        on t.date = a.date\nwhere $__timeFilter(t.date)\norder by t.date asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Strategy Distribution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "WETH includes ETH",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 0.7,
+            "axisSoftMin": 5,
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "area"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.05
+              },
+              {
+                "color": "red",
+                "value": 0.66
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "id": 56,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.7,
+        "colorByField": "%",
+        "fullHighlight": false,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "auto",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "none",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "10.3.0-64399",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH _daily_strategy_balance as (\n    select\n        DATE(timestamp) as date,\n        strategy,\n        case\n            when asset = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' then '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'\n            else asset end as asset,\n        balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY strategy, asset, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from strategy_balance\n    where asset in (\n        select\n            address\n        from o_token_asset\n        where symbol != 'OETH' AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    )\n),\n     _daily_exchange_rate as (\n    select\n        DATE(timestamp) as date,\n        base,\n        quote,\n        rate,\n        ROW_NUMBER()\n        OVER (PARTITION BY base, quote, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from exchange_rate\n),\n     daily_strategy_balance as (\n    select\n        b.date,\n        strategy,\n        symbol,\n        balance * (r.rate / 1e18) as balance,\n        (r.rate / 1e18) as rate\n    from _daily_strategy_balance b\n    inner join o_token_asset oa\n            on b.asset = oa.address AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    left join _daily_exchange_rate r\n            on r.date = b.date and r.base = 'ETH' and r.quote = oa.symbol and r.rn = 1\n    where b.rn = 1\n),\n     daily_total as (\n    select\n        date,\n        sum(balance) as total_balance\n    from daily_strategy_balance\n    group by date\n),\n     daily_strategy_asset_total as (\n    select\n        date,\n        symbol,\n        rate,\n        sum(balance) as asset_balance\n    from daily_strategy_balance\n    group by date, symbol, rate\n)\n\nselect\n    t.date as time,\n    -- t.total_balance,\n    case when a.symbol = 'WETH' then 'ETH / WETH' else a.symbol end as symbol,\n    -- a.asset_balance,\n    a.asset_balance / nullif(t.total_balance, 0) as \"%\"\n    -- a.rate\nfrom daily_total t\ninner join daily_strategy_asset_total a\n        on t.date = a.date\nwhere t.date = current_date\norder by t.date asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Current Asset Distribution %",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "WETH includes ETH",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 3,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "balance_usd"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "id": 57,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": [
+            "balance_eth",
+            "balance_usd"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH _daily_strategy_balance as (\n    select\n        DATE(timestamp) as date,\n        strategy,\n        case\n            when asset = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' then '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'\n            else asset end as asset,\n        balance,\n        ROW_NUMBER()\n        OVER (PARTITION BY strategy, asset, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from strategy_balance\n    where asset in (\n        select\n            address\n        from o_token_asset\n        where symbol != 'OETH' AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    )\n),\n     _daily_exchange_rate as (\n    select\n        DATE(timestamp) as date,\n        base,\n        quote,\n        rate,\n        ROW_NUMBER()\n        OVER (PARTITION BY base, quote, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    from exchange_rate\n),\n     daily_strategy_balance as (\n    select\n        b.date,\n        strategy,\n        symbol,\n        balance,\n        balance * coalesce(r.rate / 1e18, 1) as balance_eth,\n        balance * coalesce(r.rate / 1e18, 1) * coalesce(r_usd.rate / 1e8, 1) as balance_usd,\n        coalesce(r.rate / 1e18, 1) as rate,\n        coalesce(r_usd.rate / 1e18, 1) as rate_usd\n    from _daily_strategy_balance b\n    inner join o_token_asset oa\n            on b.asset = oa.address AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n    left join _daily_exchange_rate r\n            on r.date = b.date and r.base = 'ETH' and r.quote = oa.symbol and r.rn = 1\n    left join _daily_exchange_rate r_usd\n            on r_usd.date = b.date and r_usd.base = 'ETH' and r_usd.quote = 'USD' and r_usd.rn = 1\n    where b.rn = 1\n),\n     daily_strategy_asset_total as (\n    select\n        date,\n        symbol,\n        rate,\n        sum(balance) as balance,\n        sum(balance_eth) as balance_eth,\n        sum(balance_usd) as balance_usd\n    from daily_strategy_balance\n    group by date, symbol, rate\n)\n\nselect\n    symbol,\n    balance / 1e18 as balance,\n    balance_eth / 1e18 as balance_eth,\n    balance_usd / 1e18 as balance_usd\nfrom daily_strategy_asset_total\nwhere date = current_date\norder by date ",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Current Asset Distribution",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
       "id": 9,
       "panels": [],
       "title": "OETH Convex ETH+OETH",
@@ -37,8 +969,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -119,7 +1051,7 @@
         "h": 9,
         "w": 11,
         "x": 0,
-        "y": 1
+        "y": 29
       },
       "id": 17,
       "options": {
@@ -138,12 +1070,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'\n  and $__timeFilter(timestamp)\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -193,8 +1125,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -302,10 +1234,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 13,
         "w": 11,
         "x": 11,
-        "y": 1
+        "y": 29
       },
       "id": 13,
       "options": {
@@ -326,13 +1258,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'\n  and $__timeFilter(timestamp)\n\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -379,13 +1311,12 @@
         }
       ],
       "title": "OETH Convex ETH+OETH (AMO) - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -411,10 +1342,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 13,
         "w": 2,
         "x": 22,
-        "y": 1
+        "y": 29
       },
       "id": 36,
       "options": {
@@ -429,14 +1360,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -472,12 +1405,567 @@
       "type": "stat"
     },
     {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 11,
+        "x": 0,
+        "y": 38
+      },
+      "id": 42,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT timestamp as time, 1-balance_weight as percentage_oeth\nFROM strategy_daily_yield\nWHERE strategy = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'\n  and $__timeFilter(timestamp)\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Percent of OETH in Pool",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*_p/"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "percent"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 35
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/balance0.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/balance1.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 0,
+        "y": 42
+      },
+      "id": 49,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH base as (\nSELECT \n  timestamp as time, \n  balance0 / 1e18 as balance0, \n  balance1 / 1e18 as balance1, \n  ((balance0 / 1e18) + (balance1 / 1e18)) as total\nFROM curve_pool_balance\nwhere address = '0x94b17476a93b3262d87b9a326965d1e91f9c13e7'\norder by time\n)\n\nselect \n  time,\n  balance0,\n  balance1,\n  balance0 / nullif(total, 0) as balance0_p,\n  balance1 / nullif(total, 0) as balance1_p\nfrom base\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "address",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance0",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance1",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance2",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "curve_pool_balance"
+        }
+      ],
+      "title": "Pool Balance",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "Retrieved using `get_dy(1, 0, 1000000000000000000)`",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line+area"
+            }
+          },
+          "decimals": 5,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-red",
+                "value": null
+              },
+              {
+                "color": "transparent",
+                "value": 0.996
+              },
+              {
+                "color": "dark-red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 11,
+        "y": 42
+      },
+      "id": 52,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "select\n  timestamp as time,\n  rate / 1e18 as rate\nfrom\n  curve_pool_rate\nwhere\n  address = '0x94b17476a93b3262d87b9a326965d1e91f9c13e7'\n  and name = '1-0-1000000000000000000'\n  and $__timeFilter(timestamp)\n  and timestamp > '2023-05-01' -- omit some initial funky values\norder by\n  time asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "OETH / ETH Rate - get_dy(1, 0, 1e18)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 5,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0.996
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 2,
+        "x": 22,
+        "y": 42
+      },
+      "id": 50,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "select\n  timestamp as time,\n  rate / 1e18 as rate\nfrom\n  curve_pool_rate\nwhere\n  address = '0x94b17476a93b3262d87b9a326965d1e91f9c13e7'\n  and name = '1-0-1000000000000000000'\n  and $__timeFilter(timestamp)\n  and timestamp > '2023-05-01' -- omit some initial funky values\norder by\n  time asc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [
+                  {
+                    "name": "address",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance0",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance1",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "parameters": [
+                  {
+                    "name": "balance2",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "curve_pool_balance"
+        }
+      ],
+      "title": "Current Rate",
+      "type": "stat"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 51
       },
       "id": 10,
       "panels": [],
@@ -486,8 +1974,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -565,10 +2053,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 0,
-        "y": 11
+        "y": 52
       },
       "id": 2,
       "options": {
@@ -579,7 +2067,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -587,12 +2075,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nwhere strategy = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5'\n",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nwhere strategy = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5'\n  and $__timeFilter(timestamp)\norder by time",
           "refId": "A",
           "sql": {
             "columns": [
@@ -639,13 +2127,12 @@
         }
       ],
       "title": "OETH Frax Staking - Earnings",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -752,10 +2239,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 11,
-        "y": 11
+        "y": 52
       },
       "id": 6,
       "options": {
@@ -776,13 +2263,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5'\n  and $__timeFilter(timestamp)\n\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -829,13 +2316,12 @@
         }
       ],
       "title": "OETH Frax Staking - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -861,10 +2347,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 2,
         "x": 22,
-        "y": 11
+        "y": 52
       },
       "id": 38,
       "options": {
@@ -879,14 +2365,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -927,7 +2415,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 62
       },
       "id": 11,
       "panels": [],
@@ -936,8 +2424,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1015,10 +2503,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 0,
-        "y": 21
+        "y": 63
       },
       "id": 4,
       "options": {
@@ -1037,12 +2525,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nwhere strategy = '0xc1fc9e5ec3058921ea5025d703cbe31764756319'",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nwhere strategy = '0xc1fc9e5ec3058921ea5025d703cbe31764756319'\n  and $__timeFilter(timestamp)\norder by time",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1089,13 +2577,12 @@
         }
       ],
       "title": "OETH Morpho Aave V2 - Earnings",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1206,10 +2693,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 11,
-        "y": 21
+        "y": 63
       },
       "id": 14,
       "options": {
@@ -1230,13 +2717,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM strategy_daily_yield \nwhere strategy = '0xc1fc9e5ec3058921ea5025d703cbe31764756319'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM strategy_daily_yield \nwhere strategy = '0xc1fc9e5ec3058921ea5025d703cbe31764756319'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1283,13 +2770,12 @@
         }
       ],
       "title": "OETH Morpho Aave V2 - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1315,10 +2801,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 2,
         "x": 22,
-        "y": 21
+        "y": 63
       },
       "id": 37,
       "options": {
@@ -1333,14 +2819,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -1381,7 +2869,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 73
       },
       "id": 31,
       "panels": [],
@@ -1390,8 +2878,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1435,7 +2923,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1468,10 +2957,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 0,
-        "y": 31
+        "y": 74
       },
       "id": 32,
       "options": {
@@ -1482,7 +2971,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1490,12 +2979,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae78736cd615f374d3085123a210448e74fc6393'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae78736cd615f374d3085123a210448e74fc6393'\n  and $__timeFilter(timestamp)\n\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1545,8 +3034,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "These values are based on the ETH/rETH exchange rate which is why we see APY values that are quite variable.",
       "fieldConfig": {
@@ -1595,7 +3084,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1652,10 +3142,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 11,
-        "y": 31
+        "y": 74
       },
       "id": 33,
       "options": {
@@ -1676,13 +3166,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae78736cd615f374d3085123a210448e74fc6393'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae78736cd615f374d3085123a210448e74fc6393'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1729,13 +3219,12 @@
         }
       ],
       "title": "OETH Vault (rETH) - APY",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1747,7 +3236,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1760,10 +3250,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 2,
         "x": 22,
-        "y": 31
+        "y": 74
       },
       "id": 39,
       "options": {
@@ -1778,14 +3268,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -1822,8 +3314,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1867,7 +3359,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1900,10 +3393,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 0,
-        "y": 40
+        "y": 84
       },
       "id": 34,
       "options": {
@@ -1914,7 +3407,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -1922,12 +3415,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'\nORDER BY timestamp",
+          "rawSql": "SELECT timestamp as time, earnings_change / 1000000000000000000 as earnings_change, balance / 1000000000000000000 as balance\nFROM strategy_daily_yield\nWHERE strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'\n  and $__timeFilter(timestamp)\n\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -1977,8 +3470,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -2027,7 +3520,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2084,10 +3578,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 11,
-        "y": 40
+        "y": 84
       },
       "id": 35,
       "options": {
@@ -2108,13 +3602,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  -- earnings / 1000000000000000000 as earnings,\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \nwhere strategy = '0x39254033945aa2e4809cc2977e7087bee48bd7ab' and asset = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'\n  and $__timeFilter(timestamp)\n\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2161,13 +3655,12 @@
         }
       ],
       "title": "OETH Vault (stETH) - APY",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2179,7 +3672,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2192,10 +3686,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 2,
         "x": 22,
-        "y": 40
+        "y": 84
       },
       "id": 41,
       "options": {
@@ -2210,14 +3704,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -2258,7 +3754,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 49
+        "y": 94
       },
       "id": 12,
       "panels": [],
@@ -2267,8 +3763,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2312,7 +3808,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2345,10 +3842,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 0,
-        "y": 50
+        "y": 95
       },
       "id": 3,
       "options": {
@@ -2359,7 +3856,7 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
+          "mode": "multi",
           "sort": "none"
         }
       },
@@ -2367,12 +3864,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  earnings_change / 1000000000000000000 as earnings_change,\n  balance / 1000000000000000000 as balance\nFROM\n  strategy_daily_yield\n  where strategy = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  earnings_change / 1000000000000000000 as earnings_change,\n  balance / 1000000000000000000 as balance\nFROM\n  strategy_daily_yield\nwhere strategy = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2419,13 +3916,12 @@
         }
       ],
       "title": "OETH Aura rETH/WETH - Earnings",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -2439,7 +3935,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "axisSoftMax": -3,
+            "axisSoftMax": -2,
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
@@ -2470,13 +3966,12 @@
             }
           },
           "mappings": [],
-          "max": 2,
-          "min": -0.5,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2529,10 +4024,10 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 11,
         "x": 11,
-        "y": 50
+        "y": 95
       },
       "id": 15,
       "options": {
@@ -2553,13 +4048,13 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \n  where strategy = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'\nORDER BY timestamp",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  apy,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS apy7,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 13 PRECEDING AND CURRENT ROW) AS apy14,\n  AVG(apy) OVER(ORDER BY timestamp ROWS BETWEEN 29 PRECEDING AND CURRENT ROW) AS apy30\nFROM\n  strategy_daily_yield \nwhere strategy = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'\n  and $__timeFilter(timestamp)\nORDER BY timestamp",
           "refId": "A",
           "sql": {
             "columns": [
@@ -2606,13 +4101,12 @@
         }
       ],
       "title": "OETH Aura rETH/WETH - APY by Day",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2624,7 +4118,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2637,10 +4132,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 2,
         "x": 22,
-        "y": 50
+        "y": 95
       },
       "id": 40,
       "options": {
@@ -2655,14 +4150,16 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
-      "pluginVersion": "10.3.0-63137",
+      "pluginVersion": "11.1.0-69622",
       "targets": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "table",
@@ -2696,6 +4193,137 @@
       ],
       "title": "Latest APY",
       "type": "stat"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 105
+      },
+      "id": 55,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 25,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "stepAfter",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "normal"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 2,
+              "fieldMinMax": false,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percentunit"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 17
+          },
+          "id": 46,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "10.3.0-64082",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "cdjqw6cqd1gqob"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "rawQuery": true,
+              "rawSql": "WITH totals as (\n  select\n    DATE(daily_stat_id_id) as time,\n    sum(tvl / 1e18) as tvl\n  from\n    oeth_strategy_daily_stat\n  group by\n    DATE(daily_stat_id_id)\n  order by\n    DATE(daily_stat_id_id) asc\n),\nmix as (\n  select\n    DATE(daily_stat_id_id) as time,\n    name,\n    tvl / 1e18 as tvl,\n    (\n      select\n        tvl\n      from\n        totals\n      where\n        time = DATE(daily_stat_id_id)\n    ) as total\n  from\n    oeth_strategy_daily_stat sds\n  order by\n    DATE(daily_stat_id_id) asc\n)\nselect\n  time,\n  lower(name) as name,\n  -- tvl,\n  -- total,\n  tvl / total as \"%\"\nfrom\n  mix\nwhere $__timeFilter(time) \norder by\n  time",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "table": "oeth_strategy_daily_stat"
+            }
+          ],
+          "title": "Allocation",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Discard",
+      "type": "row"
     }
   ],
   "refresh": "30s",
@@ -2710,10 +4338,11 @@
     "from": "now-6M",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "OETH Strategy Earnings",
   "uid": "c178206e-0cd7-4b2c-98c3-8f16e0d3b58b",
-  "version": 41,
+  "version": 112,
   "weekStart": ""
 }
