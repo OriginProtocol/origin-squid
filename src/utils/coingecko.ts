@@ -107,6 +107,7 @@ export async function applyCoingeckoData(
     const coingeckoJson = await queryClient.fetchQuery({
       queryKey: [coingeckoURL],
       queryFn: async () => {
+        console.log('Fetching Coingecko market data')
         const response = await fetch(coingeckoURL)
         if (response.status === 429) {
           throw new Error('Coingecko rate limited')
@@ -118,9 +119,8 @@ export async function applyCoingeckoData(
     })
 
     if (!coingeckoJson) {
-      console.log('Could not fetch coingecko data')
+      console.log('No coingeckoJson :(')
     } else {
-      console.log('Coingecko rates received OK')
       const coingeckData = processCoingeckoData(coingeckoJson)
       for (const dayId in coingeckData) {
         const stat = statsWithNoPrice.find((s) => s.id === dayId) as
