@@ -31,7 +31,7 @@ export const createSquidProcessor = (
       maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
     })
     .setRpcDataIngestionSettings({
-      disabled: archive === 'arbitrum',
+      // disabled: archive === 'arbitrum',
       headPollInterval: 30000,
     })
     .setFinalityConfirmation(10)
