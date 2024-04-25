@@ -29,16 +29,426 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": false,
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
-      },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "id": 47,
+      "title": "Holder Info",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 18,
+        "x": 0,
+        "y": 1
+      },
+      "id": 45,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH date_series AS (\n    SELECT generate_series(MIN(DATE(timestamp)), MAX(DATE(timestamp)), '1 day')::date AS date\n    FROM erc20_balance\n),\ngrouped_data AS (\n    SELECT \n        address,\n        account,\n        DATE(timestamp) as entry_date,\n        balance,\n        ROW_NUMBER() OVER (PARTITION BY address, account, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    FROM \n        erc20_balance \n    WHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n)\nSELECT \n    ds.date as time,\n    COUNT(*) FILTER (WHERE balance >= 1e6 AND balance < 1e12) AS \">= .000000000001\",\n    COUNT(*) FILTER (WHERE balance >= 1e12 AND balance < 1e13) AS \">= .000001\",\n    COUNT(*) FILTER (WHERE balance >= 1e13 AND balance < 1e14) AS \">= .00001\",\n    COUNT(*) FILTER (WHERE balance >= 1e14 AND balance < 1e15) AS \">= .0001\",\n    COUNT(*) FILTER (WHERE balance >= 1e15 AND balance < 1e16) AS \">= .001\",\n    COUNT(*) FILTER (WHERE balance >= 1e16 AND balance < 1e17) AS \">= .01\",\n    COUNT(*) FILTER (WHERE balance >= 1e17 AND balance < 1e18) AS \">= .1\",\n    COUNT(*) FILTER (WHERE balance >= 1e18 AND balance < 1e19) AS \">= 1\",\n    COUNT(*) FILTER (WHERE balance >= 1e19 AND balance < 1e20) AS \">= 10\",\n    COUNT(*) FILTER (WHERE balance >= 1e20 AND balance < 1e21) AS \">= 100\",\n    COUNT(*) FILTER (WHERE balance >= 1e21) AS \">= 1000\"\nFROM \n    date_series ds\nLEFT JOIN \n    grouped_data gd ON ds.date = gd.entry_date AND gd.rn = 1\nWHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n  and $__timeFilter(ds.date) \nGROUP BY ds.date\nORDER BY ds.date asc;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "erc20_balance"
+        }
+      ],
+      "title": "Holder Counts",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "Origin held OETH not yet excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "id": 46,
+      "options": {
+        "displayMode": "basic",
+        "maxVizHeight": 300,
+        "minVizHeight": 15,
+        "minVizWidth": 30,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH date_series AS (\n    SELECT generate_series(MIN(DATE(timestamp)), MAX(DATE(timestamp)), '1 day')::date AS date\n    FROM erc20_balance\n),\ngrouped_data AS (\n    SELECT \n        address,\n        account,\n        DATE(timestamp) as entry_date,\n        balance,\n        ROW_NUMBER() OVER (PARTITION BY address, account, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    FROM \n        erc20_balance \n    WHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n)\nSELECT \n    ds.date as time,\n    COUNT(*) FILTER (WHERE balance >= 1e6 AND balance < 1e12) AS \">= .000000000001\",\n    COUNT(*) FILTER (WHERE balance >= 1e12 AND balance < 1e13) AS \">= .000001\",\n    COUNT(*) FILTER (WHERE balance >= 1e13 AND balance < 1e14) AS \">= .00001\",\n    COUNT(*) FILTER (WHERE balance >= 1e14 AND balance < 1e15) AS \">= .0001\",\n    COUNT(*) FILTER (WHERE balance >= 1e15 AND balance < 1e16) AS \">= .001\",\n    COUNT(*) FILTER (WHERE balance >= 1e16 AND balance < 1e17) AS \">= .01\",\n    COUNT(*) FILTER (WHERE balance >= 1e17 AND balance < 1e18) AS \">= .1\",\n    COUNT(*) FILTER (WHERE balance >= 1e18 AND balance < 1e19) AS \">= 1\",\n    COUNT(*) FILTER (WHERE balance >= 1e19 AND balance < 1e20) AS \">= 10\",\n    COUNT(*) FILTER (WHERE balance >= 1e20 AND balance < 1e21) AS \">= 100\",\n    COUNT(*) FILTER (WHERE balance >= 1e21) AS \">= 1000\"\nFROM \n    date_series ds\nLEFT JOIN \n    grouped_data gd ON ds.date = gd.entry_date AND gd.rn = 1\nWHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n  and $__timeFilter(ds.date) \nGROUP BY ds.date\nORDER BY ds.date desc\nLIMIT 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "erc20_balance"
+        }
+      ],
+      "title": "Holder Counts",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 18,
+        "x": 0,
+        "y": 10
+      },
+      "id": 49,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH date_series AS (\n    SELECT generate_series(MIN(DATE(timestamp)), MAX(DATE(timestamp)), '1 day')::date AS date\n    FROM erc20_balance\n),\ngrouped_data AS (\n    SELECT \n        address,\n        account,\n        DATE(timestamp) as entry_date,\n        balance,\n        ROW_NUMBER() OVER (PARTITION BY address, account, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    FROM \n        erc20_balance \n    WHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n)\nSELECT \n    ds.date as time,\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e6 AND balance < 1e12) / SUM(balance / 1e18) AS \">= .000000000001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e12 AND balance < 1e13) / SUM(balance / 1e18) AS \">= .000001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e13 AND balance < 1e14) / SUM(balance / 1e18) AS \">= .00001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e14 AND balance < 1e15) / SUM(balance / 1e18) AS \">= .0001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e15 AND balance < 1e16) / SUM(balance / 1e18) AS \">= .001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e16 AND balance < 1e17) / SUM(balance / 1e18) AS \">= .01\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e17 AND balance < 1e18) / SUM(balance / 1e18) AS \">= .1\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e18 AND balance < 1e19) / SUM(balance / 1e18) AS \">= 1\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e19 AND balance < 1e20) / SUM(balance / 1e18) AS \">= 10\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e20 AND balance < 1e21) / SUM(balance / 1e18) AS \">= 100\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e21) / SUM(balance / 1e18) AS \">= 1000\"\nFROM \n    date_series ds\nLEFT JOIN \n    grouped_data gd ON ds.date = gd.entry_date AND gd.rn = 1\nWHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n  and $__timeFilter(ds.date) \nGROUP BY ds.date\nORDER BY ds.date asc;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "erc20_balance"
+        }
+      ],
+      "title": "Holder TVL %",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "description": "Origin held OETH not yet excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "light-blue",
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 6,
+        "x": 18,
+        "y": 10
+      },
+      "id": 48,
+      "options": {
+        "displayMode": "basic",
+        "maxVizHeight": 300,
+        "minVizHeight": 15,
+        "minVizWidth": 30,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.1.0-69622",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "WITH date_series AS (\n    SELECT generate_series(MIN(DATE(timestamp)), MAX(DATE(timestamp)), '1 day')::date AS date\n    FROM erc20_balance\n),\ngrouped_data AS (\n    SELECT \n        address,\n        account,\n        DATE(timestamp) as entry_date,\n        balance,\n        ROW_NUMBER() OVER (PARTITION BY address, account, DATE(timestamp) ORDER BY timestamp DESC) as rn\n    FROM \n        erc20_balance \n    WHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n)\nSELECT \n    ds.date as time,\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e6 AND balance < 1e12) / SUM(balance / 1e18) AS \">= .000000000001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e12 AND balance < 1e13) / SUM(balance / 1e18) AS \">= .000001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e13 AND balance < 1e14) / SUM(balance / 1e18) AS \">= .00001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e14 AND balance < 1e15) / SUM(balance / 1e18) AS \">= .0001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e15 AND balance < 1e16) / SUM(balance / 1e18) AS \">= .001\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e16 AND balance < 1e17) / SUM(balance / 1e18) AS \">= .01\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e17 AND balance < 1e18) / SUM(balance / 1e18) AS \">= .1\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e18 AND balance < 1e19) / SUM(balance / 1e18) AS \">= 1\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e19 AND balance < 1e20) / SUM(balance / 1e18) AS \">= 10\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e20 AND balance < 1e21) / SUM(balance / 1e18) AS \">= 100\",\n    SUM(balance / 1e18) FILTER (WHERE balance >= 1e21) / SUM(balance / 1e18) AS \">= 1000\"\nFROM \n    date_series ds\nLEFT JOIN \n    grouped_data gd ON ds.date = gd.entry_date AND gd.rn = 1\nWHERE address = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\n  and $__timeFilter(ds.date)\nGROUP BY ds.date\nORDER BY ds.date desc\nLIMIT 1;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          },
+          "table": "erc20_balance"
+        }
+      ],
+      "title": "Holder TVL %",
+      "type": "bargauge"
+    },
+    {
+      "collapsed": false,
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 19
       },
       "id": 8,
       "panels": [],
@@ -46,7 +456,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -57,7 +467,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -117,7 +527,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 20
       },
       "id": 2,
       "options": {
@@ -136,7 +546,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -214,7 +624,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -279,7 +689,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 1
+        "y": 20
       },
       "id": 4,
       "options": {
@@ -298,7 +708,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -368,7 +778,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -455,7 +865,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 10
+        "y": 29
       },
       "id": 6,
       "options": {
@@ -476,7 +886,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -535,8 +945,8 @@
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -584,8 +994,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -594,38 +1003,13 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "yield_eth"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": true,
-                  "tooltip": true,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 11,
         "w": 12,
         "x": 0,
-        "y": 22
+        "y": 41
       },
       "id": 38,
       "options": {
@@ -644,14 +1028,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  yield\nFROM oeth_rebase\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  yield_eth / 1e18 as yield\nFROM o_token_rebase\nWHERE\n  $__timeFilter(\"timestamp\") AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -704,38 +1088,13 @@
           ]
         }
       ],
-      "title": "Yield Accrual",
-      "transformations": [
-        {
-          "id": "convertFieldType",
-          "options": {}
-        },
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "yield_eth",
-            "binary": {
-              "left": "yield",
-              "operator": "/",
-              "reducer": "sum",
-              "right": "1000000000000000000"
-            },
-            "mode": "binary",
-            "reduce": {
-              "include": [
-                "yield"
-              ],
-              "reducer": "sum"
-            }
-          }
-        }
-      ],
+      "title": "Yield",
       "type": "timeseries"
     },
     {
       "datasource": {
-        "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "type": "grafana-postgresql-datasource",
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -783,8 +1142,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -793,38 +1151,13 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "fee_eth"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": true,
-                  "tooltip": true,
-                  "viz": true
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 11,
         "w": 12,
         "x": 12,
-        "y": 22
+        "y": 41
       },
       "id": 37,
       "options": {
@@ -843,14 +1176,14 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  fee\nFROM oeth_rebase\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
+          "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  fee_eth / 1e18 as fee\nFROM o_token_rebase\nWHERE\n  $__timeFilter(\"timestamp\") AND chain_id = 1 AND otoken = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'\nORDER BY 1",
           "refId": "A",
           "select": [
             [
@@ -903,41 +1236,20 @@
           ]
         }
       ],
-      "title": "Fee Accrual",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "fee_eth",
-            "binary": {
-              "left": "fee",
-              "operator": "/",
-              "reducer": "sum",
-              "right": "1000000000000000000"
-            },
-            "mode": "binary",
-            "reduce": {
-              "include": [
-                "yield"
-              ],
-              "reducer": "sum"
-            }
-          }
-        }
-      ],
+      "title": "Fees",
       "type": "timeseries"
     },
     {
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 33
+        "y": 52
       },
       "id": 40,
       "panels": [],
@@ -945,7 +1257,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -956,7 +1268,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1016,7 +1328,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 34
+        "y": 53
       },
       "id": 44,
       "options": {
@@ -1035,7 +1347,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1094,13 +1406,12 @@
         }
       ],
       "title": "Convex ETH+OETH (AMO)",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1160,7 +1471,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 34
+        "y": 53
       },
       "id": 43,
       "options": {
@@ -1179,7 +1490,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1238,13 +1549,12 @@
         }
       ],
       "title": "Frax Staking",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1304,7 +1614,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 42
+        "y": 61
       },
       "id": 42,
       "options": {
@@ -1323,7 +1633,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1382,13 +1692,12 @@
         }
       ],
       "title": "Morpho Aave",
-      "transformations": [],
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "description": "",
       "fieldConfig": {
@@ -1475,7 +1784,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 42
+        "y": 61
       },
       "id": 41,
       "options": {
@@ -1494,7 +1803,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1593,13 +1902,13 @@
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 69
       },
       "id": 10,
       "panels": [],
@@ -1607,7 +1916,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -1618,7 +1927,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1677,7 +1986,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 51
+        "y": 70
       },
       "id": 12,
       "options": {
@@ -1696,7 +2005,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -1768,7 +2077,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -1853,7 +2162,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 51
+        "y": 70
       },
       "id": 13,
       "options": {
@@ -1872,7 +2181,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -1977,13 +2286,13 @@
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 59
+        "y": 78
       },
       "id": 15,
       "panels": [],
@@ -1991,7 +2300,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -2002,7 +2311,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2061,7 +2370,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 60
+        "y": 79
       },
       "id": 16,
       "options": {
@@ -2080,7 +2389,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2152,7 +2461,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2237,7 +2546,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 60
+        "y": 79
       },
       "id": 17,
       "options": {
@@ -2256,7 +2565,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -2361,13 +2670,13 @@
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 68
+        "y": 87
       },
       "id": 19,
       "panels": [],
@@ -2375,7 +2684,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -2386,7 +2695,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2445,7 +2754,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 69
+        "y": 88
       },
       "id": 20,
       "options": {
@@ -2464,7 +2773,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2536,7 +2845,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2621,7 +2930,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 69
+        "y": 88
       },
       "id": 21,
       "options": {
@@ -2640,7 +2949,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -2745,13 +3054,13 @@
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 77
+        "y": 96
       },
       "id": 23,
       "panels": [],
@@ -2759,7 +3068,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -2770,7 +3079,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -2829,7 +3138,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 78
+        "y": 97
       },
       "id": 24,
       "options": {
@@ -2848,7 +3157,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -2920,7 +3229,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -3005,7 +3314,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 78
+        "y": 97
       },
       "id": 25,
       "options": {
@@ -3024,7 +3333,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -3129,13 +3438,13 @@
       "collapsed": false,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 86
+        "y": 105
       },
       "id": 27,
       "panels": [],
@@ -3143,7 +3452,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -3154,7 +3463,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -3213,7 +3522,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 87
+        "y": 106
       },
       "id": 28,
       "options": {
@@ -3232,7 +3541,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -3304,7 +3613,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "fieldConfig": {
         "defaults": {
@@ -3389,7 +3698,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 87
+        "y": 106
       },
       "id": 29,
       "options": {
@@ -3408,7 +3717,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "format": "time_series",
           "group": [],
@@ -3513,20 +3822,20 @@
       "collapsed": true,
       "datasource": {
         "type": "grafana-postgresql-datasource",
-        "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+        "uid": "cdjqw6cqd1gqob"
       },
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 95
+        "y": 114
       },
       "id": 31,
       "panels": [
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "description": "",
           "fieldConfig": {
@@ -3586,7 +3895,7 @@
             "h": 8,
             "w": 12,
             "x": 0,
-            "y": 96
+            "y": 104
           },
           "id": 34,
           "options": {
@@ -3605,7 +3914,7 @@
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+                "uid": "cdjqw6cqd1gqob"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -3668,141 +3977,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
-          },
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "stepAfter",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 96
-          },
-          "id": 33,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "targets": [
-            {
-              "datasource": {
-                "type": "postgres",
-                "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
-              },
-              "editorMode": "code",
-              "format": "time_series",
-              "group": [],
-              "metricColumn": "none",
-              "rawQuery": true,
-              "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  sfrx_eth / 1e18 as sfrx_eth\nFROM oeth_frax_staking\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
-              "refId": "A",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "sfrx_eth"
-                    ],
-                    "type": "column"
-                  }
-                ]
-              ],
-              "sql": {
-                "columns": [
-                  {
-                    "parameters": [],
-                    "type": "function"
-                  }
-                ],
-                "groupBy": [
-                  {
-                    "property": {
-                      "type": "string"
-                    },
-                    "type": "groupBy"
-                  }
-                ],
-                "limit": 50
-              },
-              "table": "oeth_frax_staking",
-              "timeColumn": "\"timestamp\"",
-              "timeColumnType": "timestamptz",
-              "where": [
-                {
-                  "name": "$__timeFilter",
-                  "params": [],
-                  "type": "macro"
-                }
-              ]
-            }
-          ],
-          "title": "FraxETH",
-          "transformations": [],
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "description": "",
           "fieldConfig": {
@@ -3864,6 +4039,140 @@
             "x": 12,
             "y": 104
           },
+          "id": 33,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cdjqw6cqd1gqob"
+              },
+              "editorMode": "code",
+              "format": "time_series",
+              "group": [],
+              "metricColumn": "none",
+              "rawQuery": true,
+              "rawSql": "SELECT\n  \"timestamp\" AS \"time\",\n  sfrx_eth / 1e18 as sfrx_eth\nFROM oeth_frax_staking\nWHERE\n  $__timeFilter(\"timestamp\")\nORDER BY 1",
+              "refId": "A",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "sfrx_eth"
+                    ],
+                    "type": "column"
+                  }
+                ]
+              ],
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              },
+              "table": "oeth_frax_staking",
+              "timeColumn": "\"timestamp\"",
+              "timeColumnType": "timestamptz",
+              "where": [
+                {
+                  "name": "$__timeFilter",
+                  "params": [],
+                  "type": "macro"
+                }
+              ]
+            }
+          ],
+          "title": "FraxETH",
+          "transformations": [],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "cdjqw6cqd1gqob"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "stepAfter",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 112
+          },
           "id": 35,
           "options": {
             "legend": {
@@ -3881,7 +4190,7 @@
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+                "uid": "cdjqw6cqd1gqob"
               },
               "editorMode": "code",
               "format": "time_series",
@@ -3946,7 +4255,7 @@
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
-            "uid": "bc59d069-00cc-43d4-b0cf-06dadb84daef"
+            "uid": "cdjqw6cqd1gqob"
           },
           "refId": "A"
         }
@@ -3967,10 +4276,11 @@
     "from": "now-30d",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "",
   "title": "OETH Dashboard",
   "uid": "5RW4zO7Sk",
-  "version": 11,
+  "version": 28,
   "weekStart": ""
 }
