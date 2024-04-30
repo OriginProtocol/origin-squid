@@ -6,6 +6,7 @@ import { BridgeTransfer, BridgeTransferState } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { logFilter } from '@utils/logFilter'
+import { traceFilter } from '@utils/traceFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
 // https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/typescript/src/get-status.ts
@@ -64,6 +65,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
     tokens,
     tokenMappings,
     tokenPoolAddress,
+    ccipRouterAddress,
     onRampAddress,
     offRampAddresses,
   } = ccipConfig[params.chainId]
@@ -71,6 +73,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
     address: tokens,
     topic0: [erc20Abi.events.Transfer.topic],
     topic2: [tokenPoolAddress],
+    range: { from },
   })
 
   const ccipSendRequested = logFilter({
@@ -82,12 +85,22 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
   const executionStateChanged = logFilter({
     address: Object.values(offRampAddresses),
     topic0: [ccipOffRampAbi.events.ExecutionStateChanged.topic],
+    range: { from },
+  })
+
+  const ccipSendFunction = traceFilter({
+    callTo: [ccipRouterAddress],
+    type: ['call'],
+    callSighash: [ccipRouter.functions.ccipSend.sighash],
+    range: { from },
+    transaction: true,
   })
 
   const setup = (processor: EvmBatchProcessor) => {
     processor.addLog(executionStateChanged.value)
     processor.addLog(transfersToLockReleasePool.value)
     processor.addLog(ccipSendRequested.value)
+    processor.addTrace(ccipSendFunction.value)
   }
 
   const process = async (ctx: Context) => {
@@ -127,15 +140,23 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
               log.transactionHash === l.transactionHash &&
               ccipSendRequested.matches(l),
           )
-          if (logSendRequested) {
+          const traceSendRequested = block.traces.find(
+            (t) =>
+              log.transactionHash === t.transaction?.hash &&
+              ccipSendFunction.matches(t),
+          )
+          if (
+            logSendRequested &&
+            traceSendRequested &&
+            traceSendRequested.type === 'call'
+          ) {
             // console.log('match ccipSendRequested')
-            const data =
+            const logData =
               ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
-            const message = data.message
-            const decodedTxInput = ccipRouter.functions.ccipSend.decode(
-              logSendRequested.transaction!.input,
+            const message = logData.message
+            const functionData = ccipRouter.functions.ccipSend.decode(
+              traceSendRequested.action.input,
             )
-
             // A `BridgeTransferState` may already exist.
             //  If so, we should pull the `state` for it.
             const bridgeTransferState = await ctx.store.get(
@@ -156,7 +177,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 chainIn: params.chainId,
                 chainOut:
                   chainSelectorIdMappings[
-                    decodedTxInput.destinationChainSelector.toString()
+                    functionData.destinationChainSelector.toString()
                   ],
                 tokenIn: tokenAmount.token.toLowerCase(),
                 tokenOut: tokenMappings[tokenAmount.token.toLowerCase()],
