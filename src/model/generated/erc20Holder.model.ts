@@ -1,4 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import * as marshal from "./marshal"
 
 @Entity_()
 export class ERC20Holder {
@@ -21,4 +22,7 @@ export class ERC20Holder {
 
     @Column_("text", {nullable: false})
     account!: string
+
+    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    balance!: bigint
 }

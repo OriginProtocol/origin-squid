@@ -173,6 +173,7 @@ export const createERC20Tracker = ({
                   chainId: ctx.chain.id,
                   address,
                   account,
+                  balance: balance.balance,
                 })
                 if (!holders.has(account)) {
                   doStateUpdate = true

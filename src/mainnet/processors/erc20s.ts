@@ -1,5 +1,6 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
+import { createERC20SimpleTracker } from '@templates/erc20-simple'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
@@ -18,28 +19,24 @@ import { logFilter } from '@utils/logFilter'
 
 let initialized = false
 
-const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+const simpleTracks: Record<
+  string,
+  Parameters<typeof createERC20SimpleTracker>[0]
+> = {
   // Origin Specific
   OGN: {
-    // from: 15350225, // 6436154,
-    from: 16933090, // oeth deploy date
+    from: 6436154,
+    // from: 16933090, // oeth deploy date
     address: tokens.OGN,
-    accountFilter: [
-      '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
-      '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // Origin: Investor Wallet
-    ],
-    intervalTracking: true,
   },
   OGV: {
-    // from: 15350225, // 14439231,
-    from: 16933090, // oeth deploy date
+    from: 14439231,
+    // from: 16933090, // oeth deploy date
     address: tokens.OGV,
-    accountFilter: [
-      '0x2eae0cae2323167abf78462e0c0686865c67a655', // Origin: Team Distribution (starts at block 15350225)
-      '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // Origin: Investor Wallet
-    ],
-    intervalTracking: true,
   },
+}
+const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+  // Origin Specific
   OETH: {
     from: 16935276,
     address: tokens.OETH,
@@ -107,7 +104,10 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
 // This is a function to allow others to subscribe to balance tracking
 export const erc20s = () => {
   initialized = true
-  return Object.values(tracks).map(createERC20Tracker)
+  return [
+    ...Object.values(simpleTracks).map(createERC20SimpleTracker),
+    ...Object.values(tracks).map(createERC20Tracker),
+  ]
 }
 
 export const addERC20Processing = (symbol: TokenSymbol, account: string) => {

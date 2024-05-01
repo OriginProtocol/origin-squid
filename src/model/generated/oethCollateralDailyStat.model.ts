@@ -15,27 +15,15 @@ export class OETHCollateralDailyStat {
     @ManyToOne_(() => OETHDailyStat, {nullable: true})
     dailyStatId!: OETHDailyStat
 
-    /**
-     * Token symbol
-     */
     @Column_("text", {nullable: false})
     symbol!: string
 
-    /**
-     * Amount held
-     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     amount!: bigint
 
-    /**
-     * Price in ETH
-     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     price!: bigint
 
-    /**
-     * Total ETH value
-     */
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
     value!: bigint
 }
