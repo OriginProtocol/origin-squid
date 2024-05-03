@@ -1,5 +1,5 @@
-module.exports = class Data1714527816137 {
-    name = 'Data1714527816137'
+module.exports = class Data1714686799972 {
+    name = 'Data1714686799972'
 
     async up(db) {
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
@@ -61,11 +61,12 @@ module.exports = class Data1714527816137 {
         await db.query(`CREATE TABLE "liquidity_daily_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "token" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_bf1de97f9815d851f7b4abca9ca" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c5116bd4f5406fc2848552f0ba" ON "liquidity_daily_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_58d14205a5e9ad1d05f94d7bb6" ON "liquidity_daily_balance" ("block_number") `)
-        await db.query(`CREATE TABLE "bridge_transfer" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash_in" text NOT NULL, "tx_hash_out" text, "message_id" text NOT NULL, "bridge" text NOT NULL, "sender" text NOT NULL, "receiver" text NOT NULL, "chain_in" integer NOT NULL, "chain_out" integer NOT NULL, "token_in" text NOT NULL, "token_out" text NOT NULL, "amount_in" numeric NOT NULL, "amount_out" numeric NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_fab0727701656a3e6c320fca6e9" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "bridge_transfer" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash_in" text NOT NULL, "tx_hash_out" text, "message_id" text NOT NULL, "bridge" text NOT NULL, "transactor" text NOT NULL, "sender" text NOT NULL, "receiver" text NOT NULL, "chain_in" integer NOT NULL, "chain_out" integer NOT NULL, "token_in" text NOT NULL, "token_out" text NOT NULL, "amount_in" numeric NOT NULL, "amount_out" numeric NOT NULL, "state" integer NOT NULL, CONSTRAINT "PK_fab0727701656a3e6c320fca6e9" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_aaedc42eda914e44a21e8eac72" ON "bridge_transfer" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_f8d8d410f058f0bae15eefbc81" ON "bridge_transfer" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_85994c1ee045b713bbcbcccc8b" ON "bridge_transfer" ("message_id") `)
         await db.query(`CREATE INDEX "IDX_7ff6ab2147f80a465d3752e79f" ON "bridge_transfer" ("bridge") `)
+        await db.query(`CREATE INDEX "IDX_aaec7d9bb08b9ef8fb1b419c5d" ON "bridge_transfer" ("transactor") `)
         await db.query(`CREATE INDEX "IDX_3cbd3eea30bc62ebc91c276e73" ON "bridge_transfer" ("sender") `)
         await db.query(`CREATE INDEX "IDX_54f4abe8f2eb80204637ce328e" ON "bridge_transfer" ("receiver") `)
         await db.query(`CREATE INDEX "IDX_12fa326ec2496a964493f2a7bc" ON "bridge_transfer" ("chain_in") `)
@@ -297,6 +298,7 @@ module.exports = class Data1714527816137 {
         await db.query(`DROP INDEX "public"."IDX_f8d8d410f058f0bae15eefbc81"`)
         await db.query(`DROP INDEX "public"."IDX_85994c1ee045b713bbcbcccc8b"`)
         await db.query(`DROP INDEX "public"."IDX_7ff6ab2147f80a465d3752e79f"`)
+        await db.query(`DROP INDEX "public"."IDX_aaec7d9bb08b9ef8fb1b419c5d"`)
         await db.query(`DROP INDEX "public"."IDX_3cbd3eea30bc62ebc91c276e73"`)
         await db.query(`DROP INDEX "public"."IDX_54f4abe8f2eb80204637ce328e"`)
         await db.query(`DROP INDEX "public"."IDX_12fa326ec2496a964493f2a7bc"`)

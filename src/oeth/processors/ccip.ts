@@ -183,6 +183,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 tokenOut: tokenMappings[tokenAmount.token.toLowerCase()],
                 amountIn: tokenAmount.amount,
                 amountOut: tokenAmount.amount,
+                transactor: log.transaction!.from.toLowerCase(),
                 sender: message.sender.toLowerCase(),
                 receiver: message.receiver.toLowerCase(),
                 state: bridgeTransferState?.state ?? 0,

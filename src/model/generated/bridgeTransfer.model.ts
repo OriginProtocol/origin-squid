@@ -34,6 +34,10 @@ export class BridgeTransfer {
 
     @Index_()
     @Column_("text", {nullable: false})
+    transactor!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
     sender!: string
 
     @Index_()

@@ -261,6 +261,7 @@ type BridgeTransfer @entity {
   txHashOut: String # Initially null
   messageId: String! @index
   bridge: String! @index
+  transactor: String! @index
   sender: String! @index
   receiver: String! @index
   chainIn: Int! @index
