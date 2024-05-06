@@ -3,7 +3,8 @@ import { sortBy } from 'lodash'
 
 import { ERC20Balance, ERC20State } from '@model'
 import { Block, Context } from '@processor'
-import { Entity, EntityClass } from '@subsquid/typeorm-store'
+import { EntityClass } from '@subsquid/typeorm-store'
+import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
 import { jsonify } from '@utils/jsonify'
 
