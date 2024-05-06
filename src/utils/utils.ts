@@ -3,7 +3,8 @@ import { pad } from 'viem'
 
 import * as erc20 from '@abi/erc20'
 import { Context } from '@processor'
-import { Entity, EntityClass } from '@subsquid/typeorm-store'
+import { EntityClass } from '@subsquid/typeorm-store'
+import { Entity } from '@subsquid/typeorm-store/lib/store'
 
 export const max = (values: bigint[], start = 0n) => {
   return values.reduce((max, v) => (max > v ? max : v), start)
