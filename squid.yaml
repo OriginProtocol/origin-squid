@@ -6,6 +6,8 @@ build:
 deploy:
   addons:
     postgres:
+    rpc:
+      - arbitrum-one.http
   secrets:
     - RPC_ENDPOINT
     - RPC_ENDPOINT_999
@@ -23,6 +25,7 @@ deploy:
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]

@@ -32,7 +32,7 @@ export const createSquidProcessor = (
     })
     .setRpcDataIngestionSettings({
       disabled: process.env.ARCHIVE_ONLY === 'true',
-      headPollInterval: 30000,
+      headPollInterval: 5000,
     })
     .setFinalityConfirmation(10)
     .setFields({
