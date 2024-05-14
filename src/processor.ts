@@ -28,7 +28,7 @@ export const createSquidProcessor = (
     .setGateway(lookupArchive(archive))
     .setRpcEndpoint({
       url,
-      maxBatchCallSize: url.includes('alchemy.com') ? 1 : 10,
+      maxBatchCallSize: url.includes('alchemy.com') ? 1 : undefined,
     })
     .setRpcDataIngestionSettings({
       disabled: process.env.ARCHIVE_ONLY === 'true',
