@@ -1,25 +1,27 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './balancer-rate-provider.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const functions = {
-    getRate: new Func<[], {}, bigint>(
-        abi, '0x679aefce'
-    ),
-    rocketTokenRETH: new Func<[], {}, string>(
-        abi, '0xdb5dacc9'
-    ),
+    getRate: fun("0x679aefce", {}, p.uint256),
+    rocketTokenRETH: fun("0xdb5dacc9", {}, p.address),
 }
 
 export class Contract extends ContractBase {
 
-    getRate(): Promise<bigint> {
-        return this.eth_call(functions.getRate, [])
+    getRate() {
+        return this.eth_call(functions.getRate, {})
     }
 
-    rocketTokenRETH(): Promise<string> {
-        return this.eth_call(functions.rocketTokenRETH, [])
+    rocketTokenRETH() {
+        return this.eth_call(functions.rocketTokenRETH, {})
     }
 }
+
+/// Function types
+export type GetRateParams = FunctionArguments<typeof functions.getRate>
+export type GetRateReturn = FunctionReturn<typeof functions.getRate>
+
+export type RocketTokenRETHParams = FunctionArguments<typeof functions.rocketTokenRETH>
+export type RocketTokenRETHReturn = FunctionReturn<typeof functions.rocketTokenRETH>
+

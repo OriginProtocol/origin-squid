@@ -1,58 +1,66 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './oeth-zapper.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    Zap: new LogEvent<([minter: string, asset: string, amount: bigint] & {minter: string, asset: string, amount: bigint})>(
-        abi, '0x9d0b99c299bdb5656c0c9db6e1886c612db5c2881760ea54ab244f6338b4ebd6'
-    ),
+    Zap: event("0x9d0b99c299bdb5656c0c9db6e1886c612db5c2881760ea54ab244f6338b4ebd6", {"minter": indexed(p.address), "asset": indexed(p.address), "amount": p.uint256}),
 }
 
 export const functions = {
-    deposit: new Func<[], {}, bigint>(
-        abi, '0xd0e30db0'
-    ),
-    depositSFRXETH: new Func<[amount: bigint, minOETH: bigint], {amount: bigint, minOETH: bigint}, bigint>(
-        abi, '0xd443e97d'
-    ),
-    frxeth: new Func<[], {}, string>(
-        abi, '0x6f708a9d'
-    ),
-    oeth: new Func<[], {}, string>(
-        abi, '0xccfe2a69'
-    ),
-    sfrxeth: new Func<[], {}, string>(
-        abi, '0xa07311af'
-    ),
-    vault: new Func<[], {}, string>(
-        abi, '0xfbfa77cf'
-    ),
-    weth: new Func<[], {}, string>(
-        abi, '0x3fc8cef3'
-    ),
+    deposit: fun("0xd0e30db0", {}, p.uint256),
+    depositSFRXETH: fun("0xd443e97d", {"amount": p.uint256, "minOETH": p.uint256}, p.uint256),
+    frxeth: fun("0x6f708a9d", {}, p.address),
+    oeth: fun("0xccfe2a69", {}, p.address),
+    sfrxeth: fun("0xa07311af", {}, p.address),
+    vault: fun("0xfbfa77cf", {}, p.address),
+    weth: fun("0x3fc8cef3", {}, p.address),
 }
 
 export class Contract extends ContractBase {
 
-    frxeth(): Promise<string> {
-        return this.eth_call(functions.frxeth, [])
+    frxeth() {
+        return this.eth_call(functions.frxeth, {})
     }
 
-    oeth(): Promise<string> {
-        return this.eth_call(functions.oeth, [])
+    oeth() {
+        return this.eth_call(functions.oeth, {})
     }
 
-    sfrxeth(): Promise<string> {
-        return this.eth_call(functions.sfrxeth, [])
+    sfrxeth() {
+        return this.eth_call(functions.sfrxeth, {})
     }
 
-    vault(): Promise<string> {
-        return this.eth_call(functions.vault, [])
+    vault() {
+        return this.eth_call(functions.vault, {})
     }
 
-    weth(): Promise<string> {
-        return this.eth_call(functions.weth, [])
+    weth() {
+        return this.eth_call(functions.weth, {})
     }
 }
+
+/// Event types
+export type ZapEventArgs = EParams<typeof events.Zap>
+
+/// Function types
+export type DepositParams = FunctionArguments<typeof functions.deposit>
+export type DepositReturn = FunctionReturn<typeof functions.deposit>
+
+export type DepositSFRXETHParams = FunctionArguments<typeof functions.depositSFRXETH>
+export type DepositSFRXETHReturn = FunctionReturn<typeof functions.depositSFRXETH>
+
+export type FrxethParams = FunctionArguments<typeof functions.frxeth>
+export type FrxethReturn = FunctionReturn<typeof functions.frxeth>
+
+export type OethParams = FunctionArguments<typeof functions.oeth>
+export type OethReturn = FunctionReturn<typeof functions.oeth>
+
+export type SfrxethParams = FunctionArguments<typeof functions.sfrxeth>
+export type SfrxethReturn = FunctionReturn<typeof functions.sfrxeth>
+
+export type VaultParams = FunctionArguments<typeof functions.vault>
+export type VaultReturn = FunctionReturn<typeof functions.vault>
+
+export type WethParams = FunctionArguments<typeof functions.weth>
+export type WethReturn = FunctionReturn<typeof functions.weth>
+

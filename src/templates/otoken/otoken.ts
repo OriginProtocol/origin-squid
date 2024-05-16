@@ -54,8 +54,8 @@ export const createOTokenSetup =
       type: ['call'],
       callTo: [address],
       callSighash: [
-        otoken.functions.rebaseOptOut.sighash,
-        otoken.functions.rebaseOptIn.sighash,
+        otoken.functions.rebaseOptOut.selector,
+        otoken.functions.rebaseOptIn.selector,
       ],
       transaction: true,
       range: { from, to: upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
@@ -264,12 +264,12 @@ export const createOTokenProcessor = (params: {
             : (otoken.functions
                 .creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
           params.otokenAddress,
-          [[data.from], [data.to]],
+          [{ _account: data.from }, { _account: data.to }],
         ).then((results) => {
           if (afterHighResUpgrade) {
-            return results.map((r) => [r[0], r[1]])
+            return results.map((r) => [r._0, r._1])
           } else {
-            return results.map((r) => [r[0] * 1000000000n, r[1] * 1000000000n])
+            return results.map((r) => [r._0 * 1000000000n, r._1 * 1000000000n])
           }
         }) as Promise<[bigint, bigint][]>,
       ])
@@ -504,15 +504,15 @@ export const createOTokenProcessor = (params: {
       trace.type === 'call' &&
       params.otokenAddress === trace.action.to &&
       (trace.action.sighash ===
-        otoken.functions.governanceRebaseOptIn.sighash ||
-        trace.action.sighash === otoken.functions.rebaseOptIn.sighash ||
-        trace.action.sighash === otoken.functions.rebaseOptOut.sighash)
+        otoken.functions.governanceRebaseOptIn.selector ||
+        trace.action.sighash === otoken.functions.rebaseOptIn.selector ||
+        trace.action.sighash === otoken.functions.rebaseOptOut.selector)
     ) {
       await result.initialize()
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
       const address =
-        trace.action.sighash === otoken.functions.governanceRebaseOptIn.sighash
+        trace.action.sighash === otoken.functions.governanceRebaseOptIn.selector
           ? otoken.functions.governanceRebaseOptIn.decode(trace.action.input)
               ._account
           : trace.action.from.toLowerCase()
@@ -542,7 +542,7 @@ export const createOTokenProcessor = (params: {
         status: owner.rebasingOption,
       })
       result.rebaseOptions.push(rebaseOption)
-      if (trace.action.sighash === otoken.functions.rebaseOptIn.sighash) {
+      if (trace.action.sighash === otoken.functions.rebaseOptIn.selector) {
         const afterHighResUpgrade =
           block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
         const otokenContract = new otoken.Contract(
@@ -553,17 +553,17 @@ export const createOTokenProcessor = (params: {
         owner.credits = afterHighResUpgrade
           ? await otokenContract
               .creditsBalanceOfHighres(owner.address)
-              .then((c) => c[0])
+              .then((c) => c._0)
           : await otokenContract
               .creditsBalanceOf(owner.address)
-              .then((c) => c[0] * 1000000000n)
+              .then((c) => c._0 * 1000000000n)
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
         otokenObject.nonRebasingSupply -= owner.balance
         otokenObject.rebasingSupply =
           otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
-      if (trace.action.sighash === otoken.functions.rebaseOptOut.sighash) {
+      if (trace.action.sighash === otoken.functions.rebaseOptOut.selector) {
         owner.rebasingOption = RebasingOption.OptOut
         rebaseOption.status = RebasingOption.OptOut
         otokenObject.nonRebasingSupply += owner.balance

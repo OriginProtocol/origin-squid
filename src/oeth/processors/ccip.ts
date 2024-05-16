@@ -91,7 +91,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
   const ccipSendFunction = traceFilter({
     callTo: [ccipRouterAddress],
     type: ['call'],
-    callSighash: [ccipRouter.functions.ccipSend.sighash],
+    callSighash: [ccipRouter.functions.ccipSend.selector],
     range: { from },
     transaction: true,
   })

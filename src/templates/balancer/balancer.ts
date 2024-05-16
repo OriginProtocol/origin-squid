@@ -93,7 +93,7 @@ export const createBalancerProcessor = (
         block.header,
         BALANCER_VAULT,
       )
-      const [tokens, balances] = await balancerVault.getPoolTokens(poolId)
+      const { tokens, balances } = await balancerVault.getPoolTokens(poolId)
       const balance = new BalancerPoolBalance({
         id: `${poolAddress}-${block.header.height}`,
         blockNumber: block.header.height,

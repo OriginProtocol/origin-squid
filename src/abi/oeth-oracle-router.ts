@@ -1,21 +1,23 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './oeth-oracle-router.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const functions = {
-    cacheDecimals: new Func<[asset: string], {asset: string}, number>(
-        abi, '0x36b6d944'
-    ),
-    price: new Func<[asset: string], {asset: string}, bigint>(
-        abi, '0xaea91078'
-    ),
+    cacheDecimals: fun("0x36b6d944", {"asset": p.address}, p.uint8),
+    price: fun("0xaea91078", {"asset": p.address}, p.uint256),
 }
 
 export class Contract extends ContractBase {
 
-    price(asset: string): Promise<bigint> {
-        return this.eth_call(functions.price, [asset])
+    price(asset: PriceParams["asset"]) {
+        return this.eth_call(functions.price, {asset})
     }
 }
+
+/// Function types
+export type CacheDecimalsParams = FunctionArguments<typeof functions.cacheDecimals>
+export type CacheDecimalsReturn = FunctionReturn<typeof functions.cacheDecimals>
+
+export type PriceParams = FunctionArguments<typeof functions.price>
+export type PriceReturn = FunctionReturn<typeof functions.price>
+
