@@ -20,6 +20,11 @@ projects:
     include:
       - schema-general.graphql
       - types.graphql
+  ogn:
+    schema: schema-exponential-staking.graphql
+    include:
+      - schema-general.graphql
+      - types.graphql
   ogv:
     schema: schema-ogv.graphql
     include:

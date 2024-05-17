@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {OUSDStrategyDailyStat} from "./ousdStrategyDailyStat.model"
 
 @Entity_()
@@ -15,12 +14,12 @@ export class OUSDStrategyHoldingDailyStat {
     @ManyToOne_(() => OUSDStrategyDailyStat, {nullable: true})
     strategyDailyStatId!: OUSDStrategyDailyStat
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     symbol!: string
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     amount!: bigint
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     value!: bigint
 }

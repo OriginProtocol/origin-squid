@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class OToken {
-    constructor(props?: Partial<OToken>) {
+export class ExponentialStaking {
+    constructor(props?: Partial<ExponentialStaking>) {
         Object.assign(this, props)
     }
 
@@ -15,7 +15,7 @@ export class OToken {
 
     @Index_()
     @StringColumn_({nullable: false})
-    otoken!: string
+    address!: string
 
     @Index_()
     @DateTimeColumn_({nullable: false})
@@ -26,11 +26,8 @@ export class OToken {
     blockNumber!: number
 
     @BigIntColumn_({nullable: false})
-    totalSupply!: bigint
+    accRewardPerShare!: bigint
 
     @BigIntColumn_({nullable: false})
-    rebasingSupply!: bigint
-
-    @BigIntColumn_({nullable: false})
-    nonRebasingSupply!: bigint
+    assetBalance!: bigint
 }

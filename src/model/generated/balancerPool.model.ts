@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, IntColumn as IntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class BalancerPool {
@@ -10,24 +10,24 @@ export class BalancerPool {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     address!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     name!: string
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     tokenCount!: number
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     token0!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     token1!: string
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     token2!: string | undefined | null
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     token3!: string | undefined | null
 }

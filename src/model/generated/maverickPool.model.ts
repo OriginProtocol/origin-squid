@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class MaverickPool {
@@ -10,15 +10,15 @@ export class MaverickPool {
     id!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     address!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     name!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     tokenA!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     tokenB!: string
 }

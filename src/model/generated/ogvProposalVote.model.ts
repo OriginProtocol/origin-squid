@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {OGVProposal} from "./ogvProposal.model"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVVoteType} from "./_ogvVoteType"
@@ -21,15 +20,15 @@ export class OGVProposalVote {
     @ManyToOne_(() => OGVAddress, {nullable: true})
     voter!: OGVAddress
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     weight!: bigint
 
     @Column_("varchar", {length: 7, nullable: false})
     type!: OGVVoteType
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     txHash!: string
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 }

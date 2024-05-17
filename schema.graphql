@@ -1,5 +1,109 @@
 # GENERATED, DO NOT MODIFY
 
+# State
+# - Contract
+# - Lockups
+# - Accounts
+
+type ExponentialStaking @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  accRewardPerShare: BigInt!
+  assetBalance: BigInt!
+}
+
+enum ExponentialStakingLockupState {
+  Open
+  Closed
+}
+
+type ExponentialStakingLockup @entity  {
+  id: ID! # `chainId:address:account:lockupId` or `lockupId`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  amount: BigInt!
+  end: BigInt!
+  points: BigInt!
+  withdrawAmount: BigInt!
+  penalty: BigInt!
+  state: ExponentialStakingLockupState
+}
+
+type ExponentialStakingAccount @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  votes: BigInt!
+  balance: BigInt!
+  previewPoints: BigInt!
+  previewRewards: BigInt!
+  previewWithdraw: BigInt!
+}
+
+
+
+### Events
+type ExponentialStakingDelegateChanged @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  delegator: String! @index
+  fromDelegate: String!
+  toDelegate: String!
+}
+
+type ExponentialStakingDelegateVotesChanged @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  delegate: String! @index
+  previousBalance: BigInt!
+  newBalance: BigInt!
+}
+
+type ExponentialStakingPenalty @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  amount: BigInt!
+}
+
+type ExponentialStakingReward @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  amount: BigInt!
+}
+
+type ExponentialStakingStake @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  amount: BigInt!
+  end: BigInt!
+  points: BigInt!
+}
+
+type ExponentialStakingUnstake @entity  {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  amount: BigInt!
+  end: BigInt!
+  points: BigInt!
+}
 type ProcessingStatus @entity {
   id: ID!
   timestamp: DateTime!

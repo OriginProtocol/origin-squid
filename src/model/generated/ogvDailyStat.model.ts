@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class OGVDailyStat {
@@ -11,31 +10,31 @@ export class OGVDailyStat {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     blockNumber!: number
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     totalSupply!: bigint
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     totalSupplyUSD!: number
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     totalStaked!: bigint
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     tradingVolumeUSD!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     marketCapUSD!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     priceUSD!: number
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     holdersOverThreshold!: number
 }

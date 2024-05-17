@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, FloatColumn as FloatColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class OTokenAPY {
@@ -11,44 +10,44 @@ export class OTokenAPY {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     chainId!: number
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     otoken!: string
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     blockNumber!: number
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     txHash!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     date!: string
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     apr!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     apy!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     apy7DayAvg!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     apy14DayAvg!: number
 
-    @Column_("numeric", {transformer: marshal.floatTransformer, nullable: false})
+    @FloatColumn_({nullable: false})
     apy30DayAvg!: number
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     rebasingCreditsPerToken!: bigint
 }

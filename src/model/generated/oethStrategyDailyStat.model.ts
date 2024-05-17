@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {OETHDailyStat} from "./oethDailyStat.model"
 import {OETHStrategyHoldingDailyStat} from "./oethStrategyHoldingDailyStat.model"
 
@@ -16,16 +15,16 @@ export class OETHStrategyDailyStat {
     @ManyToOne_(() => OETHDailyStat, {nullable: true})
     dailyStatId!: OETHDailyStat
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     name!: string
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     total!: bigint
 
     /**
      * Sum of tokens in strategy
      */
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     tvl!: bigint
 
     /**

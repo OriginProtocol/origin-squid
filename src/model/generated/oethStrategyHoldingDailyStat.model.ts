@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 import {OETHStrategyDailyStat} from "./oethStrategyDailyStat.model"
 
 @Entity_()
@@ -18,18 +17,18 @@ export class OETHStrategyHoldingDailyStat {
     /**
      * Token symbol
      */
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     symbol!: string
 
     /**
      * Amount held
      */
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     amount!: bigint
 
     /**
      * Total ETH value
      */
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     value!: bigint
 }

@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_} from "@subsquid/typeorm-store"
 import {LiquiditySourceType} from "./_liquiditySourceType"
 
 @Entity_()
@@ -10,12 +10,12 @@ export class LiquiditySource {
     @PrimaryColumn_()
     id!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     address!: string
 
     @Column_("varchar", {length: 12, nullable: false})
     type!: LiquiditySourceType
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     token!: string
 }
