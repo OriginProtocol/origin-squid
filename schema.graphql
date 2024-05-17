@@ -48,9 +48,9 @@ type ExponentialStakingAccount @entity  {
 
 
 
-### Events
+# Events
 type ExponentialStakingDelegateChanged @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   delegator: String! @index
@@ -59,7 +59,7 @@ type ExponentialStakingDelegateChanged @entity  {
 }
 
 type ExponentialStakingDelegateVotesChanged @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   delegate: String! @index
@@ -68,7 +68,7 @@ type ExponentialStakingDelegateVotesChanged @entity  {
 }
 
 type ExponentialStakingPenalty @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -76,7 +76,7 @@ type ExponentialStakingPenalty @entity  {
 }
 
 type ExponentialStakingReward @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -84,7 +84,7 @@ type ExponentialStakingReward @entity  {
 }
 
 type ExponentialStakingStake @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -95,7 +95,7 @@ type ExponentialStakingStake @entity  {
 }
 
 type ExponentialStakingUnstake @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -386,7 +386,63 @@ type BridgeTransferState @entity {
   txHash: String! @index
   state: Int!
 }
-# OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
+enum GovernanceProposalState {
+  Pending
+  Active
+  Canceled
+  Defeated
+  Succeeded
+  Queued
+  Expired
+  Executed
+}
+
+enum GovernanceProposalEvent {
+  Created
+  Queued
+  Canceled
+  Extended
+  Executed
+}
+
+enum GovernanceVoteType {
+  Against
+  For
+  Abstain
+}
+
+type GovernanceProposalTxLog @entity {
+  id: ID!
+  hash: String!
+  event: GovernanceProposalEvent!
+  timestamp: DateTime!
+  proposal: GovernanceProposal! @index
+}
+
+type GovernanceProposal @entity {
+  id: ID! @index
+  description: String
+  proposer: String!
+  timestamp: DateTime!
+  startBlock: BigInt!
+  endBlock: BigInt!
+  lastUpdated: DateTime!
+  status: GovernanceProposalState!
+  logs: [GovernanceProposalTxLog]! @derivedFrom(field: "proposal")
+  quorum: BigInt!
+  choices: [String]!
+  scores: [Float]!
+}
+
+type GovernanceProposalVote @entity {
+  id: ID!
+  proposal: GovernanceProposal! @index
+  voter: String! @index
+  weight: BigInt!
+  type: GovernanceVoteType!
+  txHash: String!
+  timestamp: DateTime!
+}# OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
 """
 The Vault entity tracks the OETH vault balance over time.
 """

@@ -46,9 +46,9 @@ type ExponentialStakingAccount @entity  {
 
 
 
-### Events
+# Events
 type ExponentialStakingDelegateChanged @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   delegator: String! @index
@@ -57,7 +57,7 @@ type ExponentialStakingDelegateChanged @entity  {
 }
 
 type ExponentialStakingDelegateVotesChanged @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   delegate: String! @index
@@ -66,7 +66,7 @@ type ExponentialStakingDelegateVotesChanged @entity  {
 }
 
 type ExponentialStakingPenalty @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -74,7 +74,7 @@ type ExponentialStakingPenalty @entity  {
 }
 
 type ExponentialStakingReward @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -82,7 +82,7 @@ type ExponentialStakingReward @entity  {
 }
 
 type ExponentialStakingStake @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index
@@ -93,7 +93,7 @@ type ExponentialStakingStake @entity  {
 }
 
 type ExponentialStakingUnstake @entity  {
-  id: ID! # `chainId:address:account`
+  id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
   account: String! @index

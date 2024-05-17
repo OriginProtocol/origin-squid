@@ -72,7 +72,7 @@ export const createExponentialStakingTracker = ({
       filter: delegateChangedFilter,
       processor: async (ctx, block, log, state) => {
         const data = abi.events.DelegateChanged.decode(log)
-        const id = log.id
+        const id = `${chainId}:${log.id}`
         const entity = new ExponentialStakingDelegateChanged({
           id,
           chainId,
@@ -89,7 +89,7 @@ export const createExponentialStakingTracker = ({
       filter: delegateVotesChangedFilter,
       processor: async (ctx, block, log, state) => {
         const data = abi.events.DelegateVotesChanged.decode(log)
-        const id = log.id
+        const id = `${chainId}:${log.id}`
         const entity = new ExponentialStakingDelegateVotesChanged({
           id,
           chainId,
@@ -106,7 +106,7 @@ export const createExponentialStakingTracker = ({
       filter: penaltyFilter,
       processor: async (ctx, block, log, state) => {
         const data = abi.events.Penalty.decode(log)
-        const id = log.id
+        const id = `${chainId}:${log.id}`
         const entity = new ExponentialStakingPenalty({
           id,
           chainId,
@@ -118,11 +118,27 @@ export const createExponentialStakingTracker = ({
       },
     },
     {
+      description: 'Create Reward event',
+      filter: penaltyFilter,
+      processor: async (ctx, block, log, state) => {
+        const data = abi.events.Reward.decode(log)
+        const id = `${chainId}:${log.id}`
+        const entity = new ExponentialStakingReward({
+          id,
+          chainId,
+          address,
+          account: data.user,
+          amount: data.amount,
+        })
+        state.reward.set(id, entity)
+      },
+    },
+    {
       description: 'Create Stake event',
       filter: stakeFilter,
       processor: async (ctx, block, log, state) => {
         const data = abi.events.Stake.decode(log)
-        const id = log.id
+        const id = `${chainId}:${log.id}`
         const entity = new ExponentialStakingStake({
           id,
           chainId,
@@ -141,7 +157,7 @@ export const createExponentialStakingTracker = ({
       filter: unstakeFilter,
       processor: async (ctx, block, log, state) => {
         const data = abi.events.Unstake.decode(log)
-        const id = log.id
+        const id = `${chainId}:${log.id}`
         const entity = new ExponentialStakingUnstake({
           id,
           chainId,
@@ -155,7 +171,7 @@ export const createExponentialStakingTracker = ({
         state.unstake.set(id, entity)
       },
     },
-    
+
     // State Entity Processors
     {
       description: 'Handle Stake for Lockup',

@@ -2,7 +2,7 @@
   "name": "origin-squid",
   "private": true,
   "scripts": {
-    "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat schema-*.graphql >> schema.graphql && sqd codegen && git add src/model/generated/*",
+    "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat schema/*.graphql >> schema.graphql && sqd codegen && git add src/model/generated/*",
     "migration:generate": "sqd down && sqd up && sqd migration:generate && git add db/migrations/*",
     "generate": "npm-run-all codegen migration:generate",
     "build": "rm -rf lib && tsc",

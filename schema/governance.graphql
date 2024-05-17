@@ -1,0 +1,57 @@
+enum GovernanceProposalState {
+  Pending
+  Active
+  Canceled
+  Defeated
+  Succeeded
+  Queued
+  Expired
+  Executed
+}
+
+enum GovernanceProposalEvent {
+  Created
+  Queued
+  Canceled
+  Extended
+  Executed
+}
+
+enum GovernanceVoteType {
+  Against
+  For
+  Abstain
+}
+
+type GovernanceProposalTxLog @entity {
+  id: ID!
+  hash: String!
+  event: GovernanceProposalEvent!
+  timestamp: DateTime!
+  proposal: GovernanceProposal! @index
+}
+
+type GovernanceProposal @entity {
+  id: ID! @index
+  description: String
+  proposer: String!
+  timestamp: DateTime!
+  startBlock: BigInt!
+  endBlock: BigInt!
+  lastUpdated: DateTime!
+  status: GovernanceProposalState!
+  logs: [GovernanceProposalTxLog]! @derivedFrom(field: "proposal")
+  quorum: BigInt!
+  choices: [String]!
+  scores: [Float]!
+}
+
+type GovernanceProposalVote @entity {
+  id: ID!
+  proposal: GovernanceProposal! @index
+  voter: String! @index
+  weight: BigInt!
+  type: GovernanceVoteType!
+  txHash: String!
+  timestamp: DateTime!
+}
