@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVProposalState} from "./_ogvProposalState"
 import {OGVProposalTxLog} from "./ogvProposalTxLog.model"
@@ -43,6 +43,6 @@ export class OGVProposal {
     @StringColumn_({array: true, nullable: false})
     choices!: (string | undefined | null)[]
 
-    @FloatColumn_({array: true, nullable: false})
-    scores!: (number | undefined | null)[]
+    @StringColumn_({array: true, nullable: false})
+    scores!: (string | undefined | null)[]
 }

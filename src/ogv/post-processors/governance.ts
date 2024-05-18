@@ -87,10 +87,7 @@ export const process = async (ctx: Context) => {
         ) {
           await _processProposalEvents(ctx, result, block, log)
         } else if (
-          [
-            governanceAbi.events.VoteCast.topic,
-            governanceAbi.events.VoteCastWithParams.topic,
-          ].includes(firstTopic)
+          [governanceAbi.events.VoteCast.topic, governanceAbi.events.VoteCastWithParams.topic].includes(firstTopic)
         ) {
           await _processVoteCast(ctx, result, block, log)
         }
@@ -101,13 +98,7 @@ export const process = async (ctx: Context) => {
         ctx.log.error('Could not process governance event')
       }
     }
-    await _updateProposalStatuses(
-      ctx,
-      result,
-      block,
-      goActiveBlock,
-      goFinishedBlock,
-    )
+    await _updateProposalStatuses(ctx, result, block, goActiveBlock, goFinishedBlock)
   }
 
   await ctx.store.upsert(Array.from(result.addresses.values()))
@@ -116,12 +107,7 @@ export const process = async (ctx: Context) => {
   await ctx.store.upsert(result.votes)
 }
 
-const _processProposalCreated = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processProposalCreated = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   // ctx.log.info('_processProposalCreated')
   const {
     proposalId,
@@ -132,11 +118,7 @@ const _processProposalCreated = async (
   } = governanceAbi.events.ProposalCreated.decode(log)
   const proposer = await _getAddress(ctx, proposerAddr, result)
   const blockTimestamp = new Date(block.header.timestamp)
-  const governance = new governanceAbi.Contract(
-    ctx,
-    block.header,
-    GOVERNANCE_ADDRESS,
-  )
+  const governance = new governanceAbi.Contract(ctx, block.header, GOVERNANCE_ADDRESS)
 
   const proposal = new OGVProposal({
     id: proposalId.toString(),
@@ -179,23 +161,17 @@ const proposalStateMap = [
 
 const eventMapper = {
   [governanceAbi.events.ProposalQueued.topic]: {
-    decode: governanceAbi.events.ProposalQueued.decode.bind(
-      governanceAbi.events.ProposalQueued,
-    ),
+    decode: governanceAbi.events.ProposalQueued.decode.bind(governanceAbi.events.ProposalQueued),
     status: OGVProposalState.Queued,
     event: OGVProposalEvent.Queued,
   },
   [governanceAbi.events.ProposalCanceled.topic]: {
-    decode: governanceAbi.events.ProposalCanceled.decode.bind(
-      governanceAbi.events.ProposalCanceled,
-    ),
+    decode: governanceAbi.events.ProposalCanceled.decode.bind(governanceAbi.events.ProposalCanceled),
     status: OGVProposalState.Canceled,
     event: OGVProposalEvent.Canceled,
   },
   [governanceAbi.events.ProposalExecuted.topic]: {
-    decode: governanceAbi.events.ProposalExecuted.decode.bind(
-      governanceAbi.events.ProposalExecuted,
-    ),
+    decode: governanceAbi.events.ProposalExecuted.decode.bind(governanceAbi.events.ProposalExecuted),
     status: OGVProposalState.Executed,
     event: OGVProposalEvent.Executed,
   },
@@ -203,16 +179,10 @@ const eventMapper = {
 
 const _updateStatusBlocks = () => {
   goActiveBlock = Number(
-    pendingProposals.reduce(
-      (min, p) => (p.startBlock < min ? p.startBlock : min),
-      BigInt(Number.MAX_SAFE_INTEGER),
-    ),
+    pendingProposals.reduce((min, p) => (p.startBlock < min ? p.startBlock : min), BigInt(Number.MAX_SAFE_INTEGER)),
   )
   goFinishedBlock = Number(
-    activeProposals.reduce(
-      (min, p) => (p.endBlock < min ? p.endBlock : min),
-      BigInt(Number.MAX_SAFE_INTEGER),
-    ),
+    activeProposals.reduce((min, p) => (p.endBlock < min ? p.endBlock : min), BigInt(Number.MAX_SAFE_INTEGER)),
   )
 }
 
@@ -226,58 +196,34 @@ const _updateProposalStatuses = async (
   // Update for Active and post-Active statuses.
   if (block.header.height > goActiveBlock) {
     ctx.log.info('block.header.height > goActiveBlock')
-    for (const proposal of pendingProposals.filter(
-      (p) => block.header.height > Number(p.startBlock),
-    )) {
+    for (const proposal of pendingProposals.filter((p) => block.header.height > Number(p.startBlock))) {
       await _updateProposalStatus(ctx, result, block, proposal.id)
     }
-    pendingProposals = pendingProposals.filter(
-      (p) => block.header.height <= Number(p.startBlock),
-    )
+    pendingProposals = pendingProposals.filter((p) => block.header.height <= Number(p.startBlock))
   }
   if (block.header.height > goFinishedBlock) {
     ctx.log.info('block.header.height > goFinishedBlock')
-    for (const proposal of activeProposals.filter(
-      (p) => block.header.height > Number(p.endBlock),
-    )) {
+    for (const proposal of activeProposals.filter((p) => block.header.height > Number(p.endBlock))) {
       await _updateProposalStatus(ctx, result, block, proposal.id)
     }
-    activeProposals = activeProposals.filter(
-      (p) => block.header.height <= Number(p.endBlock),
-    )
+    activeProposals = activeProposals.filter((p) => block.header.height <= Number(p.endBlock))
   }
   _updateStatusBlocks()
 }
 
-const _updateProposalStatus = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  proposalId: string,
-) => {
+const _updateProposalStatus = async (ctx: Context, result: IProcessResult, block: Block, proposalId: string) => {
   const proposal = await _getProposal(ctx, proposalId, result)
   proposal.status = await _getProposalState(ctx, block, BigInt(proposalId))
   ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
-  if (
-    proposal.status === OGVProposalState.Pending &&
-    !pendingProposals.find((p) => p.id === proposal.id)
-  ) {
+  if (proposal.status === OGVProposalState.Pending && !pendingProposals.find((p) => p.id === proposal.id)) {
     pendingProposals.push(proposal)
   }
-  if (
-    proposal.status === OGVProposalState.Active &&
-    !activeProposals.find((p) => p.id === proposal.id)
-  ) {
+  if (proposal.status === OGVProposalState.Active && !activeProposals.find((p) => p.id === proposal.id)) {
     activeProposals.push(proposal)
   }
 }
 
-const _processProposalEvents = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processProposalEvents = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   // ctx.log.info('_processProposalEvents')
   const { decode, status, event } = eventMapper[log.topics[0]]!
 
@@ -298,15 +244,9 @@ const _processProposalEvents = async (
   result.proposalLogs.push(proposalTxLog)
 }
 
-const _processProposalExtended = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processProposalExtended = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   // ctx.log.info('_processProposalExtended')
-  const { proposalId, extendedDeadline } =
-    governanceAbi.events.ProposalExtended.decode(log)
+  const { proposalId, extendedDeadline } = governanceAbi.events.ProposalExtended.decode(log)
   const blockTimestamp = new Date(block.header.timestamp)
 
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
@@ -324,12 +264,7 @@ const _processProposalExtended = async (
   result.proposalLogs.push(proposalTxLog)
 }
 
-const _processVoteCast = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processVoteCast = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   // ctx.log.info('_processVoteCast')
   const {
     proposalId,
@@ -344,9 +279,7 @@ const _processVoteCast = async (
   const proposal = await _getProposal(ctx, proposalId.toString(), result)
   const voter = await _getAddress(ctx, voterAddr, result)
 
-  const voteType = [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][
-    parseInt(support.toString())
-  ]
+  const voteType = [OGVVoteType.Against, OGVVoteType.For, OGVVoteType.Abstain][parseInt(support.toString())]
   const proposalVote = new OGVProposalVote({
     id: `${proposalId.toString()}:${log.transactionHash}:${voter.id}`,
     proposal,
@@ -357,40 +290,23 @@ const _processVoteCast = async (
     type: voteType,
   })
 
-  const weightN = Number(formatEther(weight))
   const choiceIndex = proposal.choices.indexOf(voteType)
   if (choiceIndex >= 0) {
-    proposal.scores[choiceIndex]! += weightN
+    proposal.scores[choiceIndex] = (BigInt(proposal.scores[choiceIndex]!) + weight).toString()
   } else {
     proposal.choices.push(voteType)
-    proposal.scores.push(weightN)
+    proposal.scores.push(weight.toString())
   }
 
   result.votes.push(proposalVote)
 }
 
-const _getProposalState = async (
-  ctx: Context,
-  block: Block,
-  proposalId: bigint,
-): Promise<OGVProposalState> => {
-  const governance = new governanceAbi.Contract(
-    ctx,
-    block.header,
-    GOVERNANCE_ADDRESS,
-  )
-  return (
-    proposalStateMap[
-      parseInt((await governance.state(proposalId)).toString())
-    ] || OGVProposalState.Pending
-  )
+const _getProposalState = async (ctx: Context, block: Block, proposalId: bigint): Promise<OGVProposalState> => {
+  const governance = new governanceAbi.Contract(ctx, block.header, GOVERNANCE_ADDRESS)
+  return proposalStateMap[parseInt((await governance.state(proposalId)).toString())] || OGVProposalState.Pending
 }
 
-const _getAddress = async (
-  ctx: Context,
-  id: string,
-  result: IProcessResult,
-): Promise<OGVAddress> => {
+const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Promise<OGVAddress> => {
   id = id.toLowerCase()
   const { addresses } = result
 
@@ -407,11 +323,7 @@ const _getAddress = async (
   return address
 }
 
-const _getProposal = async (
-  ctx: Context,
-  id: string,
-  result: IProcessResult,
-): Promise<OGVProposal> => {
+const _getProposal = async (ctx: Context, id: string, result: IProcessResult): Promise<OGVProposal> => {
   const { proposals } = result
 
   if (proposals.has(id)) {

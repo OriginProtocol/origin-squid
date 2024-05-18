@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {GovernanceProposal} from "./governanceProposal.model"
 import {GovernanceVoteType} from "./_governanceVoteType"
 
@@ -10,6 +10,12 @@ export class GovernanceProposalVote {
 
     @PrimaryColumn_()
     id!: string
+
+    @IntColumn_({nullable: false})
+    chainId!: number
+
+    @StringColumn_({nullable: false})
+    address!: string
 
     @Index_()
     @ManyToOne_(() => GovernanceProposal, {nullable: true})

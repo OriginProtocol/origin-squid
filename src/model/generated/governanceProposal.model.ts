@@ -1,6 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {GovernanceProposalState} from "./_governanceProposalState"
-import {GovernanceProposalTxLog} from "./governanceProposalTxLog.model"
+import {GovernanceProposalEvent} from "./governanceProposalEvent.model"
 
 @Entity_()
 export class GovernanceProposal {
@@ -10,6 +10,15 @@ export class GovernanceProposal {
 
     @PrimaryColumn_()
     id!: string
+
+    @IntColumn_({nullable: false})
+    chainId!: number
+
+    @StringColumn_({nullable: false})
+    address!: string
+
+    @BigIntColumn_({nullable: false})
+    proposalId!: bigint
 
     @StringColumn_({nullable: true})
     description!: string | undefined | null
@@ -32,8 +41,8 @@ export class GovernanceProposal {
     @Column_("varchar", {length: 9, nullable: false})
     status!: GovernanceProposalState
 
-    @OneToMany_(() => GovernanceProposalTxLog, e => e.proposal)
-    logs!: GovernanceProposalTxLog[]
+    @OneToMany_(() => GovernanceProposalEvent, e => e.proposal)
+    events!: GovernanceProposalEvent[]
 
     @BigIntColumn_({nullable: false})
     quorum!: bigint
@@ -41,6 +50,6 @@ export class GovernanceProposal {
     @StringColumn_({array: true, nullable: false})
     choices!: (string | undefined | null)[]
 
-    @FloatColumn_({array: true, nullable: false})
-    scores!: (number | undefined | null)[]
+    @StringColumn_({array: true, nullable: false})
+    scores!: (string | undefined | null)[]
 }

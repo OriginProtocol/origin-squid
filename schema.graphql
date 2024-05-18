@@ -397,7 +397,7 @@ enum GovernanceProposalState {
   Executed
 }
 
-enum GovernanceProposalEvent {
+enum GovernanceProposalEventType {
   Created
   Queued
   Canceled
@@ -411,16 +411,19 @@ enum GovernanceVoteType {
   Abstain
 }
 
-type GovernanceProposalTxLog @entity {
+type GovernanceProposalEvent @entity {
   id: ID!
   hash: String!
-  event: GovernanceProposalEvent!
+  event: GovernanceProposalEventType!
   timestamp: DateTime!
   proposal: GovernanceProposal! @index
 }
 
 type GovernanceProposal @entity {
   id: ID! @index
+  chainId: Int!
+  address: String!
+  proposalId: BigInt!
   description: String
   proposer: String!
   timestamp: DateTime!
@@ -428,14 +431,16 @@ type GovernanceProposal @entity {
   endBlock: BigInt!
   lastUpdated: DateTime!
   status: GovernanceProposalState!
-  logs: [GovernanceProposalTxLog]! @derivedFrom(field: "proposal")
+  events: [GovernanceProposalEvent]! @derivedFrom(field: "proposal")
   quorum: BigInt!
   choices: [String]!
-  scores: [Float]!
+  scores: [String]!
 }
 
 type GovernanceProposalVote @entity {
   id: ID!
+  chainId: Int!
+  address: String!
   proposal: GovernanceProposal! @index
   voter: String! @index
   weight: BigInt!
@@ -706,7 +711,7 @@ type OGVProposal @entity {
   logs: [OGVProposalTxLog]! @derivedFrom(field: "proposal")
   quorum: BigInt!
   choices: [String]!
-  scores: [Float]!
+  scores: [String]!
 }
 
 type OGVProposalVote @entity {

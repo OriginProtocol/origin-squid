@@ -1,4 +1,4 @@
-export enum GovernanceProposalEvent {
+export enum GovernanceProposalEventType {
     Created = "Created",
     Queued = "Queued",
     Canceled = "Canceled",
