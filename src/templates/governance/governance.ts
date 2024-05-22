@@ -191,14 +191,14 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
   ) => {
     // Update for Active and post-Active statuses.
     if (block.header.height > goActiveBlock) {
-      ctx.log.info('block.header.height > goActiveBlock')
+      // ctx.log.info('block.header.height > goActiveBlock')
       for (const proposal of pendingProposals.filter((p) => block.header.height > Number(p.startBlock))) {
         await _updateProposalStatus(ctx, result, block, proposal.proposalId)
       }
       pendingProposals = pendingProposals.filter((p) => block.header.height <= Number(p.startBlock))
     }
     if (block.header.height > goFinishedBlock) {
-      ctx.log.info('block.header.height > goFinishedBlock')
+      // ctx.log.info('block.header.height > goFinishedBlock')
       for (const proposal of activeProposals.filter((p) => block.header.height > Number(p.endBlock))) {
         await _updateProposalStatus(ctx, result, block, proposal.proposalId)
       }
@@ -210,7 +210,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
   const _updateProposalStatus = async (ctx: Context, result: IProcessResult, block: Block, proposalId: bigint) => {
     const proposal = await _getProposal(ctx, proposalId, result)
     proposal.status = await _getProposalState(ctx, block, proposal.proposalId)
-    ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
+    // ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
     if (proposal.status === GovernanceProposalState.Pending && !pendingProposals.find((p) => p.id === proposal.id)) {
       pendingProposals.push(proposal)
     }
