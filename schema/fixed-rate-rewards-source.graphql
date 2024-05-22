@@ -1,0 +1,52 @@
+type GovernorshipTransferred @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  previousGovernor: String!
+  newGovernor: String!
+}
+type PendingGovernorshipTransfer @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  previousGovernor: String!
+  newGovernor: String!
+}
+type RewardCollected @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  amountCollected: BigInt!
+}
+type RewardsPerSecondChanged @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  newRPS: BigInt!
+  oldRPS: BigInt!
+}
+type RewardsTargetChange @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  target: String!
+  previousTarget: String!
+}
+type StrategistUpdated @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategistAddress: String!
+}

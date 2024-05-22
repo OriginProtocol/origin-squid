@@ -26,6 +26,8 @@ type ExponentialStakingLockup @entity  {
   address: String! @index
   account: String! @index
   lockupId: BigInt! @index
+  timestamp: DateTime!
+  lastUpdated: DateTime!
   amount: BigInt!
   end: BigInt!
   points: BigInt!
@@ -104,7 +106,58 @@ type ExponentialStakingUnstake @entity  {
   end: BigInt!
   points: BigInt!
 }
-type ProcessingStatus @entity {
+type GovernorshipTransferred @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  previousGovernor: String!
+  newGovernor: String!
+}
+type PendingGovernorshipTransfer @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  previousGovernor: String!
+  newGovernor: String!
+}
+type RewardCollected @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  amountCollected: BigInt!
+}
+type RewardsPerSecondChanged @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  newRPS: BigInt!
+  oldRPS: BigInt!
+}
+type RewardsTargetChange @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  target: String!
+  previousTarget: String!
+}
+type StrategistUpdated @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  strategistAddress: String!
+}type ProcessingStatus @entity {
   id: ID!
   timestamp: DateTime!
   blockNumber: Int!
@@ -429,6 +482,10 @@ type GovernanceProposal @entity {
   timestamp: DateTime!
   startBlock: BigInt!
   endBlock: BigInt!
+  targets: [String]!
+  values: [String]!
+  signatures: [String]!
+  calldatas: [String]!
   lastUpdated: DateTime!
   status: GovernanceProposalState!
   events: [GovernanceProposalEvent]! @derivedFrom(field: "proposal")

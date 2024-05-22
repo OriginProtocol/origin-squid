@@ -1,23 +1,11 @@
 import * as abi from '@abi/erc20'
-import {
-  ERC20,
-  ERC20Balance,
-  ERC20Holder,
-  ERC20State,
-  ERC20Transfer,
-} from '@model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
 import { Block, Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const createERC20SimpleTracker = ({
-  from,
-  address,
-}: {
-  from: number
-  address: TokenAddress
-}) => {
+export const createERC20SimpleTracker = ({ from, address }: { from: number; address: TokenAddress }) => {
   let erc20: ERC20 | undefined
   let lastState: ERC20State | undefined
   const transferLogFilters = [
@@ -35,11 +23,7 @@ export const createERC20SimpleTracker = ({
     try {
       if (!erc20) {
         const contract = new abi.Contract(ctx, block.header, address)
-        const [name, symbol, decimals] = await Promise.all([
-          contract.name(),
-          contract.symbol(),
-          contract.decimals(),
-        ])
+        const [name, symbol, decimals] = await Promise.all([contract.name(), contract.symbol(), contract.decimals()])
         erc20 = new ERC20({
           id: `${ctx.chain.id}-${address}`,
           chainId: ctx.chain.id,
@@ -51,10 +35,7 @@ export const createERC20SimpleTracker = ({
         await ctx.store.insert(erc20)
       }
     } catch (err) {
-      ctx.log.error(
-        { height: block.header.height, err },
-        'Failed to get contract name',
-      )
+      ctx.log.error({ height: block.header.height, err }, 'Failed to get contract name')
     }
     if (!lastState) {
       lastState = await ctx.store
@@ -101,12 +82,7 @@ export const createERC20SimpleTracker = ({
         lastState = state
         return state
       }
-      const createBalance = async (
-        ctx: Context,
-        block: Block,
-        account: string,
-        balance: bigint,
-      ) => {
+      const createBalance = async (ctx: Context, block: Block, account: string, balance: bigint) => {
         if (account === ADDRESS_ZERO) return undefined
         const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
         if (result.balances.has(id)) return result.balances.get(id)!
@@ -170,8 +146,7 @@ export const createERC20SimpleTracker = ({
             result.transfers.set(transfer.id, transfer)
 
             // Skip remaining if `from` and `to` are both address zero.
-            if (from === to && from === ADDRESS_ZERO)
-              throw new Error('what the fuck bro')
+            if (from === to && from === ADDRESS_ZERO) throw new Error('what the fuck bro')
 
             const [state, fromHolder, toHolder] = await Promise.all([
               await getState(ctx, block),
@@ -186,25 +161,17 @@ export const createERC20SimpleTracker = ({
               state.totalSupply -= data.value
             }
 
-            // ctx.log.info(`${from} ${to} ${formatEther(data.value)}`)
-
             // Handle From Address Changes
             if (fromHolder) {
               fromHolder.balance -= data.value
               await createBalance(ctx, block, from, fromHolder.balance)
-            }
-            if (fromHolder?.balance === 0n) {
-              state.holderCount += 1
+              if (fromHolder.balance === 0n) {
+                state.holderCount -= 1
+              }
             }
             // Handle To Address Changes
             if (toHolder?.balance === 0n && data.value > 0n) {
               state.holderCount += 1
-              if (state.holderCount % 100 === 0) {
-                ctx.log.info({
-                  height: block.header.height,
-                  holderCount: state.holderCount,
-                })
-              }
             }
             if (toHolder) {
               toHolder.balance += data.value

@@ -41,6 +41,10 @@ type GovernanceProposal @entity {
   timestamp: DateTime!
   startBlock: BigInt!
   endBlock: BigInt!
+  targets: [String]!
+  values: [String]!
+  signatures: [String]!
+  calldatas: [String]!
   lastUpdated: DateTime!
   status: GovernanceProposalState!
   events: [GovernanceProposalEvent]! @derivedFrom(field: "proposal")

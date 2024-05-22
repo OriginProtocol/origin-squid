@@ -133,28 +133,27 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
 
   const _processProposalCreated = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
     // ctx.log.info('_processProposalCreated')
-    const {
-      proposalId,
-      proposer: proposerAddr,
-      description,
-      startBlock,
-      endBlock,
-    } = governanceAbi.events.ProposalCreated.decode(log)
+    const data = governanceAbi.events.ProposalCreated.decode(log)
     const blockTimestamp = new Date(block.header.timestamp)
     const governance = new governanceAbi.Contract(ctx, block.header, address)
 
     const proposal = new GovernanceProposal({
-      id: `${ctx.chain.id}:${address}:${proposalId}`,
+      id: `${ctx.chain.id}:${address}:${data.proposalId}`,
       chainId: ctx.chain.id,
       address,
-      proposalId,
-      description,
-      proposer: proposerAddr.toLowerCase(),
+      proposalId: data.proposalId,
+      description: data.description,
+      proposer: data.proposer.toLowerCase(),
       timestamp: blockTimestamp,
-      startBlock,
-      endBlock,
+      startBlock: data.startBlock,
+      endBlock: data.endBlock,
+      signatures: data.signatures,
+      calldatas: data.calldatas,
+      values: data.values.map((v) => v.toString()),
+      targets: data.targets,
       lastUpdated: new Date(),
       status: GovernanceProposalState.Pending,
+      events: [],
       quorum: await governance.quorum(BigInt(block.header.height - 1)),
       choices: [],
       scores: [],
@@ -170,7 +169,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       timestamp: blockTimestamp,
     })
 
-    result.proposals.set(proposalId.toString(), proposal)
+    result.proposals.set(proposal.id, proposal)
     result.proposalEvents.push(proposalTxLog)
   }
 
@@ -194,23 +193,23 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     if (block.header.height > goActiveBlock) {
       ctx.log.info('block.header.height > goActiveBlock')
       for (const proposal of pendingProposals.filter((p) => block.header.height > Number(p.startBlock))) {
-        await _updateProposalStatus(ctx, result, block, proposal.id)
+        await _updateProposalStatus(ctx, result, block, proposal.proposalId)
       }
       pendingProposals = pendingProposals.filter((p) => block.header.height <= Number(p.startBlock))
     }
     if (block.header.height > goFinishedBlock) {
       ctx.log.info('block.header.height > goFinishedBlock')
       for (const proposal of activeProposals.filter((p) => block.header.height > Number(p.endBlock))) {
-        await _updateProposalStatus(ctx, result, block, proposal.id)
+        await _updateProposalStatus(ctx, result, block, proposal.proposalId)
       }
       activeProposals = activeProposals.filter((p) => block.header.height <= Number(p.endBlock))
     }
     _updateStatusBlocks()
   }
 
-  const _updateProposalStatus = async (ctx: Context, result: IProcessResult, block: Block, proposalId: string) => {
+  const _updateProposalStatus = async (ctx: Context, result: IProcessResult, block: Block, proposalId: bigint) => {
     const proposal = await _getProposal(ctx, proposalId, result)
-    proposal.status = await _getProposalState(ctx, block, BigInt(proposalId))
+    proposal.status = await _getProposalState(ctx, block, proposal.proposalId)
     ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
     if (proposal.status === GovernanceProposalState.Pending && !pendingProposals.find((p) => p.id === proposal.id)) {
       pendingProposals.push(proposal)
@@ -227,8 +226,8 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     const { proposalId } = decode(log)
     const blockTimestamp = new Date(block.header.timestamp)
 
-    const proposal = await _getProposal(ctx, proposalId.toString(), result)
-    await _updateProposalStatus(ctx, result, block, proposalId.toString())
+    const proposal = await _getProposal(ctx, proposalId, result)
+    await _updateProposalStatus(ctx, result, block, proposalId)
 
     const proposalTxLog = new GovernanceProposalEvent({
       id: `${ctx.chain.id}:${log.id}`,
@@ -246,9 +245,9 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     const { proposalId, extendedDeadline } = governanceAbi.events.ProposalExtended.decode(log)
     const blockTimestamp = new Date(block.header.timestamp)
 
-    const proposal = await _getProposal(ctx, proposalId.toString(), result)
+    const proposal = await _getProposal(ctx, proposalId, result)
     proposal.endBlock = extendedDeadline
-    await _updateProposalStatus(ctx, result, block, proposalId.toString())
+    await _updateProposalStatus(ctx, result, block, proposalId)
 
     const proposalTxLog = new GovernanceProposalEvent({
       id: `${ctx.chain.id}:${log.id}`,
@@ -273,7 +272,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       : governanceAbi.events.VoteCastWithParams.decode(log)
     const blockTimestamp = new Date(block.header.timestamp)
 
-    const proposal = await _getProposal(ctx, proposalId.toString(), result)
+    const proposal = await _getProposal(ctx, proposalId, result)
 
     const voteType = [GovernanceVoteType.Against, GovernanceVoteType.For, GovernanceVoteType.Abstain][
       parseInt(support.toString())
@@ -312,8 +311,13 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     )
   }
 
-  const _getProposal = async (ctx: Context, id: string, result: IProcessResult): Promise<GovernanceProposal> => {
+  const _getProposal = async (
+    ctx: Context,
+    proposalId: bigint,
+    result: IProcessResult,
+  ): Promise<GovernanceProposal> => {
     const { proposals } = result
+    const id = `${ctx.chain.id}:${address}:${proposalId}`
 
     if (proposals.has(id)) {
       return proposals.get(id)!
@@ -328,5 +332,5 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     return proposal
   }
 
-  return { setup, initialize, process }
+  return { from, setup, initialize, process }
 }

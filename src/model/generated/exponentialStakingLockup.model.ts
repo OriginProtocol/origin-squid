@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {ExponentialStakingLockupState} from "./_exponentialStakingLockupState"
 
 @Entity_()
@@ -25,6 +25,12 @@ export class ExponentialStakingLockup {
     @Index_()
     @BigIntColumn_({nullable: false})
     lockupId!: bigint
+
+    @DateTimeColumn_({nullable: false})
+    timestamp!: Date
+
+    @DateTimeColumn_({nullable: false})
+    lastUpdated!: Date
 
     @BigIntColumn_({nullable: false})
     amount!: bigint

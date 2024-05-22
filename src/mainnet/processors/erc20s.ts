@@ -19,19 +19,18 @@ import { logFilter } from '@utils/logFilter'
 
 let initialized = false
 
-const simpleTracks: Record<
-  string,
-  Parameters<typeof createERC20SimpleTracker>[0]
-> = {
+const simpleTracks: Record<string, Parameters<typeof createERC20SimpleTracker>[0]> = {
   // Origin Specific
   OGN: {
     from: 6436154,
-    // from: 16933090, // oeth deploy date
     address: tokens.OGN,
+  },
+  xOGN: {
+    from: 19919745,
+    address: tokens.xOGN,
   },
   OGV: {
     from: 14439231,
-    // from: 16933090, // oeth deploy date
     address: tokens.OGV,
   },
 }

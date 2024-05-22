@@ -24,6 +24,8 @@ type ExponentialStakingLockup @entity  {
   address: String! @index
   account: String! @index
   lockupId: BigInt! @index
+  timestamp: DateTime!
+  lastUpdated: DateTime!
   amount: BigInt!
   end: BigInt!
   points: BigInt!

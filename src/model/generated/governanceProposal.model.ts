@@ -35,6 +35,18 @@ export class GovernanceProposal {
     @BigIntColumn_({nullable: false})
     endBlock!: bigint
 
+    @StringColumn_({array: true, nullable: false})
+    targets!: (string | undefined | null)[]
+
+    @StringColumn_({array: true, nullable: false})
+    values!: (string | undefined | null)[]
+
+    @StringColumn_({array: true, nullable: false})
+    signatures!: (string | undefined | null)[]
+
+    @StringColumn_({array: true, nullable: false})
+    calldatas!: (string | undefined | null)[]
+
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
 

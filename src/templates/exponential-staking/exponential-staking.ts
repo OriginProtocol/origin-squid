@@ -184,6 +184,8 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
           address,
           account: data.user,
           lockupId: data.lockupId,
+          timestamp: new Date(block.header.timestamp),
+          lastUpdated: new Date(block.header.timestamp),
           end: data.end,
           amount: data.amount,
           points: data.points,
@@ -203,6 +205,7 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
         const id = `${chainId}:${address}:${data.lockupId}`
         const entity = state.lockup.get(id) ?? (await ctx.store.get(ExponentialStakingLockup, id))
         if (!entity) throw new Error(`Lockup not found: ${id}`)
+        entity.lastUpdated = new Date(block.header.timestamp)
         entity.withdrawAmount = data.amount
         entity.penalty = entity.amount - data.amount
         entity.state = ExponentialStakingLockupState.Closed
@@ -217,7 +220,6 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
       for (const subProcessor of subProcessors) {
         processor.addLog(subProcessor.filter.value)
       }
-      processor.includeAllBlocks({ from })
     },
     async process(ctx: Context) {
       const state: State = {
