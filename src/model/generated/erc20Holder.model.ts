@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class ERC20Holder {
@@ -14,15 +13,15 @@ export class ERC20Holder {
     id!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     chainId!: number
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     address!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     account!: string
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     balance!: bigint
 }

@@ -1,9 +1,15 @@
 import { toHex } from 'viem'
 import { arbitrum, mainnet } from 'viem/chains'
 
-import { Func } from '@abi/abi.support'
 import { Multicall } from '@abi/multicall'
 import { Block, Context } from '@processor'
+import {
+  type AbiFunction,
+  ContractBase,
+  type FunctionArguments,
+  type FunctionReturn,
+  fun,
+} from '@subsquid/evm-abi'
 
 const MULTICALL_CONTRACTS: Record<
   number,
@@ -18,12 +24,12 @@ const MULTICALL_CONTRACTS: Record<
     address: '0x842ec2c7d803033edf55e478f461fc547bc54eb2',
   },
 }
-export const multicall = async <Args extends any[], R>(
+export const multicall = async <Function extends AbiFunction<any, any>>(
   ctx: Context,
   header: Block['header'],
-  func: Func<Args, {}, R>,
+  func: Function,
   address: string,
-  calls: Args[],
+  calls: FunctionArguments<Function>[],
 ) => {
   const multicallContract = MULTICALL_CONTRACTS[ctx.chain.id]
   if (multicallContract && header.height >= multicallContract.from) {

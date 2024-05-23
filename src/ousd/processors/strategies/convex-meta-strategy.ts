@@ -21,7 +21,7 @@ export const convexMetaStrategy: IStrategyData = {
     traceFilter({
       type: ['call'],
       callTo: ['0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90'.toLowerCase()],
-      callSighash: [abstractStrategyAbi.functions.withdrawAll.sighash],
+      callSighash: [abstractStrategyAbi.functions.withdrawAll.selector],
       transaction: true,
       range: { from },
     }),

@@ -25,5 +25,10 @@ projects:
     include:
       - schema-general.graphql
       - types.graphql
+  ogn:
+    schema: schema-ogn.graphql
+    include:
+      - schema-general.graphql
+      - types.graphql
 include:
   - types.graphql

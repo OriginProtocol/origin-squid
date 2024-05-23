@@ -146,7 +146,7 @@ export const createERC20Tracker = ({
               block.header,
               abi.functions.balanceOf,
               address,
-              accounts.map((account) => [account]),
+              accounts.map((account) => ({ _owner: account })),
             )
             accounts.forEach((account, i) => {
               if (account === ADDRESS_ZERO) return

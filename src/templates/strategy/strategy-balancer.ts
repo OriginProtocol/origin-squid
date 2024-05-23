@@ -104,7 +104,7 @@ export const getBalancerStrategyHoldings = async (
     block,
     BALANCER_VAULT,
   )
-  const [poolAssets, balances] = await balancerVault.getPoolTokens(poolId)
+  const {tokens: poolAssets, balances} = await balancerVault.getPoolTokens(poolId)
 
   const totalStrategyBalance = await strategy['checkBalance()']() // in WETH
   const eth1 = BigInt('1000000000000000000')

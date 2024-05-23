@@ -1,235 +1,266 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './veogv.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    Approval: new LogEvent<([owner: string, spender: string, value: bigint] & {owner: string, spender: string, value: bigint})>(
-        abi, '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
-    ),
-    DelegateChanged: new LogEvent<([delegator: string, fromDelegate: string, toDelegate: string] & {delegator: string, fromDelegate: string, toDelegate: string})>(
-        abi, '0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f'
-    ),
-    DelegateVotesChanged: new LogEvent<([delegate: string, previousBalance: bigint, newBalance: bigint] & {delegate: string, previousBalance: bigint, newBalance: bigint})>(
-        abi, '0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724'
-    ),
-    Reward: new LogEvent<([user: string, amount: bigint] & {user: string, amount: bigint})>(
-        abi, '0x619caafabdd75649b302ba8419e48cccf64f37f1983ac4727cfb38b57703ffc9'
-    ),
-    Stake: new LogEvent<([user: string, lockupId: bigint, amount: bigint, end: bigint, points: bigint] & {user: string, lockupId: bigint, amount: bigint, end: bigint, points: bigint})>(
-        abi, '0x2720efa4b2dd4f3f8a347da3cbd290a522e9432da9072c5b8e6300496fdde282'
-    ),
-    Transfer: new LogEvent<([from: string, to: string, value: bigint] & {from: string, to: string, value: bigint})>(
-        abi, '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-    ),
-    Unstake: new LogEvent<([user: string, lockupId: bigint, amount: bigint, end: bigint, points: bigint] & {user: string, lockupId: bigint, amount: bigint, end: bigint, points: bigint})>(
-        abi, '0x05b744e3e9358bc00ba3cc0c6606a4d6536134dba00b2d2ee4b5de169acd6427'
-    ),
+    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
+    DelegateChanged: event("0x3134e8a2e6d97e929a7e54011ea5485d7d196dd5f0ba4d4ef95803e8e3fc257f", {"delegator": indexed(p.address), "fromDelegate": indexed(p.address), "toDelegate": indexed(p.address)}),
+    DelegateVotesChanged: event("0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724", {"delegate": indexed(p.address), "previousBalance": p.uint256, "newBalance": p.uint256}),
+    Reward: event("0x619caafabdd75649b302ba8419e48cccf64f37f1983ac4727cfb38b57703ffc9", {"user": indexed(p.address), "amount": p.uint256}),
+    Stake: event("0x2720efa4b2dd4f3f8a347da3cbd290a522e9432da9072c5b8e6300496fdde282", {"user": indexed(p.address), "lockupId": p.uint256, "amount": p.uint256, "end": p.uint256, "points": p.uint256}),
+    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
+    Unstake: event("0x05b744e3e9358bc00ba3cc0c6606a4d6536134dba00b2d2ee4b5de169acd6427", {"user": indexed(p.address), "lockupId": p.uint256, "amount": p.uint256, "end": p.uint256, "points": p.uint256}),
 }
 
 export const functions = {
-    DOMAIN_SEPARATOR: new Func<[], {}, string>(
-        abi, '0x3644e515'
-    ),
-    accRewardPerShare: new Func<[], {}, bigint>(
-        abi, '0x939d6237'
-    ),
-    allowance: new Func<[owner: string, spender: string], {owner: string, spender: string}, bigint>(
-        abi, '0xdd62ed3e'
-    ),
-    approve: new Func<[spender: string, amount: bigint], {spender: string, amount: bigint}, boolean>(
-        abi, '0x095ea7b3'
-    ),
-    balanceOf: new Func<[account: string], {account: string}, bigint>(
-        abi, '0x70a08231'
-    ),
-    checkpoints: new Func<[account: string, pos: number], {account: string, pos: number}, ([fromBlock: number, votes: bigint] & {fromBlock: number, votes: bigint})>(
-        abi, '0xf1127ed8'
-    ),
-    collectRewards: new Func<[], {}, []>(
-        abi, '0x70bb45b3'
-    ),
-    decimals: new Func<[], {}, number>(
-        abi, '0x313ce567'
-    ),
-    decreaseAllowance: new Func<[spender: string, subtractedValue: bigint], {spender: string, subtractedValue: bigint}, boolean>(
-        abi, '0xa457c2d7'
-    ),
-    delegate: new Func<[delegatee: string], {delegatee: string}, []>(
-        abi, '0x5c19a95c'
-    ),
-    delegateBySig: new Func<[delegatee: string, nonce: bigint, expiry: bigint, v: number, r: string, s: string], {delegatee: string, nonce: bigint, expiry: bigint, v: number, r: string, s: string}, []>(
-        abi, '0xc3cda520'
-    ),
-    delegates: new Func<[account: string], {account: string}, string>(
-        abi, '0x587cde1e'
-    ),
-    epoch: new Func<[], {}, bigint>(
-        abi, '0x900cf0cf'
-    ),
-    extend: new Func<[lockupId: bigint, duration: bigint], {lockupId: bigint, duration: bigint}, []>(
-        abi, '0xc89258db'
-    ),
-    getPastTotalSupply: new Func<[blockNumber: bigint], {blockNumber: bigint}, bigint>(
-        abi, '0x8e539e8c'
-    ),
-    getPastVotes: new Func<[account: string, blockNumber: bigint], {account: string, blockNumber: bigint}, bigint>(
-        abi, '0x3a46b1a8'
-    ),
-    getVotes: new Func<[account: string], {account: string}, bigint>(
-        abi, '0x9ab24eb0'
-    ),
-    increaseAllowance: new Func<[spender: string, addedValue: bigint], {spender: string, addedValue: bigint}, boolean>(
-        abi, '0x39509351'
-    ),
-    lockups: new Func<[_: string, _: bigint], {}, ([amount: bigint, end: bigint, points: bigint] & {amount: bigint, end: bigint, points: bigint})>(
-        abi, '0xc93d0b1e'
-    ),
-    minStakeDuration: new Func<[], {}, bigint>(
-        abi, '0x5fec5c64'
-    ),
-    name: new Func<[], {}, string>(
-        abi, '0x06fdde03'
-    ),
-    nonces: new Func<[owner: string], {owner: string}, bigint>(
-        abi, '0x7ecebe00'
-    ),
-    numCheckpoints: new Func<[account: string], {account: string}, number>(
-        abi, '0x6fcfff45'
-    ),
-    ogv: new Func<[], {}, string>(
-        abi, '0x142561cf'
-    ),
-    permit: new Func<[owner: string, spender: string, value: bigint, deadline: bigint, v: number, r: string, s: string], {owner: string, spender: string, value: bigint, deadline: bigint, v: number, r: string, s: string}, []>(
-        abi, '0xd505accf'
-    ),
-    previewPoints: new Func<[amount: bigint, duration: bigint], {amount: bigint, duration: bigint}, [_: bigint, _: bigint]>(
-        abi, '0x4fd0e648'
-    ),
-    previewRewards: new Func<[user: string], {user: string}, bigint>(
-        abi, '0xf166e920'
-    ),
-    rewardDebtPerShare: new Func<[_: string], {}, bigint>(
-        abi, '0x4423bf57'
-    ),
-    rewardsSource: new Func<[], {}, string>(
-        abi, '0xf7240d2f'
-    ),
-    'stake(uint256,uint256,address)': new Func<[amount: bigint, duration: bigint, to: string], {amount: bigint, duration: bigint, to: string}, []>(
-        abi, '0x7628a37d'
-    ),
-    'stake(uint256,uint256)': new Func<[amount: bigint, duration: bigint], {amount: bigint, duration: bigint}, []>(
-        abi, '0x7b0472f0'
-    ),
-    symbol: new Func<[], {}, string>(
-        abi, '0x95d89b41'
-    ),
-    totalSupply: new Func<[], {}, bigint>(
-        abi, '0x18160ddd'
-    ),
-    transfer: new Func<[_: string, _: bigint], {}, boolean>(
-        abi, '0xa9059cbb'
-    ),
-    transferFrom: new Func<[_: string, _: string, _: bigint], {}, boolean>(
-        abi, '0x23b872dd'
-    ),
-    unstake: new Func<[lockupId: bigint], {lockupId: bigint}, []>(
-        abi, '0x2e17de78'
-    ),
+    DOMAIN_SEPARATOR: fun("0x3644e515", {}, p.bytes32),
+    accRewardPerShare: fun("0x939d6237", {}, p.uint256),
+    allowance: fun("0xdd62ed3e", {"owner": p.address, "spender": p.address}, p.uint256),
+    approve: fun("0x095ea7b3", {"spender": p.address, "amount": p.uint256}, p.bool),
+    balanceOf: fun("0x70a08231", {"account": p.address}, p.uint256),
+    checkpoints: fun("0xf1127ed8", {"account": p.address, "pos": p.uint32}, p.struct({"fromBlock": p.uint32, "votes": p.uint224})),
+    collectRewards: fun("0x70bb45b3", {}, ),
+    decimals: fun("0x313ce567", {}, p.uint8),
+    decreaseAllowance: fun("0xa457c2d7", {"spender": p.address, "subtractedValue": p.uint256}, p.bool),
+    delegate: fun("0x5c19a95c", {"delegatee": p.address}, ),
+    delegateBySig: fun("0xc3cda520", {"delegatee": p.address, "nonce": p.uint256, "expiry": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
+    delegates: fun("0x587cde1e", {"account": p.address}, p.address),
+    epoch: fun("0x900cf0cf", {}, p.uint256),
+    extend: fun("0xc89258db", {"lockupId": p.uint256, "duration": p.uint256}, ),
+    getPastTotalSupply: fun("0x8e539e8c", {"blockNumber": p.uint256}, p.uint256),
+    getPastVotes: fun("0x3a46b1a8", {"account": p.address, "blockNumber": p.uint256}, p.uint256),
+    getVotes: fun("0x9ab24eb0", {"account": p.address}, p.uint256),
+    increaseAllowance: fun("0x39509351", {"spender": p.address, "addedValue": p.uint256}, p.bool),
+    lockups: fun("0xc93d0b1e", {"_0": p.address, "_1": p.uint256}, {"amount": p.uint128, "end": p.uint128, "points": p.uint256}),
+    minStakeDuration: fun("0x5fec5c64", {}, p.uint256),
+    name: fun("0x06fdde03", {}, p.string),
+    nonces: fun("0x7ecebe00", {"owner": p.address}, p.uint256),
+    numCheckpoints: fun("0x6fcfff45", {"account": p.address}, p.uint32),
+    ogv: fun("0x142561cf", {}, p.address),
+    permit: fun("0xd505accf", {"owner": p.address, "spender": p.address, "value": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
+    previewPoints: fun("0x4fd0e648", {"amount": p.uint256, "duration": p.uint256}, {"_0": p.uint256, "_1": p.uint256}),
+    previewRewards: fun("0xf166e920", {"user": p.address}, p.uint256),
+    rewardDebtPerShare: fun("0x4423bf57", {"_0": p.address}, p.uint256),
+    rewardsSource: fun("0xf7240d2f", {}, p.address),
+    "stake(uint256,uint256,address)": fun("0x7628a37d", {"amount": p.uint256, "duration": p.uint256, "to": p.address}, ),
+    "stake(uint256,uint256)": fun("0x7b0472f0", {"amount": p.uint256, "duration": p.uint256}, ),
+    symbol: fun("0x95d89b41", {}, p.string),
+    totalSupply: fun("0x18160ddd", {}, p.uint256),
+    transfer: fun("0xa9059cbb", {"_0": p.address, "_1": p.uint256}, p.bool),
+    transferFrom: fun("0x23b872dd", {"_0": p.address, "_1": p.address, "_2": p.uint256}, p.bool),
+    unstake: fun("0x2e17de78", {"lockupId": p.uint256}, ),
 }
 
 export class Contract extends ContractBase {
 
-    DOMAIN_SEPARATOR(): Promise<string> {
-        return this.eth_call(functions.DOMAIN_SEPARATOR, [])
+    DOMAIN_SEPARATOR() {
+        return this.eth_call(functions.DOMAIN_SEPARATOR, {})
     }
 
-    accRewardPerShare(): Promise<bigint> {
-        return this.eth_call(functions.accRewardPerShare, [])
+    accRewardPerShare() {
+        return this.eth_call(functions.accRewardPerShare, {})
     }
 
-    allowance(owner: string, spender: string): Promise<bigint> {
-        return this.eth_call(functions.allowance, [owner, spender])
+    allowance(owner: AllowanceParams["owner"], spender: AllowanceParams["spender"]) {
+        return this.eth_call(functions.allowance, {owner, spender})
     }
 
-    balanceOf(account: string): Promise<bigint> {
-        return this.eth_call(functions.balanceOf, [account])
+    balanceOf(account: BalanceOfParams["account"]) {
+        return this.eth_call(functions.balanceOf, {account})
     }
 
-    checkpoints(account: string, pos: number): Promise<([fromBlock: number, votes: bigint] & {fromBlock: number, votes: bigint})> {
-        return this.eth_call(functions.checkpoints, [account, pos])
+    checkpoints(account: CheckpointsParams["account"], pos: CheckpointsParams["pos"]) {
+        return this.eth_call(functions.checkpoints, {account, pos})
     }
 
-    decimals(): Promise<number> {
-        return this.eth_call(functions.decimals, [])
+    decimals() {
+        return this.eth_call(functions.decimals, {})
     }
 
-    delegates(account: string): Promise<string> {
-        return this.eth_call(functions.delegates, [account])
+    delegates(account: DelegatesParams["account"]) {
+        return this.eth_call(functions.delegates, {account})
     }
 
-    epoch(): Promise<bigint> {
-        return this.eth_call(functions.epoch, [])
+    epoch() {
+        return this.eth_call(functions.epoch, {})
     }
 
-    getPastTotalSupply(blockNumber: bigint): Promise<bigint> {
-        return this.eth_call(functions.getPastTotalSupply, [blockNumber])
+    getPastTotalSupply(blockNumber: GetPastTotalSupplyParams["blockNumber"]) {
+        return this.eth_call(functions.getPastTotalSupply, {blockNumber})
     }
 
-    getPastVotes(account: string, blockNumber: bigint): Promise<bigint> {
-        return this.eth_call(functions.getPastVotes, [account, blockNumber])
+    getPastVotes(account: GetPastVotesParams["account"], blockNumber: GetPastVotesParams["blockNumber"]) {
+        return this.eth_call(functions.getPastVotes, {account, blockNumber})
     }
 
-    getVotes(account: string): Promise<bigint> {
-        return this.eth_call(functions.getVotes, [account])
+    getVotes(account: GetVotesParams["account"]) {
+        return this.eth_call(functions.getVotes, {account})
     }
 
-    lockups(arg0: string, arg1: bigint): Promise<([amount: bigint, end: bigint, points: bigint] & {amount: bigint, end: bigint, points: bigint})> {
-        return this.eth_call(functions.lockups, [arg0, arg1])
+    lockups(_0: LockupsParams["_0"], _1: LockupsParams["_1"]) {
+        return this.eth_call(functions.lockups, {_0, _1})
     }
 
-    minStakeDuration(): Promise<bigint> {
-        return this.eth_call(functions.minStakeDuration, [])
+    minStakeDuration() {
+        return this.eth_call(functions.minStakeDuration, {})
     }
 
-    name(): Promise<string> {
-        return this.eth_call(functions.name, [])
+    name() {
+        return this.eth_call(functions.name, {})
     }
 
-    nonces(owner: string): Promise<bigint> {
-        return this.eth_call(functions.nonces, [owner])
+    nonces(owner: NoncesParams["owner"]) {
+        return this.eth_call(functions.nonces, {owner})
     }
 
-    numCheckpoints(account: string): Promise<number> {
-        return this.eth_call(functions.numCheckpoints, [account])
+    numCheckpoints(account: NumCheckpointsParams["account"]) {
+        return this.eth_call(functions.numCheckpoints, {account})
     }
 
-    ogv(): Promise<string> {
-        return this.eth_call(functions.ogv, [])
+    ogv() {
+        return this.eth_call(functions.ogv, {})
     }
 
-    previewPoints(amount: bigint, duration: bigint): Promise<[_: bigint, _: bigint]> {
-        return this.eth_call(functions.previewPoints, [amount, duration])
+    previewPoints(amount: PreviewPointsParams["amount"], duration: PreviewPointsParams["duration"]) {
+        return this.eth_call(functions.previewPoints, {amount, duration})
     }
 
-    previewRewards(user: string): Promise<bigint> {
-        return this.eth_call(functions.previewRewards, [user])
+    previewRewards(user: PreviewRewardsParams["user"]) {
+        return this.eth_call(functions.previewRewards, {user})
     }
 
-    rewardDebtPerShare(arg0: string): Promise<bigint> {
-        return this.eth_call(functions.rewardDebtPerShare, [arg0])
+    rewardDebtPerShare(_0: RewardDebtPerShareParams["_0"]) {
+        return this.eth_call(functions.rewardDebtPerShare, {_0})
     }
 
-    rewardsSource(): Promise<string> {
-        return this.eth_call(functions.rewardsSource, [])
+    rewardsSource() {
+        return this.eth_call(functions.rewardsSource, {})
     }
 
-    symbol(): Promise<string> {
-        return this.eth_call(functions.symbol, [])
+    symbol() {
+        return this.eth_call(functions.symbol, {})
     }
 
-    totalSupply(): Promise<bigint> {
-        return this.eth_call(functions.totalSupply, [])
+    totalSupply() {
+        return this.eth_call(functions.totalSupply, {})
     }
 }
+
+/// Event types
+export type ApprovalEventArgs = EParams<typeof events.Approval>
+export type DelegateChangedEventArgs = EParams<typeof events.DelegateChanged>
+export type DelegateVotesChangedEventArgs = EParams<typeof events.DelegateVotesChanged>
+export type RewardEventArgs = EParams<typeof events.Reward>
+export type StakeEventArgs = EParams<typeof events.Stake>
+export type TransferEventArgs = EParams<typeof events.Transfer>
+export type UnstakeEventArgs = EParams<typeof events.Unstake>
+
+/// Function types
+export type DOMAIN_SEPARATORParams = FunctionArguments<typeof functions.DOMAIN_SEPARATOR>
+export type DOMAIN_SEPARATORReturn = FunctionReturn<typeof functions.DOMAIN_SEPARATOR>
+
+export type AccRewardPerShareParams = FunctionArguments<typeof functions.accRewardPerShare>
+export type AccRewardPerShareReturn = FunctionReturn<typeof functions.accRewardPerShare>
+
+export type AllowanceParams = FunctionArguments<typeof functions.allowance>
+export type AllowanceReturn = FunctionReturn<typeof functions.allowance>
+
+export type ApproveParams = FunctionArguments<typeof functions.approve>
+export type ApproveReturn = FunctionReturn<typeof functions.approve>
+
+export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
+export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
+
+export type CheckpointsParams = FunctionArguments<typeof functions.checkpoints>
+export type CheckpointsReturn = FunctionReturn<typeof functions.checkpoints>
+
+export type CollectRewardsParams = FunctionArguments<typeof functions.collectRewards>
+export type CollectRewardsReturn = FunctionReturn<typeof functions.collectRewards>
+
+export type DecimalsParams = FunctionArguments<typeof functions.decimals>
+export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
+
+export type DecreaseAllowanceParams = FunctionArguments<typeof functions.decreaseAllowance>
+export type DecreaseAllowanceReturn = FunctionReturn<typeof functions.decreaseAllowance>
+
+export type DelegateParams = FunctionArguments<typeof functions.delegate>
+export type DelegateReturn = FunctionReturn<typeof functions.delegate>
+
+export type DelegateBySigParams = FunctionArguments<typeof functions.delegateBySig>
+export type DelegateBySigReturn = FunctionReturn<typeof functions.delegateBySig>
+
+export type DelegatesParams = FunctionArguments<typeof functions.delegates>
+export type DelegatesReturn = FunctionReturn<typeof functions.delegates>
+
+export type EpochParams = FunctionArguments<typeof functions.epoch>
+export type EpochReturn = FunctionReturn<typeof functions.epoch>
+
+export type ExtendParams = FunctionArguments<typeof functions.extend>
+export type ExtendReturn = FunctionReturn<typeof functions.extend>
+
+export type GetPastTotalSupplyParams = FunctionArguments<typeof functions.getPastTotalSupply>
+export type GetPastTotalSupplyReturn = FunctionReturn<typeof functions.getPastTotalSupply>
+
+export type GetPastVotesParams = FunctionArguments<typeof functions.getPastVotes>
+export type GetPastVotesReturn = FunctionReturn<typeof functions.getPastVotes>
+
+export type GetVotesParams = FunctionArguments<typeof functions.getVotes>
+export type GetVotesReturn = FunctionReturn<typeof functions.getVotes>
+
+export type IncreaseAllowanceParams = FunctionArguments<typeof functions.increaseAllowance>
+export type IncreaseAllowanceReturn = FunctionReturn<typeof functions.increaseAllowance>
+
+export type LockupsParams = FunctionArguments<typeof functions.lockups>
+export type LockupsReturn = FunctionReturn<typeof functions.lockups>
+
+export type MinStakeDurationParams = FunctionArguments<typeof functions.minStakeDuration>
+export type MinStakeDurationReturn = FunctionReturn<typeof functions.minStakeDuration>
+
+export type NameParams = FunctionArguments<typeof functions.name>
+export type NameReturn = FunctionReturn<typeof functions.name>
+
+export type NoncesParams = FunctionArguments<typeof functions.nonces>
+export type NoncesReturn = FunctionReturn<typeof functions.nonces>
+
+export type NumCheckpointsParams = FunctionArguments<typeof functions.numCheckpoints>
+export type NumCheckpointsReturn = FunctionReturn<typeof functions.numCheckpoints>
+
+export type OgvParams = FunctionArguments<typeof functions.ogv>
+export type OgvReturn = FunctionReturn<typeof functions.ogv>
+
+export type PermitParams = FunctionArguments<typeof functions.permit>
+export type PermitReturn = FunctionReturn<typeof functions.permit>
+
+export type PreviewPointsParams = FunctionArguments<typeof functions.previewPoints>
+export type PreviewPointsReturn = FunctionReturn<typeof functions.previewPoints>
+
+export type PreviewRewardsParams = FunctionArguments<typeof functions.previewRewards>
+export type PreviewRewardsReturn = FunctionReturn<typeof functions.previewRewards>
+
+export type RewardDebtPerShareParams = FunctionArguments<typeof functions.rewardDebtPerShare>
+export type RewardDebtPerShareReturn = FunctionReturn<typeof functions.rewardDebtPerShare>
+
+export type RewardsSourceParams = FunctionArguments<typeof functions.rewardsSource>
+export type RewardsSourceReturn = FunctionReturn<typeof functions.rewardsSource>
+
+export type StakeParams_0 = FunctionArguments<typeof functions["stake(uint256,uint256,address)"]>
+export type StakeReturn_0 = FunctionReturn<typeof functions["stake(uint256,uint256,address)"]>
+
+export type StakeParams_1 = FunctionArguments<typeof functions["stake(uint256,uint256)"]>
+export type StakeReturn_1 = FunctionReturn<typeof functions["stake(uint256,uint256)"]>
+
+export type SymbolParams = FunctionArguments<typeof functions.symbol>
+export type SymbolReturn = FunctionReturn<typeof functions.symbol>
+
+export type TotalSupplyParams = FunctionArguments<typeof functions.totalSupply>
+export type TotalSupplyReturn = FunctionReturn<typeof functions.totalSupply>
+
+export type TransferParams = FunctionArguments<typeof functions.transfer>
+export type TransferReturn = FunctionReturn<typeof functions.transfer>
+
+export type TransferFromParams = FunctionArguments<typeof functions.transferFrom>
+export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
+
+export type UnstakeParams = FunctionArguments<typeof functions.unstake>
+export type UnstakeReturn = FunctionReturn<typeof functions.unstake>
+

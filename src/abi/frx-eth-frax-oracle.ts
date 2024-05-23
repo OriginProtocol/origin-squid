@@ -1,162 +1,182 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './frx-eth-frax-oracle.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    SetMaximumDeviation: new LogEvent<([oldMaxDeviation: bigint, newMaxDeviation: bigint] & {oldMaxDeviation: bigint, newMaxDeviation: bigint})>(
-        abi, '0x7e2a21727a662d0def125b3d1237f41a099a760d472095091724cd8e56c25bf0'
-    ),
-    SetMaximumOracleDelay: new LogEvent<([oldMaxOracleDelay: bigint, newMaxOracleDelay: bigint] & {oldMaxOracleDelay: bigint, newMaxOracleDelay: bigint})>(
-        abi, '0xd72ef688fa430b6a285b84371ba35e8a8e0762b32c1deb7be9d9c111ca79f5ea'
-    ),
-    SetPriceSource: new LogEvent<([oldPriceSource: string, newPriceSource: string] & {oldPriceSource: string, newPriceSource: string})>(
-        abi, '0x964298b435edfc268e11aa89b342ef1ddac566da6759b6dd15d7aad58a1dc935'
-    ),
-    TimelockTransferStarted: new LogEvent<([previousTimelock: string, newTimelock: string] & {previousTimelock: string, newTimelock: string})>(
-        abi, '0x162998b90abc2507f3953aa797827b03a14c42dbd9a35f09feaf02e0d592773a'
-    ),
-    TimelockTransferred: new LogEvent<([previousTimelock: string, newTimelock: string] & {previousTimelock: string, newTimelock: string})>(
-        abi, '0x31b6c5a04b069b6ec1b3cef44c4e7c1eadd721349cda9823d0b1877b3551cdc6'
-    ),
+    SetMaximumDeviation: event("0x7e2a21727a662d0def125b3d1237f41a099a760d472095091724cd8e56c25bf0", {"oldMaxDeviation": p.uint256, "newMaxDeviation": p.uint256}),
+    SetMaximumOracleDelay: event("0xd72ef688fa430b6a285b84371ba35e8a8e0762b32c1deb7be9d9c111ca79f5ea", {"oldMaxOracleDelay": p.uint256, "newMaxOracleDelay": p.uint256}),
+    SetPriceSource: event("0x964298b435edfc268e11aa89b342ef1ddac566da6759b6dd15d7aad58a1dc935", {"oldPriceSource": p.address, "newPriceSource": p.address}),
+    TimelockTransferStarted: event("0x162998b90abc2507f3953aa797827b03a14c42dbd9a35f09feaf02e0d592773a", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
+    TimelockTransferred: event("0x31b6c5a04b069b6ec1b3cef44c4e7c1eadd721349cda9823d0b1877b3551cdc6", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
 }
 
 export const functions = {
-    BASE_TOKEN: new Func<[], {}, string>(
-        abi, '0x210663e4'
-    ),
-    QUOTE_TOKEN: new Func<[], {}, string>(
-        abi, '0x78892cea'
-    ),
-    acceptTransferTimelock: new Func<[], {}, []>(
-        abi, '0xf6ccaad4'
-    ),
-    addRoundData: new Func<[_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint, _timestamp: number], {_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint, _timestamp: number}, []>(
-        abi, '0x45d9f582'
-    ),
-    decimals: new Func<[], {}, number>(
-        abi, '0x313ce567'
-    ),
-    description: new Func<[], {}, string>(
-        abi, '0x7284e416'
-    ),
-    getPrices: new Func<[], {}, ([_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint] & {_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint})>(
-        abi, '0xbd9a548b'
-    ),
-    getRoundData: new Func<[_roundId: bigint], {_roundId: bigint}, ([roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint] & {roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint})>(
-        abi, '0x9a6fc8f5'
-    ),
-    lastCorrectRoundId: new Func<[], {}, bigint>(
-        abi, '0x0f4a05fb'
-    ),
-    latestRoundData: new Func<[], {}, ([roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint] & {roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint})>(
-        abi, '0xfeaf968c'
-    ),
-    maximumDeviation: new Func<[], {}, bigint>(
-        abi, '0x9152c29d'
-    ),
-    maximumOracleDelay: new Func<[], {}, bigint>(
-        abi, '0xcede91a4'
-    ),
-    pendingTimelockAddress: new Func<[], {}, string>(
-        abi, '0x090f3f50'
-    ),
-    priceSource: new Func<[], {}, string>(
-        abi, '0x20531bc9'
-    ),
-    renounceTimelock: new Func<[], {}, []>(
-        abi, '0x4f8b4ae7'
-    ),
-    rounds: new Func<[_: bigint], {}, ([priceLow: bigint, priceHigh: bigint, timestamp: number, isBadData: boolean] & {priceLow: bigint, priceHigh: bigint, timestamp: number, isBadData: boolean})>(
-        abi, '0x8c65c81f'
-    ),
-    setMaximumDeviation: new Func<[_newMaxDeviation: bigint], {_newMaxDeviation: bigint}, []>(
-        abi, '0x2dfa4267'
-    ),
-    setMaximumOracleDelay: new Func<[_newMaxOracleDelay: bigint], {_newMaxOracleDelay: bigint}, []>(
-        abi, '0xd2333be7'
-    ),
-    setPriceSource: new Func<[_newPriceSource: string], {_newPriceSource: string}, []>(
-        abi, '0xbda53107'
-    ),
-    supportsInterface: new Func<[interfaceId: string], {interfaceId: string}, boolean>(
-        abi, '0x01ffc9a7'
-    ),
-    timelockAddress: new Func<[], {}, string>(
-        abi, '0x4bc66f32'
-    ),
-    transferTimelock: new Func<[_newTimelock: string], {_newTimelock: string}, []>(
-        abi, '0x45014095'
-    ),
-    version: new Func<[], {}, bigint>(
-        abi, '0x54fd4d50'
-    ),
+    BASE_TOKEN: fun("0x210663e4", {}, p.address),
+    QUOTE_TOKEN: fun("0x78892cea", {}, p.address),
+    acceptTransferTimelock: fun("0xf6ccaad4", {}, ),
+    addRoundData: fun("0x45d9f582", {"_isBadData": p.bool, "_priceLow": p.uint104, "_priceHigh": p.uint104, "_timestamp": p.uint40}, ),
+    decimals: fun("0x313ce567", {}, p.uint8),
+    description: fun("0x7284e416", {}, p.string),
+    getPrices: fun("0xbd9a548b", {}, {"_isBadData": p.bool, "_priceLow": p.uint256, "_priceHigh": p.uint256}),
+    getRoundData: fun("0x9a6fc8f5", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    lastCorrectRoundId: fun("0x0f4a05fb", {}, p.uint80),
+    latestRoundData: fun("0xfeaf968c", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    maximumDeviation: fun("0x9152c29d", {}, p.uint256),
+    maximumOracleDelay: fun("0xcede91a4", {}, p.uint256),
+    pendingTimelockAddress: fun("0x090f3f50", {}, p.address),
+    priceSource: fun("0x20531bc9", {}, p.address),
+    renounceTimelock: fun("0x4f8b4ae7", {}, ),
+    rounds: fun("0x8c65c81f", {"_0": p.uint256}, {"priceLow": p.uint104, "priceHigh": p.uint104, "timestamp": p.uint40, "isBadData": p.bool}),
+    setMaximumDeviation: fun("0x2dfa4267", {"_newMaxDeviation": p.uint256}, ),
+    setMaximumOracleDelay: fun("0xd2333be7", {"_newMaxOracleDelay": p.uint256}, ),
+    setPriceSource: fun("0xbda53107", {"_newPriceSource": p.address}, ),
+    supportsInterface: fun("0x01ffc9a7", {"interfaceId": p.bytes4}, p.bool),
+    timelockAddress: fun("0x4bc66f32", {}, p.address),
+    transferTimelock: fun("0x45014095", {"_newTimelock": p.address}, ),
+    version: fun("0x54fd4d50", {}, p.uint256),
 }
 
 export class Contract extends ContractBase {
 
-    BASE_TOKEN(): Promise<string> {
-        return this.eth_call(functions.BASE_TOKEN, [])
+    BASE_TOKEN() {
+        return this.eth_call(functions.BASE_TOKEN, {})
     }
 
-    QUOTE_TOKEN(): Promise<string> {
-        return this.eth_call(functions.QUOTE_TOKEN, [])
+    QUOTE_TOKEN() {
+        return this.eth_call(functions.QUOTE_TOKEN, {})
     }
 
-    decimals(): Promise<number> {
-        return this.eth_call(functions.decimals, [])
+    decimals() {
+        return this.eth_call(functions.decimals, {})
     }
 
-    description(): Promise<string> {
-        return this.eth_call(functions.description, [])
+    description() {
+        return this.eth_call(functions.description, {})
     }
 
-    getPrices(): Promise<([_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint] & {_isBadData: boolean, _priceLow: bigint, _priceHigh: bigint})> {
-        return this.eth_call(functions.getPrices, [])
+    getPrices() {
+        return this.eth_call(functions.getPrices, {})
     }
 
-    getRoundData(_roundId: bigint): Promise<([roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint] & {roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint})> {
-        return this.eth_call(functions.getRoundData, [_roundId])
+    getRoundData(_roundId: GetRoundDataParams["_roundId"]) {
+        return this.eth_call(functions.getRoundData, {_roundId})
     }
 
-    lastCorrectRoundId(): Promise<bigint> {
-        return this.eth_call(functions.lastCorrectRoundId, [])
+    lastCorrectRoundId() {
+        return this.eth_call(functions.lastCorrectRoundId, {})
     }
 
-    latestRoundData(): Promise<([roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint] & {roundId: bigint, answer: bigint, startedAt: bigint, updatedAt: bigint, answeredInRound: bigint})> {
-        return this.eth_call(functions.latestRoundData, [])
+    latestRoundData() {
+        return this.eth_call(functions.latestRoundData, {})
     }
 
-    maximumDeviation(): Promise<bigint> {
-        return this.eth_call(functions.maximumDeviation, [])
+    maximumDeviation() {
+        return this.eth_call(functions.maximumDeviation, {})
     }
 
-    maximumOracleDelay(): Promise<bigint> {
-        return this.eth_call(functions.maximumOracleDelay, [])
+    maximumOracleDelay() {
+        return this.eth_call(functions.maximumOracleDelay, {})
     }
 
-    pendingTimelockAddress(): Promise<string> {
-        return this.eth_call(functions.pendingTimelockAddress, [])
+    pendingTimelockAddress() {
+        return this.eth_call(functions.pendingTimelockAddress, {})
     }
 
-    priceSource(): Promise<string> {
-        return this.eth_call(functions.priceSource, [])
+    priceSource() {
+        return this.eth_call(functions.priceSource, {})
     }
 
-    rounds(arg0: bigint): Promise<([priceLow: bigint, priceHigh: bigint, timestamp: number, isBadData: boolean] & {priceLow: bigint, priceHigh: bigint, timestamp: number, isBadData: boolean})> {
-        return this.eth_call(functions.rounds, [arg0])
+    rounds(_0: RoundsParams["_0"]) {
+        return this.eth_call(functions.rounds, {_0})
     }
 
-    supportsInterface(interfaceId: string): Promise<boolean> {
-        return this.eth_call(functions.supportsInterface, [interfaceId])
+    supportsInterface(interfaceId: SupportsInterfaceParams["interfaceId"]) {
+        return this.eth_call(functions.supportsInterface, {interfaceId})
     }
 
-    timelockAddress(): Promise<string> {
-        return this.eth_call(functions.timelockAddress, [])
+    timelockAddress() {
+        return this.eth_call(functions.timelockAddress, {})
     }
 
-    version(): Promise<bigint> {
-        return this.eth_call(functions.version, [])
+    version() {
+        return this.eth_call(functions.version, {})
     }
 }
+
+/// Event types
+export type SetMaximumDeviationEventArgs = EParams<typeof events.SetMaximumDeviation>
+export type SetMaximumOracleDelayEventArgs = EParams<typeof events.SetMaximumOracleDelay>
+export type SetPriceSourceEventArgs = EParams<typeof events.SetPriceSource>
+export type TimelockTransferStartedEventArgs = EParams<typeof events.TimelockTransferStarted>
+export type TimelockTransferredEventArgs = EParams<typeof events.TimelockTransferred>
+
+/// Function types
+export type BASE_TOKENParams = FunctionArguments<typeof functions.BASE_TOKEN>
+export type BASE_TOKENReturn = FunctionReturn<typeof functions.BASE_TOKEN>
+
+export type QUOTE_TOKENParams = FunctionArguments<typeof functions.QUOTE_TOKEN>
+export type QUOTE_TOKENReturn = FunctionReturn<typeof functions.QUOTE_TOKEN>
+
+export type AcceptTransferTimelockParams = FunctionArguments<typeof functions.acceptTransferTimelock>
+export type AcceptTransferTimelockReturn = FunctionReturn<typeof functions.acceptTransferTimelock>
+
+export type AddRoundDataParams = FunctionArguments<typeof functions.addRoundData>
+export type AddRoundDataReturn = FunctionReturn<typeof functions.addRoundData>
+
+export type DecimalsParams = FunctionArguments<typeof functions.decimals>
+export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
+
+export type DescriptionParams = FunctionArguments<typeof functions.description>
+export type DescriptionReturn = FunctionReturn<typeof functions.description>
+
+export type GetPricesParams = FunctionArguments<typeof functions.getPrices>
+export type GetPricesReturn = FunctionReturn<typeof functions.getPrices>
+
+export type GetRoundDataParams = FunctionArguments<typeof functions.getRoundData>
+export type GetRoundDataReturn = FunctionReturn<typeof functions.getRoundData>
+
+export type LastCorrectRoundIdParams = FunctionArguments<typeof functions.lastCorrectRoundId>
+export type LastCorrectRoundIdReturn = FunctionReturn<typeof functions.lastCorrectRoundId>
+
+export type LatestRoundDataParams = FunctionArguments<typeof functions.latestRoundData>
+export type LatestRoundDataReturn = FunctionReturn<typeof functions.latestRoundData>
+
+export type MaximumDeviationParams = FunctionArguments<typeof functions.maximumDeviation>
+export type MaximumDeviationReturn = FunctionReturn<typeof functions.maximumDeviation>
+
+export type MaximumOracleDelayParams = FunctionArguments<typeof functions.maximumOracleDelay>
+export type MaximumOracleDelayReturn = FunctionReturn<typeof functions.maximumOracleDelay>
+
+export type PendingTimelockAddressParams = FunctionArguments<typeof functions.pendingTimelockAddress>
+export type PendingTimelockAddressReturn = FunctionReturn<typeof functions.pendingTimelockAddress>
+
+export type PriceSourceParams = FunctionArguments<typeof functions.priceSource>
+export type PriceSourceReturn = FunctionReturn<typeof functions.priceSource>
+
+export type RenounceTimelockParams = FunctionArguments<typeof functions.renounceTimelock>
+export type RenounceTimelockReturn = FunctionReturn<typeof functions.renounceTimelock>
+
+export type RoundsParams = FunctionArguments<typeof functions.rounds>
+export type RoundsReturn = FunctionReturn<typeof functions.rounds>
+
+export type SetMaximumDeviationParams = FunctionArguments<typeof functions.setMaximumDeviation>
+export type SetMaximumDeviationReturn = FunctionReturn<typeof functions.setMaximumDeviation>
+
+export type SetMaximumOracleDelayParams = FunctionArguments<typeof functions.setMaximumOracleDelay>
+export type SetMaximumOracleDelayReturn = FunctionReturn<typeof functions.setMaximumOracleDelay>
+
+export type SetPriceSourceParams = FunctionArguments<typeof functions.setPriceSource>
+export type SetPriceSourceReturn = FunctionReturn<typeof functions.setPriceSource>
+
+export type SupportsInterfaceParams = FunctionArguments<typeof functions.supportsInterface>
+export type SupportsInterfaceReturn = FunctionReturn<typeof functions.supportsInterface>
+
+export type TimelockAddressParams = FunctionArguments<typeof functions.timelockAddress>
+export type TimelockAddressReturn = FunctionReturn<typeof functions.timelockAddress>
+
+export type TransferTimelockParams = FunctionArguments<typeof functions.transferTimelock>
+export type TransferTimelockReturn = FunctionReturn<typeof functions.transferTimelock>
+
+export type VersionParams = FunctionArguments<typeof functions.version>
+export type VersionReturn = FunctionReturn<typeof functions.version>
+

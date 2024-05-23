@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, DateTimeColumn as DateTimeColumn_, Index as Index_, IntColumn as IntColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class BridgeTransfer {
@@ -11,58 +10,58 @@ export class BridgeTransfer {
     id!: string
 
     @Index_()
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     blockNumber!: number
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     txHashIn!: string
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     txHashOut!: string | undefined | null
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     messageId!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     bridge!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     transactor!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     sender!: string
 
     @Index_()
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     receiver!: string
 
     @Index_()
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     chainIn!: number
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     chainOut!: number
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     tokenIn!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     tokenOut!: string
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     amountIn!: bigint
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     amountOut!: bigint
 
-    @Column_("int4", {nullable: false})
+    @IntColumn_({nullable: false})
     state!: number
 }

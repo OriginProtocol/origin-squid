@@ -1,341 +1,386 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './curve-lp-token.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    Transfer: new LogEvent<([sender: string, receiver: string, value: bigint] & {sender: string, receiver: string, value: bigint})>(
-        abi, '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-    ),
-    Approval: new LogEvent<([owner: string, spender: string, value: bigint] & {owner: string, spender: string, value: bigint})>(
-        abi, '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
-    ),
-    TokenExchange: new LogEvent<([buyer: string, sold_id: bigint, tokens_sold: bigint, bought_id: bigint, tokens_bought: bigint] & {buyer: string, sold_id: bigint, tokens_sold: bigint, bought_id: bigint, tokens_bought: bigint})>(
-        abi, '0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140'
-    ),
-    AddLiquidity: new LogEvent<([provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, invariant: bigint, token_supply: bigint] & {provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, invariant: bigint, token_supply: bigint})>(
-        abi, '0x26f55a85081d24974e85c6c00045d0f0453991e95873f52bff0d21af4079a768'
-    ),
-    RemoveLiquidity: new LogEvent<([provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, token_supply: bigint] & {provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, token_supply: bigint})>(
-        abi, '0x7c363854ccf79623411f8995b362bce5eddff18c927edc6f5dbbb5e05819a82c'
-    ),
-    RemoveLiquidityOne: new LogEvent<([provider: string, token_amount: bigint, coin_amount: bigint, token_supply: bigint] & {provider: string, token_amount: bigint, coin_amount: bigint, token_supply: bigint})>(
-        abi, '0x5ad056f2e28a8cec232015406b843668c1e36cda598127ec3b8c59b8c72773a0'
-    ),
-    RemoveLiquidityImbalance: new LogEvent<([provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, invariant: bigint, token_supply: bigint] & {provider: string, token_amounts: Array<bigint>, fees: Array<bigint>, invariant: bigint, token_supply: bigint})>(
-        abi, '0x2b5508378d7e19e0d5fa338419034731416c4f5b219a10379956f764317fd47e'
-    ),
-    RampA: new LogEvent<([old_A: bigint, new_A: bigint, initial_time: bigint, future_time: bigint] & {old_A: bigint, new_A: bigint, initial_time: bigint, future_time: bigint})>(
-        abi, '0xa2b71ec6df949300b59aab36b55e189697b750119dd349fcfa8c0f779e83c254'
-    ),
-    StopRampA: new LogEvent<([A: bigint, t: bigint] & {A: bigint, t: bigint})>(
-        abi, '0x46e22fb3709ad289f62ce63d469248536dbc78d82b84a3d7e74ad606dc201938'
-    ),
-    CommitNewFee: new LogEvent<([new_fee: bigint] & {new_fee: bigint})>(
-        abi, '0x878eb36b3f197f05821c06953d9bc8f14b332a227b1e26df06a4215bbfe5d73f'
-    ),
-    ApplyNewFee: new LogEvent<([fee: bigint] & {fee: bigint})>(
-        abi, '0xa8715770654f54603947addf38c689adbd7182e21673b28bcf306a957aaba215'
-    ),
+    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", {"sender": indexed(p.address), "receiver": indexed(p.address), "value": p.uint256}),
+    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
+    TokenExchange: event("0x8b3e96f2b889fa771c53c981b40daf005f63f637f1869f707052d15a3dd97140", {"buyer": indexed(p.address), "sold_id": p.int128, "tokens_sold": p.uint256, "bought_id": p.int128, "tokens_bought": p.uint256}),
+    AddLiquidity: event("0x26f55a85081d24974e85c6c00045d0f0453991e95873f52bff0d21af4079a768", {"provider": indexed(p.address), "token_amounts": p.fixedSizeArray(p.uint256, 2), "fees": p.fixedSizeArray(p.uint256, 2), "invariant": p.uint256, "token_supply": p.uint256}),
+    RemoveLiquidity: event("0x7c363854ccf79623411f8995b362bce5eddff18c927edc6f5dbbb5e05819a82c", {"provider": indexed(p.address), "token_amounts": p.fixedSizeArray(p.uint256, 2), "fees": p.fixedSizeArray(p.uint256, 2), "token_supply": p.uint256}),
+    RemoveLiquidityOne: event("0x5ad056f2e28a8cec232015406b843668c1e36cda598127ec3b8c59b8c72773a0", {"provider": indexed(p.address), "token_amount": p.uint256, "coin_amount": p.uint256, "token_supply": p.uint256}),
+    RemoveLiquidityImbalance: event("0x2b5508378d7e19e0d5fa338419034731416c4f5b219a10379956f764317fd47e", {"provider": indexed(p.address), "token_amounts": p.fixedSizeArray(p.uint256, 2), "fees": p.fixedSizeArray(p.uint256, 2), "invariant": p.uint256, "token_supply": p.uint256}),
+    RampA: event("0xa2b71ec6df949300b59aab36b55e189697b750119dd349fcfa8c0f779e83c254", {"old_A": p.uint256, "new_A": p.uint256, "initial_time": p.uint256, "future_time": p.uint256}),
+    StopRampA: event("0x46e22fb3709ad289f62ce63d469248536dbc78d82b84a3d7e74ad606dc201938", {"A": p.uint256, "t": p.uint256}),
+    CommitNewFee: event("0x878eb36b3f197f05821c06953d9bc8f14b332a227b1e26df06a4215bbfe5d73f", {"new_fee": p.uint256}),
+    ApplyNewFee: event("0xa8715770654f54603947addf38c689adbd7182e21673b28bcf306a957aaba215", {"fee": p.uint256}),
 }
 
 export const functions = {
-    initialize: new Func<[_name: string, _symbol: string, _coins: Array<string>, _rate_multipliers: Array<bigint>, _A: bigint, _fee: bigint], {_name: string, _symbol: string, _coins: Array<string>, _rate_multipliers: Array<bigint>, _A: bigint, _fee: bigint}, []>(
-        abi, '0xa461b3c8'
-    ),
-    decimals: new Func<[], {}, bigint>(
-        abi, '0x313ce567'
-    ),
-    transfer: new Func<[_to: string, _value: bigint], {_to: string, _value: bigint}, boolean>(
-        abi, '0xa9059cbb'
-    ),
-    transferFrom: new Func<[_from: string, _to: string, _value: bigint], {_from: string, _to: string, _value: bigint}, boolean>(
-        abi, '0x23b872dd'
-    ),
-    approve: new Func<[_spender: string, _value: bigint], {_spender: string, _value: bigint}, boolean>(
-        abi, '0x095ea7b3'
-    ),
-    permit: new Func<[_owner: string, _spender: string, _value: bigint, _deadline: bigint, _v: number, _r: string, _s: string], {_owner: string, _spender: string, _value: bigint, _deadline: bigint, _v: number, _r: string, _s: string}, boolean>(
-        abi, '0xd505accf'
-    ),
-    last_price: new Func<[], {}, bigint>(
-        abi, '0xfde625e6'
-    ),
-    ema_price: new Func<[], {}, bigint>(
-        abi, '0xc24c7c29'
-    ),
-    get_balances: new Func<[], {}, Array<bigint>>(
-        abi, '0x14f05979'
-    ),
-    admin_fee: new Func<[], {}, bigint>(
-        abi, '0xfee3f7f9'
-    ),
-    A: new Func<[], {}, bigint>(
-        abi, '0xf446c1d0'
-    ),
-    A_precise: new Func<[], {}, bigint>(
-        abi, '0x76a2f0f0'
-    ),
-    get_p: new Func<[], {}, bigint>(
-        abi, '0xf2388acb'
-    ),
-    price_oracle: new Func<[], {}, bigint>(
-        abi, '0x86fc88d3'
-    ),
-    get_virtual_price: new Func<[], {}, bigint>(
-        abi, '0xbb7b8b80'
-    ),
-    calc_token_amount: new Func<[_amounts: Array<bigint>, _is_deposit: boolean], {_amounts: Array<bigint>, _is_deposit: boolean}, bigint>(
-        abi, '0xed8e84f3'
-    ),
-    'add_liquidity(uint256[2],uint256)': new Func<[_amounts: Array<bigint>, _min_mint_amount: bigint], {_amounts: Array<bigint>, _min_mint_amount: bigint}, bigint>(
-        abi, '0x0b4c7e4d'
-    ),
-    'add_liquidity(uint256[2],uint256,address)': new Func<[_amounts: Array<bigint>, _min_mint_amount: bigint, _receiver: string], {_amounts: Array<bigint>, _min_mint_amount: bigint, _receiver: string}, bigint>(
-        abi, '0x0c3e4b54'
-    ),
-    get_dy: new Func<[i: bigint, j: bigint, dx: bigint], {i: bigint, j: bigint, dx: bigint}, bigint>(
-        abi, '0x5e0d443f'
-    ),
-    'exchange(int128,int128,uint256,uint256)': new Func<[i: bigint, j: bigint, _dx: bigint, _min_dy: bigint], {i: bigint, j: bigint, _dx: bigint, _min_dy: bigint}, bigint>(
-        abi, '0x3df02124'
-    ),
-    'exchange(int128,int128,uint256,uint256,address)': new Func<[i: bigint, j: bigint, _dx: bigint, _min_dy: bigint, _receiver: string], {i: bigint, j: bigint, _dx: bigint, _min_dy: bigint, _receiver: string}, bigint>(
-        abi, '0xddc1f59d'
-    ),
-    'remove_liquidity(uint256,uint256[2])': new Func<[_burn_amount: bigint, _min_amounts: Array<bigint>], {_burn_amount: bigint, _min_amounts: Array<bigint>}, Array<bigint>>(
-        abi, '0x5b36389c'
-    ),
-    'remove_liquidity(uint256,uint256[2],address)': new Func<[_burn_amount: bigint, _min_amounts: Array<bigint>, _receiver: string], {_burn_amount: bigint, _min_amounts: Array<bigint>, _receiver: string}, Array<bigint>>(
-        abi, '0x3eb1719f'
-    ),
-    'remove_liquidity_imbalance(uint256[2],uint256)': new Func<[_amounts: Array<bigint>, _max_burn_amount: bigint], {_amounts: Array<bigint>, _max_burn_amount: bigint}, bigint>(
-        abi, '0xe3103273'
-    ),
-    'remove_liquidity_imbalance(uint256[2],uint256,address)': new Func<[_amounts: Array<bigint>, _max_burn_amount: bigint, _receiver: string], {_amounts: Array<bigint>, _max_burn_amount: bigint, _receiver: string}, bigint>(
-        abi, '0x52d2cfdd'
-    ),
-    calc_withdraw_one_coin: new Func<[_burn_amount: bigint, i: bigint], {_burn_amount: bigint, i: bigint}, bigint>(
-        abi, '0xcc2b27d7'
-    ),
-    'remove_liquidity_one_coin(uint256,int128,uint256)': new Func<[_burn_amount: bigint, i: bigint, _min_received: bigint], {_burn_amount: bigint, i: bigint, _min_received: bigint}, bigint>(
-        abi, '0x1a4d01d2'
-    ),
-    'remove_liquidity_one_coin(uint256,int128,uint256,address)': new Func<[_burn_amount: bigint, i: bigint, _min_received: bigint, _receiver: string], {_burn_amount: bigint, i: bigint, _min_received: bigint, _receiver: string}, bigint>(
-        abi, '0x081579a5'
-    ),
-    ramp_A: new Func<[_future_A: bigint, _future_time: bigint], {_future_A: bigint, _future_time: bigint}, []>(
-        abi, '0x3c157e64'
-    ),
-    stop_ramp_A: new Func<[], {}, []>(
-        abi, '0x551a6588'
-    ),
-    admin_balances: new Func<[i: bigint], {i: bigint}, bigint>(
-        abi, '0xe2e7d264'
-    ),
-    withdraw_admin_fees: new Func<[], {}, []>(
-        abi, '0x30c54085'
-    ),
-    commit_new_fee: new Func<[_new_fee: bigint], {_new_fee: bigint}, []>(
-        abi, '0xa48eac9d'
-    ),
-    apply_new_fee: new Func<[], {}, []>(
-        abi, '0x4f12fe97'
-    ),
-    set_ma_exp_time: new Func<[_ma_exp_time: bigint], {_ma_exp_time: bigint}, []>(
-        abi, '0x7f3e17cb'
-    ),
-    version: new Func<[], {}, string>(
-        abi, '0x54fd4d50'
-    ),
-    coins: new Func<[arg0: bigint], {arg0: bigint}, string>(
-        abi, '0xc6610657'
-    ),
-    balances: new Func<[arg0: bigint], {arg0: bigint}, bigint>(
-        abi, '0x4903b0d1'
-    ),
-    fee: new Func<[], {}, bigint>(
-        abi, '0xddca3f43'
-    ),
-    future_fee: new Func<[], {}, bigint>(
-        abi, '0x58680d0b'
-    ),
-    admin_action_deadline: new Func<[], {}, bigint>(
-        abi, '0xe66f43f5'
-    ),
-    initial_A: new Func<[], {}, bigint>(
-        abi, '0x5409491a'
-    ),
-    future_A: new Func<[], {}, bigint>(
-        abi, '0xb4b577ad'
-    ),
-    initial_A_time: new Func<[], {}, bigint>(
-        abi, '0x2081066c'
-    ),
-    future_A_time: new Func<[], {}, bigint>(
-        abi, '0x14052288'
-    ),
-    name: new Func<[], {}, string>(
-        abi, '0x06fdde03'
-    ),
-    symbol: new Func<[], {}, string>(
-        abi, '0x95d89b41'
-    ),
-    balanceOf: new Func<[arg0: string], {arg0: string}, bigint>(
-        abi, '0x70a08231'
-    ),
-    allowance: new Func<[arg0: string, arg1: string], {arg0: string, arg1: string}, bigint>(
-        abi, '0xdd62ed3e'
-    ),
-    totalSupply: new Func<[], {}, bigint>(
-        abi, '0x18160ddd'
-    ),
-    DOMAIN_SEPARATOR: new Func<[], {}, string>(
-        abi, '0x3644e515'
-    ),
-    nonces: new Func<[arg0: string], {arg0: string}, bigint>(
-        abi, '0x7ecebe00'
-    ),
-    ma_exp_time: new Func<[], {}, bigint>(
-        abi, '0x1be913a5'
-    ),
-    ma_last_time: new Func<[], {}, bigint>(
-        abi, '0x1ddc3b01'
-    ),
+    initialize: fun("0xa461b3c8", {"_name": p.string, "_symbol": p.string, "_coins": p.fixedSizeArray(p.address, 4), "_rate_multipliers": p.fixedSizeArray(p.uint256, 4), "_A": p.uint256, "_fee": p.uint256}, ),
+    decimals: fun("0x313ce567", {}, p.uint256),
+    transfer: fun("0xa9059cbb", {"_to": p.address, "_value": p.uint256}, p.bool),
+    transferFrom: fun("0x23b872dd", {"_from": p.address, "_to": p.address, "_value": p.uint256}, p.bool),
+    approve: fun("0x095ea7b3", {"_spender": p.address, "_value": p.uint256}, p.bool),
+    permit: fun("0xd505accf", {"_owner": p.address, "_spender": p.address, "_value": p.uint256, "_deadline": p.uint256, "_v": p.uint8, "_r": p.bytes32, "_s": p.bytes32}, p.bool),
+    last_price: fun("0xfde625e6", {}, p.uint256),
+    ema_price: fun("0xc24c7c29", {}, p.uint256),
+    get_balances: fun("0x14f05979", {}, p.fixedSizeArray(p.uint256, 2)),
+    admin_fee: fun("0xfee3f7f9", {}, p.uint256),
+    A: fun("0xf446c1d0", {}, p.uint256),
+    A_precise: fun("0x76a2f0f0", {}, p.uint256),
+    get_p: fun("0xf2388acb", {}, p.uint256),
+    price_oracle: fun("0x86fc88d3", {}, p.uint256),
+    get_virtual_price: fun("0xbb7b8b80", {}, p.uint256),
+    calc_token_amount: fun("0xed8e84f3", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_is_deposit": p.bool}, p.uint256),
+    "add_liquidity(uint256[2],uint256)": fun("0x0b4c7e4d", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256}, p.uint256),
+    "add_liquidity(uint256[2],uint256,address)": fun("0x0c3e4b54", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256, "_receiver": p.address}, p.uint256),
+    get_dy: fun("0x5e0d443f", {"i": p.int128, "j": p.int128, "dx": p.uint256}, p.uint256),
+    "exchange(int128,int128,uint256,uint256)": fun("0x3df02124", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256}, p.uint256),
+    "exchange(int128,int128,uint256,uint256,address)": fun("0xddc1f59d", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256, "_receiver": p.address}, p.uint256),
+    "remove_liquidity(uint256,uint256[2])": fun("0x5b36389c", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2)}, p.fixedSizeArray(p.uint256, 2)),
+    "remove_liquidity(uint256,uint256[2],address)": fun("0x3eb1719f", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2), "_receiver": p.address}, p.fixedSizeArray(p.uint256, 2)),
+    "remove_liquidity_imbalance(uint256[2],uint256)": fun("0xe3103273", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256}, p.uint256),
+    "remove_liquidity_imbalance(uint256[2],uint256,address)": fun("0x52d2cfdd", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256, "_receiver": p.address}, p.uint256),
+    calc_withdraw_one_coin: fun("0xcc2b27d7", {"_burn_amount": p.uint256, "i": p.int128}, p.uint256),
+    "remove_liquidity_one_coin(uint256,int128,uint256)": fun("0x1a4d01d2", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256}, p.uint256),
+    "remove_liquidity_one_coin(uint256,int128,uint256,address)": fun("0x081579a5", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256, "_receiver": p.address}, p.uint256),
+    ramp_A: fun("0x3c157e64", {"_future_A": p.uint256, "_future_time": p.uint256}, ),
+    stop_ramp_A: fun("0x551a6588", {}, ),
+    admin_balances: fun("0xe2e7d264", {"i": p.uint256}, p.uint256),
+    withdraw_admin_fees: fun("0x30c54085", {}, ),
+    commit_new_fee: fun("0xa48eac9d", {"_new_fee": p.uint256}, ),
+    apply_new_fee: fun("0x4f12fe97", {}, ),
+    set_ma_exp_time: fun("0x7f3e17cb", {"_ma_exp_time": p.uint256}, ),
+    version: fun("0x54fd4d50", {}, p.string),
+    coins: fun("0xc6610657", {"arg0": p.uint256}, p.address),
+    balances: fun("0x4903b0d1", {"arg0": p.uint256}, p.uint256),
+    fee: fun("0xddca3f43", {}, p.uint256),
+    future_fee: fun("0x58680d0b", {}, p.uint256),
+    admin_action_deadline: fun("0xe66f43f5", {}, p.uint256),
+    initial_A: fun("0x5409491a", {}, p.uint256),
+    future_A: fun("0xb4b577ad", {}, p.uint256),
+    initial_A_time: fun("0x2081066c", {}, p.uint256),
+    future_A_time: fun("0x14052288", {}, p.uint256),
+    name: fun("0x06fdde03", {}, p.string),
+    symbol: fun("0x95d89b41", {}, p.string),
+    balanceOf: fun("0x70a08231", {"arg0": p.address}, p.uint256),
+    allowance: fun("0xdd62ed3e", {"arg0": p.address, "arg1": p.address}, p.uint256),
+    totalSupply: fun("0x18160ddd", {}, p.uint256),
+    DOMAIN_SEPARATOR: fun("0x3644e515", {}, p.bytes32),
+    nonces: fun("0x7ecebe00", {"arg0": p.address}, p.uint256),
+    ma_exp_time: fun("0x1be913a5", {}, p.uint256),
+    ma_last_time: fun("0x1ddc3b01", {}, p.uint256),
 }
 
 export class Contract extends ContractBase {
 
-    decimals(): Promise<bigint> {
-        return this.eth_call(functions.decimals, [])
+    decimals() {
+        return this.eth_call(functions.decimals, {})
     }
 
-    last_price(): Promise<bigint> {
-        return this.eth_call(functions.last_price, [])
+    last_price() {
+        return this.eth_call(functions.last_price, {})
     }
 
-    ema_price(): Promise<bigint> {
-        return this.eth_call(functions.ema_price, [])
+    ema_price() {
+        return this.eth_call(functions.ema_price, {})
     }
 
-    get_balances(): Promise<Array<bigint>> {
-        return this.eth_call(functions.get_balances, [])
+    get_balances() {
+        return this.eth_call(functions.get_balances, {})
     }
 
-    admin_fee(): Promise<bigint> {
-        return this.eth_call(functions.admin_fee, [])
+    admin_fee() {
+        return this.eth_call(functions.admin_fee, {})
     }
 
-    A(): Promise<bigint> {
-        return this.eth_call(functions.A, [])
+    A() {
+        return this.eth_call(functions.A, {})
     }
 
-    A_precise(): Promise<bigint> {
-        return this.eth_call(functions.A_precise, [])
+    A_precise() {
+        return this.eth_call(functions.A_precise, {})
     }
 
-    get_p(): Promise<bigint> {
-        return this.eth_call(functions.get_p, [])
+    get_p() {
+        return this.eth_call(functions.get_p, {})
     }
 
-    price_oracle(): Promise<bigint> {
-        return this.eth_call(functions.price_oracle, [])
+    price_oracle() {
+        return this.eth_call(functions.price_oracle, {})
     }
 
-    get_virtual_price(): Promise<bigint> {
-        return this.eth_call(functions.get_virtual_price, [])
+    get_virtual_price() {
+        return this.eth_call(functions.get_virtual_price, {})
     }
 
-    calc_token_amount(_amounts: Array<bigint>, _is_deposit: boolean): Promise<bigint> {
-        return this.eth_call(functions.calc_token_amount, [_amounts, _is_deposit])
+    calc_token_amount(_amounts: Calc_token_amountParams["_amounts"], _is_deposit: Calc_token_amountParams["_is_deposit"]) {
+        return this.eth_call(functions.calc_token_amount, {_amounts, _is_deposit})
     }
 
-    get_dy(i: bigint, j: bigint, dx: bigint): Promise<bigint> {
-        return this.eth_call(functions.get_dy, [i, j, dx])
+    get_dy(i: Get_dyParams["i"], j: Get_dyParams["j"], dx: Get_dyParams["dx"]) {
+        return this.eth_call(functions.get_dy, {i, j, dx})
     }
 
-    calc_withdraw_one_coin(_burn_amount: bigint, i: bigint): Promise<bigint> {
-        return this.eth_call(functions.calc_withdraw_one_coin, [_burn_amount, i])
+    calc_withdraw_one_coin(_burn_amount: Calc_withdraw_one_coinParams["_burn_amount"], i: Calc_withdraw_one_coinParams["i"]) {
+        return this.eth_call(functions.calc_withdraw_one_coin, {_burn_amount, i})
     }
 
-    admin_balances(i: bigint): Promise<bigint> {
-        return this.eth_call(functions.admin_balances, [i])
+    admin_balances(i: Admin_balancesParams["i"]) {
+        return this.eth_call(functions.admin_balances, {i})
     }
 
-    version(): Promise<string> {
-        return this.eth_call(functions.version, [])
+    version() {
+        return this.eth_call(functions.version, {})
     }
 
-    coins(arg0: bigint): Promise<string> {
-        return this.eth_call(functions.coins, [arg0])
+    coins(arg0: CoinsParams["arg0"]) {
+        return this.eth_call(functions.coins, {arg0})
     }
 
-    balances(arg0: bigint): Promise<bigint> {
-        return this.eth_call(functions.balances, [arg0])
+    balances(arg0: BalancesParams["arg0"]) {
+        return this.eth_call(functions.balances, {arg0})
     }
 
-    fee(): Promise<bigint> {
-        return this.eth_call(functions.fee, [])
+    fee() {
+        return this.eth_call(functions.fee, {})
     }
 
-    future_fee(): Promise<bigint> {
-        return this.eth_call(functions.future_fee, [])
+    future_fee() {
+        return this.eth_call(functions.future_fee, {})
     }
 
-    admin_action_deadline(): Promise<bigint> {
-        return this.eth_call(functions.admin_action_deadline, [])
+    admin_action_deadline() {
+        return this.eth_call(functions.admin_action_deadline, {})
     }
 
-    initial_A(): Promise<bigint> {
-        return this.eth_call(functions.initial_A, [])
+    initial_A() {
+        return this.eth_call(functions.initial_A, {})
     }
 
-    future_A(): Promise<bigint> {
-        return this.eth_call(functions.future_A, [])
+    future_A() {
+        return this.eth_call(functions.future_A, {})
     }
 
-    initial_A_time(): Promise<bigint> {
-        return this.eth_call(functions.initial_A_time, [])
+    initial_A_time() {
+        return this.eth_call(functions.initial_A_time, {})
     }
 
-    future_A_time(): Promise<bigint> {
-        return this.eth_call(functions.future_A_time, [])
+    future_A_time() {
+        return this.eth_call(functions.future_A_time, {})
     }
 
-    name(): Promise<string> {
-        return this.eth_call(functions.name, [])
+    name() {
+        return this.eth_call(functions.name, {})
     }
 
-    symbol(): Promise<string> {
-        return this.eth_call(functions.symbol, [])
+    symbol() {
+        return this.eth_call(functions.symbol, {})
     }
 
-    balanceOf(arg0: string): Promise<bigint> {
-        return this.eth_call(functions.balanceOf, [arg0])
+    balanceOf(arg0: BalanceOfParams["arg0"]) {
+        return this.eth_call(functions.balanceOf, {arg0})
     }
 
-    allowance(arg0: string, arg1: string): Promise<bigint> {
-        return this.eth_call(functions.allowance, [arg0, arg1])
+    allowance(arg0: AllowanceParams["arg0"], arg1: AllowanceParams["arg1"]) {
+        return this.eth_call(functions.allowance, {arg0, arg1})
     }
 
-    totalSupply(): Promise<bigint> {
-        return this.eth_call(functions.totalSupply, [])
+    totalSupply() {
+        return this.eth_call(functions.totalSupply, {})
     }
 
-    DOMAIN_SEPARATOR(): Promise<string> {
-        return this.eth_call(functions.DOMAIN_SEPARATOR, [])
+    DOMAIN_SEPARATOR() {
+        return this.eth_call(functions.DOMAIN_SEPARATOR, {})
     }
 
-    nonces(arg0: string): Promise<bigint> {
-        return this.eth_call(functions.nonces, [arg0])
+    nonces(arg0: NoncesParams["arg0"]) {
+        return this.eth_call(functions.nonces, {arg0})
     }
 
-    ma_exp_time(): Promise<bigint> {
-        return this.eth_call(functions.ma_exp_time, [])
+    ma_exp_time() {
+        return this.eth_call(functions.ma_exp_time, {})
     }
 
-    ma_last_time(): Promise<bigint> {
-        return this.eth_call(functions.ma_last_time, [])
+    ma_last_time() {
+        return this.eth_call(functions.ma_last_time, {})
     }
 }
+
+/// Event types
+export type TransferEventArgs = EParams<typeof events.Transfer>
+export type ApprovalEventArgs = EParams<typeof events.Approval>
+export type TokenExchangeEventArgs = EParams<typeof events.TokenExchange>
+export type AddLiquidityEventArgs = EParams<typeof events.AddLiquidity>
+export type RemoveLiquidityEventArgs = EParams<typeof events.RemoveLiquidity>
+export type RemoveLiquidityOneEventArgs = EParams<typeof events.RemoveLiquidityOne>
+export type RemoveLiquidityImbalanceEventArgs = EParams<typeof events.RemoveLiquidityImbalance>
+export type RampAEventArgs = EParams<typeof events.RampA>
+export type StopRampAEventArgs = EParams<typeof events.StopRampA>
+export type CommitNewFeeEventArgs = EParams<typeof events.CommitNewFee>
+export type ApplyNewFeeEventArgs = EParams<typeof events.ApplyNewFee>
+
+/// Function types
+export type InitializeParams = FunctionArguments<typeof functions.initialize>
+export type InitializeReturn = FunctionReturn<typeof functions.initialize>
+
+export type DecimalsParams = FunctionArguments<typeof functions.decimals>
+export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
+
+export type TransferParams = FunctionArguments<typeof functions.transfer>
+export type TransferReturn = FunctionReturn<typeof functions.transfer>
+
+export type TransferFromParams = FunctionArguments<typeof functions.transferFrom>
+export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
+
+export type ApproveParams = FunctionArguments<typeof functions.approve>
+export type ApproveReturn = FunctionReturn<typeof functions.approve>
+
+export type PermitParams = FunctionArguments<typeof functions.permit>
+export type PermitReturn = FunctionReturn<typeof functions.permit>
+
+export type Last_priceParams = FunctionArguments<typeof functions.last_price>
+export type Last_priceReturn = FunctionReturn<typeof functions.last_price>
+
+export type Ema_priceParams = FunctionArguments<typeof functions.ema_price>
+export type Ema_priceReturn = FunctionReturn<typeof functions.ema_price>
+
+export type Get_balancesParams = FunctionArguments<typeof functions.get_balances>
+export type Get_balancesReturn = FunctionReturn<typeof functions.get_balances>
+
+export type Admin_feeParams = FunctionArguments<typeof functions.admin_fee>
+export type Admin_feeReturn = FunctionReturn<typeof functions.admin_fee>
+
+export type AParams = FunctionArguments<typeof functions.A>
+export type AReturn = FunctionReturn<typeof functions.A>
+
+export type A_preciseParams = FunctionArguments<typeof functions.A_precise>
+export type A_preciseReturn = FunctionReturn<typeof functions.A_precise>
+
+export type Get_pParams = FunctionArguments<typeof functions.get_p>
+export type Get_pReturn = FunctionReturn<typeof functions.get_p>
+
+export type Price_oracleParams = FunctionArguments<typeof functions.price_oracle>
+export type Price_oracleReturn = FunctionReturn<typeof functions.price_oracle>
+
+export type Get_virtual_priceParams = FunctionArguments<typeof functions.get_virtual_price>
+export type Get_virtual_priceReturn = FunctionReturn<typeof functions.get_virtual_price>
+
+export type Calc_token_amountParams = FunctionArguments<typeof functions.calc_token_amount>
+export type Calc_token_amountReturn = FunctionReturn<typeof functions.calc_token_amount>
+
+export type Add_liquidityParams_0 = FunctionArguments<typeof functions["add_liquidity(uint256[2],uint256)"]>
+export type Add_liquidityReturn_0 = FunctionReturn<typeof functions["add_liquidity(uint256[2],uint256)"]>
+
+export type Add_liquidityParams_1 = FunctionArguments<typeof functions["add_liquidity(uint256[2],uint256,address)"]>
+export type Add_liquidityReturn_1 = FunctionReturn<typeof functions["add_liquidity(uint256[2],uint256,address)"]>
+
+export type Get_dyParams = FunctionArguments<typeof functions.get_dy>
+export type Get_dyReturn = FunctionReturn<typeof functions.get_dy>
+
+export type ExchangeParams_0 = FunctionArguments<typeof functions["exchange(int128,int128,uint256,uint256)"]>
+export type ExchangeReturn_0 = FunctionReturn<typeof functions["exchange(int128,int128,uint256,uint256)"]>
+
+export type ExchangeParams_1 = FunctionArguments<typeof functions["exchange(int128,int128,uint256,uint256,address)"]>
+export type ExchangeReturn_1 = FunctionReturn<typeof functions["exchange(int128,int128,uint256,uint256,address)"]>
+
+export type Remove_liquidityParams_0 = FunctionArguments<typeof functions["remove_liquidity(uint256,uint256[2])"]>
+export type Remove_liquidityReturn_0 = FunctionReturn<typeof functions["remove_liquidity(uint256,uint256[2])"]>
+
+export type Remove_liquidityParams_1 = FunctionArguments<typeof functions["remove_liquidity(uint256,uint256[2],address)"]>
+export type Remove_liquidityReturn_1 = FunctionReturn<typeof functions["remove_liquidity(uint256,uint256[2],address)"]>
+
+export type Remove_liquidity_imbalanceParams_0 = FunctionArguments<typeof functions["remove_liquidity_imbalance(uint256[2],uint256)"]>
+export type Remove_liquidity_imbalanceReturn_0 = FunctionReturn<typeof functions["remove_liquidity_imbalance(uint256[2],uint256)"]>
+
+export type Remove_liquidity_imbalanceParams_1 = FunctionArguments<typeof functions["remove_liquidity_imbalance(uint256[2],uint256,address)"]>
+export type Remove_liquidity_imbalanceReturn_1 = FunctionReturn<typeof functions["remove_liquidity_imbalance(uint256[2],uint256,address)"]>
+
+export type Calc_withdraw_one_coinParams = FunctionArguments<typeof functions.calc_withdraw_one_coin>
+export type Calc_withdraw_one_coinReturn = FunctionReturn<typeof functions.calc_withdraw_one_coin>
+
+export type Remove_liquidity_one_coinParams_0 = FunctionArguments<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256)"]>
+export type Remove_liquidity_one_coinReturn_0 = FunctionReturn<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256)"]>
+
+export type Remove_liquidity_one_coinParams_1 = FunctionArguments<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256,address)"]>
+export type Remove_liquidity_one_coinReturn_1 = FunctionReturn<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256,address)"]>
+
+export type Ramp_AParams = FunctionArguments<typeof functions.ramp_A>
+export type Ramp_AReturn = FunctionReturn<typeof functions.ramp_A>
+
+export type Stop_ramp_AParams = FunctionArguments<typeof functions.stop_ramp_A>
+export type Stop_ramp_AReturn = FunctionReturn<typeof functions.stop_ramp_A>
+
+export type Admin_balancesParams = FunctionArguments<typeof functions.admin_balances>
+export type Admin_balancesReturn = FunctionReturn<typeof functions.admin_balances>
+
+export type Withdraw_admin_feesParams = FunctionArguments<typeof functions.withdraw_admin_fees>
+export type Withdraw_admin_feesReturn = FunctionReturn<typeof functions.withdraw_admin_fees>
+
+export type Commit_new_feeParams = FunctionArguments<typeof functions.commit_new_fee>
+export type Commit_new_feeReturn = FunctionReturn<typeof functions.commit_new_fee>
+
+export type Apply_new_feeParams = FunctionArguments<typeof functions.apply_new_fee>
+export type Apply_new_feeReturn = FunctionReturn<typeof functions.apply_new_fee>
+
+export type Set_ma_exp_timeParams = FunctionArguments<typeof functions.set_ma_exp_time>
+export type Set_ma_exp_timeReturn = FunctionReturn<typeof functions.set_ma_exp_time>
+
+export type VersionParams = FunctionArguments<typeof functions.version>
+export type VersionReturn = FunctionReturn<typeof functions.version>
+
+export type CoinsParams = FunctionArguments<typeof functions.coins>
+export type CoinsReturn = FunctionReturn<typeof functions.coins>
+
+export type BalancesParams = FunctionArguments<typeof functions.balances>
+export type BalancesReturn = FunctionReturn<typeof functions.balances>
+
+export type FeeParams = FunctionArguments<typeof functions.fee>
+export type FeeReturn = FunctionReturn<typeof functions.fee>
+
+export type Future_feeParams = FunctionArguments<typeof functions.future_fee>
+export type Future_feeReturn = FunctionReturn<typeof functions.future_fee>
+
+export type Admin_action_deadlineParams = FunctionArguments<typeof functions.admin_action_deadline>
+export type Admin_action_deadlineReturn = FunctionReturn<typeof functions.admin_action_deadline>
+
+export type Initial_AParams = FunctionArguments<typeof functions.initial_A>
+export type Initial_AReturn = FunctionReturn<typeof functions.initial_A>
+
+export type Future_AParams = FunctionArguments<typeof functions.future_A>
+export type Future_AReturn = FunctionReturn<typeof functions.future_A>
+
+export type Initial_A_timeParams = FunctionArguments<typeof functions.initial_A_time>
+export type Initial_A_timeReturn = FunctionReturn<typeof functions.initial_A_time>
+
+export type Future_A_timeParams = FunctionArguments<typeof functions.future_A_time>
+export type Future_A_timeReturn = FunctionReturn<typeof functions.future_A_time>
+
+export type NameParams = FunctionArguments<typeof functions.name>
+export type NameReturn = FunctionReturn<typeof functions.name>
+
+export type SymbolParams = FunctionArguments<typeof functions.symbol>
+export type SymbolReturn = FunctionReturn<typeof functions.symbol>
+
+export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
+export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
+
+export type AllowanceParams = FunctionArguments<typeof functions.allowance>
+export type AllowanceReturn = FunctionReturn<typeof functions.allowance>
+
+export type TotalSupplyParams = FunctionArguments<typeof functions.totalSupply>
+export type TotalSupplyReturn = FunctionReturn<typeof functions.totalSupply>
+
+export type DOMAIN_SEPARATORParams = FunctionArguments<typeof functions.DOMAIN_SEPARATOR>
+export type DOMAIN_SEPARATORReturn = FunctionReturn<typeof functions.DOMAIN_SEPARATOR>
+
+export type NoncesParams = FunctionArguments<typeof functions.nonces>
+export type NoncesReturn = FunctionReturn<typeof functions.nonces>
+
+export type Ma_exp_timeParams = FunctionArguments<typeof functions.ma_exp_time>
+export type Ma_exp_timeReturn = FunctionReturn<typeof functions.ma_exp_time>
+
+export type Ma_last_timeParams = FunctionArguments<typeof functions.ma_last_time>
+export type Ma_last_timeReturn = FunctionReturn<typeof functions.ma_last_time>
+

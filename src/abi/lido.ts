@@ -1,474 +1,522 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './lido.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    StakingPaused: new LogEvent<[]>(
-        abi, '0x26d1807b479eaba249c1214b82e4b65bbb0cc73ee8a17901324b1ef1b5904e49'
-    ),
-    StakingResumed: new LogEvent<[]>(
-        abi, '0xedaeeae9aed70c4545d3ab0065713261c9cee8d6cf5c8b07f52f0a65fd91efda'
-    ),
-    StakingLimitSet: new LogEvent<([maxStakeLimit: bigint, stakeLimitIncreasePerBlock: bigint] & {maxStakeLimit: bigint, stakeLimitIncreasePerBlock: bigint})>(
-        abi, '0xce9fddf6179affa1ea7bf36d80a6bf0284e0f3b91f4b2fa6eea2af923e7fac2d'
-    ),
-    StakingLimitRemoved: new LogEvent<[]>(
-        abi, '0x9b2a687c198898fcc32a33bbc610d478f177a73ab7352023e6cc1de5bf12a3df'
-    ),
-    CLValidatorsUpdated: new LogEvent<([reportTimestamp: bigint, preCLValidators: bigint, postCLValidators: bigint] & {reportTimestamp: bigint, preCLValidators: bigint, postCLValidators: bigint})>(
-        abi, '0x1252331d4f3ee8a9f0a3484c4c2fb059c70a047b5dc5482a3ee6415f742d9f2e'
-    ),
-    DepositedValidatorsChanged: new LogEvent<([depositedValidators: bigint] & {depositedValidators: bigint})>(
-        abi, '0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff'
-    ),
-    ETHDistributed: new LogEvent<([reportTimestamp: bigint, preCLBalance: bigint, postCLBalance: bigint, withdrawalsWithdrawn: bigint, executionLayerRewardsWithdrawn: bigint, postBufferedEther: bigint] & {reportTimestamp: bigint, preCLBalance: bigint, postCLBalance: bigint, withdrawalsWithdrawn: bigint, executionLayerRewardsWithdrawn: bigint, postBufferedEther: bigint})>(
-        abi, '0x92dd3cb149a1eebd51fd8c2a3653fd96f30c4ac01d4f850fc16d46abd6c3e92f'
-    ),
-    TokenRebased: new LogEvent<([reportTimestamp: bigint, timeElapsed: bigint, preTotalShares: bigint, preTotalEther: bigint, postTotalShares: bigint, postTotalEther: bigint, sharesMintedAsFees: bigint] & {reportTimestamp: bigint, timeElapsed: bigint, preTotalShares: bigint, preTotalEther: bigint, postTotalShares: bigint, postTotalEther: bigint, sharesMintedAsFees: bigint})>(
-        abi, '0xff08c3ef606d198e316ef5b822193c489965899eb4e3c248cea1a4626c3eda50'
-    ),
-    LidoLocatorSet: new LogEvent<([lidoLocator: string] & {lidoLocator: string})>(
-        abi, '0x61f9416d3c29deb4e424342445a2b132738430becd9fa275e11297c90668b22e'
-    ),
-    ELRewardsReceived: new LogEvent<([amount: bigint] & {amount: bigint})>(
-        abi, '0xd27f9b0c98bdee27044afa149eadcd2047d6399cb6613a45c5b87e6aca76e6b5'
-    ),
-    WithdrawalsReceived: new LogEvent<([amount: bigint] & {amount: bigint})>(
-        abi, '0x6e5086f7e1ab04bd826e77faae35b1bcfe31bd144623361a40ea4af51670b1c3'
-    ),
-    Submitted: new LogEvent<([sender: string, amount: bigint, referral: string] & {sender: string, amount: bigint, referral: string})>(
-        abi, '0x96a25c8ce0baabc1fdefd93e9ed25d8e092a3332f3aa9a41722b5697231d1d1a'
-    ),
-    Unbuffered: new LogEvent<([amount: bigint] & {amount: bigint})>(
-        abi, '0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108'
-    ),
-    ScriptResult: new LogEvent<([executor: string, script: string, input: string, returnData: string] & {executor: string, script: string, input: string, returnData: string})>(
-        abi, '0x5229a5dba83a54ae8cb5b51bdd6de9474cacbe9dd332f5185f3a4f4f2e3f4ad9'
-    ),
-    RecoverToVault: new LogEvent<([vault: string, token: string, amount: bigint] & {vault: string, token: string, amount: bigint})>(
-        abi, '0x596caf56044b55fb8c4ca640089bbc2b63cae3e978b851f5745cbb7c5b288e02'
-    ),
-    EIP712StETHInitialized: new LogEvent<([eip712StETH: string] & {eip712StETH: string})>(
-        abi, '0xb80a5409082a3729c9fc139f8b41192c40e85252752df2c07caebd613086ca83'
-    ),
-    TransferShares: new LogEvent<([from: string, to: string, sharesValue: bigint] & {from: string, to: string, sharesValue: bigint})>(
-        abi, '0x9d9c909296d9c674451c0c24f02cb64981eb3b727f99865939192f880a755dcb'
-    ),
-    SharesBurnt: new LogEvent<([account: string, preRebaseTokenAmount: bigint, postRebaseTokenAmount: bigint, sharesAmount: bigint] & {account: string, preRebaseTokenAmount: bigint, postRebaseTokenAmount: bigint, sharesAmount: bigint})>(
-        abi, '0x8b2a1e1ad5e0578c3dd82494156e985dade827a87c573b5c1c7716a32162ad64'
-    ),
-    Stopped: new LogEvent<[]>(
-        abi, '0x7acc84e34091ae817647a4c49116f5cc07f319078ba80f8f5fde37ea7e25cbd6'
-    ),
-    Resumed: new LogEvent<[]>(
-        abi, '0x62451d457bc659158be6e6247f56ec1df424a5c7597f71c20c2bc44e0965c8f9'
-    ),
-    Transfer: new LogEvent<([from: string, to: string, value: bigint] & {from: string, to: string, value: bigint})>(
-        abi, '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-    ),
-    Approval: new LogEvent<([owner: string, spender: string, value: bigint] & {owner: string, spender: string, value: bigint})>(
-        abi, '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
-    ),
-    ContractVersionSet: new LogEvent<([version: bigint] & {version: bigint})>(
-        abi, '0xfddcded6b4f4730c226821172046b48372d3cd963c159701ae1b7c3bcac541bb'
-    ),
+    StakingPaused: event("0x26d1807b479eaba249c1214b82e4b65bbb0cc73ee8a17901324b1ef1b5904e49", {}),
+    StakingResumed: event("0xedaeeae9aed70c4545d3ab0065713261c9cee8d6cf5c8b07f52f0a65fd91efda", {}),
+    StakingLimitSet: event("0xce9fddf6179affa1ea7bf36d80a6bf0284e0f3b91f4b2fa6eea2af923e7fac2d", {"maxStakeLimit": p.uint256, "stakeLimitIncreasePerBlock": p.uint256}),
+    StakingLimitRemoved: event("0x9b2a687c198898fcc32a33bbc610d478f177a73ab7352023e6cc1de5bf12a3df", {}),
+    CLValidatorsUpdated: event("0x1252331d4f3ee8a9f0a3484c4c2fb059c70a047b5dc5482a3ee6415f742d9f2e", {"reportTimestamp": indexed(p.uint256), "preCLValidators": p.uint256, "postCLValidators": p.uint256}),
+    DepositedValidatorsChanged: event("0xe0aacfc334457703148118055ec794ac17654c6f918d29638ba3b18003cee5ff", {"depositedValidators": p.uint256}),
+    ETHDistributed: event("0x92dd3cb149a1eebd51fd8c2a3653fd96f30c4ac01d4f850fc16d46abd6c3e92f", {"reportTimestamp": indexed(p.uint256), "preCLBalance": p.uint256, "postCLBalance": p.uint256, "withdrawalsWithdrawn": p.uint256, "executionLayerRewardsWithdrawn": p.uint256, "postBufferedEther": p.uint256}),
+    TokenRebased: event("0xff08c3ef606d198e316ef5b822193c489965899eb4e3c248cea1a4626c3eda50", {"reportTimestamp": indexed(p.uint256), "timeElapsed": p.uint256, "preTotalShares": p.uint256, "preTotalEther": p.uint256, "postTotalShares": p.uint256, "postTotalEther": p.uint256, "sharesMintedAsFees": p.uint256}),
+    LidoLocatorSet: event("0x61f9416d3c29deb4e424342445a2b132738430becd9fa275e11297c90668b22e", {"lidoLocator": p.address}),
+    ELRewardsReceived: event("0xd27f9b0c98bdee27044afa149eadcd2047d6399cb6613a45c5b87e6aca76e6b5", {"amount": p.uint256}),
+    WithdrawalsReceived: event("0x6e5086f7e1ab04bd826e77faae35b1bcfe31bd144623361a40ea4af51670b1c3", {"amount": p.uint256}),
+    Submitted: event("0x96a25c8ce0baabc1fdefd93e9ed25d8e092a3332f3aa9a41722b5697231d1d1a", {"sender": indexed(p.address), "amount": p.uint256, "referral": p.address}),
+    Unbuffered: event("0x76a397bea5768d4fca97ef47792796e35f98dc81b16c1de84e28a818e1f97108", {"amount": p.uint256}),
+    ScriptResult: event("0x5229a5dba83a54ae8cb5b51bdd6de9474cacbe9dd332f5185f3a4f4f2e3f4ad9", {"executor": indexed(p.address), "script": p.bytes, "input": p.bytes, "returnData": p.bytes}),
+    RecoverToVault: event("0x596caf56044b55fb8c4ca640089bbc2b63cae3e978b851f5745cbb7c5b288e02", {"vault": indexed(p.address), "token": indexed(p.address), "amount": p.uint256}),
+    EIP712StETHInitialized: event("0xb80a5409082a3729c9fc139f8b41192c40e85252752df2c07caebd613086ca83", {"eip712StETH": p.address}),
+    TransferShares: event("0x9d9c909296d9c674451c0c24f02cb64981eb3b727f99865939192f880a755dcb", {"from": indexed(p.address), "to": indexed(p.address), "sharesValue": p.uint256}),
+    SharesBurnt: event("0x8b2a1e1ad5e0578c3dd82494156e985dade827a87c573b5c1c7716a32162ad64", {"account": indexed(p.address), "preRebaseTokenAmount": p.uint256, "postRebaseTokenAmount": p.uint256, "sharesAmount": p.uint256}),
+    Stopped: event("0x7acc84e34091ae817647a4c49116f5cc07f319078ba80f8f5fde37ea7e25cbd6", {}),
+    Resumed: event("0x62451d457bc659158be6e6247f56ec1df424a5c7597f71c20c2bc44e0965c8f9", {}),
+    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
+    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
+    ContractVersionSet: event("0xfddcded6b4f4730c226821172046b48372d3cd963c159701ae1b7c3bcac541bb", {"version": p.uint256}),
 }
 
 export const functions = {
-    resume: new Func<[], {}, []>(
-        abi, '0x046f7da2'
-    ),
-    name: new Func<[], {}, string>(
-        abi, '0x06fdde03'
-    ),
-    stop: new Func<[], {}, []>(
-        abi, '0x07da68f5'
-    ),
-    hasInitialized: new Func<[], {}, boolean>(
-        abi, '0x0803fac0'
-    ),
-    approve: new Func<[_spender: string, _amount: bigint], {_spender: string, _amount: bigint}, boolean>(
-        abi, '0x095ea7b3'
-    ),
-    STAKING_CONTROL_ROLE: new Func<[], {}, string>(
-        abi, '0x136dd43c'
-    ),
-    totalSupply: new Func<[], {}, bigint>(
-        abi, '0x18160ddd'
-    ),
-    getSharesByPooledEth: new Func<[_ethAmount: bigint], {_ethAmount: bigint}, bigint>(
-        abi, '0x19208451'
-    ),
-    isStakingPaused: new Func<[], {}, boolean>(
-        abi, '0x1ea7ca89'
-    ),
-    transferFrom: new Func<[_sender: string, _recipient: string, _amount: bigint], {_sender: string, _recipient: string, _amount: bigint}, boolean>(
-        abi, '0x23b872dd'
-    ),
-    getEVMScriptExecutor: new Func<[_script: string], {_script: string}, string>(
-        abi, '0x2914b9bd'
-    ),
-    setStakingLimit: new Func<[_maxStakeLimit: bigint, _stakeLimitIncreasePerBlock: bigint], {_maxStakeLimit: bigint, _stakeLimitIncreasePerBlock: bigint}, []>(
-        abi, '0x2cb5f784'
-    ),
-    RESUME_ROLE: new Func<[], {}, string>(
-        abi, '0x2de03aa1'
-    ),
-    finalizeUpgrade_v2: new Func<[_lidoLocator: string, _eip712StETH: string], {_lidoLocator: string, _eip712StETH: string}, []>(
-        abi, '0x2f85e57c'
-    ),
-    decimals: new Func<[], {}, number>(
-        abi, '0x313ce567'
-    ),
-    getRecoveryVault: new Func<[], {}, string>(
-        abi, '0x32f0a3b5'
-    ),
-    DOMAIN_SEPARATOR: new Func<[], {}, string>(
-        abi, '0x3644e515'
-    ),
-    getTotalPooledEther: new Func<[], {}, bigint>(
-        abi, '0x37cfdaca'
-    ),
-    unsafeChangeDepositedValidators: new Func<[_newDepositedValidators: bigint], {_newDepositedValidators: bigint}, []>(
-        abi, '0x38998624'
-    ),
-    PAUSE_ROLE: new Func<[], {}, string>(
-        abi, '0x389ed267'
-    ),
-    increaseAllowance: new Func<[_spender: string, _addedValue: bigint], {_spender: string, _addedValue: bigint}, boolean>(
-        abi, '0x39509351'
-    ),
-    getTreasury: new Func<[], {}, string>(
-        abi, '0x3b19e84a'
-    ),
-    isStopped: new Func<[], {}, boolean>(
-        abi, '0x3f683b6a'
-    ),
-    getBufferedEther: new Func<[], {}, bigint>(
-        abi, '0x47b714e0'
-    ),
-    initialize: new Func<[_lidoLocator: string, _eip712StETH: string], {_lidoLocator: string, _eip712StETH: string}, []>(
-        abi, '0x485cc955'
-    ),
-    receiveELRewards: new Func<[], {}, []>(
-        abi, '0x4ad509b2'
-    ),
-    getWithdrawalCredentials: new Func<[], {}, string>(
-        abi, '0x56396715'
-    ),
-    getCurrentStakeLimit: new Func<[], {}, bigint>(
-        abi, '0x609c4c6c'
-    ),
-    getStakeLimitFullInfo: new Func<[], {}, ([isStakingPaused: boolean, isStakingLimitSet: boolean, currentStakeLimit: bigint, maxStakeLimit: bigint, maxStakeLimitGrowthBlocks: bigint, prevStakeLimit: bigint, prevStakeBlockNumber: bigint] & {isStakingPaused: boolean, isStakingLimitSet: boolean, currentStakeLimit: bigint, maxStakeLimit: bigint, maxStakeLimitGrowthBlocks: bigint, prevStakeLimit: bigint, prevStakeBlockNumber: bigint})>(
-        abi, '0x665b4b0b'
-    ),
-    transferSharesFrom: new Func<[_sender: string, _recipient: string, _sharesAmount: bigint], {_sender: string, _recipient: string, _sharesAmount: bigint}, bigint>(
-        abi, '0x6d780459'
-    ),
-    balanceOf: new Func<[_account: string], {_account: string}, bigint>(
-        abi, '0x70a08231'
-    ),
-    resumeStaking: new Func<[], {}, []>(
-        abi, '0x7475f913'
-    ),
-    getFeeDistribution: new Func<[], {}, ([treasuryFeeBasisPoints: number, insuranceFeeBasisPoints: number, operatorsFeeBasisPoints: number] & {treasuryFeeBasisPoints: number, insuranceFeeBasisPoints: number, operatorsFeeBasisPoints: number})>(
-        abi, '0x752f77f1'
-    ),
-    receiveWithdrawals: new Func<[], {}, []>(
-        abi, '0x78ffcfe2'
-    ),
-    getPooledEthByShares: new Func<[_sharesAmount: bigint], {_sharesAmount: bigint}, bigint>(
-        abi, '0x7a28fb88'
-    ),
-    allowRecoverability: new Func<[token: string], {token: string}, boolean>(
-        abi, '0x7e7db6e1'
-    ),
-    nonces: new Func<[owner: string], {owner: string}, bigint>(
-        abi, '0x7ecebe00'
-    ),
-    appId: new Func<[], {}, string>(
-        abi, '0x80afdea8'
-    ),
-    getOracle: new Func<[], {}, string>(
-        abi, '0x833b1fce'
-    ),
-    eip712Domain: new Func<[], {}, ([name: string, version: string, chainId: bigint, verifyingContract: string] & {name: string, version: string, chainId: bigint, verifyingContract: string})>(
-        abi, '0x84b0196e'
-    ),
-    getContractVersion: new Func<[], {}, bigint>(
-        abi, '0x8aa10435'
-    ),
-    getInitializationBlock: new Func<[], {}, bigint>(
-        abi, '0x8b3dd749'
-    ),
-    transferShares: new Func<[_recipient: string, _sharesAmount: bigint], {_recipient: string, _sharesAmount: bigint}, bigint>(
-        abi, '0x8fcb4e5b'
-    ),
-    symbol: new Func<[], {}, string>(
-        abi, '0x95d89b41'
-    ),
-    getEIP712StETH: new Func<[], {}, string>(
-        abi, '0x9861f8e5'
-    ),
-    transferToVault: new Func<[_: string], {}, []>(
-        abi, '0x9d4941d8'
-    ),
-    canPerform: new Func<[_sender: string, _role: string, _params: Array<bigint>], {_sender: string, _role: string, _params: Array<bigint>}, boolean>(
-        abi, '0xa1658fad'
-    ),
-    submit: new Func<[_referral: string], {_referral: string}, bigint>(
-        abi, '0xa1903eab'
-    ),
-    decreaseAllowance: new Func<[_spender: string, _subtractedValue: bigint], {_spender: string, _subtractedValue: bigint}, boolean>(
-        abi, '0xa457c2d7'
-    ),
-    getEVMScriptRegistry: new Func<[], {}, string>(
-        abi, '0xa479e508'
-    ),
-    transfer: new Func<[_recipient: string, _amount: bigint], {_recipient: string, _amount: bigint}, boolean>(
-        abi, '0xa9059cbb'
-    ),
-    deposit: new Func<[_maxDepositsCount: bigint, _stakingModuleId: bigint, _depositCalldata: string], {_maxDepositsCount: bigint, _stakingModuleId: bigint, _depositCalldata: string}, []>(
-        abi, '0xaa0b7db7'
-    ),
-    UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: new Func<[], {}, string>(
-        abi, '0xad1394e9'
-    ),
-    getBeaconStat: new Func<[], {}, ([depositedValidators: bigint, beaconValidators: bigint, beaconBalance: bigint] & {depositedValidators: bigint, beaconValidators: bigint, beaconBalance: bigint})>(
-        abi, '0xae2e3538'
-    ),
-    removeStakingLimit: new Func<[], {}, []>(
-        abi, '0xb3320d9a'
-    ),
-    handleOracleReport: new Func<[_reportTimestamp: bigint, _timeElapsed: bigint, _clValidators: bigint, _clBalance: bigint, _withdrawalVaultBalance: bigint, _elRewardsVaultBalance: bigint, _sharesRequestedToBurn: bigint, _withdrawalFinalizationBatches: Array<bigint>, _simulatedShareRate: bigint], {_reportTimestamp: bigint, _timeElapsed: bigint, _clValidators: bigint, _clBalance: bigint, _withdrawalVaultBalance: bigint, _elRewardsVaultBalance: bigint, _sharesRequestedToBurn: bigint, _withdrawalFinalizationBatches: Array<bigint>, _simulatedShareRate: bigint}, Array<bigint>>(
-        abi, '0xbac3f3c5'
-    ),
-    getFee: new Func<[], {}, number>(
-        abi, '0xced72f87'
-    ),
-    kernel: new Func<[], {}, string>(
-        abi, '0xd4aae0c4'
-    ),
-    getTotalShares: new Func<[], {}, bigint>(
-        abi, '0xd5002f2e'
-    ),
-    permit: new Func<[_owner: string, _spender: string, _value: bigint, _deadline: bigint, _v: number, _r: string, _s: string], {_owner: string, _spender: string, _value: bigint, _deadline: bigint, _v: number, _r: string, _s: string}, []>(
-        abi, '0xd505accf'
-    ),
-    allowance: new Func<[_owner: string, _spender: string], {_owner: string, _spender: string}, bigint>(
-        abi, '0xdd62ed3e'
-    ),
-    isPetrified: new Func<[], {}, boolean>(
-        abi, '0xde4796ed'
-    ),
-    getLidoLocator: new Func<[], {}, string>(
-        abi, '0xe654ff17'
-    ),
-    canDeposit: new Func<[], {}, boolean>(
-        abi, '0xe78a5875'
-    ),
-    STAKING_PAUSE_ROLE: new Func<[], {}, string>(
-        abi, '0xeb85262f'
-    ),
-    getDepositableEther: new Func<[], {}, bigint>(
-        abi, '0xf2cfa87d'
-    ),
-    sharesOf: new Func<[_account: string], {_account: string}, bigint>(
-        abi, '0xf5eb42dc'
-    ),
-    pauseStaking: new Func<[], {}, []>(
-        abi, '0xf999c506'
-    ),
-    getTotalELRewardsCollected: new Func<[], {}, bigint>(
-        abi, '0xfa64ebac'
-    ),
+    resume: fun("0x046f7da2", {}, ),
+    name: fun("0x06fdde03", {}, p.string),
+    stop: fun("0x07da68f5", {}, ),
+    hasInitialized: fun("0x0803fac0", {}, p.bool),
+    approve: fun("0x095ea7b3", {"_spender": p.address, "_amount": p.uint256}, p.bool),
+    STAKING_CONTROL_ROLE: fun("0x136dd43c", {}, p.bytes32),
+    totalSupply: fun("0x18160ddd", {}, p.uint256),
+    getSharesByPooledEth: fun("0x19208451", {"_ethAmount": p.uint256}, p.uint256),
+    isStakingPaused: fun("0x1ea7ca89", {}, p.bool),
+    transferFrom: fun("0x23b872dd", {"_sender": p.address, "_recipient": p.address, "_amount": p.uint256}, p.bool),
+    getEVMScriptExecutor: fun("0x2914b9bd", {"_script": p.bytes}, p.address),
+    setStakingLimit: fun("0x2cb5f784", {"_maxStakeLimit": p.uint256, "_stakeLimitIncreasePerBlock": p.uint256}, ),
+    RESUME_ROLE: fun("0x2de03aa1", {}, p.bytes32),
+    finalizeUpgrade_v2: fun("0x2f85e57c", {"_lidoLocator": p.address, "_eip712StETH": p.address}, ),
+    decimals: fun("0x313ce567", {}, p.uint8),
+    getRecoveryVault: fun("0x32f0a3b5", {}, p.address),
+    DOMAIN_SEPARATOR: fun("0x3644e515", {}, p.bytes32),
+    getTotalPooledEther: fun("0x37cfdaca", {}, p.uint256),
+    unsafeChangeDepositedValidators: fun("0x38998624", {"_newDepositedValidators": p.uint256}, ),
+    PAUSE_ROLE: fun("0x389ed267", {}, p.bytes32),
+    increaseAllowance: fun("0x39509351", {"_spender": p.address, "_addedValue": p.uint256}, p.bool),
+    getTreasury: fun("0x3b19e84a", {}, p.address),
+    isStopped: fun("0x3f683b6a", {}, p.bool),
+    getBufferedEther: fun("0x47b714e0", {}, p.uint256),
+    initialize: fun("0x485cc955", {"_lidoLocator": p.address, "_eip712StETH": p.address}, ),
+    receiveELRewards: fun("0x4ad509b2", {}, ),
+    getWithdrawalCredentials: fun("0x56396715", {}, p.bytes32),
+    getCurrentStakeLimit: fun("0x609c4c6c", {}, p.uint256),
+    getStakeLimitFullInfo: fun("0x665b4b0b", {}, {"isStakingPaused": p.bool, "isStakingLimitSet": p.bool, "currentStakeLimit": p.uint256, "maxStakeLimit": p.uint256, "maxStakeLimitGrowthBlocks": p.uint256, "prevStakeLimit": p.uint256, "prevStakeBlockNumber": p.uint256}),
+    transferSharesFrom: fun("0x6d780459", {"_sender": p.address, "_recipient": p.address, "_sharesAmount": p.uint256}, p.uint256),
+    balanceOf: fun("0x70a08231", {"_account": p.address}, p.uint256),
+    resumeStaking: fun("0x7475f913", {}, ),
+    getFeeDistribution: fun("0x752f77f1", {}, {"treasuryFeeBasisPoints": p.uint16, "insuranceFeeBasisPoints": p.uint16, "operatorsFeeBasisPoints": p.uint16}),
+    receiveWithdrawals: fun("0x78ffcfe2", {}, ),
+    getPooledEthByShares: fun("0x7a28fb88", {"_sharesAmount": p.uint256}, p.uint256),
+    allowRecoverability: fun("0x7e7db6e1", {"token": p.address}, p.bool),
+    nonces: fun("0x7ecebe00", {"owner": p.address}, p.uint256),
+    appId: fun("0x80afdea8", {}, p.bytes32),
+    getOracle: fun("0x833b1fce", {}, p.address),
+    eip712Domain: fun("0x84b0196e", {}, {"name": p.string, "version": p.string, "chainId": p.uint256, "verifyingContract": p.address}),
+    getContractVersion: fun("0x8aa10435", {}, p.uint256),
+    getInitializationBlock: fun("0x8b3dd749", {}, p.uint256),
+    transferShares: fun("0x8fcb4e5b", {"_recipient": p.address, "_sharesAmount": p.uint256}, p.uint256),
+    symbol: fun("0x95d89b41", {}, p.string),
+    getEIP712StETH: fun("0x9861f8e5", {}, p.address),
+    transferToVault: fun("0x9d4941d8", {"_0": p.address}, ),
+    canPerform: fun("0xa1658fad", {"_sender": p.address, "_role": p.bytes32, "_params": p.array(p.uint256)}, p.bool),
+    submit: fun("0xa1903eab", {"_referral": p.address}, p.uint256),
+    decreaseAllowance: fun("0xa457c2d7", {"_spender": p.address, "_subtractedValue": p.uint256}, p.bool),
+    getEVMScriptRegistry: fun("0xa479e508", {}, p.address),
+    transfer: fun("0xa9059cbb", {"_recipient": p.address, "_amount": p.uint256}, p.bool),
+    deposit: fun("0xaa0b7db7", {"_maxDepositsCount": p.uint256, "_stakingModuleId": p.uint256, "_depositCalldata": p.bytes}, ),
+    UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE: fun("0xad1394e9", {}, p.bytes32),
+    getBeaconStat: fun("0xae2e3538", {}, {"depositedValidators": p.uint256, "beaconValidators": p.uint256, "beaconBalance": p.uint256}),
+    removeStakingLimit: fun("0xb3320d9a", {}, ),
+    handleOracleReport: fun("0xbac3f3c5", {"_reportTimestamp": p.uint256, "_timeElapsed": p.uint256, "_clValidators": p.uint256, "_clBalance": p.uint256, "_withdrawalVaultBalance": p.uint256, "_elRewardsVaultBalance": p.uint256, "_sharesRequestedToBurn": p.uint256, "_withdrawalFinalizationBatches": p.array(p.uint256), "_simulatedShareRate": p.uint256}, p.fixedSizeArray(p.uint256, 4)),
+    getFee: fun("0xced72f87", {}, p.uint16),
+    kernel: fun("0xd4aae0c4", {}, p.address),
+    getTotalShares: fun("0xd5002f2e", {}, p.uint256),
+    permit: fun("0xd505accf", {"_owner": p.address, "_spender": p.address, "_value": p.uint256, "_deadline": p.uint256, "_v": p.uint8, "_r": p.bytes32, "_s": p.bytes32}, ),
+    allowance: fun("0xdd62ed3e", {"_owner": p.address, "_spender": p.address}, p.uint256),
+    isPetrified: fun("0xde4796ed", {}, p.bool),
+    getLidoLocator: fun("0xe654ff17", {}, p.address),
+    canDeposit: fun("0xe78a5875", {}, p.bool),
+    STAKING_PAUSE_ROLE: fun("0xeb85262f", {}, p.bytes32),
+    getDepositableEther: fun("0xf2cfa87d", {}, p.uint256),
+    sharesOf: fun("0xf5eb42dc", {"_account": p.address}, p.uint256),
+    pauseStaking: fun("0xf999c506", {}, ),
+    getTotalELRewardsCollected: fun("0xfa64ebac", {}, p.uint256),
 }
 
 export class Contract extends ContractBase {
 
-    name(): Promise<string> {
-        return this.eth_call(functions.name, [])
+    name() {
+        return this.eth_call(functions.name, {})
     }
 
-    hasInitialized(): Promise<boolean> {
-        return this.eth_call(functions.hasInitialized, [])
+    hasInitialized() {
+        return this.eth_call(functions.hasInitialized, {})
     }
 
-    STAKING_CONTROL_ROLE(): Promise<string> {
-        return this.eth_call(functions.STAKING_CONTROL_ROLE, [])
+    STAKING_CONTROL_ROLE() {
+        return this.eth_call(functions.STAKING_CONTROL_ROLE, {})
     }
 
-    totalSupply(): Promise<bigint> {
-        return this.eth_call(functions.totalSupply, [])
+    totalSupply() {
+        return this.eth_call(functions.totalSupply, {})
     }
 
-    getSharesByPooledEth(_ethAmount: bigint): Promise<bigint> {
-        return this.eth_call(functions.getSharesByPooledEth, [_ethAmount])
+    getSharesByPooledEth(_ethAmount: GetSharesByPooledEthParams["_ethAmount"]) {
+        return this.eth_call(functions.getSharesByPooledEth, {_ethAmount})
     }
 
-    isStakingPaused(): Promise<boolean> {
-        return this.eth_call(functions.isStakingPaused, [])
+    isStakingPaused() {
+        return this.eth_call(functions.isStakingPaused, {})
     }
 
-    getEVMScriptExecutor(_script: string): Promise<string> {
-        return this.eth_call(functions.getEVMScriptExecutor, [_script])
+    getEVMScriptExecutor(_script: GetEVMScriptExecutorParams["_script"]) {
+        return this.eth_call(functions.getEVMScriptExecutor, {_script})
     }
 
-    RESUME_ROLE(): Promise<string> {
-        return this.eth_call(functions.RESUME_ROLE, [])
+    RESUME_ROLE() {
+        return this.eth_call(functions.RESUME_ROLE, {})
     }
 
-    decimals(): Promise<number> {
-        return this.eth_call(functions.decimals, [])
+    decimals() {
+        return this.eth_call(functions.decimals, {})
     }
 
-    getRecoveryVault(): Promise<string> {
-        return this.eth_call(functions.getRecoveryVault, [])
+    getRecoveryVault() {
+        return this.eth_call(functions.getRecoveryVault, {})
     }
 
-    DOMAIN_SEPARATOR(): Promise<string> {
-        return this.eth_call(functions.DOMAIN_SEPARATOR, [])
+    DOMAIN_SEPARATOR() {
+        return this.eth_call(functions.DOMAIN_SEPARATOR, {})
     }
 
-    getTotalPooledEther(): Promise<bigint> {
-        return this.eth_call(functions.getTotalPooledEther, [])
+    getTotalPooledEther() {
+        return this.eth_call(functions.getTotalPooledEther, {})
     }
 
-    PAUSE_ROLE(): Promise<string> {
-        return this.eth_call(functions.PAUSE_ROLE, [])
+    PAUSE_ROLE() {
+        return this.eth_call(functions.PAUSE_ROLE, {})
     }
 
-    getTreasury(): Promise<string> {
-        return this.eth_call(functions.getTreasury, [])
+    getTreasury() {
+        return this.eth_call(functions.getTreasury, {})
     }
 
-    isStopped(): Promise<boolean> {
-        return this.eth_call(functions.isStopped, [])
+    isStopped() {
+        return this.eth_call(functions.isStopped, {})
     }
 
-    getBufferedEther(): Promise<bigint> {
-        return this.eth_call(functions.getBufferedEther, [])
+    getBufferedEther() {
+        return this.eth_call(functions.getBufferedEther, {})
     }
 
-    getWithdrawalCredentials(): Promise<string> {
-        return this.eth_call(functions.getWithdrawalCredentials, [])
+    getWithdrawalCredentials() {
+        return this.eth_call(functions.getWithdrawalCredentials, {})
     }
 
-    getCurrentStakeLimit(): Promise<bigint> {
-        return this.eth_call(functions.getCurrentStakeLimit, [])
+    getCurrentStakeLimit() {
+        return this.eth_call(functions.getCurrentStakeLimit, {})
     }
 
-    getStakeLimitFullInfo(): Promise<([isStakingPaused: boolean, isStakingLimitSet: boolean, currentStakeLimit: bigint, maxStakeLimit: bigint, maxStakeLimitGrowthBlocks: bigint, prevStakeLimit: bigint, prevStakeBlockNumber: bigint] & {isStakingPaused: boolean, isStakingLimitSet: boolean, currentStakeLimit: bigint, maxStakeLimit: bigint, maxStakeLimitGrowthBlocks: bigint, prevStakeLimit: bigint, prevStakeBlockNumber: bigint})> {
-        return this.eth_call(functions.getStakeLimitFullInfo, [])
+    getStakeLimitFullInfo() {
+        return this.eth_call(functions.getStakeLimitFullInfo, {})
     }
 
-    balanceOf(_account: string): Promise<bigint> {
-        return this.eth_call(functions.balanceOf, [_account])
+    balanceOf(_account: BalanceOfParams["_account"]) {
+        return this.eth_call(functions.balanceOf, {_account})
     }
 
-    getFeeDistribution(): Promise<([treasuryFeeBasisPoints: number, insuranceFeeBasisPoints: number, operatorsFeeBasisPoints: number] & {treasuryFeeBasisPoints: number, insuranceFeeBasisPoints: number, operatorsFeeBasisPoints: number})> {
-        return this.eth_call(functions.getFeeDistribution, [])
+    getFeeDistribution() {
+        return this.eth_call(functions.getFeeDistribution, {})
     }
 
-    getPooledEthByShares(_sharesAmount: bigint): Promise<bigint> {
-        return this.eth_call(functions.getPooledEthByShares, [_sharesAmount])
+    getPooledEthByShares(_sharesAmount: GetPooledEthBySharesParams["_sharesAmount"]) {
+        return this.eth_call(functions.getPooledEthByShares, {_sharesAmount})
     }
 
-    allowRecoverability(token: string): Promise<boolean> {
-        return this.eth_call(functions.allowRecoverability, [token])
+    allowRecoverability(token: AllowRecoverabilityParams["token"]) {
+        return this.eth_call(functions.allowRecoverability, {token})
     }
 
-    nonces(owner: string): Promise<bigint> {
-        return this.eth_call(functions.nonces, [owner])
+    nonces(owner: NoncesParams["owner"]) {
+        return this.eth_call(functions.nonces, {owner})
     }
 
-    appId(): Promise<string> {
-        return this.eth_call(functions.appId, [])
+    appId() {
+        return this.eth_call(functions.appId, {})
     }
 
-    getOracle(): Promise<string> {
-        return this.eth_call(functions.getOracle, [])
+    getOracle() {
+        return this.eth_call(functions.getOracle, {})
     }
 
-    eip712Domain(): Promise<([name: string, version: string, chainId: bigint, verifyingContract: string] & {name: string, version: string, chainId: bigint, verifyingContract: string})> {
-        return this.eth_call(functions.eip712Domain, [])
+    eip712Domain() {
+        return this.eth_call(functions.eip712Domain, {})
     }
 
-    getContractVersion(): Promise<bigint> {
-        return this.eth_call(functions.getContractVersion, [])
+    getContractVersion() {
+        return this.eth_call(functions.getContractVersion, {})
     }
 
-    getInitializationBlock(): Promise<bigint> {
-        return this.eth_call(functions.getInitializationBlock, [])
+    getInitializationBlock() {
+        return this.eth_call(functions.getInitializationBlock, {})
     }
 
-    symbol(): Promise<string> {
-        return this.eth_call(functions.symbol, [])
+    symbol() {
+        return this.eth_call(functions.symbol, {})
     }
 
-    getEIP712StETH(): Promise<string> {
-        return this.eth_call(functions.getEIP712StETH, [])
+    getEIP712StETH() {
+        return this.eth_call(functions.getEIP712StETH, {})
     }
 
-    canPerform(_sender: string, _role: string, _params: Array<bigint>): Promise<boolean> {
-        return this.eth_call(functions.canPerform, [_sender, _role, _params])
+    canPerform(_sender: CanPerformParams["_sender"], _role: CanPerformParams["_role"], _params: CanPerformParams["_params"]) {
+        return this.eth_call(functions.canPerform, {_sender, _role, _params})
     }
 
-    getEVMScriptRegistry(): Promise<string> {
-        return this.eth_call(functions.getEVMScriptRegistry, [])
+    getEVMScriptRegistry() {
+        return this.eth_call(functions.getEVMScriptRegistry, {})
     }
 
-    UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE(): Promise<string> {
-        return this.eth_call(functions.UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE, [])
+    UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE() {
+        return this.eth_call(functions.UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE, {})
     }
 
-    getBeaconStat(): Promise<([depositedValidators: bigint, beaconValidators: bigint, beaconBalance: bigint] & {depositedValidators: bigint, beaconValidators: bigint, beaconBalance: bigint})> {
-        return this.eth_call(functions.getBeaconStat, [])
+    getBeaconStat() {
+        return this.eth_call(functions.getBeaconStat, {})
     }
 
-    getFee(): Promise<number> {
-        return this.eth_call(functions.getFee, [])
+    getFee() {
+        return this.eth_call(functions.getFee, {})
     }
 
-    kernel(): Promise<string> {
-        return this.eth_call(functions.kernel, [])
+    kernel() {
+        return this.eth_call(functions.kernel, {})
     }
 
-    getTotalShares(): Promise<bigint> {
-        return this.eth_call(functions.getTotalShares, [])
+    getTotalShares() {
+        return this.eth_call(functions.getTotalShares, {})
     }
 
-    allowance(_owner: string, _spender: string): Promise<bigint> {
-        return this.eth_call(functions.allowance, [_owner, _spender])
+    allowance(_owner: AllowanceParams["_owner"], _spender: AllowanceParams["_spender"]) {
+        return this.eth_call(functions.allowance, {_owner, _spender})
     }
 
-    isPetrified(): Promise<boolean> {
-        return this.eth_call(functions.isPetrified, [])
+    isPetrified() {
+        return this.eth_call(functions.isPetrified, {})
     }
 
-    getLidoLocator(): Promise<string> {
-        return this.eth_call(functions.getLidoLocator, [])
+    getLidoLocator() {
+        return this.eth_call(functions.getLidoLocator, {})
     }
 
-    canDeposit(): Promise<boolean> {
-        return this.eth_call(functions.canDeposit, [])
+    canDeposit() {
+        return this.eth_call(functions.canDeposit, {})
     }
 
-    STAKING_PAUSE_ROLE(): Promise<string> {
-        return this.eth_call(functions.STAKING_PAUSE_ROLE, [])
+    STAKING_PAUSE_ROLE() {
+        return this.eth_call(functions.STAKING_PAUSE_ROLE, {})
     }
 
-    getDepositableEther(): Promise<bigint> {
-        return this.eth_call(functions.getDepositableEther, [])
+    getDepositableEther() {
+        return this.eth_call(functions.getDepositableEther, {})
     }
 
-    sharesOf(_account: string): Promise<bigint> {
-        return this.eth_call(functions.sharesOf, [_account])
+    sharesOf(_account: SharesOfParams["_account"]) {
+        return this.eth_call(functions.sharesOf, {_account})
     }
 
-    getTotalELRewardsCollected(): Promise<bigint> {
-        return this.eth_call(functions.getTotalELRewardsCollected, [])
+    getTotalELRewardsCollected() {
+        return this.eth_call(functions.getTotalELRewardsCollected, {})
     }
 }
+
+/// Event types
+export type StakingPausedEventArgs = EParams<typeof events.StakingPaused>
+export type StakingResumedEventArgs = EParams<typeof events.StakingResumed>
+export type StakingLimitSetEventArgs = EParams<typeof events.StakingLimitSet>
+export type StakingLimitRemovedEventArgs = EParams<typeof events.StakingLimitRemoved>
+export type CLValidatorsUpdatedEventArgs = EParams<typeof events.CLValidatorsUpdated>
+export type DepositedValidatorsChangedEventArgs = EParams<typeof events.DepositedValidatorsChanged>
+export type ETHDistributedEventArgs = EParams<typeof events.ETHDistributed>
+export type TokenRebasedEventArgs = EParams<typeof events.TokenRebased>
+export type LidoLocatorSetEventArgs = EParams<typeof events.LidoLocatorSet>
+export type ELRewardsReceivedEventArgs = EParams<typeof events.ELRewardsReceived>
+export type WithdrawalsReceivedEventArgs = EParams<typeof events.WithdrawalsReceived>
+export type SubmittedEventArgs = EParams<typeof events.Submitted>
+export type UnbufferedEventArgs = EParams<typeof events.Unbuffered>
+export type ScriptResultEventArgs = EParams<typeof events.ScriptResult>
+export type RecoverToVaultEventArgs = EParams<typeof events.RecoverToVault>
+export type EIP712StETHInitializedEventArgs = EParams<typeof events.EIP712StETHInitialized>
+export type TransferSharesEventArgs = EParams<typeof events.TransferShares>
+export type SharesBurntEventArgs = EParams<typeof events.SharesBurnt>
+export type StoppedEventArgs = EParams<typeof events.Stopped>
+export type ResumedEventArgs = EParams<typeof events.Resumed>
+export type TransferEventArgs = EParams<typeof events.Transfer>
+export type ApprovalEventArgs = EParams<typeof events.Approval>
+export type ContractVersionSetEventArgs = EParams<typeof events.ContractVersionSet>
+
+/// Function types
+export type ResumeParams = FunctionArguments<typeof functions.resume>
+export type ResumeReturn = FunctionReturn<typeof functions.resume>
+
+export type NameParams = FunctionArguments<typeof functions.name>
+export type NameReturn = FunctionReturn<typeof functions.name>
+
+export type StopParams = FunctionArguments<typeof functions.stop>
+export type StopReturn = FunctionReturn<typeof functions.stop>
+
+export type HasInitializedParams = FunctionArguments<typeof functions.hasInitialized>
+export type HasInitializedReturn = FunctionReturn<typeof functions.hasInitialized>
+
+export type ApproveParams = FunctionArguments<typeof functions.approve>
+export type ApproveReturn = FunctionReturn<typeof functions.approve>
+
+export type STAKING_CONTROL_ROLEParams = FunctionArguments<typeof functions.STAKING_CONTROL_ROLE>
+export type STAKING_CONTROL_ROLEReturn = FunctionReturn<typeof functions.STAKING_CONTROL_ROLE>
+
+export type TotalSupplyParams = FunctionArguments<typeof functions.totalSupply>
+export type TotalSupplyReturn = FunctionReturn<typeof functions.totalSupply>
+
+export type GetSharesByPooledEthParams = FunctionArguments<typeof functions.getSharesByPooledEth>
+export type GetSharesByPooledEthReturn = FunctionReturn<typeof functions.getSharesByPooledEth>
+
+export type IsStakingPausedParams = FunctionArguments<typeof functions.isStakingPaused>
+export type IsStakingPausedReturn = FunctionReturn<typeof functions.isStakingPaused>
+
+export type TransferFromParams = FunctionArguments<typeof functions.transferFrom>
+export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
+
+export type GetEVMScriptExecutorParams = FunctionArguments<typeof functions.getEVMScriptExecutor>
+export type GetEVMScriptExecutorReturn = FunctionReturn<typeof functions.getEVMScriptExecutor>
+
+export type SetStakingLimitParams = FunctionArguments<typeof functions.setStakingLimit>
+export type SetStakingLimitReturn = FunctionReturn<typeof functions.setStakingLimit>
+
+export type RESUME_ROLEParams = FunctionArguments<typeof functions.RESUME_ROLE>
+export type RESUME_ROLEReturn = FunctionReturn<typeof functions.RESUME_ROLE>
+
+export type FinalizeUpgrade_v2Params = FunctionArguments<typeof functions.finalizeUpgrade_v2>
+export type FinalizeUpgrade_v2Return = FunctionReturn<typeof functions.finalizeUpgrade_v2>
+
+export type DecimalsParams = FunctionArguments<typeof functions.decimals>
+export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
+
+export type GetRecoveryVaultParams = FunctionArguments<typeof functions.getRecoveryVault>
+export type GetRecoveryVaultReturn = FunctionReturn<typeof functions.getRecoveryVault>
+
+export type DOMAIN_SEPARATORParams = FunctionArguments<typeof functions.DOMAIN_SEPARATOR>
+export type DOMAIN_SEPARATORReturn = FunctionReturn<typeof functions.DOMAIN_SEPARATOR>
+
+export type GetTotalPooledEtherParams = FunctionArguments<typeof functions.getTotalPooledEther>
+export type GetTotalPooledEtherReturn = FunctionReturn<typeof functions.getTotalPooledEther>
+
+export type UnsafeChangeDepositedValidatorsParams = FunctionArguments<typeof functions.unsafeChangeDepositedValidators>
+export type UnsafeChangeDepositedValidatorsReturn = FunctionReturn<typeof functions.unsafeChangeDepositedValidators>
+
+export type PAUSE_ROLEParams = FunctionArguments<typeof functions.PAUSE_ROLE>
+export type PAUSE_ROLEReturn = FunctionReturn<typeof functions.PAUSE_ROLE>
+
+export type IncreaseAllowanceParams = FunctionArguments<typeof functions.increaseAllowance>
+export type IncreaseAllowanceReturn = FunctionReturn<typeof functions.increaseAllowance>
+
+export type GetTreasuryParams = FunctionArguments<typeof functions.getTreasury>
+export type GetTreasuryReturn = FunctionReturn<typeof functions.getTreasury>
+
+export type IsStoppedParams = FunctionArguments<typeof functions.isStopped>
+export type IsStoppedReturn = FunctionReturn<typeof functions.isStopped>
+
+export type GetBufferedEtherParams = FunctionArguments<typeof functions.getBufferedEther>
+export type GetBufferedEtherReturn = FunctionReturn<typeof functions.getBufferedEther>
+
+export type InitializeParams = FunctionArguments<typeof functions.initialize>
+export type InitializeReturn = FunctionReturn<typeof functions.initialize>
+
+export type ReceiveELRewardsParams = FunctionArguments<typeof functions.receiveELRewards>
+export type ReceiveELRewardsReturn = FunctionReturn<typeof functions.receiveELRewards>
+
+export type GetWithdrawalCredentialsParams = FunctionArguments<typeof functions.getWithdrawalCredentials>
+export type GetWithdrawalCredentialsReturn = FunctionReturn<typeof functions.getWithdrawalCredentials>
+
+export type GetCurrentStakeLimitParams = FunctionArguments<typeof functions.getCurrentStakeLimit>
+export type GetCurrentStakeLimitReturn = FunctionReturn<typeof functions.getCurrentStakeLimit>
+
+export type GetStakeLimitFullInfoParams = FunctionArguments<typeof functions.getStakeLimitFullInfo>
+export type GetStakeLimitFullInfoReturn = FunctionReturn<typeof functions.getStakeLimitFullInfo>
+
+export type TransferSharesFromParams = FunctionArguments<typeof functions.transferSharesFrom>
+export type TransferSharesFromReturn = FunctionReturn<typeof functions.transferSharesFrom>
+
+export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
+export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
+
+export type ResumeStakingParams = FunctionArguments<typeof functions.resumeStaking>
+export type ResumeStakingReturn = FunctionReturn<typeof functions.resumeStaking>
+
+export type GetFeeDistributionParams = FunctionArguments<typeof functions.getFeeDistribution>
+export type GetFeeDistributionReturn = FunctionReturn<typeof functions.getFeeDistribution>
+
+export type ReceiveWithdrawalsParams = FunctionArguments<typeof functions.receiveWithdrawals>
+export type ReceiveWithdrawalsReturn = FunctionReturn<typeof functions.receiveWithdrawals>
+
+export type GetPooledEthBySharesParams = FunctionArguments<typeof functions.getPooledEthByShares>
+export type GetPooledEthBySharesReturn = FunctionReturn<typeof functions.getPooledEthByShares>
+
+export type AllowRecoverabilityParams = FunctionArguments<typeof functions.allowRecoverability>
+export type AllowRecoverabilityReturn = FunctionReturn<typeof functions.allowRecoverability>
+
+export type NoncesParams = FunctionArguments<typeof functions.nonces>
+export type NoncesReturn = FunctionReturn<typeof functions.nonces>
+
+export type AppIdParams = FunctionArguments<typeof functions.appId>
+export type AppIdReturn = FunctionReturn<typeof functions.appId>
+
+export type GetOracleParams = FunctionArguments<typeof functions.getOracle>
+export type GetOracleReturn = FunctionReturn<typeof functions.getOracle>
+
+export type Eip712DomainParams = FunctionArguments<typeof functions.eip712Domain>
+export type Eip712DomainReturn = FunctionReturn<typeof functions.eip712Domain>
+
+export type GetContractVersionParams = FunctionArguments<typeof functions.getContractVersion>
+export type GetContractVersionReturn = FunctionReturn<typeof functions.getContractVersion>
+
+export type GetInitializationBlockParams = FunctionArguments<typeof functions.getInitializationBlock>
+export type GetInitializationBlockReturn = FunctionReturn<typeof functions.getInitializationBlock>
+
+export type TransferSharesParams = FunctionArguments<typeof functions.transferShares>
+export type TransferSharesReturn = FunctionReturn<typeof functions.transferShares>
+
+export type SymbolParams = FunctionArguments<typeof functions.symbol>
+export type SymbolReturn = FunctionReturn<typeof functions.symbol>
+
+export type GetEIP712StETHParams = FunctionArguments<typeof functions.getEIP712StETH>
+export type GetEIP712StETHReturn = FunctionReturn<typeof functions.getEIP712StETH>
+
+export type TransferToVaultParams = FunctionArguments<typeof functions.transferToVault>
+export type TransferToVaultReturn = FunctionReturn<typeof functions.transferToVault>
+
+export type CanPerformParams = FunctionArguments<typeof functions.canPerform>
+export type CanPerformReturn = FunctionReturn<typeof functions.canPerform>
+
+export type SubmitParams = FunctionArguments<typeof functions.submit>
+export type SubmitReturn = FunctionReturn<typeof functions.submit>
+
+export type DecreaseAllowanceParams = FunctionArguments<typeof functions.decreaseAllowance>
+export type DecreaseAllowanceReturn = FunctionReturn<typeof functions.decreaseAllowance>
+
+export type GetEVMScriptRegistryParams = FunctionArguments<typeof functions.getEVMScriptRegistry>
+export type GetEVMScriptRegistryReturn = FunctionReturn<typeof functions.getEVMScriptRegistry>
+
+export type TransferParams = FunctionArguments<typeof functions.transfer>
+export type TransferReturn = FunctionReturn<typeof functions.transfer>
+
+export type DepositParams = FunctionArguments<typeof functions.deposit>
+export type DepositReturn = FunctionReturn<typeof functions.deposit>
+
+export type UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLEParams = FunctionArguments<typeof functions.UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE>
+export type UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLEReturn = FunctionReturn<typeof functions.UNSAFE_CHANGE_DEPOSITED_VALIDATORS_ROLE>
+
+export type GetBeaconStatParams = FunctionArguments<typeof functions.getBeaconStat>
+export type GetBeaconStatReturn = FunctionReturn<typeof functions.getBeaconStat>
+
+export type RemoveStakingLimitParams = FunctionArguments<typeof functions.removeStakingLimit>
+export type RemoveStakingLimitReturn = FunctionReturn<typeof functions.removeStakingLimit>
+
+export type HandleOracleReportParams = FunctionArguments<typeof functions.handleOracleReport>
+export type HandleOracleReportReturn = FunctionReturn<typeof functions.handleOracleReport>
+
+export type GetFeeParams = FunctionArguments<typeof functions.getFee>
+export type GetFeeReturn = FunctionReturn<typeof functions.getFee>
+
+export type KernelParams = FunctionArguments<typeof functions.kernel>
+export type KernelReturn = FunctionReturn<typeof functions.kernel>
+
+export type GetTotalSharesParams = FunctionArguments<typeof functions.getTotalShares>
+export type GetTotalSharesReturn = FunctionReturn<typeof functions.getTotalShares>
+
+export type PermitParams = FunctionArguments<typeof functions.permit>
+export type PermitReturn = FunctionReturn<typeof functions.permit>
+
+export type AllowanceParams = FunctionArguments<typeof functions.allowance>
+export type AllowanceReturn = FunctionReturn<typeof functions.allowance>
+
+export type IsPetrifiedParams = FunctionArguments<typeof functions.isPetrified>
+export type IsPetrifiedReturn = FunctionReturn<typeof functions.isPetrified>
+
+export type GetLidoLocatorParams = FunctionArguments<typeof functions.getLidoLocator>
+export type GetLidoLocatorReturn = FunctionReturn<typeof functions.getLidoLocator>
+
+export type CanDepositParams = FunctionArguments<typeof functions.canDeposit>
+export type CanDepositReturn = FunctionReturn<typeof functions.canDeposit>
+
+export type STAKING_PAUSE_ROLEParams = FunctionArguments<typeof functions.STAKING_PAUSE_ROLE>
+export type STAKING_PAUSE_ROLEReturn = FunctionReturn<typeof functions.STAKING_PAUSE_ROLE>
+
+export type GetDepositableEtherParams = FunctionArguments<typeof functions.getDepositableEther>
+export type GetDepositableEtherReturn = FunctionReturn<typeof functions.getDepositableEther>
+
+export type SharesOfParams = FunctionArguments<typeof functions.sharesOf>
+export type SharesOfReturn = FunctionReturn<typeof functions.sharesOf>
+
+export type PauseStakingParams = FunctionArguments<typeof functions.pauseStaking>
+export type PauseStakingReturn = FunctionReturn<typeof functions.pauseStaking>
+
+export type GetTotalELRewardsCollectedParams = FunctionArguments<typeof functions.getTotalELRewardsCollected>
+export type GetTotalELRewardsCollectedReturn = FunctionReturn<typeof functions.getTotalELRewardsCollected>
+

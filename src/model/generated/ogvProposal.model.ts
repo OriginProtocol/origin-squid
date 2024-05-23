@@ -1,5 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
-import * as marshal from "./marshal"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVProposalState} from "./_ogvProposalState"
 import {OGVProposalTxLog} from "./ogvProposalTxLog.model"
@@ -13,23 +12,23 @@ export class OGVProposal {
     @PrimaryColumn_()
     id!: string
 
-    @Column_("text", {nullable: true})
+    @StringColumn_({nullable: true})
     description!: string | undefined | null
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})
     proposer!: OGVAddress
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     startBlock!: bigint
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     endBlock!: bigint
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
 
     @Column_("varchar", {length: 9, nullable: false})
@@ -38,12 +37,12 @@ export class OGVProposal {
     @OneToMany_(() => OGVProposalTxLog, e => e.proposal)
     logs!: OGVProposalTxLog[]
 
-    @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+    @BigIntColumn_({nullable: false})
     quorum!: bigint
 
-    @Column_("text", {array: true, nullable: false})
+    @StringColumn_({array: true, nullable: false})
     choices!: (string | undefined | null)[]
 
-    @Column_("numeric", {array: true, nullable: false})
-    scores!: (number | undefined | null)[]
+    @StringColumn_({array: true, nullable: false})
+    scores!: (string | undefined | null)[]
 }

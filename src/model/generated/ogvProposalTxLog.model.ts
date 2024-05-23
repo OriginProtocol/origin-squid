@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Index as Index_} from "@subsquid/typeorm-store"
 import {OGVProposalEvent} from "./_ogvProposalEvent"
 import {OGVProposal} from "./ogvProposal.model"
 
@@ -11,13 +11,13 @@ export class OGVProposalTxLog {
     @PrimaryColumn_()
     id!: string
 
-    @Column_("text", {nullable: false})
+    @StringColumn_({nullable: false})
     hash!: string
 
     @Column_("varchar", {length: 8, nullable: false})
     event!: OGVProposalEvent
 
-    @Column_("timestamp with time zone", {nullable: false})
+    @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
     @Index_()

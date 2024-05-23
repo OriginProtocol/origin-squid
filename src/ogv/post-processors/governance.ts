@@ -363,7 +363,7 @@ const _processVoteCast = async (
     proposal.scores[choiceIndex]! += weightN
   } else {
     proposal.choices.push(voteType)
-    proposal.scores.push(weightN)
+    proposal.scores.push(weightN.toString())
   }
 
   result.votes.push(proposalVote)

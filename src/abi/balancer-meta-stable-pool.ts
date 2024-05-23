@@ -1,297 +1,338 @@
-import * as ethers from 'ethers'
-import {LogEvent, Func, ContractBase} from './abi.support'
-import {ABI_JSON} from './balancer-meta-stable-pool.abi'
-
-export const abi = new ethers.Interface(ABI_JSON);
+import * as p from '@subsquid/evm-codec'
+import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    AmpUpdateStarted: new LogEvent<([startValue: bigint, endValue: bigint, startTime: bigint, endTime: bigint] & {startValue: bigint, endValue: bigint, startTime: bigint, endTime: bigint})>(
-        abi, '0x1835882ee7a34ac194f717a35e09bb1d24c82a3b9d854ab6c9749525b714cdf2'
-    ),
-    AmpUpdateStopped: new LogEvent<([currentValue: bigint] & {currentValue: bigint})>(
-        abi, '0xa0d01593e47e69d07e0ccd87bece09411e07dd1ed40ca8f2e7af2976542a0233'
-    ),
-    Approval: new LogEvent<([owner: string, spender: string, value: bigint] & {owner: string, spender: string, value: bigint})>(
-        abi, '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925'
-    ),
-    OracleEnabledChanged: new LogEvent<([enabled: boolean] & {enabled: boolean})>(
-        abi, '0x3e350b41e86a8e10f804ade6d35340d620be35569cc75ac943e8bb14ab80ead1'
-    ),
-    PausedStateChanged: new LogEvent<([paused: boolean] & {paused: boolean})>(
-        abi, '0x9e3a5e37224532dea67b89face185703738a228a6e8a23dee546960180d3be64'
-    ),
-    PriceRateCacheUpdated: new LogEvent<([token: string, rate: bigint] & {token: string, rate: bigint})>(
-        abi, '0xc1a224b14823b63c7711127f125fbf592434682f38881ebb61408747a303affc'
-    ),
-    PriceRateProviderSet: new LogEvent<([token: string, provider: string, cacheDuration: bigint] & {token: string, provider: string, cacheDuration: bigint})>(
-        abi, '0xca6c2c5b6b44b5f3f0c08f0e28e5b6deda1cb38c3fe1113e8031d926c1e8c6d0'
-    ),
-    SwapFeePercentageChanged: new LogEvent<([swapFeePercentage: bigint] & {swapFeePercentage: bigint})>(
-        abi, '0xa9ba3ffe0b6c366b81232caab38605a0699ad5398d6cce76f91ee809e322dafc'
-    ),
-    Transfer: new LogEvent<([from: string, to: string, value: bigint] & {from: string, to: string, value: bigint})>(
-        abi, '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-    ),
+    AmpUpdateStarted: event("0x1835882ee7a34ac194f717a35e09bb1d24c82a3b9d854ab6c9749525b714cdf2", {"startValue": p.uint256, "endValue": p.uint256, "startTime": p.uint256, "endTime": p.uint256}),
+    AmpUpdateStopped: event("0xa0d01593e47e69d07e0ccd87bece09411e07dd1ed40ca8f2e7af2976542a0233", {"currentValue": p.uint256}),
+    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
+    OracleEnabledChanged: event("0x3e350b41e86a8e10f804ade6d35340d620be35569cc75ac943e8bb14ab80ead1", {"enabled": p.bool}),
+    PausedStateChanged: event("0x9e3a5e37224532dea67b89face185703738a228a6e8a23dee546960180d3be64", {"paused": p.bool}),
+    PriceRateCacheUpdated: event("0xc1a224b14823b63c7711127f125fbf592434682f38881ebb61408747a303affc", {"token": indexed(p.address), "rate": p.uint256}),
+    PriceRateProviderSet: event("0xca6c2c5b6b44b5f3f0c08f0e28e5b6deda1cb38c3fe1113e8031d926c1e8c6d0", {"token": indexed(p.address), "provider": indexed(p.address), "cacheDuration": p.uint256}),
+    SwapFeePercentageChanged: event("0xa9ba3ffe0b6c366b81232caab38605a0699ad5398d6cce76f91ee809e322dafc", {"swapFeePercentage": p.uint256}),
+    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
 }
 
 export const functions = {
-    DOMAIN_SEPARATOR: new Func<[], {}, string>(
-        abi, '0x3644e515'
-    ),
-    allowance: new Func<[owner: string, spender: string], {owner: string, spender: string}, bigint>(
-        abi, '0xdd62ed3e'
-    ),
-    approve: new Func<[spender: string, amount: bigint], {spender: string, amount: bigint}, boolean>(
-        abi, '0x095ea7b3'
-    ),
-    balanceOf: new Func<[account: string], {account: string}, bigint>(
-        abi, '0x70a08231'
-    ),
-    decimals: new Func<[], {}, number>(
-        abi, '0x313ce567'
-    ),
-    decreaseAllowance: new Func<[spender: string, amount: bigint], {spender: string, amount: bigint}, boolean>(
-        abi, '0xa457c2d7'
-    ),
-    enableOracle: new Func<[], {}, []>(
-        abi, '0x292c914a'
-    ),
-    getActionId: new Func<[selector: string], {selector: string}, string>(
-        abi, '0x851c1bb3'
-    ),
-    getAmplificationParameter: new Func<[], {}, ([value: bigint, isUpdating: boolean, precision: bigint] & {value: bigint, isUpdating: boolean, precision: bigint})>(
-        abi, '0x6daccffa'
-    ),
-    getAuthorizer: new Func<[], {}, string>(
-        abi, '0xaaabadc5'
-    ),
-    getLargestSafeQueryWindow: new Func<[], {}, bigint>(
-        abi, '0xffd088eb'
-    ),
-    getLastInvariant: new Func<[], {}, ([lastInvariant: bigint, lastInvariantAmp: bigint] & {lastInvariant: bigint, lastInvariantAmp: bigint})>(
-        abi, '0x9b02cdde'
-    ),
-    getLatest: new Func<[variable: number], {variable: number}, bigint>(
-        abi, '0xb10be739'
-    ),
-    getOracleMiscData: new Func<[], {}, ([logInvariant: bigint, logTotalSupply: bigint, oracleSampleCreationTimestamp: bigint, oracleIndex: bigint, oracleEnabled: boolean] & {logInvariant: bigint, logTotalSupply: bigint, oracleSampleCreationTimestamp: bigint, oracleIndex: bigint, oracleEnabled: boolean})>(
-        abi, '0x1ed4eddc'
-    ),
-    getOwner: new Func<[], {}, string>(
-        abi, '0x893d20e8'
-    ),
-    getPastAccumulators: new Func<[queries: Array<([variable: number, ago: bigint] & {variable: number, ago: bigint})>], {queries: Array<([variable: number, ago: bigint] & {variable: number, ago: bigint})>}, Array<bigint>>(
-        abi, '0x6b843239'
-    ),
-    getPausedState: new Func<[], {}, ([paused: boolean, pauseWindowEndTime: bigint, bufferPeriodEndTime: bigint] & {paused: boolean, pauseWindowEndTime: bigint, bufferPeriodEndTime: bigint})>(
-        abi, '0x1c0de051'
-    ),
-    getPoolId: new Func<[], {}, string>(
-        abi, '0x38fff2d0'
-    ),
-    getPriceRateCache: new Func<[token: string], {token: string}, ([rate: bigint, duration: bigint, expires: bigint] & {rate: bigint, duration: bigint, expires: bigint})>(
-        abi, '0xb867ee5a'
-    ),
-    getRate: new Func<[], {}, bigint>(
-        abi, '0x679aefce'
-    ),
-    getRateProviders: new Func<[], {}, Array<string>>(
-        abi, '0x238a2d59'
-    ),
-    getSample: new Func<[index: bigint], {index: bigint}, ([logPairPrice: bigint, accLogPairPrice: bigint, logBptPrice: bigint, accLogBptPrice: bigint, logInvariant: bigint, accLogInvariant: bigint, timestamp: bigint] & {logPairPrice: bigint, accLogPairPrice: bigint, logBptPrice: bigint, accLogBptPrice: bigint, logInvariant: bigint, accLogInvariant: bigint, timestamp: bigint})>(
-        abi, '0x60d1507c'
-    ),
-    getScalingFactors: new Func<[], {}, Array<bigint>>(
-        abi, '0x1dd746ea'
-    ),
-    getSwapFeePercentage: new Func<[], {}, bigint>(
-        abi, '0x55c67628'
-    ),
-    getTimeWeightedAverage: new Func<[queries: Array<([variable: number, secs: bigint, ago: bigint] & {variable: number, secs: bigint, ago: bigint})>], {queries: Array<([variable: number, secs: bigint, ago: bigint] & {variable: number, secs: bigint, ago: bigint})>}, Array<bigint>>(
-        abi, '0x1dccd830'
-    ),
-    getTotalSamples: new Func<[], {}, bigint>(
-        abi, '0xb48b5b40'
-    ),
-    getVault: new Func<[], {}, string>(
-        abi, '0x8d928af8'
-    ),
-    increaseAllowance: new Func<[spender: string, addedValue: bigint], {spender: string, addedValue: bigint}, boolean>(
-        abi, '0x39509351'
-    ),
-    name: new Func<[], {}, string>(
-        abi, '0x06fdde03'
-    ),
-    nonces: new Func<[owner: string], {owner: string}, bigint>(
-        abi, '0x7ecebe00'
-    ),
-    onExitPool: new Func<[poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string], {poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string}, ([amountsOut: Array<bigint>, dueProtocolFeeAmounts: Array<bigint>] & {amountsOut: Array<bigint>, dueProtocolFeeAmounts: Array<bigint>})>(
-        abi, '0x74f3b009'
-    ),
-    onJoinPool: new Func<[poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string], {poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string}, ([amountsIn: Array<bigint>, dueProtocolFeeAmounts: Array<bigint>] & {amountsIn: Array<bigint>, dueProtocolFeeAmounts: Array<bigint>})>(
-        abi, '0xd5c096c4'
-    ),
-    'onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)': new Func<[request: ([kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string] & {kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string}), balances: Array<bigint>, indexIn: bigint, indexOut: bigint], {request: ([kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string] & {kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string}), balances: Array<bigint>, indexIn: bigint, indexOut: bigint}, bigint>(
-        abi, '0x01ec954a'
-    ),
-    'onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)': new Func<[request: ([kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string] & {kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string}), balanceTokenIn: bigint, balanceTokenOut: bigint], {request: ([kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string] & {kind: number, tokenIn: string, tokenOut: string, amount: bigint, poolId: string, lastChangeBlock: bigint, from: string, to: string, userData: string}), balanceTokenIn: bigint, balanceTokenOut: bigint}, bigint>(
-        abi, '0x9d2c110c'
-    ),
-    permit: new Func<[owner: string, spender: string, value: bigint, deadline: bigint, v: number, r: string, s: string], {owner: string, spender: string, value: bigint, deadline: bigint, v: number, r: string, s: string}, []>(
-        abi, '0xd505accf'
-    ),
-    queryExit: new Func<[poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string], {poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string}, ([bptIn: bigint, amountsOut: Array<bigint>] & {bptIn: bigint, amountsOut: Array<bigint>})>(
-        abi, '0x6028bfd4'
-    ),
-    queryJoin: new Func<[poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string], {poolId: string, sender: string, recipient: string, balances: Array<bigint>, lastChangeBlock: bigint, protocolSwapFeePercentage: bigint, userData: string}, ([bptOut: bigint, amountsIn: Array<bigint>] & {bptOut: bigint, amountsIn: Array<bigint>})>(
-        abi, '0x87ec6817'
-    ),
-    setAssetManagerPoolConfig: new Func<[token: string, poolConfig: string], {token: string, poolConfig: string}, []>(
-        abi, '0x50dd6ed9'
-    ),
-    setPaused: new Func<[paused: boolean], {paused: boolean}, []>(
-        abi, '0x16c38b3c'
-    ),
-    setPriceRateCacheDuration: new Func<[token: string, duration: bigint], {token: string, duration: bigint}, []>(
-        abi, '0xb7710251'
-    ),
-    setSwapFeePercentage: new Func<[swapFeePercentage: bigint], {swapFeePercentage: bigint}, []>(
-        abi, '0x38e9922e'
-    ),
-    startAmplificationParameterUpdate: new Func<[rawEndValue: bigint, endTime: bigint], {rawEndValue: bigint, endTime: bigint}, []>(
-        abi, '0x2f1a0bc9'
-    ),
-    stopAmplificationParameterUpdate: new Func<[], {}, []>(
-        abi, '0xeb0f24d6'
-    ),
-    symbol: new Func<[], {}, string>(
-        abi, '0x95d89b41'
-    ),
-    totalSupply: new Func<[], {}, bigint>(
-        abi, '0x18160ddd'
-    ),
-    transfer: new Func<[recipient: string, amount: bigint], {recipient: string, amount: bigint}, boolean>(
-        abi, '0xa9059cbb'
-    ),
-    transferFrom: new Func<[sender: string, recipient: string, amount: bigint], {sender: string, recipient: string, amount: bigint}, boolean>(
-        abi, '0x23b872dd'
-    ),
-    updatePriceRateCache: new Func<[token: string], {token: string}, []>(
-        abi, '0xa0daaed0'
-    ),
+    DOMAIN_SEPARATOR: fun("0x3644e515", {}, p.bytes32),
+    allowance: fun("0xdd62ed3e", {"owner": p.address, "spender": p.address}, p.uint256),
+    approve: fun("0x095ea7b3", {"spender": p.address, "amount": p.uint256}, p.bool),
+    balanceOf: fun("0x70a08231", {"account": p.address}, p.uint256),
+    decimals: fun("0x313ce567", {}, p.uint8),
+    decreaseAllowance: fun("0xa457c2d7", {"spender": p.address, "amount": p.uint256}, p.bool),
+    enableOracle: fun("0x292c914a", {}, ),
+    getActionId: fun("0x851c1bb3", {"selector": p.bytes4}, p.bytes32),
+    getAmplificationParameter: fun("0x6daccffa", {}, {"value": p.uint256, "isUpdating": p.bool, "precision": p.uint256}),
+    getAuthorizer: fun("0xaaabadc5", {}, p.address),
+    getLargestSafeQueryWindow: fun("0xffd088eb", {}, p.uint256),
+    getLastInvariant: fun("0x9b02cdde", {}, {"lastInvariant": p.uint256, "lastInvariantAmp": p.uint256}),
+    getLatest: fun("0xb10be739", {"variable": p.uint8}, p.uint256),
+    getOracleMiscData: fun("0x1ed4eddc", {}, {"logInvariant": p.int256, "logTotalSupply": p.int256, "oracleSampleCreationTimestamp": p.uint256, "oracleIndex": p.uint256, "oracleEnabled": p.bool}),
+    getOwner: fun("0x893d20e8", {}, p.address),
+    getPastAccumulators: fun("0x6b843239", {"queries": p.array(p.struct({"variable": p.uint8, "ago": p.uint256}))}, p.array(p.int256)),
+    getPausedState: fun("0x1c0de051", {}, {"paused": p.bool, "pauseWindowEndTime": p.uint256, "bufferPeriodEndTime": p.uint256}),
+    getPoolId: fun("0x38fff2d0", {}, p.bytes32),
+    getPriceRateCache: fun("0xb867ee5a", {"token": p.address}, {"rate": p.uint256, "duration": p.uint256, "expires": p.uint256}),
+    getRate: fun("0x679aefce", {}, p.uint256),
+    getRateProviders: fun("0x238a2d59", {}, p.array(p.address)),
+    getSample: fun("0x60d1507c", {"index": p.uint256}, {"logPairPrice": p.int256, "accLogPairPrice": p.int256, "logBptPrice": p.int256, "accLogBptPrice": p.int256, "logInvariant": p.int256, "accLogInvariant": p.int256, "timestamp": p.uint256}),
+    getScalingFactors: fun("0x1dd746ea", {}, p.array(p.uint256)),
+    getSwapFeePercentage: fun("0x55c67628", {}, p.uint256),
+    getTimeWeightedAverage: fun("0x1dccd830", {"queries": p.array(p.struct({"variable": p.uint8, "secs": p.uint256, "ago": p.uint256}))}, p.array(p.uint256)),
+    getTotalSamples: fun("0xb48b5b40", {}, p.uint256),
+    getVault: fun("0x8d928af8", {}, p.address),
+    increaseAllowance: fun("0x39509351", {"spender": p.address, "addedValue": p.uint256}, p.bool),
+    name: fun("0x06fdde03", {}, p.string),
+    nonces: fun("0x7ecebe00", {"owner": p.address}, p.uint256),
+    onExitPool: fun("0x74f3b009", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsOut": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
+    onJoinPool: fun("0xd5c096c4", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsIn": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
+    "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)": fun("0x01ec954a", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balances": p.array(p.uint256), "indexIn": p.uint256, "indexOut": p.uint256}, p.uint256),
+    "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)": fun("0x9d2c110c", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balanceTokenIn": p.uint256, "balanceTokenOut": p.uint256}, p.uint256),
+    permit: fun("0xd505accf", {"owner": p.address, "spender": p.address, "value": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
+    queryExit: fun("0x6028bfd4", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptIn": p.uint256, "amountsOut": p.array(p.uint256)}),
+    queryJoin: fun("0x87ec6817", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptOut": p.uint256, "amountsIn": p.array(p.uint256)}),
+    setAssetManagerPoolConfig: fun("0x50dd6ed9", {"token": p.address, "poolConfig": p.bytes}, ),
+    setPaused: fun("0x16c38b3c", {"paused": p.bool}, ),
+    setPriceRateCacheDuration: fun("0xb7710251", {"token": p.address, "duration": p.uint256}, ),
+    setSwapFeePercentage: fun("0x38e9922e", {"swapFeePercentage": p.uint256}, ),
+    startAmplificationParameterUpdate: fun("0x2f1a0bc9", {"rawEndValue": p.uint256, "endTime": p.uint256}, ),
+    stopAmplificationParameterUpdate: fun("0xeb0f24d6", {}, ),
+    symbol: fun("0x95d89b41", {}, p.string),
+    totalSupply: fun("0x18160ddd", {}, p.uint256),
+    transfer: fun("0xa9059cbb", {"recipient": p.address, "amount": p.uint256}, p.bool),
+    transferFrom: fun("0x23b872dd", {"sender": p.address, "recipient": p.address, "amount": p.uint256}, p.bool),
+    updatePriceRateCache: fun("0xa0daaed0", {"token": p.address}, ),
 }
 
 export class Contract extends ContractBase {
 
-    DOMAIN_SEPARATOR(): Promise<string> {
-        return this.eth_call(functions.DOMAIN_SEPARATOR, [])
+    DOMAIN_SEPARATOR() {
+        return this.eth_call(functions.DOMAIN_SEPARATOR, {})
     }
 
-    allowance(owner: string, spender: string): Promise<bigint> {
-        return this.eth_call(functions.allowance, [owner, spender])
+    allowance(owner: AllowanceParams["owner"], spender: AllowanceParams["spender"]) {
+        return this.eth_call(functions.allowance, {owner, spender})
     }
 
-    balanceOf(account: string): Promise<bigint> {
-        return this.eth_call(functions.balanceOf, [account])
+    balanceOf(account: BalanceOfParams["account"]) {
+        return this.eth_call(functions.balanceOf, {account})
     }
 
-    decimals(): Promise<number> {
-        return this.eth_call(functions.decimals, [])
+    decimals() {
+        return this.eth_call(functions.decimals, {})
     }
 
-    getActionId(selector: string): Promise<string> {
-        return this.eth_call(functions.getActionId, [selector])
+    getActionId(selector: GetActionIdParams["selector"]) {
+        return this.eth_call(functions.getActionId, {selector})
     }
 
-    getAmplificationParameter(): Promise<([value: bigint, isUpdating: boolean, precision: bigint] & {value: bigint, isUpdating: boolean, precision: bigint})> {
-        return this.eth_call(functions.getAmplificationParameter, [])
+    getAmplificationParameter() {
+        return this.eth_call(functions.getAmplificationParameter, {})
     }
 
-    getAuthorizer(): Promise<string> {
-        return this.eth_call(functions.getAuthorizer, [])
+    getAuthorizer() {
+        return this.eth_call(functions.getAuthorizer, {})
     }
 
-    getLargestSafeQueryWindow(): Promise<bigint> {
-        return this.eth_call(functions.getLargestSafeQueryWindow, [])
+    getLargestSafeQueryWindow() {
+        return this.eth_call(functions.getLargestSafeQueryWindow, {})
     }
 
-    getLastInvariant(): Promise<([lastInvariant: bigint, lastInvariantAmp: bigint] & {lastInvariant: bigint, lastInvariantAmp: bigint})> {
-        return this.eth_call(functions.getLastInvariant, [])
+    getLastInvariant() {
+        return this.eth_call(functions.getLastInvariant, {})
     }
 
-    getLatest(variable: number): Promise<bigint> {
-        return this.eth_call(functions.getLatest, [variable])
+    getLatest(variable: GetLatestParams["variable"]) {
+        return this.eth_call(functions.getLatest, {variable})
     }
 
-    getOracleMiscData(): Promise<([logInvariant: bigint, logTotalSupply: bigint, oracleSampleCreationTimestamp: bigint, oracleIndex: bigint, oracleEnabled: boolean] & {logInvariant: bigint, logTotalSupply: bigint, oracleSampleCreationTimestamp: bigint, oracleIndex: bigint, oracleEnabled: boolean})> {
-        return this.eth_call(functions.getOracleMiscData, [])
+    getOracleMiscData() {
+        return this.eth_call(functions.getOracleMiscData, {})
     }
 
-    getOwner(): Promise<string> {
-        return this.eth_call(functions.getOwner, [])
+    getOwner() {
+        return this.eth_call(functions.getOwner, {})
     }
 
-    getPastAccumulators(queries: Array<([variable: number, ago: bigint] & {variable: number, ago: bigint})>): Promise<Array<bigint>> {
-        return this.eth_call(functions.getPastAccumulators, [queries])
+    getPastAccumulators(queries: GetPastAccumulatorsParams["queries"]) {
+        return this.eth_call(functions.getPastAccumulators, {queries})
     }
 
-    getPausedState(): Promise<([paused: boolean, pauseWindowEndTime: bigint, bufferPeriodEndTime: bigint] & {paused: boolean, pauseWindowEndTime: bigint, bufferPeriodEndTime: bigint})> {
-        return this.eth_call(functions.getPausedState, [])
+    getPausedState() {
+        return this.eth_call(functions.getPausedState, {})
     }
 
-    getPoolId(): Promise<string> {
-        return this.eth_call(functions.getPoolId, [])
+    getPoolId() {
+        return this.eth_call(functions.getPoolId, {})
     }
 
-    getPriceRateCache(token: string): Promise<([rate: bigint, duration: bigint, expires: bigint] & {rate: bigint, duration: bigint, expires: bigint})> {
-        return this.eth_call(functions.getPriceRateCache, [token])
+    getPriceRateCache(token: GetPriceRateCacheParams["token"]) {
+        return this.eth_call(functions.getPriceRateCache, {token})
     }
 
-    getRate(): Promise<bigint> {
-        return this.eth_call(functions.getRate, [])
+    getRate() {
+        return this.eth_call(functions.getRate, {})
     }
 
-    getRateProviders(): Promise<Array<string>> {
-        return this.eth_call(functions.getRateProviders, [])
+    getRateProviders() {
+        return this.eth_call(functions.getRateProviders, {})
     }
 
-    getSample(index: bigint): Promise<([logPairPrice: bigint, accLogPairPrice: bigint, logBptPrice: bigint, accLogBptPrice: bigint, logInvariant: bigint, accLogInvariant: bigint, timestamp: bigint] & {logPairPrice: bigint, accLogPairPrice: bigint, logBptPrice: bigint, accLogBptPrice: bigint, logInvariant: bigint, accLogInvariant: bigint, timestamp: bigint})> {
-        return this.eth_call(functions.getSample, [index])
+    getSample(index: GetSampleParams["index"]) {
+        return this.eth_call(functions.getSample, {index})
     }
 
-    getScalingFactors(): Promise<Array<bigint>> {
-        return this.eth_call(functions.getScalingFactors, [])
+    getScalingFactors() {
+        return this.eth_call(functions.getScalingFactors, {})
     }
 
-    getSwapFeePercentage(): Promise<bigint> {
-        return this.eth_call(functions.getSwapFeePercentage, [])
+    getSwapFeePercentage() {
+        return this.eth_call(functions.getSwapFeePercentage, {})
     }
 
-    getTimeWeightedAverage(queries: Array<([variable: number, secs: bigint, ago: bigint] & {variable: number, secs: bigint, ago: bigint})>): Promise<Array<bigint>> {
-        return this.eth_call(functions.getTimeWeightedAverage, [queries])
+    getTimeWeightedAverage(queries: GetTimeWeightedAverageParams["queries"]) {
+        return this.eth_call(functions.getTimeWeightedAverage, {queries})
     }
 
-    getTotalSamples(): Promise<bigint> {
-        return this.eth_call(functions.getTotalSamples, [])
+    getTotalSamples() {
+        return this.eth_call(functions.getTotalSamples, {})
     }
 
-    getVault(): Promise<string> {
-        return this.eth_call(functions.getVault, [])
+    getVault() {
+        return this.eth_call(functions.getVault, {})
     }
 
-    name(): Promise<string> {
-        return this.eth_call(functions.name, [])
+    name() {
+        return this.eth_call(functions.name, {})
     }
 
-    nonces(owner: string): Promise<bigint> {
-        return this.eth_call(functions.nonces, [owner])
+    nonces(owner: NoncesParams["owner"]) {
+        return this.eth_call(functions.nonces, {owner})
     }
 
-    symbol(): Promise<string> {
-        return this.eth_call(functions.symbol, [])
+    symbol() {
+        return this.eth_call(functions.symbol, {})
     }
 
-    totalSupply(): Promise<bigint> {
-        return this.eth_call(functions.totalSupply, [])
+    totalSupply() {
+        return this.eth_call(functions.totalSupply, {})
     }
 }
+
+/// Event types
+export type AmpUpdateStartedEventArgs = EParams<typeof events.AmpUpdateStarted>
+export type AmpUpdateStoppedEventArgs = EParams<typeof events.AmpUpdateStopped>
+export type ApprovalEventArgs = EParams<typeof events.Approval>
+export type OracleEnabledChangedEventArgs = EParams<typeof events.OracleEnabledChanged>
+export type PausedStateChangedEventArgs = EParams<typeof events.PausedStateChanged>
+export type PriceRateCacheUpdatedEventArgs = EParams<typeof events.PriceRateCacheUpdated>
+export type PriceRateProviderSetEventArgs = EParams<typeof events.PriceRateProviderSet>
+export type SwapFeePercentageChangedEventArgs = EParams<typeof events.SwapFeePercentageChanged>
+export type TransferEventArgs = EParams<typeof events.Transfer>
+
+/// Function types
+export type DOMAIN_SEPARATORParams = FunctionArguments<typeof functions.DOMAIN_SEPARATOR>
+export type DOMAIN_SEPARATORReturn = FunctionReturn<typeof functions.DOMAIN_SEPARATOR>
+
+export type AllowanceParams = FunctionArguments<typeof functions.allowance>
+export type AllowanceReturn = FunctionReturn<typeof functions.allowance>
+
+export type ApproveParams = FunctionArguments<typeof functions.approve>
+export type ApproveReturn = FunctionReturn<typeof functions.approve>
+
+export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
+export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
+
+export type DecimalsParams = FunctionArguments<typeof functions.decimals>
+export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
+
+export type DecreaseAllowanceParams = FunctionArguments<typeof functions.decreaseAllowance>
+export type DecreaseAllowanceReturn = FunctionReturn<typeof functions.decreaseAllowance>
+
+export type EnableOracleParams = FunctionArguments<typeof functions.enableOracle>
+export type EnableOracleReturn = FunctionReturn<typeof functions.enableOracle>
+
+export type GetActionIdParams = FunctionArguments<typeof functions.getActionId>
+export type GetActionIdReturn = FunctionReturn<typeof functions.getActionId>
+
+export type GetAmplificationParameterParams = FunctionArguments<typeof functions.getAmplificationParameter>
+export type GetAmplificationParameterReturn = FunctionReturn<typeof functions.getAmplificationParameter>
+
+export type GetAuthorizerParams = FunctionArguments<typeof functions.getAuthorizer>
+export type GetAuthorizerReturn = FunctionReturn<typeof functions.getAuthorizer>
+
+export type GetLargestSafeQueryWindowParams = FunctionArguments<typeof functions.getLargestSafeQueryWindow>
+export type GetLargestSafeQueryWindowReturn = FunctionReturn<typeof functions.getLargestSafeQueryWindow>
+
+export type GetLastInvariantParams = FunctionArguments<typeof functions.getLastInvariant>
+export type GetLastInvariantReturn = FunctionReturn<typeof functions.getLastInvariant>
+
+export type GetLatestParams = FunctionArguments<typeof functions.getLatest>
+export type GetLatestReturn = FunctionReturn<typeof functions.getLatest>
+
+export type GetOracleMiscDataParams = FunctionArguments<typeof functions.getOracleMiscData>
+export type GetOracleMiscDataReturn = FunctionReturn<typeof functions.getOracleMiscData>
+
+export type GetOwnerParams = FunctionArguments<typeof functions.getOwner>
+export type GetOwnerReturn = FunctionReturn<typeof functions.getOwner>
+
+export type GetPastAccumulatorsParams = FunctionArguments<typeof functions.getPastAccumulators>
+export type GetPastAccumulatorsReturn = FunctionReturn<typeof functions.getPastAccumulators>
+
+export type GetPausedStateParams = FunctionArguments<typeof functions.getPausedState>
+export type GetPausedStateReturn = FunctionReturn<typeof functions.getPausedState>
+
+export type GetPoolIdParams = FunctionArguments<typeof functions.getPoolId>
+export type GetPoolIdReturn = FunctionReturn<typeof functions.getPoolId>
+
+export type GetPriceRateCacheParams = FunctionArguments<typeof functions.getPriceRateCache>
+export type GetPriceRateCacheReturn = FunctionReturn<typeof functions.getPriceRateCache>
+
+export type GetRateParams = FunctionArguments<typeof functions.getRate>
+export type GetRateReturn = FunctionReturn<typeof functions.getRate>
+
+export type GetRateProvidersParams = FunctionArguments<typeof functions.getRateProviders>
+export type GetRateProvidersReturn = FunctionReturn<typeof functions.getRateProviders>
+
+export type GetSampleParams = FunctionArguments<typeof functions.getSample>
+export type GetSampleReturn = FunctionReturn<typeof functions.getSample>
+
+export type GetScalingFactorsParams = FunctionArguments<typeof functions.getScalingFactors>
+export type GetScalingFactorsReturn = FunctionReturn<typeof functions.getScalingFactors>
+
+export type GetSwapFeePercentageParams = FunctionArguments<typeof functions.getSwapFeePercentage>
+export type GetSwapFeePercentageReturn = FunctionReturn<typeof functions.getSwapFeePercentage>
+
+export type GetTimeWeightedAverageParams = FunctionArguments<typeof functions.getTimeWeightedAverage>
+export type GetTimeWeightedAverageReturn = FunctionReturn<typeof functions.getTimeWeightedAverage>
+
+export type GetTotalSamplesParams = FunctionArguments<typeof functions.getTotalSamples>
+export type GetTotalSamplesReturn = FunctionReturn<typeof functions.getTotalSamples>
+
+export type GetVaultParams = FunctionArguments<typeof functions.getVault>
+export type GetVaultReturn = FunctionReturn<typeof functions.getVault>
+
+export type IncreaseAllowanceParams = FunctionArguments<typeof functions.increaseAllowance>
+export type IncreaseAllowanceReturn = FunctionReturn<typeof functions.increaseAllowance>
+
+export type NameParams = FunctionArguments<typeof functions.name>
+export type NameReturn = FunctionReturn<typeof functions.name>
+
+export type NoncesParams = FunctionArguments<typeof functions.nonces>
+export type NoncesReturn = FunctionReturn<typeof functions.nonces>
+
+export type OnExitPoolParams = FunctionArguments<typeof functions.onExitPool>
+export type OnExitPoolReturn = FunctionReturn<typeof functions.onExitPool>
+
+export type OnJoinPoolParams = FunctionArguments<typeof functions.onJoinPool>
+export type OnJoinPoolReturn = FunctionReturn<typeof functions.onJoinPool>
+
+export type OnSwapParams_0 = FunctionArguments<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)"]>
+export type OnSwapReturn_0 = FunctionReturn<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)"]>
+
+export type OnSwapParams_1 = FunctionArguments<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)"]>
+export type OnSwapReturn_1 = FunctionReturn<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)"]>
+
+export type PermitParams = FunctionArguments<typeof functions.permit>
+export type PermitReturn = FunctionReturn<typeof functions.permit>
+
+export type QueryExitParams = FunctionArguments<typeof functions.queryExit>
+export type QueryExitReturn = FunctionReturn<typeof functions.queryExit>
+
+export type QueryJoinParams = FunctionArguments<typeof functions.queryJoin>
+export type QueryJoinReturn = FunctionReturn<typeof functions.queryJoin>
+
+export type SetAssetManagerPoolConfigParams = FunctionArguments<typeof functions.setAssetManagerPoolConfig>
+export type SetAssetManagerPoolConfigReturn = FunctionReturn<typeof functions.setAssetManagerPoolConfig>
+
+export type SetPausedParams = FunctionArguments<typeof functions.setPaused>
+export type SetPausedReturn = FunctionReturn<typeof functions.setPaused>
+
+export type SetPriceRateCacheDurationParams = FunctionArguments<typeof functions.setPriceRateCacheDuration>
+export type SetPriceRateCacheDurationReturn = FunctionReturn<typeof functions.setPriceRateCacheDuration>
+
+export type SetSwapFeePercentageParams = FunctionArguments<typeof functions.setSwapFeePercentage>
+export type SetSwapFeePercentageReturn = FunctionReturn<typeof functions.setSwapFeePercentage>
+
+export type StartAmplificationParameterUpdateParams = FunctionArguments<typeof functions.startAmplificationParameterUpdate>
+export type StartAmplificationParameterUpdateReturn = FunctionReturn<typeof functions.startAmplificationParameterUpdate>
+
+export type StopAmplificationParameterUpdateParams = FunctionArguments<typeof functions.stopAmplificationParameterUpdate>
+export type StopAmplificationParameterUpdateReturn = FunctionReturn<typeof functions.stopAmplificationParameterUpdate>
+
+export type SymbolParams = FunctionArguments<typeof functions.symbol>
+export type SymbolReturn = FunctionReturn<typeof functions.symbol>
+
+export type TotalSupplyParams = FunctionArguments<typeof functions.totalSupply>
+export type TotalSupplyReturn = FunctionReturn<typeof functions.totalSupply>
+
+export type TransferParams = FunctionArguments<typeof functions.transfer>
+export type TransferReturn = FunctionReturn<typeof functions.transfer>
+
+export type TransferFromParams = FunctionArguments<typeof functions.transferFrom>
+export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
+
+export type UpdatePriceRateCacheParams = FunctionArguments<typeof functions.updatePriceRateCache>
+export type UpdatePriceRateCacheReturn = FunctionReturn<typeof functions.updatePriceRateCache>
+

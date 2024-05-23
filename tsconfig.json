@@ -14,30 +14,14 @@
     "resolveJsonModule": true,
     "baseUrl": "./src/",
     "paths": {
-      "@abi/*": [
-        "abi/*"
-      ],
-      "@model": [
-        "model"
-      ],
-      "@processor": [
-        "processor"
-      ],
-      "@shared/*": [
-        "shared/*"
-      ],
-      "@templates/*": [
-        "templates/*"
-      ],
-      "@utils/*": [
-        "utils/*"
-      ]
+      "@abi/*": ["abi/*"],
+      "@model": ["model"],
+      "@processor": ["processor"],
+      "@shared/*": ["shared/*"],
+      "@templates/*": ["templates/*"],
+      "@utils/*": ["utils/*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
