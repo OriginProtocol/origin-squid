@@ -1,15 +1,12 @@
 import { Between, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
-import { OETHDailyStat, OGVDailyStat, OUSDDailyStat } from '@model'
+import { OETHDailyStat, OGNDailyStat, OGVDailyStat, OUSDDailyStat } from '@model'
 import { Context } from '@processor'
 import { queryClient } from '@utils/queryClient'
 import { EntityClassT } from '@utils/type'
 
-type DailyStat =
-  | EntityClassT<OETHDailyStat>
-  | EntityClassT<OGVDailyStat>
-  | EntityClassT<OUSDDailyStat>
+type DailyStat = EntityClassT<OETHDailyStat> | EntityClassT<OGVDailyStat> | EntityClassT<OUSDDailyStat>
 
 export interface CoingeckoDataInput {
   prices: [number, number][]
@@ -25,9 +22,7 @@ export interface CoingeckoDataOutput {
   }
 }
 
-export function processCoingeckoData(
-  data: CoingeckoDataInput,
-): CoingeckoDataOutput {
+export function processCoingeckoData(data: CoingeckoDataInput): CoingeckoDataOutput {
   try {
     const result: CoingeckoDataOutput = {}
 
@@ -86,16 +81,13 @@ export async function applyCoingeckoData(
   let whereClause = {
     timestamp: LessThanOrEqual(getStartOfDayTimestamp()),
   } as any
-  if (Entity === OGVDailyStat) {
+  if (Entity === OGVDailyStat || Entity === OGNDailyStat) {
     whereClause.priceUSD = 0
   } else {
     whereClause.pegPrice = 0n
   }
   if (props.startTimestamp) {
-    whereClause.timestamp = Between(
-      new Date(props.startTimestamp),
-      getStartOfDayTimestamp(),
-    )
+    whereClause.timestamp = Between(new Date(props.startTimestamp), getStartOfDayTimestamp())
   }
   const statsWithNoPrice = await ctx.store.findBy(Entity as any, whereClause)
 
@@ -127,12 +119,13 @@ export async function applyCoingeckoData(
           | OETHDailyStat
           | OUSDDailyStat
           | OGVDailyStat
+          | OGNDailyStat
         const day = coingeckData[dayId]
 
         if (stat && day.prices) {
           stat.tradingVolumeUSD = day.total_volumes || 0
           stat.marketCapUSD = day.market_caps || 0
-          if (stat instanceof OGVDailyStat) {
+          if (stat instanceof OGVDailyStat || stat instanceof OGNDailyStat) {
             stat.priceUSD = day.prices
           } else {
             stat.pegPrice = parseEther(String(day.prices))
