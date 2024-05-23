@@ -26,7 +26,7 @@ interface IProcessResult {
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
-    address: [GOVERNANCE_ADDRESS], // TODO: Change to OGN Governance Address
+    address: [], // TODO: Add OGN Governance Address
     topic0: [
       governanceAbi.events.ProposalCreated.topic,
       governanceAbi.events.ProposalExecuted.topic,
