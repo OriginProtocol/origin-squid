@@ -452,7 +452,7 @@ const getAccount = async (ctx: Context, state: State, address: string, account: 
     address,
     account,
     voteBalance: 0n,
-    delegateTo: undefined,
+    delegateTo: null,
     delegatesFrom: [],
   })
   state.account.set(id, created)
