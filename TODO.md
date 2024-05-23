@@ -1,0 +1,6 @@
+- https://github.com/OriginProtocol/ousd-governance/pull/420
+    - FixedRateRewardsSource processing?
+    - Tenderly fork?
+- ExponentialStaking
+    - Consider populating the remaining objects?
+    - This would require making RPC calls on an interval. Maybe a lower priority.

@@ -37,6 +37,11 @@ deploy:
       env:
         RPC_ENV: RPC_ENDPOINT_RETH
         TS_NODE_BASEURL: './lib'
+    - name: ogn-processor
+      cmd: [ "sqd", "process:ogn:prod" ]
+      env:
+        RPC_ENV: RPC_ENDPOINT_RETH
+        TS_NODE_BASEURL: './lib'
     - name: ousd-processor
       cmd: [ "sqd", "process:ousd:prod" ]
       env:
