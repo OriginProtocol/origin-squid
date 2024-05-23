@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class PendingGovernorshipTransfer {
-    constructor(props?: Partial<PendingGovernorshipTransfer>) {
+export class ESDelegateChanged {
+    constructor(props?: Partial<ESDelegateChanged>) {
         Object.assign(this, props)
     }
 
@@ -25,9 +25,13 @@ export class PendingGovernorshipTransfer {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
-    previousGovernor!: string
+    delegator!: string
 
     @StringColumn_({nullable: false})
-    newGovernor!: string
+    fromDelegate!: string
+
+    @StringColumn_({nullable: false})
+    toDelegate!: string
 }

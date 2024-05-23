@@ -1,33 +1,77 @@
+import dayjs from 'dayjs'
+
 import * as abi from '@abi/exponential-staking'
+import * as fixedRewardsAbi from '@abi/fixed-rate-rewards-source'
 import {
-  ExponentialStakingDelegateChanged,
-  ExponentialStakingDelegateVotesChanged,
-  ExponentialStakingLockup,
-  ExponentialStakingLockupState,
-  ExponentialStakingPenalty,
-  ExponentialStakingReward,
-  ExponentialStakingStake,
-  ExponentialStakingUnstake,
+  ESAccount,
+  ESDelegateChanged,
+  ESDelegateVotesChanged,
+  ESLockup,
+  ESLockupState,
+  ESPenalty,
+  ESReward,
+  ESStake,
+  ESUnstake,
+  ESYield,
+  FRRSRewardsPerSecondChanged,
 } from '@model'
 import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { TokenAddress } from '@utils/addresses'
+import { calculateAPY } from '@utils/calculateAPY'
 import { LogFilter, logFilter } from '@utils/logFilter'
 
 interface State {
   // State Entities
-  lockup: Map<string, ExponentialStakingLockup>
+  account: Map<string, ESAccount>
+  lockup: Map<string, ESLockup>
+  yield: Map<string, ESYield>
 
   // Event Entities
-  delegateChanged: Map<string, ExponentialStakingDelegateChanged>
-  delegateVotesChanged: Map<string, ExponentialStakingDelegateVotesChanged>
-  penalty: Map<string, ExponentialStakingPenalty>
-  reward: Map<string, ExponentialStakingReward>
-  stake: Map<string, ExponentialStakingStake>
-  unstake: Map<string, ExponentialStakingUnstake>
+  delegateChanged: Map<string, ESDelegateChanged>
+  delegateVotesChanged: Map<string, ESDelegateVotesChanged>
+  penalty: Map<string, ESPenalty>
+  reward: Map<string, ESReward>
+  stake: Map<string, ESStake>
+  unstake: Map<string, ESUnstake>
+
+  // Local State Tracking
+  rewardsPerSecond: bigint[]
 }
 
-export const createExponentialStakingTracker = ({ from, address }: { from: number; address: TokenAddress }) => {
+/**
+ * Create an ExponentialStaking contract tracker.
+ */
+export const createESTracker = ({
+  from,
+  address,
+  assetAddress,
+  rewardsAddress,
+  yieldType,
+}: {
+  from: number
+  address: TokenAddress
+  assetAddress: TokenAddress
+  rewardsAddress: string
+  yieldType: 'fixed' | undefined
+}) => {
+  const assetTransferFromFilter = logFilter({
+    address: [assetAddress],
+    topic0: [abi.events.Transfer.topic],
+    topic1: [address],
+    range: { from },
+  })
+  const assetTransferToFilter = logFilter({
+    address: [assetAddress],
+    topic0: [abi.events.Transfer.topic],
+    topic2: [address],
+    range: { from },
+  })
+  const fixedRewardsChangeFilter = logFilter({
+    address: [rewardsAddress],
+    topic0: [fixedRewardsAbi.events.RewardsPerSecondChanged.topic],
+    range: { from },
+  })
   const delegateChangedFilter = logFilter({
     address: [address],
     topic0: [abi.events.DelegateChanged.topic],
@@ -55,21 +99,23 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
   })
   const subProcessors: {
     description: string
-    filter: LogFilter
-    processor: (ctx: Context, block: Block, log: Log, state: State) => Promise<void>
+    filter: LogFilter | LogFilter[]
+    processor: (params: { ctx: Context; block: Block; log: Log; state: State }) => Promise<void>
   }[] = [
     // Event Entity Processors
     {
       description: 'Create DelegateChanged event',
       filter: delegateChangedFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.DelegateChanged.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingDelegateChanged({
+        const entity = new ESDelegateChanged({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           delegator: data.delegator,
           fromDelegate: data.fromDelegate,
           toDelegate: data.toDelegate,
@@ -80,14 +126,16 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     {
       description: 'Create DelegateVotesChanged event',
       filter: delegateVotesChangedFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.DelegateVotesChanged.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingDelegateVotesChanged({
+        const entity = new ESDelegateVotesChanged({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           delegate: data.delegate,
           newBalance: data.newBalance,
           previousBalance: data.previousBalance,
@@ -98,14 +146,16 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     {
       description: 'Create Penalty event',
       filter: penaltyFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Penalty.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingPenalty({
+        const entity = new ESPenalty({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           account: data.user,
           amount: data.amount,
         })
@@ -115,14 +165,16 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     {
       description: 'Create Reward event',
       filter: penaltyFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Reward.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingReward({
+        const entity = new ESReward({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           account: data.user,
           amount: data.amount,
         })
@@ -132,14 +184,16 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     {
       description: 'Create Stake event',
       filter: stakeFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Stake.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingStake({
+        const entity = new ESStake({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           lockupId: data.lockupId,
           account: data.user,
           amount: data.amount,
@@ -152,14 +206,16 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     {
       description: 'Create Unstake event',
       filter: unstakeFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Unstake.decode(log)
         const id = `${chainId}:${log.id}`
-        const entity = new ExponentialStakingUnstake({
+        const entity = new ESUnstake({
           id,
           chainId,
           address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
           lockupId: data.lockupId,
           account: data.user,
           amount: data.amount,
@@ -172,13 +228,13 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
 
     // State Entity Processors
     {
-      description: 'Handle Stake for Lockup',
+      description: 'Handle Stake',
       filter: stakeFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Stake.decode(log)
         const id = `${chainId}:${address}:${data.lockupId}`
-        const entity = new ExponentialStakingLockup({
+        const entity = new ESLockup({
           id,
           chainId,
           address,
@@ -191,25 +247,124 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
           points: data.points,
           withdrawAmount: 0n,
           penalty: 0n,
-          state: ExponentialStakingLockupState.Open,
+          state: ESLockupState.Open,
         })
         state.lockup.set(id, entity)
+
+        const contract = new abi.Contract(ctx, block.header, address)
+        const account = await getAccount(ctx, state, address, data.user)
+        account.voteBalance = await contract.getVotes(account.account)
+        if (account.delegateTo) {
+          const delegateAccount = await getAccount(ctx, state, address, account.delegateTo.account)
+          delegateAccount.voteBalance = await contract.getVotes(delegateAccount.account)
+        }
       },
     },
     {
-      description: 'Handle Unstake for Lockup',
+      description: 'Handle Unstake',
       filter: unstakeFilter,
-      processor: async (ctx, block, log, state) => {
+      processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Unstake.decode(log)
         const id = `${chainId}:${address}:${data.lockupId}`
-        const entity = state.lockup.get(id) ?? (await ctx.store.get(ExponentialStakingLockup, id))
+        const entity = state.lockup.get(id) ?? (await ctx.store.get(ESLockup, id))
         if (!entity) throw new Error(`Lockup not found: ${id}`)
         entity.lastUpdated = new Date(block.header.timestamp)
         entity.withdrawAmount = data.amount
         entity.penalty = entity.amount - data.amount
-        entity.state = ExponentialStakingLockupState.Closed
+        entity.state = ESLockupState.Closed
         state.lockup.set(id, entity)
+
+        const contract = new abi.Contract(ctx, block.header, address)
+        const account = await getAccount(ctx, state, address, data.user)
+        account.voteBalance = await contract.getVotes(account.account)
+        if (account.delegateTo) {
+          const delegateAccount = await getAccount(ctx, state, address, account.delegateTo.account)
+          delegateAccount.voteBalance = await contract.getVotes(delegateAccount.account)
+        }
+      },
+    },
+    {
+      description: 'Add rewardsPerSecond for local state',
+      filter: fixedRewardsChangeFilter,
+      processor: async ({ log, state }) => {
+        const rewardsPerSecond = fixedRewardsAbi.events.RewardsPerSecondChanged.decode(log).newRPS
+        state.rewardsPerSecond.push(rewardsPerSecond)
+      },
+    },
+    {
+      description: 'Create Yield Entity',
+      filter: [assetTransferFromFilter, assetTransferToFilter, fixedRewardsChangeFilter],
+      processor: async ({ ctx, block, log, state }) => {
+        if (yieldType !== 'fixed') return
+        const id = `${ctx.chain.id}:${log.id}`
+        const assetContract = new abi.Contract(ctx, block.header, assetAddress)
+        const assetBalance = await assetContract.balanceOf(address) // Could optimize to not use RPC but saving time here.
+        // Get the latest rewards per second - consider that it might be on this block.
+        const rpsFromLog =
+          fixedRewardsChangeFilter.matches(log) && fixedRewardsAbi.events.RewardsPerSecondChanged.decode(log).newRPS
+        const rpsFromState =
+          state.rewardsPerSecond.length > 0 && state.rewardsPerSecond[state.rewardsPerSecond.length - 1]
+        const rewardsPerSecond =
+          rpsFromLog ||
+          rpsFromState ||
+          (await ctx.store
+            .findOne(FRRSRewardsPerSecondChanged, {
+              order: { timestamp: 'desc' },
+              where: { chainId: ctx.chain.id, address: rewardsAddress },
+            })
+            .then((r) => r?.newRPS)) ||
+          0n
+
+        const apyCalc = calculateAPY(
+          new Date(block.header.timestamp),
+          dayjs(block.header.timestamp).add(365.25, 'days').toDate(),
+          assetBalance,
+          assetBalance + 60n * 60n * 24n * 36525n * rewardsPerSecond,
+        )
+        const entity = new ESYield({
+          id,
+          chainId: ctx.chain.id,
+          address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
+          assetBalance,
+          rewardsPerSecond,
+          apr: apyCalc.apr,
+          apy: apyCalc.apy,
+        })
+
+        const existing = state.yield.get(id)
+        if (
+          !existing ||
+          (entity.rewardsPerSecond !== existing.rewardsPerSecond && fixedRewardsChangeFilter.matches(log))
+        ) {
+          state.yield.set(id, entity)
+        }
+      },
+    },
+    {
+      description: 'Add delegate to account',
+      filter: delegateChangedFilter,
+      processor: async ({ ctx, log, state }) => {
+        const data = abi.events.DelegateChanged.decode(log)
+        const entity = await getAccount(ctx, state, address, data.delegator)
+        if (data.toDelegate === data.delegator) {
+          entity.delegateTo = null
+        } else {
+          entity.delegateTo = await getAccount(ctx, state, address, data.toDelegate)
+        }
+        state.account.set(entity.id, entity)
+      },
+    },
+    {
+      description: 'Update delegate voting balance',
+      filter: delegateVotesChangedFilter,
+      processor: async ({ ctx, log, state }) => {
+        const data = abi.events.DelegateVotesChanged.decode(log)
+        const entity = await getAccount(ctx, state, address, data.delegate)
+        entity.voteBalance = data.newBalance
+        state.account.set(entity.id, entity)
       },
     },
   ]
@@ -218,27 +373,50 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
     from,
     setup(processor: EvmBatchProcessor) {
       for (const subProcessor of subProcessors) {
-        processor.addLog(subProcessor.filter.value)
+        if (Array.isArray(subProcessor.filter)) {
+          for (const filter of subProcessor.filter) {
+            processor.addLog(filter.value)
+          }
+        } else {
+          processor.addLog(subProcessor.filter.value)
+        }
+      }
+      if (yieldType) {
+        processor.addLog(assetTransferFromFilter.value)
+        processor.addLog(assetTransferToFilter.value)
       }
     },
     async process(ctx: Context) {
       const state: State = {
         // State Entities
-        lockup: new Map<string, ExponentialStakingLockup>(),
+        lockup: new Map<string, ESLockup>(),
+        yield: new Map<string, ESYield>(),
+        account: new Map<string, ESAccount>(),
 
         // Event Entities
-        delegateChanged: new Map<string, ExponentialStakingDelegateChanged>(),
-        delegateVotesChanged: new Map<string, ExponentialStakingDelegateVotesChanged>(),
-        penalty: new Map<string, ExponentialStakingPenalty>(),
-        reward: new Map<string, ExponentialStakingReward>(),
-        stake: new Map<string, ExponentialStakingStake>(),
-        unstake: new Map<string, ExponentialStakingUnstake>(),
+        delegateChanged: new Map<string, ESDelegateChanged>(),
+        delegateVotesChanged: new Map<string, ESDelegateVotesChanged>(),
+        penalty: new Map<string, ESPenalty>(),
+        reward: new Map<string, ESReward>(),
+        stake: new Map<string, ESStake>(),
+        unstake: new Map<string, ESUnstake>(),
+
+        // Local State Tracking
+        rewardsPerSecond: [],
       }
       for (const block of ctx.blocks) {
         for (const log of block.logs) {
           for (const subProcessor of subProcessors) {
-            if (subProcessor.filter.matches(log)) {
-              await subProcessor.processor(ctx, block, log, state)
+            if (Array.isArray(subProcessor.filter)) {
+              for (const filter of subProcessor.filter) {
+                if (filter.matches(log)) {
+                  await subProcessor.processor({ ctx, block, log, state })
+                }
+              }
+            } else {
+              if (subProcessor.filter.matches(log)) {
+                await subProcessor.processor({ ctx, block, log, state })
+              }
             }
           }
         }
@@ -249,8 +427,34 @@ export const createExponentialStakingTracker = ({ from, address }: { from: numbe
         ctx.store.insert([...state.penalty.values()]),
         ctx.store.insert([...state.reward.values()]),
         ctx.store.insert([...state.stake.values()]),
+        ctx.store.upsert([...state.account.values()]),
         ctx.store.upsert([...state.lockup.values()]),
+        ctx.store.insert([...state.yield.values()]),
       ])
     },
   }
+}
+
+const getAccount = async (ctx: Context, state: State, address: string, account: string) => {
+  const id = `${ctx.chain.id}:${address}:${account}`
+  const local = state.account.get(id)
+  if (local) {
+    return local
+  }
+  const existing = await ctx.store.get(ESAccount, { where: { id }, relations: { delegateTo: true } })
+  if (existing) {
+    state.account.set(id, existing)
+    return existing
+  }
+  const created = new ESAccount({
+    id,
+    chainId: ctx.chain.id,
+    address,
+    account,
+    voteBalance: 0n,
+    delegateTo: undefined,
+    delegatesFrom: [],
+  })
+  state.account.set(id, created)
+  return created
 }

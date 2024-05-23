@@ -1,9 +1,9 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
-import {ExponentialStakingLockupState} from "./_exponentialStakingLockupState"
+import {ESLockupState} from "./_esLockupState"
 
 @Entity_()
-export class ExponentialStakingLockup {
-    constructor(props?: Partial<ExponentialStakingLockup>) {
+export class ESLockup {
+    constructor(props?: Partial<ESLockup>) {
         Object.assign(this, props)
     }
 
@@ -48,5 +48,5 @@ export class ExponentialStakingLockup {
     penalty!: bigint
 
     @Column_("varchar", {length: 6, nullable: true})
-    state!: ExponentialStakingLockupState | undefined | null
+    state!: ESLockupState | undefined | null
 }

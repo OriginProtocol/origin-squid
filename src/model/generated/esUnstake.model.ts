@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class RewardsPerSecondChanged {
-    constructor(props?: Partial<RewardsPerSecondChanged>) {
+export class ESUnstake {
+    constructor(props?: Partial<ESUnstake>) {
         Object.assign(this, props)
     }
 
@@ -25,9 +25,20 @@ export class RewardsPerSecondChanged {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    account!: string
+
+    @Index_()
     @BigIntColumn_({nullable: false})
-    newRPS!: bigint
+    lockupId!: bigint
 
     @BigIntColumn_({nullable: false})
-    oldRPS!: bigint
+    amount!: bigint
+
+    @BigIntColumn_({nullable: false})
+    end!: bigint
+
+    @BigIntColumn_({nullable: false})
+    points!: bigint
 }

@@ -1,8 +1,8 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class ExponentialStakingStake {
-    constructor(props?: Partial<ExponentialStakingStake>) {
+export class ESStake {
+    constructor(props?: Partial<ESStake>) {
         Object.assign(this, props)
     }
 
@@ -16,6 +16,14 @@ export class ExponentialStakingStake {
     @Index_()
     @StringColumn_({nullable: false})
     address!: string
+
+    @Index_()
+    @DateTimeColumn_({nullable: false})
+    timestamp!: Date
+
+    @Index_()
+    @IntColumn_({nullable: false})
+    blockNumber!: number
 
     @Index_()
     @StringColumn_({nullable: false})

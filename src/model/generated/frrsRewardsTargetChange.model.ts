@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class RewardsTargetChange {
-    constructor(props?: Partial<RewardsTargetChange>) {
+export class FRRSRewardsTargetChange {
+    constructor(props?: Partial<FRRSRewardsTargetChange>) {
         Object.assign(this, props)
     }
 

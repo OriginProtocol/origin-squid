@@ -1,11 +1,9 @@
 import * as abi from '@abi/fixed-rate-rewards-source'
 import {
-  GovernorshipTransferred,
-  PendingGovernorshipTransfer,
-  RewardCollected,
-  RewardsPerSecondChanged,
-  RewardsTargetChange,
-  StrategistUpdated,
+  FRRSRewardCollected,
+  FRRSRewardsPerSecondChanged,
+  FRRSRewardsTargetChange,
+  FRRSStrategistUpdated,
 } from '@model'
 import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -13,25 +11,16 @@ import { LogFilter, logFilter } from '@utils/logFilter'
 
 interface State {
   // Event Entities
-  governorshipTransferred: Map<string, GovernorshipTransferred>
-  pendingGovernorshipTransfer: Map<string, PendingGovernorshipTransfer>
-  rewardCollected: Map<string, RewardCollected>
-  rewardsPerSecondChanged: Map<string, RewardsPerSecondChanged>
-  rewardsTargetChange: Map<string, RewardsTargetChange>
-  strategistUpdated: Map<string, StrategistUpdated>
+  rewardCollected: Map<string, FRRSRewardCollected>
+  rewardsPerSecondChanged: Map<string, FRRSRewardsPerSecondChanged>
+  rewardsTargetChange: Map<string, FRRSRewardsTargetChange>
+  strategistUpdated: Map<string, FRRSStrategistUpdated>
 }
 
-export const createFixedRewardsSourceProcessor = ({ from, address }: { from: number; address: string }) => {
-  const governorshipTransferredFilter = logFilter({
-    address: [address],
-    topic0: [abi.events.GovernorshipTransferred.topic],
-    range: { from },
-  })
-  const pendingGovernorshipTransferFilter = logFilter({
-    address: [address],
-    topic0: [abi.events.PendingGovernorshipTransfer.topic],
-    range: { from },
-  })
+/**
+ * Create a FixedRateRewardsSource contract processor
+ */
+export const createFRRSProcessor = ({ from, address }: { from: number; address: string }) => {
   const rewardCollectedFilter = logFilter({
     address: [address],
     topic0: [abi.events.RewardCollected.topic],
@@ -59,46 +48,6 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
     processor: (ctx: Context, block: Block, log: Log, state: State) => Promise<void>
   }[] = [
     {
-      description: 'Create GovernorshipTransferred event',
-      filter: governorshipTransferredFilter,
-      processor: async (ctx: Context, block: Block, log: Log, state: State) => {
-        const data = abi.events.GovernorshipTransferred.decode(log)
-        const id = `${ctx.chain.id}:${log.id}`
-        state.governorshipTransferred.set(
-          id,
-          new GovernorshipTransferred({
-            id,
-            chainId: ctx.chain.id,
-            address,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            newGovernor: data.newGovernor,
-            previousGovernor: data.previousGovernor,
-          }),
-        )
-      },
-    },
-    {
-      description: 'Create PendingGovernorshipTransfer event',
-      filter: pendingGovernorshipTransferFilter,
-      processor: async (ctx: Context, block: Block, log: Log, state: State) => {
-        const data = abi.events.PendingGovernorshipTransfer.decode(log)
-        const id = `${ctx.chain.id}:${log.id}`
-        state.pendingGovernorshipTransfer.set(
-          id,
-          new PendingGovernorshipTransfer({
-            id,
-            chainId: ctx.chain.id,
-            address,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            newGovernor: data.newGovernor,
-            previousGovernor: data.previousGovernor,
-          }),
-        )
-      },
-    },
-    {
       description: 'Create RewardCollected event',
       filter: rewardCollectedFilter,
       processor: async (ctx: Context, block: Block, log: Log, state: State) => {
@@ -106,7 +55,7 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
         const id = `${ctx.chain.id}:${log.id}`
         state.rewardCollected.set(
           id,
-          new RewardCollected({
+          new FRRSRewardCollected({
             id,
             chainId: ctx.chain.id,
             address,
@@ -125,7 +74,7 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
         const id = `${ctx.chain.id}:${log.id}`
         state.rewardsPerSecondChanged.set(
           id,
-          new RewardsPerSecondChanged({
+          new FRRSRewardsPerSecondChanged({
             id,
             chainId: ctx.chain.id,
             address,
@@ -145,7 +94,7 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
         const id = `${ctx.chain.id}:${log.id}`
         state.rewardsTargetChange.set(
           id,
-          new RewardsTargetChange({
+          new FRRSRewardsTargetChange({
             id,
             chainId: ctx.chain.id,
             address,
@@ -165,7 +114,7 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
         const id = `${ctx.chain.id}:${log.id}`
         state.strategistUpdated.set(
           id,
-          new StrategistUpdated({
+          new FRRSStrategistUpdated({
             id,
             chainId: ctx.chain.id,
             address,
@@ -187,12 +136,10 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
   const process = async (ctx: Context) => {
     const state: State = {
       // Event Entities
-      governorshipTransferred: new Map<string, GovernorshipTransferred>(),
-      pendingGovernorshipTransfer: new Map<string, PendingGovernorshipTransfer>(),
-      rewardCollected: new Map<string, RewardCollected>(),
-      rewardsPerSecondChanged: new Map<string, RewardsPerSecondChanged>(),
-      rewardsTargetChange: new Map<string, RewardsTargetChange>(),
-      strategistUpdated: new Map<string, StrategistUpdated>(),
+      rewardCollected: new Map<string, FRRSRewardCollected>(),
+      rewardsPerSecondChanged: new Map<string, FRRSRewardsPerSecondChanged>(),
+      rewardsTargetChange: new Map<string, FRRSRewardsTargetChange>(),
+      strategistUpdated: new Map<string, FRRSStrategistUpdated>(),
     }
     for (const block of ctx.blocks) {
       for (const log of block.logs) {
@@ -204,8 +151,6 @@ export const createFixedRewardsSourceProcessor = ({ from, address }: { from: num
       }
     }
     await Promise.all([
-      ctx.store.insert([...state.governorshipTransferred.values()]),
-      ctx.store.insert([...state.pendingGovernorshipTransfer.values()]),
       ctx.store.insert([...state.rewardCollected.values()]),
       ctx.store.insert([...state.rewardsPerSecondChanged.values()]),
       ctx.store.insert([...state.rewardsTargetChange.values()]),

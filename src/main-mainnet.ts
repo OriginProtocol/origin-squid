@@ -2,11 +2,18 @@ import 'tsconfig-paths/register'
 
 import { run } from '@processor'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
-import { createExponentialStakingTracker } from '@templates/exponential-staking'
-import { createFixedRewardsSourceProcessor } from '@templates/fixed-rate-rewards-source'
+import { createESTracker } from '@templates/exponential-staking'
+import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
 import { processStatus } from '@templates/processor-status'
-import { GOVERNANCE_ADDRESS, OGN_REWARDS_SOURCE_ADDRESS, VEOGV_ADDRESS, XOGN_ADDRESS } from '@utils/addresses'
+import {
+  GOVERNANCE_ADDRESS,
+  OGN_ADDRESS,
+  OGN_REWARDS_SOURCE_ADDRESS,
+  OGV_ADDRESS,
+  VEOGV_ADDRESS,
+  XOGN_ADDRESS,
+} from '@utils/addresses'
 
 import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
@@ -18,9 +25,21 @@ export const processor = {
     curve,
     ...erc20s(),
     createGovernanceProcessor({ from: 15491391, address: GOVERNANCE_ADDRESS }),
-    createExponentialStakingTracker({ from: 15089597, address: VEOGV_ADDRESS }),
-    createExponentialStakingTracker({ from: 19919745, address: XOGN_ADDRESS }),
-    createFixedRewardsSourceProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
+    createESTracker({
+      from: 15089597,
+      address: VEOGV_ADDRESS,
+      assetAddress: OGV_ADDRESS,
+      rewardsAddress: '0x7d82e86cf1496f9485a8ea04012afeb3c7489397',
+      yieldType: undefined, // We won't calculate for this.
+    }),
+    createESTracker({
+      from: 19919745,
+      address: XOGN_ADDRESS,
+      assetAddress: OGN_ADDRESS,
+      rewardsAddress: '0x7609c88e5880e934dd3a75bcfef44e31b1badb8b',
+      yieldType: 'fixed',
+    }),
+    createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
   ],
   postProcessors: [exchangeRates, processStatus('mainnet')],
   validators: [validate],

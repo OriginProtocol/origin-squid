@@ -1,4 +1,4 @@
-export enum ExponentialStakingLockupState {
+export enum ESLockupState {
     Open = "Open",
     Closed = "Closed",
 }

@@ -1,8 +1,8 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class StrategistUpdated {
-    constructor(props?: Partial<StrategistUpdated>) {
+export class ESReward {
+    constructor(props?: Partial<ESReward>) {
         Object.assign(this, props)
     }
 
@@ -25,6 +25,10 @@ export class StrategistUpdated {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
-    strategistAddress!: string
+    account!: string
+
+    @BigIntColumn_({nullable: false})
+    amount!: bigint
 }

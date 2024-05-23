@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class ExponentialStaking {
-    constructor(props?: Partial<ExponentialStaking>) {
+export class ESDelegateVotesChanged {
+    constructor(props?: Partial<ESDelegateVotesChanged>) {
         Object.assign(this, props)
     }
 
@@ -25,9 +25,13 @@ export class ExponentialStaking {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
-    @BigIntColumn_({nullable: false})
-    accRewardPerShare!: bigint
+    @Index_()
+    @StringColumn_({nullable: false})
+    delegate!: string
 
     @BigIntColumn_({nullable: false})
-    assetBalance!: bigint
+    previousBalance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    newBalance!: bigint
 }

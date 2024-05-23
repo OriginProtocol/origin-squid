@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class GovernorshipTransferred {
-    constructor(props?: Partial<GovernorshipTransferred>) {
+export class FRRSStrategistUpdated {
+    constructor(props?: Partial<FRRSStrategistUpdated>) {
         Object.assign(this, props)
     }
 
@@ -26,8 +26,5 @@ export class GovernorshipTransferred {
     blockNumber!: number
 
     @StringColumn_({nullable: false})
-    previousGovernor!: string
-
-    @StringColumn_({nullable: false})
-    newGovernor!: string
+    strategistAddress!: string
 }

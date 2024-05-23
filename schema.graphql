@@ -5,22 +5,24 @@
 # - Lockups
 # - Accounts
 
-type ExponentialStaking @entity {
+type ESYield @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  accRewardPerShare: BigInt!
   assetBalance: BigInt!
+  rewardsPerSecond: BigInt!
+  apr: Float!
+  apy: Float!
 }
 
-enum ExponentialStakingLockupState {
+enum ESLockupState {
   Open
   Closed
 }
 
-type ExponentialStakingLockup @entity  {
+type ESLockup @entity  {
   id: ID! # `chainId:address:account:lockupId` or `lockupId`
   chainId: Int! @index
   address: String! @index
@@ -33,62 +35,68 @@ type ExponentialStakingLockup @entity  {
   points: BigInt!
   withdrawAmount: BigInt!
   penalty: BigInt!
-  state: ExponentialStakingLockupState
+  state: ESLockupState
 }
 
-type ExponentialStakingAccount @entity  {
+type ESAccount @entity {
   id: ID! # `chainId:address:account`
   chainId: Int! @index
   address: String! @index
   account: String! @index
-  votes: BigInt!
-  balance: BigInt!
-  previewPoints: BigInt!
-  previewRewards: BigInt!
-  previewWithdraw: BigInt!
+  voteBalance: BigInt!
+  delegateTo: ESAccount
+  delegatesFrom: [ESAccount]! @derivedFrom(field: "delegateTo")
 }
 
-
-
 # Events
-type ExponentialStakingDelegateChanged @entity  {
+type ESDelegateChanged @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   delegator: String! @index
   fromDelegate: String!
   toDelegate: String!
 }
 
-type ExponentialStakingDelegateVotesChanged @entity  {
+type ESDelegateVotesChanged @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   delegate: String! @index
   previousBalance: BigInt!
   newBalance: BigInt!
 }
 
-type ExponentialStakingPenalty @entity  {
+type ESPenalty @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   account: String! @index
   amount: BigInt!
 }
 
-type ExponentialStakingReward @entity  {
+type ESReward @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   account: String! @index
   amount: BigInt!
 }
 
-type ExponentialStakingStake @entity  {
+type ESStake @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!
@@ -96,35 +104,19 @@ type ExponentialStakingStake @entity  {
   points: BigInt!
 }
 
-type ExponentialStakingUnstake @entity  {
+type ESUnstake @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!
   end: BigInt!
   points: BigInt!
 }
-type GovernorshipTransferred @entity {
-  id: ID!
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  previousGovernor: String!
-  newGovernor: String!
-}
-type PendingGovernorshipTransfer @entity {
-  id: ID!
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  previousGovernor: String!
-  newGovernor: String!
-}
-type RewardCollected @entity {
+type FRRSRewardCollected @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -132,7 +124,7 @@ type RewardCollected @entity {
   blockNumber: Int! @index
   amountCollected: BigInt!
 }
-type RewardsPerSecondChanged @entity {
+type FRRSRewardsPerSecondChanged @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -141,7 +133,7 @@ type RewardsPerSecondChanged @entity {
   newRPS: BigInt!
   oldRPS: BigInt!
 }
-type RewardsTargetChange @entity {
+type FRRSRewardsTargetChange @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -150,7 +142,7 @@ type RewardsTargetChange @entity {
   target: String!
   previousTarget: String!
 }
-type StrategistUpdated @entity {
+type FRRSStrategistUpdated @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
