@@ -1,9 +1,28 @@
 # GENERATED, DO NOT MODIFY
 
 # State
-# - Contract
-# - Lockups
-# - Accounts
+
+type ESToken @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  circulating: BigInt!
+  staked: BigInt!
+  total: BigInt!
+}
+
+type ESAccount @entity {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  assetBalance: BigInt!
+  stakedBalance: BigInt!
+  balance: BigInt!
+  votingPower: BigInt!
+  delegateTo: ESAccount
+  delegatesFrom: [ESAccount]! @derivedFrom(field: "delegateTo")
+}
 
 type ESYield @entity {
   id: ID!
@@ -15,11 +34,6 @@ type ESYield @entity {
   rewardsPerSecond: BigInt!
   apr: Float!
   apy: Float!
-}
-
-enum ESLockupState {
-  Open
-  Closed
 }
 
 type ESLockup @entity  {
@@ -36,16 +50,28 @@ type ESLockup @entity  {
   withdrawAmount: BigInt!
   penalty: BigInt!
   state: ESLockupState
+  events: [ESLockupEvent]! @derivedFrom(field: "lockup")
 }
 
-type ESAccount @entity {
-  id: ID! # `chainId:address:account`
+enum ESLockupState {
+  Open
+  Closed
+}
+
+enum ESLockupEventType {
+  Staked
+  Unstaked
+  Extended
+}
+
+type ESLockupEvent @entity {
+  id: ID!
   chainId: Int! @index
   address: String! @index
-  account: String! @index
-  voteBalance: BigInt!
-  delegateTo: ESAccount
-  delegatesFrom: [ESAccount]! @derivedFrom(field: "delegateTo")
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  event: ESLockupEventType!
+  lockup: ESLockup!
 }
 
 # Events

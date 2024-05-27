@@ -22,7 +22,16 @@ export class ESAccount {
     account!: string
 
     @BigIntColumn_({nullable: false})
-    voteBalance!: bigint
+    assetBalance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    stakedBalance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    balance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    votingPower!: bigint
 
     @Index_()
     @ManyToOne_(() => ESAccount, {nullable: true})

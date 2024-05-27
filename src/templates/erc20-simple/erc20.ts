@@ -1,6 +1,7 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
 import { Block, Context } from '@processor'
+import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
@@ -35,7 +36,7 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
         await ctx.store.insert(erc20)
       }
     } catch (err) {
-      ctx.log.error({ height: block.header.height, err }, 'Failed to get contract name')
+      ctx.log.info({ height: block.header.height }, 'Failed to get contract name')
     }
     if (!lastState) {
       lastState = await ctx.store
@@ -180,12 +181,14 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
           }
         }
       }
+
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
       ])
+      publishERC20State(ctx, address, result)
     },
   }
 }

@@ -1,12 +1,7 @@
 import * as abi from '@abi/erc20'
-import {
-  ERC20,
-  ERC20Balance,
-  ERC20Holder,
-  ERC20State,
-  ERC20Transfer,
-} from '@model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
 import { Context } from '@processor'
+import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
@@ -33,13 +28,9 @@ export const createERC20Tracker = ({
     throw new Error('An ERC20 tracker was already created for: ' + address)
   }
   duplicateTracker.add(address)
-  const accountFilterSet = accountFilter
-    ? new Set(accountFilter.map((account) => account.toLowerCase()))
-    : undefined
+  const accountFilterSet = accountFilter ? new Set(accountFilter.map((account) => account.toLowerCase())) : undefined
 
-  const intervalTracker = intervalTracking
-    ? blockFrequencyTracker({ from })
-    : undefined
+  const intervalTracker = intervalTracking ? blockFrequencyTracker({ from }) : undefined
 
   let erc20: ERC20 | undefined
   // Keep an in-memory record of what our current holders are.
@@ -68,11 +59,7 @@ export const createERC20Tracker = ({
     try {
       if (!erc20) {
         const contract = new abi.Contract(ctx, block.header, address)
-        const [name, symbol, decimals] = await Promise.all([
-          contract.name(),
-          contract.symbol(),
-          contract.decimals(),
-        ])
+        const [name, symbol, decimals] = await Promise.all([contract.name(), contract.symbol(), contract.decimals()])
         erc20 = new ERC20({
           id: `${ctx.chain.id}-${address}`,
           chainId: ctx.chain.id,
@@ -84,10 +71,7 @@ export const createERC20Tracker = ({
         await ctx.store.insert(erc20)
       }
     } catch (err) {
-      ctx.log.error(
-        { height: block.header.height, err },
-        'Failed to get contract name',
-      )
+      ctx.log.error({ height: block.header.height, err }, 'Failed to get contract name')
     }
   }
   return {
@@ -113,7 +97,7 @@ export const createERC20Tracker = ({
         states: new Map<string, ERC20State>(),
         balances: new Map<string, ERC20Balance>(),
         transfers: new Map<string, ERC20Transfer>(),
-        newHolders: new Map<string, ERC20Holder>(),
+        holders: new Map<string, ERC20Holder>(),
         removedHolders: new Set<string>(),
       }
       for (const block of ctx.blocks) {
@@ -133,10 +117,7 @@ export const createERC20Tracker = ({
           })
           result.states.set(id, state)
         }
-        const updateBalances = async (
-          accounts: string[],
-          doStateUpdate = false,
-        ) => {
+        const updateBalances = async (accounts: string[], doStateUpdate = false) => {
           if (accountFilterSet) {
             accounts = accounts.filter((a) => accountFilterSet.has(a))
           }
@@ -165,10 +146,10 @@ export const createERC20Tracker = ({
               if (balance.balance === 0n) {
                 doStateUpdate = true
                 holders.delete(account)
-                result.newHolders.delete(account)
+                result.holders.delete(account)
                 result.removedHolders.add(account)
-              } else if (!holders.has(account)) {
-                const newHolder = new ERC20Holder({
+              } else {
+                const holder = new ERC20Holder({
                   id: `${ctx.chain.id}-${address}-${account}`,
                   chainId: ctx.chain.id,
                   address,
@@ -179,8 +160,8 @@ export const createERC20Tracker = ({
                   doStateUpdate = true
                   holders.add(account)
                 }
-                result.newHolders.set(newHolder.account, newHolder)
-                result.removedHolders.delete(newHolder.account)
+                result.holders.set(holder.account, holder)
+                result.removedHolders.delete(holder.account)
               }
             })
           }
@@ -227,16 +208,13 @@ export const createERC20Tracker = ({
         await updateBalances([...accounts], haveRebase)
       }
       await Promise.all([
-        ctx.store.upsert([...result.newHolders.values()]),
+        ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
-        ctx.store.remove(
-          [...result.removedHolders.values()].map(
-            (id) => new ERC20Holder({ id }),
-          ),
-        ),
+        ctx.store.remove([...result.removedHolders.values()].map((id) => new ERC20Holder({ id }))),
       ])
+      publishERC20State(ctx, address, result)
     },
   }
 }
