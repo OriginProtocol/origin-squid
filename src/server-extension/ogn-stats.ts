@@ -69,18 +69,26 @@ export class OGNStatsResolver {
 
 async function getCirculatingSupply(): Promise<number> {
   const excludeBalance = [
-    '0xe011fa2a6df98c69383457d87a056ed0103aa352', // foundation_reserve
-    '0xbe2ab3d3d8f6a32b96414ebbd865dbd276d3d899', // new_foundation_reserve
-    '0xcaa5ef7abc36d5e5a3e4d7930dcff3226617a167', // team_dist
-    '0x2eae0cae2323167abf78462e0c0686865c67a655', // new_team_dist
-    '0x3da5045699802ea1fcc60130dedea67139c5b8c0', // investor_dist
-    '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // new_investor_dist
-    '0x1a34e5b97d684b124e32bd3b7dc82736c216976b', // dist_staging
-    '0x12d7ef3c933d091210cd931224ead45d9cfddde0', // new_dist_staging
-    '0xbc0722eb6e8ba0217aeea5694fe4f214d2e53017', // partnerships
-    '0x2d00c3c132a0567bbbb45ffcfd8c6543e08ff626', // ecosystem_growth
-    '0x8ac3b96d118288427055ae7f62e407fc7c482f57', // brave_endeavors
-    '0xa2cc2eae69cbf04a3d5660bc3e689b035324fc3f', // limitless_alpha
+    // '0xe011fa2a6df98c69383457d87a056ed0103aa352', // foundation_reserve
+    // '0xcaa5ef7abc36d5e5a3e4d7930dcff3226617a167', // team_dist
+    // '0x2eae0cae2323167abf78462e0c0686865c67a655', // new_team_dist
+    // '0x3da5045699802ea1fcc60130dedea67139c5b8c0', // investor_dist
+    // '0xfe730b3cf80ca7b31905f70241f7c786baf443e3', // new_investor_dist
+    // '0x1a34e5b97d684b124e32bd3b7dc82736c216976b', // dist_staging
+    // '0xbc0722eb6e8ba0217aeea5694fe4f214d2e53017', // partnerships
+    // '0x2d00c3c132a0567bbbb45ffcfd8c6543e08ff626', // ecosystem_growth
+
+    '0xbe2ab3d3d8f6a32b96414ebbd865dbd276d3d899', // Treasury
+    '0xa2cc2eae69cbf04a3d5660bc3e689b035324fc3f', // Custodian #1
+    '0x8ac3b96d118288427055ae7f62e407fC7c482F57', // Custodian #2
+    '0x12d7ef3c933d091210cd931224ead45d9cfddde0', // Distribution Staging
+    '0x494d8f7f0ceaA527A12367c242fF0ef8E24806Dc', // Investor Distribution (New 2024)
+    '0x82723DFDCd2F6391Bd5f62593f1f4A3f8e82aAb4', // Team Distribution (New 2024)
+    '0xcce8e784c777fb9435f89f4e45f8b7fc49f7669f', // Story Staking
+    '0x501804b374ef06fa9c427476147ac09f1551b9a0', // Legacy Staking
+    '0x95c347d6214614a780847b8aaf4f96eb84f4da6d', // OGV Migration
+    '0x63898b3b6ef3d39332082178656e9862bee45c57', // OGN Staking
+    '0x000000000000000000000000000000000000dEaD', // Alternate Burn Address
   ]
 
   const abi = parseAbi([
