@@ -1,5 +1,5 @@
-module.exports = class Data1716512235220 {
-    name = 'Data1716512235220'
+module.exports = class Data1717014884738 {
+    name = 'Data1717014884738'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -15,7 +15,11 @@ module.exports = class Data1716512235220 {
         await db.query(`CREATE INDEX "IDX_700ebb527927ee781c0750b0dc" ON "es_yield" ("address") `)
         await db.query(`CREATE INDEX "IDX_e2d3a1ddc3f0886f51556442bb" ON "es_yield" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_4fdca11723165347776a9a7110" ON "es_yield" ("block_number") `)
-        await db.query(`CREATE TABLE "es_lockup_event" ("id" character varying NOT NULL, "hash" text NOT NULL, "event" character varying(8) NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "lockup_id" character varying, CONSTRAINT "PK_67e28e7f997fad22a59f8fd71c1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "es_lockup_event" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "event" character varying(8) NOT NULL, "lockup_id" character varying, CONSTRAINT "PK_67e28e7f997fad22a59f8fd71c1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_512bb02117d66720b0c72fe2d2" ON "es_lockup_event" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_953fc73b0a9873292b633601e0" ON "es_lockup_event" ("address") `)
+        await db.query(`CREATE INDEX "IDX_9584d0dce1144609a1a9a0c579" ON "es_lockup_event" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_bb14524b2db1cbbf66d1729aba" ON "es_lockup_event" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_46d53d4fad340d593995583600" ON "es_lockup_event" ("lockup_id") `)
         await db.query(`CREATE TABLE "es_lockup" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "lockup_id" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "amount" numeric NOT NULL, "end" numeric NOT NULL, "points" numeric NOT NULL, "withdraw_amount" numeric NOT NULL, "penalty" numeric NOT NULL, "state" character varying(6), CONSTRAINT "PK_5b189f92ac5becc0db1e5d1f8ad" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_15e9dc0d375d6f2687def01843" ON "es_lockup" ("chain_id") `)
@@ -363,6 +367,10 @@ module.exports = class Data1716512235220 {
         await db.query(`DROP INDEX "public"."IDX_e2d3a1ddc3f0886f51556442bb"`)
         await db.query(`DROP INDEX "public"."IDX_4fdca11723165347776a9a7110"`)
         await db.query(`DROP TABLE "es_lockup_event"`)
+        await db.query(`DROP INDEX "public"."IDX_512bb02117d66720b0c72fe2d2"`)
+        await db.query(`DROP INDEX "public"."IDX_953fc73b0a9873292b633601e0"`)
+        await db.query(`DROP INDEX "public"."IDX_9584d0dce1144609a1a9a0c579"`)
+        await db.query(`DROP INDEX "public"."IDX_bb14524b2db1cbbf66d1729aba"`)
         await db.query(`DROP INDEX "public"."IDX_46d53d4fad340d593995583600"`)
         await db.query(`DROP TABLE "es_lockup"`)
         await db.query(`DROP INDEX "public"."IDX_15e9dc0d375d6f2687def01843"`)

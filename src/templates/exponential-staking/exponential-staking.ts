@@ -264,7 +264,7 @@ export const createESTracker = ({
         state.lockupEvent.set(
           lockupEventId,
           new ESLockupEvent({
-            id,
+            id: lockupEventId,
             chainId,
             address,
             timestamp: new Date(block.header.timestamp),
@@ -307,7 +307,7 @@ export const createESTracker = ({
           state.lockupEvent.set(
             lockupEventId,
             new ESLockupEvent({
-              id,
+              id: lockupEventId,
               chainId,
               address,
               timestamp: new Date(block.header.timestamp),
@@ -422,7 +422,7 @@ export const createESTracker = ({
     ...lockupProcessors,
     ...yieldProcessors,
     ...delegationProcessors,
-  ].filter((f) => f.enabled)
+  ].filter((f) => f.enabled !== false)
 
   const updateBalances = async (ctx: Context, state: State) => {
     // Take updated balances from erc20 processors and update our local balances.
@@ -524,8 +524,10 @@ export const createESTracker = ({
         ctx.store.insert([...state.penalty.values()]),
         ctx.store.insert([...state.reward.values()]),
         ctx.store.insert([...state.stake.values()]),
+        ctx.store.insert([...state.unstake.values()]),
         ctx.store.upsert([...state.account.values()]),
         ctx.store.upsert([...state.lockup.values()]),
+        ctx.store.insert([...state.lockupEvent.values()]),
         ctx.store.insert([...state.yield.values()]),
       ])
     },
