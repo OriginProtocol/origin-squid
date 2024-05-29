@@ -36,8 +36,8 @@ export class ESLockup {
     @BigIntColumn_({nullable: false})
     amount!: bigint
 
-    @BigIntColumn_({nullable: false})
-    end!: bigint
+    @DateTimeColumn_({nullable: false})
+    end!: Date
 
     @BigIntColumn_({nullable: false})
     points!: bigint

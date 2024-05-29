@@ -43,7 +43,7 @@ type ESLockup @entity  {
   timestamp: DateTime!
   lastUpdated: DateTime!
   amount: BigInt!
-  end: BigInt!
+  end: DateTime!
   points: BigInt!
   withdrawAmount: BigInt!
   penalty: BigInt!

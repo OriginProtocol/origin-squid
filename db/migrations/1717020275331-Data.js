@@ -1,5 +1,5 @@
-module.exports = class Data1717014884738 {
-    name = 'Data1717014884738'
+module.exports = class Data1717020275331 {
+    name = 'Data1717020275331'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -21,7 +21,7 @@ module.exports = class Data1717014884738 {
         await db.query(`CREATE INDEX "IDX_9584d0dce1144609a1a9a0c579" ON "es_lockup_event" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_bb14524b2db1cbbf66d1729aba" ON "es_lockup_event" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_46d53d4fad340d593995583600" ON "es_lockup_event" ("lockup_id") `)
-        await db.query(`CREATE TABLE "es_lockup" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "lockup_id" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "amount" numeric NOT NULL, "end" numeric NOT NULL, "points" numeric NOT NULL, "withdraw_amount" numeric NOT NULL, "penalty" numeric NOT NULL, "state" character varying(6), CONSTRAINT "PK_5b189f92ac5becc0db1e5d1f8ad" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "es_lockup" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "lockup_id" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "amount" numeric NOT NULL, "end" TIMESTAMP WITH TIME ZONE NOT NULL, "points" numeric NOT NULL, "withdraw_amount" numeric NOT NULL, "penalty" numeric NOT NULL, "state" character varying(6), CONSTRAINT "PK_5b189f92ac5becc0db1e5d1f8ad" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_15e9dc0d375d6f2687def01843" ON "es_lockup" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_f3c10b1e75f626e1aaeaa3cfc3" ON "es_lockup" ("address") `)
         await db.query(`CREATE INDEX "IDX_5dd7ffdf1c625829f7eb79ee27" ON "es_lockup" ("account") `)

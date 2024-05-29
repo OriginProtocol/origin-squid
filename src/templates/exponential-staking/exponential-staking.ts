@@ -239,7 +239,7 @@ export const createESTracker = ({
       processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Stake.decode(log)
-        const id = `${chainId}:${address}:${data.lockupId}`
+        const id = `${chainId}:${address}:${data.user}:${data.lockupId}`
         const entity = new ESLockup({
           id,
           chainId,
@@ -248,7 +248,7 @@ export const createESTracker = ({
           lockupId: data.lockupId,
           timestamp: new Date(block.header.timestamp),
           lastUpdated: new Date(block.header.timestamp),
-          end: data.end,
+          end: new Date(Number(data.end) * 1000),
           amount: data.amount,
           points: data.points,
           withdrawAmount: 0n,
@@ -290,7 +290,7 @@ export const createESTracker = ({
       processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Unstake.decode(log)
-        const id = `${chainId}:${address}:${data.lockupId}`
+        const id = `${chainId}:${address}:${data.user}:${data.lockupId}`
         const entity = state.lockup.get(id) ?? (await ctx.store.get(ESLockup, id))
         if (!entity) throw new Error(`Lockup not found: ${id}`)
         entity.lastUpdated = new Date(block.header.timestamp)
@@ -471,15 +471,14 @@ export const createESTracker = ({
   return {
     from,
     setup(processor: EvmBatchProcessor) {
-      for (const subProcessor of subProcessors) {
-        if (Array.isArray(subProcessor.filter)) {
-          for (const filter of subProcessor.filter) {
-            processor.addLog(filter.value)
-          }
-        } else {
-          processor.addLog(subProcessor.filter.value)
-        }
-      }
+      processor.addLog(assetTransferFromFilter.value)
+      processor.addLog(assetTransferToFilter.value)
+      processor.addLog(fixedRewardsChangeFilter.value)
+      processor.addLog(delegateChangedFilter.value)
+      processor.addLog(delegateVotesChangedFilter.value)
+      processor.addLog(penaltyFilter.value)
+      processor.addLog(stakeFilter.value)
+      processor.addLog(unstakeFilter.value)
     },
     async process(ctx: Context) {
       const state: State = {
