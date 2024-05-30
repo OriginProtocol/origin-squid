@@ -278,7 +278,7 @@ export const createESTracker = ({
             blockNumber: block.header.height,
             txHash: log.transactionHash,
             lockup: entity,
-            event: isExtend ? ESLockupEventType.Extended : ESLockupEventType.Unstaked,
+            event: isExtend ? ESLockupEventType.Extended : ESLockupEventType.Staked,
           }),
         )
 
