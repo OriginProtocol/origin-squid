@@ -61,6 +61,7 @@ export const createFRRSProcessor = ({ from, address }: { from: number; address: 
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
+            txHash: log.transactionHash,
             amountCollected: data.amountCollected,
           }),
         )
@@ -80,6 +81,7 @@ export const createFRRSProcessor = ({ from, address }: { from: number; address: 
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
+            txHash: log.transactionHash,
             newRPS: data.newRPS,
             oldRPS: data.oldRPS,
           }),
@@ -100,6 +102,7 @@ export const createFRRSProcessor = ({ from, address }: { from: number; address: 
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
+            txHash: log.transactionHash,
             previousTarget: data.previousTarget,
             target: data.target,
           }),
@@ -120,6 +123,7 @@ export const createFRRSProcessor = ({ from, address }: { from: number; address: 
             address,
             timestamp: new Date(block.header.timestamp),
             blockNumber: block.header.height,
+            txHash: log.transactionHash,
             strategistAddress: data._address,
           }),
         )

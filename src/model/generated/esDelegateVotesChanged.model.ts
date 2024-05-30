@@ -27,6 +27,10 @@ export class ESDelegateVotesChanged {
 
     @Index_()
     @StringColumn_({nullable: false})
+    txHash!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
     delegate!: string
 
     @BigIntColumn_({nullable: false})

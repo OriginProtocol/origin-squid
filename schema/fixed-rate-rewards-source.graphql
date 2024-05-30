@@ -4,6 +4,7 @@ type FRRSRewardCollected @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   amountCollected: BigInt!
 }
 type FRRSRewardsPerSecondChanged @entity {
@@ -12,6 +13,7 @@ type FRRSRewardsPerSecondChanged @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   newRPS: BigInt!
   oldRPS: BigInt!
 }
@@ -21,6 +23,7 @@ type FRRSRewardsTargetChange @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   target: String!
   previousTarget: String!
 }
@@ -30,5 +33,6 @@ type FRRSStrategistUpdated @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   strategistAddress: String!
 }

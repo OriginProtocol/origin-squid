@@ -41,6 +41,7 @@ type ESLockup @entity  {
   account: String! @index
   lockupId: BigInt! @index
   timestamp: DateTime!
+  txHash: String! @index
   lastUpdated: DateTime!
   amount: BigInt!
   end: DateTime!
@@ -68,6 +69,7 @@ type ESLockupEvent @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   event: ESLockupEventType!
   lockup: ESLockup!
 }
@@ -79,6 +81,7 @@ type ESDelegateChanged @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   delegator: String! @index
   fromDelegate: String!
   toDelegate: String!
@@ -90,6 +93,7 @@ type ESDelegateVotesChanged @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   delegate: String! @index
   previousBalance: BigInt!
   newBalance: BigInt!
@@ -101,6 +105,7 @@ type ESPenalty @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   amount: BigInt!
 }
@@ -111,6 +116,7 @@ type ESReward @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   amount: BigInt!
 }
@@ -121,6 +127,7 @@ type ESStake @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!
@@ -134,6 +141,7 @@ type ESUnstake @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!

@@ -25,7 +25,7 @@ enum GovernanceVoteType {
 
 type GovernanceProposalEvent @entity {
   id: ID!
-  hash: String!
+  txHash: String! @index
   event: GovernanceProposalEventType!
   timestamp: DateTime!
   proposal: GovernanceProposal! @index
@@ -33,12 +33,13 @@ type GovernanceProposalEvent @entity {
 
 type GovernanceProposal @entity {
   id: ID! @index
-  chainId: Int!
-  address: String!
+  chainId: Int! @index
+  address: String! @index
   proposalId: BigInt!
   description: String
   proposer: String!
   timestamp: DateTime!
+  txHash: String! @index
   startBlock: BigInt!
   endBlock: BigInt!
   targets: [String]!

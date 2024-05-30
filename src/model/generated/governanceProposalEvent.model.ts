@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Index as Index_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_} from "@subsquid/typeorm-store"
 import {GovernanceProposalEventType} from "./_governanceProposalEventType"
 import {GovernanceProposal} from "./governanceProposal.model"
 
@@ -11,8 +11,9 @@ export class GovernanceProposalEvent {
     @PrimaryColumn_()
     id!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
-    hash!: string
+    txHash!: string
 
     @Column_("varchar", {length: 8, nullable: false})
     event!: GovernanceProposalEventType

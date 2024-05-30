@@ -25,6 +25,10 @@ export class FRRSStrategistUpdated {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    txHash!: string
+
     @StringColumn_({nullable: false})
     strategistAddress!: string
 }

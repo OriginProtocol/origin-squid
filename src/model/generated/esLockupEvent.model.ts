@@ -27,6 +27,10 @@ export class ESLockupEvent {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    txHash!: string
+
     @Column_("varchar", {length: 8, nullable: false})
     event!: ESLockupEventType
 

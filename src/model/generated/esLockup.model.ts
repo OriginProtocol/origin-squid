@@ -30,6 +30,10 @@ export class ESLockup {
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    txHash!: string
+
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
 

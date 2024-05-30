@@ -25,6 +25,10 @@ export class FRRSRewardCollected {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    txHash!: string
+
     @BigIntColumn_({nullable: false})
     amountCollected!: bigint
 }

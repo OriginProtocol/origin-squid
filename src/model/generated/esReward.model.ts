@@ -27,6 +27,10 @@ export class ESReward {
 
     @Index_()
     @StringColumn_({nullable: false})
+    txHash!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
     account!: string
 
     @BigIntColumn_({nullable: false})

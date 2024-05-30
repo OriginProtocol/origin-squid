@@ -27,6 +27,10 @@ export class ESDelegateChanged {
 
     @Index_()
     @StringColumn_({nullable: false})
+    txHash!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
     delegator!: string
 
     @StringColumn_({nullable: false})

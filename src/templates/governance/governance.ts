@@ -145,6 +145,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       description: data.description,
       proposer: data.proposer.toLowerCase(),
       timestamp: blockTimestamp,
+      txHash: log.transactionHash,
       startBlock: data.startBlock,
       endBlock: data.endBlock,
       signatures: data.signatures,
@@ -165,7 +166,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       id: `${ctx.chain.id}:${log.id}`,
       proposal,
       event: GovernanceProposalEventType.Created,
-      hash: log.transactionHash,
+      txHash: log.transactionHash,
       timestamp: blockTimestamp,
     })
 
@@ -233,7 +234,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       id: `${ctx.chain.id}:${log.id}`,
       proposal,
       event,
-      hash: log.transactionHash,
+      txHash: log.transactionHash,
       timestamp: blockTimestamp,
     })
 
@@ -253,7 +254,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       id: `${ctx.chain.id}:${log.id}`,
       proposal,
       event: GovernanceProposalEventType.Extended,
-      hash: log.transactionHash,
+      txHash: log.transactionHash,
       timestamp: blockTimestamp,
     })
 

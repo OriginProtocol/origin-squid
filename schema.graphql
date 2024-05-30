@@ -43,6 +43,7 @@ type ESLockup @entity  {
   account: String! @index
   lockupId: BigInt! @index
   timestamp: DateTime!
+  txHash: String! @index
   lastUpdated: DateTime!
   amount: BigInt!
   end: DateTime!
@@ -70,6 +71,7 @@ type ESLockupEvent @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   event: ESLockupEventType!
   lockup: ESLockup!
 }
@@ -81,6 +83,7 @@ type ESDelegateChanged @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   delegator: String! @index
   fromDelegate: String!
   toDelegate: String!
@@ -92,6 +95,7 @@ type ESDelegateVotesChanged @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   delegate: String! @index
   previousBalance: BigInt!
   newBalance: BigInt!
@@ -103,6 +107,7 @@ type ESPenalty @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   amount: BigInt!
 }
@@ -113,6 +118,7 @@ type ESReward @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   amount: BigInt!
 }
@@ -123,6 +129,7 @@ type ESStake @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!
@@ -136,6 +143,7 @@ type ESUnstake @entity  {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   account: String! @index
   lockupId: BigInt! @index
   amount: BigInt!
@@ -148,6 +156,7 @@ type FRRSRewardCollected @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   amountCollected: BigInt!
 }
 type FRRSRewardsPerSecondChanged @entity {
@@ -156,6 +165,7 @@ type FRRSRewardsPerSecondChanged @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   newRPS: BigInt!
   oldRPS: BigInt!
 }
@@ -165,6 +175,7 @@ type FRRSRewardsTargetChange @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   target: String!
   previousTarget: String!
 }
@@ -174,6 +185,7 @@ type FRRSStrategistUpdated @entity {
   address: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  txHash: String! @index
   strategistAddress: String!
 }type ProcessingStatus @entity {
   id: ID!
@@ -484,7 +496,7 @@ enum GovernanceVoteType {
 
 type GovernanceProposalEvent @entity {
   id: ID!
-  hash: String!
+  txHash: String! @index
   event: GovernanceProposalEventType!
   timestamp: DateTime!
   proposal: GovernanceProposal! @index
@@ -492,12 +504,13 @@ type GovernanceProposalEvent @entity {
 
 type GovernanceProposal @entity {
   id: ID! @index
-  chainId: Int!
-  address: String!
+  chainId: Int! @index
+  address: String! @index
   proposalId: BigInt!
   description: String
   proposer: String!
   timestamp: DateTime!
+  txHash: String! @index
   startBlock: BigInt!
   endBlock: BigInt!
   targets: [String]!
