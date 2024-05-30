@@ -20,7 +20,7 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
     if (erc20) return
     const block = ctx.blocks.find((b) => b.header.height >= from)
     if (!block) return
-    erc20 = await ctx.store.findOne(ERC20, { where: { address } })
+    erc20 = await ctx.store.findOne(ERC20, { where: { chainId: ctx.chain.id, address } })
     try {
       if (!erc20) {
         const contract = new abi.Contract(ctx, block.header, address)
@@ -41,7 +41,8 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
     if (!lastState) {
       lastState = await ctx.store
         .find(ERC20State, {
-          order: { id: 'desc' },
+          order: { blockNumber: 'desc' },
+          where: { chainId: ctx.chain.id, address },
           take: 1,
         })
         .then((r) => r[0])

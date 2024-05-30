@@ -55,7 +55,7 @@ export const createERC20Tracker = ({
     if (erc20) return
     const block = ctx.blocks.find((b) => b.header.height >= from)
     if (!block) return
-    erc20 = await ctx.store.findOne(ERC20, { where: { address } })
+    erc20 = await ctx.store.findOne(ERC20, { where: { chainId: ctx.chain.id, address } })
     try {
       if (!erc20) {
         const contract = new abi.Contract(ctx, block.header, address)
@@ -87,7 +87,7 @@ export const createERC20Tracker = ({
     async process(ctx: Context) {
       await initialize(ctx)
       if (!holders) {
-        const holdersArray = await ctx.store.findBy(ERC20Holder, { address })
+        const holdersArray = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
         holders = new Set<string>()
         for (const holder of holdersArray) {
           holders.add(holder.account)
@@ -198,7 +198,7 @@ export const createERC20Tracker = ({
           if (isRebaseLog) {
             haveRebase = true
             const holders = await ctx.store.find(ERC20Holder, {
-              where: { address },
+              where: { chainId: ctx.chain.id, address },
             })
             for (const holder of holders) {
               accounts.add(holder.account.toLowerCase())
