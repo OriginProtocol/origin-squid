@@ -535,9 +535,9 @@ export const createESTracker = ({
         ctx.store.insert([...state.unstake.values()]),
         ctx.store.upsert([...state.account.values()]),
         ctx.store.upsert([...state.lockup.values()]),
-        ctx.store.insert([...state.lockupEvent.values()]),
         ctx.store.insert([...state.yield.values()]),
       ])
+      await ctx.store.insert([...state.lockupEvent.values()])
     },
   }
 }
