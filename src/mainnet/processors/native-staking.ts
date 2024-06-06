@@ -22,27 +22,26 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 export const initialize = async (ctx: Context) => {
   // Only add these if there are no pubkeys yet.
-  if ((await ctx.store.count(BeaconDepositPubkey)) > 0) return
-  let count = 0
+  const existingCount = await ctx.store.count(BeaconDepositPubkey)
+  if (existingCount > 0) return
+
   ctx.log.info('Inserting beacon deposit pubkeys from dump.')
-  await readLinesFromUrlInBatches('https://origin-squid.s3.amazonaws.com/pubkeys.dump', 25000, async (pubkeys) => {
-    const result: BeaconDepositPubkey[] = []
-    for (const pubkey of pubkeys) {
-      if (!pubkey.startsWith('0x')) throw new Error(`Bad pubkey: ${pubkey}`)
-      result.push(
-        new BeaconDepositPubkey({
-          id: pubkey,
-          deposits: [],
-          count: 1,
-          createDate: new Date(0),
-          lastUpdated: new Date(0),
-        }),
-      )
-    }
-    count += pubkeys.length
-    ctx.log.info(`Pubkeys processed: ${count}`)
-    await ctx.store.insert(result)
-  })
+  let count = 0
+  await readLinesFromUrlInBatches(
+    'https://origin-squid.s3.amazonaws.com/BeaconDepositPubkey.jsonl',
+    25000,
+    async (pubkeys) => {
+      const result: BeaconDepositPubkey[] = []
+      for (const json of pubkeys) {
+        const entity = new BeaconDepositPubkey(JSON.parse(json))
+        if (!entity.id.startsWith('0x')) throw new Error(`Bad pubkey: ${entity.id}`)
+        result.push(entity)
+      }
+      count += pubkeys.length
+      ctx.log.info(`Pubkeys processed: ${count}`)
+      await ctx.store.insert(result)
+    },
+  )
 }
 
 interface Result {
