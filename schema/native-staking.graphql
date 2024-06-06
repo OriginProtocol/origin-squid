@@ -1,0 +1,23 @@
+type BeaconDepositEvent @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  caller: String! @index
+  # Event Data
+  pubkey: BeaconDepositPubkey!
+  withdrawalCredentials: String!
+  amount: String!
+  signature: String!
+  index: String!
+}
+
+type BeaconDepositPubkey @entity  {
+  id: ID! # `pubkey`
+  createDate: DateTime!
+  lastUpdated: DateTime!
+  count: Int!
+  deposits: [BeaconDepositEvent!] @derivedFrom(field: "pubkey")
+}

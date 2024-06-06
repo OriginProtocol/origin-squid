@@ -1,6 +1,7 @@
 /.git
 /node_modules
 /lib
+/dump
 /*Versions.json
 npm-debug.log
 

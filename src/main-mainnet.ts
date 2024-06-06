@@ -10,11 +10,13 @@ import { OGN_ADDRESS, OGN_REWARDS_SOURCE_ADDRESS, XOGN_ADDRESS } from '@utils/ad
 
 import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
+import * as nativeStaking from './mainnet/processors/native-staking'
 import * as validate from './mainnet/validators/validate-mainnet'
 
 export const processor = {
   stateSchema: 'mainnet-processor',
   processors: [
+    nativeStaking,
     curve,
     ...erc20s(),
     // createGovernanceProcessor({ from: 0000000000, address: OGN_GOVERNANCE_ADDRESS }),

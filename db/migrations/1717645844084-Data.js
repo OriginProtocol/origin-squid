@@ -1,5 +1,5 @@
-module.exports = class Data1717097272796 {
-    name = 'Data1717097272796'
+module.exports = class Data1717645844084 {
+    name = 'Data1717645844084'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -178,6 +178,15 @@ module.exports = class Data1717097272796 {
         await db.query(`CREATE TABLE "governance_proposal_vote" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "voter" text NOT NULL, "weight" numeric NOT NULL, "type" character varying(7) NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "proposal_id" character varying, CONSTRAINT "PK_e13a15bfb5ccfdec4c19975de87" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5531af241c24a09c854ead9d55" ON "governance_proposal_vote" ("proposal_id") `)
         await db.query(`CREATE INDEX "IDX_adc6eb148ad48697e74d23c722" ON "governance_proposal_vote" ("voter") `)
+        await db.query(`CREATE TABLE "beacon_deposit_pubkey" ("id" character varying NOT NULL, "create_date" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "count" integer NOT NULL, CONSTRAINT "PK_4741993dcf81760e9777dec18a7" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "beacon_deposit_event" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "caller" text NOT NULL, "withdrawal_credentials" text NOT NULL, "amount" text NOT NULL, "signature" text NOT NULL, "index" text NOT NULL, "pubkey_id" character varying, CONSTRAINT "PK_1ebc083560d266f487bd7098f43" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_4b157d82fc2a709b1cdd1b056a" ON "beacon_deposit_event" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_92a49797f76dbbacf77bbc5291" ON "beacon_deposit_event" ("address") `)
+        await db.query(`CREATE INDEX "IDX_682ca401d8eb6b21267621c349" ON "beacon_deposit_event" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_14a73117a1c3655d0df3e246df" ON "beacon_deposit_event" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_5a85c2519463653ac015291db4" ON "beacon_deposit_event" ("tx_hash") `)
+        await db.query(`CREATE INDEX "IDX_c27461303e85eb671a3cb730b4" ON "beacon_deposit_event" ("caller") `)
+        await db.query(`CREATE INDEX "IDX_dff55f23cfcfa0ff664964572f" ON "beacon_deposit_event" ("pubkey_id") `)
         await db.query(`CREATE TABLE "oeth_vault" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, "st_eth" numeric NOT NULL, "r_eth" numeric NOT NULL, "frx_eth" numeric NOT NULL, CONSTRAINT "PK_9debaa84944fe2be9dc4219ba8f" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d6298a294864b4eaf793cf35a4" ON "oeth_vault" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_e20cb507a673817b2c68720415" ON "oeth_vault" ("block_number") `)
@@ -343,6 +352,7 @@ module.exports = class Data1717097272796 {
         await db.query(`ALTER TABLE "es_lockup_event" ADD CONSTRAINT "FK_46d53d4fad340d5939955836004" FOREIGN KEY ("lockup_id") REFERENCES "es_lockup"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "governance_proposal_event" ADD CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a" FOREIGN KEY ("proposal_id") REFERENCES "governance_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "governance_proposal_vote" ADD CONSTRAINT "FK_5531af241c24a09c854ead9d551" FOREIGN KEY ("proposal_id") REFERENCES "governance_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "beacon_deposit_event" ADD CONSTRAINT "FK_dff55f23cfcfa0ff664964572ff" FOREIGN KEY ("pubkey_id") REFERENCES "beacon_deposit_pubkey"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_strategy_holding_daily_stat" ADD CONSTRAINT "FK_4e867f220975e615e6077d860c1" FOREIGN KEY ("strategy_daily_stat_id_id") REFERENCES "oeth_strategy_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_strategy_daily_stat" ADD CONSTRAINT "FK_6c7096c96a000d8471256ca8fc3" FOREIGN KEY ("daily_stat_id_id") REFERENCES "oeth_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "oeth_collateral_daily_stat" ADD CONSTRAINT "FK_a90045de50406be7bd56efd3ea4" FOREIGN KEY ("daily_stat_id_id") REFERENCES "oeth_daily_stat"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -545,6 +555,15 @@ module.exports = class Data1717097272796 {
         await db.query(`DROP TABLE "governance_proposal_vote"`)
         await db.query(`DROP INDEX "public"."IDX_5531af241c24a09c854ead9d55"`)
         await db.query(`DROP INDEX "public"."IDX_adc6eb148ad48697e74d23c722"`)
+        await db.query(`DROP TABLE "beacon_deposit_pubkey"`)
+        await db.query(`DROP TABLE "beacon_deposit_event"`)
+        await db.query(`DROP INDEX "public"."IDX_4b157d82fc2a709b1cdd1b056a"`)
+        await db.query(`DROP INDEX "public"."IDX_92a49797f76dbbacf77bbc5291"`)
+        await db.query(`DROP INDEX "public"."IDX_682ca401d8eb6b21267621c349"`)
+        await db.query(`DROP INDEX "public"."IDX_14a73117a1c3655d0df3e246df"`)
+        await db.query(`DROP INDEX "public"."IDX_5a85c2519463653ac015291db4"`)
+        await db.query(`DROP INDEX "public"."IDX_c27461303e85eb671a3cb730b4"`)
+        await db.query(`DROP INDEX "public"."IDX_dff55f23cfcfa0ff664964572f"`)
         await db.query(`DROP TABLE "oeth_vault"`)
         await db.query(`DROP INDEX "public"."IDX_d6298a294864b4eaf793cf35a4"`)
         await db.query(`DROP INDEX "public"."IDX_e20cb507a673817b2c68720415"`)
@@ -710,6 +729,7 @@ module.exports = class Data1717097272796 {
         await db.query(`ALTER TABLE "es_lockup_event" DROP CONSTRAINT "FK_46d53d4fad340d5939955836004"`)
         await db.query(`ALTER TABLE "governance_proposal_event" DROP CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a"`)
         await db.query(`ALTER TABLE "governance_proposal_vote" DROP CONSTRAINT "FK_5531af241c24a09c854ead9d551"`)
+        await db.query(`ALTER TABLE "beacon_deposit_event" DROP CONSTRAINT "FK_dff55f23cfcfa0ff664964572ff"`)
         await db.query(`ALTER TABLE "oeth_strategy_holding_daily_stat" DROP CONSTRAINT "FK_4e867f220975e615e6077d860c1"`)
         await db.query(`ALTER TABLE "oeth_strategy_daily_stat" DROP CONSTRAINT "FK_6c7096c96a000d8471256ca8fc3"`)
         await db.query(`ALTER TABLE "oeth_collateral_daily_stat" DROP CONSTRAINT "FK_a90045de50406be7bd56efd3ea4"`)

@@ -1,6 +1,7 @@
 /node_modules
 /lib
 /builds
+/dump
 
 /**Versions.json
 

@@ -7,11 +7,7 @@ import { arbitrum, mainnet } from 'viem/chains'
 
 import { lookupArchive } from '@subsquid/archive-registry'
 import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
-import {
-  DataHandlerContext,
-  EvmBatchProcessor,
-  EvmBatchProcessorFields,
-} from '@subsquid/evm-processor'
+import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { calculateBlockRate } from '@utils/calculateBlockRate'
 
@@ -37,7 +33,7 @@ export const createSquidProcessor = (
     .setFinalityConfirmation(10)
     .setFields({
       transaction: {
-        // from: true,
+        from: true,
         to: true,
         hash: true,
         // gasUsed: true,
@@ -73,10 +69,7 @@ interface Processor {
 
 let initialized = false
 
-const chainConfigs: Record<
-  number,
-  { chain: Chain; archive: KnownArchives; rpcEnv: string } | undefined
-> = {
+const chainConfigs: Record<number, { chain: Chain; archive: KnownArchives; rpcEnv: string } | undefined> = {
   [mainnet.id]: {
     chain: mainnet,
     archive: 'eth-mainnet',
@@ -102,10 +95,7 @@ export const run = ({
   postProcessors?: Processor[]
   validators?: Pick<Processor, 'process' | 'name'>[]
 }) => {
-  assert(
-    !processors.find((p) => p.from === undefined),
-    'All processors must have a `from` defined',
-  )
+  assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
@@ -116,9 +106,7 @@ export const run = ({
       ? Number(process.env.BLOCK_FROM)
       : Math.min(
           ...(processors.map((p) => p.from).filter((x) => x) as number[]),
-          ...((postProcessors ?? [])
-            .map((p) => p.from)
-            .filter((x) => x) as number[]),
+          ...((postProcessors ?? []).map((p) => p.from).filter((x) => x) as number[]),
         ),
     to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
@@ -154,18 +142,10 @@ export const run = ({
           const times = await Promise.all([
             ...processors
               .filter((p) => p.initialize)
-              .map((p, index) =>
-                p.initialize!(ctx).then(
-                  time(p.name ?? `initializing processor-${index}`),
-                ),
-              ),
+              .map((p, index) => p.initialize!(ctx).then(time(p.name ?? `initializing processor-${index}`))),
             ...(postProcessors ?? [])
               .filter((p) => p.initialize)
-              .map((p, index) =>
-                p.initialize!(ctx).then(
-                  time(p.name ?? `initializing postProcessors-${index}`),
-                ),
-              ),
+              .map((p, index) => p.initialize!(ctx).then(time(p.name ?? `initializing postProcessors-${index}`))),
           ])
           times.forEach((t) => t())
         }
@@ -173,9 +153,7 @@ export const run = ({
         // Main Processing Run
         start = Date.now()
         const times = await Promise.all(
-          processors.map((p, index) =>
-            p.process(ctx).then(time(p.name ?? `processor-${index}`)),
-          ),
+          processors.map((p, index) => p.process(ctx).then(time(p.name ?? `processor-${index}`))),
         )
         if (process.env.DEBUG_PERF === 'true') {
           times.forEach((t) => t())
@@ -185,9 +163,7 @@ export const run = ({
           // Post Processing Run
           start = Date.now()
           const postTimes = await Promise.all(
-            postProcessors.map((p, index) =>
-              p.process(ctx).then(time(p.name ?? `postProcessor-${index}`)),
-            ),
+            postProcessors.map((p, index) => p.process(ctx).then(time(p.name ?? `postProcessor-${index}`))),
           )
           if (process.env.DEBUG_PERF === 'true') {
             postTimes.forEach((t) => t())
@@ -198,9 +174,7 @@ export const run = ({
           // Validation Run
           start = Date.now()
           const validatorTimes = await Promise.all(
-            validators.map((p, index) =>
-              p.process(ctx).then(time(p.name ?? `validator-${index}`)),
-            ),
+            validators.map((p, index) => p.process(ctx).then(time(p.name ?? `validator-${index}`))),
           )
           if (process.env.DEBUG_PERF === 'true') {
             validatorTimes.forEach((t) => t())
@@ -210,14 +184,8 @@ export const run = ({
         ctx.log.info({
           blocks: ctx.blocks.length,
           logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
-          traces: ctx.blocks.reduce(
-            (sum, block) => sum + block.traces.length,
-            0,
-          ),
-          transactions: ctx.blocks.reduce(
-            (sum, block) => sum + block.transactions.length,
-            0,
-          ),
+          traces: ctx.blocks.reduce((sum, block) => sum + block.traces.length, 0),
+          transactions: ctx.blocks.reduce((sum, block) => sum + block.transactions.length, 0),
           // logArray: ctx.blocks.reduce(
           //   (logs, block) => [...logs, ...block.logs],
           //   [] as Log[],
@@ -229,9 +197,7 @@ export const run = ({
   )
 }
 
-export type Fields = EvmBatchProcessorFields<
-  ReturnType<typeof createSquidProcessor>
->
+export type Fields = EvmBatchProcessorFields<ReturnType<typeof createSquidProcessor>>
 export type Context = DataHandlerContext<Store, Fields> & {
   chain: Chain
   blockRate: number

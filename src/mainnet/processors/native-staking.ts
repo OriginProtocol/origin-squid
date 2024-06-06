@@ -1,0 +1,106 @@
+import * as beaconAbi from '@abi/beacon-deposit-contract'
+import { BeaconDepositEvent, BeaconDepositPubkey } from '@model'
+import { Block, Context } from '@processor'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { logFilter } from '@utils/logFilter'
+import { readLinesFromUrlInBatches } from '@utils/readLinesFromUrlInBatches'
+
+export const from = 20029793 // Dump contains pubkeys up until 20029793.
+
+const beaconDepositContractAddress = '0x00000000219ab540356cbb839cbe05303d7705fa'
+const withdrawCredentials = '0x01000000000000000000000034edb2ee25751ee67f68a45813b22811687c0238'
+
+const beaconDepositFilter = logFilter({
+  address: [beaconDepositContractAddress],
+  topic0: [beaconAbi.events.DepositEvent.topic],
+  transaction: true,
+})
+
+export const setup = (processor: EvmBatchProcessor) => {
+  processor.addLog(beaconDepositFilter.value)
+}
+
+export const initialize = async (ctx: Context) => {
+  // Only add these if there are no pubkeys yet.
+  if ((await ctx.store.count(BeaconDepositPubkey)) > 0) return
+  let count = 0
+  ctx.log.info('Inserting beacon deposit pubkeys from dump.')
+  await readLinesFromUrlInBatches('https://origin-squid.s3.amazonaws.com/pubkeys.dump', 25000, async (pubkeys) => {
+    const result: BeaconDepositPubkey[] = []
+    for (const pubkey of pubkeys) {
+      if (!pubkey.startsWith('0x')) throw new Error(`Bad pubkey: ${pubkey}`)
+      result.push(
+        new BeaconDepositPubkey({
+          id: pubkey,
+          deposits: [],
+          count: 1,
+          createDate: new Date(0),
+          lastUpdated: new Date(0),
+        }),
+      )
+    }
+    count += pubkeys.length
+    ctx.log.info(`Pubkeys processed: ${count}`)
+    await ctx.store.insert(result)
+  })
+}
+
+interface Result {
+  pubkeys: Map<string, BeaconDepositPubkey>
+  deposits: Map<string, BeaconDepositEvent>
+}
+
+export const process = async (ctx: Context) => {
+  const result: Result = {
+    pubkeys: new Map<string, BeaconDepositPubkey>(),
+    deposits: new Map<string, BeaconDepositEvent>(),
+  }
+  for (const block of ctx.blocks) {
+    for (const log of block.logs) {
+      if (beaconDepositFilter.matches(log)) {
+        const data = beaconAbi.events.DepositEvent.decode(log)
+        const pubkey = await getBeaconDepositPubkey(ctx, block, result, data.pubkey)
+        pubkey.count += 1
+        pubkey.lastUpdated = new Date(block.header.timestamp)
+
+        if (withdrawCredentials === data.withdrawal_credentials) {
+          if (pubkey.count > 1) {
+            ctx.log.error(`Origin pubkey used ${pubkey.count} times: ${pubkey.id}`)
+          }
+          const deposit = new BeaconDepositEvent({
+            id: `${ctx.chain.id}:${log.id}`,
+            chainId: ctx.chain.id,
+            address: log.address,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+            txHash: log.transactionHash,
+            caller: log.transaction?.from,
+            amount: data.amount,
+            index: data.index,
+            signature: data.signature,
+            withdrawalCredentials: data.withdrawal_credentials,
+            pubkey,
+          })
+          result.deposits.set(deposit.id, deposit)
+        }
+      }
+    }
+  }
+  await ctx.store.upsert([...result.pubkeys.values()])
+  await ctx.store.insert([...result.deposits.values()])
+}
+
+const getBeaconDepositPubkey = async (ctx: Context, block: Block, result: Result, pubkey: string) => {
+  const existing = result.pubkeys.get(pubkey) ?? (await ctx.store.get(BeaconDepositPubkey, pubkey))
+  const entity =
+    existing ??
+    new BeaconDepositPubkey({
+      id: pubkey,
+      deposits: [],
+      count: 0,
+      createDate: new Date(block.header.timestamp),
+      lastUpdated: new Date(block.header.timestamp),
+    })
+  result.pubkeys.set(pubkey, entity)
+  return entity
+}
