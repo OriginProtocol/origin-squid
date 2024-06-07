@@ -22,8 +22,8 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 export const initialize = async (ctx: Context) => {
   // Only add these if there are no pubkeys yet.
-  const existingCount = await ctx.store.count(BeaconDepositPubkey)
-  if (existingCount > 0) return
+  const existing = await ctx.store.find(BeaconDepositPubkey, { take: 1 })
+  if (existing.length > 0) return
 
   ctx.log.info('Inserting beacon deposit pubkeys from dump.')
   let count = 0
@@ -50,11 +50,13 @@ interface Result {
 }
 
 export const process = async (ctx: Context) => {
+  if (ctx.blocks[ctx.blocks.length - 1].header.height < from) return
   const result: Result = {
     pubkeys: new Map<string, BeaconDepositPubkey>(),
     deposits: new Map<string, BeaconDepositEvent>(),
   }
   for (const block of ctx.blocks) {
+    if (block.header.height < from) continue
     for (const log of block.logs) {
       if (beaconDepositFilter.matches(log)) {
         const data = beaconAbi.events.DepositEvent.decode(log)
