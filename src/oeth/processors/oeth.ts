@@ -1,5 +1,10 @@
-import { createOTokenProcessor, createOTokenSetup } from '@templates/otoken'
+import { Context } from '@processor'
+import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { createOTokenProcessor } from '@templates/otoken'
+import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor'
 import {
+  CURVE_ETH_OETH_POOL_ADDRESS,
+  CURVE_FRXETH_OETH_POOL_ADDRESS,
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
@@ -12,20 +17,8 @@ import {
   WSTETH_ADDRESS,
 } from '@utils/addresses'
 
-export const from = 16933090 // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
-
-export const setup = createOTokenSetup({
-  address: OETH_ADDRESS,
-  wrappedAddress: WOETH_ADDRESS,
-  vaultAddress: OETH_VAULT_ADDRESS,
-  from,
-  upgrades: {
-    rebaseOptEvents: 18872285,
-  },
-})
-
-export const process = createOTokenProcessor({
-  from,
+const otokenProcessor = createOTokenProcessor({
+  from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
   vaultFrom: 17084107,
   otokenAddress: OETH_ADDRESS,
   wotokenAddress: WOETH_ADDRESS,
@@ -40,4 +33,33 @@ export const process = createOTokenProcessor({
     { asset: WSTETH_ADDRESS, symbol: 'wstETH' },
     { asset: OETH_ADDRESS, symbol: 'OETH' },
   ],
+  upgrades: {
+    rebaseOptEvents: 18872285,
+  },
 })
+
+const otokenActivityProcessor = createOTokenActivityProcessor({
+  from: 16933090,
+  otokenAddress: OETH_ADDRESS,
+  wotokenAddress: WOETH_ADDRESS,
+  curvePools: [
+    {
+      address: CURVE_ETH_OETH_POOL_ADDRESS,
+      tokens: [ETH_ADDRESS, OETH_ADDRESS],
+    },
+    {
+      address: CURVE_FRXETH_OETH_POOL_ADDRESS,
+      tokens: [FRXETH_ADDRESS, OETH_ADDRESS],
+    },
+  ],
+  balancerPools: ['0x7056c8dfa8182859ed0d4fb0ef0886fdf3d2edcf000200000000000000000623'],
+})
+
+export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)
+export const setup = (processor: EvmBatchProcessor) => {
+  otokenProcessor.setup(processor)
+  otokenActivityProcessor.setup(processor)
+}
+export const process = async (ctx: Context) => {
+  await Promise.all([otokenProcessor.process(ctx), otokenActivityProcessor.process(ctx)])
+}

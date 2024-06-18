@@ -1,4 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, JSONColumn as JSONColumn_} from "@subsquid/typeorm-store"
+import {OTokenActivityType} from "./_oTokenActivityType"
 
 @Entity_()
 export class OTokenActivity {
@@ -29,30 +30,9 @@ export class OTokenActivity {
     @StringColumn_({nullable: false})
     txHash!: string
 
-    @StringColumn_({nullable: false})
-    callDataLast4Bytes!: string
+    @Column_("varchar", {length: 12, nullable: true})
+    type!: OTokenActivityType | undefined | null
 
-    @StringColumn_({nullable: true})
-    address!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    sighash!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    action!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    exchange!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    interface!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    fromSymbol!: string | undefined | null
-
-    @StringColumn_({nullable: true})
-    toSymbol!: string | undefined | null
-
-    @BigIntColumn_({nullable: true})
-    amount!: bigint | undefined | null
+    @JSONColumn_({nullable: true})
+    data!: unknown | undefined | null
 }

@@ -1071,18 +1071,44 @@ type OTokenActivity @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index
-  callDataLast4Bytes: String!
-  address: String
-  sighash: String
-
-  action: String
-  exchange: String
-  interface: String
-
-  fromSymbol: String
-  toSymbol: String
-  amount: BigInt
+  type: OTokenActivityType
+  data: JSON
 }
+
+
+enum OTokenActivityType {
+  Approval
+  Bridge
+  ClaimRewards
+  DelegateVote
+  ExtendStake
+  Migrate
+  Redeem
+  Stake
+  Swap
+  Unstake
+  Vote
+}
+
+#type OTokenActivity @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  otoken: String! @index
+#  timestamp: DateTime! @index
+#  blockNumber: Int! @index
+#  txHash: String! @index
+#  callDataLast4Bytes: String!
+#  address: String
+#  sighash: String
+#
+#  action: String
+#  exchange: String
+#  interface: String
+#
+#  fromSymbol: String
+#  toSymbol: String
+#  amount: BigInt
+#}
 """
 The Vault entity tracks the OUSD vault balance over time.
 """

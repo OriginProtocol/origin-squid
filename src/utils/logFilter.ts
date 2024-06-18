@@ -10,9 +10,7 @@ const prepare = (hex: string) => pad(lower(hex))
 /**
  * Helper to create and match logs, ensuring hex values are lowercase and properly padded.
  */
-export const logFilter = (
-  filter: Parameters<EvmBatchProcessor['addLog']>[0],
-) => {
+export const logFilter = (filter: Parameters<EvmBatchProcessor['addLog']>[0]) => {
   filter = {
     address: filter.address?.map(lower),
     topic0: filter.topic0?.map(prepare),
@@ -21,6 +19,8 @@ export const logFilter = (
     topic3: filter.topic3?.map(prepare),
     range: filter.range,
     transaction: filter.transaction,
+    transactionLogs: filter.transactionLogs,
+    transactionTraces: filter.transactionTraces,
   }
   return {
     value: filter,
@@ -42,8 +42,7 @@ export const logFilter = (
       }
       if (
         filter.range &&
-        (log.block.height < filter.range.from ||
-          (filter.range.to && log.block.height > filter.range.to))
+        (log.block.height < filter.range.from || (filter.range.to && log.block.height > filter.range.to))
       ) {
         return false
       }

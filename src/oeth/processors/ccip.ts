@@ -5,6 +5,7 @@ import * as erc20Abi from '@abi/erc20'
 import { BridgeTransfer, BridgeTransferState } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { WOETH_ADDRESS, WOETH_ARBITRUM_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 import { traceFilter } from '@utils/traceFilter'
 
@@ -36,10 +37,9 @@ const ccipConfig = {
     offRampAddresses: {
       '42161': '0xefc4a18af59398ff23bfe7325f2401ad44286f4d',
     },
-    tokens: ['0xdcee70654261af21c44c093c300ed3bb97b78192'],
+    tokens: [WOETH_ADDRESS],
     tokenMappings: {
-      '0xdcee70654261af21c44c093c300ed3bb97b78192':
-        '0xd8724322f44e5c58d7a815f542036fb17dbbf839', // wOETH
+      [WOETH_ADDRESS]: WOETH_ARBITRUM_ADDRESS,
     } as Record<string, string>,
   },
   '42161': {
@@ -51,24 +51,16 @@ const ccipConfig = {
     offRampAddresses: {
       '1': '0x542ba1902044069330e8c5b36a84ec503863722f',
     },
-    tokens: ['0xd8724322f44e5c58d7a815f542036fb17dbbf839'],
+    tokens: [WOETH_ARBITRUM_ADDRESS],
     tokenMappings: {
-      '0xd8724322f44e5c58d7a815f542036fb17dbbf839':
-        '0xdcee70654261af21c44c093c300ed3bb97b78192', // wOETH
+      [WOETH_ARBITRUM_ADDRESS]: WOETH_ADDRESS,
     } as Record<string, string>,
   },
 }
 
 export const ccip = (params: { chainId: 1 | 42161 }) => {
-  const {
-    from,
-    tokens,
-    tokenMappings,
-    tokenPoolAddress,
-    ccipRouterAddress,
-    onRampAddress,
-    offRampAddresses,
-  } = ccipConfig[params.chainId]
+  const { from, tokens, tokenMappings, tokenPoolAddress, ccipRouterAddress, onRampAddress, offRampAddresses } =
+    ccipConfig[params.chainId]
   const transfersToLockReleasePool = logFilter({
     address: tokens,
     topic0: [erc20Abi.events.Transfer.topic],
@@ -136,33 +128,19 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
         if (transfersToLockReleasePool.matches(log)) {
           // console.log('match transfersToOnramp')
           const logSendRequested = block.logs.find(
-            (l) =>
-              log.transactionHash === l.transactionHash &&
-              ccipSendRequested.matches(l),
+            (l) => log.transactionHash === l.transactionHash && ccipSendRequested.matches(l),
           )
           const traceSendRequested = block.traces.find(
-            (t) =>
-              log.transactionHash === t.transaction?.hash &&
-              ccipSendFunction.matches(t),
+            (t) => log.transactionHash === t.transaction?.hash && ccipSendFunction.matches(t),
           )
-          if (
-            logSendRequested &&
-            traceSendRequested &&
-            traceSendRequested.type === 'call'
-          ) {
+          if (logSendRequested && traceSendRequested && traceSendRequested.type === 'call') {
             // console.log('match ccipSendRequested')
-            const logData =
-              ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
+            const logData = ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
             const message = logData.message
-            const functionData = ccipRouter.functions.ccipSend.decode(
-              traceSendRequested.action.input,
-            )
+            const functionData = ccipRouter.functions.ccipSend.decode(traceSendRequested.action.input)
             // A `BridgeTransferState` may already exist.
             //  If so, we should pull the `state` for it.
-            const bridgeTransferState = await ctx.store.get(
-              BridgeTransferState,
-              message.messageId,
-            )
+            const bridgeTransferState = await ctx.store.get(BridgeTransferState, message.messageId)
 
             for (let i = 0; i < message.tokenAmounts.length; i++) {
               const tokenAmount = message.tokenAmounts[i]
@@ -175,10 +153,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 messageId: message.messageId,
                 bridge: 'ccip',
                 chainIn: params.chainId,
-                chainOut:
-                  chainSelectorIdMappings[
-                    functionData.destinationChainSelector.toString()
-                  ],
+                chainOut: chainSelectorIdMappings[functionData.destinationChainSelector.toString()],
                 tokenIn: tokenAmount.token.toLowerCase(),
                 tokenOut: tokenMappings[tokenAmount.token.toLowerCase()],
                 amountIn: tokenAmount.amount,
