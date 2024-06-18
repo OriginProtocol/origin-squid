@@ -7,6 +7,7 @@ export interface ActivityBase {
   status: ActivityStatus
   txHash: string
   chainId: number
+  account: string
 }
 
 export interface ApprovalActivity extends ActivityBase {
@@ -55,13 +56,6 @@ export interface MigrateActivity extends ActivityBase {
   staked?: bigint
 }
 
-export interface RedeemActivity extends ActivityBase {
-  type: 'Redeem'
-  tokenIn: string
-  tokenOut: string
-  amountIn: bigint
-}
-
 export interface StakeActivity extends ActivityBase {
   type: 'Stake'
   tokenIn: string
@@ -69,21 +63,57 @@ export interface StakeActivity extends ActivityBase {
   monthDuration: number
 }
 
+export interface UnstakeActivity extends ActivityBase {
+  type: 'Unstake'
+  tokenIn: string
+  tokenOut: string
+  lockupId: string
+}
+
 export interface SwapActivity extends ActivityBase {
   type: 'Swap'
   exchange: 'Curve' | 'Balancer'
-  pool: string
+  contract: string
   tokenIn: string
   tokenOut: string
   amountIn: bigint
   amountOut: bigint
 }
 
-export interface UnstakeActivity extends ActivityBase {
-  type: 'Unstake'
+export interface WrapActivity extends ActivityBase {
+  type: 'Wrap'
+  contract: string
   tokenIn: string
   tokenOut: string
-  lockupId: string
+  amountIn: bigint
+  amountOut: bigint
+}
+
+export interface UnwrapActivity extends ActivityBase {
+  type: 'Unwrap'
+  contract: string
+  tokenIn: string
+  tokenOut: string
+  amountIn: bigint
+  amountOut: bigint
+}
+
+export interface MintActivity extends ActivityBase {
+  type: 'Mint'
+  contract: string
+  tokenIn: string
+  tokenOut: string
+  amountIn: bigint
+  amountOut: bigint
+}
+
+export interface RedeemActivity extends ActivityBase {
+  type: 'Redeem'
+  contract: string
+  tokenIn: string
+  tokenOut: string
+  amountIn: bigint
+  amountOut: bigint
 }
 
 export interface VoteActivity extends ActivityBase {
@@ -100,8 +130,11 @@ export type Activity =
   | DelegateVoteActivity
   | ExtendStakeActivity
   | MigrateActivity
-  | RedeemActivity
   | StakeActivity
-  | SwapActivity
   | UnstakeActivity
+  | SwapActivity
+  | WrapActivity
+  | UnwrapActivity
+  | MintActivity
+  | RedeemActivity
   | VoteActivity

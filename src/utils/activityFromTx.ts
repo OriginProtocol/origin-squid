@@ -99,12 +99,6 @@ export async function activityFromTx(ctx: Context, block: Block, log: Log) {
       }),
   )
 
-  const woethEvents = compact(
-    logs
-      .filter((l) => l.address === WOETH_ADDRESS)
-      .map(({ data, topics }) => tryDecodeEventLog({ abi: WrappedOETHAbi, data, topics })),
-  )
-
   const oneInchEvents = logs.filter((l) => l.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS)
   const uniswapWethEvents = compact(
     logs

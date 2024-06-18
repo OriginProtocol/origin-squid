@@ -5,9 +5,12 @@ export enum OTokenActivityType {
     DelegateVote = "DelegateVote",
     ExtendStake = "ExtendStake",
     Migrate = "Migrate",
-    Redeem = "Redeem",
     Stake = "Stake",
     Swap = "Swap",
+    Wrap = "Wrap",
+    Unwrap = "Unwrap",
+    Mint = "Mint",
+    Redeem = "Redeem",
     Unstake = "Unstake",
     Vote = "Vote",
 }

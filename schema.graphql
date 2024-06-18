@@ -1083,9 +1083,12 @@ enum OTokenActivityType {
   DelegateVote
   ExtendStake
   Migrate
-  Redeem
   Stake
   Swap
+  Wrap
+  Unwrap
+  Mint
+  Redeem
   Unstake
   Vote
 }

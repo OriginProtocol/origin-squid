@@ -41,6 +41,7 @@ const otokenProcessor = createOTokenProcessor({
 const otokenActivityProcessor = createOTokenActivityProcessor({
   from: 16933090,
   otokenAddress: OETH_ADDRESS,
+  vaultAddress: OETH_VAULT_ADDRESS,
   wotokenAddress: WOETH_ADDRESS,
   curvePools: [
     {
