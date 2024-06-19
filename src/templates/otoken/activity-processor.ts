@@ -1,6 +1,7 @@
-import { compact, groupBy, uniq } from 'lodash'
+import { add, compact, groupBy, uniq } from 'lodash'
 
 import * as balancerVaultAbi from '@abi/balancer-vault'
+import * as cowswapSettlementAbi from '@abi/cow-swap-settlement'
 import * as curvePoolAbi from '@abi/curve-lp-token'
 import * as otokenAbi from '@abi/otoken'
 import * as otokenVaultAbi from '@abi/otoken-vault'
@@ -17,7 +18,12 @@ import {
   UnwrapActivity,
   WrapActivity,
 } from '@templates/otoken/activity-types'
-import { BALANCER_VAULT_ADDRESS, ETH_ADDRESS, ONEINCH_AGGREGATION_ROUTER_ADDRESS } from '@utils/addresses'
+import {
+  BALANCER_VAULT_ADDRESS,
+  COWSWAP_SETTLEMENT_ADDRESS,
+  ETH_ADDRESS,
+  ONEINCH_AGGREGATION_ROUTER_ADDRESS,
+} from '@utils/addresses'
 import { LogFilter, logFilter } from '@utils/logFilter'
 
 interface Input {
@@ -45,6 +51,8 @@ export const createOTokenActivityProcessor = (params: Input) => {
 
     // Swaps
     balancerActivityProcessor({ pools: params.balancerPools }),
+    cowSwapActivityProcessor({ address: params.otokenAddress }),
+    params.wotokenAddress && cowSwapActivityProcessor({ address: params.wotokenAddress }),
 
     // Wraps & Unwraps
     params.wotokenAddress && wrappedActivityProcessor(params.wotokenAddress),
@@ -112,16 +120,24 @@ const curveActivityProcessor = ({ address, tokens }: { address: string; tokens: 
         .filter((l) => tokenExchangeFilter.matches(l))
         .map((log) => {
           const tokenExchange = curvePoolAbi.events.TokenExchange.decode(log)
-          return createActivity<SwapActivity>(ctx, block, log, {
-            type: 'Swap',
-            account: tokenExchange.buyer,
-            exchange: 'Curve',
-            contract: log.address,
-            tokenIn: tokens[Number(tokenExchange.sold_id)],
-            tokenOut: tokens[Number(tokenExchange.bought_id)],
-            amountIn: tokenExchange.tokens_sold.toString(),
-            amountOut: tokenExchange.tokens_bought.toString(),
-          })
+          return createActivity<SwapActivity>(
+            { ctx, block, log },
+            {
+              type: 'Swap',
+              account: tokenExchange.buyer,
+              exchange: 'Curve',
+              contract: log.address,
+              tokensIn: [
+                { token: tokens[Number(tokenExchange.sold_id)], amount: tokenExchange.tokens_sold.toString() },
+              ],
+              tokensOut: [
+                {
+                  token: tokens[Number(tokenExchange.bought_id)],
+                  amount: tokenExchange.tokens_bought.toString(),
+                },
+              ],
+            },
+          )
         })
     },
   }
@@ -144,16 +160,52 @@ const balancerActivityProcessor = ({ pools }: { pools: string[] }): ActivityProc
         .filter((l) => swapFilter.matches(l))
         .map((log) => {
           const swap = balancerVaultAbi.events.Swap.decode(log)
-          return createActivity<SwapActivity>(ctx, block, log, {
-            type: 'Swap',
-            account: log.transaction!.from,
-            exchange: 'Balancer',
-            contract: swap.poolId,
-            tokenIn: swap.tokenIn,
-            tokenOut: swap.tokenOut,
-            amountIn: swap.amountIn.toString(),
-            amountOut: swap.amountOut.toString(),
-          })
+          return createActivity<SwapActivity>(
+            { ctx, block, log },
+            {
+              type: 'Swap',
+              account: log.transaction!.from,
+              exchange: 'Balancer',
+              contract: swap.poolId,
+              tokensIn: [{ token: swap.tokenIn, amount: swap.amountIn.toString() }],
+              tokensOut: [{ token: swap.tokenOut, amount: swap.amountOut.toString() }],
+            },
+          )
+        })
+    },
+  }
+}
+
+const cowSwapActivityProcessor = ({ address }: { address: string }): ActivityProcessor<SwapActivity> => {
+  const tradeFilter = logFilter({
+    address: [COWSWAP_SETTLEMENT_ADDRESS],
+    topic0: [cowswapSettlementAbi.events.Trade.topic],
+    transaction: true,
+  })
+  return {
+    name: 'Cowswap Activity Processor',
+    filters: [tradeFilter],
+    async process(ctx: Context, block: Block, logs: Log[]): Promise<SwapActivity[]> {
+      const tradeLogs = logs
+        .filter((l) => tradeFilter.matches(l))
+        .map((log) => ({
+          log,
+          data: cowswapSettlementAbi.events.Trade.decode(log),
+        }))
+      return tradeLogs
+        .filter(({ data }) => data.buyToken.toLowerCase() === address || data.sellToken.toLowerCase() === address)
+        .map(({ log, data }) => {
+          return createActivity<SwapActivity>(
+            { ctx, block, log },
+            {
+              type: 'Swap',
+              account: log.transaction!.from,
+              exchange: 'Balancer',
+              contract: COWSWAP_SETTLEMENT_ADDRESS,
+              tokensIn: [{ token: data.sellToken, amount: data.sellAmount.toString() }],
+              tokensOut: [{ token: data.buyToken, amount: data.buyAmount.toString() }],
+            },
+          )
         })
     },
   }
@@ -177,15 +229,18 @@ const wrappedActivityProcessor = (wrappedAddress: string): ActivityProcessor<Wra
           ...depositLogs.map((log) => {
             const data = wotokenAbi.events.Deposit.decode(log)
             const tokenIn = transferInLog?.address ?? 'unknown'
-            return createActivity<WrapActivity>(ctx, block, log, {
-              type: 'Wrap',
-              contract: wrappedAddress,
-              account: data.owner,
-              tokenIn,
-              tokenOut: wrappedAddress,
-              amountIn: data.assets.toString(),
-              amountOut: data.shares.toString(),
-            })
+            return createActivity<WrapActivity>(
+              { ctx, block, log },
+              {
+                type: 'Wrap',
+                contract: wrappedAddress,
+                account: data.owner,
+                tokenIn,
+                tokenOut: wrappedAddress,
+                amountIn: data.assets.toString(),
+                amountOut: data.shares.toString(),
+              },
+            )
           }),
         )
       }
@@ -197,15 +252,18 @@ const wrappedActivityProcessor = (wrappedAddress: string): ActivityProcessor<Wra
           ...withdrawLogs.map((log) => {
             const data = wotokenAbi.events.Withdraw.decode(log)
             const tokenOut = transferOutLog?.address ?? 'unknown'
-            return createActivity<UnwrapActivity>(ctx, block, log, {
-              type: 'Unwrap',
-              contract: wrappedAddress,
-              account: data.owner,
-              tokenIn: wrappedAddress,
-              tokenOut,
-              amountIn: data.shares.toString(),
-              amountOut: data.assets.toString(),
-            })
+            return createActivity<UnwrapActivity>(
+              { ctx, block, log },
+              {
+                type: 'Unwrap',
+                contract: wrappedAddress,
+                account: data.owner,
+                tokenIn: wrappedAddress,
+                tokenOut,
+                amountIn: data.shares.toString(),
+                amountOut: data.assets.toString(),
+              },
+            )
           }),
         )
       }
@@ -239,15 +297,18 @@ const vaultActivityProcessor = ({
         result.push(
           ...mintLogs.map((log) => {
             const data = otokenVaultAbi.events.Mint.decode(log)
-            return createActivity<MintActivity>(ctx, block, log, {
-              type: 'Mint',
-              contract: log.address,
-              account: data._addr,
-              tokenIn,
-              amountIn: amountIn.toString(),
-              tokenOut: otokenAddress,
-              amountOut: data._value.toString(),
-            })
+            return createActivity<MintActivity>(
+              { ctx, block, log },
+              {
+                type: 'Mint',
+                contract: log.address,
+                account: data._addr,
+                tokenIn,
+                amountIn: amountIn.toString(),
+                tokenOut: otokenAddress,
+                amountOut: data._value.toString(),
+              },
+            )
           }),
         )
       }
@@ -260,15 +321,18 @@ const vaultActivityProcessor = ({
         result.push(
           ...redeemLogs.map((log) => {
             const data = otokenVaultAbi.events.Redeem.decode(log)
-            return createActivity<RedeemActivity>(ctx, block, log, {
-              type: 'Redeem',
-              contract: log.address,
-              account: data._addr,
-              tokenIn: otokenAddress,
-              amountIn: data._value.toString(),
-              tokenOut: tokensOut.length > 1 ? 'MIX' : tokensOut[0] ?? ETH_ADDRESS,
-              amountOut: amountOut.toString(),
-            })
+            return createActivity<RedeemActivity>(
+              { ctx, block, log },
+              {
+                type: 'Redeem',
+                contract: log.address,
+                account: data._addr,
+                tokenIn: otokenAddress,
+                amountIn: data._value.toString(),
+                tokenOut: tokensOut.length > 1 ? 'MIX' : tokensOut[0] ?? ETH_ADDRESS,
+                amountOut: amountOut.toString(),
+              },
+            )
           }),
         )
       }
@@ -297,17 +361,20 @@ const transferActivityProcessor = ({
           data: otokenAbi.events.Transfer.decode(log),
         }))
 
-      const swapActivity = calculateTransferActivityAsSwap(ctx, block, transferLogs, ONEINCH_AGGREGATION_ROUTER_ADDRESS)
+      const swapActivity = calculateTransferActivityAsSwap(ctx, block, transferLogs)
       if (swapActivity) return swapActivity
 
       return transferLogs.map(({ log, data }) => {
-        return createActivity<TransferActivity>(ctx, block, log, {
-          type: 'Transfer',
-          token: log.address,
-          from: data.from.toLowerCase(),
-          to: data.to.toLowerCase(),
-          amount: data.value.toString(),
-        })
+        return createActivity<TransferActivity>(
+          { ctx, block, log },
+          {
+            type: 'Transfer',
+            token: log.address,
+            from: data.from.toLowerCase(),
+            to: data.to.toLowerCase(),
+            amount: data.value.toString(),
+          },
+        )
       })
     },
   }
@@ -320,70 +387,67 @@ const calculateTransferActivityAsSwap = (
     log: Log
     data: ReturnType<typeof wotokenAbi.events.Transfer.decode>
   }[],
-  swapperAddress: string,
 ) => {
-  const swapperLogs = logs.filter(
-    ({ log, data }) => data.from.toLowerCase() === swapperAddress || data.to.toLowerCase() === swapperAddress,
-  )
-  if (swapperLogs.length === 2) {
-    const changes = calculateBalanceChanges(swapperLogs)
-    let account: string = ''
-    let tokenIn: string = ''
-    let tokenOut: string = ''
-    let amountIn: bigint = 0n
-    let amountOut: bigint = 0n
-    for (const { token, from, to, value } of changes) {
-      if (from === swapperAddress) {
-        account = to
-        tokenOut = token
-        amountOut = value
-      } else if (to === swapperAddress) {
-        tokenIn = token
-        amountIn = value
-      }
-    }
-    return [
-      createActivity<SwapActivity>(ctx, block, swapperLogs[0].log, {
-        type: 'Swap',
-        account,
-        exchange: 'Curve',
-        contract: swapperAddress,
-        tokenIn,
-        tokenOut,
-        amountIn: amountIn.toString(),
-        amountOut: amountOut.toString(),
-      }),
-    ]
+  if (logs.length === 1) return undefined
+  const resultMap: Record<string, SwapActivity> = {}
+  const tokens = new Set<string>()
+  for (const { log, data } of logs) {
+    tokens.add(log.address)
+    // To
+    resultMap[data.to.toLowerCase()] =
+      resultMap[data.to.toLowerCase()] ??
+      createActivity<SwapActivity>(
+        { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.to.toLowerCase()}` },
+        {
+          type: 'Swap',
+          exchange: logs.find((l) => l.log.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS) ? '1inch' : 'other',
+          contract: log.address,
+          account: data.to.toLowerCase(),
+          tokensOut: [],
+          tokensIn: [],
+        },
+      )
+    resultMap[data.to.toLowerCase()].tokensIn.push({ token: log.address, amount: data.value.toString() })
+
+    // From
+    resultMap[data.from.toLowerCase()] =
+      resultMap[data.from.toLowerCase()] ??
+      createActivity<SwapActivity>(
+        { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.from.toLowerCase()}` },
+        {
+          type: 'Swap',
+          exchange: logs.find((l) => l.log.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS) ? '1inch' : 'other',
+          contract: log.address,
+          account: data.to.toLowerCase(),
+          tokensOut: [],
+          tokensIn: [],
+        },
+      )
+    resultMap[data.from.toLowerCase()].tokensOut.push({ token: log.address, amount: data.value.toString() })
   }
+  if (tokens.size <= 1) return undefined
+  // We are a swap if we sent and received more than one token
+  const results = Object.values(resultMap).filter((r) => r.tokensIn.length > 0 && r.tokensOut.length > 0)
+  if (results.length > 0) return results
   return undefined
 }
 
-const calculateBalanceChanges = (
-  logs: {
-    log: Log
-    data: ReturnType<typeof wotokenAbi.events.Transfer.decode>
-  }[],
-) => {
-  return Object.entries(
-    logs.reduce<Record<string, bigint>>((acc, { log, data }) => {
-      const key = `${log.address}:${data.from.toLowerCase()}:${data.to.toLowerCase()}`
-      acc[key] = (acc[key] || 0n) + data.value
-      return acc
-    }, {}),
-  ).map(([data, value]) => {
-    const [token, from, to] = data.split(':')
-    return { token, from, to, value }
-  })
-}
-
 const createActivity = <T extends Activity>(
-  ctx: Context,
-  block: Block,
-  log: Log,
+  {
+    ctx,
+    block,
+    log,
+    id,
+  }: {
+    ctx: Context
+    block: Block
+    log: Log
+    id?: string
+  },
   partial: Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
 ) =>
   ({
-    id: `${ctx.chain.id}:${log.id}`,
+    id: id ?? `${ctx.chain.id}:${log.id}`,
     chainId: ctx.chain.id,
     blockNumber: block.header.height,
     timestamp: block.header.timestamp,

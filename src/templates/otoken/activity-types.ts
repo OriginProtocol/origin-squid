@@ -81,12 +81,10 @@ export interface UnstakeActivity extends ActivityBase {
 export interface SwapActivity extends ActivityBase {
   type: 'Swap'
   account: string
-  exchange: 'Curve' | 'Balancer'
+  exchange: 'Curve' | 'Balancer' | '1inch' | 'other'
   contract: string
-  tokenIn: string
-  tokenOut: string
-  amountIn: string
-  amountOut: string
+  tokensIn: { token: string; amount: string }[]
+  tokensOut: { token: string; amount: string }[]
 }
 
 export interface TransferActivity extends ActivityBase {
