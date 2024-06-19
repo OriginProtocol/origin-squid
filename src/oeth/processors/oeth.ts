@@ -58,9 +58,12 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 
 export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)
 export const setup = (processor: EvmBatchProcessor) => {
-  otokenProcessor.setup(processor)
+  // otokenProcessor.setup(processor)
   otokenActivityProcessor.setup(processor)
 }
 export const process = async (ctx: Context) => {
-  await Promise.all([otokenProcessor.process(ctx), otokenActivityProcessor.process(ctx)])
+  await Promise.all([
+    // otokenProcessor.process(ctx),
+    otokenActivityProcessor.process(ctx),
+  ])
 }

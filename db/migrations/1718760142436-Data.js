@@ -1,5 +1,5 @@
-module.exports = class Data1717645844084 {
-    name = 'Data1717645844084'
+module.exports = class Data1718760142436 {
+    name = 'Data1718760142436'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -303,7 +303,7 @@ module.exports = class Data1717645844084 {
         await db.query(`CREATE INDEX "IDX_091cfbe0d977006e05144bd1fe" ON "o_token_vault" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_fa92b36d011441a02d9a231860" ON "o_token_vault" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_3a2bfb2808c1d7cbb0a568910c" ON "o_token_vault" ("address") `)
-        await db.query(`CREATE TABLE "o_token_activity" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "call_data_last4_bytes" text NOT NULL, "address" text, "sighash" text, "action" text, "exchange" text, "interface" text, "from_symbol" text, "to_symbol" text, "amount" numeric, CONSTRAINT "PK_a6e9207d04e252b4de591283276" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_activity" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(12), "data" jsonb, CONSTRAINT "PK_a6e9207d04e252b4de591283276" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9c617918c3dc521bed5220a185" ON "o_token_activity" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_62bfeb1dee3bcefffdbd10172a" ON "o_token_activity" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_57bb1f7d2fd6fe063b9cd434b2" ON "o_token_activity" ("timestamp") `)

@@ -1084,6 +1084,7 @@ enum OTokenActivityType {
   ExtendStake
   Migrate
   Stake
+  Transfer
   Swap
   Wrap
   Unwrap

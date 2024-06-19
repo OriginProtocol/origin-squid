@@ -6,6 +6,7 @@ export enum OTokenActivityType {
     ExtendStake = "ExtendStake",
     Migrate = "Migrate",
     Stake = "Stake",
+    Transfer = "Transfer",
     Swap = "Swap",
     Wrap = "Wrap",
     Unwrap = "Unwrap",
