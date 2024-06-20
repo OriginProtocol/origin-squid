@@ -14,7 +14,6 @@
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
-    "process:ogn": "sqd process:ogn",
     "process:mainnet": "sqd process:mainnet",
     "process": "sqd process"
   },
