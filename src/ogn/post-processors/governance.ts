@@ -12,7 +12,7 @@ import {
 } from '@model'
 import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { GOVERNANCE_ADDRESS } from '@utils/addresses'
+import { OGN_GOVERNANCE_ADDRESS } from '@utils/addresses'
 import { env } from '@utils/env'
 
 export const from = 15491391 // https://etherscan.io/tx/0x0e04e429248c384e6b36229edf8eb5a77bec7023c58808c21b702edfcbc0e0d6
@@ -70,7 +70,7 @@ export const process = async (ctx: Context) => {
   _updateStatusBlocks()
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
-      if (log.address !== GOVERNANCE_ADDRESS) continue
+      if (log.address !== OGN_GOVERNANCE_ADDRESS) continue
 
       const firstTopic = log.topics[0]
       try {
@@ -118,7 +118,7 @@ const _processProposalCreated = async (ctx: Context, result: IProcessResult, blo
   } = governanceAbi.events.ProposalCreated.decode(log)
   const proposer = await _getAddress(ctx, proposerAddr, result)
   const blockTimestamp = new Date(block.header.timestamp)
-  const governance = new governanceAbi.Contract(ctx, block.header, GOVERNANCE_ADDRESS)
+  const governance = new governanceAbi.Contract(ctx, block.header, OGN_GOVERNANCE_ADDRESS)
 
   const proposal = new OGNProposal({
     id: proposalId.toString(),
@@ -303,7 +303,7 @@ const _processVoteCast = async (ctx: Context, result: IProcessResult, block: Blo
 }
 
 const _getProposalState = async (ctx: Context, block: Block, proposalId: bigint): Promise<OGNProposalState> => {
-  const governance = new governanceAbi.Contract(ctx, block.header, GOVERNANCE_ADDRESS)
+  const governance = new governanceAbi.Contract(ctx, block.header, OGN_GOVERNANCE_ADDRESS)
   return proposalStateMap[parseInt((await governance.state(proposalId)).toString())] || OGNProposalState.Pending
 }
 

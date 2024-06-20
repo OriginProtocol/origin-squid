@@ -53,7 +53,8 @@ export const OETH_STRATEGY_BALANCER_ADDRESS = '0x49109629ac1deb03f2e9b2fe2ac4a62
 export const BALANCER_VAULT = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 export const AURA_REWARDS_POOL_ADDRESS = '0xdd1fe5ad401d4777ce89959b7fa587e569bf125d'
 
-export const GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b6'
+export const OGV_GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b6'
+export const OGN_GOVERNANCE_ADDRESS = '0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec'
 
 export const OGN_ADDRESS = '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26'
 export const OGV_ADDRESS = '0x9c354503c38481a7a7a51629142963f98ecc12d0'
@@ -146,7 +147,7 @@ export const ousd = {
 export const ogv = {
   ogv: OGV_ADDRESS,
   veOGV: VEOGV_ADDRESS,
-  governance: GOVERNANCE_ADDRESS,
+  governance: OGV_GOVERNANCE_ADDRESS,
 }
 
 export const addresses = {
