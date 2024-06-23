@@ -1,38 +1,38 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    TokenExchange: event("0xbd3eb7bcfdd1721a4eb4f00d0df3ed91bd6f17222f82b2d7bce519d8cab3fe46", {"buyer": indexed(p.address), "receiver": indexed(p.address), "pool": indexed(p.address), "token_sold": p.address, "token_bought": p.address, "amount_sold": p.uint256, "amount_bought": p.uint256}),
-    ExchangeMultiple: event("0x14b561178ae0f368f40fafd0485c4f7129ea71cdc00b4ce1e5940f9bc659c8b2", {"buyer": indexed(p.address), "receiver": indexed(p.address), "route": p.fixedSizeArray(p.address, 9), "swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "pools": p.fixedSizeArray(p.address, 4), "amount_sold": p.uint256, "amount_bought": p.uint256}),
+    TokenExchange: event("0xbd3eb7bcfdd1721a4eb4f00d0df3ed91bd6f17222f82b2d7bce519d8cab3fe46", "TokenExchange(address,address,address,address,address,uint256,uint256)", {"buyer": indexed(p.address), "receiver": indexed(p.address), "pool": indexed(p.address), "token_sold": p.address, "token_bought": p.address, "amount_sold": p.uint256, "amount_bought": p.uint256}),
+    ExchangeMultiple: event("0x14b561178ae0f368f40fafd0485c4f7129ea71cdc00b4ce1e5940f9bc659c8b2", "ExchangeMultiple(address,address,address[9],uint256[3][4],address[4],uint256,uint256)", {"buyer": indexed(p.address), "receiver": indexed(p.address), "route": p.fixedSizeArray(p.address, 9), "swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "pools": p.fixedSizeArray(p.address, 4), "amount_sold": p.uint256, "amount_bought": p.uint256}),
 }
 
 export const functions = {
-    "exchange_with_best_rate(address,address,uint256,uint256)": fun("0x10e5e303", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    "exchange_with_best_rate(address,address,uint256,uint256,address)": fun("0x9f69a6a6", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
-    "exchange(address,address,address,uint256,uint256)": fun("0x4798ce5b", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    "exchange(address,address,address,uint256,uint256,address)": fun("0x1a4c1ca3", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
-    "exchange_multiple(address[9],uint256[3][4],uint256,uint256)": fun("0x353ca424", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])": fun("0x9db4f7aa", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
-    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)": fun("0x0651cb35", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4), "_receiver": p.address}, p.uint256),
-    "get_best_rate(address,address,uint256)": fun("0x4e21df75", {"_from": p.address, "_to": p.address, "_amount": p.uint256}, {"_0": p.address, "_1": p.uint256}),
-    "get_best_rate(address,address,uint256,address[8])": fun("0x488de9af", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_exclude_pools": p.fixedSizeArray(p.address, 8)}, {"_0": p.address, "_1": p.uint256}),
-    get_exchange_amount: fun("0x3973e834", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
-    get_input_amount: fun("0x7fa5a654", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
-    get_exchange_amounts: fun("0x4be9ae42", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amounts": p.fixedSizeArray(p.uint256, 100)}, p.fixedSizeArray(p.uint256, 100)),
-    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)": fun("0x7b3d22cf", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256}, p.uint256),
-    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])": fun("0xe6eabf23", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
-    get_calculator: fun("0x5d7dc825", {"_pool": p.address}, p.address),
-    update_registry_address: fun("0x4bbc5b1f", {}, p.bool),
-    set_calculator: fun("0x188c7ee5", {"_pool": p.address, "_calculator": p.address}, p.bool),
-    set_default_calculator: fun("0xda3fb2ab", {"_calculator": p.address}, p.bool),
-    claim_balance: fun("0x752d53c6", {"_token": p.address}, p.bool),
-    set_killed: fun("0x90b22997", {"_is_killed": p.bool}, p.bool),
-    registry: fun("0x7b103999", {}, p.address),
-    factory_registry: fun("0xf7cbf4c6", {}, p.address),
-    crypto_registry: fun("0xf3b8f829", {}, p.address),
-    default_calculator: fun("0x3b359fc8", {}, p.address),
-    is_killed: fun("0x9c868ac0", {}, p.bool),
+    "exchange_with_best_rate(address,address,uint256,uint256)": fun("0x10e5e303", "exchange_with_best_rate(address,address,uint256,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange_with_best_rate(address,address,uint256,uint256,address)": fun("0x9f69a6a6", "exchange_with_best_rate(address,address,uint256,uint256,address)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
+    "exchange(address,address,address,uint256,uint256)": fun("0x4798ce5b", "exchange(address,address,address,uint256,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange(address,address,address,uint256,uint256,address)": fun("0x1a4c1ca3", "exchange(address,address,address,uint256,uint256,address)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256)": fun("0x353ca424", "exchange_multiple(address[9],uint256[3][4],uint256,uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])": fun("0x9db4f7aa", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)": fun("0x0651cb35", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4), "_receiver": p.address}, p.uint256),
+    "get_best_rate(address,address,uint256)": viewFun("0x4e21df75", "get_best_rate(address,address,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256}, {"_0": p.address, "_1": p.uint256}),
+    "get_best_rate(address,address,uint256,address[8])": viewFun("0x488de9af", "get_best_rate(address,address,uint256,address[8])", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_exclude_pools": p.fixedSizeArray(p.address, 8)}, {"_0": p.address, "_1": p.uint256}),
+    get_exchange_amount: viewFun("0x3973e834", "get_exchange_amount(address,address,address,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
+    get_input_amount: viewFun("0x7fa5a654", "get_input_amount(address,address,address,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
+    get_exchange_amounts: viewFun("0x4be9ae42", "get_exchange_amounts(address,address,address,uint256[100])", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amounts": p.fixedSizeArray(p.uint256, 100)}, p.fixedSizeArray(p.uint256, 100)),
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)": viewFun("0x7b3d22cf", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256}, p.uint256),
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])": viewFun("0xe6eabf23", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
+    get_calculator: viewFun("0x5d7dc825", "get_calculator(address)", {"_pool": p.address}, p.address),
+    update_registry_address: fun("0x4bbc5b1f", "update_registry_address()", {}, p.bool),
+    set_calculator: fun("0x188c7ee5", "set_calculator(address,address)", {"_pool": p.address, "_calculator": p.address}, p.bool),
+    set_default_calculator: fun("0xda3fb2ab", "set_default_calculator(address)", {"_calculator": p.address}, p.bool),
+    claim_balance: fun("0x752d53c6", "claim_balance(address)", {"_token": p.address}, p.bool),
+    set_killed: fun("0x90b22997", "set_killed(bool)", {"_is_killed": p.bool}, p.bool),
+    registry: viewFun("0x7b103999", "registry()", {}, p.address),
+    factory_registry: viewFun("0xf7cbf4c6", "factory_registry()", {}, p.address),
+    crypto_registry: viewFun("0xf3b8f829", "crypto_registry()", {}, p.address),
+    default_calculator: viewFun("0x3b359fc8", "default_calculator()", {}, p.address),
+    is_killed: viewFun("0x9c868ac0", "is_killed()", {}, p.bool),
 }
 
 export class Contract extends ContractBase {

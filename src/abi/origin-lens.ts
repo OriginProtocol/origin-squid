@@ -1,36 +1,36 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    GovernorshipTransferred: event("0xc7c0c772add429241571afb3805861fb3cfa2af374534088b76cdb4325a87e9a", {"previousGovernor": indexed(p.address), "newGovernor": indexed(p.address)}),
-    PendingGovernorshipTransfer: event("0xa39cc5eb22d0f34d8beaefee8a3f17cc229c1a1d1ef87a5ad47313487b1c4f0d", {"previousGovernor": indexed(p.address), "newGovernor": indexed(p.address)}),
-    StrategistUpdated: event("0x869e0abd13cc3a975de7b93be3df1cb2255c802b1cead85963cc79d99f131bee", {"_address": p.address}),
-    StrategyTypeChanged: event("0x7fab7e3127613cf3a72eafc4bfcb3e179d35d1c69e1d0217c1dd029dc23690bd", {"strategyAddr": indexed(p.address), "kind": p.uint8}),
+    GovernorshipTransferred: event("0xc7c0c772add429241571afb3805861fb3cfa2af374534088b76cdb4325a87e9a", "GovernorshipTransferred(address,address)", {"previousGovernor": indexed(p.address), "newGovernor": indexed(p.address)}),
+    PendingGovernorshipTransfer: event("0xa39cc5eb22d0f34d8beaefee8a3f17cc229c1a1d1ef87a5ad47313487b1c4f0d", "PendingGovernorshipTransfer(address,address)", {"previousGovernor": indexed(p.address), "newGovernor": indexed(p.address)}),
+    StrategistUpdated: event("0x869e0abd13cc3a975de7b93be3df1cb2255c802b1cead85963cc79d99f131bee", "StrategistUpdated(address)", {"_address": p.address}),
+    StrategyTypeChanged: event("0x7fab7e3127613cf3a72eafc4bfcb3e179d35d1c69e1d0217c1dd029dc23690bd", "StrategyTypeChanged(address,uint8)", {"strategyAddr": indexed(p.address), "kind": p.uint8}),
 }
 
 export const functions = {
-    ETH_ADDR: fun("0x7753f47b", {}, p.address),
-    WETH_ADDR: fun("0x82dfc5f7", {}, p.address),
-    assetCount: fun("0xeafe7a74", {}, p.uint256),
-    assets: fun("0xcf35bdd0", {"_0": p.uint256}, p.address),
-    cacheStrategies: fun("0x44f98829", {}, ),
-    claimGovernance: fun("0x5d36b190", {}, ),
-    curvePoolCoinCount: fun("0xdd6640c3", {"_0": p.address}, p.uint256),
-    getStrategyAssetBalance: fun("0x3a1d532b", {"strategyAddr": p.address, "asset": p.address}, p.uint256),
-    getStrategyBalances: fun("0xe50bf68f", {"strategyAddr": p.address}, {"supportedAssets": p.array(p.address), "assetBalances": p.array(p.uint256)}),
-    governor: fun("0x0c340a24", {}, p.address),
-    initialize: fun("0xe336f8c5", {"_strategistAddr": p.address, "_strategies": p.array(p.address), "strategyKinds": p.array(p.uint8)}, ),
-    isGovernor: fun("0xc7af3352", {}, p.bool),
-    oToken: fun("0x1a32aad6", {}, p.address),
-    oracleRouter: fun("0x55a29e91", {}, p.address),
-    setStrategistAddr: fun("0x773540b3", {"_address": p.address}, ),
-    setStrategyKind: fun("0xaefc61e0", {"strategy": p.address, "kind": p.uint8}, ),
-    strategies: fun("0xd574ea3d", {"_0": p.uint256}, p.address),
-    strategistAddr: fun("0x570d8e1d", {}, p.address),
-    strategyConfig: fun("0x91450e63", {"_0": p.address}, {"supported": p.bool, "kind": p.uint8}),
-    transferGovernance: fun("0xd38bfff4", {"_newGovernor": p.address}, ),
-    vault: fun("0xfbfa77cf", {}, p.address),
+    ETH_ADDR: viewFun("0x7753f47b", "ETH_ADDR()", {}, p.address),
+    WETH_ADDR: viewFun("0x82dfc5f7", "WETH_ADDR()", {}, p.address),
+    assetCount: viewFun("0xeafe7a74", "assetCount()", {}, p.uint256),
+    assets: viewFun("0xcf35bdd0", "assets(uint256)", {"_0": p.uint256}, p.address),
+    cacheStrategies: fun("0x44f98829", "cacheStrategies()", {}, ),
+    claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
+    curvePoolCoinCount: viewFun("0xdd6640c3", "curvePoolCoinCount(address)", {"_0": p.address}, p.uint256),
+    getStrategyAssetBalance: viewFun("0x3a1d532b", "getStrategyAssetBalance(address,address)", {"strategyAddr": p.address, "asset": p.address}, p.uint256),
+    getStrategyBalances: viewFun("0xe50bf68f", "getStrategyBalances(address)", {"strategyAddr": p.address}, {"supportedAssets": p.array(p.address), "assetBalances": p.array(p.uint256)}),
+    governor: viewFun("0x0c340a24", "governor()", {}, p.address),
+    initialize: fun("0xe336f8c5", "initialize(address,address[],uint8[])", {"_strategistAddr": p.address, "_strategies": p.array(p.address), "strategyKinds": p.array(p.uint8)}, ),
+    isGovernor: viewFun("0xc7af3352", "isGovernor()", {}, p.bool),
+    oToken: viewFun("0x1a32aad6", "oToken()", {}, p.address),
+    oracleRouter: viewFun("0x55a29e91", "oracleRouter()", {}, p.address),
+    setStrategistAddr: fun("0x773540b3", "setStrategistAddr(address)", {"_address": p.address}, ),
+    setStrategyKind: fun("0xaefc61e0", "setStrategyKind(address,uint8)", {"strategy": p.address, "kind": p.uint8}, ),
+    strategies: viewFun("0xd574ea3d", "strategies(uint256)", {"_0": p.uint256}, p.address),
+    strategistAddr: viewFun("0x570d8e1d", "strategistAddr()", {}, p.address),
+    strategyConfig: viewFun("0x91450e63", "strategyConfig(address)", {"_0": p.address}, {"supported": p.bool, "kind": p.uint8}),
+    transferGovernance: fun("0xd38bfff4", "transferGovernance(address)", {"_newGovernor": p.address}, ),
+    vault: viewFun("0xfbfa77cf", "vault()", {}, p.address),
 }
 
 export class Contract extends ContractBase {

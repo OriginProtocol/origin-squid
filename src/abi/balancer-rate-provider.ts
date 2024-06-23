@@ -1,10 +1,10 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const functions = {
-    getRate: fun("0x679aefce", {}, p.uint256),
-    rocketTokenRETH: fun("0xdb5dacc9", {}, p.address),
+    getRate: viewFun("0x679aefce", "getRate()", {}, p.uint256),
+    rocketTokenRETH: viewFun("0xdb5dacc9", "rocketTokenRETH()", {}, p.address),
 }
 
 export class Contract extends ContractBase {

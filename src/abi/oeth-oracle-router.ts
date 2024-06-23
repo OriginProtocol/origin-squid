@@ -1,10 +1,10 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const functions = {
-    cacheDecimals: fun("0x36b6d944", {"asset": p.address}, p.uint8),
-    price: fun("0xaea91078", {"asset": p.address}, p.uint256),
+    cacheDecimals: fun("0x36b6d944", "cacheDecimals(address)", {"asset": p.address}, p.uint8),
+    price: viewFun("0xaea91078", "price(address)", {"asset": p.address}, p.uint256),
 }
 
 export class Contract extends ContractBase {
