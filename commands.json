@@ -149,18 +149,6 @@
         "lib/main-ogv.js"
       ]
     },
-    "process:ogn": {
-      "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-ogn.js"
-      ]
-    },
     "process:mainnet": {
       "description": "Load .env and start the squid processor",
       "deps": [
@@ -218,18 +206,6 @@
         "node",
         "--require=tsconfig-paths/register",
         "lib/main-ogv.js"
-      ],
-      "hidden": true
-    },
-    "process:ogn:prod": {
-      "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-ogn.js"
       ],
       "hidden": true
     },

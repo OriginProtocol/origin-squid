@@ -6,7 +6,13 @@ import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
 import { processStatus } from '@templates/processor-status'
-import { OGN_ADDRESS, OGN_REWARDS_SOURCE_ADDRESS, XOGN_ADDRESS } from '@utils/addresses'
+import {
+  OGN_ADDRESS,
+  OGN_GOVERNANCE_ADDRESS,
+  OGN_REWARDS_SOURCE_ADDRESS,
+  OGV_GOVERNANCE_ADDRESS,
+  XOGN_ADDRESS,
+} from '@utils/addresses'
 
 import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
@@ -19,7 +25,8 @@ export const processor = {
     nativeStaking,
     curve,
     ...erc20s(),
-    // createGovernanceProcessor({ from: 0000000000, address: OGN_GOVERNANCE_ADDRESS }),
+    createGovernanceProcessor({ from: 15491391, address: OGV_GOVERNANCE_ADDRESS }),
+    createGovernanceProcessor({ from: 20117923, address: OGN_GOVERNANCE_ADDRESS }),
     createESTracker({
       from: 19919745,
       address: XOGN_ADDRESS,
