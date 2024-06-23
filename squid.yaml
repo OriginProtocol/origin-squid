@@ -7,6 +7,7 @@ deploy:
   addons:
     postgres:
     rpc:
+      - eth.http
       - arbitrum-one.http
   secrets:
     - RPC_ENDPOINT
@@ -19,28 +20,28 @@ deploy:
     - name: mainnet-processor
       cmd: [ "sqd", "process:mainnet:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
     - name: arbitrum-processor
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ENV: RPC_ETH_HTTP
         RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
     - name: ogv-processor
       cmd: [ "sqd", "process:ogv:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
     - name: ousd-processor
       cmd: [ "sqd", "process:ousd:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
+        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
   api:
     env:
