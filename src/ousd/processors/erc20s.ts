@@ -1,7 +1,21 @@
+import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
-import { OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
+import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
+import { logFilter } from '@utils/logFilter'
 
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+  OUSD: {
+    from: 10884563, // From Reset:
+    address: tokens.OUSD,
+    rebaseFilters: [
+      logFilter({
+        address: [OUSD_ADDRESS],
+        topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
+        transaction: true,
+        range: { from: 10884563 },
+      }),
+    ],
+  },
   // OUSD Related
   USDT: {
     // from: 11362821,

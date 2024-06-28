@@ -23,6 +23,7 @@ export const OETH_ZAPPER_ADDRESS = '0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66'
 export const OETH_DRIPPER_ADDRESS = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
 export const WOETH_ADDRESS = '0xdcee70654261af21c44c093c300ed3bb97b78192'
 export const WOETH_ARBITRUM_ADDRESS = '0xd8724322f44e5c58d7a815f542036fb17dbbf839'
+export const PRIME_ETH_ADDRESS = '0x6ef3d766dfe02dc4bf04aae9122eb9a0ded25615'
 
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const STETH_ADDRESS = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'
@@ -92,6 +93,7 @@ export const tokens = {
   rETH: RETH_ADDRESS,
   frxETH: FRXETH_ADDRESS,
   sfrxETH: SFRXETH_ADDRESS,
+  primeETH: PRIME_ETH_ADDRESS,
 
   // Non-stable
   BAL: BAL_ADDRESS,
