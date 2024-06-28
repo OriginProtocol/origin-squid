@@ -74,9 +74,11 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
 
   const initialize = async (ctx: Context) => {
     const pending = await ctx.store.findBy(GovernanceProposal, {
+      address,
       status: GovernanceProposalState.Pending,
     })
     const active = await ctx.store.findBy(GovernanceProposal, {
+      address,
       status: GovernanceProposalState.Active,
     })
     pendingProposals.push(...pending)
@@ -152,7 +154,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
       calldatas: data.calldatas,
       values: data.values.map((v) => v.toString()),
       targets: data.targets,
-      lastUpdated: new Date(),
+      lastUpdated: blockTimestamp,
       status: GovernanceProposalState.Pending,
       events: [],
       quorum: await governance.quorum(BigInt(block.header.height - 1)),
@@ -210,6 +212,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
 
   const _updateProposalStatus = async (ctx: Context, result: IProcessResult, block: Block, proposalId: bigint) => {
     const proposal = await _getProposal(ctx, proposalId, result)
+    proposal.lastUpdated = new Date(block.header.timestamp)
     proposal.status = await _getProposalState(ctx, block, proposal.proposalId)
     // ctx.log.info({ status: proposal.status }, '_updateProposalStatus')
     if (proposal.status === GovernanceProposalState.Pending && !pendingProposals.find((p) => p.id === proposal.id)) {
@@ -228,6 +231,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     const blockTimestamp = new Date(block.header.timestamp)
 
     const proposal = await _getProposal(ctx, proposalId, result)
+    proposal.lastUpdated = new Date(block.header.timestamp)
     await _updateProposalStatus(ctx, result, block, proposalId)
 
     const proposalTxLog = new GovernanceProposalEvent({
@@ -247,6 +251,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     const blockTimestamp = new Date(block.header.timestamp)
 
     const proposal = await _getProposal(ctx, proposalId, result)
+    proposal.lastUpdated = new Date(block.header.timestamp)
     proposal.endBlock = extendedDeadline
     await _updateProposalStatus(ctx, result, block, proposalId)
 
@@ -274,6 +279,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
     const blockTimestamp = new Date(block.header.timestamp)
 
     const proposal = await _getProposal(ctx, proposalId, result)
+    proposal.lastUpdated = new Date(block.header.timestamp)
 
     const voteType = [GovernanceVoteType.Against, GovernanceVoteType.For, GovernanceVoteType.Abstain][
       parseInt(support.toString())
