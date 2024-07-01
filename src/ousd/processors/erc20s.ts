@@ -5,14 +5,14 @@ import { logFilter } from '@utils/logFilter'
 
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   OUSD: {
-    from: 10884563, // From Reset:
+    from: 11585978, // From Reset:
     address: tokens.OUSD,
     rebaseFilters: [
       logFilter({
         address: [OUSD_ADDRESS],
         topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
         transaction: true,
-        range: { from: 10884563 },
+        range: { from: 11585978 },
       }),
     ],
   },
