@@ -11,6 +11,8 @@ import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { calculateBlockRate } from '@utils/calculateBlockRate'
 
+import './rpc-issues'
+
 dayjs.extend(duration)
 dayjs.extend(utc)
 
