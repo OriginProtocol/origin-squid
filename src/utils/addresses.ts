@@ -64,6 +64,8 @@ export const VEOGV_ADDRESS = '0x0c4576ca1c365868e162554af8e385dc3e7c66d9'
 export const XOGN_ADDRESS = '0x63898b3b6ef3d39332082178656e9862bee45c57'
 export const OGN_REWARDS_SOURCE_ADDRESS = '0x7609c88e5880e934dd3a75bcfef44e31b1badb8b'
 
+export const LEGACY_OGN_STAKING = '0x501804b374ef06fa9c427476147ac09f1551b9a0'
+
 // Token Helper Objects & Types
 export const tokens = {
   // Origin ERC20 Tokens

@@ -1,5 +1,5 @@
-module.exports = class Data1719163778896 {
-    name = 'Data1719163778896'
+module.exports = class Data1719870615420 {
+    name = 'Data1719870615420'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -178,6 +178,7 @@ module.exports = class Data1719163778896 {
         await db.query(`CREATE TABLE "governance_proposal_vote" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "voter" text NOT NULL, "weight" numeric NOT NULL, "type" character varying(7) NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "proposal_id" character varying, CONSTRAINT "PK_e13a15bfb5ccfdec4c19975de87" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5531af241c24a09c854ead9d55" ON "governance_proposal_vote" ("proposal_id") `)
         await db.query(`CREATE INDEX "IDX_adc6eb148ad48697e74d23c722" ON "governance_proposal_vote" ("voter") `)
+        await db.query(`CREATE TABLE "legacy_staker" ("id" character varying NOT NULL, "input_amount" numeric NOT NULL, "output_amount" numeric NOT NULL, "balance" numeric NOT NULL, "reward_amount" numeric NOT NULL, CONSTRAINT "PK_11a12e3c39ce22c9a05990c9a56" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "beacon_deposit_pubkey" ("id" character varying NOT NULL, "create_date" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "count" integer NOT NULL, CONSTRAINT "PK_4741993dcf81760e9777dec18a7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "beacon_deposit_event" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "caller" text NOT NULL, "withdrawal_credentials" text NOT NULL, "amount" text NOT NULL, "signature" text NOT NULL, "index" text NOT NULL, "pubkey_id" character varying, CONSTRAINT "PK_1ebc083560d266f487bd7098f43" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_4b157d82fc2a709b1cdd1b056a" ON "beacon_deposit_event" ("chain_id") `)
@@ -528,6 +529,7 @@ module.exports = class Data1719163778896 {
         await db.query(`DROP TABLE "governance_proposal_vote"`)
         await db.query(`DROP INDEX "public"."IDX_5531af241c24a09c854ead9d55"`)
         await db.query(`DROP INDEX "public"."IDX_adc6eb148ad48697e74d23c722"`)
+        await db.query(`DROP TABLE "legacy_staker"`)
         await db.query(`DROP TABLE "beacon_deposit_pubkey"`)
         await db.query(`DROP TABLE "beacon_deposit_event"`)
         await db.query(`DROP INDEX "public"."IDX_4b157d82fc2a709b1cdd1b056a"`)
