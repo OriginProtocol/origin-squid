@@ -8,16 +8,13 @@ deploy:
     postgres:
   secrets:
     - RPC_ENDPOINT
-    - RPC_ENDPOINT_999
-    - RPC_ENDPOINT_RETH
-    - RPC_BACKUP
+    - RPC_ENV
     - RPC_ARBITRUM_ENDPOINT
     - RPC_ARBITRUM_ENV
   processor:
     - name: ousd-processor
       cmd: [ "sqd", "process:ousd:prod" ]
       env:
-        RPC_ENV: RPC_ENDPOINT_RETH
         TS_NODE_BASEURL: './lib'
   api:
     env:
