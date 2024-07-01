@@ -52,10 +52,10 @@ export const process = async (ctx: Context) => {
         const staker = await _getStaker(ctx, user, result)
         staker.outputAmount += amount
         staker.balance -= amount
-      } else if (firstTopic === legacyStakingAbi.events['Withdrawn(address,uint256)'].topic) {
+      } else if (firstTopic === legacyStakingAbi.events['Withdrawn(address,uint256,uint256)'].topic) {
         let { user, amount, stakedAmount } = legacyStakingAbi.events['Withdrawn(address,uint256,uint256)'].decode(log)
         const staker = await _getStaker(ctx, user, result)
-        staker.outputAmount += amount
+        staker.outputAmount += stakedAmount
         staker.rewardAmount += amount - stakedAmount
         staker.balance -= stakedAmount
       } else if (firstTopic === legacyStakingAbi.events.StakesTransfered.topic) {
