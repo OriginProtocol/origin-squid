@@ -11,37 +11,32 @@ deploy:
       - arbitrum-one.http
   secrets:
     - RPC_ENDPOINT
-    - RPC_ENDPOINT_999
-    - RPC_ENDPOINT_RETH
-    - RPC_BACKUP
+    - RPC_ENV
     - RPC_ARBITRUM_ENDPOINT
     - RPC_ARBITRUM_ENV
   processor:
     - name: mainnet-processor
       cmd: [ "sqd", "process:mainnet:prod" ]
       env:
-        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
     - name: arbitrum-processor
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
-        RPC_ENV: RPC_ETH_HTTP
         RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]
       env:
-        RPC_ENV: RPC_ETH_HTTP
         TS_NODE_BASEURL: './lib'
     - name: ogv-processor
       cmd: [ "sqd", "process:ogv:prod" ]
       env:
-        RPC_ENV: RPC_ETH_HTTP
+        RPC_ENV: RPC_ENDPOINT
         TS_NODE_BASEURL: './lib'
     - name: ousd-processor
       cmd: [ "sqd", "process:ousd:prod" ]
       env:
-        RPC_ENV: RPC_ETH_HTTP
+        RPC_ENV: RPC_ENDPOINT
         TS_NODE_BASEURL: './lib'
   api:
     env:
