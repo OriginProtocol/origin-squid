@@ -537,7 +537,17 @@ type GovernanceProposalVote @entity {
   type: GovernanceVoteType!
   txHash: String!
   timestamp: DateTime!
-}type BeaconDepositEvent @entity  {
+}
+
+type LegacyStaker @entity {
+  id: ID! @index
+  inputAmount: BigInt!
+  outputAmount: BigInt!
+  balance: BigInt!
+  rewardAmount: BigInt!
+}
+
+type BeaconDepositEvent @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index

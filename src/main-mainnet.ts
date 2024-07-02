@@ -15,6 +15,7 @@ import {
 } from '@utils/addresses'
 
 import * as curve from './mainnet/processors/curve'
+import * as legacyStaking from './mainnet/processors/legacy-staking'
 import { erc20s } from './mainnet/processors/erc20s'
 import * as nativeStaking from './mainnet/processors/native-staking'
 import * as validate from './mainnet/validators/validate-mainnet'
@@ -23,6 +24,7 @@ export const processor = {
   stateSchema: 'mainnet-processor',
   processors: [
     nativeStaking,
+    legacyStaking,
     curve,
     ...erc20s(),
     createGovernanceProcessor({ from: 15491391, address: OGV_GOVERNANCE_ADDRESS }),
