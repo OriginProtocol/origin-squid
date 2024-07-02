@@ -142,7 +142,9 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
               timestamp: new Date(block.header.timestamp),
               address: log.address,
               from,
+              fromBalance: 0n,
               to,
+              toBalance: 0n,
               value: data.value,
             })
             result.transfers.set(transfer.id, transfer)
@@ -165,6 +167,7 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
 
             // Handle From Address Changes
             if (fromHolder) {
+              transfer.fromBalance = fromHolder.balance
               fromHolder.balance -= data.value
               await createBalance(ctx, block, from, fromHolder.balance)
               if (fromHolder.balance === 0n && data.value > 0n) {
@@ -177,6 +180,7 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
             }
             if (toHolder) {
               toHolder.balance += data.value
+              transfer.toBalance = toHolder.balance
               await createBalance(ctx, block, to, toHolder.balance)
             }
           }

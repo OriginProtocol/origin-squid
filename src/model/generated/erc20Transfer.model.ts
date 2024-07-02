@@ -30,9 +30,15 @@ export class ERC20Transfer {
     @StringColumn_({nullable: false})
     from!: string
 
+    @BigIntColumn_({nullable: false})
+    fromBalance!: bigint
+
     @Index_()
     @StringColumn_({nullable: false})
     to!: string
+
+    @BigIntColumn_({nullable: false})
+    toBalance!: bigint
 
     @BigIntColumn_({nullable: false})
     value!: bigint

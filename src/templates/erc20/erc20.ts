@@ -139,7 +139,7 @@ export const createERC20Tracker = ({
                 timestamp: new Date(block.header.timestamp),
                 blockNumber: block.header.height,
                 address,
-                account: account.toLowerCase(),
+                account,
                 balance: balances[i],
               })
               result.balances.set(id, balance)
@@ -181,6 +181,9 @@ export const createERC20Tracker = ({
             const data = abi.events.Transfer.decode(log)
             accounts.add(data.from.toLowerCase())
             accounts.add(data.to.toLowerCase())
+            await updateBalances([data.from.toLowerCase(), data.to.toLowerCase()])
+            const fromHolder = result.holders.get(data.from.toLowerCase())
+            const toHolder = result.holders.get(data.to.toLowerCase())
             const transfer = new ERC20Transfer({
               id: `${ctx.chain.id}-${log.id}`,
               chainId: ctx.chain.id,
@@ -189,7 +192,9 @@ export const createERC20Tracker = ({
               timestamp: new Date(block.header.timestamp),
               address: log.address,
               from: data.from.toLowerCase(),
+              fromBalance: fromHolder?.balance ?? 0n,
               to: data.to.toLowerCase(),
+              toBalance: toHolder?.balance ?? 0n,
               value: data.value,
             })
             result.transfers.set(transfer.id, transfer)

@@ -1,5 +1,5 @@
-module.exports = class Data1719163778896 {
-    name = 'Data1719163778896'
+module.exports = class Data1719938621886 {
+    name = 'Data1719938621886'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -125,7 +125,7 @@ module.exports = class Data1719163778896 {
         await db.query(`CREATE INDEX "IDX_bb6a884e702f2887037d5a7eec" ON "erc20_balance" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_c9fbe21a3411d93ea586af2a4c" ON "erc20_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d1f50dc39003331b76fad8a640" ON "erc20_balance" ("block_number") `)
-        await db.query(`CREATE TABLE "erc20_transfer" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "value" numeric NOT NULL, CONSTRAINT "PK_12764843146818a31e3d28fc577" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "erc20_transfer" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "from_balance" numeric NOT NULL, "to" text NOT NULL, "to_balance" numeric NOT NULL, "value" numeric NOT NULL, CONSTRAINT "PK_12764843146818a31e3d28fc577" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f914d2e140eb88375a5a2ef6c7" ON "erc20_transfer" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_6350ddb2def19c1e3a06d8b3ec" ON "erc20_transfer" ("address") `)
         await db.query(`CREATE INDEX "IDX_eca70565083880d00e9110b000" ON "erc20_transfer" ("from") `)
