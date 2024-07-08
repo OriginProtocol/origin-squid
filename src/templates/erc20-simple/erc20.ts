@@ -167,8 +167,8 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
 
             // Handle From Address Changes
             if (fromHolder) {
-              transfer.fromBalance = fromHolder.balance
               fromHolder.balance -= data.value
+              transfer.fromBalance = fromHolder.balance
               await createBalance(ctx, block, from, fromHolder.balance)
               if (fromHolder.balance === 0n && data.value > 0n) {
                 state.holderCount -= 1
