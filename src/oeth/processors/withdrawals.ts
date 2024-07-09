@@ -57,7 +57,7 @@ const processWithdrawalRequested = async (
     amount: data._amount,
     claimed: false,
     queued: data._queued,
-    withdrawer: data._withdrawer,
+    withdrawer: data._withdrawer?.toLowerCase(),
   })
   result.withdrawalRequests.push(withdrawalRequest)
 }
