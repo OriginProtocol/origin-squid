@@ -8,7 +8,7 @@ import { logFilter } from '@utils/logFilter'
 export const from = 20264539 // TODO update with actual update blocknumber
 
 interface ProcessResult {
-  withdrawalRequests: OETHWithdrawalRequest[]
+  withdrawalRequests: Map<string, OETHWithdrawalRequest>
 }
 
 const withdrawalRequestedFilter = logFilter({
@@ -29,7 +29,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 export const process = async (ctx: Context) => {
   const result: ProcessResult = {
-    withdrawalRequests: [],
+    withdrawalRequests: new Map<string, OETHWithdrawalRequest>(),
   }
 
   for (const block of ctx.blocks) {
@@ -42,7 +42,7 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.insert(result.withdrawalRequests)
+  await ctx.store.upsert([...result.withdrawalRequests.values()])
 }
 
 const processWithdrawalRequested = async (
@@ -52,17 +52,18 @@ const processWithdrawalRequested = async (
   log: Context['blocks'][number]['logs'][number],
 ) => {
   const data = oethVault.events.WithdrawalRequested.decode(log)
+
   const withdrawalRequest = new OETHWithdrawalRequest({
-    id: log.id,
+    id: `${data._withdrawer.toLowerCase()}:${data._requestId}`,
     blockNumber: block.header.height,
     timestamp: new Date(block.header.timestamp),
     requestId: data._requestId,
     amount: data._amount,
     claimed: false,
     queued: data._queued,
-    withdrawer: data._withdrawer?.toLowerCase(),
+    withdrawer: data._withdrawer.toLowerCase(),
   })
-  result.withdrawalRequests.push(withdrawalRequest)
+  result.withdrawalRequests.set(withdrawalRequest.id, withdrawalRequest)
 }
 
 const processWithdrawalClaimed = async (
@@ -72,10 +73,17 @@ const processWithdrawalClaimed = async (
   log: Context['blocks'][number]['logs'][number],
 ) => {
   const data = oethVault.events.WithdrawalClaimed.decode(log)
-  const foundIndex = result.withdrawalRequests.findIndex(
-    (r) => r.requestId === data._requestId && r.withdrawer?.toLowerCase() === data._withdrawer?.toLowerCase(),
-  )
-  if (foundIndex > -1) {
-    result.withdrawalRequests[foundIndex] = { ...result.withdrawalRequests[foundIndex], claimed: true }
+  const id = `${data._withdrawer.toLowerCase()}:${data._requestId}`
+  let updated
+  if (result.withdrawalRequests.has(id)) {
+    updated = result.withdrawalRequests.get(id)
+  } else {
+    updated = await ctx.store.findOneBy(OETHWithdrawalRequest, {
+      requestId: data._requestId,
+      withdrawer: data._withdrawer.toLowerCase(),
+    })
+  }
+  if (updated) {
+    result.withdrawalRequests.set(id, { ...updated, claimed: true })
   }
 }
