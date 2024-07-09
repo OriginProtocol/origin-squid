@@ -34,8 +34,11 @@ export const process = async (ctx: Context) => {
 
   for (const block of ctx.blocks) {
     for (const log of block.logs) {
-      await processWithdrawalRequested(ctx, result, block, log)
-      await processWithdrawalClaimed(ctx, result, block, log)
+      if (withdrawalRequestedFilter.matches(log)) {
+        await processWithdrawalRequested(ctx, result, block, log)
+      } else if (withdrawalClaimedFilter.matches(log)) {
+        await processWithdrawalClaimed(ctx, result, block, log)
+      }
     }
   }
 
