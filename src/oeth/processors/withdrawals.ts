@@ -78,10 +78,7 @@ const processWithdrawalClaimed = async (
   if (result.withdrawalRequests.has(id)) {
     updated = result.withdrawalRequests.get(id)
   } else {
-    updated = await ctx.store.findOneBy(OETHWithdrawalRequest, {
-      requestId: data._requestId,
-      withdrawer: data._withdrawer.toLowerCase(),
-    })
+    updated = await ctx.store.findOneBy(OETHWithdrawalRequest, { id })
   }
   if (updated) {
     result.withdrawalRequests.set(id, { ...updated, claimed: true })
