@@ -701,8 +701,7 @@ type OETHStrategyDailyStat @entity {
   """
   Total ETH value
   """
-  holdings: [OETHStrategyHoldingDailyStat]
-  @derivedFrom(field: "strategyDailyStatId")
+  holdings: [OETHStrategyHoldingDailyStat] @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OETHStrategyHoldingDailyStat @entity {
@@ -741,7 +740,19 @@ type OETHRewardTokenCollected @entity {
   recipient: String!
   rewardToken: String!
   amount: BigInt!
-}type OGV @entity {
+}
+
+type OETHWithdrawalRequest @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  requestId: BigInt!
+  withdrawer: String!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
+}
+type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
