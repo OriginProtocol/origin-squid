@@ -81,6 +81,7 @@ const processWithdrawalClaimed = async (
     updated = await ctx.store.findOneBy(OETHWithdrawalRequest, { id })
   }
   if (updated) {
-    result.withdrawalRequests.set(id, { ...updated, claimed: true })
+    updated.claimed = true
+    result.withdrawalRequests.set(id, updated)
   }
 }
