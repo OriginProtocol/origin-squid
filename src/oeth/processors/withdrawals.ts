@@ -3,6 +3,7 @@ import { OETHWithdrawalRequest } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OETH_VAULT_ADDRESS } from '@utils/addresses'
+import { logFilter } from '@utils/logFilter'
 
 export const from = 20264539 // TODO update with actual update blocknumber
 
@@ -10,17 +11,20 @@ interface ProcessResult {
   withdrawalRequests: OETHWithdrawalRequest[]
 }
 
+const withdrawalRequestedFilter = logFilter({
+  address: [OETH_VAULT_ADDRESS],
+  topic0: [oethVault.events.WithdrawalRequested.topic],
+  range: { from },
+})
+const withdrawalClaimedFilter = logFilter({
+  address: [OETH_VAULT_ADDRESS],
+  topic0: [oethVault.events.WithdrawalClaimed.topic],
+  range: { from },
+})
+
 export const setup = (processor: EvmBatchProcessor) => {
-  processor.addLog({
-    address: [OETH_VAULT_ADDRESS],
-    topic0: [oethVault.events.WithdrawalRequested.topic],
-    range: { from },
-  })
-  processor.addLog({
-    address: [OETH_VAULT_ADDRESS],
-    topic0: [oethVault.events.WithdrawalClaimed.topic],
-    range: { from },
-  })
+  processor.addLog(withdrawalRequestedFilter.value)
+  processor.addLog(withdrawalClaimedFilter.value)
 }
 
 export const process = async (ctx: Context) => {
