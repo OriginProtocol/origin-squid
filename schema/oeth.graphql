@@ -180,4 +180,5 @@ type OETHWithdrawalRequest @entity {
   amount: BigInt!
   queued: BigInt!
   claimed: Boolean!
+  txHash: String! @index
 }

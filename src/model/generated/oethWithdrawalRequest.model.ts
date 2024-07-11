@@ -31,4 +31,8 @@ export class OETHWithdrawalRequest {
 
     @BooleanColumn_({nullable: false})
     claimed!: boolean
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    txHash!: string
 }

@@ -62,6 +62,7 @@ const processWithdrawalRequested = async (
     claimed: false,
     queued: data._queued,
     withdrawer: data._withdrawer.toLowerCase(),
+    txHash: log.transactionHash,
   })
   result.withdrawalRequests.set(withdrawalRequest.id, withdrawalRequest)
 }
