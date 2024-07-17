@@ -1,7 +1,7 @@
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createOTokenProcessor } from '@templates/otoken'
-import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor'
+import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import {
   CURVE_ETH_OETH_POOL_ADDRESS,
   CURVE_FRXETH_OETH_POOL_ADDRESS,
