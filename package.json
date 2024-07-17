@@ -14,7 +14,6 @@
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
-    "process:ogn": "sqd process:ogn",
     "process:mainnet": "sqd process:mainnet",
     "process": "sqd process"
   },
@@ -41,13 +40,14 @@
     "viem": "^1.10.13"
   },
   "devDependencies": {
-    "@subsquid/evm-typegen": "^4.1.1",
+    "@subsquid/evm-typegen": "^4.3.0",
     "@subsquid/typeorm-codegen": "^2.0.1",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/js-yaml": "^4.0.8",
     "@types/node": "^18.16.17",
     "@types/node-fetch": "^2.6.9",
     "@types/uuid": "^9.0.2",
+    "@types/websocket": "^1.0.10",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
     "tsconfig-paths": "^4.2.0",

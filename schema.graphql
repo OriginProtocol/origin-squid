@@ -334,7 +334,9 @@ type ERC20Transfer @entity {
   timestamp: DateTime!
   address: String! @index
   from: String! @index
+  fromBalance: BigInt!
   to: String! @index
+  toBalance: BigInt!
   value: BigInt!
 }
 
@@ -535,7 +537,17 @@ type GovernanceProposalVote @entity {
   type: GovernanceVoteType!
   txHash: String!
   timestamp: DateTime!
-}type BeaconDepositEvent @entity  {
+}
+
+type LegacyStaker @entity {
+  id: ID! @index
+  inputAmount: BigInt!
+  outputAmount: BigInt!
+  balance: BigInt!
+  rewardAmount: BigInt!
+}
+
+type BeaconDepositEvent @entity  {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
@@ -729,124 +741,7 @@ type OETHRewardTokenCollected @entity {
   recipient: String!
   rewardToken: String!
   amount: BigInt!
-}type OGN @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  circulating: BigInt!
-  staked: BigInt!
-  total: BigInt!
-}
-
-type OGNAddress @entity {
-  id: ID! @index
-  balance: BigInt!
-  staked: BigInt!
-  xognBalance: BigInt!
-  votingPower: BigInt!
-  delegatee: OGNAddress
-  lastUpdated: DateTime!
-}
-
-enum OGNLockupEventType {
-  Staked
-  Unstaked
-  Extended
-}
-
-type OGNLockupTxLog @entity {
-  id: ID!
-  hash: String!
-  event: OGNLockupEventType!
-  timestamp: DateTime!
-  blockNumber: Int!
-  totalSupply: BigInt!
-  ognLockup: OGNLockup!
-}
-
-type OGNLockup @entity {
-  id: ID!
-  lockupId: String! @index
-  address: OGNAddress! @index
-  logs: [OGNLockupTxLog]! @derivedFrom(field: "ognLockup")
-  amount: BigInt!
-  end: DateTime!
-  xogn: BigInt! # Amount of xogn received
-  timestamp: DateTime!
-  # active: Boolean
-}
-
-enum OGNProposalState {
-  Pending
-  Active
-  Canceled
-  Defeated
-  Succeeded
-  Queued
-  Expired
-  Executed
-}
-
-enum OGNProposalEvent {
-  Created
-  Queued
-  Canceled
-  Extended
-  Executed
-}
-
-enum OGNVoteType {
-  Against
-  For
-  Abstain
-}
-
-type OGNProposalTxLog @entity {
-  id: ID!
-  hash: String!
-  event: OGNProposalEvent!
-  timestamp: DateTime!
-  proposal: OGNProposal! @index
-}
-
-type OGNProposal @entity {
-  id: ID! @index
-  description: String
-  proposer: OGNAddress!
-  timestamp: DateTime!
-  startBlock: BigInt!
-  endBlock: BigInt!
-  lastUpdated: DateTime!
-  status: OGNProposalState!
-  logs: [OGNProposalTxLog]! @derivedFrom(field: "proposal")
-  quorum: BigInt!
-  choices: [String]!
-  scores: [String]!
-}
-
-type OGNProposalVote @entity {
-  id: ID!
-  proposal: OGNProposal! @index
-  voter: OGNAddress! @index
-  weight: BigInt!
-  type: OGNVoteType!
-  txHash: String!
-  timestamp: DateTime!
-}
-
-type OGNDailyStat @entity {
-  id: ID!
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  totalSupply: BigInt!
-  totalSupplyUSD: Float!
-  totalStaked: BigInt!
-  tradingVolumeUSD: Float!
-  marketCapUSD: Float!
-  priceUSD: Float!
-  holdersOverThreshold: Int!
-}
-type OGV @entity {
+}type OGV @entity {
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index

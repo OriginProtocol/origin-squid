@@ -27,6 +27,7 @@ export const OETH_ZAPPER_ADDRESS = '0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66'
 export const OETH_DRIPPER_ADDRESS = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
 export const WOETH_ADDRESS = '0xdcee70654261af21c44c093c300ed3bb97b78192'
 export const WOETH_ARBITRUM_ADDRESS = '0xd8724322f44e5c58d7a815f542036fb17dbbf839'
+export const PRIME_ETH_ADDRESS = '0x6ef3d766dfe02dc4bf04aae9122eb9a0ded25615'
 
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const STETH_ADDRESS = '0xae7ab96520de3a18e5e111b5eaab095312d7fe84'
@@ -54,7 +55,8 @@ export const OETH_STRATEGY_BALANCER_ADDRESS = '0x49109629ac1deb03f2e9b2fe2ac4a62
 export const BALANCER_VAULT = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 export const AURA_REWARDS_POOL_ADDRESS = '0xdd1fe5ad401d4777ce89959b7fa587e569bf125d'
 
-export const GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b6'
+export const OGV_GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b6'
+export const OGN_GOVERNANCE_ADDRESS = '0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec'
 
 export const OGN_ADDRESS = '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26'
 export const OGV_ADDRESS = '0x9c354503c38481a7a7a51629142963f98ecc12d0'
@@ -62,6 +64,8 @@ export const OGV_ADDRESS = '0x9c354503c38481a7a7a51629142963f98ecc12d0'
 export const VEOGV_ADDRESS = '0x0c4576ca1c365868e162554af8e385dc3e7c66d9'
 export const XOGN_ADDRESS = '0x63898b3b6ef3d39332082178656e9862bee45c57'
 export const OGN_REWARDS_SOURCE_ADDRESS = '0x7609c88e5880e934dd3a75bcfef44e31b1badb8b'
+
+export const LEGACY_OGN_STAKING = '0x501804b374ef06fa9c427476147ac09f1551b9a0'
 
 // Token Helper Objects & Types
 export const tokens = {
@@ -92,6 +96,7 @@ export const tokens = {
   rETH: RETH_ADDRESS,
   frxETH: FRXETH_ADDRESS,
   sfrxETH: SFRXETH_ADDRESS,
+  primeETH: PRIME_ETH_ADDRESS,
 
   // Non-stable
   BAL: BAL_ADDRESS,
@@ -147,7 +152,7 @@ export const ousd = {
 export const ogv = {
   ogv: OGV_ADDRESS,
   veOGV: VEOGV_ADDRESS,
-  governance: GOVERNANCE_ADDRESS,
+  governance: OGV_GOVERNANCE_ADDRESS,
 }
 
 export const addresses = {

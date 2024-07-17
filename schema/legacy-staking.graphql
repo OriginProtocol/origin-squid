@@ -1,0 +1,10 @@
+
+
+type LegacyStaker @entity {
+  id: ID! @index
+  inputAmount: BigInt!
+  outputAmount: BigInt!
+  balance: BigInt!
+  rewardAmount: BigInt!
+}
+

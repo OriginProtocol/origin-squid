@@ -1,19 +1,19 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    Zap: event("0x9d0b99c299bdb5656c0c9db6e1886c612db5c2881760ea54ab244f6338b4ebd6", {"minter": indexed(p.address), "asset": indexed(p.address), "amount": p.uint256}),
+    Zap: event("0x9d0b99c299bdb5656c0c9db6e1886c612db5c2881760ea54ab244f6338b4ebd6", "Zap(address,address,uint256)", {"minter": indexed(p.address), "asset": indexed(p.address), "amount": p.uint256}),
 }
 
 export const functions = {
-    deposit: fun("0xd0e30db0", {}, p.uint256),
-    depositSFRXETH: fun("0xd443e97d", {"amount": p.uint256, "minOETH": p.uint256}, p.uint256),
-    frxeth: fun("0x6f708a9d", {}, p.address),
-    oeth: fun("0xccfe2a69", {}, p.address),
-    sfrxeth: fun("0xa07311af", {}, p.address),
-    vault: fun("0xfbfa77cf", {}, p.address),
-    weth: fun("0x3fc8cef3", {}, p.address),
+    deposit: fun("0xd0e30db0", "deposit()", {}, p.uint256),
+    depositSFRXETH: fun("0xd443e97d", "depositSFRXETH(uint256,uint256)", {"amount": p.uint256, "minOETH": p.uint256}, p.uint256),
+    frxeth: viewFun("0x6f708a9d", "frxeth()", {}, p.address),
+    oeth: viewFun("0xccfe2a69", "oeth()", {}, p.address),
+    sfrxeth: viewFun("0xa07311af", "sfrxeth()", {}, p.address),
+    vault: viewFun("0xfbfa77cf", "vault()", {}, p.address),
+    weth: viewFun("0x3fc8cef3", "weth()", {}, p.address),
 }
 
 export class Contract extends ContractBase {

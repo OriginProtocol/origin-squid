@@ -1,68 +1,68 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    AmpUpdateStarted: event("0x1835882ee7a34ac194f717a35e09bb1d24c82a3b9d854ab6c9749525b714cdf2", {"startValue": p.uint256, "endValue": p.uint256, "startTime": p.uint256, "endTime": p.uint256}),
-    AmpUpdateStopped: event("0xa0d01593e47e69d07e0ccd87bece09411e07dd1ed40ca8f2e7af2976542a0233", {"currentValue": p.uint256}),
-    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
-    OracleEnabledChanged: event("0x3e350b41e86a8e10f804ade6d35340d620be35569cc75ac943e8bb14ab80ead1", {"enabled": p.bool}),
-    PausedStateChanged: event("0x9e3a5e37224532dea67b89face185703738a228a6e8a23dee546960180d3be64", {"paused": p.bool}),
-    PriceRateCacheUpdated: event("0xc1a224b14823b63c7711127f125fbf592434682f38881ebb61408747a303affc", {"token": indexed(p.address), "rate": p.uint256}),
-    PriceRateProviderSet: event("0xca6c2c5b6b44b5f3f0c08f0e28e5b6deda1cb38c3fe1113e8031d926c1e8c6d0", {"token": indexed(p.address), "provider": indexed(p.address), "cacheDuration": p.uint256}),
-    SwapFeePercentageChanged: event("0xa9ba3ffe0b6c366b81232caab38605a0699ad5398d6cce76f91ee809e322dafc", {"swapFeePercentage": p.uint256}),
-    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
+    AmpUpdateStarted: event("0x1835882ee7a34ac194f717a35e09bb1d24c82a3b9d854ab6c9749525b714cdf2", "AmpUpdateStarted(uint256,uint256,uint256,uint256)", {"startValue": p.uint256, "endValue": p.uint256, "startTime": p.uint256, "endTime": p.uint256}),
+    AmpUpdateStopped: event("0xa0d01593e47e69d07e0ccd87bece09411e07dd1ed40ca8f2e7af2976542a0233", "AmpUpdateStopped(uint256)", {"currentValue": p.uint256}),
+    Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", "Approval(address,address,uint256)", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
+    OracleEnabledChanged: event("0x3e350b41e86a8e10f804ade6d35340d620be35569cc75ac943e8bb14ab80ead1", "OracleEnabledChanged(bool)", {"enabled": p.bool}),
+    PausedStateChanged: event("0x9e3a5e37224532dea67b89face185703738a228a6e8a23dee546960180d3be64", "PausedStateChanged(bool)", {"paused": p.bool}),
+    PriceRateCacheUpdated: event("0xc1a224b14823b63c7711127f125fbf592434682f38881ebb61408747a303affc", "PriceRateCacheUpdated(address,uint256)", {"token": indexed(p.address), "rate": p.uint256}),
+    PriceRateProviderSet: event("0xca6c2c5b6b44b5f3f0c08f0e28e5b6deda1cb38c3fe1113e8031d926c1e8c6d0", "PriceRateProviderSet(address,address,uint256)", {"token": indexed(p.address), "provider": indexed(p.address), "cacheDuration": p.uint256}),
+    SwapFeePercentageChanged: event("0xa9ba3ffe0b6c366b81232caab38605a0699ad5398d6cce76f91ee809e322dafc", "SwapFeePercentageChanged(uint256)", {"swapFeePercentage": p.uint256}),
+    Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "Transfer(address,address,uint256)", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
 }
 
 export const functions = {
-    DOMAIN_SEPARATOR: fun("0x3644e515", {}, p.bytes32),
-    allowance: fun("0xdd62ed3e", {"owner": p.address, "spender": p.address}, p.uint256),
-    approve: fun("0x095ea7b3", {"spender": p.address, "amount": p.uint256}, p.bool),
-    balanceOf: fun("0x70a08231", {"account": p.address}, p.uint256),
-    decimals: fun("0x313ce567", {}, p.uint8),
-    decreaseAllowance: fun("0xa457c2d7", {"spender": p.address, "amount": p.uint256}, p.bool),
-    enableOracle: fun("0x292c914a", {}, ),
-    getActionId: fun("0x851c1bb3", {"selector": p.bytes4}, p.bytes32),
-    getAmplificationParameter: fun("0x6daccffa", {}, {"value": p.uint256, "isUpdating": p.bool, "precision": p.uint256}),
-    getAuthorizer: fun("0xaaabadc5", {}, p.address),
-    getLargestSafeQueryWindow: fun("0xffd088eb", {}, p.uint256),
-    getLastInvariant: fun("0x9b02cdde", {}, {"lastInvariant": p.uint256, "lastInvariantAmp": p.uint256}),
-    getLatest: fun("0xb10be739", {"variable": p.uint8}, p.uint256),
-    getOracleMiscData: fun("0x1ed4eddc", {}, {"logInvariant": p.int256, "logTotalSupply": p.int256, "oracleSampleCreationTimestamp": p.uint256, "oracleIndex": p.uint256, "oracleEnabled": p.bool}),
-    getOwner: fun("0x893d20e8", {}, p.address),
-    getPastAccumulators: fun("0x6b843239", {"queries": p.array(p.struct({"variable": p.uint8, "ago": p.uint256}))}, p.array(p.int256)),
-    getPausedState: fun("0x1c0de051", {}, {"paused": p.bool, "pauseWindowEndTime": p.uint256, "bufferPeriodEndTime": p.uint256}),
-    getPoolId: fun("0x38fff2d0", {}, p.bytes32),
-    getPriceRateCache: fun("0xb867ee5a", {"token": p.address}, {"rate": p.uint256, "duration": p.uint256, "expires": p.uint256}),
-    getRate: fun("0x679aefce", {}, p.uint256),
-    getRateProviders: fun("0x238a2d59", {}, p.array(p.address)),
-    getSample: fun("0x60d1507c", {"index": p.uint256}, {"logPairPrice": p.int256, "accLogPairPrice": p.int256, "logBptPrice": p.int256, "accLogBptPrice": p.int256, "logInvariant": p.int256, "accLogInvariant": p.int256, "timestamp": p.uint256}),
-    getScalingFactors: fun("0x1dd746ea", {}, p.array(p.uint256)),
-    getSwapFeePercentage: fun("0x55c67628", {}, p.uint256),
-    getTimeWeightedAverage: fun("0x1dccd830", {"queries": p.array(p.struct({"variable": p.uint8, "secs": p.uint256, "ago": p.uint256}))}, p.array(p.uint256)),
-    getTotalSamples: fun("0xb48b5b40", {}, p.uint256),
-    getVault: fun("0x8d928af8", {}, p.address),
-    increaseAllowance: fun("0x39509351", {"spender": p.address, "addedValue": p.uint256}, p.bool),
-    name: fun("0x06fdde03", {}, p.string),
-    nonces: fun("0x7ecebe00", {"owner": p.address}, p.uint256),
-    onExitPool: fun("0x74f3b009", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsOut": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
-    onJoinPool: fun("0xd5c096c4", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsIn": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
-    "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)": fun("0x01ec954a", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balances": p.array(p.uint256), "indexIn": p.uint256, "indexOut": p.uint256}, p.uint256),
-    "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)": fun("0x9d2c110c", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balanceTokenIn": p.uint256, "balanceTokenOut": p.uint256}, p.uint256),
-    permit: fun("0xd505accf", {"owner": p.address, "spender": p.address, "value": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
-    queryExit: fun("0x6028bfd4", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptIn": p.uint256, "amountsOut": p.array(p.uint256)}),
-    queryJoin: fun("0x87ec6817", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptOut": p.uint256, "amountsIn": p.array(p.uint256)}),
-    setAssetManagerPoolConfig: fun("0x50dd6ed9", {"token": p.address, "poolConfig": p.bytes}, ),
-    setPaused: fun("0x16c38b3c", {"paused": p.bool}, ),
-    setPriceRateCacheDuration: fun("0xb7710251", {"token": p.address, "duration": p.uint256}, ),
-    setSwapFeePercentage: fun("0x38e9922e", {"swapFeePercentage": p.uint256}, ),
-    startAmplificationParameterUpdate: fun("0x2f1a0bc9", {"rawEndValue": p.uint256, "endTime": p.uint256}, ),
-    stopAmplificationParameterUpdate: fun("0xeb0f24d6", {}, ),
-    symbol: fun("0x95d89b41", {}, p.string),
-    totalSupply: fun("0x18160ddd", {}, p.uint256),
-    transfer: fun("0xa9059cbb", {"recipient": p.address, "amount": p.uint256}, p.bool),
-    transferFrom: fun("0x23b872dd", {"sender": p.address, "recipient": p.address, "amount": p.uint256}, p.bool),
-    updatePriceRateCache: fun("0xa0daaed0", {"token": p.address}, ),
+    DOMAIN_SEPARATOR: viewFun("0x3644e515", "DOMAIN_SEPARATOR()", {}, p.bytes32),
+    allowance: viewFun("0xdd62ed3e", "allowance(address,address)", {"owner": p.address, "spender": p.address}, p.uint256),
+    approve: fun("0x095ea7b3", "approve(address,uint256)", {"spender": p.address, "amount": p.uint256}, p.bool),
+    balanceOf: viewFun("0x70a08231", "balanceOf(address)", {"account": p.address}, p.uint256),
+    decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
+    decreaseAllowance: fun("0xa457c2d7", "decreaseAllowance(address,uint256)", {"spender": p.address, "amount": p.uint256}, p.bool),
+    enableOracle: fun("0x292c914a", "enableOracle()", {}, ),
+    getActionId: viewFun("0x851c1bb3", "getActionId(bytes4)", {"selector": p.bytes4}, p.bytes32),
+    getAmplificationParameter: viewFun("0x6daccffa", "getAmplificationParameter()", {}, {"value": p.uint256, "isUpdating": p.bool, "precision": p.uint256}),
+    getAuthorizer: viewFun("0xaaabadc5", "getAuthorizer()", {}, p.address),
+    getLargestSafeQueryWindow: viewFun("0xffd088eb", "getLargestSafeQueryWindow()", {}, p.uint256),
+    getLastInvariant: viewFun("0x9b02cdde", "getLastInvariant()", {}, {"lastInvariant": p.uint256, "lastInvariantAmp": p.uint256}),
+    getLatest: viewFun("0xb10be739", "getLatest(uint8)", {"variable": p.uint8}, p.uint256),
+    getOracleMiscData: viewFun("0x1ed4eddc", "getOracleMiscData()", {}, {"logInvariant": p.int256, "logTotalSupply": p.int256, "oracleSampleCreationTimestamp": p.uint256, "oracleIndex": p.uint256, "oracleEnabled": p.bool}),
+    getOwner: viewFun("0x893d20e8", "getOwner()", {}, p.address),
+    getPastAccumulators: viewFun("0x6b843239", "getPastAccumulators((uint8,uint256)[])", {"queries": p.array(p.struct({"variable": p.uint8, "ago": p.uint256}))}, p.array(p.int256)),
+    getPausedState: viewFun("0x1c0de051", "getPausedState()", {}, {"paused": p.bool, "pauseWindowEndTime": p.uint256, "bufferPeriodEndTime": p.uint256}),
+    getPoolId: viewFun("0x38fff2d0", "getPoolId()", {}, p.bytes32),
+    getPriceRateCache: viewFun("0xb867ee5a", "getPriceRateCache(address)", {"token": p.address}, {"rate": p.uint256, "duration": p.uint256, "expires": p.uint256}),
+    getRate: viewFun("0x679aefce", "getRate()", {}, p.uint256),
+    getRateProviders: viewFun("0x238a2d59", "getRateProviders()", {}, p.array(p.address)),
+    getSample: viewFun("0x60d1507c", "getSample(uint256)", {"index": p.uint256}, {"logPairPrice": p.int256, "accLogPairPrice": p.int256, "logBptPrice": p.int256, "accLogBptPrice": p.int256, "logInvariant": p.int256, "accLogInvariant": p.int256, "timestamp": p.uint256}),
+    getScalingFactors: viewFun("0x1dd746ea", "getScalingFactors()", {}, p.array(p.uint256)),
+    getSwapFeePercentage: viewFun("0x55c67628", "getSwapFeePercentage()", {}, p.uint256),
+    getTimeWeightedAverage: viewFun("0x1dccd830", "getTimeWeightedAverage((uint8,uint256,uint256)[])", {"queries": p.array(p.struct({"variable": p.uint8, "secs": p.uint256, "ago": p.uint256}))}, p.array(p.uint256)),
+    getTotalSamples: viewFun("0xb48b5b40", "getTotalSamples()", {}, p.uint256),
+    getVault: viewFun("0x8d928af8", "getVault()", {}, p.address),
+    increaseAllowance: fun("0x39509351", "increaseAllowance(address,uint256)", {"spender": p.address, "addedValue": p.uint256}, p.bool),
+    name: viewFun("0x06fdde03", "name()", {}, p.string),
+    nonces: viewFun("0x7ecebe00", "nonces(address)", {"owner": p.address}, p.uint256),
+    onExitPool: fun("0x74f3b009", "onExitPool(bytes32,address,address,uint256[],uint256,uint256,bytes)", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsOut": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
+    onJoinPool: fun("0xd5c096c4", "onJoinPool(bytes32,address,address,uint256[],uint256,uint256,bytes)", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"amountsIn": p.array(p.uint256), "dueProtocolFeeAmounts": p.array(p.uint256)}),
+    'onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)': fun("0x01ec954a", "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balances": p.array(p.uint256), "indexIn": p.uint256, "indexOut": p.uint256}, p.uint256),
+    'onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)': fun("0x9d2c110c", "onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)", {"request": p.struct({"kind": p.uint8, "tokenIn": p.address, "tokenOut": p.address, "amount": p.uint256, "poolId": p.bytes32, "lastChangeBlock": p.uint256, "from": p.address, "to": p.address, "userData": p.bytes}), "balanceTokenIn": p.uint256, "balanceTokenOut": p.uint256}, p.uint256),
+    permit: fun("0xd505accf", "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)", {"owner": p.address, "spender": p.address, "value": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
+    queryExit: fun("0x6028bfd4", "queryExit(bytes32,address,address,uint256[],uint256,uint256,bytes)", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptIn": p.uint256, "amountsOut": p.array(p.uint256)}),
+    queryJoin: fun("0x87ec6817", "queryJoin(bytes32,address,address,uint256[],uint256,uint256,bytes)", {"poolId": p.bytes32, "sender": p.address, "recipient": p.address, "balances": p.array(p.uint256), "lastChangeBlock": p.uint256, "protocolSwapFeePercentage": p.uint256, "userData": p.bytes}, {"bptOut": p.uint256, "amountsIn": p.array(p.uint256)}),
+    setAssetManagerPoolConfig: fun("0x50dd6ed9", "setAssetManagerPoolConfig(address,bytes)", {"token": p.address, "poolConfig": p.bytes}, ),
+    setPaused: fun("0x16c38b3c", "setPaused(bool)", {"paused": p.bool}, ),
+    setPriceRateCacheDuration: fun("0xb7710251", "setPriceRateCacheDuration(address,uint256)", {"token": p.address, "duration": p.uint256}, ),
+    setSwapFeePercentage: fun("0x38e9922e", "setSwapFeePercentage(uint256)", {"swapFeePercentage": p.uint256}, ),
+    startAmplificationParameterUpdate: fun("0x2f1a0bc9", "startAmplificationParameterUpdate(uint256,uint256)", {"rawEndValue": p.uint256, "endTime": p.uint256}, ),
+    stopAmplificationParameterUpdate: fun("0xeb0f24d6", "stopAmplificationParameterUpdate()", {}, ),
+    symbol: viewFun("0x95d89b41", "symbol()", {}, p.string),
+    totalSupply: viewFun("0x18160ddd", "totalSupply()", {}, p.uint256),
+    transfer: fun("0xa9059cbb", "transfer(address,uint256)", {"recipient": p.address, "amount": p.uint256}, p.bool),
+    transferFrom: fun("0x23b872dd", "transferFrom(address,address,uint256)", {"sender": p.address, "recipient": p.address, "amount": p.uint256}, p.bool),
+    updatePriceRateCache: fun("0xa0daaed0", "updatePriceRateCache(address)", {"token": p.address}, ),
 }
 
 export class Contract extends ContractBase {
@@ -288,11 +288,11 @@ export type OnExitPoolReturn = FunctionReturn<typeof functions.onExitPool>
 export type OnJoinPoolParams = FunctionArguments<typeof functions.onJoinPool>
 export type OnJoinPoolReturn = FunctionReturn<typeof functions.onJoinPool>
 
-export type OnSwapParams_0 = FunctionArguments<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)"]>
-export type OnSwapReturn_0 = FunctionReturn<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)"]>
+export type OnSwapParams_0 = FunctionArguments<typeof functions['onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)']>
+export type OnSwapReturn_0 = FunctionReturn<typeof functions['onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256[],uint256,uint256)']>
 
-export type OnSwapParams_1 = FunctionArguments<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)"]>
-export type OnSwapReturn_1 = FunctionReturn<typeof functions["onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)"]>
+export type OnSwapParams_1 = FunctionArguments<typeof functions['onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)']>
+export type OnSwapReturn_1 = FunctionReturn<typeof functions['onSwap((uint8,address,address,uint256,bytes32,uint256,address,address,bytes),uint256,uint256)']>
 
 export type PermitParams = FunctionArguments<typeof functions.permit>
 export type PermitReturn = FunctionReturn<typeof functions.permit>

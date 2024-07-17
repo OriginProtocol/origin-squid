@@ -1,31 +1,31 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    Interaction: event("0xed99827efb37016f2275f98c4bcf71c7551c75d59e9b450f79fa32e60be672c2", {"target": indexed(p.address), "value": p.uint256, "selector": p.bytes4}),
-    OrderInvalidated: event("0x875b6cb035bbd4ac6500fabc6d1e4ca5bdc58a3e2b424ccb5c24cdbebeb009a9", {"owner": indexed(p.address), "orderUid": p.bytes}),
-    PreSignature: event("0x01bf7c8b0ca55deecbea89d7e58295b7ffbf685fd0d96801034ba8c6ffe1c68d", {"owner": indexed(p.address), "orderUid": p.bytes, "signed": p.bool}),
-    Settlement: event("0x40338ce1a7c49204f0099533b1e9a7ee0a3d261f84974ab7af36105b8c4e9db4", {"solver": indexed(p.address)}),
-    Trade: event("0xa07a543ab8a018198e99ca0184c93fe9050a79400a0a723441f84de1d972cc17", {"owner": indexed(p.address), "sellToken": p.address, "buyToken": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "feeAmount": p.uint256, "orderUid": p.bytes}),
+    Interaction: event("0xed99827efb37016f2275f98c4bcf71c7551c75d59e9b450f79fa32e60be672c2", "Interaction(address,uint256,bytes4)", {"target": indexed(p.address), "value": p.uint256, "selector": p.bytes4}),
+    OrderInvalidated: event("0x875b6cb035bbd4ac6500fabc6d1e4ca5bdc58a3e2b424ccb5c24cdbebeb009a9", "OrderInvalidated(address,bytes)", {"owner": indexed(p.address), "orderUid": p.bytes}),
+    PreSignature: event("0x01bf7c8b0ca55deecbea89d7e58295b7ffbf685fd0d96801034ba8c6ffe1c68d", "PreSignature(address,bytes,bool)", {"owner": indexed(p.address), "orderUid": p.bytes, "signed": p.bool}),
+    Settlement: event("0x40338ce1a7c49204f0099533b1e9a7ee0a3d261f84974ab7af36105b8c4e9db4", "Settlement(address)", {"solver": indexed(p.address)}),
+    Trade: event("0xa07a543ab8a018198e99ca0184c93fe9050a79400a0a723441f84de1d972cc17", "Trade(address,address,address,uint256,uint256,uint256,bytes)", {"owner": indexed(p.address), "sellToken": p.address, "buyToken": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "feeAmount": p.uint256, "orderUid": p.bytes}),
 }
 
 export const functions = {
-    authenticator: fun("0x2335c76b", {}, p.address),
-    domainSeparator: fun("0xf698da25", {}, p.bytes32),
-    filledAmount: fun("0x2479fb6e", {"_0": p.bytes}, p.uint256),
-    freeFilledAmountStorage: fun("0xed9f35ce", {"orderUids": p.array(p.bytes)}, ),
-    freePreSignatureStorage: fun("0xa2a7d51b", {"orderUids": p.array(p.bytes)}, ),
-    getStorageAt: fun("0x5624b25b", {"offset": p.uint256, "length": p.uint256}, p.bytes),
-    invalidateOrder: fun("0x15337bc0", {"orderUid": p.bytes}, ),
-    preSignature: fun("0xd08d33d1", {"_0": p.bytes}, p.uint256),
-    setPreSignature: fun("0xec6cb13f", {"orderUid": p.bytes, "signed": p.bool}, ),
-    settle: fun("0x13d79a0b", {"tokens": p.array(p.address), "clearingPrices": p.array(p.uint256), "trades": p.array(p.struct({"sellTokenIndex": p.uint256, "buyTokenIndex": p.uint256, "receiver": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "validTo": p.uint32, "appData": p.bytes32, "feeAmount": p.uint256, "flags": p.uint256, "executedAmount": p.uint256, "signature": p.bytes})), "interactions": p.fixedSizeArray(p.array(p.struct({"target": p.address, "value": p.uint256, "callData": p.bytes})), 3)}, ),
-    simulateDelegatecall: fun("0xf84436bd", {"targetContract": p.address, "calldataPayload": p.bytes}, p.bytes),
-    simulateDelegatecallInternal: fun("0x43218e19", {"targetContract": p.address, "calldataPayload": p.bytes}, p.bytes),
-    swap: fun("0x845a101f", {"swaps": p.array(p.struct({"poolId": p.bytes32, "assetInIndex": p.uint256, "assetOutIndex": p.uint256, "amount": p.uint256, "userData": p.bytes})), "tokens": p.array(p.address), "trade": p.struct({"sellTokenIndex": p.uint256, "buyTokenIndex": p.uint256, "receiver": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "validTo": p.uint32, "appData": p.bytes32, "feeAmount": p.uint256, "flags": p.uint256, "executedAmount": p.uint256, "signature": p.bytes})}, ),
-    vault: fun("0xfbfa77cf", {}, p.address),
-    vaultRelayer: fun("0x9b552cc2", {}, p.address),
+    authenticator: viewFun("0x2335c76b", "authenticator()", {}, p.address),
+    domainSeparator: viewFun("0xf698da25", "domainSeparator()", {}, p.bytes32),
+    filledAmount: viewFun("0x2479fb6e", "filledAmount(bytes)", {"_0": p.bytes}, p.uint256),
+    freeFilledAmountStorage: fun("0xed9f35ce", "freeFilledAmountStorage(bytes[])", {"orderUids": p.array(p.bytes)}, ),
+    freePreSignatureStorage: fun("0xa2a7d51b", "freePreSignatureStorage(bytes[])", {"orderUids": p.array(p.bytes)}, ),
+    getStorageAt: viewFun("0x5624b25b", "getStorageAt(uint256,uint256)", {"offset": p.uint256, "length": p.uint256}, p.bytes),
+    invalidateOrder: fun("0x15337bc0", "invalidateOrder(bytes)", {"orderUid": p.bytes}, ),
+    preSignature: viewFun("0xd08d33d1", "preSignature(bytes)", {"_0": p.bytes}, p.uint256),
+    setPreSignature: fun("0xec6cb13f", "setPreSignature(bytes,bool)", {"orderUid": p.bytes, "signed": p.bool}, ),
+    settle: fun("0x13d79a0b", "settle(address[],uint256[],(uint256,uint256,address,uint256,uint256,uint32,bytes32,uint256,uint256,uint256,bytes)[],(address,uint256,bytes)[][3])", {"tokens": p.array(p.address), "clearingPrices": p.array(p.uint256), "trades": p.array(p.struct({"sellTokenIndex": p.uint256, "buyTokenIndex": p.uint256, "receiver": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "validTo": p.uint32, "appData": p.bytes32, "feeAmount": p.uint256, "flags": p.uint256, "executedAmount": p.uint256, "signature": p.bytes})), "interactions": p.fixedSizeArray(p.array(p.struct({"target": p.address, "value": p.uint256, "callData": p.bytes})), 3)}, ),
+    simulateDelegatecall: fun("0xf84436bd", "simulateDelegatecall(address,bytes)", {"targetContract": p.address, "calldataPayload": p.bytes}, p.bytes),
+    simulateDelegatecallInternal: fun("0x43218e19", "simulateDelegatecallInternal(address,bytes)", {"targetContract": p.address, "calldataPayload": p.bytes}, p.bytes),
+    swap: fun("0x845a101f", "swap((bytes32,uint256,uint256,uint256,bytes)[],address[],(uint256,uint256,address,uint256,uint256,uint32,bytes32,uint256,uint256,uint256,bytes))", {"swaps": p.array(p.struct({"poolId": p.bytes32, "assetInIndex": p.uint256, "assetOutIndex": p.uint256, "amount": p.uint256, "userData": p.bytes})), "tokens": p.array(p.address), "trade": p.struct({"sellTokenIndex": p.uint256, "buyTokenIndex": p.uint256, "receiver": p.address, "sellAmount": p.uint256, "buyAmount": p.uint256, "validTo": p.uint32, "appData": p.bytes32, "feeAmount": p.uint256, "flags": p.uint256, "executedAmount": p.uint256, "signature": p.bytes})}, ),
+    vault: viewFun("0xfbfa77cf", "vault()", {}, p.address),
+    vaultRelayer: viewFun("0x9b552cc2", "vaultRelayer()", {}, p.address),
 }
 
 export class Contract extends ContractBase {

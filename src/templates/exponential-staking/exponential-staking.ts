@@ -96,6 +96,11 @@ export const createESTracker = ({
     topic0: [abi.events.Penalty.topic],
     range: { from },
   })
+  const rewardFilter = logFilter({
+    address: [address],
+    topic0: [abi.events.Reward.topic],
+    range: { from },
+  })
   const stakeFilter = logFilter({
     address: [address],
     topic0: [abi.events.Stake.topic],
@@ -172,7 +177,7 @@ export const createESTracker = ({
     },
     {
       description: 'Create Reward event',
-      filter: penaltyFilter,
+      filter: rewardFilter,
       processor: async ({ ctx, block, log, state }) => {
         const chainId = ctx.chain.id
         const data = abi.events.Reward.decode(log)

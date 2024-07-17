@@ -1,39 +1,39 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    SetMaximumDeviation: event("0x7e2a21727a662d0def125b3d1237f41a099a760d472095091724cd8e56c25bf0", {"oldMaxDeviation": p.uint256, "newMaxDeviation": p.uint256}),
-    SetMaximumOracleDelay: event("0xd72ef688fa430b6a285b84371ba35e8a8e0762b32c1deb7be9d9c111ca79f5ea", {"oldMaxOracleDelay": p.uint256, "newMaxOracleDelay": p.uint256}),
-    SetPriceSource: event("0x964298b435edfc268e11aa89b342ef1ddac566da6759b6dd15d7aad58a1dc935", {"oldPriceSource": p.address, "newPriceSource": p.address}),
-    TimelockTransferStarted: event("0x162998b90abc2507f3953aa797827b03a14c42dbd9a35f09feaf02e0d592773a", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
-    TimelockTransferred: event("0x31b6c5a04b069b6ec1b3cef44c4e7c1eadd721349cda9823d0b1877b3551cdc6", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
+    SetMaximumDeviation: event("0x7e2a21727a662d0def125b3d1237f41a099a760d472095091724cd8e56c25bf0", "SetMaximumDeviation(uint256,uint256)", {"oldMaxDeviation": p.uint256, "newMaxDeviation": p.uint256}),
+    SetMaximumOracleDelay: event("0xd72ef688fa430b6a285b84371ba35e8a8e0762b32c1deb7be9d9c111ca79f5ea", "SetMaximumOracleDelay(uint256,uint256)", {"oldMaxOracleDelay": p.uint256, "newMaxOracleDelay": p.uint256}),
+    SetPriceSource: event("0x964298b435edfc268e11aa89b342ef1ddac566da6759b6dd15d7aad58a1dc935", "SetPriceSource(address,address)", {"oldPriceSource": p.address, "newPriceSource": p.address}),
+    TimelockTransferStarted: event("0x162998b90abc2507f3953aa797827b03a14c42dbd9a35f09feaf02e0d592773a", "TimelockTransferStarted(address,address)", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
+    TimelockTransferred: event("0x31b6c5a04b069b6ec1b3cef44c4e7c1eadd721349cda9823d0b1877b3551cdc6", "TimelockTransferred(address,address)", {"previousTimelock": indexed(p.address), "newTimelock": indexed(p.address)}),
 }
 
 export const functions = {
-    BASE_TOKEN: fun("0x210663e4", {}, p.address),
-    QUOTE_TOKEN: fun("0x78892cea", {}, p.address),
-    acceptTransferTimelock: fun("0xf6ccaad4", {}, ),
-    addRoundData: fun("0x45d9f582", {"_isBadData": p.bool, "_priceLow": p.uint104, "_priceHigh": p.uint104, "_timestamp": p.uint40}, ),
-    decimals: fun("0x313ce567", {}, p.uint8),
-    description: fun("0x7284e416", {}, p.string),
-    getPrices: fun("0xbd9a548b", {}, {"_isBadData": p.bool, "_priceLow": p.uint256, "_priceHigh": p.uint256}),
-    getRoundData: fun("0x9a6fc8f5", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    lastCorrectRoundId: fun("0x0f4a05fb", {}, p.uint80),
-    latestRoundData: fun("0xfeaf968c", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    maximumDeviation: fun("0x9152c29d", {}, p.uint256),
-    maximumOracleDelay: fun("0xcede91a4", {}, p.uint256),
-    pendingTimelockAddress: fun("0x090f3f50", {}, p.address),
-    priceSource: fun("0x20531bc9", {}, p.address),
-    renounceTimelock: fun("0x4f8b4ae7", {}, ),
-    rounds: fun("0x8c65c81f", {"_0": p.uint256}, {"priceLow": p.uint104, "priceHigh": p.uint104, "timestamp": p.uint40, "isBadData": p.bool}),
-    setMaximumDeviation: fun("0x2dfa4267", {"_newMaxDeviation": p.uint256}, ),
-    setMaximumOracleDelay: fun("0xd2333be7", {"_newMaxOracleDelay": p.uint256}, ),
-    setPriceSource: fun("0xbda53107", {"_newPriceSource": p.address}, ),
-    supportsInterface: fun("0x01ffc9a7", {"interfaceId": p.bytes4}, p.bool),
-    timelockAddress: fun("0x4bc66f32", {}, p.address),
-    transferTimelock: fun("0x45014095", {"_newTimelock": p.address}, ),
-    version: fun("0x54fd4d50", {}, p.uint256),
+    BASE_TOKEN: viewFun("0x210663e4", "BASE_TOKEN()", {}, p.address),
+    QUOTE_TOKEN: viewFun("0x78892cea", "QUOTE_TOKEN()", {}, p.address),
+    acceptTransferTimelock: fun("0xf6ccaad4", "acceptTransferTimelock()", {}, ),
+    addRoundData: fun("0x45d9f582", "addRoundData(bool,uint104,uint104,uint40)", {"_isBadData": p.bool, "_priceLow": p.uint104, "_priceHigh": p.uint104, "_timestamp": p.uint40}, ),
+    decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
+    description: viewFun("0x7284e416", "description()", {}, p.string),
+    getPrices: viewFun("0xbd9a548b", "getPrices()", {}, {"_isBadData": p.bool, "_priceLow": p.uint256, "_priceHigh": p.uint256}),
+    getRoundData: viewFun("0x9a6fc8f5", "getRoundData(uint80)", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    lastCorrectRoundId: viewFun("0x0f4a05fb", "lastCorrectRoundId()", {}, p.uint80),
+    latestRoundData: viewFun("0xfeaf968c", "latestRoundData()", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    maximumDeviation: viewFun("0x9152c29d", "maximumDeviation()", {}, p.uint256),
+    maximumOracleDelay: viewFun("0xcede91a4", "maximumOracleDelay()", {}, p.uint256),
+    pendingTimelockAddress: viewFun("0x090f3f50", "pendingTimelockAddress()", {}, p.address),
+    priceSource: viewFun("0x20531bc9", "priceSource()", {}, p.address),
+    renounceTimelock: fun("0x4f8b4ae7", "renounceTimelock()", {}, ),
+    rounds: viewFun("0x8c65c81f", "rounds(uint256)", {"_0": p.uint256}, {"priceLow": p.uint104, "priceHigh": p.uint104, "timestamp": p.uint40, "isBadData": p.bool}),
+    setMaximumDeviation: fun("0x2dfa4267", "setMaximumDeviation(uint256)", {"_newMaxDeviation": p.uint256}, ),
+    setMaximumOracleDelay: fun("0xd2333be7", "setMaximumOracleDelay(uint256)", {"_newMaxOracleDelay": p.uint256}, ),
+    setPriceSource: fun("0xbda53107", "setPriceSource(address)", {"_newPriceSource": p.address}, ),
+    supportsInterface: viewFun("0x01ffc9a7", "supportsInterface(bytes4)", {"interfaceId": p.bytes4}, p.bool),
+    timelockAddress: viewFun("0x4bc66f32", "timelockAddress()", {}, p.address),
+    transferTimelock: fun("0x45014095", "transferTimelock(address)", {"_newTimelock": p.address}, ),
+    version: viewFun("0x54fd4d50", "version()", {}, p.uint256),
 }
 
 export class Contract extends ContractBase {

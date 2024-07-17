@@ -1,38 +1,38 @@
 import * as p from '@subsquid/evm-codec'
-import { event, fun, indexed, ContractBase } from '@subsquid/evm-abi'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
-    AnswerUpdated: event("0x0559884fd3a460db3073b7fc896cc77986f16e378210ded43186175bf646fc5f", {"current": indexed(p.int256), "roundId": indexed(p.uint256), "updatedAt": p.uint256}),
-    NewRound: event("0x0109fc6f55cf40689f02fbaad7af7fe7bbac8a3d2186600afc7d3e10cac60271", {"roundId": indexed(p.uint256), "startedBy": indexed(p.address), "startedAt": p.uint256}),
-    OwnershipTransferRequested: event("0xed8889f560326eb138920d842192f0eb3dd22b4f139c87a2c57538e05bae1278", {"from": indexed(p.address), "to": indexed(p.address)}),
-    OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", {"from": indexed(p.address), "to": indexed(p.address)}),
+    AnswerUpdated: event("0x0559884fd3a460db3073b7fc896cc77986f16e378210ded43186175bf646fc5f", "AnswerUpdated(int256,uint256,uint256)", {"current": indexed(p.int256), "roundId": indexed(p.uint256), "updatedAt": p.uint256}),
+    NewRound: event("0x0109fc6f55cf40689f02fbaad7af7fe7bbac8a3d2186600afc7d3e10cac60271", "NewRound(uint256,address,uint256)", {"roundId": indexed(p.uint256), "startedBy": indexed(p.address), "startedAt": p.uint256}),
+    OwnershipTransferRequested: event("0xed8889f560326eb138920d842192f0eb3dd22b4f139c87a2c57538e05bae1278", "OwnershipTransferRequested(address,address)", {"from": indexed(p.address), "to": indexed(p.address)}),
+    OwnershipTransferred: event("0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0", "OwnershipTransferred(address,address)", {"from": indexed(p.address), "to": indexed(p.address)}),
 }
 
 export const functions = {
-    acceptOwnership: fun("0x79ba5097", {}, ),
-    accessController: fun("0xbc43cbaf", {}, p.address),
-    aggregator: fun("0x245a7bfc", {}, p.address),
-    confirmAggregator: fun("0xa928c096", {"_aggregator": p.address}, ),
-    decimals: fun("0x313ce567", {}, p.uint8),
-    description: fun("0x7284e416", {}, p.string),
-    getAnswer: fun("0xb5ab58dc", {"_roundId": p.uint256}, p.int256),
-    getRoundData: fun("0x9a6fc8f5", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    getTimestamp: fun("0xb633620c", {"_roundId": p.uint256}, p.uint256),
-    latestAnswer: fun("0x50d25bcd", {}, p.int256),
-    latestRound: fun("0x668a0f02", {}, p.uint256),
-    latestRoundData: fun("0xfeaf968c", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    latestTimestamp: fun("0x8205bf6a", {}, p.uint256),
-    owner: fun("0x8da5cb5b", {}, p.address),
-    phaseAggregators: fun("0xc1597304", {"_0": p.uint16}, p.address),
-    phaseId: fun("0x58303b10", {}, p.uint16),
-    proposeAggregator: fun("0xf8a2abd3", {"_aggregator": p.address}, ),
-    proposedAggregator: fun("0xe8c4be30", {}, p.address),
-    proposedGetRoundData: fun("0x6001ac53", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    proposedLatestRoundData: fun("0x8f6b4d91", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
-    setController: fun("0x92eefe9b", {"_accessController": p.address}, ),
-    transferOwnership: fun("0xf2fde38b", {"_to": p.address}, ),
-    version: fun("0x54fd4d50", {}, p.uint256),
+    acceptOwnership: fun("0x79ba5097", "acceptOwnership()", {}, ),
+    accessController: viewFun("0xbc43cbaf", "accessController()", {}, p.address),
+    aggregator: viewFun("0x245a7bfc", "aggregator()", {}, p.address),
+    confirmAggregator: fun("0xa928c096", "confirmAggregator(address)", {"_aggregator": p.address}, ),
+    decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
+    description: viewFun("0x7284e416", "description()", {}, p.string),
+    getAnswer: viewFun("0xb5ab58dc", "getAnswer(uint256)", {"_roundId": p.uint256}, p.int256),
+    getRoundData: viewFun("0x9a6fc8f5", "getRoundData(uint80)", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    getTimestamp: viewFun("0xb633620c", "getTimestamp(uint256)", {"_roundId": p.uint256}, p.uint256),
+    latestAnswer: viewFun("0x50d25bcd", "latestAnswer()", {}, p.int256),
+    latestRound: viewFun("0x668a0f02", "latestRound()", {}, p.uint256),
+    latestRoundData: viewFun("0xfeaf968c", "latestRoundData()", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    latestTimestamp: viewFun("0x8205bf6a", "latestTimestamp()", {}, p.uint256),
+    owner: viewFun("0x8da5cb5b", "owner()", {}, p.address),
+    phaseAggregators: viewFun("0xc1597304", "phaseAggregators(uint16)", {"_0": p.uint16}, p.address),
+    phaseId: viewFun("0x58303b10", "phaseId()", {}, p.uint16),
+    proposeAggregator: fun("0xf8a2abd3", "proposeAggregator(address)", {"_aggregator": p.address}, ),
+    proposedAggregator: viewFun("0xe8c4be30", "proposedAggregator()", {}, p.address),
+    proposedGetRoundData: viewFun("0x6001ac53", "proposedGetRoundData(uint80)", {"_roundId": p.uint80}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    proposedLatestRoundData: viewFun("0x8f6b4d91", "proposedLatestRoundData()", {}, {"roundId": p.uint80, "answer": p.int256, "startedAt": p.uint256, "updatedAt": p.uint256, "answeredInRound": p.uint80}),
+    setController: fun("0x92eefe9b", "setController(address)", {"_accessController": p.address}, ),
+    transferOwnership: fun("0xf2fde38b", "transferOwnership(address)", {"_to": p.address}, ),
+    version: viewFun("0x54fd4d50", "version()", {}, p.uint256),
 }
 
 export class Contract extends ContractBase {

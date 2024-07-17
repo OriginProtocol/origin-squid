@@ -33,6 +33,14 @@ const simpleTracks: Record<string, Parameters<typeof createERC20SimpleTracker>[0
     from: 14439231,
     address: tokens.OGV,
   },
+  veOGV: {
+    from: 15089596,
+    address: tokens.veOGV,
+  },
+  primeETH: {
+    from: 19138973,
+    address: tokens.primeETH,
+  },
 }
 const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   // Origin Specific
