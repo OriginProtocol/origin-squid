@@ -28,6 +28,7 @@ export const cowSwapActivityProcessor = ({ address }: { address: string }): Acti
           return createActivity<SwapActivity>(
             { ctx, block, log },
             {
+              processor: 'cow-swap',
               type: 'Swap',
               account: log.transaction!.from,
               exchange: 'Balancer',

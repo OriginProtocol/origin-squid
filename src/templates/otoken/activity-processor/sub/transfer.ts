@@ -34,6 +34,7 @@ export const transferActivityProcessor = ({
         return createActivity<TransferActivity>(
           { ctx, block, log },
           {
+            processor: 'transfer',
             type: 'Transfer',
             token: log.address,
             from: data.from.toLowerCase(),
@@ -44,6 +45,16 @@ export const transferActivityProcessor = ({
       })
     },
   }
+}
+
+const getExchangeName = (
+  logs: {
+    log: Log
+    data: ReturnType<typeof wotokenAbi.events.Transfer.decode>
+  }[],
+) => {
+  if (logs[0].log.transaction?.to === '0x6131b5fae19ea4f9d964eac0408e4408b66337b5') return 'Kyber Swap'
+  return logs.find((l) => l.log.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS) ? '1inch' : 'other'
 }
 
 const calculateTransferActivityAsSwap = (
@@ -57,6 +68,7 @@ const calculateTransferActivityAsSwap = (
   if (logs.length === 1) return undefined
   const resultMap: Record<string, SwapActivity> = {}
   const tokens = new Set<string>()
+  const exchange = getExchangeName(logs)
   for (const { log, data } of logs) {
     tokens.add(log.address)
     // To
@@ -65,8 +77,9 @@ const calculateTransferActivityAsSwap = (
       createActivity<SwapActivity>(
         { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.to.toLowerCase()}` },
         {
+          processor: 'transfer',
           type: 'Swap',
-          exchange: logs.find((l) => l.log.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS) ? '1inch' : 'other',
+          exchange,
           contract: log.address,
           account: data.to.toLowerCase(),
           tokensOut: [],
@@ -81,8 +94,9 @@ const calculateTransferActivityAsSwap = (
       createActivity<SwapActivity>(
         { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.from.toLowerCase()}` },
         {
+          processor: 'transfer',
           type: 'Swap',
-          exchange: logs.find((l) => l.log.address === ONEINCH_AGGREGATION_ROUTER_ADDRESS) ? '1inch' : 'other',
+          exchange,
           contract: log.address,
           account: data.to.toLowerCase(),
           tokensOut: [],

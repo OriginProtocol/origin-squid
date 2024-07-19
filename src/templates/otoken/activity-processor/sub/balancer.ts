@@ -26,6 +26,7 @@ export const balancerActivityProcessor = ({ pools }: { pools: string[] }): Activ
           return createActivity<SwapActivity>(
             { ctx, block, log },
             {
+              processor: 'balancer',
               type: 'Swap',
               account: log.transaction!.from,
               exchange: 'Balancer',

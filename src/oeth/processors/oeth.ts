@@ -9,9 +9,11 @@ import {
   FRXETH_ADDRESS,
   OETH_ADDRESS,
   OETH_VAULT_ADDRESS,
+  OETH_ZAPPER_ADDRESS,
   RETH_ADDRESS,
   SFRXETH_ADDRESS,
   STETH_ADDRESS,
+  UNISWAP_V3_OETH_WEH_ADDRESS,
   WETH_ADDRESS,
   WOETH_ADDRESS,
   WSTETH_ADDRESS,
@@ -43,6 +45,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   otokenAddress: OETH_ADDRESS,
   vaultAddress: OETH_VAULT_ADDRESS,
   wotokenAddress: WOETH_ADDRESS,
+  zapperAddress: OETH_ZAPPER_ADDRESS,
   curvePools: [
     {
       address: CURVE_ETH_OETH_POOL_ADDRESS,
@@ -54,6 +57,10 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
     },
   ],
   balancerPools: ['0x7056c8dfa8182859ed0d4fb0ef0886fdf3d2edcf000200000000000000000623'],
+  uniswapV3: {
+    address: UNISWAP_V3_OETH_WEH_ADDRESS,
+    tokens: [WETH_ADDRESS, OETH_ADDRESS],
+  },
 })
 
 export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)

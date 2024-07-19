@@ -1,5 +1,11 @@
 import { Block, Context, Log } from '@processor'
 import { Activity } from '@templates/otoken/activity-types'
+import { useProcessorState } from '@utils/state'
+
+export const useActivityState = (ctx: Context) =>
+  useProcessorState(ctx, 'activity-state', {
+    processedLogs: new Set<string>(),
+  })
 
 export const createActivity = <T extends Activity>(
   {

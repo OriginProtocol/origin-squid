@@ -36,6 +36,7 @@ export const vaultActivityProcessor = ({
             return createActivity<MintActivity>(
               { ctx, block, log },
               {
+                processor: 'vault',
                 type: 'Mint',
                 contract: log.address,
                 account: data._addr,
@@ -60,6 +61,7 @@ export const vaultActivityProcessor = ({
             return createActivity<RedeemActivity>(
               { ctx, block, log },
               {
+                processor: 'vault',
                 type: 'Redeem',
                 contract: log.address,
                 account: data._addr,

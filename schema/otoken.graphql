@@ -124,6 +124,7 @@ enum OTokenActivityType {
   Unwrap
   Mint
   Redeem
+  Zap
   Unstake
   Vote
 }

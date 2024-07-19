@@ -1,7 +1,7 @@
 import * as wotokenAbi from '@abi/woeth'
 import { Block, Context, Log } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
-import { createActivity } from '@templates/otoken/activity-processor/utils'
+import { createActivity, useActivityState } from '@templates/otoken/activity-processor/utils'
 import { UnwrapActivity, WrapActivity } from '@templates/otoken/activity-types'
 import { logFilter } from '@utils/logFilter'
 
@@ -26,6 +26,7 @@ export const wrappedActivityProcessor = (wrappedAddress: string): ActivityProces
             return createActivity<WrapActivity>(
               { ctx, block, log },
               {
+                processor: 'wrapped',
                 type: 'Wrap',
                 contract: wrappedAddress,
                 account: data.owner,
@@ -49,6 +50,7 @@ export const wrappedActivityProcessor = (wrappedAddress: string): ActivityProces
             return createActivity<UnwrapActivity>(
               { ctx, block, log },
               {
+                processor: 'wrapped',
                 type: 'Unwrap',
                 contract: wrappedAddress,
                 account: data.owner,

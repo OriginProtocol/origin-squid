@@ -1,4 +1,5 @@
 export type ActivityStatus = 'idle' | 'pending' | 'signed' | 'success' | 'error'
+export type Exchange = 'Curve' | 'Balancer' | '1inch' | 'other' | 'UniswapV2' | 'UniswapV3' | 'Kyber Swap'
 
 export interface ActivityBase {
   id: string
@@ -7,6 +8,7 @@ export interface ActivityBase {
   status: ActivityStatus
   txHash: string
   chainId: number
+  processor: string
 }
 
 export interface ApprovalActivity extends ActivityBase {
@@ -81,7 +83,7 @@ export interface UnstakeActivity extends ActivityBase {
 export interface SwapActivity extends ActivityBase {
   type: 'Swap'
   account: string
-  exchange: 'Curve' | 'Balancer' | '1inch' | 'other'
+  exchange: Exchange
   contract: string
   tokensIn: { token: string; amount: string }[]
   tokensOut: { token: string; amount: string }[]
@@ -135,6 +137,16 @@ export interface RedeemActivity extends ActivityBase {
   amountOut: string
 }
 
+export interface ZapActivity extends ActivityBase {
+  type: 'Zap'
+  account: string
+  contract: string
+  tokenIn: string
+  tokenOut: string
+  amountIn: string
+  amountOut: string
+}
+
 export interface VoteActivity extends ActivityBase {
   type: 'Vote'
   account: string
@@ -158,4 +170,5 @@ export type Activity =
   | UnwrapActivity
   | MintActivity
   | RedeemActivity
+  | ZapActivity
   | VoteActivity

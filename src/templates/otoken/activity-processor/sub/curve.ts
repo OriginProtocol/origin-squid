@@ -24,6 +24,7 @@ export const curveActivityProcessor = ({
           return createActivity<SwapActivity>(
             { ctx, block, log },
             {
+              processor: 'curve',
               type: 'Swap',
               account: tokenExchange.buyer,
               exchange: 'Curve',

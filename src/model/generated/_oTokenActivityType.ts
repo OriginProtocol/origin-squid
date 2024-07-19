@@ -12,6 +12,7 @@ export enum OTokenActivityType {
     Unwrap = "Unwrap",
     Mint = "Mint",
     Redeem = "Redeem",
+    Zap = "Zap",
     Unstake = "Unstake",
     Vote = "Vote",
 }
