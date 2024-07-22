@@ -224,9 +224,10 @@ enum HistoryType {
 
 type StrategyBalance @entity {
   """
-  Format: 'strategy:asset:blockNumber'
+  Format: 'chainId:strategy:asset:blockNumber'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   strategy: String!

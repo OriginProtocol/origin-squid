@@ -10,6 +10,7 @@ import { TraceFilter } from '@utils/traceFilter'
 import * as strategyBalancer from './strategy-balancer'
 import * as strategyCurveAMO from './strategy-curve-amo'
 import * as strategyGeneric from './strategy-generic'
+import * as strategyNativeStaking from './strategy-native-staking'
 import * as strategyVault from './strategy-vault'
 
 export type IBalancerPoolInfo = {
@@ -29,12 +30,7 @@ export type IStrategyData = {
   name: string
   contractName: string
   address: string
-  kind:
-    | 'Generic'
-    | 'Vault'
-    | 'CurveAMO'
-    | 'BalancerMetaStablePool'
-    | 'BalancerComposableStablePool'
+  kind: 'Generic' | 'Vault' | 'CurveAMO' | 'BalancerMetaStablePool' | 'BalancerComposableStablePool' | 'NativeStaking'
   base: {
     address: string
     decimals: number
@@ -77,6 +73,7 @@ const processors: Record<
     setup: () => Promise.reject('Not implemented.'),
     process: () => Promise.reject('Not implemented.'),
   },
+  NativeStaking: strategyNativeStaking,
 }
 
 export const createStrategySetup = (strategyData: IStrategyData) => {

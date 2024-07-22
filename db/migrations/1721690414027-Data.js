@@ -1,5 +1,5 @@
-module.exports = class Data1721327933049 {
-    name = 'Data1721327933049'
+module.exports = class Data1721690414027 {
+    name = 'Data1721690414027'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -100,7 +100,8 @@ module.exports = class Data1721327933049 {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c61a93768eed9e58ce399bbe01" ON "exchange_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "strategy_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_ca6f93229d1392e9546d01dae4f" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "strategy_balance" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_ca6f93229d1392e9546d01dae4f" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_bb5bbdf054deadf169e9e0330a" ON "strategy_balance" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_0113bf0b63183bea0d22cd0d08" ON "strategy_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a88065dcd92011698bbe7df7b1" ON "strategy_balance" ("block_number") `)
         await db.query(`CREATE TABLE "strategy_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, CONSTRAINT "PK_e87c46575e870fe2202190c2728" PRIMARY KEY ("id"))`)
@@ -452,6 +453,7 @@ module.exports = class Data1721327933049 {
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)
         await db.query(`DROP INDEX "public"."IDX_c61a93768eed9e58ce399bbe01"`)
         await db.query(`DROP TABLE "strategy_balance"`)
+        await db.query(`DROP INDEX "public"."IDX_bb5bbdf054deadf169e9e0330a"`)
         await db.query(`DROP INDEX "public"."IDX_0113bf0b63183bea0d22cd0d08"`)
         await db.query(`DROP INDEX "public"."IDX_a88065dcd92011698bbe7df7b1"`)
         await db.query(`DROP TABLE "strategy_yield"`)

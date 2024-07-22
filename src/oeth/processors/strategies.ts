@@ -2,25 +2,20 @@ import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
 import { currencies } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  IStrategyData,
-  createStrategyProcessor,
-  createStrategySetup,
-} from '@templates/strategy'
-import {
-  createStrategyRewardProcessor,
-  createStrategyRewardSetup,
-} from '@templates/strategy-rewards'
+import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
+import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_NATIVE_STRATEGY_ADDRESSES,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
   STETH_ADDRESS,
   WETH_ADDRESS,
   addresses,
 } from '@utils/addresses'
+import { logFilter } from '@utils/logFilter'
 
 export const oethStrategies: readonly IStrategyData[] = [
   {
@@ -90,8 +85,7 @@ export const oethStrategies: readonly IStrategyData[] = [
       passiveByDepositWithdrawal: true,
     },
     balancerPoolInfo: {
-      poolId:
-        '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
+      poolId: '0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112',
       poolAddress: '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
       rewardPoolAddress: '0xdd1fe5ad401d4777ce89959b7fa587e569bf125d',
     },
@@ -121,35 +115,39 @@ export const oethStrategies: readonly IStrategyData[] = [
     oTokenAddress: OETH_ADDRESS,
     kind: 'Vault',
     base: { address: STETH_ADDRESS, decimals: 18 },
-    assets: [STETH_ADDRESS].map((address) => ({
-      address,
-      decimals: 18,
-    })),
+    assets: [STETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
   },
   {
-    from: 17067232,
-    name: 'OETH Vault (WETH)',
-    contractName: 'VaultCore',
-    address: OETH_VAULT_ADDRESS,
+    from: 20046251,
+    name: 'OETH Native Staking',
+    contractName: 'NativeStakingSSVStrategy',
+    address: OETH_NATIVE_STRATEGY_ADDRESSES[0],
     oTokenAddress: OETH_ADDRESS,
-    kind: 'Vault',
-    base: { address: ETH_ADDRESS, decimals: 18 },
-    assets: [WETH_ADDRESS].map((address) => ({
-      address,
-      decimals: 18,
-    })),
+    kind: 'NativeStaking',
+    base: { address: WETH_ADDRESS, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
+  {
+    from: 20290461,
+    name: 'OETH Native Staking',
+    contractName: 'NativeStakingSSVStrategy',
+    address: OETH_NATIVE_STRATEGY_ADDRESSES[1],
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'NativeStaking',
+    base: { address: WETH_ADDRESS, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
 ]
 
-const strategies = oethStrategies
+const strategies = oethStrategies.filter((s) => s.kind === 'NativeStaking') as IStrategyData[]
 
 export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {
   strategies.forEach((s) => createStrategySetup(s)(processor))
-  strategies
-    .filter((s) => s.kind !== 'Vault')
-    .forEach((s) => createStrategyRewardSetup(s)(processor))
+  strategies.filter((s) => s.kind !== 'Vault').forEach((s) => createStrategyRewardSetup(s)(processor))
 }
 
 const processors = [

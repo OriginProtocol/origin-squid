@@ -6,15 +6,9 @@ import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { convertDecimals } from '@utils/utils'
 
 import { IStrategyData } from './index'
-import {
-  processStrategyEarnings,
-  setupStrategyEarnings,
-} from './strategy-earnings'
+import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
 
-export const setup = (
-  processor: EvmBatchProcessor,
-  strategyData: IStrategyData,
-) => {
+export const setup = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {
   processor.includeAllBlocks({ from: strategyData.from })
   setupStrategyEarnings(processor, strategyData)
 }
@@ -22,10 +16,7 @@ export const setup = (
 const trackers = new Map<string, ReturnType<typeof blockFrequencyUpdater>>()
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
   if (!trackers.has(strategyData.address)) {
-    trackers.set(
-      strategyData.address,
-      blockFrequencyUpdater({ from: strategyData.from }),
-    )
+    trackers.set(strategyData.address, blockFrequencyUpdater({ from: strategyData.from }))
   }
   const blockFrequencyUpdate = trackers.get(strategyData.address)!
   const strategyBalances: StrategyBalance[] = []
@@ -46,7 +37,8 @@ const getStrategyHoldings = async (
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
   const promises = assets.map(async (asset) => {
     return new StrategyBalance({
-      id: `${address}:${asset.address}:${block.header.height}`,
+      id: `${ctx.chain.id}:${address}:${asset.address}:${block.header.height}`,
+      chainId: ctx.chain.id,
       strategy: address,
       asset: asset.address,
       balance: balances.find((b) => b.asset === asset.address)?.balance,
@@ -72,11 +64,7 @@ const getStrategyBalances = async (
       return {
         address: strategyData.address,
         asset: asset.address,
-        balance: convertDecimals(
-          asset.decimals,
-          strategyData.base.decimals,
-          balance,
-        ),
+        balance: convertDecimals(asset.decimals, strategyData.base.decimals, balance),
       }
     }),
   )
