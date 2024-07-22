@@ -20,23 +20,19 @@ import * as validateOeth from './oeth/validators/validate-oeth'
 export const processor = {
   stateSchema: 'oeth-processor',
   processors: [
-    // ccip({ chainId: 1 }),
+    ccip({ chainId: 1 }),
     oeth,
-    // vault,
-    // fraxStaking,
-    // morphoAave,
-    // dripper,
-    // curveLp,
-    // balancerMetaPoolStrategy,
-    // strategies,
-    // exchangeRates,
+    vault,
+    fraxStaking,
+    morphoAave,
+    dripper,
+    curveLp,
+    balancerMetaPoolStrategy,
+    strategies,
+    exchangeRates,
   ],
-  // postProcessors: [
-  //   exchangeRatesPostProcessor,
-  //   dailyStats,
-  //   processStatus('oeth'),
-  // ],
-  // validators: [validateOeth],
+  postProcessors: [exchangeRatesPostProcessor, dailyStats, processStatus('oeth')],
+  validators: [validateOeth],
 }
 export default processor
 
