@@ -118,6 +118,19 @@ export const oethStrategies: readonly IStrategyData[] = [
     assets: [STETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
   },
   {
+    from: 17067232,
+    name: 'OETH Vault (WETH)',
+    contractName: 'VaultCore',
+    address: OETH_VAULT_ADDRESS,
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'Vault',
+    base: { address: ETH_ADDRESS, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({
+      address,
+      decimals: 18,
+    })),
+  },
+  {
     from: 20046251,
     name: 'OETH Native Staking',
     contractName: 'NativeStakingSSVStrategy',
