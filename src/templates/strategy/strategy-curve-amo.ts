@@ -8,15 +8,9 @@ import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
 import { IStrategyData } from './index'
-import {
-  processStrategyEarnings,
-  setupStrategyEarnings,
-} from './strategy-earnings'
+import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
 
-export const setup = (
-  processor: EvmBatchProcessor,
-  strategyData: IStrategyData,
-) => {
+export const setup = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {
   processor.includeAllBlocks({ from: strategyData.from })
   setupStrategyEarnings(processor, strategyData)
 }
@@ -24,10 +18,7 @@ export const setup = (
 const trackers = new Map<string, ReturnType<typeof blockFrequencyUpdater>>()
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
   if (!trackers.has(strategyData.address)) {
-    trackers.set(
-      strategyData.address,
-      blockFrequencyUpdater({ from: strategyData.from }),
-    )
+    trackers.set(strategyData.address, blockFrequencyUpdater({ from: strategyData.from }))
   }
   const blockFrequencyUpdate = trackers.get(strategyData.address)!
   const data: StrategyBalance[] = []
@@ -47,7 +38,8 @@ const getCurveAMOStrategyHoldings = async (
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
   return balances.map(({ address, asset, balance }) => {
     return new StrategyBalance({
-      id: `${address}:${asset}:${block.header.height}`,
+      id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
+      chainId: ctx.chain.id,
       strategy: address,
       asset,
       balance,
@@ -57,21 +49,13 @@ const getCurveAMOStrategyHoldings = async (
   })
 }
 
-export const getStrategyBalances = async (
-  ctx: Context,
-  block: { height: number },
-  strategyData: IStrategyData,
-) => {
+export const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {
   if (strategyData.address === '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63') {
     return getConvexEthMetaStrategyBalances(ctx, block, strategyData)
   }
   return await Promise.all(
     strategyData.assets.map(async (asset) => {
-      const contract = new abstractStrategyAbi.Contract(
-        ctx,
-        block,
-        strategyData.address,
-      )
+      const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
       const balance = await contract.checkBalance(asset.address)
       return { address: strategyData.address, asset: asset.address, balance }
     }),
@@ -121,8 +105,7 @@ export const getConvexEthMetaStrategyBalances = async (
   }
 
   const eth1 = 1000000000000000000n
-  const totalStrategyLPBalance =
-    ((stakedLPBalance + unstakedBalance) * lpPrice) / eth1
+  const totalStrategyLPBalance = ((stakedLPBalance + unstakedBalance) * lpPrice) / eth1
 
   return poolAssets.map((asset, i) => {
     const poolAssetSplit = (eth1 * assetBalances[i]) / totalPoolValue

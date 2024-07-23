@@ -2,13 +2,16 @@ import * as beaconAbi from '@abi/beacon-deposit-contract'
 import { BeaconDepositEvent, BeaconDepositPubkey } from '@model'
 import { Block, Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OETH_NATIVE_STRATEGY_ADDRESSES } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 import { readLinesFromUrlInBatches } from '@utils/readLinesFromUrlInBatches'
 
 export const from = 20029793 // Dump contains pubkeys up until 20029793.
 
 const beaconDepositContractAddress = '0x00000000219ab540356cbb839cbe05303d7705fa'
-const withdrawCredentials = '0x01000000000000000000000034edb2ee25751ee67f68a45813b22811687c0238'
+const withdrawCredentials = OETH_NATIVE_STRATEGY_ADDRESSES.map(
+  (address) => `0x010000000000000000000000${address.slice(2)}`,
+)
 
 const beaconDepositFilter = logFilter({
   address: [beaconDepositContractAddress],
@@ -64,7 +67,7 @@ export const process = async (ctx: Context) => {
         pubkey.count += 1
         pubkey.lastUpdated = new Date(block.header.timestamp)
 
-        if (withdrawCredentials === data.withdrawal_credentials) {
+        if (withdrawCredentials.includes(data.withdrawal_credentials)) {
           if (pubkey.count > 1) {
             ctx.log.error(`Origin pubkey used ${pubkey.count} times: ${pubkey.id}`)
           }

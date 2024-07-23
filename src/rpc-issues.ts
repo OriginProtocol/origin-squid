@@ -33,6 +33,7 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
 }
 
 const fixSelfDestructs = (input: any) => {
+  if (!input) return
   if (typeof input !== 'object') return
   if (Array.isArray(input)) {
     input.forEach((v) => fixSelfDestructs(v))
