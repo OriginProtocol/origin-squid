@@ -1,5 +1,6 @@
 import * as otokenAbi from '@abi/otoken'
 import * as wotokenAbi from '@abi/woeth'
+import { OTokenActivity } from '@model'
 import { Block, Context, Log } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
@@ -7,11 +8,7 @@ import { SwapActivity, TransferActivity } from '@templates/otoken/activity-types
 import { ONEINCH_AGGREGATION_ROUTER_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const transferActivityProcessor = ({
-  otokenAddress,
-}: {
-  otokenAddress: string
-}): ActivityProcessor<TransferActivity | SwapActivity> => {
+export const transferActivityProcessor = ({ otokenAddress }: { otokenAddress: string }): ActivityProcessor => {
   const transferFilter = logFilter({
     address: [otokenAddress],
     topic0: [otokenAbi.events.Transfer.topic],
@@ -27,12 +24,12 @@ export const transferActivityProcessor = ({
           data: otokenAbi.events.Transfer.decode(log),
         }))
 
-      const swapActivity = calculateTransferActivityAsSwap(ctx, block, transferLogs)
+      const swapActivity = calculateTransferActivityAsSwap(ctx, block, transferLogs, otokenAddress)
       if (swapActivity) return swapActivity
 
       return transferLogs.map(({ log, data }) => {
         return createActivity<TransferActivity>(
-          { ctx, block, log },
+          { ctx, block, log, otokenAddress },
           {
             processor: 'transfer',
             type: 'Transfer',
@@ -64,18 +61,19 @@ const calculateTransferActivityAsSwap = (
     log: Log
     data: ReturnType<typeof wotokenAbi.events.Transfer.decode>
   }[],
+  otokenAddress: string,
 ) => {
   if (logs.length === 1) return undefined
-  const resultMap: Record<string, SwapActivity> = {}
+  const resultMap: Record<string, OTokenActivity> = {}
   const tokens = new Set<string>()
   const exchange = getExchangeName(logs)
   for (const { log, data } of logs) {
     tokens.add(log.address)
     // To
-    resultMap[data.to.toLowerCase()] =
+    const toActivity =
       resultMap[data.to.toLowerCase()] ??
       createActivity<SwapActivity>(
-        { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.to.toLowerCase()}` },
+        { ctx, block, log: logs[0].log, otokenAddress },
         {
           processor: 'transfer',
           type: 'Swap',
@@ -86,13 +84,15 @@ const calculateTransferActivityAsSwap = (
           tokensIn: [],
         },
       )
-    resultMap[data.to.toLowerCase()].tokensIn.push({ token: log.address, amount: data.value.toString() })
+    const toSwapActivity = toActivity.data as SwapActivity
+    toSwapActivity.tokensIn.push({ token: log.address, amount: data.value.toString() })
+    resultMap[data.to.toLowerCase()] = toActivity
 
     // From
-    resultMap[data.from.toLowerCase()] =
+    const fromActivity =
       resultMap[data.from.toLowerCase()] ??
       createActivity<SwapActivity>(
-        { ctx, block, log: logs[0].log, id: `${ctx.chain.id}:${log.id}:${data.from.toLowerCase()}` },
+        { ctx, block, log: logs[0].log, otokenAddress },
         {
           processor: 'transfer',
           type: 'Swap',
@@ -103,11 +103,16 @@ const calculateTransferActivityAsSwap = (
           tokensIn: [],
         },
       )
-    resultMap[data.from.toLowerCase()].tokensOut.push({ token: log.address, amount: data.value.toString() })
+    const fromSwapActivity = fromActivity.data as SwapActivity
+    resultMap[data.from.toLowerCase()] = fromActivity
+    fromSwapActivity.tokensOut.push({ token: log.address, amount: data.value.toString() })
   }
   if (tokens.size <= 1) return undefined
   // We are a swap if we sent and received more than one token
-  const results = Object.values(resultMap).filter((r) => r.tokensIn.length > 0 && r.tokensOut.length > 0)
+  const results = Object.values(resultMap).filter((r) => {
+    const activity = r.data as SwapActivity
+    return activity.tokensIn.length > 0 && activity.tokensOut.length > 0
+  })
   if (results.length > 0) return results
   return undefined
 }

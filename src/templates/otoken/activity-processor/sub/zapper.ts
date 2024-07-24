@@ -1,4 +1,5 @@
 import * as zapperAbi from '@abi/oeth-zapper'
+import { OTokenActivity } from '@model'
 import { Block, Context, Log } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
@@ -21,14 +22,14 @@ export const zapperActivityProcessor = ({
         transaction: true,
       }),
     ],
-    async process(ctx: Context, block: Block, logs: Log[]): Promise<ZapActivity[]> {
+    async process(ctx: Context, block: Block, logs: Log[]): Promise<OTokenActivity[]> {
       const [zapFilter] = this.filters
       return logs
         .filter((l) => zapFilter.matches(l))
         .map((log) => {
           const zap = zapperAbi.events.Zap.decode(log)
           return createActivity<ZapActivity>(
-            { ctx, block, log },
+            { ctx, block, log, otokenAddress },
             {
               processor: 'zapper',
               type: 'Zap',

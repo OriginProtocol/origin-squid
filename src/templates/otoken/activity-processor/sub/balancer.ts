@@ -1,4 +1,5 @@
 import * as balancerVaultAbi from '@abi/balancer-vault'
+import { OTokenActivity } from '@model'
 import { Block, Context, Log } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
@@ -6,7 +7,13 @@ import { SwapActivity } from '@templates/otoken/activity-types'
 import { BALANCER_VAULT_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const balancerActivityProcessor = ({ pools }: { pools: string[] }): ActivityProcessor => {
+export const balancerActivityProcessor = ({
+  otokenAddress,
+  pools,
+}: {
+  otokenAddress: string
+  pools: string[]
+}): ActivityProcessor => {
   return {
     name: 'Balancer Pool Processor',
     filters: [
@@ -17,14 +24,14 @@ export const balancerActivityProcessor = ({ pools }: { pools: string[] }): Activ
         transaction: true,
       }),
     ],
-    async process(ctx: Context, block: Block, logs: Log[]): Promise<SwapActivity[]> {
+    async process(ctx: Context, block: Block, logs: Log[]): Promise<OTokenActivity[]> {
       const [swapFilter] = this.filters
       return logs
         .filter((l) => swapFilter.matches(l))
         .map((log) => {
           const swap = balancerVaultAbi.events.Swap.decode(log)
           return createActivity<SwapActivity>(
-            { ctx, block, log },
+            { ctx, block, log, otokenAddress },
             {
               processor: 'balancer',
               type: 'Swap',

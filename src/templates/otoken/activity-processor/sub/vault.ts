@@ -2,6 +2,7 @@ import { uniq } from 'lodash'
 
 import * as otokenVaultAbi from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
+import { OTokenActivity } from '@model'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { MintActivity, RedeemActivity } from '@templates/otoken/activity-types'
@@ -14,7 +15,7 @@ export const vaultActivityProcessor = ({
 }: {
   otokenAddress: string
   vaultAddress: string
-}): ActivityProcessor<MintActivity | RedeemActivity> => {
+}): ActivityProcessor => {
   const mintFilter = logFilter({ address: [vaultAddress], topic0: [otokenVaultAbi.events.Mint.topic] })
   const redeemFilter = logFilter({ address: [vaultAddress], topic0: [otokenVaultAbi.events.Redeem.topic] })
   const transferInFilter = logFilter({ topic0: [wotokenAbi.events.Transfer.topic], topic2: [vaultAddress] })
@@ -23,7 +24,7 @@ export const vaultActivityProcessor = ({
     name: 'Vault Processor',
     filters: [mintFilter, redeemFilter, transferInFilter, transferOutFilter],
     process: async (ctx, block, logs) => {
-      const result: (MintActivity | RedeemActivity)[] = []
+      const result: OTokenActivity[] = []
       // Mint
       const mintLogs = logs.filter((l) => mintFilter.matches(l))
       if (mintLogs.length) {
@@ -34,7 +35,7 @@ export const vaultActivityProcessor = ({
           ...mintLogs.map((log) => {
             const data = otokenVaultAbi.events.Mint.decode(log)
             return createActivity<MintActivity>(
-              { ctx, block, log },
+              { ctx, block, log, otokenAddress },
               {
                 processor: 'vault',
                 type: 'Mint',
@@ -59,7 +60,7 @@ export const vaultActivityProcessor = ({
           ...redeemLogs.map((log) => {
             const data = otokenVaultAbi.events.Redeem.decode(log)
             return createActivity<RedeemActivity>(
-              { ctx, block, log },
+              { ctx, block, log, otokenAddress },
               {
                 processor: 'vault',
                 type: 'Redeem',

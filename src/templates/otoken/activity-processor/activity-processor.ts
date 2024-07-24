@@ -40,6 +40,7 @@ export const createOTokenActivityProcessor = (params: {
     // Bridges
     params.wotokenAddress &&
       ccipBridgeActivityProcessor({
+        otokenAddress: params.otokenAddress,
         wotokenAddresses: compact([params.wotokenAddress, params.wotokenArbitrumAddress]),
       }),
 
@@ -47,21 +48,29 @@ export const createOTokenActivityProcessor = (params: {
     zapperActivityProcessor({ otokenAddress: params.otokenAddress, zapperAddress: params.zapperAddress }),
 
     // Swaps
-    uniswapV3ActivityProcessor(params.uniswapV3),
-    ...params.curvePools.map((pool) => curveActivityProcessor(pool)),
-    balancerActivityProcessor({ pools: params.balancerPools }),
-    cowSwapActivityProcessor({ address: params.otokenAddress }),
-    params.wotokenAddress && cowSwapActivityProcessor({ address: params.wotokenAddress }),
+    uniswapV3ActivityProcessor({ otokenAddress: params.otokenAddress, ...params.uniswapV3 }),
+    ...params.curvePools.map((pool) => curveActivityProcessor({ otokenAddress: params.otokenAddress, ...pool })),
+    balancerActivityProcessor({ otokenAddress: params.otokenAddress, pools: params.balancerPools }),
+    cowSwapActivityProcessor({ otokenAddress: params.otokenAddress, address: params.otokenAddress }),
+    params.wotokenAddress &&
+      cowSwapActivityProcessor({
+        otokenAddress: params.otokenAddress,
+        address: params.wotokenAddress,
+      }),
 
     // Wraps & Unwraps
-    params.wotokenAddress && wrappedActivityProcessor(params.wotokenAddress),
+    params.wotokenAddress &&
+      wrappedActivityProcessor({
+        otokenAddress: params.otokenAddress,
+        wotokenAddress: params.wotokenAddress,
+      }),
 
     // Mints & Redeems
     vaultActivityProcessor({ otokenAddress: params.otokenAddress, vaultAddress: params.vaultAddress }),
 
     // Transfers & Swaps
     transferActivityProcessor({ otokenAddress: params.otokenAddress }),
-  ])
+  ]).filter((p) => p.name.includes('Approval'))
 
   const from = params.from
   const setup = (processor: EvmBatchProcessor) => {
@@ -72,7 +81,7 @@ export const createOTokenActivityProcessor = (params: {
     }
   }
   const process = async (ctx: Context) => {
-    const activities: Activity[] = []
+    const activities: OTokenActivity[] = []
     // Loop through each block
     for (const block of ctx.blocks) {
       // Group logs by transaction
@@ -88,21 +97,7 @@ export const createOTokenActivityProcessor = (params: {
         }
       }
     }
-    await ctx.store.insert(
-      activities.map(
-        (activity) =>
-          new OTokenActivity({
-            id: activity.id,
-            chainId: activity.chainId,
-            type: OTokenActivityType[activity.type],
-            txHash: activity.txHash,
-            blockNumber: activity.blockNumber,
-            timestamp: new Date(activity.timestamp),
-            otoken: params.otokenAddress,
-            data: activity,
-          }),
-      ),
-    )
+    await ctx.store.insert(activities)
   }
   return { from, setup, process }
 }

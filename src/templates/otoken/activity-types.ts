@@ -43,6 +43,7 @@ export interface BridgeActivity extends ActivityBase {
   state: number
 }
 
+// TODO
 export interface ClaimRewardsActivity extends ActivityBase {
   type: 'ClaimRewards'
   account: string
@@ -50,6 +51,7 @@ export interface ClaimRewardsActivity extends ActivityBase {
   amountIn: string
 }
 
+// TODO
 export interface DelegateVoteActivity extends ActivityBase {
   type: 'DelegateVote'
   account: string
@@ -58,15 +60,7 @@ export interface DelegateVoteActivity extends ActivityBase {
   delegateTo: string
 }
 
-export interface ExtendStakeActivity extends ActivityBase {
-  type: 'ExtendStake'
-  account: string
-  amountIn: string
-  tokenIn: string
-  monthDuration: number
-  lockupId: string
-}
-
+// TODO
 export interface MigrateActivity extends ActivityBase {
   type: 'Migrate'
   account: string
@@ -78,6 +72,7 @@ export interface MigrateActivity extends ActivityBase {
   staked?: string
 }
 
+// TODO
 export interface StakeActivity extends ActivityBase {
   type: 'Stake'
   account: string
@@ -86,11 +81,22 @@ export interface StakeActivity extends ActivityBase {
   monthDuration: number
 }
 
+// TODO
 export interface UnstakeActivity extends ActivityBase {
   type: 'Unstake'
   account: string
   tokenIn: string
   tokenOut: string
+  lockupId: string
+}
+
+// TODO
+export interface ExtendStakeActivity extends ActivityBase {
+  type: 'ExtendStake'
+  account: string
+  amountIn: string
+  tokenIn: string
+  monthDuration: number
   lockupId: string
 }
 
@@ -161,6 +167,7 @@ export interface ZapActivity extends ActivityBase {
   amountOut: string
 }
 
+// TODO
 export interface VoteActivity extends ActivityBase {
   type: 'Vote'
   account: string

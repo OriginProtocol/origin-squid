@@ -1,4 +1,5 @@
 import * as cowswapSettlementAbi from '@abi/cow-swap-settlement'
+import { OTokenActivity } from '@model'
 import { Block, Context, Log } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
@@ -6,7 +7,13 @@ import { SwapActivity } from '@templates/otoken/activity-types'
 import { COWSWAP_SETTLEMENT_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const cowSwapActivityProcessor = ({ address }: { address: string }): ActivityProcessor<SwapActivity> => {
+export const cowSwapActivityProcessor = ({
+  otokenAddress,
+  address,
+}: {
+  otokenAddress: string
+  address: string
+}): ActivityProcessor => {
   const tradeFilter = logFilter({
     address: [COWSWAP_SETTLEMENT_ADDRESS],
     topic0: [cowswapSettlementAbi.events.Trade.topic],
@@ -15,7 +22,7 @@ export const cowSwapActivityProcessor = ({ address }: { address: string }): Acti
   return {
     name: 'Cowswap Activity Processor',
     filters: [tradeFilter],
-    async process(ctx: Context, block: Block, logs: Log[]): Promise<SwapActivity[]> {
+    async process(ctx: Context, block: Block, logs: Log[]): Promise<OTokenActivity[]> {
       const tradeLogs = logs
         .filter((l) => tradeFilter.matches(l))
         .map((log) => ({
@@ -26,7 +33,7 @@ export const cowSwapActivityProcessor = ({ address }: { address: string }): Acti
         .filter(({ data }) => data.buyToken.toLowerCase() === address || data.sellToken.toLowerCase() === address)
         .map(({ log, data }) => {
           return createActivity<SwapActivity>(
-            { ctx, block, log },
+            { ctx, block, log, otokenAddress },
             {
               processor: 'cow-swap',
               type: 'Swap',

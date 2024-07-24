@@ -1,17 +1,21 @@
+import { OTokenActivity } from '@model'
 import { Context } from '@processor'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
-import { ActivityStatus, BridgeActivity } from '@templates/otoken/activity-types'
+import { BridgeActivity } from '@templates/otoken/activity-types'
 import { waitForProcessorState } from '@utils/state'
 
 import { CCIPProcessorResult } from '../../../../oeth/processors/ccip'
 
-export const ccipBridgeActivityProcessor = (params: { wotokenAddresses: string[] }): ActivityProcessor => {
+export const ccipBridgeActivityProcessor = (params: {
+  otokenAddress: string
+  wotokenAddresses: string[]
+}): ActivityProcessor => {
   return {
     name: 'CCIP Bridge Processor',
     filters: [],
-    async process(ctx: Context): Promise<BridgeActivity[]> {
-      const results: BridgeActivity[] = []
+    async process(ctx: Context): Promise<OTokenActivity[]> {
+      const results: OTokenActivity[] = []
       const ccipResult = await waitForProcessorState<CCIPProcessorResult>(ctx, 'ccip')
       for (const { block, log, transfer } of ccipResult.transfersWithLogs.values()) {
         if (
@@ -23,7 +27,7 @@ export const ccipBridgeActivityProcessor = (params: { wotokenAddresses: string[]
         }
         results.push(
           createActivity<BridgeActivity>(
-            { ctx, block, log },
+            { ctx, block, log, otokenAddress: params.otokenAddress },
             {
               processor: 'ccip-bridge',
               type: 'Bridge',
