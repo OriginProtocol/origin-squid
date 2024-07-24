@@ -21,7 +21,10 @@ export const createActivity = <T extends Activity>(
     log: Log
     id?: string
   },
-  partial: { processor: string } & Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
+  partial: {
+    processor: string
+    status?: T['status']
+  } & Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
 ) => {
   const activity = {
     id: id ?? `${partial.processor}:${ctx.chain.id}:${log.id}`,

@@ -16,6 +16,7 @@ import {
   UNISWAP_V3_OETH_WEH_ADDRESS,
   WETH_ADDRESS,
   WOETH_ADDRESS,
+  WOETH_ARBITRUM_ADDRESS,
   WSTETH_ADDRESS,
 } from '@utils/addresses'
 
@@ -45,6 +46,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   otokenAddress: OETH_ADDRESS,
   vaultAddress: OETH_VAULT_ADDRESS,
   wotokenAddress: WOETH_ADDRESS,
+  wotokenArbitrumAddress: WOETH_ARBITRUM_ADDRESS,
   zapperAddress: OETH_ZAPPER_ADDRESS,
   curvePools: [
     {

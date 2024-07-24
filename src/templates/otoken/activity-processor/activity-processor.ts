@@ -3,6 +3,7 @@ import { compact, groupBy } from 'lodash'
 import { OTokenActivity, OTokenActivityType } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { approvalActivityProcessor } from '@templates/otoken/activity-processor/sub/approval'
 import { balancerActivityProcessor } from '@templates/otoken/activity-processor/sub/balancer'
 import { ccipBridgeActivityProcessor } from '@templates/otoken/activity-processor/sub/ccip-bridge'
 import { cowSwapActivityProcessor } from '@templates/otoken/activity-processor/sub/cow-swap'
@@ -20,6 +21,8 @@ export const createOTokenActivityProcessor = (params: {
   otokenAddress: string
   vaultAddress: string
   wotokenAddress?: string
+  wotokenArbitrumAddress?: string
+
   zapperAddress: string
   curvePools: {
     address: string
@@ -31,8 +34,14 @@ export const createOTokenActivityProcessor = (params: {
   const processors: ActivityProcessor[] = compact([
     // TODO: Morpho Blue: https://etherscan.io/tx/0xde3e7e991f70979ffdfaf0652b4c2722773416341ca78dcdaabd3cae98f8204d#eventlog
 
+    // Approvals
+    approvalActivityProcessor(params),
+
     // Bridges
-    ccipBridgeActivityProcessor(),
+    params.wotokenAddress &&
+      ccipBridgeActivityProcessor({
+        wotokenAddresses: compact([params.wotokenAddress, params.wotokenArbitrumAddress]),
+      }),
 
     // Zaps
     zapperActivityProcessor({ otokenAddress: params.otokenAddress, zapperAddress: params.zapperAddress }),

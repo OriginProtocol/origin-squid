@@ -13,9 +13,10 @@ export interface ActivityBase {
 
 export interface ApprovalActivity extends ActivityBase {
   type: 'Approval'
-  account: string
-  tokenIn: string
-  amountIn: string
+  owner: string
+  spender: string
+  token: string
+  value: string
 }
 
 export interface BridgeActivity extends ActivityBase {
@@ -33,6 +34,12 @@ export interface BridgeActivity extends ActivityBase {
   tokenOut: string
   amountIn: string
   amountOut: string
+  /**
+   * 0 = untouched
+   * 1 = processing
+   * 2 = complete
+   * 3 = failed
+   */
   state: number
 }
 
