@@ -1,3 +1,5 @@
+import crypto from 'crypto'
+
 import { Block, Context, Log } from '@processor'
 import { Activity } from '@templates/otoken/activity-types'
 import { useProcessorState } from '@utils/state'
@@ -19,14 +21,17 @@ export const createActivity = <T extends Activity>(
     log: Log
     id?: string
   },
-  partial: Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
-) =>
-  ({
-    id: id ?? `${ctx.chain.id}:${log.id}`,
+  partial: { processor: string } & Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
+) => {
+  const activity = {
+    id: id ?? `${partial.processor}:${ctx.chain.id}:${log.id}`,
     chainId: ctx.chain.id,
     blockNumber: block.header.height,
     timestamp: block.header.timestamp,
     status: 'success',
     txHash: log.transactionHash,
     ...partial,
-  }) as T
+  } as T
+  activity.id += `:${crypto.createHash('sha256').update(JSON.stringify(activity)).digest('hex').substring(0, 8)}`
+  return activity
+}

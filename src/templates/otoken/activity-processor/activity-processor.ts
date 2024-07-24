@@ -4,6 +4,7 @@ import { OTokenActivity, OTokenActivityType } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { balancerActivityProcessor } from '@templates/otoken/activity-processor/sub/balancer'
+import { ccipBridgeActivityProcessor } from '@templates/otoken/activity-processor/sub/ccip-bridge'
 import { cowSwapActivityProcessor } from '@templates/otoken/activity-processor/sub/cow-swap'
 import { curveActivityProcessor } from '@templates/otoken/activity-processor/sub/curve'
 import { transferActivityProcessor } from '@templates/otoken/activity-processor/sub/transfer'
@@ -29,6 +30,9 @@ export const createOTokenActivityProcessor = (params: {
 }) => {
   const processors: ActivityProcessor[] = compact([
     // TODO: Morpho Blue: https://etherscan.io/tx/0xde3e7e991f70979ffdfaf0652b4c2722773416341ca78dcdaabd3cae98f8204d#eventlog
+
+    // Bridges
+    ccipBridgeActivityProcessor(),
 
     // Zaps
     zapperActivityProcessor({ otokenAddress: params.otokenAddress, zapperAddress: params.zapperAddress }),
@@ -75,7 +79,6 @@ export const createOTokenActivityProcessor = (params: {
         }
       }
     }
-    debugger
     await ctx.store.insert(
       activities.map(
         (activity) =>

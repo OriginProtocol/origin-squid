@@ -3,10 +3,11 @@ import * as ccipOnRampAbi from '@abi/ccip-evm2evmonramp'
 import * as ccipRouter from '@abi/ccip-router'
 import * as erc20Abi from '@abi/erc20'
 import { BridgeTransfer, BridgeTransferState } from '@model'
-import { Context } from '@processor'
+import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { WOETH_ADDRESS, WOETH_ARBITRUM_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
+import { publishProcessorState } from '@utils/state'
 import { traceFilter } from '@utils/traceFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
@@ -17,8 +18,9 @@ import { traceFilter } from '@utils/traceFilter'
 // These can be retrieved using the chain selector id on the router function `getOffRamps`
 // States: https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/config/messageState.json
 
-interface ProcessResult {
+export interface CCIPProcessorResult {
   transfers: Map<string, BridgeTransfer>
+  transfersWithLogs: Map<string, { block: Block; log: Log; transfer: BridgeTransfer }>
   bridgeTransferStates: Map<string, BridgeTransferState>
 }
 
@@ -96,8 +98,9 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
   }
 
   const process = async (ctx: Context) => {
-    const result: ProcessResult = {
+    const result: CCIPProcessorResult = {
       transfers: new Map<string, BridgeTransfer>(),
+      transfersWithLogs: new Map<string, { block: Block; log: Log; transfer: BridgeTransfer }>(),
       bridgeTransferStates: new Map<string, BridgeTransferState>(),
     }
 
@@ -122,6 +125,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             bridgeTransfer.txHashOut = log.transactionHash
             bridgeTransfer.state = data.state
             result.transfers.set(state.id, bridgeTransfer)
+            result.transfersWithLogs.set(state.id, { block, log, transfer: bridgeTransfer })
           }
           // console.log(state)
         }
@@ -165,12 +169,14 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
               })
               // console.log(transfer)
               result.transfers.set(transfer.id, transfer)
+              result.transfersWithLogs.set(transfer.id, { block, log, transfer })
             }
           }
         }
       }
     }
 
+    publishProcessorState<CCIPProcessorResult>(ctx, 'ccip', result)
     await ctx.store.upsert([...result.transfers.values()])
     await ctx.store.upsert([...result.bridgeTransferStates.values()])
   }

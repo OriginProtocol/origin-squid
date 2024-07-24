@@ -20,13 +20,20 @@ export interface ApprovalActivity extends ActivityBase {
 
 export interface BridgeActivity extends ActivityBase {
   type: 'Bridge'
-  from: string
-  to: string
+  txHashIn: string
+  txHashOut: string | undefined | null
+  messageId: string
+  bridge: string
+  transactor: string
+  sender: string
+  receiver: string
   chainIn: number
   chainOut: number
   tokenIn: string
   tokenOut: string
   amountIn: string
+  amountOut: string
+  state: number
 }
 
 export interface ClaimRewardsActivity extends ActivityBase {
