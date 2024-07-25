@@ -7,6 +7,10 @@ import { StrategyBalance } from '@model'
 
 import { oethStrategies } from '../oeth/processors/strategies'
 
+/**
+ * This is used by the OETH analytics Balance Sheet (marketing site)
+ */
+
 @ObjectType()
 export class Strategy {
   @Field(() => String, { nullable: false })
