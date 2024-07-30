@@ -61,7 +61,7 @@ export const createSquidProcessor = (
     })
 }
 
-interface Processor {
+export interface Processor {
   name?: string
   from?: number
   initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.

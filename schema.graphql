@@ -1,5 +1,104 @@
 # GENERATED, DO NOT MODIFY
 
+type AeroPoolApproval @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  owner: String! @index
+  spender: String! @index
+  value: BigInt!
+}
+
+type AeroPoolBurn @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  to: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroPoolClaim @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroPoolEIP712DomainChanged @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+}
+
+type AeroPoolFees @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroPoolMint @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroPoolSwap @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  to: String! @index
+  amount0In: BigInt!
+  amount1In: BigInt!
+  amount0Out: BigInt!
+  amount1Out: BigInt!
+}
+
+type AeroPoolSync @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  reserve0: BigInt!
+  reserve1: BigInt!
+}
+
+type AeroPoolTransfer @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  to: String! @index
+  value: BigInt!
+}
 # State
 
 type ESToken @entity {
