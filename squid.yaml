@@ -9,11 +9,10 @@ deploy:
     rpc:
       - eth.http
       - arbitrum-one.http
+      - base.http
   secrets:
     - RPC_ENDPOINT
     - RPC_ENV
-    - RPC_ARBITRUM_ENDPOINT
-    - RPC_ARBITRUM_ENV
   processor:
     - name: mainnet-processor
       cmd: [ "sqd", "process:mainnet:prod" ]
@@ -23,6 +22,11 @@ deploy:
       cmd: [ "sqd", "process:arbitrum:prod" ]
       env:
         RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
+        TS_NODE_BASEURL: './lib'
+    - name: base-processor
+      cmd: [ "sqd", "process:base:prod" ]
+      env:
+        RPC_BASE_ENV: RPC_BASE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: oeth-processor
       cmd: [ "sqd", "process:oeth:prod" ]

@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
 import { Chain } from 'viem'
-import { arbitrum, mainnet } from 'viem/chains'
+import { arbitrum, base, mainnet } from 'viem/chains'
 
 import { lookupArchive } from '@subsquid/archive-registry'
 import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
@@ -81,6 +81,11 @@ const chainConfigs: Record<number, { chain: Chain; archive: KnownArchives; rpcEn
     chain: arbitrum,
     archive: 'arbitrum',
     rpcEnv: process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT',
+  },
+  [base.id]: {
+    chain: base,
+    archive: 'base-mainnet',
+    rpcEnv: process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT',
   },
 }
 

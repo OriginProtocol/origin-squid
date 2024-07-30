@@ -113,6 +113,18 @@
         "lib/main-arbitrum.js"
       ]
     },
+    "process:base": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
+        "lib/main-base.js"
+      ]
+    },
     "process:oeth": {
       "description": "Load .env and start the squid processor",
       "deps": [
@@ -170,6 +182,18 @@
         "node",
         "--require=tsconfig-paths/register",
         "lib/main-arbitrum.js"
+      ],
+      "hidden": true
+    },
+    "process:base:prod": {
+      "description": "Start the squid processor",
+      "deps": [
+        "migration:apply"
+      ],
+      "cmd": [
+        "node",
+        "--require=tsconfig-paths/register",
+        "lib/main-base.js"
       ],
       "hidden": true
     },
