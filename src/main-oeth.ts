@@ -15,6 +15,7 @@ import * as fraxStaking from './oeth/processors/frax-staking'
 import * as morphoAave from './oeth/processors/morpho-aave'
 import * as strategies from './oeth/processors/strategies'
 import * as vault from './oeth/processors/vault'
+import * as withdrawals from './oeth/processors/withdrawals'
 import * as validateOeth from './oeth/validators/validate-oeth'
 
 export const processor = {
@@ -30,6 +31,7 @@ export const processor = {
     balancerMetaPoolStrategy,
     strategies,
     exchangeRates,
+    withdrawals,
   ],
   postProcessors: [exchangeRatesPostProcessor, dailyStats, processStatus('oeth')],
   validators: [validateOeth],
