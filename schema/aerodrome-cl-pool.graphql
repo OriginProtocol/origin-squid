@@ -1,0 +1,114 @@
+type AeroCLPoolBurn @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  owner: String! @index
+  tickLower: Int!
+  tickUpper: Int!
+  amount: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolCollect @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  owner: String! @index
+  recipient: String!
+  tickLower: Int!
+  tickUpper: Int!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolCollectFees @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolFlash @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+  paid0: BigInt!
+  paid1: BigInt!
+}
+
+type AeroCLPoolIncreaseObservationCardinalityNext @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  observationCardinalityNextOld: Int!
+  observationCardinalityNextNew: Int!
+}
+
+type AeroCLPoolInitialize @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sqrtPriceX96: BigInt!
+  tick: Int!
+}
+
+type AeroCLPoolMint @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String!
+  owner: String! @index
+  tickLower: Int!
+  tickUpper: Int!
+  amount: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolSetFeeProtocol @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  feeProtocol0Old: Int!
+  feeProtocol1Old: Int!
+  feeProtocol0New: Int!
+  feeProtocol1New: Int!
+}
+
+type AeroCLPoolSwap @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+  sqrtPriceX96: BigInt!
+  liquidity: BigInt!
+  tick: Int!
+}
