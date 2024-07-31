@@ -5,7 +5,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OETH_VAULT_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const from = 20264539 // TODO update with actual update blocknumber
+export const from = 20428558
 
 interface ProcessResult {
   withdrawalRequests: Map<string, OETHWithdrawalRequest>
