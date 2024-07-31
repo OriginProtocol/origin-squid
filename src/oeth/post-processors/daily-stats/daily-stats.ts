@@ -1,11 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import {
-  EntityManager,
-  FindOptionsOrderValue,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm'
+import { EntityManager, FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
 
 import {
   ExchangeRate,
@@ -26,7 +21,7 @@ import {
 } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { OETH_ADDRESS } from '@utils/addresses'
+import { OETH_ADDRESS, WOETH_ADDRESS } from '@utils/addresses'
 import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)
@@ -38,8 +33,7 @@ export const setup = async (processor: EvmBatchProcessor) => {
 }
 
 export const process = async (ctx: Context) => {
-  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)
-    ?.header.timestamp
+  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)?.header.timestamp
   if (!firstBlockTimestamp) return
 
   const firstBlock = ctx.blocks[0]
@@ -48,11 +42,7 @@ export const process = async (ctx: Context) => {
   const endDate = dayjs.utc(lastBlock.header.timestamp).endOf('day')
 
   let dates: Date[] = []
-  for (
-    let date = startDate;
-    !date.isAfter(endDate);
-    date = date.add(1, 'day').endOf('day')
-  ) {
+  for (let date = startDate; !date.isAfter(endDate); date = date.add(1, 'day').endOf('day')) {
     // ctx.log.info({ date, startDate, endDate })
     dates.push(date.toDate())
   }
@@ -80,9 +70,7 @@ export const process = async (ctx: Context) => {
       vsCurrency: 'eth',
     })) as OETHDailyStat[]
     const existingIds = dailyStats.map((stat) => stat.id)
-    dailyStats.push(
-      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
-    )
+    dailyStats.push(...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0))
   }
 
   await ctx.store.upsert(dailyStats)
@@ -142,7 +130,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
         chainId: ctx.chain.id,
         otoken: OETH_ADDRESS,
         timestamp: LessThanOrEqual(date),
-        address: { address: '0xdcee70654261af21c44c093c300ed3bb97b78192' },
+        address: { address: WOETH_ADDRESS },
       },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
@@ -238,10 +226,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
   // Collateral totals
   const ETH = lastCurve?.ethOwned || 0n
   const OETHOwned = lastCurve?.oethOwned || 0n
-  const WETH =
-    (lastVault?.weth || 0n) +
-    (lastMorpho?.weth || 0n) +
-    (lastBalancer?.weth || 0n)
+  const WETH = (lastVault?.weth || 0n) + (lastMorpho?.weth || 0n) + (lastBalancer?.weth || 0n)
   const stETH = lastVault?.stETH || 0n
 
   const rETHRaw = (lastVault?.rETH || 0n) + (lastBalancer?.rETH || 0n)
@@ -250,15 +235,11 @@ async function updateDailyStats(ctx: Context, date: Date) {
 
   const sfrxEthExchangeRate = lastSfrxEthRate?.rate || 1000000000000000000n
   const sfrxETH = lastFrax?.sfrxETH || 0n
-  const convertedSfrxEth =
-    (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n
+  const convertedSfrxEth = (sfrxETH * sfrxEthExchangeRate) / 1000000000000000000n
 
   // Strategy totals
   const vaultTotal =
-    (lastVault?.frxETH || 0n) +
-    (lastVault?.weth || 0n) +
-    (lastVault?.stETH || 0n) +
-    (lastVault?.rETH || 0n)
+    (lastVault?.frxETH || 0n) + (lastVault?.weth || 0n) + (lastVault?.stETH || 0n) + (lastVault?.rETH || 0n)
 
   const balancerTotal = (lastBalancer?.weth || 0n) + (lastBalancer?.rETH || 0n)
 

@@ -15,7 +15,6 @@ import {
   WETH_ADDRESS,
   addresses,
 } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
 
 export const oethStrategies: readonly IStrategyData[] = [
   {
@@ -132,7 +131,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   },
   {
     from: 20046251,
-    name: 'OETH Native Staking',
+    name: 'OETH Native Staking 1',
     contractName: 'NativeStakingSSVStrategy',
     address: OETH_NATIVE_STRATEGY_ADDRESSES[0],
     oTokenAddress: OETH_ADDRESS,
@@ -143,7 +142,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   },
   {
     from: 20290461,
-    name: 'OETH Native Staking',
+    name: 'OETH Native Staking 2',
     contractName: 'NativeStakingSSVStrategy',
     address: OETH_NATIVE_STRATEGY_ADDRESSES[1],
     oTokenAddress: OETH_ADDRESS,

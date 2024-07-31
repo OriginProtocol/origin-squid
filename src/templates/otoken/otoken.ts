@@ -1,6 +1,3 @@
-import { groupBy } from 'lodash'
-import { GetTransactionReceiptReturnType } from 'viem'
-
 import * as erc20 from '@abi/erc20'
 import * as otoken from '@abi/otoken'
 import * as otokenVault from '@abi/otoken-vault'
@@ -19,12 +16,8 @@ import {
 } from '@model'
 import { Context } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import {
-  CurrencyAddress,
-  CurrencySymbol,
-} from '@shared/post-processors/exchange-rates/currencies'
+import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { type Transaction, activityFromTx } from '@utils/activityFromTx'
 import { ADDRESS_ZERO } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
@@ -32,58 +25,6 @@ import { multicall } from '@utils/multicall'
 import { getLatestEntity } from '@utils/utils'
 
 import { createAddress, createRebaseAPY } from './utils'
-
-export const createOTokenSetup =
-  ({
-    address,
-    wrappedAddress,
-    vaultAddress,
-    from,
-    upgrades,
-  }: {
-    address: string
-    wrappedAddress?: string
-    vaultAddress: string
-    from: number
-    upgrades?: {
-      rebaseOptEvents: number
-    }
-  }) =>
-  (processor: EvmBatchProcessor) => {
-    processor.addTrace({
-      type: ['call'],
-      callTo: [address],
-      callSighash: [
-        otoken.functions.rebaseOptOut.selector,
-        otoken.functions.rebaseOptIn.selector,
-      ],
-      transaction: true,
-      range: { from, to: upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
-    })
-    processor.addLog({
-      address: [address],
-      topic0: [
-        otoken.events.Transfer.topic,
-        otoken.events.TotalSupplyUpdatedHighres.topic,
-        otoken.events.AccountRebasingEnabled.topic,
-        otoken.events.AccountRebasingDisabled.topic,
-      ],
-      transaction: true,
-      range: { from },
-    })
-    if (wrappedAddress) {
-      processor.addLog({
-        address: [wrappedAddress],
-        topic0: [erc20.events.Transfer.topic],
-        range: { from },
-      })
-    }
-    processor.addLog({
-      address: [vaultAddress],
-      topic0: [otokenVault.events.YieldDistribution.topic],
-      range: { from },
-    })
-  }
 
 export const createOTokenProcessor = (params: {
   from: number
@@ -93,7 +34,43 @@ export const createOTokenProcessor = (params: {
   wotokenAddress?: string
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
+  upgrades?: {
+    rebaseOptEvents: number
+  }
 }) => {
+  const setup = (processor: EvmBatchProcessor) => {
+    processor.addTrace({
+      type: ['call'],
+      callTo: [params.otokenAddress],
+      callSighash: [otoken.functions.rebaseOptOut.selector, otoken.functions.rebaseOptIn.selector],
+      transaction: true,
+      range: { from: params.from, to: params.upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
+    })
+    processor.addLog({
+      address: [params.otokenAddress],
+      topic0: [
+        otoken.events.Transfer.topic,
+        otoken.events.TotalSupplyUpdatedHighres.topic,
+        otoken.events.AccountRebasingEnabled.topic,
+        otoken.events.AccountRebasingDisabled.topic,
+      ],
+      transaction: true,
+      range: { from: params.from },
+    })
+    if (params.wotokenAddress) {
+      processor.addLog({
+        address: [params.wotokenAddress],
+        topic0: [erc20.events.Transfer.topic],
+        range: { from: params.from },
+      })
+    }
+    processor.addLog({
+      address: [params.otokenVaultAddress],
+      topic0: [otokenVault.events.YieldDistribution.topic],
+      range: { from: params.from },
+    })
+  }
+
   interface ProcessResult {
     initialized: boolean
     initialize: () => Promise<void>
@@ -176,15 +153,10 @@ export const createOTokenProcessor = (params: {
         await processTotalSupplyUpdatedHighres(ctx, result, block, log)
         await processRebaseOptEvent(ctx, result, block, log)
       }
-      await processActivity(ctx, result, block)
     }
 
     await frequencyUpdate(ctx, async (ctx, block) => {
-      const vaultContract = new otokenVault.Contract(
-        ctx,
-        block.header,
-        params.otokenVaultAddress,
-      )
+      const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
       result.vaults.push(
         new OTokenVault({
           id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
@@ -247,13 +219,8 @@ export const createOTokenProcessor = (params: {
         return entity
       }
 
-      const afterHighResUpgrade =
-        block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
-      const [
-        addressSub,
-        addressAdd,
-        [fromCreditsBalanceOf, toCreditsBalanceOf],
-      ] = await Promise.all([
+      const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+      const [addressSub, addressAdd, [fromCreditsBalanceOf, toCreditsBalanceOf]] = await Promise.all([
         ensureAddress(data.from),
         ensureAddress(data.to),
         multicall(
@@ -261,8 +228,7 @@ export const createOTokenProcessor = (params: {
           block.header,
           afterHighResUpgrade
             ? otoken.functions.creditsBalanceOfHighres
-            : (otoken.functions
-                .creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
+            : (otoken.functions.creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
           params.otokenAddress,
           [{ _account: data.from }, { _account: data.to }],
         ).then((results) => {
@@ -279,24 +245,15 @@ export const createOTokenProcessor = (params: {
        * "0017708038-000327-29fec:0xd2cdf18b60a5cdb634180d5615df7a58a597247c:Sent","0","49130257489166670","2023-07-16T19:50:11.000Z",17708038,"0x0e3ac28945d45993e3d8e1f716b6e9ec17bfc000418a1091a845b7a00c7e3280","Sent","0xd2cdf18b60a5cdb634180d5615df7a58a597247c",
        */
 
-      const updateAddressBalance = ({
-        address,
-        credits,
-      }: {
-        address: OTokenAddress
-        credits: [bigint, bigint]
-      }) => {
+      const updateAddressBalance = ({ address, credits }: { address: OTokenAddress; credits: [bigint, bigint] }) => {
         const newBalance = (credits[0] * DECIMALS_18) / credits[1]
         const change = newBalance - address.balance
         if (change === 0n) return
-        const type =
-          addressSub === address ? HistoryType.Sent : HistoryType.Received
+        const type = addressSub === address ? HistoryType.Sent : HistoryType.Received
         result.history.push(
           new OTokenHistory({
             // we can't use {t.id} because it's not unique
-            id: getUniqueId(
-              `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`,
-            ),
+            id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`),
             chainId: ctx.chain.id,
             otoken: params.otokenAddress,
             address: address,
@@ -321,17 +278,11 @@ export const createOTokenProcessor = (params: {
         credits: toCreditsBalanceOf,
       })
 
-      if (
-        addressAdd.rebasingOption === RebasingOption.OptOut &&
-        data.from === ADDRESS_ZERO
-      ) {
+      if (addressAdd.rebasingOption === RebasingOption.OptOut && data.from === ADDRESS_ZERO) {
         // If it's a mint and minter has opted out of rebasing,
         // add to non-rebasing supply
         otokenObject.nonRebasingSupply += data.value
-      } else if (
-        data.to === ADDRESS_ZERO &&
-        addressSub.rebasingOption === RebasingOption.OptOut
-      ) {
+      } else if (data.to === ADDRESS_ZERO && addressSub.rebasingOption === RebasingOption.OptOut) {
         // If it's a redeem and redeemer has opted out of rebasing,
         // subtract non-rebasing supply
         otokenObject.nonRebasingSupply -= data.value
@@ -352,55 +303,7 @@ export const createOTokenProcessor = (params: {
       }
 
       // Update rebasing supply in all cases
-      otokenObject.rebasingSupply =
-        otokenObject.totalSupply - otokenObject.nonRebasingSupply
-    }
-  }
-
-  const processActivity = async (
-    ctx: Context,
-    result: ProcessResult,
-    block: Context['blocks']['0'],
-  ) => {
-    await result.initialize()
-    const logs = block.logs
-    const groupedLogs = groupBy(logs, (log) => log.transactionHash)
-    for (const [txHash, logs] of Object.entries(groupedLogs)) {
-      const log = logs.find((l) => l.address === params.otokenAddress)
-      const transaction = log?.transaction as unknown as Transaction
-      if (log && transaction) {
-        // We need to get the whole transaction receipt for all related logs.
-        // This shouldn't slow things down too much since it's only done for
-        // OToken transactions.
-        const txReceipt = await ctx._chain.client.call(
-          'eth_getTransactionReceipt',
-          [log.transactionHash],
-        )
-
-        const activity = await activityFromTx(
-          transaction,
-          txReceipt.logs as unknown as GetTransactionReceiptReturnType['logs'],
-        )
-        if (activity) {
-          for (const item of activity) {
-            result.activity.push(
-              new OTokenActivity({
-                id: getUniqueId(
-                  `${ctx.chain.id}-${params.otokenAddress}-${log.id}`,
-                ),
-                chainId: ctx.chain.id,
-                otoken: params.otokenAddress,
-                timestamp: new Date(block.header.timestamp),
-                blockNumber: block.header.height,
-                txHash: log.transactionHash,
-                address: transaction.to,
-                sighash: transaction.input.slice(0, 10),
-                ...item,
-              }),
-            )
-          }
-        }
-      }
+      otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
     }
   }
 
@@ -419,8 +322,7 @@ export const createOTokenProcessor = (params: {
     // OToken Object
     const otokenObject = await getLatestOTokenObject(ctx, result, block)
     otokenObject.totalSupply = data.totalSupply
-    otokenObject.rebasingSupply =
-      otokenObject.totalSupply - otokenObject.nonRebasingSupply
+    otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
     if (!result.lastYieldDistributionEvent) {
       throw new Error('lastYieldDistributionEvent is not set')
@@ -444,22 +346,16 @@ export const createOTokenProcessor = (params: {
     )
 
     for (const address of owners!.values()) {
-      if (
-        !address.credits ||
-        address.rebasingOption === RebasingOption.OptOut
-      ) {
+      if (!address.credits || address.rebasingOption === RebasingOption.OptOut) {
         continue
       }
-      const newBalance =
-        (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
+      const newBalance = (address.credits * DECIMALS_18) / data.rebasingCreditsPerToken
       const earned = newBalance - address.balance
 
       if (earned === 0n) continue
       result.history.push(
         new OTokenHistory({
-          id: getUniqueId(
-            `${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`,
-          ),
+          id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`),
           // we can't use {t.id} because it's not unique
           chainId: ctx.chain.id,
           otoken: params.otokenAddress,
@@ -503,8 +399,7 @@ export const createOTokenProcessor = (params: {
     if (
       trace.type === 'call' &&
       params.otokenAddress === trace.action.to &&
-      (trace.action.sighash ===
-        otoken.functions.governanceRebaseOptIn.selector ||
+      (trace.action.sighash === otoken.functions.governanceRebaseOptIn.selector ||
         trace.action.sighash === otoken.functions.rebaseOptIn.selector ||
         trace.action.sighash === otoken.functions.rebaseOptOut.selector)
     ) {
@@ -513,26 +408,17 @@ export const createOTokenProcessor = (params: {
       const blockNumber = block.header.height
       const address =
         trace.action.sighash === otoken.functions.governanceRebaseOptIn.selector
-          ? otoken.functions.governanceRebaseOptIn.decode(trace.action.input)
-              ._account
+          ? otoken.functions.governanceRebaseOptIn.decode(trace.action.input)._account
           : trace.action.from.toLowerCase()
       const otokenObject = await getLatestOTokenObject(ctx, result, block)
       let owner = owners!.get(address)
       if (!owner) {
-        owner = await createAddress(
-          ctx,
-          params.otokenAddress,
-          address,
-          timestamp,
-        )
+        owner = await createAddress(ctx, params.otokenAddress, address, timestamp)
         owners!.set(address, owner)
       }
 
       const rebaseOption = new OTokenRebaseOption({
-        id: getUniqueId(
-          `${ctx.chain.id}-${params.otokenAddress}-${trace.transaction
-            ?.hash!}-${owner.address}`,
-        ),
+        id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${trace.transaction?.hash!}-${owner.address}`),
         chainId: ctx.chain.id,
         otoken: params.otokenAddress,
         timestamp,
@@ -543,41 +429,28 @@ export const createOTokenProcessor = (params: {
       })
       result.rebaseOptions.push(rebaseOption)
       if (trace.action.sighash === otoken.functions.rebaseOptIn.selector) {
-        const afterHighResUpgrade =
-          block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
-        const otokenContract = new otoken.Contract(
-          ctx,
-          block.header,
-          params.otokenAddress,
-        )
+        const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+        const otokenContract = new otoken.Contract(ctx, block.header, params.otokenAddress)
         owner.credits = afterHighResUpgrade
-          ? await otokenContract
-              .creditsBalanceOfHighres(owner.address)
-              .then((c) => c._0)
-          : await otokenContract
-              .creditsBalanceOf(owner.address)
-              .then((c) => c._0 * 1000000000n)
+          ? await otokenContract.creditsBalanceOfHighres(owner.address).then((c) => c._0)
+          : await otokenContract.creditsBalanceOf(owner.address).then((c) => c._0 * 1000000000n)
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
         otokenObject.nonRebasingSupply -= owner.balance
-        otokenObject.rebasingSupply =
-          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+        otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
       if (trace.action.sighash === otoken.functions.rebaseOptOut.selector) {
         owner.rebasingOption = RebasingOption.OptOut
         rebaseOption.status = RebasingOption.OptOut
         otokenObject.nonRebasingSupply += owner.balance
-        otokenObject.rebasingSupply =
-          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+        otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
     }
   }
 
   const rebaseEventTopics = {
-    [otoken.events.AccountRebasingEnabled.topic]:
-      otoken.events.AccountRebasingEnabled,
-    [otoken.events.AccountRebasingDisabled.topic]:
-      otoken.events.AccountRebasingDisabled,
+    [otoken.events.AccountRebasingEnabled.topic]: otoken.events.AccountRebasingEnabled,
+    [otoken.events.AccountRebasingDisabled.topic]: otoken.events.AccountRebasingDisabled,
   }
   const processRebaseOptEvent = async (
     ctx: Context,
@@ -595,21 +468,12 @@ export const createOTokenProcessor = (params: {
       const address = data.account.toLowerCase()
       let owner = owners!.get(address)
       if (!owner) {
-        owner = await createAddress(
-          ctx,
-          params.otokenAddress,
-          address,
-          timestamp,
-        )
+        owner = await createAddress(ctx, params.otokenAddress, address, timestamp)
         owners!.set(address, owner)
       }
 
       const rebaseOption = new OTokenRebaseOption({
-        id: getUniqueId(
-          `${ctx.chain.id}-${params.otokenAddress}-${log.transactionHash!}-${
-            owner.address
-          }`,
-        ),
+        id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.transactionHash!}-${owner.address}`),
         chainId: ctx.chain.id,
         otoken: params.otokenAddress,
         timestamp,
@@ -623,33 +487,24 @@ export const createOTokenProcessor = (params: {
         owner.rebasingOption = RebasingOption.OptIn
         rebaseOption.status = RebasingOption.OptIn
         otokenObject.nonRebasingSupply -= owner.balance
-        otokenObject.rebasingSupply =
-          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+        otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
       if (log.topics[0] === otoken.events.AccountRebasingDisabled.topic) {
         owner.rebasingOption = RebasingOption.OptOut
         rebaseOption.status = RebasingOption.OptOut
         otokenObject.nonRebasingSupply += owner.balance
-        otokenObject.rebasingSupply =
-          otokenObject.totalSupply - otokenObject.nonRebasingSupply
+        otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       }
     }
   }
 
-  const getLatestOTokenObject = async (
-    ctx: Context,
-    result: ProcessResult,
-    block: Context['blocks']['0'],
-  ) => {
+  const getLatestOTokenObject = async (ctx: Context, result: ProcessResult, block: Context['blocks']['0']) => {
     const timestamp = new Date(block.header.timestamp).toISOString()
     const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp}`
-    const { latest, current } = await getLatestEntity(
-      ctx,
-      OToken,
-      result.otokens,
-      otokenId,
-      { chainId: ctx.chain.id, otoken: params.otokenAddress },
-    )
+    const { latest, current } = await getLatestEntity(ctx, OToken, result.otokens, otokenId, {
+      chainId: ctx.chain.id,
+      otoken: params.otokenAddress,
+    })
 
     let otokenObject = current
     if (!otokenObject) {
@@ -669,5 +524,5 @@ export const createOTokenProcessor = (params: {
     return otokenObject
   }
 
-  return process
+  return { from: params.from, setup, process }
 }

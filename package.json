@@ -40,7 +40,7 @@
     "viem": "^1.10.13"
   },
   "devDependencies": {
-    "@subsquid/evm-typegen": "^4.2.0",
+    "@subsquid/evm-typegen": "^4.3.0",
     "@subsquid/typeorm-codegen": "^2.0.1",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/js-yaml": "^4.0.8",

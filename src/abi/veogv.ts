@@ -42,8 +42,8 @@ export const functions = {
     previewRewards: viewFun("0xf166e920", "previewRewards(address)", {"user": p.address}, p.uint256),
     rewardDebtPerShare: viewFun("0x4423bf57", "rewardDebtPerShare(address)", {"_0": p.address}, p.uint256),
     rewardsSource: viewFun("0xf7240d2f", "rewardsSource()", {}, p.address),
-    "stake(uint256,uint256,address)": fun("0x7628a37d", "stake(uint256,uint256,address)", {"amount": p.uint256, "duration": p.uint256, "to": p.address}, ),
-    "stake(uint256,uint256)": fun("0x7b0472f0", "stake(uint256,uint256)", {"amount": p.uint256, "duration": p.uint256}, ),
+    'stake(uint256,uint256,address)': fun("0x7628a37d", "stake(uint256,uint256,address)", {"amount": p.uint256, "duration": p.uint256, "to": p.address}, ),
+    'stake(uint256,uint256)': fun("0x7b0472f0", "stake(uint256,uint256)", {"amount": p.uint256, "duration": p.uint256}, ),
     symbol: viewFun("0x95d89b41", "symbol()", {}, p.string),
     totalSupply: viewFun("0x18160ddd", "totalSupply()", {}, p.uint256),
     transfer: fun("0xa9059cbb", "transfer(address,uint256)", {"_0": p.address, "_1": p.uint256}, p.bool),
@@ -243,11 +243,11 @@ export type RewardDebtPerShareReturn = FunctionReturn<typeof functions.rewardDeb
 export type RewardsSourceParams = FunctionArguments<typeof functions.rewardsSource>
 export type RewardsSourceReturn = FunctionReturn<typeof functions.rewardsSource>
 
-export type StakeParams_0 = FunctionArguments<typeof functions["stake(uint256,uint256,address)"]>
-export type StakeReturn_0 = FunctionReturn<typeof functions["stake(uint256,uint256,address)"]>
+export type StakeParams_0 = FunctionArguments<typeof functions['stake(uint256,uint256,address)']>
+export type StakeReturn_0 = FunctionReturn<typeof functions['stake(uint256,uint256,address)']>
 
-export type StakeParams_1 = FunctionArguments<typeof functions["stake(uint256,uint256)"]>
-export type StakeReturn_1 = FunctionReturn<typeof functions["stake(uint256,uint256)"]>
+export type StakeParams_1 = FunctionArguments<typeof functions['stake(uint256,uint256)']>
+export type StakeReturn_1 = FunctionReturn<typeof functions['stake(uint256,uint256)']>
 
 export type SymbolParams = FunctionArguments<typeof functions.symbol>
 export type SymbolReturn = FunctionReturn<typeof functions.symbol>

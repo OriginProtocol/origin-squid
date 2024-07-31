@@ -29,8 +29,8 @@ export const functions = {
     earned: viewFun("0x008cc262", "earned(address)", {"account": p.address}, p.uint256),
     extraRewards: viewFun("0x40c35446", "extraRewards(uint256)", {"_0": p.uint256}, p.address),
     extraRewardsLength: viewFun("0xd55a23f4", "extraRewardsLength()", {}, p.uint256),
-    "getReward()": fun("0x3d18b912", "getReward()", {}, p.bool),
-    "getReward(address,bool)": fun("0x7050ccd9", "getReward(address,bool)", {"_account": p.address, "_claimExtras": p.bool}, p.bool),
+    'getReward()': fun("0x3d18b912", "getReward()", {}, p.bool),
+    'getReward(address,bool)': fun("0x7050ccd9", "getReward(address,bool)", {"_account": p.address, "_claimExtras": p.bool}, p.bool),
     historicalRewards: viewFun("0x262d3d6d", "historicalRewards()", {}, p.uint256),
     lastTimeRewardApplicable: viewFun("0x80faa57d", "lastTimeRewardApplicable()", {}, p.uint256),
     lastUpdateTime: viewFun("0xc8f33c91", "lastUpdateTime()", {}, p.uint256),
@@ -68,8 +68,8 @@ export const functions = {
     transfer: fun("0xa9059cbb", "transfer(address,uint256)", {"_0": p.address, "_1": p.uint256}, p.bool),
     transferFrom: fun("0x23b872dd", "transferFrom(address,address,uint256)", {"_0": p.address, "_1": p.address, "_2": p.uint256}, p.bool),
     userRewardPerTokenPaid: viewFun("0x8b876347", "userRewardPerTokenPaid(address)", {"_0": p.address}, p.uint256),
-    "withdraw(uint256,bool)": fun("0x38d07436", "withdraw(uint256,bool)", {"amount": p.uint256, "claim": p.bool}, p.bool),
-    "withdraw(uint256,address,address)": fun("0xb460af94", "withdraw(uint256,address,address)", {"assets": p.uint256, "receiver": p.address, "owner": p.address}, p.uint256),
+    'withdraw(uint256,bool)': fun("0x38d07436", "withdraw(uint256,bool)", {"amount": p.uint256, "claim": p.bool}, p.bool),
+    'withdraw(uint256,address,address)': fun("0xb460af94", "withdraw(uint256,address,address)", {"assets": p.uint256, "receiver": p.address, "owner": p.address}, p.uint256),
     withdrawAll: fun("0x1c1c6fe5", "withdrawAll(bool)", {"claim": p.bool}, ),
     withdrawAllAndUnwrap: fun("0x49f039a2", "withdrawAllAndUnwrap(bool)", {"claim": p.bool}, ),
     withdrawAndUnwrap: fun("0xc32e7202", "withdrawAndUnwrap(uint256,bool)", {"amount": p.uint256, "claim": p.bool}, p.bool),
@@ -290,11 +290,11 @@ export type ExtraRewardsReturn = FunctionReturn<typeof functions.extraRewards>
 export type ExtraRewardsLengthParams = FunctionArguments<typeof functions.extraRewardsLength>
 export type ExtraRewardsLengthReturn = FunctionReturn<typeof functions.extraRewardsLength>
 
-export type GetRewardParams_0 = FunctionArguments<typeof functions["getReward()"]>
-export type GetRewardReturn_0 = FunctionReturn<typeof functions["getReward()"]>
+export type GetRewardParams_0 = FunctionArguments<typeof functions['getReward()']>
+export type GetRewardReturn_0 = FunctionReturn<typeof functions['getReward()']>
 
-export type GetRewardParams_1 = FunctionArguments<typeof functions["getReward(address,bool)"]>
-export type GetRewardReturn_1 = FunctionReturn<typeof functions["getReward(address,bool)"]>
+export type GetRewardParams_1 = FunctionArguments<typeof functions['getReward(address,bool)']>
+export type GetRewardReturn_1 = FunctionReturn<typeof functions['getReward(address,bool)']>
 
 export type HistoricalRewardsParams = FunctionArguments<typeof functions.historicalRewards>
 export type HistoricalRewardsReturn = FunctionReturn<typeof functions.historicalRewards>
@@ -407,11 +407,11 @@ export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
 export type UserRewardPerTokenPaidParams = FunctionArguments<typeof functions.userRewardPerTokenPaid>
 export type UserRewardPerTokenPaidReturn = FunctionReturn<typeof functions.userRewardPerTokenPaid>
 
-export type WithdrawParams_0 = FunctionArguments<typeof functions["withdraw(uint256,bool)"]>
-export type WithdrawReturn_0 = FunctionReturn<typeof functions["withdraw(uint256,bool)"]>
+export type WithdrawParams_0 = FunctionArguments<typeof functions['withdraw(uint256,bool)']>
+export type WithdrawReturn_0 = FunctionReturn<typeof functions['withdraw(uint256,bool)']>
 
-export type WithdrawParams_1 = FunctionArguments<typeof functions["withdraw(uint256,address,address)"]>
-export type WithdrawReturn_1 = FunctionReturn<typeof functions["withdraw(uint256,address,address)"]>
+export type WithdrawParams_1 = FunctionArguments<typeof functions['withdraw(uint256,address,address)']>
+export type WithdrawReturn_1 = FunctionReturn<typeof functions['withdraw(uint256,address,address)']>
 
 export type WithdrawAllParams = FunctionArguments<typeof functions.withdrawAll>
 export type WithdrawAllReturn = FunctionReturn<typeof functions.withdrawAll>

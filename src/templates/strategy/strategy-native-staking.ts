@@ -1,5 +1,4 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
-import * as nativeStakingStrategyAbi from '@abi/strategy-native-staking'
 import { StrategyBalance } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'

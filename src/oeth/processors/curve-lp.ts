@@ -5,11 +5,7 @@ import * as curveLpToken from '@abi/curve-lp-token'
 import { OETHCurveLP } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  OETH_CONVEX_ADDRESS,
-  OETH_CURVE_LP_ADDRESS,
-  OETH_CURVE_REWARD_LP_ADDRESS,
-} from '@utils/addresses'
+import { CURVE_ETH_OETH_POOL_ADDRESS, OETH_CONVEX_ADDRESS, OETH_CURVE_REWARD_LP_ADDRESS } from '@utils/addresses'
 import { getLatestEntity } from '@utils/utils'
 
 interface ProcessResult {
@@ -23,7 +19,7 @@ export const from = Math.min(
 
 export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
-    address: [OETH_CURVE_LP_ADDRESS],
+    address: [CURVE_ETH_OETH_POOL_ADDRESS],
     topic0: [
       curveLpToken.events.AddLiquidity.topic,
       curveLpToken.events.RemoveLiquidity.topic,
@@ -35,10 +31,7 @@ export const setup = (processor: EvmBatchProcessor) => {
   })
   processor.addLog({
     address: [OETH_CURVE_REWARD_LP_ADDRESS],
-    topic0: [
-      baseRewardPool.events.Staked.topic,
-      baseRewardPool.events.Withdrawn.topic,
-    ],
+    topic0: [baseRewardPool.events.Staked.topic, baseRewardPool.events.Withdrawn.topic],
     topic1: [pad(OETH_CONVEX_ADDRESS)],
     range: { from },
   })
@@ -50,9 +43,7 @@ export const process = async (ctx: Context) => {
   }
 
   for (const block of ctx.blocks) {
-    const haveCurveLpEvent = block.logs.find(
-      (log) => log.address === OETH_CURVE_LP_ADDRESS,
-    )
+    const haveCurveLpEvent = block.logs.find((log) => log.address === CURVE_ETH_OETH_POOL_ADDRESS)
     if (haveCurveLpEvent) {
       await updateCurveValues(ctx, result, block)
     }
@@ -66,30 +57,15 @@ export const process = async (ctx: Context) => {
   await ctx.store.insert(result.curveLPs)
 }
 
-const updateCurveValues = async (
-  ctx: Context,
-  result: ProcessResult,
-  block: Context['blocks']['0'],
-) => {
+const updateCurveValues = async (ctx: Context, result: ProcessResult, block: Context['blocks']['0']) => {
   const { curveLP } = await getLatestCurveLP(ctx, result, block)
-  const poolContract = new curveLpToken.Contract(
-    ctx,
-    block.header,
-    OETH_CURVE_LP_ADDRESS,
-  )
-  const [totalSupply, balances] = await Promise.all([
-    poolContract.totalSupply(),
-    poolContract.get_balances(),
-  ])
+  const poolContract = new curveLpToken.Contract(ctx, block.header, CURVE_ETH_OETH_POOL_ADDRESS)
+  const [totalSupply, balances] = await Promise.all([poolContract.totalSupply(), poolContract.get_balances()])
   curveLP.totalSupply = totalSupply
   curveLP.eth = balances[0]
   curveLP.oeth = balances[1]
-  curveLP.ethOwned = curveLP.totalSupply
-    ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-    : 0n
-  curveLP.oethOwned = curveLP.totalSupply
-    ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-    : 0n
+  curveLP.ethOwned = curveLP.totalSupply ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
+  curveLP.oethOwned = curveLP.totalSupply ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
 }
 
 const processCurveRewardEvents = async (
@@ -103,37 +79,20 @@ const processCurveRewardEvents = async (
     const { amount } = baseRewardPool.events.Staked.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupplyOwned += amount
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
+    curveLP.ethOwned = curveLP.totalSupply ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
+    curveLP.oethOwned = curveLP.totalSupply ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
   } else if (log.topics[0] === baseRewardPool.events.Withdrawn.topic) {
     const { amount } = baseRewardPool.events.Withdrawn.decode(log)
     const { curveLP } = await getLatestCurveLP(ctx, result, block)
     curveLP.totalSupplyOwned -= amount
-    curveLP.ethOwned = curveLP.totalSupply
-      ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
-    curveLP.oethOwned = curveLP.totalSupply
-      ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply
-      : 0n
+    curveLP.ethOwned = curveLP.totalSupply ? (curveLP.eth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
+    curveLP.oethOwned = curveLP.totalSupply ? (curveLP.oeth * curveLP.totalSupplyOwned) / curveLP.totalSupply : 0n
   }
 }
 
-const getLatestCurveLP = async (
-  ctx: Context,
-  result: ProcessResult,
-  block: Context['blocks']['0'],
-) => {
+const getLatestCurveLP = async (ctx: Context, result: ProcessResult, block: Context['blocks']['0']) => {
   const timestampId = new Date(block.header.timestamp).toISOString()
-  const { latest, current } = await getLatestEntity(
-    ctx,
-    OETHCurveLP,
-    result.curveLPs,
-    timestampId,
-  )
+  const { latest, current } = await getLatestEntity(ctx, OETHCurveLP, result.curveLPs, timestampId)
 
   let isNew = false
   let curveLP = current

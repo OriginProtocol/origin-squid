@@ -1,5 +1,5 @@
 import { LiquiditySourceType } from '@model'
-import { addresses } from '@utils/addresses'
+import { UNISWAP_V3_OETH_WEH_ADDRESS, addresses } from '@utils/addresses'
 
 import { addERC20Processing } from './erc20s'
 import { registerLiquiditySource } from './liquidity-sources'
@@ -18,7 +18,7 @@ const pools = [
     tokens: ['wstETH', 'WETH'],
   },
   {
-    address: '0x52299416c469843f4e0d54688099966a6c7d720f',
+    address: UNISWAP_V3_OETH_WEH_ADDRESS,
     tokens: ['OETH', 'WETH'],
   },
 ] as const
@@ -26,11 +26,7 @@ const pools = [
 export const initialize = () => {
   for (const pool of pools) {
     for (const token of pool.tokens) {
-      registerLiquiditySource(
-        pool.address,
-        LiquiditySourceType.UniswapPool,
-        addresses.tokens[token],
-      )
+      registerLiquiditySource(pool.address, LiquiditySourceType.UniswapPool, addresses.tokens[token])
       addERC20Processing(token, pool.address)
     }
   }

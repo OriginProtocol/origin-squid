@@ -3,9 +3,11 @@ import * as ccipOnRampAbi from '@abi/ccip-evm2evmonramp'
 import * as ccipRouter from '@abi/ccip-router'
 import * as erc20Abi from '@abi/erc20'
 import { BridgeTransfer, BridgeTransferState } from '@model'
-import { Context } from '@processor'
+import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { WOETH_ADDRESS, WOETH_ARBITRUM_ADDRESS } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
+import { publishProcessorState } from '@utils/state'
 import { traceFilter } from '@utils/traceFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain
@@ -16,8 +18,9 @@ import { traceFilter } from '@utils/traceFilter'
 // These can be retrieved using the chain selector id on the router function `getOffRamps`
 // States: https://github.com/smartcontractkit/smart-contract-examples/blob/main/ccip-offchain/config/messageState.json
 
-interface ProcessResult {
+export interface CCIPProcessorResult {
   transfers: Map<string, BridgeTransfer>
+  transfersWithLogs: Map<string, { block: Block; log: Log; transfer: BridgeTransfer }>
   bridgeTransferStates: Map<string, BridgeTransferState>
 }
 
@@ -36,10 +39,9 @@ const ccipConfig = {
     offRampAddresses: {
       '42161': '0xefc4a18af59398ff23bfe7325f2401ad44286f4d',
     },
-    tokens: ['0xdcee70654261af21c44c093c300ed3bb97b78192'],
+    tokens: [WOETH_ADDRESS],
     tokenMappings: {
-      '0xdcee70654261af21c44c093c300ed3bb97b78192':
-        '0xd8724322f44e5c58d7a815f542036fb17dbbf839', // wOETH
+      [WOETH_ADDRESS]: WOETH_ARBITRUM_ADDRESS,
     } as Record<string, string>,
   },
   '42161': {
@@ -51,24 +53,16 @@ const ccipConfig = {
     offRampAddresses: {
       '1': '0x542ba1902044069330e8c5b36a84ec503863722f',
     },
-    tokens: ['0xd8724322f44e5c58d7a815f542036fb17dbbf839'],
+    tokens: [WOETH_ARBITRUM_ADDRESS],
     tokenMappings: {
-      '0xd8724322f44e5c58d7a815f542036fb17dbbf839':
-        '0xdcee70654261af21c44c093c300ed3bb97b78192', // wOETH
+      [WOETH_ARBITRUM_ADDRESS]: WOETH_ADDRESS,
     } as Record<string, string>,
   },
 }
 
 export const ccip = (params: { chainId: 1 | 42161 }) => {
-  const {
-    from,
-    tokens,
-    tokenMappings,
-    tokenPoolAddress,
-    ccipRouterAddress,
-    onRampAddress,
-    offRampAddresses,
-  } = ccipConfig[params.chainId]
+  const { from, tokens, tokenMappings, tokenPoolAddress, ccipRouterAddress, onRampAddress, offRampAddresses } =
+    ccipConfig[params.chainId]
   const transfersToLockReleasePool = logFilter({
     address: tokens,
     topic0: [erc20Abi.events.Transfer.topic],
@@ -104,8 +98,9 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
   }
 
   const process = async (ctx: Context) => {
-    const result: ProcessResult = {
+    const result: CCIPProcessorResult = {
       transfers: new Map<string, BridgeTransfer>(),
+      transfersWithLogs: new Map<string, { block: Block; log: Log; transfer: BridgeTransfer }>(),
       bridgeTransferStates: new Map<string, BridgeTransferState>(),
     }
 
@@ -130,39 +125,26 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
             bridgeTransfer.txHashOut = log.transactionHash
             bridgeTransfer.state = data.state
             result.transfers.set(state.id, bridgeTransfer)
+            result.transfersWithLogs.set(state.id, { block, log, transfer: bridgeTransfer })
           }
           // console.log(state)
         }
         if (transfersToLockReleasePool.matches(log)) {
           // console.log('match transfersToOnramp')
           const logSendRequested = block.logs.find(
-            (l) =>
-              log.transactionHash === l.transactionHash &&
-              ccipSendRequested.matches(l),
+            (l) => log.transactionHash === l.transactionHash && ccipSendRequested.matches(l),
           )
           const traceSendRequested = block.traces.find(
-            (t) =>
-              log.transactionHash === t.transaction?.hash &&
-              ccipSendFunction.matches(t),
+            (t) => log.transactionHash === t.transaction?.hash && ccipSendFunction.matches(t),
           )
-          if (
-            logSendRequested &&
-            traceSendRequested &&
-            traceSendRequested.type === 'call'
-          ) {
+          if (logSendRequested && traceSendRequested && traceSendRequested.type === 'call') {
             // console.log('match ccipSendRequested')
-            const logData =
-              ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
+            const logData = ccipOnRampAbi.events.CCIPSendRequested.decode(logSendRequested)
             const message = logData.message
-            const functionData = ccipRouter.functions.ccipSend.decode(
-              traceSendRequested.action.input,
-            )
+            const functionData = ccipRouter.functions.ccipSend.decode(traceSendRequested.action.input)
             // A `BridgeTransferState` may already exist.
             //  If so, we should pull the `state` for it.
-            const bridgeTransferState = await ctx.store.get(
-              BridgeTransferState,
-              message.messageId,
-            )
+            const bridgeTransferState = await ctx.store.get(BridgeTransferState, message.messageId)
 
             for (let i = 0; i < message.tokenAmounts.length; i++) {
               const tokenAmount = message.tokenAmounts[i]
@@ -175,10 +157,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
                 messageId: message.messageId,
                 bridge: 'ccip',
                 chainIn: params.chainId,
-                chainOut:
-                  chainSelectorIdMappings[
-                    functionData.destinationChainSelector.toString()
-                  ],
+                chainOut: chainSelectorIdMappings[functionData.destinationChainSelector.toString()],
                 tokenIn: tokenAmount.token.toLowerCase(),
                 tokenOut: tokenMappings[tokenAmount.token.toLowerCase()],
                 amountIn: tokenAmount.amount,
@@ -190,12 +169,14 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
               })
               // console.log(transfer)
               result.transfers.set(transfer.id, transfer)
+              result.transfersWithLogs.set(transfer.id, { block, log, transfer })
             }
           }
         }
       }
     }
 
+    publishProcessorState<CCIPProcessorResult>(ctx, 'ccip', result)
     await ctx.store.upsert([...result.transfers.values()])
     await ctx.store.upsert([...result.bridgeTransferStates.values()])
   }

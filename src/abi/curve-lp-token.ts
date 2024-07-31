@@ -33,18 +33,18 @@ export const functions = {
     price_oracle: viewFun("0x86fc88d3", "price_oracle()", {}, p.uint256),
     get_virtual_price: viewFun("0xbb7b8b80", "get_virtual_price()", {}, p.uint256),
     calc_token_amount: viewFun("0xed8e84f3", "calc_token_amount(uint256[2],bool)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_is_deposit": p.bool}, p.uint256),
-    "add_liquidity(uint256[2],uint256)": fun("0x0b4c7e4d", "add_liquidity(uint256[2],uint256)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256}, p.uint256),
-    "add_liquidity(uint256[2],uint256,address)": fun("0x0c3e4b54", "add_liquidity(uint256[2],uint256,address)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256, "_receiver": p.address}, p.uint256),
+    'add_liquidity(uint256[2],uint256)': fun("0x0b4c7e4d", "add_liquidity(uint256[2],uint256)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256}, p.uint256),
+    'add_liquidity(uint256[2],uint256,address)': fun("0x0c3e4b54", "add_liquidity(uint256[2],uint256,address)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_min_mint_amount": p.uint256, "_receiver": p.address}, p.uint256),
     get_dy: viewFun("0x5e0d443f", "get_dy(int128,int128,uint256)", {"i": p.int128, "j": p.int128, "dx": p.uint256}, p.uint256),
-    "exchange(int128,int128,uint256,uint256)": fun("0x3df02124", "exchange(int128,int128,uint256,uint256)", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256}, p.uint256),
-    "exchange(int128,int128,uint256,uint256,address)": fun("0xddc1f59d", "exchange(int128,int128,uint256,uint256,address)", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256, "_receiver": p.address}, p.uint256),
-    "remove_liquidity(uint256,uint256[2])": fun("0x5b36389c", "remove_liquidity(uint256,uint256[2])", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2)}, p.fixedSizeArray(p.uint256, 2)),
-    "remove_liquidity(uint256,uint256[2],address)": fun("0x3eb1719f", "remove_liquidity(uint256,uint256[2],address)", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2), "_receiver": p.address}, p.fixedSizeArray(p.uint256, 2)),
-    "remove_liquidity_imbalance(uint256[2],uint256)": fun("0xe3103273", "remove_liquidity_imbalance(uint256[2],uint256)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256}, p.uint256),
-    "remove_liquidity_imbalance(uint256[2],uint256,address)": fun("0x52d2cfdd", "remove_liquidity_imbalance(uint256[2],uint256,address)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256, "_receiver": p.address}, p.uint256),
+    'exchange(int128,int128,uint256,uint256)': fun("0x3df02124", "exchange(int128,int128,uint256,uint256)", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256}, p.uint256),
+    'exchange(int128,int128,uint256,uint256,address)': fun("0xddc1f59d", "exchange(int128,int128,uint256,uint256,address)", {"i": p.int128, "j": p.int128, "_dx": p.uint256, "_min_dy": p.uint256, "_receiver": p.address}, p.uint256),
+    'remove_liquidity(uint256,uint256[2])': fun("0x5b36389c", "remove_liquidity(uint256,uint256[2])", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2)}, p.fixedSizeArray(p.uint256, 2)),
+    'remove_liquidity(uint256,uint256[2],address)': fun("0x3eb1719f", "remove_liquidity(uint256,uint256[2],address)", {"_burn_amount": p.uint256, "_min_amounts": p.fixedSizeArray(p.uint256, 2), "_receiver": p.address}, p.fixedSizeArray(p.uint256, 2)),
+    'remove_liquidity_imbalance(uint256[2],uint256)': fun("0xe3103273", "remove_liquidity_imbalance(uint256[2],uint256)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256}, p.uint256),
+    'remove_liquidity_imbalance(uint256[2],uint256,address)': fun("0x52d2cfdd", "remove_liquidity_imbalance(uint256[2],uint256,address)", {"_amounts": p.fixedSizeArray(p.uint256, 2), "_max_burn_amount": p.uint256, "_receiver": p.address}, p.uint256),
     calc_withdraw_one_coin: viewFun("0xcc2b27d7", "calc_withdraw_one_coin(uint256,int128)", {"_burn_amount": p.uint256, "i": p.int128}, p.uint256),
-    "remove_liquidity_one_coin(uint256,int128,uint256)": fun("0x1a4d01d2", "remove_liquidity_one_coin(uint256,int128,uint256)", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256}, p.uint256),
-    "remove_liquidity_one_coin(uint256,int128,uint256,address)": fun("0x081579a5", "remove_liquidity_one_coin(uint256,int128,uint256,address)", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256, "_receiver": p.address}, p.uint256),
+    'remove_liquidity_one_coin(uint256,int128,uint256)': fun("0x1a4d01d2", "remove_liquidity_one_coin(uint256,int128,uint256)", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256}, p.uint256),
+    'remove_liquidity_one_coin(uint256,int128,uint256,address)': fun("0x081579a5", "remove_liquidity_one_coin(uint256,int128,uint256,address)", {"_burn_amount": p.uint256, "i": p.int128, "_min_received": p.uint256, "_receiver": p.address}, p.uint256),
     ramp_A: fun("0x3c157e64", "ramp_A(uint256,uint256)", {"_future_A": p.uint256, "_future_time": p.uint256}, ),
     stop_ramp_A: fun("0x551a6588", "stop_ramp_A()", {}, ),
     admin_balances: viewFun("0xe2e7d264", "admin_balances(uint256)", {"i": p.uint256}, p.uint256),
@@ -270,41 +270,41 @@ export type Get_virtual_priceReturn = FunctionReturn<typeof functions.get_virtua
 export type Calc_token_amountParams = FunctionArguments<typeof functions.calc_token_amount>
 export type Calc_token_amountReturn = FunctionReturn<typeof functions.calc_token_amount>
 
-export type Add_liquidityParams_0 = FunctionArguments<typeof functions["add_liquidity(uint256[2],uint256)"]>
-export type Add_liquidityReturn_0 = FunctionReturn<typeof functions["add_liquidity(uint256[2],uint256)"]>
+export type Add_liquidityParams_0 = FunctionArguments<typeof functions['add_liquidity(uint256[2],uint256)']>
+export type Add_liquidityReturn_0 = FunctionReturn<typeof functions['add_liquidity(uint256[2],uint256)']>
 
-export type Add_liquidityParams_1 = FunctionArguments<typeof functions["add_liquidity(uint256[2],uint256,address)"]>
-export type Add_liquidityReturn_1 = FunctionReturn<typeof functions["add_liquidity(uint256[2],uint256,address)"]>
+export type Add_liquidityParams_1 = FunctionArguments<typeof functions['add_liquidity(uint256[2],uint256,address)']>
+export type Add_liquidityReturn_1 = FunctionReturn<typeof functions['add_liquidity(uint256[2],uint256,address)']>
 
 export type Get_dyParams = FunctionArguments<typeof functions.get_dy>
 export type Get_dyReturn = FunctionReturn<typeof functions.get_dy>
 
-export type ExchangeParams_0 = FunctionArguments<typeof functions["exchange(int128,int128,uint256,uint256)"]>
-export type ExchangeReturn_0 = FunctionReturn<typeof functions["exchange(int128,int128,uint256,uint256)"]>
+export type ExchangeParams_0 = FunctionArguments<typeof functions['exchange(int128,int128,uint256,uint256)']>
+export type ExchangeReturn_0 = FunctionReturn<typeof functions['exchange(int128,int128,uint256,uint256)']>
 
-export type ExchangeParams_1 = FunctionArguments<typeof functions["exchange(int128,int128,uint256,uint256,address)"]>
-export type ExchangeReturn_1 = FunctionReturn<typeof functions["exchange(int128,int128,uint256,uint256,address)"]>
+export type ExchangeParams_1 = FunctionArguments<typeof functions['exchange(int128,int128,uint256,uint256,address)']>
+export type ExchangeReturn_1 = FunctionReturn<typeof functions['exchange(int128,int128,uint256,uint256,address)']>
 
-export type Remove_liquidityParams_0 = FunctionArguments<typeof functions["remove_liquidity(uint256,uint256[2])"]>
-export type Remove_liquidityReturn_0 = FunctionReturn<typeof functions["remove_liquidity(uint256,uint256[2])"]>
+export type Remove_liquidityParams_0 = FunctionArguments<typeof functions['remove_liquidity(uint256,uint256[2])']>
+export type Remove_liquidityReturn_0 = FunctionReturn<typeof functions['remove_liquidity(uint256,uint256[2])']>
 
-export type Remove_liquidityParams_1 = FunctionArguments<typeof functions["remove_liquidity(uint256,uint256[2],address)"]>
-export type Remove_liquidityReturn_1 = FunctionReturn<typeof functions["remove_liquidity(uint256,uint256[2],address)"]>
+export type Remove_liquidityParams_1 = FunctionArguments<typeof functions['remove_liquidity(uint256,uint256[2],address)']>
+export type Remove_liquidityReturn_1 = FunctionReturn<typeof functions['remove_liquidity(uint256,uint256[2],address)']>
 
-export type Remove_liquidity_imbalanceParams_0 = FunctionArguments<typeof functions["remove_liquidity_imbalance(uint256[2],uint256)"]>
-export type Remove_liquidity_imbalanceReturn_0 = FunctionReturn<typeof functions["remove_liquidity_imbalance(uint256[2],uint256)"]>
+export type Remove_liquidity_imbalanceParams_0 = FunctionArguments<typeof functions['remove_liquidity_imbalance(uint256[2],uint256)']>
+export type Remove_liquidity_imbalanceReturn_0 = FunctionReturn<typeof functions['remove_liquidity_imbalance(uint256[2],uint256)']>
 
-export type Remove_liquidity_imbalanceParams_1 = FunctionArguments<typeof functions["remove_liquidity_imbalance(uint256[2],uint256,address)"]>
-export type Remove_liquidity_imbalanceReturn_1 = FunctionReturn<typeof functions["remove_liquidity_imbalance(uint256[2],uint256,address)"]>
+export type Remove_liquidity_imbalanceParams_1 = FunctionArguments<typeof functions['remove_liquidity_imbalance(uint256[2],uint256,address)']>
+export type Remove_liquidity_imbalanceReturn_1 = FunctionReturn<typeof functions['remove_liquidity_imbalance(uint256[2],uint256,address)']>
 
 export type Calc_withdraw_one_coinParams = FunctionArguments<typeof functions.calc_withdraw_one_coin>
 export type Calc_withdraw_one_coinReturn = FunctionReturn<typeof functions.calc_withdraw_one_coin>
 
-export type Remove_liquidity_one_coinParams_0 = FunctionArguments<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256)"]>
-export type Remove_liquidity_one_coinReturn_0 = FunctionReturn<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256)"]>
+export type Remove_liquidity_one_coinParams_0 = FunctionArguments<typeof functions['remove_liquidity_one_coin(uint256,int128,uint256)']>
+export type Remove_liquidity_one_coinReturn_0 = FunctionReturn<typeof functions['remove_liquidity_one_coin(uint256,int128,uint256)']>
 
-export type Remove_liquidity_one_coinParams_1 = FunctionArguments<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256,address)"]>
-export type Remove_liquidity_one_coinReturn_1 = FunctionReturn<typeof functions["remove_liquidity_one_coin(uint256,int128,uint256,address)"]>
+export type Remove_liquidity_one_coinParams_1 = FunctionArguments<typeof functions['remove_liquidity_one_coin(uint256,int128,uint256,address)']>
+export type Remove_liquidity_one_coinReturn_1 = FunctionReturn<typeof functions['remove_liquidity_one_coin(uint256,int128,uint256,address)']>
 
 export type Ramp_AParams = FunctionArguments<typeof functions.ramp_A>
 export type Ramp_AReturn = FunctionReturn<typeof functions.ramp_A>

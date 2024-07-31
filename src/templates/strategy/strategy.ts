@@ -30,7 +30,7 @@ export type IStrategyData = {
   name: string
   contractName: string
   address: string
-  kind: 'Generic' | 'Vault' | 'CurveAMO' | 'BalancerMetaStablePool' | 'BalancerComposableStablePool' | 'NativeStaking'
+  kind: 'Generic' | 'Vault' | 'CurveAMO' | 'BalancerMetaStablePool' | 'NativeStaking'
   base: {
     address: string
     decimals: number
@@ -69,10 +69,6 @@ const processors: Record<
   Vault: strategyVault,
   CurveAMO: strategyCurveAMO,
   BalancerMetaStablePool: strategyBalancer,
-  BalancerComposableStablePool: {
-    setup: () => Promise.reject('Not implemented.'),
-    process: () => Promise.reject('Not implemented.'),
-  },
   NativeStaking: strategyNativeStaking,
 }
 
