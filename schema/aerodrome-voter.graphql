@@ -1,0 +1,103 @@
+type AeroVoterAbstained @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  voter: String! @index
+  pool: String! @index
+  tokenId: BigInt! @index
+  weight: BigInt!
+  totalWeight: BigInt!
+}
+#
+#type AeroVoterDistributeReward @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  sender: String! @index
+#  gauge: String! @index
+#  amount: BigInt!
+#}
+#
+#type AeroVoterGaugeCreated @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  poolFactory: String! @index
+#  votingRewardsFactory: String! @index
+#  gaugeFactory: String! @index
+#  pool: String!
+#  bribeVotingReward: String!
+#  feeVotingReward: String!
+#  gauge: String!
+#  creator: String!
+#}
+#
+#type AeroVoterGaugeKilled @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  gauge: String! @index
+#}
+#
+#type AeroVoterGaugeRevived @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  gauge: String! @index
+#}
+#
+#type AeroVoterNotifyReward @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  sender: String! @index
+#  reward: String! @index
+#  amount: BigInt!
+#}
+
+type AeroVoterVoted @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  voter: String! @index
+  pool: String! @index
+  tokenId: BigInt! @index
+  weight: BigInt!
+  totalWeight: BigInt!
+}
+#
+#type AeroVoterWhitelistNFT @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  whitelister: String! @index
+#  tokenId: BigInt! @index
+#  bool: Boolean! @index
+#}
+#
+#type AeroVoterWhitelistToken @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  whitelister: String! @index
+#  token: String! @index
+#  bool: Boolean! @index
+#}

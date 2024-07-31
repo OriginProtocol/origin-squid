@@ -1,10 +1,10 @@
-import * as aerodromePoolAbi from '@abi/aerodrome-pool'
+import * as aerodromeGaugeAbi from '@abi/aerodrome-gauge'
 import * as models from '@model'
 import { Block, Context, Log, Processor } from '@processor'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromePool = (params: { address: string; from: number }): Processor => {
-  const eventProcessors = Object.entries(aerodromePoolAbi.events).map(([eventName, event]) => {
+export const aerodromeGauge = (params: { address: string; from: number }): Processor => {
+  const eventProcessors = Object.entries(aerodromeGaugeAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],
       topic0: [event.topic],
@@ -15,7 +15,7 @@ export const aerodromePool = (params: { address: string; from: number }): Proces
       filter,
       process: (ctx: Context, block: Block, log: Log) => {
         if (!filter.matches(log)) return null
-        const Model = models[`AeroPool${eventName as keyof typeof aerodromePoolAbi.events}`]
+        const Model = models[`AeroGauge${eventName as keyof typeof aerodromeGaugeAbi.events}`]
         const data = event.decode(log) as any
         for (const key of Object.keys(data)) {
           if (typeof data[key] === 'string') {
@@ -35,7 +35,7 @@ export const aerodromePool = (params: { address: string; from: number }): Proces
   })
   return {
     from: params.from,
-    name: `Aerodrome Pool ${params.address}`,
+    name: `Aerodrome Gauge ${params.address}`,
     setup: (processor) => {
       for (const { filter } of eventProcessors) {
         processor.addLog(filter.value)

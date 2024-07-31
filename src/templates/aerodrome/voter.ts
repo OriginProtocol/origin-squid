@@ -1,13 +1,17 @@
-import * as aerodromePoolAbi from '@abi/aerodrome-pool'
+import { pick } from 'lodash'
+
+import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as models from '@model'
 import { Block, Context, Log, Processor } from '@processor'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromePool = (params: { address: string; from: number }): Processor => {
-  const eventProcessors = Object.entries(aerodromePoolAbi.events).map(([eventName, event]) => {
+export const aerodromeVoter = (params: { address: string; pools: string[]; from: number }): Processor => {
+  const aeroVoterEvents = pick(aerodromeVoterAbi.events, ['Voted', 'Abstained'])
+  const eventProcessors = Object.entries(aeroVoterEvents).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],
       topic0: [event.topic],
+      topic2: params.pools,
       range: { from: params.from },
     })
     return {
@@ -15,11 +19,15 @@ export const aerodromePool = (params: { address: string; from: number }): Proces
       filter,
       process: (ctx: Context, block: Block, log: Log) => {
         if (!filter.matches(log)) return null
-        const Model = models[`AeroPool${eventName as keyof typeof aerodromePoolAbi.events}`]
+        const Model = models[`AeroVoter${eventName as keyof typeof aeroVoterEvents}`]
         const data = event.decode(log) as any
         for (const key of Object.keys(data)) {
           if (typeof data[key] === 'string') {
             data[key] = data[key].toLowerCase()
+            if (key === '_bool') {
+              data.bool = data._bool
+              delete data._bool
+            }
           }
         }
         return new Model({
@@ -35,7 +43,7 @@ export const aerodromePool = (params: { address: string; from: number }): Proces
   })
   return {
     from: params.from,
-    name: `Aerodrome Pool ${params.address}`,
+    name: `Aerodrome Voter ${params.address}`,
     setup: (processor) => {
       for (const { filter } of eventProcessors) {
         processor.addLog(filter.value)
