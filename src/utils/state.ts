@@ -1,5 +1,18 @@
 import { Context } from '@processor'
 
+export const cached = <I extends [Context, ...any[]], R>(
+  keyFn: (...params: I) => string,
+  fn: (...params: I) => Promise<R>,
+) => {
+  return async (...params: I) => {
+    const [state, setState] = useProcessorState<R | undefined>(params[0], keyFn(...params), undefined)
+    if (state) return state
+    const result = await fn(...params)
+    setState(result)
+    return result
+  }
+}
+
 export const useProcessorState = <T>(ctx: Context, key: string, defaultValue?: T) => {
   const { __state } = ctx
   let value = __state.get(key) as T | undefined

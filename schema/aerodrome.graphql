@@ -1,0 +1,41 @@
+type AeroPoolState @entity {
+  id: ID! # chainId:poolAddress:blockNumber
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  totalUsd: BigInt!
+  asset0: BigInt!
+  asset1: BigInt!
+  voteWeight: BigInt!
+  votePercentage: BigInt!
+}
+
+type AeroCLPoolState @entity {
+  id: ID! # chainId-poolAddress-blockNumber
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  voteWeight: BigInt!
+  votePercentage: BigInt!
+  currentTick: AeroCLPoolTick
+}
+
+type AeroCLPoolTick @entity {
+  id: ID! # chainId-poolAddress-tick-blockNumber
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  tick: Int! @index
+  liquidityGross: BigInt!
+  liquidityNet: BigInt!
+  stakedLiquidityNet: BigInt!
+  feeGrowthOutside0X128: BigInt!
+  feeGrowthOutside1X128: BigInt!
+  rewardGrowthOutsideX128: BigInt!
+  tickCumulativeOutside: BigInt!
+  secondsPerLiquidityOutsideX128: BigInt!
+  secondsOutside: Int!
+}
