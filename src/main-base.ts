@@ -17,16 +17,14 @@ export const processor = {
   stateSchema: 'base-processor',
   processors: [
     baseERC20s,
-    aerodromePool(baseAddresses.pools['vAMM-OGN/OETHb']),
-    aerodromeGauge({
-      address: baseAddresses.pools['vAMM-OGN/OETHb'].gauge,
-      from: 16014718,
-    }),
-    aerodromeCLPool(baseAddresses.pools['CL1-WETH/OETHb']),
-    aerodromeCLGauge({
-      address: '0x45F8b8eC9c92D09BA8495074436fD97073423041',
-      from: 13903918,
-    }),
+    aerodromePool(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
+    aerodromeGauge(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
+    aerodromePool(baseAddresses.aerodrome['vAMM-OGN/OETHb'].pool),
+    // aerodromeGauge(baseAddresses.aerodrome['vAMM-OGN/OETHb'].gauge),
+    aerodromeCLPool(baseAddresses.aerodrome['CL1-WETH/OETHb'].pool),
+    // aerodromeCLGauge(baseAddresses.aerodrome['CL1-WETH/OETHb'].gauge),
+    aerodromeCLPool(baseAddresses.aerodrome['CL1-cbETH/WETH'].pool),
+    aerodromeCLGauge(baseAddresses.aerodrome['CL1-cbETH/WETH'].gauge),
     aerodromeVoter({
       address: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',
       pools: ['0x8eA4C49B712217fd6e29Db920E3dd48287a0d50D', '0x565aecF84b5d30a6E79a5CEf3f0dA0Fc4280dEBC'],
