@@ -1,5 +1,5 @@
-module.exports = class Data1723231953228 {
-    name = 'Data1723231953228'
+module.exports = class Data1723235652887 {
+    name = 'Data1723235652887'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -322,18 +322,18 @@ module.exports = class Data1723231953228 {
         await db.query(`CREATE INDEX "IDX_91022eaca5c237c8181574f6c3" ON "aero_pool_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_a1f09e4a565cbeac79b02ccfee" ON "aero_pool_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_f17f2a943862d7c1c485bf4ccd" ON "aero_pool_state" ("address") `)
-        await db.query(`CREATE TABLE "aero_cl_pool_tick" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "tick" integer NOT NULL, "liquidity_gross" numeric NOT NULL, "liquidity_net" numeric NOT NULL, "staked_liquidity_net" numeric NOT NULL, "fee_growth_outside0_x128" numeric NOT NULL, "fee_growth_outside1_x128" numeric NOT NULL, "reward_growth_outside_x128" numeric NOT NULL, "tick_cumulative_outside" numeric NOT NULL, "seconds_per_liquidity_outside_x128" numeric NOT NULL, "seconds_outside" integer NOT NULL, CONSTRAINT "PK_ba8e1ecce7fe090f58e1026d0e1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "aero_cl_pool_tick" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "tick" integer NOT NULL, "tick_price" numeric NOT NULL, "liquidity_gross" numeric NOT NULL, "liquidity_net" numeric NOT NULL, "staked_liquidity_net" numeric NOT NULL, "fee_growth_outside0_x128" numeric NOT NULL, "fee_growth_outside1_x128" numeric NOT NULL, "reward_growth_outside_x128" numeric NOT NULL, "tick_cumulative_outside" numeric NOT NULL, "seconds_per_liquidity_outside_x128" numeric NOT NULL, "seconds_outside" integer NOT NULL, CONSTRAINT "PK_ba8e1ecce7fe090f58e1026d0e1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1f062aee707e1d898a99e7d78a" ON "aero_cl_pool_tick" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9db8ded60dc83ae88b93bbdf61" ON "aero_cl_pool_tick" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8ed6f7b5149327341c751f7956" ON "aero_cl_pool_tick" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_5a4fcc4d09e1e362cff15dd834" ON "aero_cl_pool_tick" ("address") `)
         await db.query(`CREATE INDEX "IDX_eb4f3fdb047a473a6b62672251" ON "aero_cl_pool_tick" ("tick") `)
-        await db.query(`CREATE TABLE "aero_cl_pool_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "vote_weight" numeric NOT NULL, "vote_percentage" numeric NOT NULL, "current_tick_id" character varying, CONSTRAINT "PK_21a637df332cf98fca08bd79365" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "aero_cl_pool_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "vote_weight" numeric NOT NULL, "vote_percentage" numeric NOT NULL, "tick_price" numeric NOT NULL, "tick_id" character varying, CONSTRAINT "PK_21a637df332cf98fca08bd79365" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_e363a6cd0ddeb41a94ed68089c" ON "aero_cl_pool_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_e7458985ad9ee1b4472bc30bbb" ON "aero_cl_pool_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_94a520efd2d3992b50f0469d22" ON "aero_cl_pool_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_ca4c93c360bd5dffdc237f9f5a" ON "aero_cl_pool_state" ("address") `)
-        await db.query(`CREATE INDEX "IDX_7720bb01f95aafe81c66e28afe" ON "aero_cl_pool_state" ("current_tick_id") `)
+        await db.query(`CREATE INDEX "IDX_02aa86fe0e78999620744402a0" ON "aero_cl_pool_state" ("tick_id") `)
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a234e56547c4f8b9135d80444b" ON "es_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_588f0be9f9bdc1d8dd29797fec" ON "es_token" ("block_number") `)
@@ -662,7 +662,7 @@ module.exports = class Data1723231953228 {
         await db.query(`CREATE TABLE "ousd_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_eth7_day" numeric NOT NULL, "yield_eth_all_time" numeric NOT NULL, "yield_usd" numeric NOT NULL, "yield_usd7_day" numeric NOT NULL, "yield_usd_all_time" numeric NOT NULL, "fees_eth" numeric NOT NULL, "fees_eth7_day" numeric NOT NULL, "fees_eth_all_time" numeric NOT NULL, "fees_usd" numeric NOT NULL, "fees_usd7_day" numeric NOT NULL, "fees_usd_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_f8adaf321a99f2b4b877c262880" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f9020d89932aad2d0de8923490" ON "ousd_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_0bb5f72bf5fa59ce8c232caa4c" ON "ousd_daily_stat" ("timestamp") `)
-        await db.query(`ALTER TABLE "aero_cl_pool_state" ADD CONSTRAINT "FK_7720bb01f95aafe81c66e28afea" FOREIGN KEY ("current_tick_id") REFERENCES "aero_cl_pool_tick"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "aero_cl_pool_state" ADD CONSTRAINT "FK_02aa86fe0e78999620744402a0c" FOREIGN KEY ("tick_id") REFERENCES "aero_cl_pool_tick"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "es_account" ADD CONSTRAINT "FK_7b43e7bb90d3b435d074112f572" FOREIGN KEY ("delegate_to_id") REFERENCES "es_account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "es_lockup_event" ADD CONSTRAINT "FK_46d53d4fad340d5939955836004" FOREIGN KEY ("lockup_id") REFERENCES "es_lockup"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "governance_proposal_event" ADD CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a" FOREIGN KEY ("proposal_id") REFERENCES "governance_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -1018,7 +1018,7 @@ module.exports = class Data1723231953228 {
         await db.query(`DROP INDEX "public"."IDX_e7458985ad9ee1b4472bc30bbb"`)
         await db.query(`DROP INDEX "public"."IDX_94a520efd2d3992b50f0469d22"`)
         await db.query(`DROP INDEX "public"."IDX_ca4c93c360bd5dffdc237f9f5a"`)
-        await db.query(`DROP INDEX "public"."IDX_7720bb01f95aafe81c66e28afe"`)
+        await db.query(`DROP INDEX "public"."IDX_02aa86fe0e78999620744402a0"`)
         await db.query(`DROP TABLE "es_token"`)
         await db.query(`DROP INDEX "public"."IDX_a234e56547c4f8b9135d80444b"`)
         await db.query(`DROP INDEX "public"."IDX_588f0be9f9bdc1d8dd29797fec"`)
@@ -1347,7 +1347,7 @@ module.exports = class Data1723231953228 {
         await db.query(`DROP TABLE "ousd_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_f9020d89932aad2d0de8923490"`)
         await db.query(`DROP INDEX "public"."IDX_0bb5f72bf5fa59ce8c232caa4c"`)
-        await db.query(`ALTER TABLE "aero_cl_pool_state" DROP CONSTRAINT "FK_7720bb01f95aafe81c66e28afea"`)
+        await db.query(`ALTER TABLE "aero_cl_pool_state" DROP CONSTRAINT "FK_02aa86fe0e78999620744402a0c"`)
         await db.query(`ALTER TABLE "es_account" DROP CONSTRAINT "FK_7b43e7bb90d3b435d074112f572"`)
         await db.query(`ALTER TABLE "es_lockup_event" DROP CONSTRAINT "FK_46d53d4fad340d5939955836004"`)
         await db.query(`ALTER TABLE "governance_proposal_event" DROP CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a"`)

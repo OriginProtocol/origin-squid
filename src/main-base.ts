@@ -8,6 +8,7 @@ import { aerodromeGauge } from '@templates/aerodrome/gauge'
 import { aerodromePool } from '@templates/aerodrome/pool'
 import { aerodromeVoter } from '@templates/aerodrome/voter'
 import { aerodromeVoterEscrow } from '@templates/aerodrome/voter-escrow'
+import { baseAddresses } from '@utils/addresses-base'
 
 import { baseERC20s } from './base'
 
@@ -16,18 +17,12 @@ export const processor = {
   stateSchema: 'base-processor',
   processors: [
     baseERC20s,
-    aerodromePool({
-      address: '0x8eA4C49B712217fd6e29Db920E3dd48287a0d50D',
-      from: 15676793,
-    }),
+    aerodromePool(baseAddresses.pools['vAMM-OGN/OETHb']),
     aerodromeGauge({
-      address: '0xA88BcfEcC886dEA1e8B3108179F0532d53c8c055',
+      address: baseAddresses.pools['vAMM-OGN/OETHb'].gauge,
       from: 16014718,
     }),
-    aerodromeCLPool({
-      address: '0x565aecF84b5d30a6E79a5CEf3f0dA0Fc4280dEBC',
-      from: 13901333,
-    }),
+    aerodromeCLPool(baseAddresses.pools['CL1-WETH/OETHb']),
     aerodromeCLGauge({
       address: '0x45F8b8eC9c92D09BA8495074436fD97073423041',
       from: 13903918,

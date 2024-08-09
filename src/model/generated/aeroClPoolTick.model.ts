@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, FloatColumn as FloatColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class AeroCLPoolTick {
@@ -28,6 +28,9 @@ export class AeroCLPoolTick {
     @Index_()
     @IntColumn_({nullable: false})
     tick!: number
+
+    @FloatColumn_({nullable: false})
+    tickPrice!: number
 
     @BigIntColumn_({nullable: false})
     liquidityGross!: bigint

@@ -3,12 +3,17 @@ import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as models from '@model'
 import { AeroCLPoolState, AeroCLPoolTick, AeroPoolState } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
+import { getPriceFromTick } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromeCLPool = (params: { address: string; from: number }): Processor => {
+export const aerodromeCLPool = (params: {
+  address: string
+  from: number
+  assets: { address: string; decimals: number }[]
+}): Processor => {
   const eventProcessors = Object.entries(aerodromeCLPoolAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],
@@ -71,7 +76,7 @@ export const aerodromeCLPool = (params: { address: string; from: number }): Proc
       const aeroPoolStateProcessing = async () => {
         const states: AeroCLPoolState[] = []
         const ticks: AeroCLPoolTick[] = []
-        await frequencyUpdater(ctx, async (ctx, block) => {
+        const updateState = async (ctx: Context, block: Block) => {
           const poolContract = new aerodromeCLPoolAbi.Contract(ctx, block.header, params.address)
           const totalVoteWeight = await getVoterTotalWeight(ctx, block)
           const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodromeVoter)
@@ -80,6 +85,7 @@ export const aerodromeCLPool = (params: { address: string; from: number }): Proc
 
           const slot0 = await poolContract.slot0()
           const tick = await poolContract.ticks(slot0.tick)
+          const tickPrice = getPriceFromTick(slot0.tick, params.assets[0].decimals, params.assets[1].decimals)
 
           const currentTick = new AeroCLPoolTick({
             id: `${ctx.chain.id}-${params.address}-${slot0.tick}-${block.header.height}`,
@@ -88,6 +94,7 @@ export const aerodromeCLPool = (params: { address: string; from: number }): Proc
             timestamp: new Date(block.header.timestamp),
             address: params.address,
             tick: slot0.tick,
+            tickPrice,
             liquidityGross: tick.liquidityGross,
             liquidityNet: tick.liquidityNet,
             stakedLiquidityNet: tick.stakedLiquidityNet,
@@ -107,11 +114,13 @@ export const aerodromeCLPool = (params: { address: string; from: number }): Proc
             address: params.address,
             voteWeight,
             votePercentage,
-            currentTick,
+            tick: currentTick,
+            tickPrice,
           })
           states.push(state)
           ticks.push(currentTick)
-        })
+        }
+        await frequencyUpdater(ctx, updateState)
         await ctx.store.insert(ticks)
         await ctx.store.insert(states)
       }

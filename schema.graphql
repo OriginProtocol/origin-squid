@@ -653,7 +653,8 @@ type AeroCLPoolState @entity {
   address: String! @index
   voteWeight: BigInt!
   votePercentage: BigInt!
-  currentTick: AeroCLPoolTick
+  tick: AeroCLPoolTick!
+  tickPrice: Float!
 }
 
 type AeroCLPoolTick @entity {
@@ -663,6 +664,7 @@ type AeroCLPoolTick @entity {
   timestamp: DateTime! @index
   address: String! @index
   tick: Int! @index
+  tickPrice: Float!
   liquidityGross: BigInt!
   liquidityNet: BigInt!
   stakedLiquidityNet: BigInt!

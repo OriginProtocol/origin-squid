@@ -9,7 +9,11 @@ import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromePool = (params: { address: string; from: number }): Processor => {
+export const aerodromePool = (params: {
+  address: string
+  from: number
+  assets: { address: string; decimals: number }[]
+}): Processor => {
   const eventProcessors = Object.entries(aerodromePoolAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],
@@ -73,10 +77,21 @@ export const aerodromePool = (params: { address: string; from: number }): Proces
         const states: AeroPoolState[] = []
         await frequencyUpdater(ctx, async (ctx, block) => {
           const poolContract = new aerodromePoolAbi.Contract(ctx, block.header, params.address)
-          const tokens = await poolContract.tokens()
           const reserves = await poolContract.getReserves()
-          const reserve0Usd = await convertRate(ctx, block, tokens._0, baseAddresses.USDC, reserves._reserve0)
-          const reserve1Usd = await convertRate(ctx, block, tokens._1, baseAddresses.USDC, reserves._reserve1)
+          const reserve0Usd = await convertRate(
+            ctx,
+            block,
+            params.asset0.address,
+            baseAddresses.USDC,
+            reserves._reserve0,
+          )
+          const reserve1Usd = await convertRate(
+            ctx,
+            block,
+            params.asset1.address,
+            baseAddresses.USDC,
+            reserves._reserve1,
+          )
           const totalVoteWeight = await getVoterTotalWeight(ctx, block)
           const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodromeVoter)
           const voteWeight = await voterContract.weights(params.address)

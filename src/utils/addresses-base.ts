@@ -9,10 +9,29 @@ export const baseAddresses = {
     'vAMM-WETH/OGN': {
       address: '0x8eA4C49B712217fd6e29Db920E3dd48287a0d50D',
       gauge: '0xA88BcfEcC886dEA1e8B3108179F0532d53c8c055',
+      assets: [
+        { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+        { address: '0x7002458B1DF59EccB57387bC79fFc7C29E22e6f7', decimals: 18 },
+      ],
+      from: 15676793,
+    },
+    'vAMM-OGN/OETHb': {
+      address: '0x6FB655476fDCFB9712dD200308D941A1c6D1119e',
+      gauge: '0x0000000000000000000000000000000000000000',
+      assets: [
+        { address: '0x7002458B1DF59EccB57387bC79fFc7C29E22e6f7', decimals: 18 },
+        { address: '0xDBFeFD2e8460a6Ee4955A68582F85708BAEA60A3', decimals: 18 },
+      ],
+      from: 18084976,
     },
     'CL1-WETH/OETHb': {
-      address: '0x8eA4C49B712217fd6e29Db920E3dd48287a0d50D',
+      address: '0x6446021F4E396dA3df4235C62537431372195D38',
       gauge: '0x0000000000000000000000000000000000000000',
+      assets: [
+        { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+        { address: '0xDBFeFD2e8460a6Ee4955A68582F85708BAEA60A3', decimals: 18 },
+      ],
+      from: 18056601,
     },
   },
 }

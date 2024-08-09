@@ -24,15 +24,15 @@ export const convertRate = async (ctx: Context, block: Block, from: string, to: 
   return convertUsingRate(value, rate)
 }
 
-const getTickFromSqrtPriceX96 = (sqrtPriceX96: bigint) => {
+export const getTickFromSqrtPriceX96 = (sqrtPriceX96: bigint) => {
   const Q96 = 2n ** 96n
   return Math.floor(Math.log((Number(sqrtPriceX96) / Number(Q96)) ** 2) / Math.log(1.0001))
 }
 
-const getPriceFromTick = (tick: number, decimals0: number = 18, decimals1: number = 18) => {
+export const getPriceFromTick = (tick: number, decimals0: number = 18, decimals1: number = 18) => {
   return 1.0001 ** tick / 10 ** (decimals1 - decimals0)
 }
 
-const getPriceFromSqrtPriceX96 = (sqrtPriceX96: bigint, decimals0: number = 18, decimals1: number = 18) => {
+export const getPriceFromSqrtPriceX96 = (sqrtPriceX96: bigint, decimals0: number = 18, decimals1: number = 18) => {
   return getPriceFromTick(getTickFromSqrtPriceX96(sqrtPriceX96), decimals0, decimals1)
 }
