@@ -27,6 +27,15 @@ export class AeroCLPoolState {
     address!: string
 
     @BigIntColumn_({nullable: false})
+    totalUsd!: bigint
+
+    @BigIntColumn_({nullable: false})
+    asset0!: bigint
+
+    @BigIntColumn_({nullable: false})
+    asset1!: bigint
+
+    @BigIntColumn_({nullable: false})
     voteWeight!: bigint
 
     @BigIntColumn_({nullable: false})

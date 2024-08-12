@@ -81,14 +81,14 @@ export const aerodromePool = (params: {
           const reserve0Usd = await convertRate(
             ctx,
             block,
-            params.asset0.address,
+            params.assets[0].address,
             baseAddresses.USDC,
             reserves._reserve0,
           )
           const reserve1Usd = await convertRate(
             ctx,
             block,
-            params.asset1.address,
+            params.assets[1].address,
             baseAddresses.USDC,
             reserves._reserve1,
           )

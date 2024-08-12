@@ -1,5 +1,5 @@
-module.exports = class Data1723235652887 {
-    name = 'Data1723235652887'
+module.exports = class Data1723502032116 {
+    name = 'Data1723502032116'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -328,7 +328,7 @@ module.exports = class Data1723235652887 {
         await db.query(`CREATE INDEX "IDX_8ed6f7b5149327341c751f7956" ON "aero_cl_pool_tick" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_5a4fcc4d09e1e362cff15dd834" ON "aero_cl_pool_tick" ("address") `)
         await db.query(`CREATE INDEX "IDX_eb4f3fdb047a473a6b62672251" ON "aero_cl_pool_tick" ("tick") `)
-        await db.query(`CREATE TABLE "aero_cl_pool_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "vote_weight" numeric NOT NULL, "vote_percentage" numeric NOT NULL, "tick_price" numeric NOT NULL, "tick_id" character varying, CONSTRAINT "PK_21a637df332cf98fca08bd79365" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "aero_cl_pool_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "total_usd" numeric NOT NULL, "asset0" numeric NOT NULL, "asset1" numeric NOT NULL, "vote_weight" numeric NOT NULL, "vote_percentage" numeric NOT NULL, "tick_price" numeric NOT NULL, "tick_id" character varying, CONSTRAINT "PK_21a637df332cf98fca08bd79365" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_e363a6cd0ddeb41a94ed68089c" ON "aero_cl_pool_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_e7458985ad9ee1b4472bc30bbb" ON "aero_cl_pool_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_94a520efd2d3992b50f0469d22" ON "aero_cl_pool_state" ("timestamp") `)

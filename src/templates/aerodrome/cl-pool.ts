@@ -1,9 +1,10 @@
 import * as aerodromeCLPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
+import * as erc20Abi from '@abi/erc20'
 import * as models from '@model'
 import { AeroCLPoolState, AeroCLPoolTick, AeroPoolState } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
-import { getPriceFromTick } from '@templates/aerodrome/prices'
+import { convertRate, getPriceFromTick } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
@@ -83,7 +84,14 @@ export const aerodromeCLPool = (params: {
           const voteWeight = await voterContract.weights(params.address)
           const votePercentage = (voteWeight * 10n ** 18n) / totalVoteWeight
 
-          const slot0 = await poolContract.slot0()
+          const token0Contract = new erc20Abi.Contract(ctx, block.header, params.assets[0].address)
+          const token1Contract = new erc20Abi.Contract(ctx, block.header, params.assets[1].address)
+          const [reserve0, reserve1, slot0] = await Promise.all([
+            token0Contract.balanceOf(params.address),
+            token1Contract.balanceOf(params.address),
+            poolContract.slot0(),
+          ])
+
           const tick = await poolContract.ticks(slot0.tick)
           const tickPrice = getPriceFromTick(slot0.tick, params.assets[0].decimals, params.assets[1].decimals)
 
@@ -106,12 +114,20 @@ export const aerodromeCLPool = (params: {
             secondsOutside: tick.secondsOutside,
           })
 
+          const [reserve0Usd, reserve1Usd] = await Promise.all([
+            convertRate(ctx, block, params.assets[0].address, baseAddresses.USDC, reserve0),
+            convertRate(ctx, block, params.assets[1].address, baseAddresses.USDC, reserve1),
+          ])
+
           const state = new AeroCLPoolState({
             id: `${ctx.chain.id}-${params.address}-${block.header.height}`,
             chainId: ctx.chain.id,
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
             address: params.address,
+            asset0: reserve0,
+            asset1: reserve1,
+            totalUsd: reserve0Usd + reserve1Usd,
             voteWeight,
             votePercentage,
             tick: currentTick,

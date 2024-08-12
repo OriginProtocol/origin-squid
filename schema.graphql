@@ -651,6 +651,9 @@ type AeroCLPoolState @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   address: String! @index
+  totalUsd: BigInt!
+  asset0: BigInt!
+  asset1: BigInt!
   voteWeight: BigInt!
   votePercentage: BigInt!
   tick: AeroCLPoolTick!
