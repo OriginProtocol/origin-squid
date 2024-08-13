@@ -16,12 +16,20 @@ export const aerodromeLP = (params: { address: string; from: number }): Processo
       const states: AeroLPPosition[] = []
       await frequencyUpdater(ctx, async (ctx: Context, block: Block) => {
         const sugar = new aerodromeLPSugarAbi.Contract(ctx, block.header, baseAddresses.aerodrome.sugarLPV3)
-        const positions = await sugar.positions(1_000_000, 0, params.address)
+        const positions = await Promise.all([
+          sugar.positions(300, 0, params.address),
+          sugar.positions(300, 300, params.address),
+          sugar.positions(300, 600, params.address),
+          sugar.positions(300, 900, params.address),
+          sugar.positions(300, 1200, params.address),
+          sugar.positions(300, 1500, params.address),
+          sugar.positions(300, 1800, params.address),
+        ]).then((p) => p.flat())
         states.push(
           ...positions.map(
             (p) =>
               new AeroLPPosition({
-                id: `${ctx.chain.id}-${params.address}-${block.header.height}-${p.id}`,
+                id: `${ctx.chain.id}-${params.address}-${block.header.height}-${p.lp}-${p.id}`,
                 chainId: ctx.chain.id,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),

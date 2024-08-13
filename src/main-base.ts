@@ -38,7 +38,7 @@ export const processor = {
     }),
     aerodromeLP({
       address: '0x0d5cf17cd8ac6d45a01defac7adede953072d705', // Random Wallet with Positions
-      from: 15676793,
+      from: 17000000,
     }),
     // TODO: I don't know if we need this one...
     // aerodromeVoterEscrow({
