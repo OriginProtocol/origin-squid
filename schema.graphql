@@ -754,6 +754,19 @@ type OETHWithdrawalRequest @entity {
   claimed: Boolean!
   txHash: String! @index
 }
+type OGNDailyStat @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  totalStaked: BigInt!
+  tradingVolumeUSD: Float!
+  marketCapUSD: Float!
+  priceUSD: Float!
+  holdersOverThreshold: Int!
+}
 type OGV @entity {
   id: ID!
   timestamp: DateTime! @index

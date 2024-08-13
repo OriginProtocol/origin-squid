@@ -14,9 +14,10 @@ import {
   XOGN_ADDRESS,
 } from '@utils/addresses'
 
+import * as dailyStats from './mainnet/post-processors/daily-stats'
 import * as curve from './mainnet/processors/curve'
-import * as legacyStaking from './mainnet/processors/legacy-staking'
 import { erc20s } from './mainnet/processors/erc20s'
+import * as legacyStaking from './mainnet/processors/legacy-staking'
 import * as nativeStaking from './mainnet/processors/native-staking'
 import * as validate from './mainnet/validators/validate-mainnet'
 
@@ -38,7 +39,7 @@ export const processor = {
     }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
   ],
-  postProcessors: [exchangeRates, processStatus('mainnet')],
+  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
   validators: [validate],
 }
 export default processor
