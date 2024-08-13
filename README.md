@@ -136,3 +136,10 @@ Squid tools assume a certain [project layout](https://docs.subsquid.io/basics/sq
 - Run `sqd deploy .`
 - Make branch for new version (eg v9) and push to origin
 - Switch back to main branch
+
+## Reset cloud dev version (v999)
+
+Useful if you made a schema change or need to reload data.
+
+- Check `squid.yaml` to make sure you're on v999
+- `sqd deploy . --update --hard-reset`
