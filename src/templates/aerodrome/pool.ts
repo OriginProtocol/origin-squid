@@ -93,7 +93,7 @@ export const aerodromePool = (params: {
             reserves._reserve1,
           )
           const totalVoteWeight = await getVoterTotalWeight(ctx, block)
-          const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodromeVoter)
+          const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodrome.voter)
           const voteWeight = await voterContract.weights(params.address)
           const votePercentage = (voteWeight * 10n ** 18n) / totalVoteWeight
           const state = new AeroPoolState({

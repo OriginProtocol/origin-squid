@@ -5,6 +5,7 @@ import { run } from '@processor'
 import { aerodromeCLGauge } from '@templates/aerodrome/cl-gauge'
 import { aerodromeCLPool } from '@templates/aerodrome/cl-pool'
 import { aerodromeGauge } from '@templates/aerodrome/gauge'
+import { aerodromeLP } from '@templates/aerodrome/lp'
 import { aerodromePool } from '@templates/aerodrome/pool'
 import { aerodromeVoter } from '@templates/aerodrome/voter'
 import { aerodromeVoterEscrow } from '@templates/aerodrome/voter-escrow'
@@ -19,16 +20,25 @@ export const processor = {
     baseERC20s,
     aerodromePool(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
     aerodromeGauge(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
-    aerodromePool(baseAddresses.aerodrome['vAMM-OGN/OETHb'].pool),
+    aerodromePool(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool),
     // aerodromeGauge(baseAddresses.aerodrome['vAMM-OGN/OETHb'].gauge),
-    aerodromeCLPool(baseAddresses.aerodrome['CL1-WETH/OETHb'].pool),
+    aerodromeCLPool(baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool),
     // aerodromeCLGauge(baseAddresses.aerodrome['CL1-WETH/OETHb'].gauge),
     aerodromeCLPool(baseAddresses.aerodrome['CL1-cbETH/WETH'].pool),
     aerodromeCLGauge(baseAddresses.aerodrome['CL1-cbETH/WETH'].gauge),
     aerodromeVoter({
-      address: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',
-      pools: ['0x8eA4C49B712217fd6e29Db920E3dd48287a0d50D', '0x565aecF84b5d30a6E79a5CEf3f0dA0Fc4280dEBC'],
+      address: baseAddresses.aerodrome.voter,
+      pools: [
+        baseAddresses.aerodrome['vAMM-WETH/OGN'].pool.address,
+        baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool.address,
+        baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool.address,
+        baseAddresses.aerodrome['CL1-cbETH/WETH'].pool.address,
+      ],
       from: 15676793, // Should be the pools' lowest `from`
+    }),
+    aerodromeLP({
+      address: '0x0d5cf17cd8ac6d45a01defac7adede953072d705', // Random Wallet with Positions
+      from: 15676793,
     }),
     // TODO: I don't know if we need this one...
     // aerodromeVoterEscrow({

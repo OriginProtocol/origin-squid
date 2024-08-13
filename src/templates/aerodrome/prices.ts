@@ -8,7 +8,7 @@ const E18 = 10n ** 18n
 export const getAerodromeRates = cached(
   (ctx: Context, block: Block, from: string, to: string) => `${block.header.height}:${from}:${to}`,
   async (ctx, block, from, to) => {
-    const pricesContract = new aerodromePricesAbi.Contract(ctx, block.header, baseAddresses.aerodromeBasePrices)
+    const pricesContract = new aerodromePricesAbi.Contract(ctx, block.header, baseAddresses.aerodrome.basePrices)
     // For superOETHb and OGN there is currently no direct path to USDC - so we rate through WETH.
     if (from !== baseAddresses.WETH && to === baseAddresses.USDC) {
       return await pricesContract.getManyRatesWithConnectors(1, [from, baseAddresses.WETH, to]).then((rate) => rate[0])

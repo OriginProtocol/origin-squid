@@ -6,7 +6,7 @@ import { useProcessorState } from '@utils/state'
 export const getVoterTotalWeight = async (ctx: Context, block: Block) => {
   const [totalWeight, setTotalWeight] = useProcessorState<bigint | undefined>(ctx, 'aerodrome-totalWeight')
   if (totalWeight) return totalWeight
-  const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodromeVoter)
+  const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodrome.voter)
   const retrievedTotalWeight = await voterContract.totalWeight()
   setTotalWeight(retrievedTotalWeight)
   return retrievedTotalWeight

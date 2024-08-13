@@ -3,9 +3,13 @@ export const baseAddresses = {
   WETH: '0x4200000000000000000000000000000000000006',
   OGN: '0x7002458b1df59eccb57387bc79ffc7c29e22e6f7',
   superOETHb: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3',
-  aerodromeBasePrices: '0xee717411f6e44f9fee011835c8e6faac5deff166',
-  aerodromeVoter: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',
+  wsuperOETHb: '0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6',
   aerodrome: {
+    voter: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',
+    basePrices: '0xee717411f6e44f9fee011835c8e6faac5deff166',
+    offchainOracle: '0x5b80fd3dc871d56a31bf7bb13b14cd8a8fbf7baf',
+    sugarLPV3: '0x68c19e13618c41158fe4baba1b8fb3a9c74bdb0a',
+    factoryRegistry: '0x5c3f18f06cc09ca1910767a34a20f771039e37c0',
     'vAMM-WETH/OGN': {
       pool: {
         address: '0x8ea4c49b712217fd6e29db920e3dd48287a0d50d',
@@ -20,7 +24,7 @@ export const baseAddresses = {
         from: 16014718,
       },
     },
-    'vAMM-OGN/OETHb': {
+    'vAMM-OGN/superOETHb': {
       pool: {
         address: '0x6fb655476fdcfb9712dd200308d941a1c6d1119e',
         assets: [
@@ -31,7 +35,7 @@ export const baseAddresses = {
       },
       gauge: null,
     },
-    'CL1-WETH/OETHb': {
+    'CL1-WETH/superOETHb': {
       pool: {
         address: '0x6446021f4e396da3df4235c62537431372195d38',
         assets: [
@@ -44,15 +48,15 @@ export const baseAddresses = {
     },
     'CL1-cbETH/WETH': {
       pool: {
-        address: '0x47cA96Ea59C13F72745928887f84C9F52C3D7348',
+        address: '0x47ca96ea59c13f72745928887f84c9f52c3d7348',
         assets: [
-          { address: '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22', decimals: 18 },
+          { address: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22', decimals: 18 },
           { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
         ],
         from: 13900345,
       },
       gauge: {
-        address: '0xF5550F8F0331B8CAA165046667f4E6628E9E3Aac',
+        address: '0xf5550f8f0331b8caa165046667f4e6628e9e3aac',
         from: 13903874,
       },
     },

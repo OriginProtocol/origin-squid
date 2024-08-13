@@ -44,3 +44,26 @@ type AeroCLPoolTick @entity {
   secondsPerLiquidityOutsideX128: BigInt!
   secondsOutside: Int!
 }
+
+type AeroLPPosition @entity {
+  id: ID! # chainId-address-blockNumber-positionId
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  positionId: BigInt! @index
+  lp: String! @index
+  liquidity: BigInt!
+  staked: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+  staked0: BigInt!
+  staked1: BigInt!
+  unstakedEarned0: BigInt!
+  unstakedEarned1: BigInt!
+  emissionsEarned: BigInt!
+  tickLower: Int!
+  tickUpper: Int!
+  sqrtRatioLower: BigInt!
+  sqrtRatioUpper: BigInt!
+}
