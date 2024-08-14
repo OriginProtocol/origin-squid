@@ -11,13 +11,14 @@ import { aerodromeVoter } from '@templates/aerodrome/voter'
 import { aerodromeVoterEscrow } from '@templates/aerodrome/voter-escrow'
 import { baseAddresses } from '@utils/addresses-base'
 
-import { baseERC20s } from './base'
+import { baseERC20s, superOETHb } from './base'
 
 export const processor = {
   chainId: base.id,
   stateSchema: 'base-processor',
   processors: [
     baseERC20s,
+    superOETHb,
     aerodromePool(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
     aerodromeGauge(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
     aerodromePool(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool),

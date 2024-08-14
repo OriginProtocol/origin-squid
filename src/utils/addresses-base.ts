@@ -3,6 +3,7 @@ export const baseAddresses = {
   WETH: '0x4200000000000000000000000000000000000006',
   OGN: '0x7002458b1df59eccb57387bc79ffc7c29e22e6f7',
   superOETHb: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3',
+  superOETHbVault: '0x98a0cbef61bd2d21435f433be4cd42b56b38cc93',
   wsuperOETHb: '0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6',
   aerodrome: {
     voter: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',

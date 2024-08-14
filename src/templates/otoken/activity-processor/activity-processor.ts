@@ -23,13 +23,14 @@ export const createOTokenActivityProcessor = (params: {
   wotokenAddress?: string
   wotokenArbitrumAddress?: string
 
-  zapperAddress: string
-  curvePools: {
+  cowSwap: boolean
+  zapperAddress?: string
+  curvePools?: {
     address: string
     tokens: string[]
   }[]
-  balancerPools: string[]
-  uniswapV3: { address: string; tokens: [string, string] }
+  balancerPools?: string[]
+  uniswapV3?: { address: string; tokens: [string, string] }
 }) => {
   const processors: ActivityProcessor[] = compact([
     // TODO: Morpho Blue: https://etherscan.io/tx/0xde3e7e991f70979ffdfaf0652b4c2722773416341ca78dcdaabd3cae98f8204d#eventlog
@@ -45,14 +46,32 @@ export const createOTokenActivityProcessor = (params: {
       }),
 
     // Zaps
-    zapperActivityProcessor({ otokenAddress: params.otokenAddress, zapperAddress: params.zapperAddress }),
+    params.zapperAddress &&
+      zapperActivityProcessor({
+        otokenAddress: params.otokenAddress,
+        zapperAddress: params.zapperAddress,
+      }),
 
     // Swaps
-    uniswapV3ActivityProcessor({ otokenAddress: params.otokenAddress, ...params.uniswapV3 }),
-    ...params.curvePools.map((pool) => curveActivityProcessor({ otokenAddress: params.otokenAddress, ...pool })),
-    balancerActivityProcessor({ otokenAddress: params.otokenAddress, pools: params.balancerPools }),
-    cowSwapActivityProcessor({ otokenAddress: params.otokenAddress, address: params.otokenAddress }),
-    params.wotokenAddress &&
+    // =====
+
+    // Uniswap
+    params.uniswapV3 && uniswapV3ActivityProcessor({ otokenAddress: params.otokenAddress, ...params.uniswapV3 }),
+    ...(params.curvePools
+      ? params.curvePools.map((pool) => curveActivityProcessor({ otokenAddress: params.otokenAddress, ...pool }))
+      : []),
+
+    // Balancer
+    params.balancerPools &&
+      balancerActivityProcessor({
+        otokenAddress: params.otokenAddress,
+        pools: params.balancerPools,
+      }),
+
+    // Cowswap
+    params.cowSwap && cowSwapActivityProcessor({ otokenAddress: params.otokenAddress, address: params.otokenAddress }),
+    params.cowSwap &&
+      params.wotokenAddress &&
       cowSwapActivityProcessor({
         otokenAddress: params.otokenAddress,
         address: params.wotokenAddress,

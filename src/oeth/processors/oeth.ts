@@ -48,6 +48,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   wotokenAddress: WOETH_ADDRESS,
   wotokenArbitrumAddress: WOETH_ARBITRUM_ADDRESS,
   zapperAddress: OETH_ZAPPER_ADDRESS,
+  cowSwap: true,
   curvePools: [
     {
       address: CURVE_ETH_OETH_POOL_ADDRESS,

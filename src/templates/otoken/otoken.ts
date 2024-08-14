@@ -35,17 +35,19 @@ export const createOTokenProcessor = (params: {
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   upgrades?: {
-    rebaseOptEvents: number
+    rebaseOptEvents: number | false
   }
 }) => {
   const setup = (processor: EvmBatchProcessor) => {
-    processor.addTrace({
-      type: ['call'],
-      callTo: [params.otokenAddress],
-      callSighash: [otoken.functions.rebaseOptOut.selector, otoken.functions.rebaseOptIn.selector],
-      transaction: true,
-      range: { from: params.from, to: params.upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
-    })
+    if (params.upgrades?.rebaseOptEvents !== false) {
+      processor.addTrace({
+        type: ['call'],
+        callTo: [params.otokenAddress],
+        callSighash: [otoken.functions.rebaseOptOut.selector, otoken.functions.rebaseOptIn.selector],
+        transaction: true,
+        range: { from: params.from, to: params.upgrades?.rebaseOptEvents }, // First AccountRebasing appears on 18872285, on OETH
+      })
+    }
     processor.addLog({
       address: [params.otokenAddress],
       topic0: [

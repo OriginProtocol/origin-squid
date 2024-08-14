@@ -27,7 +27,6 @@ export const createSquidProcessor = (
     .setRpcEndpoint({
       url,
       maxBatchCallSize: url.includes('alchemy.com') ? 1 : 100,
-      requestTimeout: 10000,
     })
     .setRpcDataIngestionSettings({
       disabled: process.env.ARCHIVE_ONLY === 'true',

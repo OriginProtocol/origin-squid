@@ -2,7 +2,9 @@ import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import { AeroLPPosition } from '@model'
 import { Block, Context, Processor } from '@processor'
 import { baseAddresses } from '@utils/addresses-base'
+import { batchPromises } from '@utils/batchPromises'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { range } from '@utils/range'
 
 export const aerodromeLP = (params: { address: string; from: number }): Processor => {
   const frequencyUpdater = blockFrequencyUpdater({ from: params.from })
@@ -16,15 +18,8 @@ export const aerodromeLP = (params: { address: string; from: number }): Processo
       const states: AeroLPPosition[] = []
       await frequencyUpdater(ctx, async (ctx: Context, block: Block) => {
         const sugar = new aerodromeLPSugarAbi.Contract(ctx, block.header, baseAddresses.aerodrome.sugarLPV3)
-        const positions = await Promise.all([
-          sugar.positions(300, 0, params.address),
-          sugar.positions(300, 300, params.address),
-          sugar.positions(300, 600, params.address),
-          sugar.positions(300, 900, params.address),
-          sugar.positions(300, 1200, params.address),
-          sugar.positions(300, 1500, params.address),
-          sugar.positions(300, 1800, params.address),
-        ]).then((p) => p.flat())
+        const fns = range(20).map((i) => () => sugar.positions(100, i * 100, params.address))
+        const positions = await batchPromises(fns).then((p) => p.flat())
         states.push(
           ...positions.map(
             (p) =>
