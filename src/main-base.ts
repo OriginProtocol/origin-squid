@@ -17,7 +17,7 @@ export const processor = {
   chainId: base.id,
   stateSchema: 'base-processor',
   processors: [
-    baseERC20s,
+    ...baseERC20s,
     superOETHb,
     aerodromePool(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
     aerodromeGauge(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
