@@ -10,7 +10,13 @@ const otokenProcessor = createOTokenProcessor({
   otokenAddress: baseAddresses.superOETHb,
   wotokenAddress: baseAddresses.wsuperOETHb,
   otokenVaultAddress: baseAddresses.superOETHbVault,
-  oTokenAssets: [{ asset: baseAddresses.superOETHb, symbol: 'superOETHb' }],
+  oTokenAssets: [
+    { asset: baseAddresses.superOETHb, symbol: 'superOETHb' },
+    {
+      asset: baseAddresses.WETH,
+      symbol: 'WETH',
+    },
+  ],
   upgrades: {
     rebaseOptEvents: false,
   },

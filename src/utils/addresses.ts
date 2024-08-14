@@ -111,6 +111,7 @@ export const tokens = {
   // Ether
   ETH: ETH_ADDRESS,
   WETH: WETH_ADDRESS,
+  WETH_base: baseAddresses.WETH,
   stETH: STETH_ADDRESS,
   wstETH: WSTETH_ADDRESS,
   rETH: RETH_ADDRESS,
