@@ -1,4 +1,6 @@
 // Lowercase Addresses
+import { baseAddresses } from '@utils/addresses-base'
+
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
@@ -81,6 +83,7 @@ export const OGV_GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b
 // ----------------
 // ----------------
 
+// TODO: this needs better multichain organization
 // Token Helper Objects & Types
 export const tokens = {
   // Origin ERC20 Tokens
@@ -93,6 +96,8 @@ export const tokens = {
   // Origin OTokens
   OETH: OETH_ADDRESS,
   OUSD: OUSD_ADDRESS,
+  superOETHb_base: baseAddresses.superOETHb,
+  wsuperOETHb_base: baseAddresses.wsuperOETHb,
   wOETH: WOETH_ADDRESS,
   wOETH_arbitrum: WOETH_ARBITRUM_ADDRESS,
 
