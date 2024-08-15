@@ -8,10 +8,7 @@ import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
 import { Block, Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import {
-  Currency,
-  convertRate,
-} from '@shared/post-processors/exchange-rates/currencies'
+import { Currency, convertRate } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
@@ -35,20 +32,14 @@ const eth1 = 1000000000000000000n
 const depositWithdrawalFilter = (strategyData: IStrategyData) =>
   logFilter({
     address: [strategyData.address],
-    topic0: [
-      abstractStrategyAbi.events.Deposit.topic,
-      abstractStrategyAbi.events.Withdrawal.topic,
-    ],
+    topic0: [abstractStrategyAbi.events.Deposit.topic, abstractStrategyAbi.events.Withdrawal.topic],
     range: { from: strategyData.from },
   })
 
 const curvePoolFilter = (strategyData: IStrategyData) =>
   logFilter({
     address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
-    topic0: [
-      baseRewardPool.events.Staked.topic,
-      baseRewardPool.events.Withdrawn.topic,
-    ],
+    topic0: [baseRewardPool.events.Staked.topic, baseRewardPool.events.Withdrawn.topic],
     topic1: [strategyData.address],
     range: { from: strategyData.from },
   })
@@ -56,10 +47,7 @@ const curvePoolFilter = (strategyData: IStrategyData) =>
 const balancerPoolFilter = (strategyData: IStrategyData) =>
   logFilter({
     address: [strategyData.balancerPoolInfo!.rewardPoolAddress],
-    topic0: [
-      baseRewardPool.events.Staked.topic,
-      baseRewardPool.events.Withdrawn.topic,
-    ],
+    topic0: [baseRewardPool.events.Staked.topic, baseRewardPool.events.Withdrawn.topic],
     topic1: [strategyData.address],
     range: { from: strategyData.from },
   })
@@ -95,10 +83,11 @@ const oTokenValues = {
   },
 } as const
 
-export const setupStrategyEarnings = (
-  processor: EvmBatchProcessor,
-  strategyData: IStrategyData,
-) => {
+export const setupStrategyEarnings = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {
+  if (!oTokenValues[strategyData.oTokenAddress]) {
+    throw new Error(`\`oTokenValues\` is not set up for ${strategyData.oTokenAddress}`)
+  }
+
   processor.includeAllBlocks({ from: strategyData.from })
   const balanceUpdateFilters = strategyData.balanceUpdateLogFilters ?? []
   strategyData.balanceUpdateLogFilters = balanceUpdateFilters
@@ -182,15 +171,8 @@ export const processStrategyEarnings = async (
         compare: number
       } = { compare: -1 },
     ) => {
-      const compareBalances = await getStrategyBalances(
-        ctx,
-        { height: block.header.height + compare },
-        strategyData,
-      )
-      const balances =
-        compare === 0
-          ? compareBalances
-          : await getStrategyBalances(ctx, block.header, strategyData)
+      const compareBalances = await getStrategyBalances(ctx, { height: block.header.height + compare }, strategyData)
+      const balances = compare === 0 ? compareBalances : await getStrategyBalances(ctx, block.header, strategyData)
       return balances
         .map((balance, i) => {
           return {
@@ -201,16 +183,12 @@ export const processStrategyEarnings = async (
         })
         .map((b) => {
           b.balance = convertDecimals(
-            strategyData.assets.find(
-              (a) => a.address.toLowerCase() === b.asset.toLowerCase(),
-            )!.decimals,
+            strategyData.assets.find((a) => a.address.toLowerCase() === b.asset.toLowerCase())!.decimals,
             strategyData.base.decimals,
             b.balance,
           )
           b.compareBalance = convertDecimals(
-            strategyData.assets.find(
-              (a) => a.address.toLowerCase() === b.asset.toLowerCase(),
-            )!.decimals,
+            strategyData.assets.find((a) => a.address.toLowerCase() === b.asset.toLowerCase())!.decimals,
             strategyData.base.decimals,
             b.compareBalance,
           )
@@ -221,23 +199,12 @@ export const processStrategyEarnings = async (
       // ctx.log.info(`balanceTrackingUpdate`)
       didUpdate = true
       const balances = await getBalances()
-      await processDepositWithdrawal(
-        ctx,
-        strategyData,
-        block,
-        strategyYields,
-        balances,
-      )
+      await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances)
     }
 
-    if (
-      strategyData.balanceUpdateTraceFilters &&
-      strategyData.balanceUpdateTraceFilters.length > 0
-    ) {
+    if (strategyData.balanceUpdateTraceFilters && strategyData.balanceUpdateTraceFilters.length > 0) {
       for (const trace of block.traces) {
-        if (
-          strategyData.balanceUpdateTraceFilters.find((f) => f.matches(trace))
-        ) {
+        if (strategyData.balanceUpdateTraceFilters.find((f) => f.matches(trace))) {
           await balanceTrackingUpdate()
         }
       }
@@ -252,49 +219,30 @@ export const processStrategyEarnings = async (
         // Example for OETH: Pull all WETH transfers from harvester to the dripper.
         const earningsTransferLogs = block.logs.filter(
           (l) =>
-            l.transactionHash === log.transactionHash &&
-            rewardTokenCollectedTransfersFilter(strategyData).matches(l),
+            l.transactionHash === log.transactionHash && rewardTokenCollectedTransfersFilter(strategyData).matches(l),
         )
-        const amount = earningsTransferLogs.reduce(
-          (sum, l) => sum + BigInt(l.data),
-          0n,
-        )
+        const amount = earningsTransferLogs.reduce((sum, l) => sum + BigInt(l.data), 0n)
 
-        await processRewardTokenCollected(
-          ctx,
-          strategyData,
-          block,
-          strategyYields,
-          {
-            token: strategyData.base.address,
-            amount: convertDecimals(
-              oTokenValues[strategyData.oTokenAddress]
-                .rewardConversionTokenDecimals,
-              strategyData.base.decimals,
-              amount,
-            ),
-          },
-        )
+        await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
+          token: strategyData.base.address,
+          amount: convertDecimals(
+            oTokenValues[strategyData.oTokenAddress].rewardConversionTokenDecimals,
+            strategyData.base.decimals,
+            amount,
+          ),
+        })
       }
 
-      if (
-        strategyData.kind === 'BalancerMetaStablePool' &&
-        balancerPoolFilter(strategyData).matches(log)
-      ) {
+      if (strategyData.kind === 'BalancerMetaStablePool' && balancerPoolFilter(strategyData).matches(log)) {
         await balanceTrackingUpdate()
-      } else if (
-        strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))
-      ) {
+      } else if (strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))) {
         await balanceTrackingUpdate()
       } else if (
         strategyData.earnings?.passiveByDepositWithdrawal &&
         depositWithdrawalFilter(strategyData).matches(log)
       ) {
         await balanceTrackingUpdate()
-      } else if (
-        rewardTokenCollectedFilter(strategyData).matches(log) &&
-        !txIgnore.has(log.transactionHash)
-      ) {
+      } else if (rewardTokenCollectedFilter(strategyData).matches(log) && !txIgnore.has(log.transactionHash)) {
         await rewardTokenCollectedUpdate()
       }
     }
@@ -307,13 +255,7 @@ export const processStrategyEarnings = async (
       }
       if (tracker(ctx, block)) {
         const balances = await getBalances({ compare: 0 })
-        await processDepositWithdrawal(
-          ctx,
-          strategyData,
-          block,
-          strategyYields,
-          balances,
-        )
+        await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances)
       }
     }
   }
@@ -335,14 +277,7 @@ const processRewardTokenCollected = async (
   const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
   // ctx.log.info(`processRewardTokenCollected ${id}`)
   // ctx.log.info(`Amount earned through rewards: ${formatEther(params.amount)}`)
-  let { latest, current, results } = await getLatest(
-    ctx,
-    block,
-    resultMap,
-    strategyData,
-    strategyData.base.address,
-    id,
-  )
+  let { latest, current, results } = await getLatest(ctx, block, resultMap, strategyData, strategyData.base.address, id)
 
   const amount = params.amount
   if (!current) {
@@ -382,19 +317,13 @@ const processDepositWithdrawal = async (
 ) => {
   const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
   // ctx.log.info(assets, `processDepositWithdrawal ${id}`)
-  let { latest, current, results } = await getLatest(
-    ctx,
-    block,
-    resultMap,
-    strategyData,
-    strategyData.base.address,
-    id,
-  )
+  let { latest, current, results } = await getLatest(ctx, block, resultMap, strategyData, strategyData.base.address, id)
 
   // Convert incoming values to ETH
-  const desiredRates = strategyData.assets
-    .filter((a) => a.convertTo)
-    .map((a) => [a.convertTo!.address, a.address]) as [Currency, Currency][]
+  const desiredRates = strategyData.assets.filter((a) => a.convertTo).map((a) => [a.convertTo!.address, a.address]) as [
+    Currency,
+    Currency,
+  ][]
   const rates = await ensureExchangeRates(ctx, block, desiredRates)
   const previousBalance = assets.reduce((sum, a, index) => {
     const asset = strategyData.assets[index]
@@ -405,23 +334,17 @@ const processDepositWithdrawal = async (
   }, 0n)
   const balance = assets.reduce((sum, a, index) => {
     const asset = strategyData.assets[index]
-    const balance = asset.convertTo
-      ? convertRate(rates, 'ETH', a.asset as Currency, a.balance)
-      : a.balance
+    const balance = asset.convertTo ? convertRate(rates, 'ETH', a.asset as Currency, a.balance) : a.balance
     return sum + balance
   }, 0n)
 
-  const otokenBalance =
-    assets.find((a) => a.asset.toLowerCase() === strategyData.oTokenAddress)
-      ?.balance ?? 0n
+  const otokenBalance = assets.find((a) => a.asset.toLowerCase() === strategyData.oTokenAddress)?.balance ?? 0n
 
-  const balanceWeightN =
-    eth1 - (balance === 0n ? 0n : (otokenBalance * eth1) / balance)
+  const balanceWeightN = eth1 - (balance === 0n ? 0n : (otokenBalance * eth1) / balance)
   const balanceWeight = Number(formatEther(balanceWeightN))
 
   const timestamp = new Date(block.header.timestamp)
-  let earningsChange =
-    previousBalance - (latest?.balance ?? previousBalance) ?? 0n
+  let earningsChange = previousBalance - (latest?.balance ?? previousBalance) ?? 0n
 
   // TODO: ??? Probably should listen for add/remove liquidity events
   //  and calculate earnings changes from fees rather than relying on this

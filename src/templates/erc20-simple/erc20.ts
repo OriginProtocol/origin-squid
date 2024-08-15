@@ -6,7 +6,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-export const createERC20SimpleTracker = ({ from, address }: { from: number; address: TokenAddress }) => {
+export const createERC20SimpleTracker = ({ from, address }: { from: number; address: TokenAddress | string }) => {
   let erc20: ERC20 | undefined
   let lastState: ERC20State | undefined
   const transferLogFilters = [

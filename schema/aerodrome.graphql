@@ -45,25 +45,34 @@ type AeroCLPoolTick @entity {
   secondsOutside: Int!
 }
 
-type AeroLPPosition @entity {
-  id: ID! # chainId-address-blockNumber-positionId
+type AeroCLLPPositionHistory @entity {
+  id: ID! # blockNumber-positionId
   chainId: Int! @index
   blockNumber: Int! @index
   timestamp: DateTime! @index
-  address: String! @index
+  pool: String! @index
   positionId: BigInt! @index
   lp: String! @index
   liquidity: BigInt!
-  staked: BigInt!
-  amount0: BigInt!
-  amount1: BigInt!
-  staked0: BigInt!
-  staked1: BigInt!
-  unstakedEarned0: BigInt!
-  unstakedEarned1: BigInt!
-  emissionsEarned: BigInt!
   tickLower: Int!
   tickUpper: Int!
-  sqrtRatioLower: BigInt!
-  sqrtRatioUpper: BigInt!
+  tickSpacing: Int!
+  priceLower: Float!
+  priceUpper: Float!
+}
+
+type AeroCLLPPosition @entity {
+  id: ID! # positionId
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  pool: String! @index
+  positionId: BigInt! @index
+  lp: String! @index
+  liquidity: BigInt!
+  tickLower: Int!
+  tickUpper: Int!
+  tickSpacing: Int!
+  priceLower: Float!
+  priceUpper: Float!
 }

@@ -10,6 +10,15 @@ export const baseERC20s = [
     from: 15676145,
     address: OGN_BASE_ADDRESS,
   }),
+  // vAMM-WETH/OGN
+  createERC20SimpleTracker(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
+  createERC20SimpleTracker(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
+  createERC20SimpleTracker(baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool),
+  // createERC20SimpleTracker(baseAddresses.aerodrome['CL1-WETH/superOETHb'].gauge),
+  createERC20SimpleTracker(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool),
+  // createERC20SimpleTracker(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].gauge),
+  createERC20SimpleTracker(baseAddresses.aerodrome['CL1-cbETH/WETH'].pool),
+  createERC20SimpleTracker(baseAddresses.aerodrome['CL1-cbETH/WETH'].gauge),
   createERC20Tracker({
     from: 17819702,
     address: baseAddresses.superOETHb,

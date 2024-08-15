@@ -11,6 +11,7 @@ export const baseAddresses = {
     offchainOracle: '0x5b80fd3dc871d56a31bf7bb13b14cd8a8fbf7baf',
     sugarLPV3: '0x68c19e13618c41158fe4baba1b8fb3a9c74bdb0a',
     factoryRegistry: '0x5c3f18f06cc09ca1910767a34a20f771039e37c0',
+    slipstreamNft: '0x827922686190790b37229fd06084350E74485b72',
     'vAMM-WETH/OGN': {
       pool: {
         address: '0x8ea4c49b712217fd6e29db920e3dd48287a0d50d',
@@ -59,6 +60,20 @@ export const baseAddresses = {
       gauge: {
         address: '0xf5550f8f0331b8caa165046667f4e6628e9e3aac',
         from: 13903874,
+      },
+    },
+    'CL100-WETH/USDC': {
+      pool: {
+        address: '0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59',
+        from: 13899892,
+        assets: [
+          { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+          { address: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', decimals: 6 },
+        ],
+      },
+      gauge: {
+        address: '0xf33a96b5932d9e9b9a0eda447abd8c9d48d2e0c8',
+        from: 13903905,
       },
     },
   },

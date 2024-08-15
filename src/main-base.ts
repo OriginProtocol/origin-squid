@@ -38,8 +38,11 @@ export const processor = {
       from: 15676793, // Should be the pools' lowest `from`
     }),
     aerodromeLP({
-      address: '0x0d5cf17cd8ac6d45a01defac7adede953072d705', // Random Wallet with Positions
-      from: 17000000,
+      address: baseAddresses.aerodrome['CL100-WETH/USDC'].pool.address,
+      account: ['0x0d90e61805c101d88ddc614344274c0249b793ef', '0x811e8f6d80f38a2f0f8b606cb743a950638f0ad4'], // Random Wallet with Positions
+      from: baseAddresses.aerodrome['CL100-WETH/USDC'].pool.from,
+      decimals0: 18,
+      decimals1: 6,
     }),
     // TODO: I don't know if we need this one...
     // aerodromeVoterEscrow({
