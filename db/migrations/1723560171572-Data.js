@@ -1,5 +1,5 @@
-module.exports = class Data1722542269716 {
-    name = 'Data1722542269716'
+module.exports = class Data1723560171572 {
+    name = 'Data1723560171572'
 
     async up(db) {
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
@@ -223,6 +223,9 @@ module.exports = class Data1722542269716 {
         await db.query(`CREATE INDEX "IDX_22ebb6be552c90b2c99b165cde" ON "oeth_withdrawal_request" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_fd1acb337d03a48f775c22edcd" ON "oeth_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_2733a93f9fc9cf900ac1de1a0d" ON "oeth_withdrawal_request" ("tx_hash") `)
+        await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_cb4297ef85375ee13a3446b240" ON "ogn_daily_stat" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_b96b9849e1e479d743ffb547c9" ON "ogn_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2418a8b8b92b2f5977be761cf9" ON "ogv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_b8f20bcf48e4aa77e0f48d77db" ON "ogv" ("block_number") `)
@@ -579,6 +582,9 @@ module.exports = class Data1722542269716 {
         await db.query(`DROP INDEX "public"."IDX_22ebb6be552c90b2c99b165cde"`)
         await db.query(`DROP INDEX "public"."IDX_fd1acb337d03a48f775c22edcd"`)
         await db.query(`DROP INDEX "public"."IDX_2733a93f9fc9cf900ac1de1a0d"`)
+        await db.query(`DROP TABLE "ogn_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_cb4297ef85375ee13a3446b240"`)
+        await db.query(`DROP INDEX "public"."IDX_b96b9849e1e479d743ffb547c9"`)
         await db.query(`DROP TABLE "ogv"`)
         await db.query(`DROP INDEX "public"."IDX_2418a8b8b92b2f5977be761cf9"`)
         await db.query(`DROP INDEX "public"."IDX_b8f20bcf48e4aa77e0f48d77db"`)
