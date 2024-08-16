@@ -5,6 +5,8 @@ type AeroPoolState @entity {
   timestamp: DateTime! @index
   address: String! @index
   totalUsd: BigInt!
+  liquidity: BigInt!
+  stakedLiquidity: BigInt!
   asset0: BigInt!
   asset1: BigInt!
   voteWeight: BigInt!
@@ -18,6 +20,8 @@ type AeroCLPoolState @entity {
   timestamp: DateTime! @index
   address: String! @index
   totalUsd: BigInt!
+  liquidity: BigInt!
+  stakedLiquidity: BigInt!
   asset0: BigInt!
   asset1: BigInt!
   voteWeight: BigInt!
@@ -61,11 +65,13 @@ type AeroCLLPPositionHistory @entity {
   priceUpper: Float!
 }
 
-type AeroCLLPPosition @entity {
+type AeroCLPoolLPPosition @entity {
   id: ID! # positionId
   chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
+  openBlockNumber: Int! @index
+  openTimestamp: DateTime! @index
+  closeBlockNumber: Int! @index
+  closeTimestamp: DateTime! @index
   pool: String! @index
   positionId: BigInt! @index
   lp: String! @index
@@ -75,4 +81,14 @@ type AeroCLLPPosition @entity {
   tickSpacing: Int!
   priceLower: Float!
   priceUpper: Float!
+}
+
+type AeroCLPoolLP @entity {
+  id: ID! # pool-lp
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  pool: String! @index
+  lp: String! @index
+  liquidity
 }

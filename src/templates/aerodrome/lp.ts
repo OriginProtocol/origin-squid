@@ -9,46 +9,51 @@ import { baseAddresses } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
 
 export const aerodromeLP = (params: {
-  address: string
-  from: number
-  account: string[]
-  decimals0?: number
-  decimals1?: number
+  pool: {
+    address: string
+    from: number
+    assets: { address: string; decimals: number }[]
+  }
+  gauge: {
+    address: string
+    from: number
+  }
+  lps: string[]
 }): Processor => {
   const mintFilter = logFilter({
-    address: [params.address],
+    address: [params.pool.address],
     topic0: [aerodromeCLPoolAbi.events.Mint.topic],
     topic1: [baseAddresses.aerodrome.slipstreamNft],
-    range: { from: params.from },
+    range: { from: params.pool.from },
   })
   const burnFilter = logFilter({
-    address: [params.address],
+    address: [params.pool.address],
     topic0: [aerodromeCLPoolAbi.events.Burn.topic],
     topic1: [baseAddresses.aerodrome.slipstreamNft],
-    range: { from: params.from },
+    range: { from: params.pool.from },
   })
   const nftMintFilter = logFilter({
     address: [baseAddresses.aerodrome.slipstreamNft],
     topic0: [slipstreamNftAbi.events.Transfer.topic],
     topic1: ['0x00'],
-    topic2: params.account,
-    range: { from: params.from },
+    topic2: params.lps,
+    range: { from: params.pool.from },
     transaction: true,
     transactionLogs: true,
   })
   const nftBurnFilter = logFilter({
     address: [baseAddresses.aerodrome.slipstreamNft],
     topic0: [slipstreamNftAbi.events.Transfer.topic],
-    topic1: params.account,
+    topic1: params.lps,
     topic2: ['0x00'],
-    range: { from: params.from },
+    range: { from: params.pool.from },
     transaction: true,
     transactionLogs: true,
   })
 
   return {
-    from: params.from,
-    name: `Aerodrome LP ${params.address}`,
+    from: params.pool.from,
+    name: `Aerodrome LP ${params.pool.address}`,
     setup: (processor) => {
       processor.addLog(nftMintFilter.value)
       processor.addLog(nftBurnFilter.value)
@@ -86,15 +91,23 @@ export const aerodromeLP = (params: {
                 chainId: ctx.chain.id,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),
-                pool: params.address,
+                pool: params.pool.address,
                 positionId: nftData.tokenId,
                 lp: nftData.to.toLowerCase(),
                 liquidity: nftPosition.liquidity, // This *can* change over time.
                 tickLower: nftPosition.tickLower,
                 tickUpper: nftPosition.tickUpper,
                 tickSpacing: nftPosition.tickSpacing,
-                priceLower: getPriceFromTick(nftPosition.tickLower, params.decimals0, params.decimals1),
-                priceUpper: getPriceFromTick(nftPosition.tickUpper, params.decimals0, params.decimals1),
+                priceLower: getPriceFromTick(
+                  nftPosition.tickLower,
+                  params.pool.assets[0].decimals,
+                  params.pool.assets[1].decimals,
+                ),
+                priceUpper: getPriceFromTick(
+                  nftPosition.tickUpper,
+                  params.pool.assets[0].decimals,
+                  params.pool.assets[1].decimals,
+                ),
               })
               const positionHistoryArray = positionHistoryMap.get(nftData.tokenId.toString()) ?? []
               positionHistoryArray.push(positionHistory)
