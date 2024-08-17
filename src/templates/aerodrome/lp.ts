@@ -97,7 +97,42 @@ export const aerodromeLP = (params: {
               }),
           ),
         )
-        // TODO: Aggregate for lpStates
+        if (positions.length) {
+          const lpState = new AeroLP({
+            id: `${ctx.chain.id}-${params.pool}-${params.account}-${block.header.height}`,
+            chainId: ctx.chain.id,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+            pool: params.pool,
+            account: params.account,
+            liquidity: positions.reduce((sum, p) => sum + p.liquidity, 0n),
+            staked: positions.reduce((sum, p) => sum + p.staked, 0n),
+            amount0: positions.reduce((sum, p) => sum + p.amount0, 0n),
+            amount1: positions.reduce((sum, p) => sum + p.amount1, 0n),
+            staked0: positions.reduce((sum, p) => sum + p.staked0, 0n),
+            staked1: positions.reduce((sum, p) => sum + p.staked1, 0n),
+            unstakedEarned0: positions.reduce((sum, p) => sum + p.unstaked_earned0, 0n),
+            unstakedEarned1: positions.reduce((sum, p) => sum + p.unstaked_earned1, 0n),
+            emissionsEarned: positions.reduce((sum, p) => sum + p.emissions_earned, 0n),
+            tickLower: positions.reduce(
+              (lower, p) => (lower === undefined || lower > p.tick_lower ? p.tick_lower : lower),
+              undefined as undefined | number,
+            ),
+            tickUpper: positions.reduce(
+              (upper, p) => (upper === undefined || upper < p.tick_upper ? p.tick_upper : upper),
+              undefined as undefined | number,
+            ),
+            sqrtRatioLower: positions.reduce(
+              (lower, p) => (lower === undefined || lower > p.sqrt_ratio_lower ? p.sqrt_ratio_lower : lower),
+              undefined as undefined | bigint,
+            ),
+            sqrtRatioUpper: positions.reduce(
+              (upper, p) => (upper === undefined || upper < p.sqrt_ratio_upper ? p.sqrt_ratio_upper : upper),
+              undefined as undefined | bigint,
+            ),
+          })
+          lpStates.push(lpState)
+        }
       })
       await ctx.store.insert(lpStates)
       await ctx.store.insert(lpPositionStates)
