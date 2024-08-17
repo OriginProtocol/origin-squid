@@ -1,168 +1,106 @@
 import { uniqBy } from 'lodash'
 
-import * as aerodromeCLPoolAbi from '@abi/aerodrome-cl-pool'
-import * as slipstreamNftAbi from '@abi/aerodrome-slipstream-nft'
-import { AeroCLLPPosition, AeroCLLPPositionHistory } from '@model'
-import { Processor } from '@processor'
-import { getPriceFromTick } from '@templates/aerodrome/prices'
+import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
+import { AeroLP, AeroLPPosition } from '@model'
+import { Block, Context, Processor } from '@processor'
 import { baseAddresses } from '@utils/addresses-base'
-import { logFilter } from '@utils/logFilter'
+import { batchPromises } from '@utils/batchPromises'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { range } from '@utils/range'
+
+// For AMM Pools the sugar contract iterates through all the pools, according to the pool indices.
+// To shortcut - we can supply accurate offsets and limits.
+const ammPoolFactory = '0x420dd381b31aef6683db6b902084cb0ffece40da'
+const ammPoolLookupOffset: Record<string, number | undefined> = {
+  [baseAddresses.aerodrome['vAMM-WETH/OGN'].pool.address]: 1324,
+  [baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool.address]: 1673,
+}
+
+// For CL Pools the sugar contract quickly checks unstaked positions.
+// Staked positions then require iteration through all the pools.
+// This leaves us in a "can we skip anything?" situation.
+// Strategy
+// - 1 call at index 0 with our desired limit
+// - 1 call at the known pool index + count we just found, with our desired limit
+// (not perfect, but good enough?)
+const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a' // 0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59
+const clPoolLookupOffset: Record<string, number | undefined> = {
+  [baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool.address]: 113,
+  [baseAddresses.aerodrome['CL100-WETH/USDC'].pool.address]: 1,
+}
+
+const MAX_POSITIONS = 200
 
 export const aerodromeLP = (params: {
-  pool: {
-    address: string
-    from: number
-    assets: { address: string; decimals: number }[]
-  }
-  gauge: {
-    address: string
-    from: number
-  }
-  lps: string[]
+  pool: string
+  poolType: 'amm' | 'cl'
+  account: string
+  from: number
 }): Processor => {
-  const mintFilter = logFilter({
-    address: [params.pool.address],
-    topic0: [aerodromeCLPoolAbi.events.Mint.topic],
-    topic1: [baseAddresses.aerodrome.slipstreamNft],
-    range: { from: params.pool.from },
-  })
-  const burnFilter = logFilter({
-    address: [params.pool.address],
-    topic0: [aerodromeCLPoolAbi.events.Burn.topic],
-    topic1: [baseAddresses.aerodrome.slipstreamNft],
-    range: { from: params.pool.from },
-  })
-  const nftMintFilter = logFilter({
-    address: [baseAddresses.aerodrome.slipstreamNft],
-    topic0: [slipstreamNftAbi.events.Transfer.topic],
-    topic1: ['0x00'],
-    topic2: params.lps,
-    range: { from: params.pool.from },
-    transaction: true,
-    transactionLogs: true,
-  })
-  const nftBurnFilter = logFilter({
-    address: [baseAddresses.aerodrome.slipstreamNft],
-    topic0: [slipstreamNftAbi.events.Transfer.topic],
-    topic1: params.lps,
-    topic2: ['0x00'],
-    range: { from: params.pool.from },
-    transaction: true,
-    transactionLogs: true,
-  })
-
+  const frequencyUpdater = blockFrequencyUpdater({ from: params.from })
   return {
-    from: params.pool.from,
-    name: `Aerodrome LP ${params.pool.address}`,
+    from: params.from,
+    name: `Aerodrome LP ${params.account}`,
     setup: (processor) => {
-      processor.addLog(nftMintFilter.value)
-      processor.addLog(nftBurnFilter.value)
+      processor.includeAllBlocks({ from: params.from })
     },
     process: async (ctx) => {
-      const positionMap = new Map<string, AeroCLLPPosition>()
-      const positionHistoryMap = new Map<string, AeroCLLPPositionHistory[]>()
-      const getLatest = async (positionId: bigint) => {
-        const position = positionMap.get(positionId.toString())
-        const positionHistoryArray = positionHistoryMap.get(positionId.toString()) ?? []
-        positionHistoryMap.set(positionId.toString(), positionHistoryArray)
-        const latestHistory =
-          positionHistoryArray[positionHistoryArray.length - 1] ??
-          (await ctx.store.findOne(AeroCLLPPositionHistory, {
-            where: { positionId },
-            order: { timestamp: 'desc' },
-          }))
-        return { positionHistoryArray, latestHistory, position }
-      }
-      for (const block of ctx.blocks) {
-        for (const log of block.logs) {
-          if (nftMintFilter.matches(log)) {
-            const mintLog = log.transaction?.logs?.find((l) => mintFilter.matches(l))
-            // Checking that this exists helps determine the log is from a pool we care about.
-            if (mintLog) {
-              const nftData = slipstreamNftAbi.events.Transfer.decode(log)
-              const nftContract = new slipstreamNftAbi.Contract(
-                ctx,
-                block.header,
-                baseAddresses.aerodrome.slipstreamNft,
-              )
-              const nftPosition = await nftContract.positions(nftData.tokenId)
-              const positionHistory = new AeroCLLPPositionHistory({
-                id: `${block.header.height}-${nftData.tokenId}`,
+      const lpStates: AeroLP[] = []
+      const lpPositionStates: AeroLPPosition[] = []
+      await frequencyUpdater(ctx, async (ctx: Context, block: Block) => {
+        const sugar = new aerodromeLPSugarAbi.Contract(ctx, block.header, baseAddresses.aerodrome.sugarLPV3)
+        const offset = params.poolType === 'amm' ? ammPoolLookupOffset[params.pool] : clPoolLookupOffset[params.pool]
+        const factoryAddress = params.poolType === 'amm' ? ammPoolFactory : clPoolFactory
+        if (!offset) throw new Error('Pool offset not found.')
+        let positions = []
+        if (params.poolType === 'cl') {
+          positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, params.account, factoryAddress)
+          positions = uniqBy(
+            [
+              ...positions,
+              ...(await sugar.positionsByFactory(
+                MAX_POSITIONS,
+                offset + positions.length,
+                params.account,
+                factoryAddress,
+              )),
+            ],
+            (p) => p.id,
+          )
+        } else {
+          positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, params.account, factoryAddress)
+        }
+        lpPositionStates.push(
+          ...positions.map(
+            (p) =>
+              new AeroLPPosition({
+                id: `${ctx.chain.id}-${params.pool}-${params.account}-${p.id}-${block.header.height}`,
                 chainId: ctx.chain.id,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),
-                pool: params.pool.address,
-                positionId: nftData.tokenId,
-                lp: nftData.to.toLowerCase(),
-                liquidity: nftPosition.liquidity, // This *can* change over time.
-                tickLower: nftPosition.tickLower,
-                tickUpper: nftPosition.tickUpper,
-                tickSpacing: nftPosition.tickSpacing,
-                priceLower: getPriceFromTick(
-                  nftPosition.tickLower,
-                  params.pool.assets[0].decimals,
-                  params.pool.assets[1].decimals,
-                ),
-                priceUpper: getPriceFromTick(
-                  nftPosition.tickUpper,
-                  params.pool.assets[0].decimals,
-                  params.pool.assets[1].decimals,
-                ),
-              })
-              const positionHistoryArray = positionHistoryMap.get(nftData.tokenId.toString()) ?? []
-              positionHistoryArray.push(positionHistory)
-              positionHistoryMap.set(nftData.tokenId.toString(), positionHistoryArray)
-
-              const position = new AeroCLLPPosition({
-                ...positionHistory,
-                id: nftData.tokenId.toString(),
-              })
-              positionMap.set(position.id, position)
-
-              ctx.log.info(
-                `${block.header.height} Aerodrome CL LP Position NFT #${
-                  nftData.tokenId
-                } minted for ${nftData.to.toLowerCase()}`,
-              )
-            }
-          } else if (nftBurnFilter.matches(log)) {
-            const burnLog = log.transaction?.logs?.find((l) => burnFilter.matches(l))
-            // Checking that this exists helps determine the log is from a pool we care about.
-            if (burnLog) {
-              const burnData = aerodromeCLPoolAbi.events.Burn.decode(burnLog)
-              const nftData = slipstreamNftAbi.events.Transfer.decode(log)
-              const { latestHistory, positionHistoryArray } = await getLatest(nftData.tokenId)
-              if (latestHistory) {
-                const positionHistory = new AeroCLLPPositionHistory({
-                  ...latestHistory,
-                  id: `${block.header.height}-${nftData.tokenId}`,
-                  blockNumber: block.header.height,
-                  timestamp: new Date(block.header.timestamp),
-                  liquidity: 0n,
-                })
-                positionHistoryArray.push(positionHistory)
-
-                const position = new AeroCLLPPosition({
-                  ...positionHistory,
-                  id: nftData.tokenId.toString(),
-                })
-                positionMap.set(position.id, position)
-
-                ctx.log.info(
-                  `${block.header.height} Aerodrome CL LP Position NFT #${
-                    nftData.tokenId
-                  } burned for ${nftData.to.toLowerCase()}`,
-                )
-              }
-            }
-          }
-        }
-      }
-
-      // These entities look the same but have different uniqueness by IDs.
-      // One is stored by tokenId, the other by block & tokenId.
-      await ctx.store.upsert([...positionMap.values()])
-      await ctx.store.insert([...positionHistoryMap.values()].flat())
+                pool: params.pool,
+                positionId: p.id,
+                account: params.account,
+                liquidity: p.liquidity,
+                staked: p.staked,
+                amount0: p.amount0,
+                amount1: p.amount1,
+                staked0: p.staked0,
+                staked1: p.staked1,
+                unstakedEarned0: p.unstaked_earned0,
+                unstakedEarned1: p.unstaked_earned1,
+                emissionsEarned: p.emissions_earned,
+                tickLower: p.tick_lower,
+                tickUpper: p.tick_upper,
+                sqrtRatioLower: p.sqrt_ratio_lower,
+                sqrtRatioUpper: p.sqrt_ratio_upper,
+              }),
+          ),
+        )
+        // TODO: Aggregate for lpStates
+      })
+      await ctx.store.insert(lpStates)
+      await ctx.store.insert(lpPositionStates)
     },
   }
 }

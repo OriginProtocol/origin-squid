@@ -19,10 +19,16 @@ export const processor = {
   processors: [
     ...baseERC20s,
     superOETHb,
-    aerodromePool(baseAddresses.aerodrome['vAMM-WETH/OGN'].pool),
+    aerodromePool({
+      ...baseAddresses.aerodrome['vAMM-WETH/OGN'].pool,
+      gaugeAddress: baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge.address,
+    }),
     aerodromeGauge(baseAddresses.aerodrome['vAMM-WETH/OGN'].gauge),
-    aerodromePool(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool),
-    // aerodromeGauge(baseAddresses.aerodrome['vAMM-OGN/OETHb'].gauge),
+    aerodromePool({
+      ...baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool,
+      gaugeAddress: undefined, // baseAddresses.aerodrome['vAMM-OGN/superOETHb'].gauge.address,
+    }),
+    // aerodromeGauge(baseAddresses.aerodrome['vAMM-OGN/superOETHb'].gauge),
     aerodromeCLPool(baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool),
     // aerodromeCLGauge(baseAddresses.aerodrome['CL1-WETH/OETHb'].gauge),
     aerodromeCLPool(baseAddresses.aerodrome['CL1-cbETH/WETH'].pool),
@@ -41,9 +47,22 @@ export const processor = {
     aerodromeCLPool(baseAddresses.aerodrome['CL100-WETH/USDC'].pool),
     aerodromeCLGauge(baseAddresses.aerodrome['CL100-WETH/USDC'].gauge),
     aerodromeLP({
-      pool: baseAddresses.aerodrome['CL100-WETH/USDC'].pool,
-      gauge: baseAddresses.aerodrome['CL100-WETH/USDC'].gauge,
-      lps: ['0x0d90e61805c101d88ddc614344274c0249b793ef'], // Random Wallet with Positions
+      pool: baseAddresses.aerodrome['CL100-WETH/USDC'].pool.address,
+      poolType: 'cl',
+      account: '0x0d90e61805c101d88ddc614344274c0249b793ef', // Random Wallet with Positions
+      from: baseAddresses.aerodrome['CL100-WETH/USDC'].pool.from,
+    }),
+    aerodromeLP({
+      pool: baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool.address,
+      poolType: 'amm',
+      account: '0xfd9e6005187f448957a0972a7d0c0a6da2911236', // First Minter
+      from: baseAddresses.aerodrome['vAMM-OGN/superOETHb'].pool.from,
+    }),
+    aerodromeLP({
+      pool: baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool.address,
+      poolType: 'cl',
+      account: '0xfd9e6005187f448957a0972a7d0c0a6da2911236', // First Minter
+      from: baseAddresses.aerodrome['CL1-WETH/superOETHb'].pool.from,
     }),
     // TODO: I don't know if we need this one...
     // aerodromeVoterEscrow({

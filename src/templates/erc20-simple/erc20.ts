@@ -36,7 +36,7 @@ export const createERC20SimpleTracker = ({ from, address }: { from: number; addr
         await ctx.store.insert(erc20)
       }
     } catch (err) {
-      ctx.log.info({ height: block.header.height }, 'Failed to get contract name')
+      ctx.log.info({ height: block.header.height }, `Failed to get contract name for ${address}`)
     }
     if (!lastState) {
       lastState = await ctx.store

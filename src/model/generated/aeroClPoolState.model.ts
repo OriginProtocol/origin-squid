@@ -30,6 +30,12 @@ export class AeroCLPoolState {
     totalUsd!: bigint
 
     @BigIntColumn_({nullable: false})
+    liquidity!: bigint
+
+    @BigIntColumn_({nullable: false})
+    stakedLiquidity!: bigint
+
+    @BigIntColumn_({nullable: false})
     asset0!: bigint
 
     @BigIntColumn_({nullable: false})

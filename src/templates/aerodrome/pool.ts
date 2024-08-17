@@ -11,6 +11,7 @@ import { logFilter } from '@utils/logFilter'
 
 export const aerodromePool = (params: {
   address: string
+  gaugeAddress: string | undefined
   from: number
   assets: { address: string; decimals: number }[]
 }): Processor => {
@@ -77,6 +78,8 @@ export const aerodromePool = (params: {
         const states: AeroPoolState[] = []
         await frequencyUpdater(ctx, async (ctx, block) => {
           const poolContract = new aerodromePoolAbi.Contract(ctx, block.header, params.address)
+          const liquidity = await poolContract.totalSupply()
+          const stakedLiquidity = params.gaugeAddress ? await poolContract.balanceOf(params.gaugeAddress) : 0n
           const reserves = await poolContract.getReserves()
           const reserve0Usd = await convertRate(
             ctx,
@@ -102,6 +105,8 @@ export const aerodromePool = (params: {
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
             address: params.address,
+            liquidity,
+            stakedLiquidity,
             totalUsd: reserve0Usd + reserve1Usd,
             asset0: reserves._reserve0,
             asset1: reserves._reserve1,

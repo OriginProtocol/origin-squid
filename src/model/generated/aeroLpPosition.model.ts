@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class AeroPoolState {
-    constructor(props?: Partial<AeroPoolState>) {
+export class AeroLPPosition {
+    constructor(props?: Partial<AeroLPPosition>) {
         Object.assign(this, props)
     }
 
@@ -23,26 +23,52 @@ export class AeroPoolState {
 
     @Index_()
     @StringColumn_({nullable: false})
-    address!: string
+    pool!: string
 
+    @Index_()
     @BigIntColumn_({nullable: false})
-    totalUsd!: bigint
+    positionId!: bigint
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    account!: string
 
     @BigIntColumn_({nullable: false})
     liquidity!: bigint
 
     @BigIntColumn_({nullable: false})
-    stakedLiquidity!: bigint
+    staked!: bigint
 
     @BigIntColumn_({nullable: false})
-    asset0!: bigint
+    amount0!: bigint
 
     @BigIntColumn_({nullable: false})
-    asset1!: bigint
+    amount1!: bigint
 
     @BigIntColumn_({nullable: false})
-    voteWeight!: bigint
+    staked0!: bigint
 
     @BigIntColumn_({nullable: false})
-    votePercentage!: bigint
+    staked1!: bigint
+
+    @BigIntColumn_({nullable: false})
+    unstakedEarned0!: bigint
+
+    @BigIntColumn_({nullable: false})
+    unstakedEarned1!: bigint
+
+    @BigIntColumn_({nullable: false})
+    emissionsEarned!: bigint
+
+    @IntColumn_({nullable: false})
+    tickLower!: number
+
+    @IntColumn_({nullable: false})
+    tickUpper!: number
+
+    @BigIntColumn_({nullable: false})
+    sqrtRatioLower!: bigint
+
+    @BigIntColumn_({nullable: false})
+    sqrtRatioUpper!: bigint
 }

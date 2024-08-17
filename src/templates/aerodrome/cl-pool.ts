@@ -9,6 +9,7 @@ import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
+import { multicall } from '@utils/multicall'
 
 export const aerodromeCLPool = (params: {
   address: string
@@ -86,7 +87,9 @@ export const aerodromeCLPool = (params: {
 
           const token0Contract = new erc20Abi.Contract(ctx, block.header, params.assets[0].address)
           const token1Contract = new erc20Abi.Contract(ctx, block.header, params.assets[1].address)
-          const [reserve0, reserve1, slot0] = await Promise.all([
+          const [liquidity, stakedLiquidity, reserve0, reserve1, slot0] = await Promise.all([
+            poolContract.liquidity(),
+            poolContract.stakedLiquidity(),
             token0Contract.balanceOf(params.address),
             token1Contract.balanceOf(params.address),
             poolContract.slot0(),
@@ -125,6 +128,8 @@ export const aerodromeCLPool = (params: {
             blockNumber: block.header.height,
             timestamp: new Date(block.header.timestamp),
             address: params.address,
+            liquidity,
+            stakedLiquidity,
             asset0: reserve0,
             asset1: reserve1,
             totalUsd: reserve0Usd + reserve1Usd,

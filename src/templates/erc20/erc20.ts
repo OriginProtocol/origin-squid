@@ -71,7 +71,7 @@ export const createERC20Tracker = ({
         await ctx.store.insert(erc20)
       }
     } catch (err) {
-      ctx.log.error({ height: block.header.height, err }, 'Failed to get contract name')
+      ctx.log.error({ height: block.header.height, err }, `Failed to get contract name for ${address}`)
     }
   }
   return {
