@@ -37,9 +37,10 @@ export const aerodromeLP = (params: {
   account: string
   from: number
 }): Processor => {
-  const frequencyUpdater = blockFrequencyUpdater({ from: params.from })
+  const from = Math.max(16962730, params.from)
+  const frequencyUpdater = blockFrequencyUpdater({ from })
   return {
-    from: params.from,
+    from, // Sugar deploy date or from.
     name: `Aerodrome LP ${params.account}`,
     setup: (processor) => {
       processor.includeAllBlocks({ from: params.from })
@@ -54,7 +55,9 @@ export const aerodromeLP = (params: {
         if (!offset) throw new Error('Pool offset not found.')
         let positions = []
         if (params.poolType === 'cl') {
-          positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, params.account, factoryAddress)
+          // First pull from offset 0 to capture any unstaked positions.
+          positions = await sugar.positionsByFactory(MAX_POSITIONS, 0, params.account, factoryAddress)
+          // Then pull from pool offset + however many positions we just found and merge the result.
           positions = uniqBy(
             [
               ...positions,
@@ -68,6 +71,7 @@ export const aerodromeLP = (params: {
             (p) => p.id,
           )
         } else {
+          // No special logic needed for AMM.
           positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, params.account, factoryAddress)
         }
         lpPositionStates.push(
