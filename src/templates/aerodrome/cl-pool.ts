@@ -118,8 +118,8 @@ export const aerodromeCLPool = (params: {
           })
 
           const [reserve0Usd, reserve1Usd] = await Promise.all([
-            convertRate(ctx, block, params.assets[0].address, baseAddresses.USDC, reserve0),
-            convertRate(ctx, block, params.assets[1].address, baseAddresses.USDC, reserve1),
+            convertRate(ctx, block, params.assets[0].address, baseAddresses.tokens.USDC, reserve0),
+            convertRate(ctx, block, params.assets[1].address, baseAddresses.tokens.USDC, reserve1),
           ])
 
           const state = new AeroCLPoolState({

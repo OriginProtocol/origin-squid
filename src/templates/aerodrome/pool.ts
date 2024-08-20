@@ -85,14 +85,14 @@ export const aerodromePool = (params: {
             ctx,
             block,
             params.assets[0].address,
-            baseAddresses.USDC,
+            baseAddresses.tokens.USDC,
             reserves._reserve0,
           )
           const reserve1Usd = await convertRate(
             ctx,
             block,
             params.assets[1].address,
-            baseAddresses.USDC,
+            baseAddresses.tokens.USDC,
             reserves._reserve1,
           )
           const totalVoteWeight = await getVoterTotalWeight(ctx, block)

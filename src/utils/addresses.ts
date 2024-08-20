@@ -96,8 +96,8 @@ export const tokens = {
   // Origin OTokens
   OETH: OETH_ADDRESS,
   OUSD: OUSD_ADDRESS,
-  superOETHb_base: baseAddresses.superOETHb,
-  wsuperOETHb_base: baseAddresses.wsuperOETHb,
+  superOETHb_base: baseAddresses.tokens.superOETHb,
+  wsuperOETHb_base: baseAddresses.tokens.wsuperOETHb,
   wOETH: WOETH_ADDRESS,
   wOETH_arbitrum: WOETH_ARBITRUM_ADDRESS,
 
@@ -111,7 +111,7 @@ export const tokens = {
   // Ether
   ETH: ETH_ADDRESS,
   WETH: WETH_ADDRESS,
-  WETH_base: baseAddresses.WETH,
+  WETH_base: baseAddresses.tokens.WETH,
   stETH: STETH_ADDRESS,
   wstETH: WSTETH_ADDRESS,
   rETH: RETH_ADDRESS,

@@ -7,13 +7,13 @@ import { baseAddresses } from '@utils/addresses-base'
 const otokenProcessor = createOTokenProcessor({
   from: 17819702,
   vaultFrom: 17819702,
-  otokenAddress: baseAddresses.superOETHb,
-  wotokenAddress: baseAddresses.wsuperOETHb,
-  otokenVaultAddress: baseAddresses.superOETHbVault,
+  otokenAddress: baseAddresses.tokens.superOETHb,
+  wotokenAddress: baseAddresses.tokens.wsuperOETHb,
+  otokenVaultAddress: baseAddresses.superOETHb.vault,
   oTokenAssets: [
-    { asset: baseAddresses.superOETHb, symbol: 'superOETHb' },
+    { asset: baseAddresses.tokens.superOETHb, symbol: 'superOETHb' },
     {
-      asset: baseAddresses.WETH,
+      asset: baseAddresses.tokens.WETH,
       symbol: 'WETH',
     },
   ],
@@ -24,9 +24,9 @@ const otokenProcessor = createOTokenProcessor({
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
   from: 17819702,
-  otokenAddress: baseAddresses.superOETHb,
-  wotokenAddress: baseAddresses.wsuperOETHb,
-  vaultAddress: baseAddresses.superOETHbVault,
+  otokenAddress: baseAddresses.tokens.superOETHb,
+  wotokenAddress: baseAddresses.tokens.wsuperOETHb,
+  vaultAddress: baseAddresses.superOETHb.vault,
   cowSwap: false,
 })
 

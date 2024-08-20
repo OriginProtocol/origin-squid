@@ -1,10 +1,33 @@
-export const baseAddresses = {
+import { compact, omit, uniq } from 'lodash'
+
+const superOETHb = {
+  address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3',
+  wrapped: '0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6',
+  vault: '0x98a0cbef61bd2d21435f433be4cd42b56b38cc93',
+  oracleRouter: '0xc72bda59e382be10bb5d71abd01ecc65aa16fd83',
+  dripper: undefined,
+  zapper: undefined,
+  harvester: undefined,
+  vaultTokens: undefined,
+}
+
+export const tokens = {
   USDC: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
   WETH: '0x4200000000000000000000000000000000000006',
   OGN: '0x7002458b1df59eccb57387bc79ffc7c29e22e6f7',
-  superOETHb: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3',
-  superOETHbVault: '0x98a0cbef61bd2d21435f433be4cd42b56b38cc93',
-  wsuperOETHb: '0x7fcd174e80f264448ebee8c88a7c4476aaf58ea6',
+  cbETH: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22',
+  superOETHb: superOETHb.address,
+  wsuperOETHb: superOETHb.wrapped,
+}
+
+export const baseAddresses = {
+  multisig: {
+    '5/8': '0x92a19381444a001d62ce67baff066fa1111d7202',
+    '2/9': '0x28bce2eE5775B652D92bB7c2891A89F036619703',
+  },
+  tokens,
+  superOETHb,
+  origin: compact(uniq([...Object.values(omit(superOETHb, 'vaultTokens'))].flat().map((a) => a?.toLowerCase()))),
   aerodrome: {
     voter: '0x16613524e02ad97edfef371bc883f2f5d6c480a5',
     basePrices: '0xee717411f6e44f9fee011835c8e6faac5deff166',

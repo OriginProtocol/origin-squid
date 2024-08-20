@@ -12,10 +12,10 @@ export const baseERC20s = [
   }),
   createERC20Tracker({
     from: 17819702,
-    address: baseAddresses.superOETHb,
+    address: baseAddresses.tokens.superOETHb,
     rebaseFilters: [
       logFilter({
-        address: [baseAddresses.superOETHb],
+        address: [baseAddresses.tokens.superOETHb],
         topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
         transaction: true,
         range: { from: 17819702 },
@@ -24,6 +24,6 @@ export const baseERC20s = [
   }),
   createERC20SimpleTracker({
     from: 17819702,
-    address: baseAddresses.wsuperOETHb,
+    address: baseAddresses.tokens.wsuperOETHb,
   }),
 ]
