@@ -22,8 +22,8 @@ export const createSquidProcessor = (
 ) => {
   const url = process.env[rpc_env] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
-  return new EvmBatchProcessor()
-    .setGateway(lookupArchive(archive))
+
+  const processor = new EvmBatchProcessor()
     .setRpcEndpoint({
       url,
       maxBatchCallSize: url.includes('alchemy.com') ? 1 : 100,
@@ -59,6 +59,15 @@ export const createSquidProcessor = (
         createResultAddress: true,
       },
     })
+
+  if (process.env.DISABLE_ARCHIVE !== 'true') {
+    console.log(`Archive: ${archive}`)
+    processor.setGateway(lookupArchive(archive))
+  }else{
+    console.log(`Archive disabled`)
+  }
+
+  return processor
 }
 
 export interface Processor {

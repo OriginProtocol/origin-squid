@@ -1,0 +1,13 @@
+type OGNDailyStat @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  totalStaked: BigInt!
+  tradingVolumeUSD: Float!
+  marketCapUSD: Float!
+  priceUSD: Float!
+  holdersOverThreshold: Int!
+}

@@ -1,5 +1,5 @@
-module.exports = class Data1723918784166 {
-    name = 'Data1723918784166'
+module.exports = class Data1724195739675 {
+    name = 'Data1724195739675'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -564,6 +564,13 @@ module.exports = class Data1723918784166 {
         await db.query(`CREATE TABLE "oeth_reward_token_collected" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "strategy" text NOT NULL, "recipient" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_47098cc5fbc7cb95c2374fa33cd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_81a9fa43ae4a6ae63e4103127b" ON "oeth_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d36c78b9c3e9d737f067638bc4" ON "oeth_reward_token_collected" ("block_number") `)
+        await db.query(`CREATE TABLE "oeth_withdrawal_request" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "request_id" numeric NOT NULL, "withdrawer" text NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "tx_hash" text NOT NULL, CONSTRAINT "PK_93e4b80f8ae8723a3b38f94b26a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_22ebb6be552c90b2c99b165cde" ON "oeth_withdrawal_request" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_fd1acb337d03a48f775c22edcd" ON "oeth_withdrawal_request" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_2733a93f9fc9cf900ac1de1a0d" ON "oeth_withdrawal_request" ("tx_hash") `)
+        await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_cb4297ef85375ee13a3446b240" ON "ogn_daily_stat" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_b96b9849e1e479d743ffb547c9" ON "ogn_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2418a8b8b92b2f5977be761cf9" ON "ogv" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_b8f20bcf48e4aa77e0f48d77db" ON "ogv" ("block_number") `)
@@ -1262,6 +1269,13 @@ module.exports = class Data1723918784166 {
         await db.query(`DROP TABLE "oeth_reward_token_collected"`)
         await db.query(`DROP INDEX "public"."IDX_81a9fa43ae4a6ae63e4103127b"`)
         await db.query(`DROP INDEX "public"."IDX_d36c78b9c3e9d737f067638bc4"`)
+        await db.query(`DROP TABLE "oeth_withdrawal_request"`)
+        await db.query(`DROP INDEX "public"."IDX_22ebb6be552c90b2c99b165cde"`)
+        await db.query(`DROP INDEX "public"."IDX_fd1acb337d03a48f775c22edcd"`)
+        await db.query(`DROP INDEX "public"."IDX_2733a93f9fc9cf900ac1de1a0d"`)
+        await db.query(`DROP TABLE "ogn_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_cb4297ef85375ee13a3446b240"`)
+        await db.query(`DROP INDEX "public"."IDX_b96b9849e1e479d743ffb547c9"`)
         await db.query(`DROP TABLE "ogv"`)
         await db.query(`DROP INDEX "public"."IDX_2418a8b8b92b2f5977be761cf9"`)
         await db.query(`DROP INDEX "public"."IDX_b8f20bcf48e4aa77e0f48d77db"`)
