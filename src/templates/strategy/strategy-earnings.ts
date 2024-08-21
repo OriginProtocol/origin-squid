@@ -20,6 +20,7 @@ import {
   USDT_ADDRESS,
   WETH_ADDRESS,
 } from '@utils/addresses'
+import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 import { convertDecimals, lastExcept } from '@utils/utils'
@@ -80,6 +81,12 @@ const oTokenValues = {
     rewardConversionTokenDecimals: 18,
     harvester: OETH_HARVESTER_ADDRESS,
     dripper: OETH_DRIPPER_ADDRESS,
+  },
+  [baseAddresses.superOETHb.address]: {
+    rewardConversionToken: baseAddresses.tokens.WETH,
+    rewardConversionTokenDecimals: 18,
+    harvester: baseAddresses.multisig['2/9'],
+    dripper: baseAddresses.superOETHb.dripper,
   },
 } as const
 

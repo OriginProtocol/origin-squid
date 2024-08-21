@@ -118,11 +118,11 @@ async function updateDailyStats(ctx: Context, date: Date) {
     ctx.store.findOne(OETHMorphoAave, queryParams),
     ctx.store.findOne(OETHDripper, queryParams),
     ctx.store.findOne(ExchangeRate, {
-      where: { timestamp: LessThanOrEqual(date), pair: 'ETH_rETH' },
+      where: { chainId: 1, timestamp: LessThanOrEqual(date), pair: 'ETH_rETH' },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
     ctx.store.findOne(ExchangeRate, {
-      where: { timestamp: LessThanOrEqual(date), pair: 'ETH_sfrxETH' },
+      where: { chainId: 1, timestamp: LessThanOrEqual(date), pair: 'ETH_sfrxETH' },
       order: { timestamp: 'desc' as FindOptionsOrderValue },
     }),
     ctx.store.findOne(OTokenHistory, {

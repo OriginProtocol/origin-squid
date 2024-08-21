@@ -926,9 +926,10 @@ as values which change less frequently.
 """
 type ExchangeRate @entity {
   """
-  Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+  Format: 'chainId:blockNumber:pair' ex '1:123456789:ETH_USD'
   """
   id: ID!
+  chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   pair: String!

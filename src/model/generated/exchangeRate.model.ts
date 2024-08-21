@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, DateTimeColumn as DateTimeColumn_, Index as Index_, IntColumn as IntColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 /**
  * Any entity which has a price associated with it should have that price go in here.
@@ -12,10 +12,14 @@ export class ExchangeRate {
     }
 
     /**
-     * Format: 'blockNumber:pair' ex '123456789:ETH_USD'
+     * Format: 'chainId:blockNumber:pair' ex '1:123456789:ETH_USD'
      */
     @PrimaryColumn_()
     id!: string
+
+    @Index_()
+    @IntColumn_({nullable: false})
+    chainId!: number
 
     @Index_()
     @DateTimeColumn_({nullable: false})

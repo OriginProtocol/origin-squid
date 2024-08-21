@@ -3,6 +3,7 @@ import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
+import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { LogFilter } from '@utils/logFilter'
 import { TraceFilter } from '@utils/traceFilter'
@@ -26,7 +27,7 @@ export type ICurveAMOInfo = {
 
 export type IStrategyData = {
   from: number
-  oTokenAddress: typeof OUSD_ADDRESS | typeof OETH_ADDRESS
+  oTokenAddress: typeof OUSD_ADDRESS | typeof OETH_ADDRESS | typeof baseAddresses.superOETHb.address
   name: string
   contractName: string
   address: string

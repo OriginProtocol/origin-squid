@@ -24,7 +24,7 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height
-  const id = `${blockNumber}:${pair}`
+  const id = `${ctx.chain.id}:${blockNumber}:${pair}`
   let exchangeRate = exchangeRates.get(id)
   if (exchangeRate) return exchangeRate
 
@@ -36,6 +36,7 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
   if (price) {
     exchangeRate = new ExchangeRate({
       id,
+      chainId: ctx.chain.id,
       timestamp,
       blockNumber,
       pair,

@@ -6,10 +6,12 @@ import { baseAddresses } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
 
 export const baseERC20s = [
+  // OGN
   createERC20SimpleTracker({
     from: 15676145,
     address: OGN_BASE_ADDRESS,
   }),
+  // superOETHb
   createERC20Tracker({
     from: 17819702,
     address: baseAddresses.tokens.superOETHb,
@@ -22,8 +24,16 @@ export const baseERC20s = [
       }),
     ],
   }),
+  // wsuperOETHb
   createERC20SimpleTracker({
     from: 17819702,
     address: baseAddresses.tokens.wsuperOETHb,
+  }),
+  // WETH (limited)
+  createERC20Tracker({
+    from: 18689558,
+    address: baseAddresses.tokens.WETH,
+    accountFilter: [baseAddresses.superOETHb.dripper],
+    intervalTracking: true,
   }),
 ]
