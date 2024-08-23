@@ -14,10 +14,10 @@ import { PoolDefinition, aerodromePools, baseAddresses } from '@utils/addresses-
 import { baseERC20s, baseStrategies, bridgedWoethStrategy, superOETHb } from './base'
 
 const pools: PoolDefinition[] = [
-  aerodromePools['vAMM-WETH/OGN'],
-  aerodromePools['vAMM-OGN/superOETHb'],
-  aerodromePools['CL1-WETH/superOETHb'],
-  aerodromePools['CL1-cbETH/WETH'],
+  // aerodromePools['vAMM-WETH/OGN'],
+  // aerodromePools['vAMM-OGN/superOETHb'],
+  // aerodromePools['CL1-WETH/superOETHb'],
+  // aerodromePools['CL1-cbETH/WETH'],
   aerodromePools['CL100-WETH/USDC'],
 ]
 
@@ -37,7 +37,7 @@ const aerodromeProcessors = pools
       }
     }
     if (pool.lps?.length > 0) {
-      aerodromeLP(pool)
+      processors.push(...aerodromeLP(pool))
     }
 
     return processors
