@@ -153,7 +153,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   },
 ]
 
-const strategies = oethStrategies.filter((s) => s.kind === 'NativeStaking') as IStrategyData[]
+const strategies = oethStrategies
 
 export const from = Math.min(...strategies.map((s) => s.from))
 
