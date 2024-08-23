@@ -4,9 +4,7 @@ import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import { AeroLP, AeroLPPosition } from '@model'
 import { Block, Context, Processor } from '@processor'
 import { PoolDefinition, aerodromePools, baseAddresses } from '@utils/addresses-base'
-import { batchPromises } from '@utils/batchPromises'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { range } from '@utils/range'
 
 // For AMM Pools the sugar contract iterates through all the pools, according to the pool indices.
 // To shortcut - we can supply accurate offsets and limits.
