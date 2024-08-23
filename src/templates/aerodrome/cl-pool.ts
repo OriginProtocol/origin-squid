@@ -6,16 +6,12 @@ import { AeroCLPoolState, AeroCLPoolTick, AeroPoolState } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
 import { convertRate, getPriceFromTick } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
-import { baseAddresses } from '@utils/addresses-base'
+import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
 
-export const aerodromeCLPool = (params: {
-  address: string
-  from: number
-  assets: { address: string; decimals: number }[]
-}): Processor => {
+export const aerodromeCLPool = (params: PoolDefinition): Processor => {
   const eventProcessors = Object.entries(aerodromeCLPoolAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],

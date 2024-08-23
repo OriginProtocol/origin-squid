@@ -5,16 +5,11 @@ import { AeroPoolState } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
 import { convertRate } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
-import { baseAddresses } from '@utils/addresses-base'
+import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromePool = (params: {
-  address: string
-  gaugeAddress: string | undefined
-  from: number
-  assets: { address: string; decimals: number }[]
-}): Processor => {
+export const aerodromePool = (params: PoolDefinition): Processor => {
   const eventProcessors = Object.entries(aerodromePoolAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],
@@ -79,7 +74,7 @@ export const aerodromePool = (params: {
         await frequencyUpdater(ctx, async (ctx, block) => {
           const poolContract = new aerodromePoolAbi.Contract(ctx, block.header, params.address)
           const liquidity = await poolContract.totalSupply()
-          const stakedLiquidity = params.gaugeAddress ? await poolContract.balanceOf(params.gaugeAddress) : 0n
+          const stakedLiquidity = params.gauge ? await poolContract.balanceOf(params.gauge.address) : 0n
           const reserves = await poolContract.getReserves()
           const reserve0Usd = await convertRate(
             ctx,

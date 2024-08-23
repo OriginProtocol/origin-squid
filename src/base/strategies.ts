@@ -14,10 +14,7 @@ export const oethbStrategies: readonly IStrategyData[] = [
     oTokenAddress: baseAddresses.superOETHb.address,
     kind: 'Generic',
     base: { address: baseAddresses.tokens.WETH, decimals: 18 },
-    assets: [
-      { address: baseAddresses.tokens.WETH, decimals: 18 },
-      { address: baseAddresses.tokens.bridgedWOETH, decimals: 18 },
-    ],
+    assets: [{ address: baseAddresses.tokens.WETH, decimals: 18 }],
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
 ]

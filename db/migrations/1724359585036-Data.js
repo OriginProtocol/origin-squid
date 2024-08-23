@@ -1,5 +1,5 @@
-module.exports = class Data1724202865721 {
-    name = 'Data1724202865721'
+module.exports = class Data1724359585036 {
+    name = 'Data1724359585036'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -683,6 +683,11 @@ module.exports = class Data1724202865721 {
         await db.query(`CREATE TABLE "ousd_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "amo_supply" numeric NOT NULL, "dripper_weth" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_eth7_day" numeric NOT NULL, "yield_eth_all_time" numeric NOT NULL, "yield_usd" numeric NOT NULL, "yield_usd7_day" numeric NOT NULL, "yield_usd_all_time" numeric NOT NULL, "fees_eth" numeric NOT NULL, "fees_eth7_day" numeric NOT NULL, "fees_eth_all_time" numeric NOT NULL, "fees_usd" numeric NOT NULL, "fees_usd7_day" numeric NOT NULL, "fees_usd_all_time" numeric NOT NULL, "peg_price" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_f8adaf321a99f2b4b877c262880" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f9020d89932aad2d0de8923490" ON "ousd_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_0bb5f72bf5fa59ce8c232caa4c" ON "ousd_daily_stat" ("timestamp") `)
+        await db.query(`CREATE TABLE "event_woeth_price_updated" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "old_value" numeric NOT NULL, "new_value" numeric NOT NULL, CONSTRAINT "PK_1c828c028380b7600d024778689" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_cfeca5e039fb3f137b5922a60a" ON "event_woeth_price_updated" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_e05f1c97627f04cb666bfbfd2e" ON "event_woeth_price_updated" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_462441741f17550d40da0cd5c0" ON "event_woeth_price_updated" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_dd99dbcb9666973f47c7462593" ON "event_woeth_price_updated" ("address") `)
         await db.query(`ALTER TABLE "aero_cl_pool_state" ADD CONSTRAINT "FK_02aa86fe0e78999620744402a0c" FOREIGN KEY ("tick_id") REFERENCES "aero_cl_pool_tick"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "es_account" ADD CONSTRAINT "FK_7b43e7bb90d3b435d074112f572" FOREIGN KEY ("delegate_to_id") REFERENCES "es_account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "es_lockup_event" ADD CONSTRAINT "FK_46d53d4fad340d5939955836004" FOREIGN KEY ("lockup_id") REFERENCES "es_lockup"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -1389,6 +1394,11 @@ module.exports = class Data1724202865721 {
         await db.query(`DROP TABLE "ousd_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_f9020d89932aad2d0de8923490"`)
         await db.query(`DROP INDEX "public"."IDX_0bb5f72bf5fa59ce8c232caa4c"`)
+        await db.query(`DROP TABLE "event_woeth_price_updated"`)
+        await db.query(`DROP INDEX "public"."IDX_cfeca5e039fb3f137b5922a60a"`)
+        await db.query(`DROP INDEX "public"."IDX_e05f1c97627f04cb666bfbfd2e"`)
+        await db.query(`DROP INDEX "public"."IDX_462441741f17550d40da0cd5c0"`)
+        await db.query(`DROP INDEX "public"."IDX_dd99dbcb9666973f47c7462593"`)
         await db.query(`ALTER TABLE "aero_cl_pool_state" DROP CONSTRAINT "FK_02aa86fe0e78999620744402a0c"`)
         await db.query(`ALTER TABLE "es_account" DROP CONSTRAINT "FK_7b43e7bb90d3b435d074112f572"`)
         await db.query(`ALTER TABLE "es_lockup_event" DROP CONSTRAINT "FK_46d53d4fad340d5939955836004"`)

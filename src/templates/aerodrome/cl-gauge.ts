@@ -1,9 +1,10 @@
 import * as aerodromeCLGaugeAbi from '@abi/aerodrome-cl-gauge'
 import * as models from '@model'
 import { Block, Context, Log, Processor } from '@processor'
+import { PoolDefinition } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromeCLGauge = (params: { address: string; from: number }): Processor => {
+export const aerodromeCLGauge = (params: NonNullable<PoolDefinition['gauge']>): Processor => {
   const eventProcessors = Object.entries(aerodromeCLGaugeAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
       address: [params.address],

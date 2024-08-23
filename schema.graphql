@@ -1923,3 +1923,12 @@ type OUSDCollateralDailyStat @entity {
   price: BigInt!
   value: BigInt!
 }
+type EventWOETHPriceUpdated @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  oldValue: BigInt!
+  newValue: BigInt!
+}

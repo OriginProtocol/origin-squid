@@ -33,7 +33,7 @@ export const baseERC20s = [
   createERC20Tracker({
     from: 18689558,
     address: baseAddresses.tokens.WETH,
-    accountFilter: [baseAddresses.superOETHb.dripper],
+    accountFilter: [baseAddresses.superOETHb.dripper, baseAddresses.superOETHb.vault],
     intervalTracking: true,
   }),
 ]

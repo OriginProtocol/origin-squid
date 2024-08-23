@@ -1,14 +1,15 @@
 import * as aerodromeGaugeAbi from '@abi/aerodrome-gauge'
 import * as models from '@model'
 import { Block, Context, Log, Processor } from '@processor'
+import { PoolDefinition } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
 
-export const aerodromeGauge = (params: { address: string; from: number }): Processor => {
+export const aerodromeGauge = (gauge: NonNullable<PoolDefinition['gauge']>): Processor => {
   const eventProcessors = Object.entries(aerodromeGaugeAbi.events).map(([eventName, event]) => {
     const filter = logFilter({
-      address: [params.address],
+      address: [gauge.address],
       topic0: [event.topic],
-      range: { from: params.from },
+      range: { from: gauge.from },
     })
     return {
       name: eventName,
@@ -34,8 +35,8 @@ export const aerodromeGauge = (params: { address: string; from: number }): Proce
     }
   })
   return {
-    from: params.from,
-    name: `Aerodrome Gauge ${params.address}`,
+    from: gauge.from,
+    name: `Aerodrome Gauge ${gauge.address}`,
     setup: (processor) => {
       for (const { filter } of eventProcessors) {
         processor.addLog(filter.value)
