@@ -1,6 +1,6 @@
 import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
-import { currencies } from '@shared/post-processors/exchange-rates/currencies'
+import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
@@ -28,7 +28,7 @@ export const oethStrategies: readonly IStrategyData[] = [
       poolAddress: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
       rewardsPoolAddress: '0x24b65dc1cf053a8d96872c323d29e86ec43eb33a',
     },
-    base: { address: currencies.ETH, decimals: 18 },
+    base: { address: mainnetCurrencies.ETH, decimals: 18 },
     assets: [ETH_ADDRESS, OETH_ADDRESS].map((address) => ({
       address,
       decimals: 18,
@@ -42,7 +42,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     address: addresses.strategies.oeth.FraxETHStrategy,
     oTokenAddress: OETH_ADDRESS,
     kind: 'Generic',
-    base: { address: currencies.ETH, decimals: 18 },
+    base: { address: mainnetCurrencies.ETH, decimals: 18 },
     assets: [FRXETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
@@ -53,7 +53,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     address: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     oTokenAddress: OETH_ADDRESS,
     kind: 'Generic',
-    base: { address: currencies.ETH, decimals: 18 },
+    base: { address: mainnetCurrencies.ETH, decimals: 18 },
     assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
@@ -64,7 +64,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     address: addresses.strategies.oeth.BalancerMetaPoolStrategy,
     oTokenAddress: OETH_ADDRESS,
     kind: 'BalancerMetaStablePool',
-    base: { address: currencies.ETH, decimals: 18 },
+    base: { address: mainnetCurrencies.ETH, decimals: 18 },
     assets: [
       {
         address: WETH_ADDRESS,

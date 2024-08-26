@@ -3,6 +3,7 @@ import 'tsconfig-paths/register'
 import { base } from 'viem/chains'
 
 import { Processor, run } from '@processor'
+import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { aerodromeCLGauge } from '@templates/aerodrome/cl-gauge'
 import { aerodromeCLPool } from '@templates/aerodrome/cl-pool'
 import { aerodromeGauge } from '@templates/aerodrome/gauge'
@@ -59,7 +60,7 @@ export const processor = {
   chainId: base.id,
   stateSchema: 'base-processor',
   processors: [...baseERC20s, superOETHb, baseStrategies, bridgedWoethStrategy, ...aerodromeProcessors],
-  postProcessors: [],
+  postProcessors: [exchangeRates],
   validators: [],
 }
 export default processor

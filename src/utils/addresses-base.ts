@@ -12,17 +12,18 @@ const superOETHb = {
   zapper: undefined,
   harvester: undefined,
   vaultTokens: undefined,
-}
+} as const
 
 export const tokens = {
   USDC: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+  ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
   WETH: '0x4200000000000000000000000000000000000006',
   OGN: '0x7002458b1df59eccb57387bc79ffc7c29e22e6f7',
   cbETH: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22',
   bridgedWOETH: '0xd8724322f44e5c58d7a815f542036fb17dbbf839',
   superOETHb: superOETHb.address,
   wsuperOETHb: superOETHb.wrapped,
-}
+} as const
 
 export const aerodromePools = {
   'vAMM-WETH/OGN': {
@@ -131,4 +132,4 @@ export const baseAddresses = {
     slipstreamNft: '0x827922686190790b37229fd06084350E74485b72',
     pools: aerodromePools,
   },
-}
+} as const

@@ -1,4 +1,4 @@
-import { currencies } from '@shared/post-processors/exchange-rates/currencies'
+import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { IStrategyData } from '@templates/strategy'
 import { OUSD_ADDRESS } from '@utils/addresses'
 
@@ -11,7 +11,7 @@ export const morphoCompound: IStrategyData = {
   name: 'OUSD Morpho Compound',
   contractName: 'MorphoCompoundStrategy',
   address: '0x5a4eee58744d1430876d5ca93cab5ccb763c037d',
-  base: { address: currencies.USD, decimals: 18 },
+  base: { address: mainnetCurrencies.USD, decimals: 18 },
   assets: [DAI, USDT, USDC],
   earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
 }

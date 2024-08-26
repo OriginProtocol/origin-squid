@@ -14,11 +14,12 @@ import {
   OTokenVault,
   RebasingOption,
 } from '@model'
-import { Context } from '@processor'
+import { Block, Context } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/currencies'
+import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { ADDRESS_ZERO } from '@utils/addresses'
+import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
+import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { multicall } from '@utils/multicall'
@@ -26,11 +27,13 @@ import { getLatestEntity } from '@utils/utils'
 
 import { createAddress, createRebaseAPY } from './utils'
 
+export type OTokenContractAddress = typeof OUSD_ADDRESS | typeof OETH_ADDRESS | typeof baseAddresses.superOETHb.address
+
 export const createOTokenProcessor = (params: {
   from: number
   vaultFrom: number
   Upgrade_CreditsBalanceOfHighRes?: number
-  otokenAddress: string
+  otokenAddress: OTokenContractAddress
   wotokenAddress?: string
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
@@ -84,7 +87,7 @@ export const createOTokenProcessor = (params: {
     apies: OTokenAPY[]
     activity: OTokenActivity[]
     vaults: OTokenVault[]
-    lastYieldDistributionEvent?: {
+    lastYieldDistributionEvent: {
       fee: bigint
       yield: bigint
     }
@@ -143,6 +146,7 @@ export const createOTokenProcessor = (params: {
       apies: [],
       activity: [],
       vaults: [],
+      lastYieldDistributionEvent: { yield: 0n, fee: 0n },
     }
 
     for (const block of ctx.blocks) {
@@ -326,10 +330,6 @@ export const createOTokenProcessor = (params: {
     otokenObject.totalSupply = data.totalSupply
     otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
-    if (!result.lastYieldDistributionEvent) {
-      throw new Error('lastYieldDistributionEvent is not set')
-    }
-
     const exchangeRate = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
     if (!exchangeRate) {
       throw new Error('Could not fetch ETH/USD exchange rate')
@@ -500,7 +500,7 @@ export const createOTokenProcessor = (params: {
     }
   }
 
-  const getLatestOTokenObject = async (ctx: Context, result: ProcessResult, block: Context['blocks']['0']) => {
+  const getLatestOTokenObject = async (ctx: Context, result: ProcessResult, block: Block) => {
     const timestamp = new Date(block.header.timestamp).toISOString()
     const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp}`
     const { latest, current } = await getLatestEntity(ctx, OToken, result.otokens, otokenId, {

@@ -1,11 +1,7 @@
 import { Context } from '@processor'
-import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
+import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  createBalancerInitializer,
-  createBalancerProcessor,
-  createBalancerSetup,
-} from '@templates/balancer'
+import { createBalancerInitializer, createBalancerProcessor, createBalancerSetup } from '@templates/balancer'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090
@@ -17,11 +13,8 @@ const pools: {
   poolAddress: string
   poolId: string
   from: number
-  tokens:
-    | [string, string]
-    | [string, string, string]
-    | [string, string, string, string]
-  rates?: [CurrencyAddress, CurrencyAddress][]
+  tokens: [string, string] | [string, string, string] | [string, string, string, string]
+  rates?: [MainnetCurrencyAddress, MainnetCurrencyAddress][]
 }[] = [
   // {
   //   name: 'Balancer rETH Stable Pool',

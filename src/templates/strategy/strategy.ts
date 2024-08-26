@@ -1,9 +1,9 @@
 import { Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
+import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
-import { baseAddresses } from '@utils/addresses-base'
+import { OTokenContractAddress } from '@templates/otoken'
+import { OETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { LogFilter } from '@utils/logFilter'
 import { TraceFilter } from '@utils/traceFilter'
@@ -27,7 +27,7 @@ export type ICurveAMOInfo = {
 
 export type IStrategyData = {
   from: number
-  oTokenAddress: typeof OUSD_ADDRESS | typeof OETH_ADDRESS | typeof baseAddresses.superOETHb.address
+  oTokenAddress: OTokenContractAddress
   name: string
   contractName: string
   address: string
@@ -97,8 +97,8 @@ export const createStrategyProcessor = (strategyData: IStrategyData) => {
             block,
             strategyData.assets.map((asset) =>
               strategyData.oTokenAddress === OETH_ADDRESS
-                ? ['ETH', asset.address as CurrencyAddress]
-                : [asset.address as CurrencyAddress, 'USD'],
+                ? ['ETH', asset.address as MainnetCurrencyAddress]
+                : [asset.address as MainnetCurrencyAddress, 'USD'],
             ),
           )
         }),
