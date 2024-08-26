@@ -2,7 +2,7 @@ import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
 import { Block, Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { CurrencyAddress } from '@shared/post-processors/exchange-rates/currencies'
+import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
@@ -25,7 +25,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     await ensureExchangeRates(
       ctx,
       block,
-      strategyData.assets.map((asset) => ['ETH', asset.address as CurrencyAddress]),
+      strategyData.assets.map((asset) => ['ETH', asset.address as MainnetCurrencyAddress]),
     )
     const results = await getStrategyHoldings(ctx, block, strategyData)
     strategyBalances.push(...results)

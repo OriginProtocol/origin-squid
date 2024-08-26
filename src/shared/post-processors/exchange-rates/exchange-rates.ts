@@ -1,12 +1,11 @@
 import { compact } from 'lodash'
-import { Between } from 'typeorm'
 
 import { ExchangeRate } from '@model'
 import { Block, Context } from '@processor'
+import { getPrice } from '@shared/post-processors/exchange-rates/price-routing'
 import { useProcessorState } from '@utils/state'
 
-import { Currency, currenciesByAddress } from './currencies'
-import { getPrice } from './price-routing'
+import { Currency, CurrencyAddress, MainnetCurrency, currenciesByAddress } from './mainnetCurrencies'
 
 const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rates', new Map<string, ExchangeRate>())
 
@@ -19,8 +18,10 @@ export const process = async (ctx: Context) => {
 }
 
 export const ensureExchangeRate = async (ctx: Context, block: Block, base: Currency, quote: Currency) => {
-  if (currenciesByAddress[base.toLowerCase()]) base = currenciesByAddress[base.toLowerCase()]
-  if (currenciesByAddress[quote.toLowerCase()]) quote = currenciesByAddress[quote.toLowerCase()]
+  if (currenciesByAddress[base.toLowerCase() as CurrencyAddress])
+    base = currenciesByAddress[base.toLowerCase() as CurrencyAddress]
+  if (currenciesByAddress[quote.toLowerCase() as CurrencyAddress])
+    quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress]
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height
@@ -49,6 +50,6 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
   return exchangeRate
 }
 
-export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
+export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [MainnetCurrency, MainnetCurrency][]) => {
   return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
 }

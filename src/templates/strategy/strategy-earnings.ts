@@ -8,7 +8,7 @@ import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
 import { Block, Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { Currency, convertRate } from '@shared/post-processors/exchange-rates/currencies'
+import { MainnetCurrency, convertRate } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
@@ -328,20 +328,20 @@ const processDepositWithdrawal = async (
 
   // Convert incoming values to ETH
   const desiredRates = strategyData.assets.filter((a) => a.convertTo).map((a) => [a.convertTo!.address, a.address]) as [
-    Currency,
-    Currency,
+    MainnetCurrency,
+    MainnetCurrency,
   ][]
   const rates = await ensureExchangeRates(ctx, block, desiredRates)
   const previousBalance = assets.reduce((sum, a, index) => {
     const asset = strategyData.assets[index]
     const compareBalance = asset.convertTo
-      ? convertRate(rates, 'ETH', a.asset as Currency, a.compareBalance)
+      ? convertRate(rates, 'ETH', a.asset as MainnetCurrency, a.compareBalance)
       : a.compareBalance
     return sum + compareBalance
   }, 0n)
   const balance = assets.reduce((sum, a, index) => {
     const asset = strategyData.assets[index]
-    const balance = asset.convertTo ? convertRate(rates, 'ETH', a.asset as Currency, a.balance) : a.balance
+    const balance = asset.convertTo ? convertRate(rates, 'ETH', a.asset as MainnetCurrency, a.balance) : a.balance
     return sum + balance
   }, 0n)
 
