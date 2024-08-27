@@ -9,9 +9,9 @@ const superOETHb = {
   strategies: {
     bridgedWOETH: '0x80c864704dd06c3693ed5179190786ee38acf835',
   },
-  zapper: undefined,
+  zapper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
   harvester: undefined,
-  vaultTokens: undefined,
+  vaultTokens: ['0x4200000000000000000000000000000000000006'],
 } as const
 
 export const tokens = {

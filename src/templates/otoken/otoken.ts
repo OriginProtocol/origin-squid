@@ -1,3 +1,6 @@
+import { findLast, last } from 'lodash'
+import { formatUnits } from 'viem'
+
 import * as erc20 from '@abi/erc20'
 import * as otoken from '@abi/otoken'
 import * as otokenVault from '@abi/otoken-vault'
@@ -8,6 +11,7 @@ import {
   OTokenActivity,
   OTokenAddress,
   OTokenAsset,
+  OTokenDailyStat,
   OTokenHistory,
   OTokenRebase,
   OTokenRebaseOption,
@@ -34,7 +38,10 @@ export const createOTokenProcessor = (params: {
   vaultFrom: number
   Upgrade_CreditsBalanceOfHighRes?: number
   otokenAddress: OTokenContractAddress
-  wotokenAddress?: string
+  wotoken?: {
+    address: string
+    from: number
+  }
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   upgrades?: {
@@ -62,11 +69,11 @@ export const createOTokenProcessor = (params: {
       transaction: true,
       range: { from: params.from },
     })
-    if (params.wotokenAddress) {
+    if (params.wotoken) {
       processor.addLog({
-        address: [params.wotokenAddress],
+        address: [params.wotoken.address],
         topic0: [erc20.events.Transfer.topic],
-        range: { from: params.from },
+        range: { from: params.wotoken.from },
       })
     }
     processor.addLog({
@@ -79,6 +86,8 @@ export const createOTokenProcessor = (params: {
   interface ProcessResult {
     initialized: boolean
     initialize: () => Promise<void>
+    dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }>
+    currentDailyStat?: OTokenDailyStat
     otokens: OToken[]
     assets: OTokenAsset[]
     history: OTokenHistory[]
@@ -138,6 +147,8 @@ export const createOTokenProcessor = (params: {
           )
         }
       },
+      dailyStats: new Map<string, { block: Block; entity: OTokenDailyStat }>(),
+      currentDailyStat: undefined,
       otokens: [],
       assets: [],
       history: [],
@@ -150,6 +161,7 @@ export const createOTokenProcessor = (params: {
     }
 
     for (const block of ctx.blocks) {
+      await getOTokenDailyStat(ctx, result, block)
       for (const trace of block.traces) {
         await processRebaseOpt(ctx, result, block, trace)
       }
@@ -176,6 +188,40 @@ export const createOTokenProcessor = (params: {
       )
     })
 
+    // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
+    for (const { block, entity } of result.dailyStats.values()) {
+      const blockDate = new Date(block.header.timestamp)
+      const otokenObject = await getLatestOTokenObject(ctx, result, block)
+      entity.totalSupply = otokenObject.totalSupply
+      entity.nonRebasingSupply = otokenObject.nonRebasingSupply
+      entity.rebasingSupply = otokenObject.rebasingSupply
+
+      const apy = findLast(result.apies, (rebase) => rebase.timestamp <= blockDate)
+      if (apy) {
+        entity.apr = apy.apr
+        entity.apy = apy.apy
+        entity.apy7 = apy.apy7DayAvg
+        entity.apy14 = apy.apy14DayAvg
+        entity.apy30 = apy.apy30DayAvg
+      }
+      const rebase = findLast(result.rebases, (rebase) => rebase.timestamp <= blockDate)
+      if (rebase) {
+        entity.fees = rebase.feeETH
+        entity.yield = rebase.yieldETH
+      }
+
+      entity.rateETH = await ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n)
+      entity.rateUSD = await ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n)
+      entity.amoSupply = 0n // TODO
+      entity.dripperWETH = 0n // TODO
+      entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
+      entity.wrappedSupply =
+        params.wotoken && block.header.height >= params.wotoken.from
+          ? await new erc20.Contract(ctx, block.header, params.wotoken.address).totalSupply()
+          : 0n
+      ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
+    }
+
     if (owners) {
       await ctx.store.upsert([...owners.values()])
     }
@@ -188,6 +234,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.rebaseOptions),
       ctx.store.insert(result.activity),
       ctx.store.insert(result.vaults),
+      ctx.store.upsert([...result.dailyStats.values()].map((ds) => ds.entity)),
     ])
   }
 
@@ -524,6 +571,52 @@ export const createOTokenProcessor = (params: {
     }
 
     return otokenObject
+  }
+
+  const getOTokenDailyStat = async (ctx: Context, result: ProcessResult, block: Block) => {
+    const blockDate = new Date(block.header.timestamp)
+    const dayString = blockDate.toISOString().substring(0, 10)
+    const id = `${ctx.chain.id}-${params.otokenAddress}-${dayString}`
+    let entity = result.dailyStats.get(id)?.entity ?? (await ctx.store.get(OTokenDailyStat, id))
+
+    if (!entity) {
+      entity = new OTokenDailyStat({
+        id,
+        chainId: ctx.chain.id,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        otoken: params.otokenAddress,
+
+        apr: 0,
+        apy: 0,
+        apy7: 0,
+        apy14: 0,
+        apy30: 0,
+
+        rateUSD: 0n,
+        rateETH: 0n,
+
+        totalSupply: 0n,
+        rebasingSupply: 0n,
+        nonRebasingSupply: 0n,
+        wrappedSupply: 0n,
+
+        amoSupply: 0n,
+        dripperWETH: 0n,
+
+        yield: 0n,
+        fees: 0n,
+
+        marketCapUSD: 0,
+      })
+      result.dailyStats.set(entity.id, { block, entity })
+    } else {
+      result.dailyStats.set(entity.id, { block, entity })
+      entity.timestamp = new Date(block.header.timestamp)
+      entity.blockNumber = block.header.height
+    }
+
+    return entity
   }
 
   return { from: params.from, setup, process }

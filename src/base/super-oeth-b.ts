@@ -8,7 +8,10 @@ const otokenProcessor = createOTokenProcessor({
   from: 17819702,
   vaultFrom: 17819702,
   otokenAddress: baseAddresses.tokens.superOETHb,
-  wotokenAddress: baseAddresses.tokens.wsuperOETHb,
+  wotoken: {
+    address: baseAddresses.tokens.wsuperOETHb,
+    from: 18760018,
+  },
   otokenVaultAddress: baseAddresses.superOETHb.vault,
   oTokenAssets: [
     { asset: baseAddresses.tokens.superOETHb, symbol: 'superOETHb' },

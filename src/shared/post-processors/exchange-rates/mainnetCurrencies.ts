@@ -4,7 +4,6 @@ import {
   BaseCurrencySymbol,
   baseCurrenciesByAddress,
 } from '@shared/post-processors/exchange-rates/price-routing-base'
-import { baseAddresses } from '@utils/addresses-base'
 import { invertMap } from '@utils/invertMap'
 
 export const mainnetCurrencies = {
@@ -14,6 +13,7 @@ export const mainnetCurrencies = {
   USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
+  OUSD: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
   wOETH: '0xdcee70654261af21c44c093c300ed3bb97b78192',
   WETH: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   stETH: '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',

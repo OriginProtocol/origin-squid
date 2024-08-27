@@ -60,6 +60,7 @@ export const getChainlinkPrice = async (
   base: MainnetCurrency,
   quote: MainnetCurrency,
 ) => {
+  if (height < 12864088) return 0n
   const registry = new chainlinkFeedRegistry.Contract(ctx, { height }, registryAddress)
   try {
     base = mainnetCurrencies[base as MainnetCurrencySymbol] ?? base
