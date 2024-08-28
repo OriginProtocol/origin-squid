@@ -1,5 +1,5 @@
-module.exports = class Data1724710716734 {
-    name = 'Data1724710716734'
+module.exports = class Data1724876504346 {
+    name = 'Data1724876504346'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -334,6 +334,12 @@ module.exports = class Data1724710716734 {
         await db.query(`CREATE INDEX "IDX_94a520efd2d3992b50f0469d22" ON "aero_cl_pool_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_ca4c93c360bd5dffdc237f9f5a" ON "aero_cl_pool_state" ("address") `)
         await db.query(`CREATE INDEX "IDX_02aa86fe0e78999620744402a0" ON "aero_cl_pool_state" ("tick_id") `)
+        await db.query(`CREATE TABLE "aero_pool_epoch_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "epoch" numeric NOT NULL, "votes" numeric NOT NULL, "emissions" numeric NOT NULL, "bribes" jsonb, "fees" jsonb, CONSTRAINT "PK_a3a3162bf495fa5dd616802b876" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_1bdbc99a8dadba9f6beb7547a5" ON "aero_pool_epoch_state" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_39bfdc610191dd653c67842ae0" ON "aero_pool_epoch_state" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_703ee4530d82b62fb6d40410e4" ON "aero_pool_epoch_state" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_01335581495551843503db4a23" ON "aero_pool_epoch_state" ("address") `)
+        await db.query(`CREATE INDEX "IDX_e04dd7afda9bc4dd6541c92f37" ON "aero_pool_epoch_state" ("epoch") `)
         await db.query(`CREATE TABLE "aero_lp" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "pool" text NOT NULL, "account" text NOT NULL, "liquidity" numeric NOT NULL, "staked" numeric NOT NULL, "amount0" numeric NOT NULL, "amount1" numeric NOT NULL, "staked0" numeric NOT NULL, "staked1" numeric NOT NULL, "unstaked_earned0" numeric NOT NULL, "unstaked_earned1" numeric NOT NULL, "emissions_earned" numeric NOT NULL, "tick_lower" integer NOT NULL, "tick_upper" integer NOT NULL, "sqrt_ratio_lower" numeric NOT NULL, "sqrt_ratio_upper" numeric NOT NULL, CONSTRAINT "PK_691dfa620bca29acb95e78c2a15" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d41b9f42cab6899f26cd6510bf" ON "aero_lp" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_2acd173568dcc7df1b2655cb13" ON "aero_lp" ("block_number") `)
@@ -1050,6 +1056,12 @@ module.exports = class Data1724710716734 {
         await db.query(`DROP INDEX "public"."IDX_94a520efd2d3992b50f0469d22"`)
         await db.query(`DROP INDEX "public"."IDX_ca4c93c360bd5dffdc237f9f5a"`)
         await db.query(`DROP INDEX "public"."IDX_02aa86fe0e78999620744402a0"`)
+        await db.query(`DROP TABLE "aero_pool_epoch_state"`)
+        await db.query(`DROP INDEX "public"."IDX_1bdbc99a8dadba9f6beb7547a5"`)
+        await db.query(`DROP INDEX "public"."IDX_39bfdc610191dd653c67842ae0"`)
+        await db.query(`DROP INDEX "public"."IDX_703ee4530d82b62fb6d40410e4"`)
+        await db.query(`DROP INDEX "public"."IDX_01335581495551843503db4a23"`)
+        await db.query(`DROP INDEX "public"."IDX_e04dd7afda9bc4dd6541c92f37"`)
         await db.query(`DROP TABLE "aero_lp"`)
         await db.query(`DROP INDEX "public"."IDX_d41b9f42cab6899f26cd6510bf"`)
         await db.query(`DROP INDEX "public"."IDX_2acd173568dcc7df1b2655cb13"`)

@@ -2,14 +2,14 @@ import * as aerodromeCLPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as erc20Abi from '@abi/erc20'
 import * as models from '@model'
-import { AeroCLPoolState, AeroCLPoolTick, AeroPoolState } from '@model'
+import { AeroCLPoolState, AeroCLPoolTick, AeroPoolEpochState, AeroPoolState, TokenAmount } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
+import { createAeroPoolEpoch } from '@templates/aerodrome/epoch'
 import { convertRate, getPriceFromTick } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
-import { multicall } from '@utils/multicall'
 
 export const aerodromeCLPool = (params: PoolDefinition): Processor => {
   const eventProcessors = Object.entries(aerodromeCLPoolAbi.events).map(([eventName, event]) => {
@@ -74,6 +74,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
       const aeroPoolStateProcessing = async () => {
         const states: AeroCLPoolState[] = []
         const ticks: AeroCLPoolTick[] = []
+        const epochs: AeroPoolEpochState[] = []
         const updateState = async (ctx: Context, block: Block) => {
           const poolContract = new aerodromeCLPoolAbi.Contract(ctx, block.header, params.address)
           const totalVoteWeight = await getVoterTotalWeight(ctx, block)
@@ -134,12 +135,19 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
             tick: currentTick,
             tickPrice,
           })
+
+          const epochState = await createAeroPoolEpoch(ctx, block, params.address)
+          if (epochState) {
+            epochs.push(epochState)
+          }
+
           states.push(state)
           ticks.push(currentTick)
         }
         await frequencyUpdater(ctx, updateState)
         await ctx.store.insert(ticks)
         await ctx.store.insert(states)
+        await ctx.store.insert(epochs)
       }
       await Promise.all([eventProcessing(), aeroPoolStateProcessing()])
     },

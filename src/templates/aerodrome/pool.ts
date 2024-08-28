@@ -1,8 +1,9 @@
 import * as aerodromePoolAbi from '@abi/aerodrome-pool'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as models from '@model'
-import { AeroPoolState } from '@model'
+import { AeroPoolEpochState, AeroPoolState } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
+import { createAeroPoolEpoch } from '@templates/aerodrome/epoch'
 import { convertRate } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
@@ -71,6 +72,7 @@ export const aerodromePool = (params: PoolDefinition): Processor => {
       }
       const aeroPoolStateProcessing = async () => {
         const states: AeroPoolState[] = []
+        const epochs: AeroPoolEpochState[] = []
         await frequencyUpdater(ctx, async (ctx, block) => {
           const poolContract = new aerodromePoolAbi.Contract(ctx, block.header, params.address)
           const liquidity = await poolContract.totalSupply()
@@ -109,8 +111,14 @@ export const aerodromePool = (params: PoolDefinition): Processor => {
             votePercentage,
           })
           states.push(state)
+
+          const epochState = await createAeroPoolEpoch(ctx, block, params.address)
+          if (epochState) {
+            epochs.push(epochState)
+          }
         })
         await ctx.store.insert(states)
+        await ctx.store.insert(epochs)
       }
 
       await Promise.all([eventProcessing(), aeroPoolStateProcessing()])

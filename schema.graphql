@@ -683,6 +683,24 @@ type AeroCLPoolTick @entity {
   secondsOutside: Int!
 }
 
+type AeroPoolEpochState @entity {
+  id: ID! # chainId-poolAddress-epochTs-blockNumber
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  epoch: BigInt! @index
+  votes: BigInt!
+  emissions: BigInt!
+  bribes: [TokenAmount!]
+  fees: [TokenAmount!]
+}
+
+type TokenAmount {
+  token: String!
+  amount: BigInt!
+}
+
 type AeroLP @entity {
   id: ID! # chainId-pool-blockNumber-positionId
   chainId: Int! @index
@@ -726,7 +744,8 @@ type AeroLPPosition @entity {
   tickUpper: Int!
   sqrtRatioLower: BigInt!
   sqrtRatioUpper: BigInt!
-}# State
+}
+# State
 
 type ESToken @entity {
   id: ID!
