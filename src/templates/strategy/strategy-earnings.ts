@@ -85,7 +85,7 @@ const oTokenValues = {
   [baseAddresses.superOETHb.address]: {
     rewardConversionToken: baseAddresses.tokens.WETH,
     rewardConversionTokenDecimals: 18,
-    harvester: baseAddresses.multisig['2/9'],
+    harvester: baseAddresses.multisig['2/8'],
     dripper: baseAddresses.superOETHb.dripper,
   },
 } as const

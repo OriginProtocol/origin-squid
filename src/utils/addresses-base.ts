@@ -8,6 +8,7 @@ const superOETHb = {
   dripper: '0x0030c7dc6cb7f449e9566f273342c3370ee6b16a',
   strategies: {
     bridgedWOETH: '0x80c864704dd06c3693ed5179190786ee38acf835',
+    amo: '0xf611cc500eee7e4e4763a05fe623e2363c86d2af',
   },
   zapper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
   harvester: undefined,
@@ -67,7 +68,7 @@ export const aerodromePools = {
       },
       { address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3', decimals: 18 },
     ],
-    lps: ['0xfd9e6005187f448957a0972a7d0c0a6da2911236'],
+    lps: [superOETHb.strategies.amo],
     from: 18056601,
     gauge: null,
   },
@@ -109,7 +110,7 @@ export const aerodromePoolArray: PoolDefinition[] = Object.values(aerodromePools
 export const baseAddresses = {
   multisig: {
     '5/8': '0x92a19381444a001d62ce67baff066fa1111d7202',
-    '2/9': '0x28bce2eE5775B652D92bB7c2891A89F036619703',
+    '2/8': '0x28bce2eE5775B652D92bB7c2891A89F036619703',
   },
   tokens,
   superOETHb,

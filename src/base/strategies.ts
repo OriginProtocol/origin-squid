@@ -17,6 +17,17 @@ export const oethbStrategies: readonly IStrategyData[] = [
     assets: [{ address: baseAddresses.tokens.WETH, decimals: 18 }],
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
+  {
+    from: 19046362,
+    name: 'Aerodrome AMO Strategy',
+    contractName: 'AerodromeAMOStrategy',
+    address: baseAddresses.superOETHb.strategies.amo,
+    oTokenAddress: baseAddresses.superOETHb.address,
+    kind: 'Generic',
+    base: { address: baseAddresses.tokens.WETH, decimals: 18 },
+    assets: [{ address: baseAddresses.tokens.WETH, decimals: 18 }],
+    earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
+  },
 ]
 
 const strategies = oethbStrategies
