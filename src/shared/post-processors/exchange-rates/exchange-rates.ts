@@ -3,6 +3,7 @@ import { compact } from 'lodash'
 import { ExchangeRate } from '@model'
 import { Block, Context } from '@processor'
 import { getPrice } from '@shared/post-processors/exchange-rates/price-routing'
+import { BaseCurrency, translateBaseSymbol } from '@shared/post-processors/exchange-rates/price-routing-base'
 import { useProcessorState } from '@utils/state'
 
 import { Currency, CurrencyAddress, MainnetCurrency, currenciesByAddress } from './mainnetCurrencies'
@@ -18,10 +19,14 @@ export const process = async (ctx: Context) => {
 }
 
 export const ensureExchangeRate = async (ctx: Context, block: Block, base: Currency, quote: Currency) => {
-  if (currenciesByAddress[base.toLowerCase() as CurrencyAddress])
-    base = currenciesByAddress[base.toLowerCase() as CurrencyAddress]
-  if (currenciesByAddress[quote.toLowerCase() as CurrencyAddress])
-    quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress]
+  if (ctx.chain.id === 1) {
+    base = currenciesByAddress[base.toLowerCase() as CurrencyAddress] ?? base
+    quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress] ?? quote
+  } else if (ctx.chain.id === 8453) {
+    // base network
+    base = translateBaseSymbol(base as BaseCurrency)
+    quote = translateBaseSymbol(quote as BaseCurrency)
+  }
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height
@@ -34,6 +39,7 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
     ctx.log.info({ base, quote, err, message: err.message })
     throw err
   })
+  // ctx.log.info(`${base}, ${quote}, ${price}`)
   if (price) {
     exchangeRate = new ExchangeRate({
       id,

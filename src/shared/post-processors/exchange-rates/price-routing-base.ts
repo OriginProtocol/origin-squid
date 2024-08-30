@@ -27,7 +27,7 @@ const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height
     { height },
     baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb'].address,
   )
-  return await pool.getReserves().then((r) => (r._reserve0 * ONE_ETH) / r._reserve1)
+  return await pool.getReserves().then((r) => (r._reserve1 * ONE_ETH) / r._reserve0)
 }
 
 const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
@@ -35,9 +35,9 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
   OGN_ETH: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_superOETHb: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_USD: async (ctx: Context, height: number) => {
-    const rate1 = await alternativePriceFeeds['OGN_ETH'](ctx, height)
+    const rate1 = await alternativePriceFeeds['OGN_superOETHb'](ctx, height)
     const rate2 = await chainlinkPriceFeeds['superOETHb_USD'](ctx, height)
-    return (rate1 * ONE_ETH) / rate2
+    return (rate1 * rate2) / ONE_ETH
   },
 }
 
@@ -49,8 +49,8 @@ export type BaseCurrency = BaseCurrencySymbol | BaseCurrencyAddress
 
 export const getBasePrice = async (ctx: Context, height: number, base: BaseCurrency, quote: BaseCurrency) => {
   try {
-    base = translateSymbol(baseCurrenciesByAddress[base as BaseCurrencyAddress] || base)
-    quote = translateSymbol(baseCurrenciesByAddress[quote as BaseCurrencyAddress] || quote)
+    base = translateBaseSymbol(base)
+    quote = translateBaseSymbol(quote)
     if (base === quote) return 1_000_000_000_000_000_000n
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
     if (feed) {
@@ -67,7 +67,8 @@ export const getBasePrice = async (ctx: Context, height: number, base: BaseCurre
   }
 }
 
-export const translateSymbol = (symbol: BaseCurrencySymbol): BaseCurrencySymbol => {
+export const translateBaseSymbol = (symbol: BaseCurrency): BaseCurrencySymbol => {
+  symbol = baseCurrenciesByAddress[symbol as BaseCurrencyAddress] || symbol
   if (symbol === 'WETH') return 'ETH'
   if (symbol === 'superOETHb') return 'ETH'
   if (symbol === 'USDC') return 'USD'

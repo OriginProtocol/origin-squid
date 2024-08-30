@@ -12,6 +12,12 @@ export const setup = (processor: EvmBatchProcessor) => {
 export const process = async (ctx: Context) => {
   const blockFrequencyUpdate = blockFrequencyUpdater({ from })
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
-    await ensureExchangeRates(ctx, block, [['AERO', 'USD']])
+    await ensureExchangeRates(ctx, block, [
+      ['AERO', 'USD'],
+      ['OGN', 'USD'],
+      ['OGN', 'ETH'],
+      ['ETH', 'USD'],
+      ['superOETHb', 'USD'],
+    ])
   })
 }
