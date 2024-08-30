@@ -118,6 +118,7 @@ export const baseAddresses = {
   multisig: {
     '5/8': '0x92a19381444a001d62ce67baff066fa1111d7202',
     '2/8': '0x28bce2eE5775B652D92bB7c2891A89F036619703',
+    reservoir: '0xb6d85ce798660076152d6fd3a484129668839c95',
   },
   tokens,
   superOETHb,
