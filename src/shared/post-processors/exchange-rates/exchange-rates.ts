@@ -50,6 +50,6 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
   return exchangeRate
 }
 
-export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [MainnetCurrency, MainnetCurrency][]) => {
+export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
   return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
 }
