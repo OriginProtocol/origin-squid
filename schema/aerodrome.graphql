@@ -111,13 +111,3 @@ type AeroLPPosition @entity {
   sqrtRatioLower: BigInt!
   sqrtRatioUpper: BigInt!
 }
-
-type AeroRate @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  from: String!
-  to: String!
-  price: BigInt!
-}

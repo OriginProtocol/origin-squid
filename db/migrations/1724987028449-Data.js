@@ -1,5 +1,5 @@
-module.exports = class Data1724881596816 {
-    name = 'Data1724881596816'
+module.exports = class Data1724987028449 {
+    name = 'Data1724987028449'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -353,10 +353,6 @@ module.exports = class Data1724881596816 {
         await db.query(`CREATE INDEX "IDX_b4e54387b76cb3bce1bd725f7a" ON "aero_lp_position" ("pool") `)
         await db.query(`CREATE INDEX "IDX_b465865a93cb044c6649523287" ON "aero_lp_position" ("position_id") `)
         await db.query(`CREATE INDEX "IDX_05aaf9416181ddc9012f41da2f" ON "aero_lp_position" ("account") `)
-        await db.query(`CREATE TABLE "aero_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "price" numeric NOT NULL, CONSTRAINT "PK_90e204448ef076d924202df31e0" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_9f7c045cc678d186ad9e5ee2c4" ON "aero_rate" ("chain_id") `)
-        await db.query(`CREATE INDEX "IDX_1af6e1affe7d85eb31ccf2003e" ON "aero_rate" ("block_number") `)
-        await db.query(`CREATE INDEX "IDX_203576427721935ae31f6e930a" ON "aero_rate" ("timestamp") `)
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a234e56547c4f8b9135d80444b" ON "es_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_588f0be9f9bdc1d8dd29797fec" ON "es_token" ("block_number") `)
@@ -1079,10 +1075,6 @@ module.exports = class Data1724881596816 {
         await db.query(`DROP INDEX "public"."IDX_b4e54387b76cb3bce1bd725f7a"`)
         await db.query(`DROP INDEX "public"."IDX_b465865a93cb044c6649523287"`)
         await db.query(`DROP INDEX "public"."IDX_05aaf9416181ddc9012f41da2f"`)
-        await db.query(`DROP TABLE "aero_rate"`)
-        await db.query(`DROP INDEX "public"."IDX_9f7c045cc678d186ad9e5ee2c4"`)
-        await db.query(`DROP INDEX "public"."IDX_1af6e1affe7d85eb31ccf2003e"`)
-        await db.query(`DROP INDEX "public"."IDX_203576427721935ae31f6e930a"`)
         await db.query(`DROP TABLE "es_token"`)
         await db.query(`DROP INDEX "public"."IDX_a234e56547c4f8b9135d80444b"`)
         await db.query(`DROP INDEX "public"."IDX_588f0be9f9bdc1d8dd29797fec"`)

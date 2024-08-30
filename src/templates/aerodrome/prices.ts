@@ -1,29 +1,14 @@
-import * as aerodromePricesAbi from '@abi/aerodrome-base-prices'
 import { Block, Context } from '@processor'
-import { baseAddresses } from '@utils/addresses-base'
-import { cached } from '@utils/state'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { BaseCurrency } from '@shared/post-processors/exchange-rates/price-routing-base'
 
 const E18 = 10n ** 18n
 
-export const getAerodromeRates = cached(
-  (ctx: Context, block: Block, from: string, to: string) => `${block.header.height}:${from}:${to}`,
-  async (ctx, block, from, to) => {
-    const pricesContract = new aerodromePricesAbi.Contract(ctx, block.header, baseAddresses.aerodrome.basePrices)
-    // For superOETHb and OGN there is currently no direct path to USDC - so we rate through WETH.
-    if (from !== baseAddresses.tokens.WETH && to === baseAddresses.tokens.USDC) {
-      return await pricesContract
-        .getManyRatesWithConnectors(1, [from, baseAddresses.tokens.WETH, to])
-        .then((rate) => rate[0])
-    } else {
-      return await pricesContract.getManyRatesWithConnectors(1, [from, to]).then((rate) => rate[0])
-    }
-  },
-)
-
 export const convertUsingRate = (value: bigint, rate: bigint) => (value * rate) / E18
-export const convertRate = async (ctx: Context, block: Block, from: string, to: string, value: bigint) => {
-  const rate = await getAerodromeRates(ctx, block, from, to)
-  return convertUsingRate(value, rate)
+export const convertRate = async (ctx: Context, block: Block, from: BaseCurrency, to: BaseCurrency, value: bigint) => {
+  const exchangeRate = await ensureExchangeRate(ctx, block, from, to)
+  if (!exchangeRate) return 0n
+  return convertUsingRate(value, exchangeRate.rate)
 }
 
 export const getTickFromSqrtPriceX96 = (sqrtPriceX96: bigint) => {
