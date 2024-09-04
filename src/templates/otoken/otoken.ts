@@ -1,4 +1,5 @@
-import { findLast, last } from 'lodash'
+import { findLast } from 'lodash'
+import { LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20 from '@abi/erc20'
@@ -87,7 +88,6 @@ export const createOTokenProcessor = (params: {
     initialized: boolean
     initialize: () => Promise<void>
     dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }>
-    currentDailyStat?: OTokenDailyStat
     otokens: OToken[]
     assets: OTokenAsset[]
     history: OTokenHistory[]
@@ -148,7 +148,6 @@ export const createOTokenProcessor = (params: {
         }
       },
       dailyStats: new Map<string, { block: Block; entity: OTokenDailyStat }>(),
-      currentDailyStat: undefined,
       otokens: [],
       assets: [],
       history: [],
@@ -191,10 +190,20 @@ export const createOTokenProcessor = (params: {
     // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
     for (const { block, entity } of result.dailyStats.values()) {
       const blockDate = new Date(block.header.timestamp)
-      const otokenObject = await getLatestOTokenObject(ctx, result, block)
-      entity.totalSupply = otokenObject.totalSupply
-      entity.nonRebasingSupply = otokenObject.nonRebasingSupply
-      entity.rebasingSupply = otokenObject.rebasingSupply
+      // Get the latest otokenObject for the blockDate in question. We cannot use `getLatestOTokenObject`.
+      let otokenObject = findLast(result.otokens, (o) => o.timestamp <= blockDate)
+      if (!otokenObject) {
+        otokenObject = await ctx.store.findOne(OToken, {
+          where: {
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            timestamp: LessThanOrEqual(blockDate),
+          },
+        })
+      }
+      entity.totalSupply = otokenObject?.totalSupply ?? 0n
+      entity.nonRebasingSupply = otokenObject?.nonRebasingSupply ?? 0n
+      entity.rebasingSupply = otokenObject?.rebasingSupply ?? 0n
 
       const apy = findLast(result.apies, (rebase) => rebase.timestamp <= blockDate)
       if (apy) {
@@ -378,7 +387,7 @@ export const createOTokenProcessor = (params: {
     otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
     const exchangeRate = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
-    if (!exchangeRate) {
+    if (!exchangeRate || exchangeRate.rate === 0n) {
       throw new Error('Could not fetch ETH/USD exchange rate')
     }
 

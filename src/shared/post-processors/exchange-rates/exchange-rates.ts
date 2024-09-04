@@ -2,11 +2,10 @@ import { compact } from 'lodash'
 
 import { ExchangeRate } from '@model'
 import { Block, Context } from '@processor'
-import { getPrice } from '@shared/post-processors/exchange-rates/price-routing'
-import { BaseCurrency, translateBaseSymbol } from '@shared/post-processors/exchange-rates/price-routing-base'
+import { getPrice, translateSymbol } from '@shared/post-processors/exchange-rates/price-routing'
 import { useProcessorState } from '@utils/state'
 
-import { Currency, CurrencyAddress, MainnetCurrency, currenciesByAddress } from './mainnetCurrencies'
+import { Currency } from './mainnetCurrencies'
 
 const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rates', new Map<string, ExchangeRate>())
 
@@ -19,14 +18,8 @@ export const process = async (ctx: Context) => {
 }
 
 export const ensureExchangeRate = async (ctx: Context, block: Block, base: Currency, quote: Currency) => {
-  if (ctx.chain.id === 1) {
-    base = currenciesByAddress[base.toLowerCase() as CurrencyAddress] ?? base
-    quote = currenciesByAddress[quote.toLowerCase() as CurrencyAddress] ?? quote
-  } else if (ctx.chain.id === 8453) {
-    // base network
-    base = translateBaseSymbol(base as BaseCurrency)
-    quote = translateBaseSymbol(quote as BaseCurrency)
-  }
+  base = translateSymbol(ctx, base)
+  quote = translateSymbol(ctx, quote)
   const [exchangeRates] = useExchangeRates(ctx)
   const pair = `${base}_${quote}`
   const blockNumber = block.header.height

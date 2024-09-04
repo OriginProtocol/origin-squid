@@ -173,6 +173,18 @@
         "lib/main-mainnet.js"
       ]
     },
+    "process:test": {
+      "description": "Load .env and start the squid processor",
+      "deps": [
+        "build"
+      ],
+      "cmd": [
+        "node",
+        "--require=dotenv/config",
+        "--require=tsconfig-paths/register",
+        "lib/main-test.js"
+      ]
+    },
     "process:arbitrum:prod": {
       "description": "Start the squid processor",
       "deps": [

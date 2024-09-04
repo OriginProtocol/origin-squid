@@ -16,6 +16,7 @@
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:mainnet": "sqd process:mainnet",
+    "process:test": "sqd process:test",
     "process": "sqd process"
   },
   "dependencies": {

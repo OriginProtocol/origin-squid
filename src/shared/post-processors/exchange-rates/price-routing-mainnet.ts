@@ -3,6 +3,7 @@ import { memoize } from 'lodash'
 import * as balancerMetaStablePoolAbi from '@abi/balancer-meta-stable-pool'
 import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as chainlinkFeedRegistry from '@abi/chainlink-feed-registry'
+import * as diaOracleAbi from '@abi/dia-oracle'
 import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
@@ -10,10 +11,19 @@ import * as woethAbi from '@abi/woeth'
 import { Context } from '@processor'
 import { STETH_ADDRESS } from '@utils/addresses'
 
-import { MainnetCurrency, MainnetCurrencySymbol, mainnetCurrencies } from './mainnetCurrencies'
+import {
+  MainnetCurrency,
+  MainnetCurrencyAddress,
+  MainnetCurrencySymbol,
+  mainnetCurrencies,
+  mainnetCurrenciesByAddress,
+} from './mainnetCurrencies'
 
 export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
   if (base === 'ETH' && quote === 'OETH') {
+    return 1_000_000_000_000_000_000n
+  }
+  if (base === 'OETH' && quote === 'ETH') {
     return 1_000_000_000_000_000_000n
   }
   if (base === 'ETH' && quote === 'WETH') {
@@ -36,6 +46,19 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
   }
   if (base === 'ETH' && oethOracleCurrencies.has(quote) && height >= 18032298) {
     return getOethOraclePrice(ctx, height, quote)
+  }
+  if (base === 'OUSD' && quote === 'USD') {
+    return getPrice_OUSD_USD(ctx, height)
+  }
+  if (base === 'OUSD' && quote === 'ETH') {
+    const ousdusd = await getPrice_OUSD_USD(ctx, height)
+    const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+    if (!ethusd) return 0n
+    return (ousdusd * 10n ** 8n) / ethusd
+  }
+  if (base === 'OETH' && quote === 'USD') {
+    const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+    return ethusd * 10n ** 10n
   }
   return getChainlinkPrice(ctx, height, base, quote)
 }
@@ -120,8 +143,19 @@ export const getBalancePoolRateProviders = memoize(
   (_ctx, _block, address) => address.toLowerCase(),
 )
 
+export const getPrice_OUSD_USD = (ctx: Context, height: number) => {
+  if (height < 18071236) return 1_000_000_000_000_000_000n
+  const diaOracle = new diaOracleAbi.Contract(ctx, { height }, '0xafa00e7eff2ea6d216e432d99807c159d08c2b79')
+  return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
+}
+
 export const getPrice_wOETH_OETH = (ctx: Context, height: number) => {
   if (height < 17141658) return 1_000_000_000_000_000_000n
   const woeth = new woethAbi.Contract(ctx, { height }, mainnetCurrencies.wOETH)
   return woeth.previewRedeem(1_000_000_000_000_000_000n)
+}
+
+export const translateMainnetSymbol = (symbol: MainnetCurrency): MainnetCurrencySymbol => {
+  symbol = mainnetCurrenciesByAddress[symbol as MainnetCurrencyAddress] || symbol
+  return symbol
 }
