@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 8453
+version: 45
 description: 'Origin Protocol 🦑'
 build:
 deploy:
