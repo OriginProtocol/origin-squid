@@ -117,9 +117,10 @@ export const aerodromePoolArray: PoolDefinition[] = Object.values(aerodromePools
 export const baseAddresses = {
   multisig: {
     '5/8': '0x92a19381444a001d62ce67baff066fa1111d7202',
-    '2/8': '0x28bce2eE5775B652D92bB7c2891A89F036619703',
+    '2/8': '0x28bce2ee5775b652d92bb7c2891a89f036619703',
     reservoir: '0xb6d85ce798660076152d6fd3a484129668839c95',
   },
+  baseHotWallet: '0x3c112e20141b65041c252a68a611ef145f58b7bc',
   tokens,
   superOETHb,
   origin: compact(
@@ -138,7 +139,7 @@ export const baseAddresses = {
     offchainOracle: '0x5b80fd3dc871d56a31bf7bb13b14cd8a8fbf7baf',
     sugarLPV3: '0x68c19e13618c41158fe4baba1b8fb3a9c74bdb0a',
     factoryRegistry: '0x5c3f18f06cc09ca1910767a34a20f771039e37c0',
-    slipstreamNft: '0x827922686190790b37229fd06084350E74485b72',
+    slipstreamNft: '0x827922686190790b37229fd06084350e74485b72',
     pools: aerodromePools,
   },
 } as const
