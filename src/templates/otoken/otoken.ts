@@ -189,6 +189,7 @@ export const createOTokenProcessor = (params: {
 
     // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
     for (const { block, entity } of result.dailyStats.values()) {
+      if (block.header.height < params.from) continue
       const blockDate = new Date(block.header.timestamp)
       // Get the latest otokenObject for the blockDate in question. We cannot use `getLatestOTokenObject`.
       let otokenObject = findLast(result.otokens, (o) => o.timestamp <= blockDate)
@@ -199,13 +200,18 @@ export const createOTokenProcessor = (params: {
             otoken: params.otokenAddress,
             timestamp: LessThanOrEqual(blockDate),
           },
+          order: { timestamp: 'desc' },
         })
       }
-      entity.totalSupply = otokenObject?.totalSupply ?? 0n
-      entity.nonRebasingSupply = otokenObject?.nonRebasingSupply ?? 0n
-      entity.rebasingSupply = otokenObject?.rebasingSupply ?? 0n
+      if (!otokenObject) {
+        continue
+        // throw new Error('otokenObject not found for daily stat processing')
+      }
+      entity.totalSupply = otokenObject.totalSupply ?? 0n
+      entity.nonRebasingSupply = otokenObject.nonRebasingSupply ?? 0n
+      entity.rebasingSupply = otokenObject.rebasingSupply ?? 0n
 
-      const apy = findLast(result.apies, (rebase) => rebase.timestamp <= blockDate)
+      const apy = findLast(result.apies, (apy) => apy.timestamp <= blockDate)
       if (apy) {
         entity.apr = apy.apr
         entity.apy = apy.apy

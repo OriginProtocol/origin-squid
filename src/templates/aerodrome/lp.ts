@@ -21,7 +21,7 @@ const ammPoolLookupOffset: Record<string, number | undefined> = {
 // - 1 call at index 0 with our desired limit
 // - 1 call at the known pool index + count we just found, with our desired limit
 // (not perfect, but good enough?)
-const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a' // 0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59
+const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a'
 const clPoolLookupOffset: Record<string, number | undefined> = {
   [aerodromePools['CL1-WETH/superOETHb'].address]: 113,
   [aerodromePools['CL100-WETH/USDC'].address]: 1,
