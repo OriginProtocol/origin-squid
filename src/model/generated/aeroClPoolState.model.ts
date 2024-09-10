@@ -53,4 +53,7 @@ export class AeroCLPoolState {
 
     @FloatColumn_({nullable: false})
     tickPrice!: number
+
+    @BigIntColumn_({nullable: false})
+    sqrtPriceX96!: bigint
 }

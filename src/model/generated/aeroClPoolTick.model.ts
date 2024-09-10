@@ -33,6 +33,9 @@ export class AeroCLPoolTick {
     tickPrice!: number
 
     @BigIntColumn_({nullable: false})
+    sqrtPriceX96!: bigint
+
+    @BigIntColumn_({nullable: false})
     liquidityGross!: bigint
 
     @BigIntColumn_({nullable: false})

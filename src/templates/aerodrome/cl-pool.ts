@@ -5,7 +5,7 @@ import * as models from '@model'
 import { AeroCLPoolState, AeroCLPoolTick, AeroPoolEpochState, AeroPoolState, TokenAmount } from '@model'
 import { Block, Context, Log, Processor } from '@processor'
 import { createAeroPoolEpoch } from '@templates/aerodrome/epoch'
-import { convertRate, getPriceFromTick } from '@templates/aerodrome/prices'
+import { convertRate, getPriceFromSqrtPriceX96 } from '@templates/aerodrome/prices'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
@@ -93,7 +93,11 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
           ])
 
           const tick = await poolContract.ticks(slot0.tick)
-          const tickPrice = getPriceFromTick(slot0.tick, params.assets[0].decimals, params.assets[1].decimals)
+          const tickPrice = getPriceFromSqrtPriceX96(
+            slot0.sqrtPriceX96,
+            params.assets[0].decimals,
+            params.assets[1].decimals,
+          )
 
           const currentTick = new AeroCLPoolTick({
             id: `${ctx.chain.id}-${params.address}-${slot0.tick}-${block.header.height}`,
@@ -103,6 +107,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
             address: params.address,
             tick: slot0.tick,
             tickPrice,
+            sqrtPriceX96: slot0.sqrtPriceX96,
             liquidityGross: tick.liquidityGross,
             liquidityNet: tick.liquidityNet,
             stakedLiquidityNet: tick.stakedLiquidityNet,
@@ -134,6 +139,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
             votePercentage,
             tick: currentTick,
             tickPrice,
+            sqrtPriceX96: slot0.sqrtPriceX96,
           })
 
           const epochState = await createAeroPoolEpoch(ctx, block, params.address)
