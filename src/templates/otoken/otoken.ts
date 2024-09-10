@@ -1,5 +1,6 @@
+import dayjs from 'dayjs'
 import { findLast } from 'lodash'
-import { LessThanOrEqual } from 'typeorm'
+import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20 from '@abi/erc20'
@@ -211,7 +212,13 @@ export const createOTokenProcessor = (params: {
       entity.nonRebasingSupply = otokenObject.nonRebasingSupply ?? 0n
       entity.rebasingSupply = otokenObject.rebasingSupply ?? 0n
 
-      const apy = findLast(result.apies, (apy) => apy.timestamp <= blockDate)
+      let apy = findLast(result.apies, (apy) => apy.timestamp <= blockDate)
+      if (!apy) {
+        apy = await ctx.store.findOne(OTokenAPY, {
+          order: { timestamp: 'desc' },
+          where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: LessThanOrEqual(blockDate) },
+        })
+      }
       if (apy) {
         entity.apr = apy.apr
         entity.apy = apy.apy
@@ -219,11 +226,21 @@ export const createOTokenProcessor = (params: {
         entity.apy14 = apy.apy14DayAvg
         entity.apy30 = apy.apy30DayAvg
       }
-      const rebase = findLast(result.rebases, (rebase) => rebase.timestamp <= blockDate)
-      if (rebase) {
-        entity.fees = rebase.feeETH
-        entity.yield = rebase.yieldETH
-      }
+      const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
+      // These should remain unique since any result rebases have not been stored in the database yet.
+      let rebases = result.rebases.filter((rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate)
+      rebases.push(
+        ...(await ctx.store.find(OTokenRebase, {
+          order: { timestamp: 'desc' },
+          where: {
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            timestamp: Between(startOfDay, blockDate),
+          },
+        })),
+      )
+      entity.fees = rebases.reduce((sum, current) => sum + current.feeETH, 0n)
+      entity.yield = rebases.reduce((sum, current) => sum + current.yieldETH, 0n)
 
       entity.rateETH = await ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n)
       entity.rateUSD = await ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n)
