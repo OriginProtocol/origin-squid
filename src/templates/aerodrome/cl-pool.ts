@@ -93,11 +93,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
           ])
 
           const tick = await poolContract.ticks(slot0.tick)
-          const tickPrice = getPriceFromSqrtPriceX96(
-            slot0.sqrtPriceX96,
-            params.assets[0].decimals,
-            params.assets[1].decimals,
-          )
+          const tickPrice = getPriceFromSqrtPriceX96(slot0.sqrtPriceX96)
 
           const currentTick = new AeroCLPoolTick({
             id: `${ctx.chain.id}-${params.address}-${slot0.tick}-${block.header.height}`,

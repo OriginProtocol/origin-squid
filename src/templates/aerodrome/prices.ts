@@ -16,10 +16,12 @@ export const getTickFromSqrtPriceX96 = (sqrtPriceX96: bigint) => {
   return Math.floor(Math.log((Number(sqrtPriceX96) / Number(Q96)) ** 2) / Math.log(1.0001))
 }
 
-export const getPriceFromTick = (tick: number, decimals0: number = 18, decimals1: number = 18) => {
-  return 1.0001 ** tick / 10 ** (decimals1 - decimals0)
+export const getPriceFromTick = (tick: number) => {
+  return 1.0001 ** tick / 10 ** 18
 }
 
-export const getPriceFromSqrtPriceX96 = (sqrtPriceX96: bigint, decimals0: number = 18, decimals1: number = 18) => {
-  return getPriceFromTick(getTickFromSqrtPriceX96(sqrtPriceX96), decimals0, decimals1)
+export const getPriceFromSqrtPriceX96 = (sqrtPriceX96: bigint): number => {
+  const Q96 = BigInt(2 ** 96)
+  const sqrtPrice = Number(sqrtPriceX96) / Number(Q96)
+  return sqrtPrice * sqrtPrice
 }
