@@ -2,27 +2,18 @@ import { GraphQLResolveInfo } from 'graphql'
 import 'reflect-metadata'
 import { Field, Info, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
-import {
-  createPublicClient,
-  fallback,
-  formatEther,
-  getContract,
-  http,
-  parseAbi,
-} from 'viem'
+import { createPublicClient, fallback, formatEther, getContract, http, parseAbi } from 'viem'
 import { mainnet } from 'viem/chains'
 
 import * as Erc20ABI from '@abi/erc20.abi'
+import { chainConfigs } from '@processor'
 import { OGN_ADDRESS } from '@utils/addresses'
 
 import './fetch-polyfill'
 
 const publicClient = createPublicClient({
   chain: mainnet,
-  transport: fallback([
-    http(process.env.RPC_ENDPOINT),
-    http(process.env.RPC_BACKUP),
-  ]),
+  transport: fallback(chainConfigs[mainnet.id].endpoints.map((url) => http(url))),
 })
 
 const ogn = getContract({
@@ -51,16 +42,20 @@ export class OGNStatsResolver {
   @Query(() => OGNStatsResult)
   async ognStats(@Info() info: GraphQLResolveInfo): Promise<OGNStatsResult> {
     const result = new OGNStatsResult({})
-    const fields = info.fieldNodes[0].selectionSet?.selections.map(
-      (selection) => (selection as any).name.value,
-    )
+    const fields = info.fieldNodes[0].selectionSet?.selections.map((selection) => (selection as any).name.value)
 
     // Only fetch the fields that are requested
     if (fields?.includes('circulatingSupply')) {
-      result.circulatingSupply = await getCirculatingSupply()
+      result.circulatingSupply = await getCirculatingSupply().catch((err) => {
+        console.error(err)
+        return 0
+      })
     }
     if (fields?.includes('totalSupply')) {
-      result.totalSupply = await getTotalSupply()
+      result.totalSupply = await getTotalSupply().catch((err) => {
+        console.error(err)
+        return 0
+      })
     }
 
     return result

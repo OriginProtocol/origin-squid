@@ -2,11 +2,11 @@ import assert from 'assert'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import utc from 'dayjs/plugin/utc'
+import { compact } from 'lodash'
 import { Chain } from 'viem'
 import { arbitrum, base, mainnet } from 'viem/chains'
 
-import { lookupArchive } from '@subsquid/archive-registry'
-import { KnownArchives } from '@subsquid/archive-registry/lib/chains'
+import { KnownArchivesEVM, lookupArchive } from '@subsquid/archive-registry'
 import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { calculateBlockRate } from '@utils/calculateBlockRate'
@@ -16,11 +16,8 @@ import './rpc-issues'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
-export const createSquidProcessor = (
-  archive: KnownArchives = 'eth-mainnet',
-  rpc_env = process.env.RPC_ENV ?? 'RPC_ENDPOINT',
-) => {
-  const url = process.env[rpc_env] || 'http://localhost:8545'
+export const createSquidProcessor = (config: ChainConfig) => {
+  const url = config.endpoints[0] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
 
   const processor = new EvmBatchProcessor()
@@ -61,9 +58,9 @@ export const createSquidProcessor = (
     })
 
   if (process.env.DISABLE_ARCHIVE !== 'true') {
-    console.log(`Archive: ${archive}`)
-    processor.setGateway(lookupArchive(archive))
-  }else{
+    console.log(`Archive: ${config.archive}`)
+    processor.setGateway(lookupArchive(config.archive))
+  } else {
     console.log(`Archive disabled`)
   }
 
@@ -80,23 +77,38 @@ export interface Processor {
 
 let initialized = false
 
-const chainConfigs: Record<number, { chain: Chain; archive: KnownArchives; rpcEnv: string } | undefined> = {
+export interface ChainConfig {
+  chain: Chain
+  archive: KnownArchivesEVM
+  endpoints: string[]
+}
+
+export const chainConfigs = {
   [mainnet.id]: {
     chain: mainnet,
     archive: 'eth-mainnet',
-    rpcEnv: process.env.RPC_ENV ?? 'RPC_ENDPOINT',
+    endpoints: compact([
+      process.env[process.env.RPC_ENV ?? 'RPC_ENDPOINT'],
+      process.env[process.env.RPC_ENV_BACKUP ?? 'RPC_ETH_HTTP'],
+    ]),
   },
   [arbitrum.id]: {
     chain: arbitrum,
     archive: 'arbitrum',
-    rpcEnv: process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT',
+    endpoints: compact([
+      process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
+      process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
+    ]),
   },
   [base.id]: {
     chain: base,
     archive: 'base-mainnet',
-    rpcEnv: process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT',
+    endpoints: compact([
+      process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
+      process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
+    ]),
   },
-}
+} as const
 
 export const run = ({
   chainId = 1,
@@ -105,7 +117,7 @@ export const run = ({
   postProcessors,
   validators,
 }: {
-  chainId?: number
+  chainId?: 1 | 42161 | 8453
   stateSchema?: string
   processors: Processor[]
   postProcessors?: Processor[]
@@ -115,7 +127,7 @@ export const run = ({
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
-  const processor = createSquidProcessor(config.archive, config.rpcEnv)
+  const processor = createSquidProcessor(config)
 
   processor.setBlockRange({
     from: process.env.BLOCK_FROM
