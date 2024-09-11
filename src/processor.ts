@@ -96,16 +96,16 @@ export const chainConfigs = {
     chain: arbitrum,
     archive: 'arbitrum',
     endpoints: compact([
-      process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
-      process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
+      process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
+      process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
     ]),
   },
   [base.id]: {
     chain: base,
     archive: 'base-mainnet',
     endpoints: compact([
-      process.env[process.env.RPC_ARBITRUM_ENV ?? 'RPC_ARBITRUM_ENDPOINT'],
-      process.env[process.env.RPC_ARBITRUM_ENV_BACKUP ?? 'RPC_ARBITRUM_ONE_HTTP'],
+      process.env[process.env.RPC_BASE_ENV ?? 'RPC_BASE_ENDPOINT'],
+      process.env[process.env.RPC_BASE_ENV_BACKUP ?? 'RPC_BASE_HTTP'],
     ]),
   },
 } as const
