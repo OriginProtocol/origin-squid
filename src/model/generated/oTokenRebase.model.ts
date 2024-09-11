@@ -44,10 +44,16 @@ export class OTokenRebase {
     apy!: OTokenAPY
 
     @BigIntColumn_({nullable: false})
+    fee!: bigint
+
+    @BigIntColumn_({nullable: false})
     feeETH!: bigint
 
     @BigIntColumn_({nullable: false})
     feeUSD!: bigint
+
+    @BigIntColumn_({nullable: false})
+    yield!: bigint
 
     @BigIntColumn_({nullable: false})
     yieldETH!: bigint

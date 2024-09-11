@@ -1,5 +1,5 @@
-module.exports = class Data1725936187363 {
-    name = 'Data1725936187363'
+module.exports = class Data1726098914515 {
+    name = 'Data1726098914515'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -624,7 +624,7 @@ module.exports = class Data1725936187363 {
         await db.query(`CREATE INDEX "IDX_79f0934481fe045319c864cd84" ON "o_token_apy" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_f5f416a1490ee2007a9c7593d0" ON "o_token_apy" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_a98d74fc6af6f3a599fe1ba7fb" ON "o_token_apy" ("date") `)
-        await db.query(`CREATE TABLE "o_token_rebase" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee_eth" numeric NOT NULL, "fee_usd" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_usd" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_f8e636dc692c399dd1ead98c720" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_rebase" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "total_supply" numeric NOT NULL, "rebasing_credits" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, "fee" numeric NOT NULL, "fee_eth" numeric NOT NULL, "fee_usd" numeric NOT NULL, "yield" numeric NOT NULL, "yield_eth" numeric NOT NULL, "yield_usd" numeric NOT NULL, "apy_id" character varying, CONSTRAINT "PK_f8e636dc692c399dd1ead98c720" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_83666ab47ff5ef0c56bf40d122" ON "o_token_rebase" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_3fb75a6c8b831ca4d201d60e01" ON "o_token_rebase" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_15ef53e2bdcc3034ab8adea1f1" ON "o_token_rebase" ("timestamp") `)

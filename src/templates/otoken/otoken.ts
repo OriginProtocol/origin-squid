@@ -28,6 +28,7 @@ import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
+import { jsonify } from '@utils/jsonify'
 import { multicall } from '@utils/multicall'
 import { getLatestEntity } from '@utils/utils'
 
@@ -97,10 +98,12 @@ export const createOTokenProcessor = (params: {
     apies: OTokenAPY[]
     activity: OTokenActivity[]
     vaults: OTokenVault[]
-    lastYieldDistributionEvent: {
-      fee: bigint
-      yield: bigint
-    }
+    lastYieldDistributionEvent:
+      | {
+          fee: bigint
+          yield: bigint
+        }
+      | undefined
   }
 
   let owners: Map<string, OTokenAddress> | undefined = undefined
@@ -157,7 +160,7 @@ export const createOTokenProcessor = (params: {
       apies: [],
       activity: [],
       vaults: [],
-      lastYieldDistributionEvent: { yield: 0n, fee: 0n },
+      lastYieldDistributionEvent: undefined,
     }
 
     for (const block of ctx.blocks) {
@@ -406,13 +409,18 @@ export const createOTokenProcessor = (params: {
 
     // OToken Object
     const otokenObject = await getLatestOTokenObject(ctx, result, block)
+
+    if (!result.lastYieldDistributionEvent) {
+      result.lastYieldDistributionEvent = { yield: data.totalSupply - otokenObject.totalSupply, fee: 0n }
+      console.log(
+        `Created artificial YieldDistribution event data since it is missing: ${jsonify(
+          result.lastYieldDistributionEvent,
+        )}`,
+      )
+    }
+
     otokenObject.totalSupply = data.totalSupply
     otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
-
-    const exchangeRate = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
-    if (!exchangeRate || exchangeRate.rate === 0n) {
-      throw new Error('Could not fetch ETH/USD exchange rate')
-    }
 
     // Rebase events
     const rebase = createRebaseAPY(
@@ -423,7 +431,6 @@ export const createOTokenProcessor = (params: {
       log,
       data,
       result.lastYieldDistributionEvent,
-      exchangeRate,
     )
 
     for (const address of owners!.values()) {

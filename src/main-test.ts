@@ -5,6 +5,7 @@ import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 
 if (require.main === module) {
+  console.log('process:test running')
   run({
     chainId: 1,
     stateSchema: 'test-processor',
@@ -25,6 +26,8 @@ if (require.main === module) {
           // OETH
           const OETH_USD = await ensureExchangeRate(ctx, ctx.blocks[0], OETH_ADDRESS, 'USD')
           const OETH_ETH = await ensureExchangeRate(ctx, ctx.blocks[0], OETH_ADDRESS, 'ETH')
+
+          const ETH_USD = await ensureExchangeRate(ctx, ctx.blocks[0], 'ETH', 'USD')
 
           debugger
         },

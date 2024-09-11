@@ -55,8 +55,10 @@ type OTokenRebase @entity {
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
   apy: OTokenAPY!
+  fee: BigInt!
   feeETH: BigInt!
   feeUSD: BigInt!
+  yield: BigInt!
   yieldETH: BigInt!
   yieldUSD: BigInt!
 }

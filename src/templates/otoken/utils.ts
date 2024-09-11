@@ -3,14 +3,10 @@ import utc from 'dayjs/plugin/utc'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
-import {
-  ExchangeRate,
-  OTokenAPY,
-  OTokenAddress,
-  OTokenRebase,
-  RebasingOption,
-} from '@model'
+import { OTokenAPY, OTokenAddress, OTokenRebase, RebasingOption } from '@model'
 import { Context } from '@processor'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { calculateAPY } from '@utils/calculateAPY'
 
@@ -19,16 +15,10 @@ dayjs.extend(utc)
 /**
  * Create a new Address entity
  */
-export async function createAddress(
-  ctx: Context,
-  otoken: string,
-  addr: string,
-  lastUpdated?: Date,
-) {
+export async function createAddress(ctx: Context, otoken: string, addr: string, lastUpdated?: Date) {
   let isContract: boolean = false
   if (addr !== '0x0000000000000000000000000000000000000000') {
-    isContract =
-      (await ctx._chain.client.call('eth_getCode', [addr, 'latest'])) !== '0x'
+    isContract = (await ctx._chain.client.call('eth_getCode', [addr, 'latest'])) !== '0x'
   }
 
   // ctx.log.info(`New address ${rawAddress}`);
@@ -51,37 +41,34 @@ export async function createAddress(
  */
 export async function createRebaseAPY(
   ctx: Context,
-  otokenAddress: string,
+  otokenAddress: CurrencyAddress,
   apies: OTokenAPY[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
-  rebaseEvent: ReturnType<
-    typeof otoken.events.TotalSupplyUpdatedHighres.decode
-  >,
+  rebaseEvent: ReturnType<typeof otoken.events.TotalSupplyUpdatedHighres.decode>,
   lastYieldDistributionEvent: {
     fee: bigint
     yield: bigint
   },
-  exchangeRate: ExchangeRate,
 ) {
   let feeETH = 0n
   let yieldETH = 0n
   let feeUSD = 0n
   let yieldUSD = 0n
-  const rate = exchangeRate.rate
-  const generateId = (date: dayjs.Dayjs | string | Date | number) =>
-    dayjs.utc(date).toISOString().substring(0, 10)
+  const generateId = (date: dayjs.Dayjs | string | Date | number) => dayjs.utc(date).toISOString().substring(0, 10)
 
   if (OUSD_STABLE_OTOKENS.includes(otokenAddress)) {
+    const rate = await ensureExchangeRate(ctx, block, otokenAddress, 'ETH').then((er) => er?.rate ?? 0n)
     feeUSD = lastYieldDistributionEvent.fee
     yieldUSD = lastYieldDistributionEvent.yield
-    feeETH = (feeUSD * 1000000000000000000n) / rate / 10000000000n
-    yieldETH = (yieldUSD * 1000000000000000000n) / rate / 10000000000n
+    feeETH = (feeUSD * rate) / 1000000000000000000n
+    yieldETH = (yieldUSD * rate) / 1000000000000000000n
   } else {
+    const rate = await ensureExchangeRate(ctx, block, otokenAddress, 'USD').then((er) => er?.rate ?? 0n)
     feeETH = lastYieldDistributionEvent.fee
     yieldETH = lastYieldDistributionEvent.yield
-    feeUSD = (feeETH * exchangeRate.rate) / 100000000n
-    yieldUSD = (yieldETH * exchangeRate.rate) / 100000000n
+    feeUSD = (feeETH * rate) / 1000000000000000000n
+    yieldUSD = (yieldETH * rate) / 1000000000000000000n
   }
 
   const rebase = new OTokenRebase({
@@ -94,6 +81,8 @@ export async function createRebaseAPY(
     rebasingCredits: rebaseEvent.rebasingCredits,
     rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     totalSupply: rebaseEvent.totalSupply,
+    fee: lastYieldDistributionEvent.fee,
+    yield: lastYieldDistributionEvent.yield,
     feeUSD,
     yieldUSD,
     feeETH,
@@ -206,9 +195,7 @@ export async function createRebaseAPY(
       return dateId >= i.value && dateId < blockDateId
     })
     // console.log(i.days, pastAPYs.length)
-    apy![i.key] =
-      pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) /
-      (pastAPYs.length + 1)
+    apy![i.key] = pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) / (pastAPYs.length + 1)
   }
 
   return rebase
