@@ -65,11 +65,13 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
 }
 
 export const getOETHETHPrice = async (ctx: Context, height: number) => {
+  if (height < 17230232) return 10n ** 18n
   const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
   return await contract.get_dy(0n, 1n, 1000000000000000000n)
 }
 
 export const getETHOETHPrice = async (ctx: Context, height: number) => {
+  if (height < 17230232) return 10n ** 18n
   const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
   return await contract.get_dy(1n, 0n, 1000000000000000000n)
 }

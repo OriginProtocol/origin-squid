@@ -34,6 +34,9 @@ const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height
 
 const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
   ETH_superOETHb: async (ctx, height) => {
+    if (height < baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].from) {
+      return 10n ** 18n
+    }
     const pool = new aerodromeClPoolAbi.Contract(
       ctx,
       { height },
@@ -43,6 +46,9 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
     return getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96) - 10n ** 14n // minus .01% fee
   },
   superOETHb_ETH: async (ctx, height) => {
+    if (height < baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].from) {
+      return 10n ** 18n
+    }
     const pool = new aerodromeClPoolAbi.Contract(
       ctx,
       { height },

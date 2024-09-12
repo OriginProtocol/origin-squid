@@ -1,12 +1,7 @@
 import assert from 'assert'
 import { pick, sortBy } from 'lodash'
 
-import {
-  OTokenHistory,
-  OTokenRebase,
-  OUSDDailyStat,
-  StrategyYield,
-} from '@model'
+import { OTokenHistory, OTokenRebase, OUSDDailyStat, StrategyYield } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
@@ -20,30 +15,10 @@ let firstBlock = true
 export const process = async (ctx: Context) => {
   if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
-    await validateExpectations(
-      ctx,
-      block,
-      StrategyYield,
-      expectations.strategyYields,
-    )
-    await validateExpectations(
-      ctx,
-      block,
-      OTokenHistory,
-      expectations.oTokenHistories,
-    )
-    await validateExpectations(
-      ctx,
-      block,
-      OTokenRebase,
-      expectations.oTokenRebases,
-    )
-    await validateExpectations(
-      ctx,
-      block,
-      OUSDDailyStat,
-      expectations.ousdDailyStats,
-    )
+    await validateExpectations(ctx, block, StrategyYield, expectations.strategyYields)
+    await validateExpectations(ctx, block, OTokenHistory, expectations.oTokenHistories)
+    await validateExpectations(ctx, block, OTokenRebase, expectations.oTokenRebases)
+    await validateExpectations(ctx, block, OUSDDailyStat, expectations.ousdDailyStats)
     firstBlock = false
   }
 }
@@ -66,10 +41,7 @@ const validateExpectations = async <
       await validateExpectation(ctx, Class, entity)
     }
   }
-  assert(
-    !expectations.length || expectations[0]?.blockNumber >= block.header.height,
-    'Something is missing',
-  )
+  assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
   while (expectations[0]?.blockNumber === block.header.height) {
     const entity = expectations.shift()!
     await validateExpectation(ctx, Class, entity)
@@ -89,10 +61,7 @@ const validateExpectation = async <
   const actual = await ctx.store.findOne(Class, {
     where: { id: expectation.id },
   })
-  assert(
-    actual,
-    `Expected entity does not exist: Entity=${Class.name} id=${expectation.id}`,
-  )
+  assert(actual, `Expected entity does not exist: Entity=${Class.name} id=${expectation.id}`)
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
   // We decide to only care about float decimal accuracy to the 8th.
   assert.deepEqual(
@@ -101,11 +70,7 @@ const validateExpectation = async <
         typeof value === 'number' ? Number(value.toFixed(8)) : value,
       ),
     ),
-    JSON.parse(
-      jsonify(expectation, (_key, value) =>
-        typeof value === 'number' ? Number(value.toFixed(8)) : value,
-      ),
-    ),
+    JSON.parse(jsonify(expectation, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
   )
   ctx.log.info(`Validated entity: Entity=${Class.name} id=${expectation.id}`)
 }
@@ -130,8 +95,7 @@ const expectations = {
       apr: 0.09152595180820716,
       rebasingCreditsPerToken: '852686447110306439510756300',
       timestamp: '2021-11-09T06:59:40.000000Z',
-      txHash:
-        '0x8100a86ef0b23789be3ca200886e4b9cb4209e5c97e59eaf744b9181267ae4b3',
+      txHash: '0x8100a86ef0b23789be3ca200886e4b9cb4209e5c97e59eaf744b9181267ae4b3',
     },
     {
       id: '1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2021-12-06',
@@ -146,8 +110,7 @@ const expectations = {
       apr: 0.31677789277204865,
       rebasingCreditsPerToken: '836987556812892596511761169',
       timestamp: '2021-12-06T06:59:47.000000Z',
-      txHash:
-        '0x2d403152b1758105818fd597e03a9993c0c6308326f511d40ef856dc899bbba2',
+      txHash: '0x2d403152b1758105818fd597e03a9993c0c6308326f511d40ef856dc899bbba2',
     },
   ]),
   oTokenHistories: e([
@@ -158,8 +121,7 @@ const expectations = {
       balance: '5000000000000000000000',
       otoken: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
       timestamp: '2021-02-04T00:08:32.000000Z',
-      txHash:
-        '0x951a57d616a98aeaeeb1df722d6c1565da20ad74fa410db95a80c28da3c88175',
+      txHash: '0x951a57d616a98aeaeeb1df722d6c1565da20ad74fa410db95a80c28da3c88175',
       type: 'Received',
       value: '5000000000000000000000',
     },
@@ -170,8 +132,7 @@ const expectations = {
       balance: '1',
       otoken: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
       timestamp: '2021-05-01T14:59:47.000000Z',
-      txHash:
-        '0x5643e6f85bab24cf1057a09d20c7fa353d895d96d0c114141b6792c76c93dfc2',
+      txHash: '0x5643e6f85bab24cf1057a09d20c7fa353d895d96d0c114141b6792c76c93dfc2',
       type: 'Sent',
       value: '-4999999999999999999999',
     },
@@ -180,15 +141,14 @@ const expectations = {
     {
       id: '1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-0014883457-a66bb-000005',
       blockNumber: 14883457,
-      feeETH: '178820559593958335',
+      feeETH: '178820559593958066',
       feeUSD: '346263724854739034559',
       rebasingCredits: '28313629639061008328884206782869381',
       rebasingCreditsPerToken: '793786451700174206240401619',
       timestamp: '2022-06-01T06:59:39.000000Z',
-      txHash:
-        '0xca8bb9f49e9135e81cb7f8c0876bfdce54352bbf45ceeda567144ca488ec1df5',
+      txHash: '0xca8bb9f49e9135e81cb7f8c0876bfdce54352bbf45ceeda567144ca488ec1df5',
       totalSupply: '63608906999875802980711462',
-      yieldETH: '1788205595939583356',
+      yieldETH: '1788205595939580665',
       yieldUSD: '3462637248547390345598',
     },
   ]),
