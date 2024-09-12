@@ -25,3 +25,9 @@ export const getPriceFromSqrtPriceX96 = (sqrtPriceX96: bigint): number => {
   const sqrtPrice = Number(sqrtPriceX96) / Number(Q96)
   return sqrtPrice * sqrtPrice
 }
+
+export const getPriceFromSqrtPriceX96N = (sqrtPriceX96: bigint): bigint => {
+  const Q96 = BigInt(2 ** 96)
+  const sqrtPrice = (sqrtPriceX96 * 10n ** 18n) / Q96
+  return (sqrtPrice * sqrtPrice) / 10n ** 18n
+}

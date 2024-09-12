@@ -3,13 +3,14 @@ import { memoize } from 'lodash'
 import * as balancerMetaStablePoolAbi from '@abi/balancer-meta-stable-pool'
 import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as chainlinkFeedRegistry from '@abi/chainlink-feed-registry'
+import * as curveLpToken from '@abi/curve-lp-token'
 import * as diaOracleAbi from '@abi/dia-oracle'
 import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
 import * as woethAbi from '@abi/woeth'
 import { Context } from '@processor'
-import { STETH_ADDRESS } from '@utils/addresses'
+import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
 import {
   MainnetCurrency,
@@ -21,10 +22,10 @@ import {
 
 export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
   if (base === 'ETH' && quote === 'OETH') {
-    return 1_000_000_000_000_000_000n
+    return await getETHOETHPrice(ctx, height)
   }
   if (base === 'OETH' && quote === 'ETH') {
-    return 1_000_000_000_000_000_000n
+    return await getOETHETHPrice(ctx, height)
   }
   if (base === 'ETH' && quote === 'WETH') {
     return 1_000_000_000_000_000_000n
@@ -61,6 +62,16 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
     return ethusd * 10n ** 10n
   }
   return getChainlinkPrice(ctx, height, base, quote)
+}
+
+export const getOETHETHPrice = async (ctx: Context, height: number) => {
+  const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
+  return await contract.get_dy(0n, 1n, 1000000000000000000n)
+}
+
+export const getETHOETHPrice = async (ctx: Context, height: number) => {
+  const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
+  return await contract.get_dy(1n, 0n, 1000000000000000000n)
 }
 
 export const getRETHPrice = async (ctx: Context, height: number) => {

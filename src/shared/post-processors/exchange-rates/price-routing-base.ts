@@ -1,6 +1,8 @@
+import * as aerodromeClPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromePoolAbi from '@abi/aerodrome-pool'
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
 import { Context } from '@processor'
+import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 import { invertMap } from '@utils/invertMap'
 
@@ -31,7 +33,24 @@ const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height
 }
 
 const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
-  ETH_superOETHb: () => Promise.resolve(ONE_ETH),
+  ETH_superOETHb: async (ctx, height) => {
+    const pool = new aerodromeClPoolAbi.Contract(
+      ctx,
+      { height },
+      baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].address,
+    )
+    const slot0 = await pool.slot0()
+    return getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96) - 10n ** 14n // minus .01% fee
+  },
+  superOETHb_ETH: async (ctx, height) => {
+    const pool = new aerodromeClPoolAbi.Contract(
+      ctx,
+      { height },
+      baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].address,
+    )
+    const slot0 = await pool.slot0()
+    return 10n ** 36n / getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96) - 10n ** 14n // minus .01% fee
+  },
   OGN_ETH: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_superOETHb: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_USD: async (ctx: Context, height: number) => {
@@ -70,7 +89,6 @@ export const getBasePrice = async (ctx: Context, height: number, base: BaseCurre
 export const translateBaseSymbol = (symbol: BaseCurrency): BaseCurrencySymbol => {
   symbol = baseCurrenciesByAddress[symbol as BaseCurrencyAddress] || symbol
   if (symbol === 'WETH') return 'ETH'
-  if (symbol === 'superOETHb') return 'ETH'
   if (symbol === 'USDC') return 'USD'
   return symbol
 }
