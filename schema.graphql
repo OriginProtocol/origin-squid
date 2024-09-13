@@ -1795,6 +1795,18 @@ type OTokenDailyStat @entity {
 
   marketCapUSD: Float!
 }
+
+type OTokenDripperState @entity {
+  id: ID! # chain-otokenAddress-blockNumber
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  availableFunds: BigInt!
+  lastCollect: BigInt!
+  perBlock: BigInt!
+  dripDuration: BigInt!
+}
 """
 The Vault entity tracks the OUSD vault balance over time.
 """

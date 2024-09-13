@@ -8,6 +8,7 @@ import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_DRIPPER_ADDRESS,
   OETH_VAULT_ADDRESS,
   OETH_ZAPPER_ADDRESS,
   RETH_ADDRESS,
@@ -28,6 +29,7 @@ const otokenProcessor = createOTokenProcessor({
     address: WOETH_ADDRESS,
     from: 17080507,
   },
+  dripperAddress: OETH_DRIPPER_ADDRESS,
   otokenVaultAddress: OETH_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: ETH_ADDRESS, symbol: 'ETH' },

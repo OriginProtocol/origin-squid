@@ -12,6 +12,7 @@ const otokenProcessor = createOTokenProcessor({
     address: baseAddresses.tokens.wsuperOETHb,
     from: 18760018,
   },
+  dripperAddress: baseAddresses.superOETHb.dripper,
   otokenVaultAddress: baseAddresses.superOETHb.vault,
   oTokenAssets: [
     { asset: baseAddresses.tokens.superOETHb, symbol: 'superOETHb' },

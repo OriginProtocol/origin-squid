@@ -3,6 +3,7 @@ import { findLast } from 'lodash'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
+import * as dripper from '@abi/dripper'
 import * as erc20 from '@abi/erc20'
 import * as otoken from '@abi/otoken'
 import * as otokenVault from '@abi/otoken-vault'
@@ -14,6 +15,7 @@ import {
   OTokenAddress,
   OTokenAsset,
   OTokenDailyStat,
+  OTokenDripperState,
   OTokenHistory,
   OTokenRebase,
   OTokenRebaseOption,
@@ -45,6 +47,7 @@ export const createOTokenProcessor = (params: {
     address: string
     from: number
   }
+  dripperAddress: string
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   upgrades?: {
@@ -98,6 +101,7 @@ export const createOTokenProcessor = (params: {
     apies: OTokenAPY[]
     activity: OTokenActivity[]
     vaults: OTokenVault[]
+    dripperStates: OTokenDripperState[]
     lastYieldDistributionEvent:
       | {
           fee: bigint
@@ -160,6 +164,7 @@ export const createOTokenProcessor = (params: {
       apies: [],
       activity: [],
       vaults: [],
+      dripperStates: [],
       lastYieldDistributionEvent: undefined,
     }
 
@@ -187,6 +192,26 @@ export const createOTokenProcessor = (params: {
           timestamp: new Date(block.header.timestamp),
           address: params.otokenVaultAddress,
           totalValue: await vaultContract.totalValue(),
+        }),
+      )
+
+      const dripperContract = new dripper.Contract(ctx, block.header, params.dripperAddress)
+      const [dripDuration, { lastCollect, perBlock }, availableFunds] = await Promise.all([
+        dripperContract.dripDuration(),
+        dripperContract.drip(),
+        dripperContract.availableFunds(),
+      ])
+      result.dripperStates.push(
+        new OTokenDripperState({
+          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+          chainId: ctx.chain.id,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          otoken: params.otokenAddress,
+          dripDuration,
+          lastCollect,
+          perBlock,
+          availableFunds,
         }),
       )
     })
@@ -245,10 +270,18 @@ export const createOTokenProcessor = (params: {
       entity.fees = rebases.reduce((sum, current) => sum + current.feeETH, 0n)
       entity.yield = rebases.reduce((sum, current) => sum + current.yieldETH, 0n)
 
-      entity.rateETH = await ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n)
-      entity.rateUSD = await ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n)
+      const dripperContract = new dripper.Contract(ctx, block.header, params.dripperAddress)
+      const [rateETH, rateUSD, dripperWETH] = await Promise.all([
+        ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n),
+        ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n),
+        dripperContract.availableFunds(),
+      ])
+
+      entity.rateETH = rateETH
+      entity.rateUSD = rateUSD
       entity.amoSupply = 0n // TODO
-      entity.dripperWETH = 0n // TODO
+
+      entity.dripperWETH = dripperWETH
       entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
       entity.wrappedSupply =
         params.wotoken && block.header.height >= params.wotoken.from
@@ -269,6 +302,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.rebaseOptions),
       ctx.store.insert(result.activity),
       ctx.store.insert(result.vaults),
+      ctx.store.insert(result.dripperStates),
       ctx.store.upsert([...result.dailyStats.values()].map((ds) => ds.entity)),
     ])
   }
