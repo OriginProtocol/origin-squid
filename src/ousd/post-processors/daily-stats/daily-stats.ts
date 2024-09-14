@@ -1,11 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import {
-  EntityManager,
-  FindOptionsOrderValue,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm'
+import { EntityManager, FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
 
 import {
   OToken,
@@ -14,7 +9,6 @@ import {
   OTokenHistory,
   OUSDCollateralDailyStat,
   OUSDDailyStat,
-  OUSDMorphoAave,
   OUSDStrategyDailyStat,
   OUSDStrategyHoldingDailyStat,
   OUSDVault,
@@ -33,8 +27,7 @@ export const setup = async (processor: EvmBatchProcessor) => {
 }
 
 export const process = async (ctx: Context) => {
-  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)
-    ?.header.timestamp
+  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)?.header.timestamp
   if (!firstBlockTimestamp) return
 
   const firstBlock = ctx.blocks[0]
@@ -43,11 +36,7 @@ export const process = async (ctx: Context) => {
   const endDate = dayjs.utc(lastBlock.header.timestamp).endOf('day')
 
   let dates: Date[] = []
-  for (
-    let date = startDate;
-    !date.isAfter(endDate);
-    date = date.add(1, 'day').endOf('day')
-  ) {
+  for (let date = startDate; !date.isAfter(endDate); date = date.add(1, 'day').endOf('day')) {
     dates.push(date.toDate())
   }
 
@@ -73,9 +62,7 @@ export const process = async (ctx: Context) => {
       // startTimestamp: Date.UTC(2023, 4, 17),
     })) as OUSDDailyStat[]
     const existingIds = dailyStats.map((stat) => stat.id)
-    dailyStats.push(
-      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
-    )
+    dailyStats.push(...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0))
   }
 
   await ctx.store.upsert(dailyStats)
@@ -100,18 +87,10 @@ async function updateDailyStats(ctx: Context, date: Date) {
     },
   }
 
-  const [
-    lastApy,
-    lastOusd,
-    lastVault,
-    lastMorpho,
-    lastWrappedOUSDHistory,
-    holdersOverThreshold,
-  ] = await Promise.all([
+  const [lastApy, lastOusd, lastVault, lastWrappedOUSDHistory, holdersOverThreshold] = await Promise.all([
     ctx.store.findOne(OTokenAPY, otokenQueryParams),
     ctx.store.findOne(OToken, otokenQueryParams),
     ctx.store.findOne(OUSDVault, queryParams),
-    ctx.store.findOne(OUSDMorphoAave, queryParams),
     ctx.store.findOne(OTokenHistory, {
       where: {
         chainId: ctx.chain.id,
@@ -129,7 +108,7 @@ async function updateDailyStats(ctx: Context, date: Date) {
   ])
 
   // Do we have any useful data yet?
-  const allEntities = [lastApy, lastOusd, lastVault, lastMorpho].filter(Boolean)
+  const allEntities = [lastApy, lastOusd, lastVault].filter(Boolean)
   if (![lastApy, lastOusd].every((entity) => !!entity)) {
     return null
   }

@@ -1,3 +1,5 @@
+import * as baseRewardPool from '@abi/base-reward-pool'
+import * as erc20 from '@abi/erc20'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createOTokenProcessor } from '@templates/otoken'
@@ -8,6 +10,7 @@ import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_CURVE_REWARD_LP_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_VAULT_ADDRESS,
   OETH_ZAPPER_ADDRESS,
@@ -19,6 +22,7 @@ import {
   WOETH_ADDRESS,
   WOETH_ARBITRUM_ADDRESS,
   WSTETH_ADDRESS,
+  strategies,
 } from '@utils/addresses'
 
 const otokenProcessor = createOTokenProcessor({
@@ -43,6 +47,16 @@ const otokenProcessor = createOTokenProcessor({
   ],
   upgrades: {
     rebaseOptEvents: 18872285,
+  },
+  getAmoSupply: async (ctx, height) => {
+    const oethContract = new erc20.Contract(ctx, { height }, OETH_ADDRESS)
+    const rewardPoolContract = new baseRewardPool.Contract(ctx, { height }, OETH_CURVE_REWARD_LP_ADDRESS)
+    const [poolBalance, rewardBalance, rewardTotal] = await Promise.all([
+      oethContract.balanceOf(CURVE_ETH_OETH_POOL_ADDRESS),
+      rewardPoolContract.balanceOf(strategies.oeth.ConvexEthMetaStrategy),
+      rewardPoolContract.totalSupply(),
+    ])
+    return (poolBalance * rewardBalance) / rewardTotal
   },
 })
 

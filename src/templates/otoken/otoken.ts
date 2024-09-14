@@ -50,6 +50,7 @@ export const createOTokenProcessor = (params: {
   dripperAddress: string
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
+  getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
   upgrades?: {
     rebaseOptEvents: number | false
   }
@@ -267,19 +268,20 @@ export const createOTokenProcessor = (params: {
           },
         })),
       )
-      entity.fees = rebases.reduce((sum, current) => sum + current.feeETH, 0n)
-      entity.yield = rebases.reduce((sum, current) => sum + current.yieldETH, 0n)
+      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
+      entity.yield = rebases.reduce((sum, current) => sum + current.yield, 0n)
 
       const dripperContract = new dripper.Contract(ctx, block.header, params.dripperAddress)
-      const [rateETH, rateUSD, dripperWETH] = await Promise.all([
+      const [rateETH, rateUSD, dripperWETH, amoSupply] = await Promise.all([
         ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n),
         ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n),
         dripperContract.availableFunds(),
+        params.getAmoSupply(ctx, block.header.height),
       ])
 
       entity.rateETH = rateETH
       entity.rateUSD = rateUSD
-      entity.amoSupply = 0n // TODO
+      entity.amoSupply = amoSupply
 
       entity.dripperWETH = dripperWETH
       entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)

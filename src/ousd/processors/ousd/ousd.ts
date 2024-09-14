@@ -24,4 +24,5 @@ export const { from, setup, process } = createOTokenProcessor({
     { asset: USDT_ADDRESS, symbol: 'USDT' },
     { asset: DAI_ADDRESS, symbol: 'DAI' },
   ],
+  getAmoSupply: async () => 0n,
 })

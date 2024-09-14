@@ -1,8 +1,9 @@
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { getPositions } from '@templates/aerodrome/lp'
 import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
-import { baseAddresses } from '@utils/addresses-base'
+import { aerodromePools, baseAddresses } from '@utils/addresses-base'
 
 const otokenProcessor = createOTokenProcessor({
   from: 17819702,
@@ -21,6 +22,15 @@ const otokenProcessor = createOTokenProcessor({
       symbol: 'WETH',
     },
   ],
+  getAmoSupply: async (ctx, height) => {
+    const positions = await getPositions(
+      ctx,
+      height,
+      aerodromePools['CL1-WETH/superOETHb'],
+      baseAddresses.superOETHb.strategies.amo,
+    )
+    return positions.reduce((acc, position) => acc + BigInt(position.amount1) + BigInt(position.staked1), 0n)
+  },
   upgrades: {
     rebaseOptEvents: false,
   },

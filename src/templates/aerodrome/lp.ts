@@ -8,8 +8,8 @@ import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
 // For AMM Pools the sugar contract iterates through all the pools, according to the pool indices.
 // To shortcut - we can supply accurate offsets and limits.
-const ammPoolFactory = '0x420dd381b31aef6683db6b902084cb0ffece40da'
-const ammPoolLookupOffset: Record<string, number | undefined> = {
+export const ammPoolFactory = '0x420dd381b31aef6683db6b902084cb0ffece40da'
+export const ammPoolLookupOffset: Record<string, number | undefined> = {
   [aerodromePools['vAMM-WETH/OGN'].address]: 1324,
   [aerodromePools['vAMM-OGN/superOETHb'].address]: 1673,
 }
@@ -21,13 +21,37 @@ const ammPoolLookupOffset: Record<string, number | undefined> = {
 // - 1 call at index 0 with our desired limit
 // - 1 call at the known pool index + count we just found, with our desired limit
 // (not perfect, but good enough?)
-const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a'
-const clPoolLookupOffset: Record<string, number | undefined> = {
+export const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a'
+export const clPoolLookupOffset: Record<string, number | undefined> = {
   [aerodromePools['CL1-WETH/superOETHb'].address]: 113,
   [aerodromePools['CL100-WETH/USDC'].address]: 1,
 }
 
 const MAX_POSITIONS = 200
+
+export const getPositions = async (ctx: Context, height: number, pool: PoolDefinition, account: string) => {
+  const sugar = new aerodromeLPSugarAbi.Contract(ctx, { height }, baseAddresses.aerodrome.sugarLPV3)
+  const offset = pool.type === 'amm' ? ammPoolLookupOffset[pool.address] : clPoolLookupOffset[pool.address]
+  const factoryAddress = pool.type === 'amm' ? ammPoolFactory : clPoolFactory
+  if (!offset) throw new Error('Pool offset not found.')
+  let positions = []
+  if (pool.type === 'cl') {
+    // First pull from offset 0 to capture any unstaked positions.
+    positions = await sugar.positionsByFactory(MAX_POSITIONS, 0, account, factoryAddress)
+    // Then pull from pool offset + however many positions we just found and merge the result.
+    positions = uniqBy(
+      [
+        ...positions,
+        ...(await sugar.positionsByFactory(MAX_POSITIONS, offset + positions.length, account, factoryAddress)),
+      ],
+      (p) => p.id,
+    )
+  } else {
+    // No special logic needed for AMM.
+    positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, account, factoryAddress)
+  }
+  return positions
+}
 
 export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
   const from = Math.max(16962730, pool.from) // Sugar deploy date or from.
@@ -43,26 +67,7 @@ export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
         const lpStates: AeroLP[] = []
         const lpPositionStates: AeroLPPosition[] = []
         await frequencyUpdater(ctx, async (ctx: Context, block: Block) => {
-          const sugar = new aerodromeLPSugarAbi.Contract(ctx, block.header, baseAddresses.aerodrome.sugarLPV3)
-          const offset = pool.type === 'amm' ? ammPoolLookupOffset[pool.address] : clPoolLookupOffset[pool.address]
-          const factoryAddress = pool.type === 'amm' ? ammPoolFactory : clPoolFactory
-          if (!offset) throw new Error('Pool offset not found.')
-          let positions = []
-          if (pool.type === 'cl') {
-            // First pull from offset 0 to capture any unstaked positions.
-            positions = await sugar.positionsByFactory(MAX_POSITIONS, 0, account, factoryAddress)
-            // Then pull from pool offset + however many positions we just found and merge the result.
-            positions = uniqBy(
-              [
-                ...positions,
-                ...(await sugar.positionsByFactory(MAX_POSITIONS, offset + positions.length, account, factoryAddress)),
-              ],
-              (p) => p.id,
-            )
-          } else {
-            // No special logic needed for AMM.
-            positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, account, factoryAddress)
-          }
+          const positions = await getPositions(ctx, block.header.height, pool, account)
           lpPositionStates.push(
             ...positions.map(
               (p) =>
