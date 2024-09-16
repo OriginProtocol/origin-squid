@@ -52,6 +52,7 @@ const otokenProcessor = createOTokenProcessor({
     rebaseOptEvents: 18872285,
   },
   getAmoSupply: async (ctx, height) => {
+    if (height < 17297479) return 0n
     const oethContract = new erc20.Contract(ctx, { height }, OETH_ADDRESS)
     const rewardPoolContract = new baseRewardPool.Contract(ctx, { height }, OETH_CURVE_REWARD_LP_ADDRESS)
     const [poolBalance, rewardBalance, rewardTotal] = await Promise.all([
