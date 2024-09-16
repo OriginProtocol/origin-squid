@@ -17,7 +17,10 @@ export const { from, setup, process } = createOTokenProcessor({
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
   otokenAddress: OUSD_ADDRESS,
-  dripperAddress: OUSD_DRIPPER_ADDRESS,
+  dripper: {
+    address: OUSD_DRIPPER_ADDRESS,
+    from: 14250273,
+  },
   otokenVaultAddress: OUSD_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: USDC_ADDRESS, symbol: 'USDC' },

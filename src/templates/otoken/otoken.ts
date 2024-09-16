@@ -47,7 +47,10 @@ export const createOTokenProcessor = (params: {
     address: string
     from: number
   }
-  dripperAddress: string
+  dripper?: {
+    address: string
+    from: number
+  }
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
@@ -196,25 +199,27 @@ export const createOTokenProcessor = (params: {
         }),
       )
 
-      const dripperContract = new dripper.Contract(ctx, block.header, params.dripperAddress)
-      const [dripDuration, { lastCollect, perBlock }, availableFunds] = await Promise.all([
-        dripperContract.dripDuration(),
-        dripperContract.drip(),
-        dripperContract.availableFunds(),
-      ])
-      result.dripperStates.push(
-        new OTokenDripperState({
-          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-          chainId: ctx.chain.id,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          otoken: params.otokenAddress,
-          dripDuration,
-          lastCollect,
-          perBlock,
-          availableFunds,
-        }),
-      )
+      if (params.dripper && params.dripper.from <= block.header.height) {
+        const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
+        const [dripDuration, { lastCollect, perBlock }, availableFunds] = await Promise.all([
+          dripperContract.dripDuration(),
+          dripperContract.drip(),
+          dripperContract.availableFunds(),
+        ])
+        result.dripperStates.push(
+          new OTokenDripperState({
+            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+            chainId: ctx.chain.id,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+            otoken: params.otokenAddress,
+            dripDuration,
+            lastCollect,
+            perBlock,
+            availableFunds,
+          }),
+        )
+      }
     })
 
     // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
@@ -271,11 +276,15 @@ export const createOTokenProcessor = (params: {
       entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
       entity.yield = rebases.reduce((sum, current) => sum + current.yield, 0n)
 
-      const dripperContract = new dripper.Contract(ctx, block.header, params.dripperAddress)
+      const getDripperAvailableFunds = async () => {
+        if (!params.dripper || params.dripper.from < block.header.height) return 0n
+        const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
+        return dripperContract.availableFunds()
+      }
       const [rateETH, rateUSD, dripperWETH, amoSupply] = await Promise.all([
         ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n),
         ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n),
-        dripperContract.availableFunds(),
+        getDripperAvailableFunds(),
         params.getAmoSupply(ctx, block.header.height),
       ])
 
@@ -445,15 +454,6 @@ export const createOTokenProcessor = (params: {
 
     // OToken Object
     const otokenObject = await getLatestOTokenObject(ctx, result, block)
-
-    if (!result.lastYieldDistributionEvent) {
-      result.lastYieldDistributionEvent = { yield: data.totalSupply - otokenObject.totalSupply, fee: 0n }
-      console.log(
-        `Created artificial YieldDistribution event data since it is missing: ${jsonify(
-          result.lastYieldDistributionEvent,
-        )}`,
-      )
-    }
 
     otokenObject.totalSupply = data.totalSupply
     otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply

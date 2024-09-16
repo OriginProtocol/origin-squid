@@ -33,7 +33,10 @@ const otokenProcessor = createOTokenProcessor({
     address: WOETH_ADDRESS,
     from: 17080507,
   },
-  dripperAddress: OETH_DRIPPER_ADDRESS,
+  dripper: {
+    address: OETH_DRIPPER_ADDRESS,
+    from: 17067707,
+  },
   otokenVaultAddress: OETH_VAULT_ADDRESS,
   oTokenAssets: [
     { asset: ETH_ADDRESS, symbol: 'ETH' },
