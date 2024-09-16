@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { last } from 'lodash'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
@@ -43,13 +44,16 @@ export async function createRebaseAPY(
   ctx: Context,
   otokenAddress: CurrencyAddress,
   apies: OTokenAPY[],
+  rebases: OTokenRebase[],
   block: Context['blocks']['0'],
   log: Context['blocks']['0']['logs']['0'],
   rebaseEvent: ReturnType<typeof otoken.events.TotalSupplyUpdatedHighres.decode>,
-  lastYieldDistributionEvent: {
-    fee: bigint
-    yield: bigint
-  },
+  lastYieldDistributionEvent:
+    | {
+        fee: bigint
+        yield: bigint
+      }
+    | undefined,
 ) {
   let feeETH = 0n
   let yieldETH = 0n
@@ -57,16 +61,36 @@ export async function createRebaseAPY(
   let yieldUSD = 0n
   const generateId = (date: dayjs.Dayjs | string | Date | number) => dayjs.utc(date).toISOString().substring(0, 10)
 
+  let _fee = lastYieldDistributionEvent?.fee ?? 0n
+  let _yield = lastYieldDistributionEvent?.yield ?? 0n
+  if (!lastYieldDistributionEvent) {
+    let lastRebase =
+      last(rebases) ??
+      (await ctx.store.findOne(OTokenRebase, {
+        where: {
+          chainId: ctx.chain.id,
+          otoken: otokenAddress,
+        },
+        order: { timestamp: 'DESC' },
+      }))
+    if (lastRebase) {
+      //  (current rebasing credits / current rcpt) - (current rebasing credits / past rcpt)
+      _yield =
+        (rebaseEvent.rebasingCredits * 10n ** 18n) / rebaseEvent.rebasingCreditsPerToken -
+        (rebaseEvent.rebasingCredits * 10n ** 18n) / lastRebase.rebasingCreditsPerToken
+    }
+  }
+
   if (OUSD_STABLE_OTOKENS.includes(otokenAddress)) {
     const rate = await ensureExchangeRate(ctx, block, otokenAddress, 'ETH').then((er) => er?.rate ?? 0n)
-    feeUSD = lastYieldDistributionEvent.fee
-    yieldUSD = lastYieldDistributionEvent.yield
+    feeUSD = _fee
+    yieldUSD = _yield
     feeETH = (feeUSD * rate) / 1000000000000000000n
     yieldETH = (yieldUSD * rate) / 1000000000000000000n
   } else {
     const rate = await ensureExchangeRate(ctx, block, otokenAddress, 'USD').then((er) => er?.rate ?? 0n)
-    feeETH = lastYieldDistributionEvent.fee
-    yieldETH = lastYieldDistributionEvent.yield
+    feeETH = _fee
+    yieldETH = _yield
     feeUSD = (feeETH * rate) / 1000000000000000000n
     yieldUSD = (yieldETH * rate) / 1000000000000000000n
   }
@@ -81,8 +105,8 @@ export async function createRebaseAPY(
     rebasingCredits: rebaseEvent.rebasingCredits,
     rebasingCreditsPerToken: rebaseEvent.rebasingCreditsPerToken,
     totalSupply: rebaseEvent.totalSupply,
-    fee: lastYieldDistributionEvent.fee,
-    yield: lastYieldDistributionEvent.yield,
+    fee: _fee,
+    yield: _yield,
     feeUSD,
     yieldUSD,
     feeETH,

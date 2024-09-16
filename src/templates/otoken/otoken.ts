@@ -463,6 +463,7 @@ export const createOTokenProcessor = (params: {
       ctx,
       params.otokenAddress,
       result.apies,
+      result.rebases,
       block,
       log,
       data,
