@@ -277,7 +277,7 @@ export const createOTokenProcessor = (params: {
       entity.yield = rebases.reduce((sum, current) => sum + current.yield, 0n)
 
       const getDripperAvailableFunds = async () => {
-        if (!params.dripper || params.dripper.from < block.header.height) return 0n
+        if (!params.dripper || params.dripper.from > block.header.height) return 0n
         const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
         return dripperContract.availableFunds()
       }
