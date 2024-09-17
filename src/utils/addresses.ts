@@ -121,6 +121,7 @@ export const tokens = {
 
   // Non-stable
   BAL: BAL_ADDRESS,
+  AERO: baseAddresses.tokens.AERO,
 } as const
 export type TokenSymbol = keyof typeof tokens
 export type TokenAddress = (typeof tokens)[TokenSymbol]

@@ -29,6 +29,13 @@ export const baseERC20s = [
     from: 17819702,
     address: baseAddresses.tokens.wsuperOETHb,
   }),
+  // AERO (limited)
+  createERC20Tracker({
+    from: 18689558,
+    address: baseAddresses.tokens.AERO,
+    accountFilter: [baseAddresses.superOETHb.strategies.amo, baseAddresses.multisig.reservoir],
+    intervalTracking: true,
+  }),
   // WETH (limited)
   createERC20Tracker({
     from: 18689558,
