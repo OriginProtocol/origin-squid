@@ -10,3 +10,4 @@
 
 .env
 .yarn.lock
+.DS_Store

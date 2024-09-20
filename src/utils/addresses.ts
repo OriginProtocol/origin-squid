@@ -31,6 +31,8 @@ export const CURVE_FRXETH_OETH_POOL_ADDRESS = '0xfa0bbb0a5815f6648241c9221027b70
 
 export const BALANCER_VAULT = '0xba12222222228d8ba445958a75a0704d566bf2c8'
 export const AURA_REWARDS_POOL_ADDRESS = '0xdd1fe5ad401d4777ce89959b7fa587e569bf125d'
+export const MORPHO_ADDRESS = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb'
+export const META_MORPHO_ADDRESS = '0xbeef01735c132ada46aa9aa4c54623caa92a64cb'
 
 // ----------------
 // Origin Addresses
@@ -144,6 +146,7 @@ export const strategies = {
     CompoundStrategy: '0x9c459eeb3fa179a40329b81c1635525e9a0ef094', // Deprecated
     ConvexStrategy: '0xea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3', // Deprecated
     LUSDMetaStrategy: '0x7A192DD9Cc4Ea9bdEdeC9992df74F1DA55e60a19', // Deprecated
+    MetaMorphoStrategy: '0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0',
   },
 } as const
 

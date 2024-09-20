@@ -125,6 +125,10 @@ export const run = ({
 }) => {
   assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
 
+  if (process.env.PROCESSOR) {
+    processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))
+  }
+
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
   const processor = createSquidProcessor(config)
