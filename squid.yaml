@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: origin-squid
-version: 49
+version: 999
 description: 'Origin Protocol 🦑'
 build:
 deploy:
@@ -15,30 +15,30 @@ deploy:
     - RPC_ENV
   processor:
     - name: mainnet-processor
-      cmd: [ "sqd", "process:mainnet:prod" ]
+      cmd: ['sqd', 'process:mainnet:prod']
       env:
         TS_NODE_BASEURL: './lib'
     - name: arbitrum-processor
-      cmd: [ "sqd", "process:arbitrum:prod" ]
+      cmd: ['sqd', 'process:arbitrum:prod']
       env:
         RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: base-processor
-      cmd: [ "sqd", "process:base:prod" ]
+      cmd: ['sqd', 'process:base:prod']
       env:
         RPC_BASE_ENV: RPC_BASE_HTTP
         TS_NODE_BASEURL: './lib'
     - name: oeth-processor
-      cmd: [ "sqd", "process:oeth:prod" ]
+      cmd: ['sqd', 'process:oeth:prod']
       env:
         TS_NODE_BASEURL: './lib'
     - name: ogv-processor
-      cmd: [ "sqd", "process:ogv:prod" ]
+      cmd: ['sqd', 'process:ogv:prod']
       env:
         RPC_ENV: RPC_ENDPOINT
         TS_NODE_BASEURL: './lib'
     - name: ousd-processor
-      cmd: [ "sqd", "process:ousd:prod" ]
+      cmd: ['sqd', 'process:ousd:prod']
       env:
         RPC_ENV: RPC_ENDPOINT
         TS_NODE_BASEURL: './lib'
