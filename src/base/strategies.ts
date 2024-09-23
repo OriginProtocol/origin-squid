@@ -7,6 +7,7 @@ import { baseAddresses } from '@utils/addresses-base'
 
 export const oethbStrategies: readonly IStrategyData[] = [
   {
+    chainId: 8453,
     from: 18689563,
     name: 'Bridged WOETH Strategy',
     contractName: 'BridgedWOETHStrategy',
@@ -18,6 +19,7 @@ export const oethbStrategies: readonly IStrategyData[] = [
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
   {
+    chainId: 8453,
     from: 19046362,
     name: 'Aerodrome AMO Strategy',
     contractName: 'AerodromeAMOStrategy',

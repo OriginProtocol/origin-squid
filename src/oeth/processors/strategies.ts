@@ -18,6 +18,7 @@ import {
 
 export const oethStrategies: readonly IStrategyData[] = [
   {
+    chainId: 1,
     from: 17249899,
     name: 'OETH Convex ETH+OETH (AMO)',
     contractName: 'ConvexEthMetaStrategy',
@@ -36,6 +37,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
   {
+    chainId: 1,
     from: 17067232,
     name: 'OETH Frax Staking',
     contractName: 'FraxETHStrategy',
@@ -47,6 +49,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
+    chainId: 1,
     from: 17367105,
     name: 'OETH Morpho Aave V2',
     contractName: 'MorphoAaveStrategy',
@@ -58,6 +61,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
+    chainId: 1,
     from: 18156225,
     name: 'OETH Aura rETH/WETH',
     contractName: 'BalancerMetaPoolStrategy',
@@ -90,6 +94,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     },
   },
   {
+    chainId: 1,
     from: 17141121,
     name: 'OETH Vault (rETH)',
     contractName: 'VaultCore',
@@ -107,6 +112,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     })),
   },
   {
+    chainId: 1,
     from: 17067232,
     name: 'OETH Vault (stETH)',
     contractName: 'VaultCore',
@@ -117,6 +123,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     assets: [STETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
   },
   {
+    chainId: 1,
     from: 17067232,
     name: 'OETH Vault (WETH)',
     contractName: 'VaultCore',
@@ -130,6 +137,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     })),
   },
   {
+    chainId: 1,
     from: 20046251,
     name: 'OETH Native Staking 1',
     contractName: 'NativeStakingSSVStrategy',
@@ -141,6 +149,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {
+    chainId: 1,
     from: 20290461,
     name: 'OETH Native Staking 2',
     contractName: 'NativeStakingSSVStrategy',

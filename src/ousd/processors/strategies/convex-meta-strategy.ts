@@ -9,6 +9,7 @@ import { DAI, USDC, USDT } from './const'
 const from = 15896478
 
 export const convexMetaStrategy: IStrategyData = {
+  chainId: 1,
   from,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'CurveAMO',

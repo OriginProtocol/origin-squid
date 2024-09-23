@@ -12,7 +12,7 @@ import { metamorphoStrategy } from './metamorpho-strategy'
 import { morphoAave } from './morpho-aave'
 import { morphoCompound } from './morpho-compound'
 
-const ousdStrategies: readonly IStrategyData[] = [
+export const ousdStrategies: readonly IStrategyData[] = [
   convexMetaStrategy,
   aaveStrategy,
   morphoCompound,

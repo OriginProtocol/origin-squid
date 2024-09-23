@@ -1,10 +1,15 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { compact } from 'lodash'
+import { ousdStrategies } from 'ousd/processors/strategies'
 import { Arg, Field, Info, Int, ObjectType, Query, Resolver } from 'type-graphql'
 import { EntityManager, LessThanOrEqual } from 'typeorm'
 
 import { StrategyBalance } from '@model'
+import { IStrategyData } from '@templates/strategy'
+import { addresses } from '@utils/addresses'
+import { baseAddresses } from '@utils/addresses-base'
 
+import { oethbStrategies } from '../base/strategies'
 import { oethStrategies } from '../oeth/processors/strategies'
 
 /**
@@ -47,6 +52,12 @@ export class Balance {
   }
 }
 
+const otokens: Record<string, readonly IStrategyData[]> = {
+  [addresses.oeth.address]: oethStrategies,
+  [addresses.ousd.address]: ousdStrategies,
+  [baseAddresses.superOETHb.address]: oethbStrategies,
+}
+
 @Resolver()
 export class StrategyResolver {
   constructor(private tx: () => Promise<EntityManager>) {}
@@ -54,11 +65,19 @@ export class StrategyResolver {
   @Query(() => [Strategy])
   async strategies(
     @Arg('timestamp', () => String, { nullable: true }) timestamp: string | null,
+    @Arg('chainId', () => Number, { nullable: true }) chainId: number | null,
+    @Arg('otoken', () => String, { nullable: true }) otoken: string | null,
     @Info() info: GraphQLResolveInfo,
   ): Promise<Strategy[]> {
     const manager = await this.tx()
+
+    let strategies = otoken ? otokens[otoken] : Object.values(otokens).flat()
+    if (chainId) {
+      strategies = strategies.filter((s) => s.chainId === chainId)
+    }
+
     return Promise.all(
-      oethStrategies.map(async (s) => {
+      strategies.map(async (s) => {
         return {
           name: s.name,
           contractName: s.contractName,

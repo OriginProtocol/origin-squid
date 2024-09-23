@@ -9,6 +9,7 @@ import { logFilter } from '@utils/logFilter'
 import { DAI, USDT } from './const'
 
 export const aaveStrategy: IStrategyData = {
+  chainId: 1,
   from: 14206832, // 13369326, Initial Deploy
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',

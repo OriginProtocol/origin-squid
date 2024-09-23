@@ -2,9 +2,10 @@ import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainne
 import { IStrategyData } from '@templates/strategy'
 import { OUSD_ADDRESS } from '@utils/addresses'
 
-import { DAI, USDC, USDT } from './const'
+import { DAI } from './const'
 
 export const makerDsrStrategy: IStrategyData = {
+  chainId: 1,
   from: 17883037,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
