@@ -82,6 +82,7 @@ export async function createRebaseAPY(
         (rebaseEvent.rebasingCredits * 10n ** 18n) / rebaseEvent.rebasingCreditsPerToken -
         (rebaseEvent.rebasingCredits * 10n ** 18n) / lastRebase.rebasingCreditsPerToken
       _fee = (_yield * 25n) / 100n
+      _yield += _fee // YieldDistributionEvent yield includes the fee so let's add that here.
     }
   }
 

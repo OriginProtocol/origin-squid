@@ -30,7 +30,6 @@ import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
-import { jsonify } from '@utils/jsonify'
 import { multicall } from '@utils/multicall'
 import { getLatestEntity } from '@utils/utils'
 
@@ -274,7 +273,7 @@ export const createOTokenProcessor = (params: {
         })),
       )
       entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
-      entity.yield = rebases.reduce((sum, current) => sum + current.yield, 0n)
+      entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
 
       const getDripperAvailableFunds = async () => {
         if (!params.dripper || params.dripper.from > block.header.height) return 0n
