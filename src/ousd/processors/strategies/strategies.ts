@@ -1,20 +1,14 @@
 import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  IStrategyData,
-  createStrategyProcessor,
-  createStrategySetup,
-} from '@templates/strategy'
-import {
-  createStrategyRewardProcessor,
-  createStrategyRewardSetup,
-} from '@templates/strategy-rewards'
+import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
+import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 
 import { aaveStrategy } from './aave-strategy'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'
 import { makerDsrStrategy } from './maker-dsr-strategy'
+import { metamorphoStrategy } from './metamorpho-strategy'
 import { morphoAave } from './morpho-aave'
 import { morphoCompound } from './morpho-compound'
 
@@ -25,6 +19,7 @@ const ousdStrategies: readonly IStrategyData[] = [
   morphoAave,
   fluxStrategy,
   makerDsrStrategy,
+  metamorphoStrategy,
 
   // Deprecated
   // {
@@ -45,7 +40,7 @@ const ousdStrategies: readonly IStrategyData[] = [
 ]
 
 const strategies = ousdStrategies
-
+export const name = 'OUSD Strategies'
 export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {

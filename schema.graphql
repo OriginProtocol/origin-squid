@@ -1867,8 +1867,7 @@ type OUSDStrategyDailyStat @entity {
   name: String!
   total: BigInt!
   tvl: BigInt!
-  holdings: [OUSDStrategyHoldingDailyStat]
-  @derivedFrom(field: "strategyDailyStatId")
+  holdings: [OUSDStrategyHoldingDailyStat] @derivedFrom(field: "strategyDailyStatId")
 }
 
 type OUSDStrategyHoldingDailyStat @entity {
@@ -1886,6 +1885,20 @@ type OUSDCollateralDailyStat @entity {
   amount: BigInt!
   price: BigInt!
   value: BigInt!
+}
+
+type MorphoMarketState @entity {
+  id: ID!
+  chainId: Int!
+  timestamp: DateTime!
+  blockNumber: Int!
+  marketId: String!
+  totalSupplyAssets: BigInt!
+  totalSupplyShares: BigInt!
+  totalBorrowAssets: BigInt!
+  totalBorrowShares: BigInt!
+  lastUpdate: BigInt!
+  fee: BigInt!
 }
 type EventWOETHPriceUpdated @entity {
   id: ID!

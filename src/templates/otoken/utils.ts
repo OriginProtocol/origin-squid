@@ -74,10 +74,14 @@ export async function createRebaseAPY(
         order: { timestamp: 'DESC' },
       }))
     if (lastRebase) {
+      // Hack solution if `lastYieldDistributionEvent` is missing.
+      // The split should be 80:20 and this is currently only seen on superOETHb.
+      // For any amount of yield seen we can assume we've also generated 25% of that amount as fees.
       //  (current rebasing credits / current rcpt) - (current rebasing credits / past rcpt)
       _yield =
         (rebaseEvent.rebasingCredits * 10n ** 18n) / rebaseEvent.rebasingCreditsPerToken -
         (rebaseEvent.rebasingCredits * 10n ** 18n) / lastRebase.rebasingCreditsPerToken
+      _fee = (_yield * 25n) / 100n
     }
   }
 
