@@ -29,11 +29,7 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
   if (getPrice) {
     return getPrice(ctx, height)
   }
-  if (base === 'OETH' && quote === 'USD') {
-    const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
-    return ethusd * 10n ** 10n
-  }
-  return getChainlinkPrice(ctx, height, base, quote)
+  throw new Error(`No price for ${base}_${quote}`)
 }
 
 const getOETHETHPrice = async (ctx: Context, height: number) => {
@@ -94,7 +90,8 @@ const getChainlinkPrice = async (ctx: Context, height: number, base: MainnetCurr
 
 const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
 const oethOracleAddress = '0xbE19cC5654e30dAF04AD3B5E06213D70F4e882eE'
-const getOethOraclePrice = (ctx: Context, height: number, quote: MainnetCurrency) => {
+const getOethOraclePrice = async (ctx: Context, height: number, quote: MainnetCurrency) => {
+  if (height < 18032300) return 0n
   const router = new oethOracleRouter.Contract(ctx, { height }, oethOracleAddress)
   return router.price(mainnetCurrencies[quote as MainnetCurrencySymbol] ?? quote)
 }

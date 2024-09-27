@@ -28,14 +28,6 @@ if (require.main === module) {
               pair.split('_')[1] as CurrencySymbol,
             )
             console.log(`${pair} = ${Number(rate?.rate) / 1e18}`)
-
-            const rate2 = await ensureExchangeRate(
-              ctx,
-              ctx.blocks[0],
-              pair.split('_')[1] as CurrencySymbol,
-              pair.split('_')[0] as CurrencySymbol,
-            )
-            console.log(`${pair.split('_').reverse().join('_')} = ${Number(rate2?.rate) / 1e18}`)
           }
 
           process.exit(0)
