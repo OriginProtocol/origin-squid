@@ -148,7 +148,7 @@ export const translateMainnetSymbol = (symbol: MainnetCurrency): MainnetCurrency
   return symbol
 }
 
-export const invertRate = (rate: bigint, decimals = 18) => 10n ** BigInt(2 * decimals) / rate
+export const invertRate = (rate: bigint, decimals = 18) => (rate > 0n ? 10n ** BigInt(2 * decimals) / rate : 0n)
 export const twoWay = <Base extends CurrencySymbol, Quote extends CurrencySymbol>(
   base: Base,
   quote: Quote,
