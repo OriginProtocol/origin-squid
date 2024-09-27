@@ -25,8 +25,9 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
   base = translateMainnetSymbol(base)
   quote = translateMainnetSymbol(quote)
 
-  const getPrice = priceMap[`${base}_${quote}`]
-  if (getPrice) {
+  const priceEntry = priceMap[`${base}_${quote}`]
+  if (priceEntry) {
+    const [getPrice] = priceEntry
     return getPrice(ctx, height)
   }
   throw new Error(`No price for ${base}_${quote}`)
@@ -148,25 +149,46 @@ export const translateMainnetSymbol = (symbol: MainnetCurrency): MainnetCurrency
   return symbol
 }
 
+export const derived = <Base extends MainnetCurrencySymbol, Quote extends MainnetCurrencySymbol>(
+  base: Base,
+  quote: Quote,
+  connections: { base: MainnetCurrencySymbol; quote: MainnetCurrencySymbol }[],
+  decimals: number = 18,
+) => {
+  return twoWay(
+    base,
+    quote,
+    async (ctx: Context, height: number) => {
+      const baseExponent = 10n ** BigInt(decimals)
+      const rates = await Promise.all(connections.map(({ base, quote }) => getMainnetPrice(ctx, height, base, quote)))
+      return rates.reduce((acc, rate) => (acc * rate) / baseExponent, baseExponent)
+    },
+    decimals,
+  )
+}
 export const invertRate = (rate: bigint, decimals = 18) => (rate > 0n ? 10n ** BigInt(2 * decimals) / rate : 0n)
-export const twoWay = <Base extends CurrencySymbol, Quote extends CurrencySymbol>(
+export const twoWay = <Base extends MainnetCurrencySymbol, Quote extends MainnetCurrencySymbol>(
   base: Base,
   quote: Quote,
   getPrice: (ctx: Context, height: number) => Promise<bigint>,
+  decimals: number = 18,
 ) =>
   ({
-    [`${base}_${quote}`]: async (ctx: Context, height: number) => getPrice(ctx, height),
-    [`${quote}_${base}`]: async (ctx: Context, height: number) => getPrice(ctx, height).then(invertRate),
-  }) as Record<`${Base}_${Quote}` | `${Quote}_${Base}`, (ctx: Context, height: number) => Promise<bigint>>
+    [`${base}_${quote}`]: [async (ctx: Context, height: number) => getPrice(ctx, height), decimals],
+    [`${quote}_${base}`]: [
+      async (ctx: Context, height: number) => getPrice(ctx, height).then((rate) => invertRate(rate, decimals)),
+      decimals,
+    ],
+  }) as Record<`${Base}_${Quote}` | `${Quote}_${Base}`, [(ctx: Context, height: number) => Promise<bigint>, number]>
 
 export const priceMap: Partial<
-  Record<`${CurrencySymbol}_${CurrencySymbol}`, (ctx: Context, height: number) => Promise<bigint>>
+  Record<`${CurrencySymbol}_${CurrencySymbol}`, [(ctx: Context, height: number) => Promise<bigint>, number]>
 > = {
-  ETH_WETH: async () => 1_000_000_000_000_000_000n,
-  WETH_ETH: async () => 1_000_000_000_000_000_000n,
-  ETH_ETH: async () => 1_000_000_000_000_000_000n,
-  ETH_OETH: getETHOETHPrice,
-  OETH_ETH: getOETHETHPrice,
+  ETH_WETH: [async () => 1_000_000_000_000_000_000n, 18],
+  WETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
+  ETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
+  ETH_OETH: [getETHOETHPrice, 18],
+  OETH_ETH: [getOETHETHPrice, 18],
   ...twoWay('ETH', 'sfrxETH', getStakedFraxPrice),
   ...twoWay('ETH', 'rETH', getRETHPrice),
   ...twoWay('ETH', 'frxETH', getFrxEthPrice),
@@ -175,6 +197,19 @@ export const priceMap: Partial<
   ...twoWay('OUSD', 'ETH', getPrice_OUSD_ETH),
   ...twoWay('ETH', 'stETH', (ctx, height) => getOethOraclePrice(ctx, height, 'stETH')),
   ...twoWay('OETH', 'USD', getPrice_OETH_USD),
-  ETH_USD: (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'),
-  // ...twoWay('ETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD').then((p) => p * 10n ** 10n)),
-} as const
+  ...twoWay('ETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'), 8),
+  ...twoWay('DAI', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'DAI', 'USD'), 8),
+  ...twoWay('USDC', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'USD'), 8),
+  ...twoWay('USDT', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'USD'), 8),
+  ...derived(
+    'DAI',
+    'ETH',
+    [
+      { base: 'DAI', quote: 'USD' },
+      { base: 'USD', quote: 'ETH' },
+    ],
+    8,
+  ),
+  ...twoWay('USDC', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'ETH')),
+  ...twoWay('USDT', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'ETH')),
+}

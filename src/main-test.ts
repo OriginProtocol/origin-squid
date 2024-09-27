@@ -20,14 +20,14 @@ if (require.main === module) {
         process: async (ctx) => {
           // Validate that we're getting otoken rates the way we want to.
 
-          for (const pair of Object.keys(priceMap)) {
+          for (const [pair, [getPrice, decimals]] of Object.entries(priceMap)) {
             const rate = await ensureExchangeRate(
               ctx,
               ctx.blocks[0],
               pair.split('_')[0] as CurrencySymbol,
               pair.split('_')[1] as CurrencySymbol,
             )
-            console.log(`${pair} = ${Number(rate?.rate) / 1e18}`)
+            console.log(`${pair} = ${Number(rate?.rate) / 10 ** decimals}`)
           }
 
           process.exit(0)
