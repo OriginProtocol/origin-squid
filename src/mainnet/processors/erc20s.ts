@@ -5,14 +5,12 @@ import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_VAULT_ADDRESS,
-  OUSD_VAULT_ADDRESS,
-  TokenSymbol,
   WOETH_ADDRESS,
   oethStrategyArray,
-  ousdStrategyArray,
   tokens,
 } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
+import { TokenSymbol } from '@utils/symbols'
 
 // TODO: Would be nice if interested parties could register their desires here from other parts of the code,
 //  allowing multiple declarations of need without issue.

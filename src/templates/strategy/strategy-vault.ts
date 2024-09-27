@@ -1,8 +1,11 @@
 import * as erc20 from '@abi/erc20'
 import { StrategyBalance } from '@model'
 import { Block, Context } from '@processor'
+import { convertRate } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { addressToSymbol } from '@utils/symbols'
 import { convertDecimals } from '@utils/utils'
 
 import { IStrategyData } from './index'
@@ -33,21 +36,24 @@ const getStrategyHoldings = async (
   block: Block,
   strategyData: IStrategyData,
 ): Promise<StrategyBalance[]> => {
-  const { assets, address } = strategyData
+  const data: StrategyBalance[] = []
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
-  const promises = assets.map(async (asset) => {
-    return new StrategyBalance({
-      id: `${ctx.chain.id}:${address}:${asset.address}:${block.header.height}`,
-      chainId: ctx.chain.id,
-      strategy: address,
-      asset: asset.address,
-      balance: balances.find((b) => b.asset === asset.address)?.balance,
-      blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp),
-    })
-  })
-
-  return await Promise.all(promises)
+  for (const { address, asset, balance } of balances) {
+    data.push(
+      new StrategyBalance({
+        id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
+        chainId: ctx.chain.id,
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+        strategy: address,
+        asset,
+        symbol: addressToSymbol(asset),
+        balance,
+        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+      }),
+    )
+  }
+  return data
 }
 
 const getStrategyBalances = async (

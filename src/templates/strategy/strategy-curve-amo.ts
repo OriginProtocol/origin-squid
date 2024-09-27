@@ -3,9 +3,12 @@ import * as erc20 from '@abi/erc20'
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
 import { Block, Context } from '@processor'
+import { convertRate } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { addressToSymbol } from '@utils/symbols'
 
 import { IStrategyData } from './index'
 import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
@@ -36,17 +39,23 @@ const getCurveAMOStrategyHoldings = async (
   strategyData: IStrategyData,
 ): Promise<StrategyBalance[]> => {
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
-  return balances.map(({ address, asset, balance }) => {
-    return new StrategyBalance({
-      id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
-      chainId: ctx.chain.id,
-      strategy: address,
-      asset,
-      balance,
-      blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp),
-    })
-  })
+  let strategyBalances: StrategyBalance[] = []
+  for (const { address, asset, balance } of balances) {
+    strategyBalances.push(
+      new StrategyBalance({
+        id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
+        chainId: ctx.chain.id,
+        strategy: address,
+        asset,
+        symbol: addressToSymbol(asset),
+        balance,
+        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+      }),
+    )
+  }
+  return strategyBalances
 }
 
 export const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {

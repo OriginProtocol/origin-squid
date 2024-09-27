@@ -980,7 +980,9 @@ type StrategyBalance @entity {
   blockNumber: Int! @index
   strategy: String!
   asset: String!
+  symbol: String!
   balance: BigInt!
+  balanceETH: BigInt!
 }
 
 type StrategyYield @entity {
@@ -1746,7 +1748,6 @@ type OTokenActivity @entity {
   data: JSON
 }
 
-
 enum OTokenActivityType {
   Approval
   Bridge
@@ -1792,6 +1793,8 @@ type OTokenDailyStat @entity {
 
   yield: BigInt!
   fees: BigInt!
+  cumulativeYield: BigInt!
+  cumulativeFees: BigInt!
 
   marketCapUSD: Float!
 }

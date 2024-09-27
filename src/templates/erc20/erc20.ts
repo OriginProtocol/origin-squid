@@ -3,10 +3,11 @@ import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@mo
 import { Context } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
+import { ADDRESS_ZERO } from '@utils/addresses'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { LogFilter, logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
+import { TokenAddress } from '@utils/symbols'
 
 const duplicateTracker = new Set<string>()
 

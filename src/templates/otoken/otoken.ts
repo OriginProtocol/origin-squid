@@ -272,8 +272,14 @@ export const createOTokenProcessor = (params: {
           },
         })),
       )
-      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
       entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
+      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
+
+      const lastDayString = dayjs(block.header.timestamp).subtract(1, 'day').toISOString().substring(0, 10)
+      const lastId = `${ctx.chain.id}-${params.otokenAddress}-${lastDayString}`
+      const last = result.dailyStats.get(lastId)?.entity ?? (await ctx.store.get(OTokenDailyStat, lastId))
+      entity.cumulativeYield = (last?.cumulativeYield ?? 0n) + entity.yield
+      entity.cumulativeFees = (last?.cumulativeFees ?? 0n) + entity.fees
 
       const getDripperAvailableFunds = async () => {
         if (!params.dripper || params.dripper.from > block.header.height) return 0n
@@ -649,8 +655,7 @@ export const createOTokenProcessor = (params: {
   }
 
   const getOTokenDailyStat = async (ctx: Context, result: ProcessResult, block: Block) => {
-    const blockDate = new Date(block.header.timestamp)
-    const dayString = blockDate.toISOString().substring(0, 10)
+    const dayString = new Date(block.header.timestamp).toISOString().substring(0, 10)
     const id = `${ctx.chain.id}-${params.otokenAddress}-${dayString}`
     let entity = result.dailyStats.get(id)?.entity ?? (await ctx.store.get(OTokenDailyStat, id))
 
@@ -681,6 +686,8 @@ export const createOTokenProcessor = (params: {
 
         yield: 0n,
         fees: 0n,
+        cumulativeYield: 0n,
+        cumulativeFees: 0n,
 
         marketCapUSD: 0,
       })

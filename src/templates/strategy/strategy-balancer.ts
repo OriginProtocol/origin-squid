@@ -3,10 +3,13 @@ import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import { StrategyBalance } from '@model'
 import { Context } from '@processor'
+import { convertRate } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { getBalancePoolRateProviders } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, BALANCER_VAULT, ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { addressToSymbol } from '@utils/symbols'
 
 import { IStrategyData } from './index'
 import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
@@ -24,20 +27,22 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
   const blockFrequencyUpdate = trackers.get(strategyData.address)!
   const data: StrategyBalance[] = []
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
-    const results = await getBalancerStrategyHoldings(ctx, block.header, strategyData).then((holdings) =>
-      holdings.map(({ address, asset, balance }) => {
-        return new StrategyBalance({
+    const balances = await getBalancerStrategyHoldings(ctx, block.header, strategyData)
+    for (const { address, asset, balance } of balances) {
+      data.push(
+        new StrategyBalance({
           id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
           chainId: ctx.chain.id,
-          strategy: address,
-          asset,
-          balance,
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
-        })
-      }),
-    )
-    data.push(...results)
+          strategy: address,
+          asset,
+          symbol: addressToSymbol(asset),
+          balance,
+          balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+        }),
+      )
+    }
   })
   await ctx.store.insert(data)
   await processStrategyEarnings(ctx, strategyData, getStrategyETHBalance)

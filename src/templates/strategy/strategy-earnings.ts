@@ -7,8 +7,8 @@ import * as erc20 from '@abi/erc20'
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
 import { Block, Context } from '@processor'
-import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { MainnetCurrency, convertRate } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
+import { MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
@@ -332,18 +332,20 @@ const processDepositWithdrawal = async (
     MainnetCurrency,
   ][]
   const rates = await ensureExchangeRates(ctx, block, desiredRates)
-  const previousBalance = assets.reduce((sum, a, index) => {
+  let previousBalance = 0n
+  for (let index = 0; index < assets.length; index++) {
+    const a = assets[index]
     const asset = strategyData.assets[index]
-    const compareBalance = asset.convertTo
-      ? convertRate(rates, 'ETH', a.asset as MainnetCurrency, a.compareBalance)
+    previousBalance += asset.convertTo
+      ? await convertRate(ctx, block, 'ETH', a.asset as MainnetCurrency, a.compareBalance)
       : a.compareBalance
-    return sum + compareBalance
-  }, 0n)
-  const balance = assets.reduce((sum, a, index) => {
+  }
+  let balance = 0n
+  for (let index = 0; index < assets.length; index++) {
+    const a = assets[index]
     const asset = strategyData.assets[index]
-    const balance = asset.convertTo ? convertRate(rates, 'ETH', a.asset as MainnetCurrency, a.balance) : a.balance
-    return sum + balance
-  }, 0n)
+    balance += asset.convertTo ? await convertRate(ctx, block, 'ETH', a.asset as MainnetCurrency, a.balance) : a.balance
+  }
 
   const otokenBalance = assets.find((a) => a.asset.toLowerCase() === strategyData.oTokenAddress)?.balance ?? 0n
 
@@ -351,7 +353,7 @@ const processDepositWithdrawal = async (
   const balanceWeight = Number(formatEther(balanceWeightN))
 
   const timestamp = new Date(block.header.timestamp)
-  let earningsChange = previousBalance - (latest?.balance ?? previousBalance) ?? 0n
+  let earningsChange = previousBalance - (latest?.balance ?? previousBalance)
 
   // TODO: ??? Probably should listen for add/remove liquidity events
   //  and calculate earnings changes from fees rather than relying on this

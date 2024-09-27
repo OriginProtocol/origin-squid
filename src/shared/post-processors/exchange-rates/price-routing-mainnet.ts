@@ -13,6 +13,7 @@ import { Context } from '@processor'
 import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
 import {
+  CurrencySymbol,
   MainnetCurrency,
   MainnetCurrencyAddress,
   MainnetCurrencySymbol,
@@ -21,41 +22,12 @@ import {
 } from './mainnetCurrencies'
 
 export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
-  if (base === 'ETH' && quote === 'OETH') {
-    return await getETHOETHPrice(ctx, height)
-  }
-  if (base === 'OETH' && quote === 'ETH') {
-    return await getOETHETHPrice(ctx, height)
-  }
-  if (base === 'ETH' && quote === 'WETH') {
-    return 1_000_000_000_000_000_000n
-  }
-  if (base === 'ETH' && quote === 'ETH') {
-    return 1_000_000_000_000_000_000n
-  }
-  if (base === 'ETH' && quote === 'sfrxETH') {
-    return getStakedFraxPrice(ctx, height)
-  }
-  if (base === 'ETH' && quote === 'rETH') {
-    return getRETHPrice(ctx, height)
-  }
-  if (base === 'ETH' && quote === 'frxETH') {
-    return getFrxEthPrice(ctx, height)
-  }
-  if (base === 'wOETH' && quote === 'OETH') {
-    return getPrice_wOETH_OETH(ctx, height)
-  }
-  if (base === 'ETH' && oethOracleCurrencies.has(quote) && height >= 18032298) {
-    return getOethOraclePrice(ctx, height, quote)
-  }
-  if (base === 'OUSD' && quote === 'USD') {
-    return getPrice_OUSD_USD(ctx, height)
-  }
-  if (base === 'OUSD' && quote === 'ETH') {
-    const ousdusd = await getPrice_OUSD_USD(ctx, height)
-    const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
-    if (!ethusd) return 0n
-    return (ousdusd * 10n ** 8n) / ethusd
+  base = translateMainnetSymbol(base)
+  quote = translateMainnetSymbol(quote)
+
+  const getPrice = priceMap[`${base}_${quote}`]
+  if (getPrice) {
+    return getPrice(ctx, height)
   }
   if (base === 'OETH' && quote === 'USD') {
     const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
@@ -64,20 +36,20 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
   return getChainlinkPrice(ctx, height, base, quote)
 }
 
-export const getOETHETHPrice = async (ctx: Context, height: number) => {
+const getOETHETHPrice = async (ctx: Context, height: number) => {
   if (height < 17230232) return 10n ** 18n
   const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
   return await contract.get_dy(0n, 1n, 1000000000000000000n)
 }
 
-export const getETHOETHPrice = async (ctx: Context, height: number) => {
+const getETHOETHPrice = async (ctx: Context, height: number) => {
   if (height < 17230232) return 10n ** 18n
   const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
   return await contract.get_dy(1n, 0n, 1000000000000000000n)
 }
 
-export const getRETHPrice = async (ctx: Context, height: number) => {
-  if (height < 13846138) return undefined
+const getRETHPrice = async (ctx: Context, height: number) => {
+  if (height < 13846138) return 0n
   // Balancer rETH Stable Pool Rate Provider
   const rateProvider = await getBalancePoolRateProviders(ctx, { height }, '0x1e19cf2d73a72ef1332c882f20534b6519be0276')
   // Balancer Vault `getPoolTokens` https://etherscan.io/address/0xba12222222228d8ba445958a75a0704d566bf2c8#readContract#F10
@@ -90,12 +62,7 @@ export const getRETHPrice = async (ctx: Context, height: number) => {
 }
 
 const registryAddress = '0x47fb2585d2c56fe188d0e6ec628a38b74fceeedf'
-export const getChainlinkPrice = async (
-  ctx: Context,
-  height: number,
-  base: MainnetCurrency,
-  quote: MainnetCurrency,
-) => {
+const getChainlinkPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
   if (height < 12864088) return 0n
   const registry = new chainlinkFeedRegistry.Contract(ctx, { height }, registryAddress)
   try {
@@ -125,23 +92,22 @@ export const getChainlinkPrice = async (
   }
 }
 
-export const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
-
+const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
 const oethOracleAddress = '0xbE19cC5654e30dAF04AD3B5E06213D70F4e882eE'
-export const getOethOraclePrice = (ctx: Context, height: number, quote: MainnetCurrency) => {
+const getOethOraclePrice = (ctx: Context, height: number, quote: MainnetCurrency) => {
   const router = new oethOracleRouter.Contract(ctx, { height }, oethOracleAddress)
   return router.price(mainnetCurrencies[quote as MainnetCurrencySymbol] ?? quote)
 }
 
 const stakedFraxAddress = '0xac3e018457b222d93114458476f3e3416abbe38f'
-export const getStakedFraxPrice = (ctx: Context, height: number) => {
-  if (height < 15686046) return undefined
+const getStakedFraxPrice = async (ctx: Context, height: number) => {
+  if (height < 15686046) return 0n
   const router = new stakedFraxEth.Contract(ctx, { height }, stakedFraxAddress)
   return router.previewRedeem(1_000_000_000_000_000_000n)
 }
 
 const frxEthFraxOracleAddress = '0xC58F3385FBc1C8AD2c0C9a061D7c13b141D7A5Df'
-export const getFrxEthPrice = (ctx: Context, height: number) => {
+const getFrxEthPrice = async (ctx: Context, height: number) => {
   // Deploy block of 17571367 doesn't work, so we wait until it is functional.
   if (height < 17571500) return 1_000_000_000_000_000_000n
   const frxEth = new frxEthFraxOracle.Contract(ctx, { height }, frxEthFraxOracleAddress)
@@ -156,19 +122,62 @@ export const getBalancePoolRateProviders = memoize(
   (_ctx, _block, address) => address.toLowerCase(),
 )
 
-export const getPrice_OUSD_USD = (ctx: Context, height: number) => {
+const getPrice_OUSD_USD = async (ctx: Context, height: number) => {
   if (height < 18071236) return 1_000_000_000_000_000_000n
   const diaOracle = new diaOracleAbi.Contract(ctx, { height }, '0xafa00e7eff2ea6d216e432d99807c159d08c2b79')
   return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
 }
 
-export const getPrice_wOETH_OETH = (ctx: Context, height: number) => {
+const getPrice_wOETH_OETH = async (ctx: Context, height: number) => {
   if (height < 17141658) return 1_000_000_000_000_000_000n
   const woeth = new woethAbi.Contract(ctx, { height }, mainnetCurrencies.wOETH)
   return woeth.previewRedeem(1_000_000_000_000_000_000n)
+}
+
+const getPrice_OUSD_ETH = async (ctx: Context, height: number) => {
+  const ousdusd = await getPrice_OUSD_USD(ctx, height)
+  const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+  if (!ethusd) return 0n
+  return (ousdusd * 10n ** 8n) / ethusd
+}
+
+const getPrice_OETH_USD = async (ctx: Context, height: number) => {
+  const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+  return ethusd * 10n ** 10n
 }
 
 export const translateMainnetSymbol = (symbol: MainnetCurrency): MainnetCurrencySymbol => {
   symbol = mainnetCurrenciesByAddress[symbol as MainnetCurrencyAddress] || symbol
   return symbol
 }
+
+export const invertRate = (rate: bigint, decimals = 18) => 10n ** BigInt(2 * decimals) / rate
+export const twoWay = <Base extends CurrencySymbol, Quote extends CurrencySymbol>(
+  base: Base,
+  quote: Quote,
+  getPrice: (ctx: Context, height: number) => Promise<bigint>,
+) =>
+  ({
+    [`${base}_${quote}`]: async (ctx: Context, height: number) => getPrice(ctx, height),
+    [`${quote}_${base}`]: async (ctx: Context, height: number) => getPrice(ctx, height).then(invertRate),
+  }) as Record<`${Base}_${Quote}` | `${Quote}_${Base}`, (ctx: Context, height: number) => Promise<bigint>>
+
+export const priceMap: Partial<
+  Record<`${CurrencySymbol}_${CurrencySymbol}`, (ctx: Context, height: number) => Promise<bigint>>
+> = {
+  ETH_WETH: async () => 1_000_000_000_000_000_000n,
+  WETH_ETH: async () => 1_000_000_000_000_000_000n,
+  ETH_ETH: async () => 1_000_000_000_000_000_000n,
+  ETH_OETH: getETHOETHPrice,
+  OETH_ETH: getOETHETHPrice,
+  ...twoWay('ETH', 'sfrxETH', getStakedFraxPrice),
+  ...twoWay('ETH', 'rETH', getRETHPrice),
+  ...twoWay('ETH', 'frxETH', getFrxEthPrice),
+  ...twoWay('wOETH', 'OETH', getPrice_wOETH_OETH),
+  ...twoWay('OUSD', 'USD', getPrice_OUSD_USD),
+  ...twoWay('OUSD', 'ETH', getPrice_OUSD_ETH),
+  ...twoWay('ETH', 'stETH', (ctx, height) => getOethOraclePrice(ctx, height, 'stETH')),
+  ...twoWay('OETH', 'USD', getPrice_OETH_USD),
+  ETH_USD: (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'),
+  // ...twoWay('ETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD').then((p) => p * 10n ** 10n)),
+} as const

@@ -52,3 +52,11 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
 export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
   return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
 }
+
+const E18 = 10n ** 18n
+export const convertUsingRate = (value: bigint, rate: bigint) => (value * rate) / E18
+export const convertRate = async (ctx: Context, block: Block, from: Currency, to: Currency, value: bigint) => {
+  const exchangeRate = await ensureExchangeRate(ctx, block, from, to)
+  if (!exchangeRate) return 0n
+  return convertUsingRate(value, exchangeRate.rate)
+}

@@ -1,5 +1,4 @@
 // Lowercase Addresses
-import { baseAddresses } from '@utils/addresses-base'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
@@ -98,10 +97,7 @@ export const tokens = {
   // Origin OTokens
   OETH: OETH_ADDRESS,
   OUSD: OUSD_ADDRESS,
-  superOETHb_base: baseAddresses.tokens.superOETHb,
-  wsuperOETHb_base: baseAddresses.tokens.wsuperOETHb,
   wOETH: WOETH_ADDRESS,
-  wOETH_arbitrum: WOETH_ARBITRUM_ADDRESS,
 
   // Dollar
   DAI: DAI_ADDRESS,
@@ -113,7 +109,6 @@ export const tokens = {
   // Ether
   ETH: ETH_ADDRESS,
   WETH: WETH_ADDRESS,
-  WETH_base: baseAddresses.tokens.WETH,
   stETH: STETH_ADDRESS,
   wstETH: WSTETH_ADDRESS,
   rETH: RETH_ADDRESS,
@@ -123,10 +118,7 @@ export const tokens = {
 
   // Non-stable
   BAL: BAL_ADDRESS,
-  AERO: baseAddresses.tokens.AERO,
 } as const
-export type TokenSymbol = keyof typeof tokens
-export type TokenAddress = (typeof tokens)[TokenSymbol]
 
 // Strategy Helper Objects & Types
 export const strategies = {

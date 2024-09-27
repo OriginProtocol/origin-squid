@@ -30,6 +30,12 @@ export class StrategyBalance {
     @StringColumn_({nullable: false})
     asset!: string
 
+    @StringColumn_({nullable: false})
+    symbol!: string
+
     @BigIntColumn_({nullable: false})
     balance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    balanceETH!: bigint
 }
