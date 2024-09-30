@@ -1,10 +1,11 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
 import { Block, Context } from '@processor'
-import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress, MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { addressToSymbol } from '@utils/symbols'
 
 import { IStrategyData } from './index'
 import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
@@ -39,20 +40,24 @@ const getStrategyHoldings = async (
   block: Block,
   strategyData: IStrategyData,
 ): Promise<StrategyBalance[]> => {
-  const { assets, address } = strategyData
-  const promises = assets.map(async (asset) => {
-    const balances = await getStrategyBalances(ctx, block.header, strategyData)
-    return new StrategyBalance({
-      id: `${ctx.chain.id}:${address}:${asset.address}:${block.header.height}`,
-      chainId: ctx.chain.id,
-      strategy: address,
-      asset: asset.address,
-      balance: balances.find((b) => b.asset === asset.address)?.balance,
-      blockNumber: block.header.height,
-      timestamp: new Date(block.header.timestamp),
-    })
-  })
-  return Promise.all(promises)
+  const data: StrategyBalance[] = []
+  const balances = await getStrategyBalances(ctx, block.header, strategyData)
+  for (const { address, asset, balance } of balances) {
+    data.push(
+      new StrategyBalance({
+        id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
+        chainId: ctx.chain.id,
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+        strategy: address,
+        asset,
+        symbol: addressToSymbol(asset),
+        balance,
+        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+      }),
+    )
+  }
+  return data
 }
 
 const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {

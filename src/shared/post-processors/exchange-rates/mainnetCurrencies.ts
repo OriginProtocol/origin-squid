@@ -1,4 +1,3 @@
-import { ExchangeRate } from '@model'
 import {
   BaseCurrencyAddress,
   BaseCurrencySymbol,
@@ -31,23 +30,6 @@ export const currenciesByAddress = {
   ...mainnetCurrenciesByAddress,
   ...baseCurrenciesByAddress,
 } as const
-
-const eth1 = 1000000000000000000n
-export const convertRate = (
-  rates: Pick<ExchangeRate, 'base' | 'quote' | 'rate'>[],
-  base: MainnetCurrency,
-  quote: MainnetCurrency,
-  balance: bigint,
-) => {
-  base = currenciesByAddress[base.toLowerCase() as MainnetCurrencyAddress] ?? base
-  quote = currenciesByAddress[quote.toLowerCase() as MainnetCurrencyAddress] ?? quote
-  const rate = rates.find((r) => r.base === base && r.quote === quote)
-  if (rate) {
-    return (balance * rate.rate) / eth1
-  } else {
-    return 0n
-  }
-}
 
 export type MainnetCurrencySymbol = keyof typeof mainnetCurrencies
 export type MainnetCurrencyAddress = (typeof mainnetCurrencies)[keyof typeof mainnetCurrencies]
