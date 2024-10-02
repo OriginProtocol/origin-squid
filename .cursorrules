@@ -1,0 +1,3 @@
+- We are a subsquid project which extracts data from EVM blockchains.
+- We reference `README.md` for instructions on how to use and contribute to our project.
+- When saving entities, use `.insert()` or `.upsert()`.

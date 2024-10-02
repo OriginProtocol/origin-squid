@@ -1,5 +1,5 @@
-module.exports = class Data1727379829987 {
-    name = 'Data1727379829987'
+module.exports = class Data1727834322947 {
+    name = 'Data1727834322947'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -353,6 +353,18 @@ module.exports = class Data1727379829987 {
         await db.query(`CREATE INDEX "IDX_b4e54387b76cb3bce1bd725f7a" ON "aero_lp_position" ("pool") `)
         await db.query(`CREATE INDEX "IDX_b465865a93cb044c6649523287" ON "aero_lp_position" ("position_id") `)
         await db.query(`CREATE INDEX "IDX_05aaf9416181ddc9012f41da2f" ON "aero_lp_position" ("account") `)
+        await db.query(`CREATE TABLE "arm" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "symbol" text NOT NULL, "decimals" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, CONSTRAINT "PK_711e2a749a8c4baeccf8365290c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_supply" numeric NOT NULL, "apr" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_e58fff61dd95dfeac112204c378" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_68943c1b73a665919e9377027e" ON "arm_state" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_85852cf19a3ddc86a4762398dd" ON "arm_state" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_d9779389f627b43d2f746323de" ON "arm_state" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_b9db75a2ca9b9d6e6c5aa744ab" ON "arm_state" ("address") `)
+        await db.query(`CREATE TABLE "arm_wallet_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_49d5b63ee8910799e025243d3ca" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_220d7e77cdac207f563f873e28" ON "arm_wallet_state" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_b91b857dc51f990325cd442917" ON "arm_wallet_state" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_63edbe66c2a661432e6ab18c88" ON "arm_wallet_state" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_1c4a751c24db49e56158735bea" ON "arm_wallet_state" ("address") `)
+        await db.query(`CREATE INDEX "IDX_3a5683ae52030d05e5bf04458b" ON "arm_wallet_state" ("account") `)
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a234e56547c4f8b9135d80444b" ON "es_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_588f0be9f9bdc1d8dd29797fec" ON "es_token" ("block_number") `)
@@ -1054,6 +1066,18 @@ module.exports = class Data1727379829987 {
         await db.query(`DROP INDEX "public"."IDX_b4e54387b76cb3bce1bd725f7a"`)
         await db.query(`DROP INDEX "public"."IDX_b465865a93cb044c6649523287"`)
         await db.query(`DROP INDEX "public"."IDX_05aaf9416181ddc9012f41da2f"`)
+        await db.query(`DROP TABLE "arm"`)
+        await db.query(`DROP TABLE "arm_state"`)
+        await db.query(`DROP INDEX "public"."IDX_68943c1b73a665919e9377027e"`)
+        await db.query(`DROP INDEX "public"."IDX_85852cf19a3ddc86a4762398dd"`)
+        await db.query(`DROP INDEX "public"."IDX_d9779389f627b43d2f746323de"`)
+        await db.query(`DROP INDEX "public"."IDX_b9db75a2ca9b9d6e6c5aa744ab"`)
+        await db.query(`DROP TABLE "arm_wallet_state"`)
+        await db.query(`DROP INDEX "public"."IDX_220d7e77cdac207f563f873e28"`)
+        await db.query(`DROP INDEX "public"."IDX_b91b857dc51f990325cd442917"`)
+        await db.query(`DROP INDEX "public"."IDX_63edbe66c2a661432e6ab18c88"`)
+        await db.query(`DROP INDEX "public"."IDX_1c4a751c24db49e56158735bea"`)
+        await db.query(`DROP INDEX "public"."IDX_3a5683ae52030d05e5bf04458b"`)
         await db.query(`DROP TABLE "es_token"`)
         await db.query(`DROP INDEX "public"."IDX_a234e56547c4f8b9135d80444b"`)
         await db.query(`DROP INDEX "public"."IDX_588f0be9f9bdc1d8dd29797fec"`)
