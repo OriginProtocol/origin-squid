@@ -43,4 +43,4 @@ jobs:
         run: sqd auth -k $API_TOKEN
 
       - name: Build and deploy squid
-        run: sqd build && sqd deploy .
+        run: sqd build && sqd deploy . -o origin --no-stream-logs
