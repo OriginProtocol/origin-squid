@@ -6,10 +6,10 @@
 
 Ensure we don't miss anything on a release by following this checklist.
 
-- [ ] Create version branch (e.g. `v25`)
-- [ ] Update squid.yaml version
-- [ ] Deploy (`sqd deploy .`)
-- [ ] Commit & Push
+- [ ] Go to github repository and create a release
+- [ ] Create a new tag following the format `v<VERSION_NUMBER>` where `VERSION_NUMBER` is the squid version of the processor (i.e. `v54`)
+- [ ] Generate the release notes automatically or fill them manually
+- [ ] Publish the release
 - [ ] Wait for processing to complete
 - [ ] Set to production at https://app.subsquid.io/squids
 - [ ] Check functionality of front-ends
@@ -17,8 +17,6 @@ Ensure we don't miss anything on a release by following this checklist.
 - [ ] Notify in #defi-data if important
 - [ ] Hibernate previous version(s)
 - [ ] Delete old versions (keep recently hibernated version as a backup)
-
-If a version has issues in deployment, fix it in the branch and later *cherry-pick* those fixes back to `main`.
 
 ## Env Options
 
