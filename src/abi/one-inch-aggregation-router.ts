@@ -15,8 +15,8 @@ export const functions = {
     and: viewFun("0xbfa75143", "and(uint256,bytes)", {"offsets": p.uint256, "data": p.bytes}, p.bool),
     arbitraryStaticCall: viewFun("0xbf15fcd8", "arbitraryStaticCall(address,bytes)", {"target": p.address, "data": p.bytes}, p.uint256),
     cancelOrder: fun("0x2d9a56f6", "cancelOrder((uint256,address,address,address,address,address,uint256,uint256,uint256,bytes))", {"order": p.struct({"salt": p.uint256, "makerAsset": p.address, "takerAsset": p.address, "maker": p.address, "receiver": p.address, "allowedSender": p.address, "makingAmount": p.uint256, "takingAmount": p.uint256, "offsets": p.uint256, "interactions": p.bytes})}, {"orderRemaining": p.uint256, "orderHash": p.bytes32}),
-    "cancelOrderRFQ(uint256)": fun("0x825caba1", "cancelOrderRFQ(uint256)", {"orderInfo": p.uint256}, ),
-    "cancelOrderRFQ(uint256,uint256)": fun("0xbddccd35", "cancelOrderRFQ(uint256,uint256)", {"orderInfo": p.uint256, "additionalMask": p.uint256}, ),
+    'cancelOrderRFQ(uint256)': fun("0x825caba1", "cancelOrderRFQ(uint256)", {"orderInfo": p.uint256}, ),
+    'cancelOrderRFQ(uint256,uint256)': fun("0xbddccd35", "cancelOrderRFQ(uint256,uint256)", {"orderInfo": p.uint256, "additionalMask": p.uint256}, ),
     checkPredicate: viewFun("0x6c838250", "checkPredicate((uint256,address,address,address,address,address,uint256,uint256,uint256,bytes))", {"order": p.struct({"salt": p.uint256, "makerAsset": p.address, "takerAsset": p.address, "maker": p.address, "receiver": p.address, "allowedSender": p.address, "makingAmount": p.uint256, "takingAmount": p.uint256, "offsets": p.uint256, "interactions": p.bytes})}, p.bool),
     clipperSwap: fun("0x84bd6d29", "clipperSwap(address,address,address,uint256,uint256,uint256,bytes32,bytes32)", {"clipperExchange": p.address, "srcToken": p.address, "dstToken": p.address, "inputAmount": p.uint256, "outputAmount": p.uint256, "goodUntil": p.uint256, "r": p.bytes32, "vs": p.bytes32}, p.uint256),
     clipperSwapTo: fun("0x093d4fa5", "clipperSwapTo(address,address,address,address,uint256,uint256,uint256,bytes32,bytes32)", {"clipperExchange": p.address, "recipient": p.address, "srcToken": p.address, "dstToken": p.address, "inputAmount": p.uint256, "outputAmount": p.uint256, "goodUntil": p.uint256, "r": p.bytes32, "vs": p.bytes32}, p.uint256),
@@ -149,11 +149,11 @@ export type ArbitraryStaticCallReturn = FunctionReturn<typeof functions.arbitrar
 export type CancelOrderParams = FunctionArguments<typeof functions.cancelOrder>
 export type CancelOrderReturn = FunctionReturn<typeof functions.cancelOrder>
 
-export type CancelOrderRFQParams_0 = FunctionArguments<typeof functions["cancelOrderRFQ(uint256)"]>
-export type CancelOrderRFQReturn_0 = FunctionReturn<typeof functions["cancelOrderRFQ(uint256)"]>
+export type CancelOrderRFQParams_0 = FunctionArguments<typeof functions['cancelOrderRFQ(uint256)']>
+export type CancelOrderRFQReturn_0 = FunctionReturn<typeof functions['cancelOrderRFQ(uint256)']>
 
-export type CancelOrderRFQParams_1 = FunctionArguments<typeof functions["cancelOrderRFQ(uint256,uint256)"]>
-export type CancelOrderRFQReturn_1 = FunctionReturn<typeof functions["cancelOrderRFQ(uint256,uint256)"]>
+export type CancelOrderRFQParams_1 = FunctionArguments<typeof functions['cancelOrderRFQ(uint256,uint256)']>
+export type CancelOrderRFQReturn_1 = FunctionReturn<typeof functions['cancelOrderRFQ(uint256,uint256)']>
 
 export type CheckPredicateParams = FunctionArguments<typeof functions.checkPredicate>
 export type CheckPredicateReturn = FunctionReturn<typeof functions.checkPredicate>

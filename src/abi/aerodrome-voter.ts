@@ -21,8 +21,8 @@ export const functions = {
     claimable: viewFun("0x402914f5", "claimable(address)", {"_0": p.address}, p.uint256),
     createGauge: fun("0x794cea3c", "createGauge(address,address)", {"_poolFactory": p.address, "_pool": p.address}, p.address),
     depositManaged: fun("0xe0c11f9a", "depositManaged(uint256,uint256)", {"_tokenId": p.uint256, "_mTokenId": p.uint256}, ),
-    "distribute(address[])": fun("0x6138889b", "distribute(address[])", {"_gauges": p.array(p.address)}, ),
-    "distribute(uint256,uint256)": fun("0x7625391a", "distribute(uint256,uint256)", {"_start": p.uint256, "_finish": p.uint256}, ),
+    'distribute(address[])': fun("0x6138889b", "distribute(address[])", {"_gauges": p.array(p.address)}, ),
+    'distribute(uint256,uint256)': fun("0x7625391a", "distribute(uint256,uint256)", {"_start": p.uint256, "_finish": p.uint256}, ),
     emergencyCouncil: viewFun("0x7778960e", "emergencyCouncil()", {}, p.address),
     epochGovernor: viewFun("0x3aae971f", "epochGovernor()", {}, p.address),
     epochNext: viewFun("0x880e36fc", "epochNext(uint256)", {"_timestamp": p.uint256}, p.uint256),
@@ -58,9 +58,9 @@ export const functions = {
     setGovernor: fun("0xc42cf535", "setGovernor(address)", {"_governor": p.address}, ),
     setMaxVotingNum: fun("0x30331b2f", "setMaxVotingNum(uint256)", {"_maxVotingNum": p.uint256}, ),
     totalWeight: viewFun("0x96c82e57", "totalWeight()", {}, p.uint256),
-    "updateFor(address)": fun("0x0e0a5968", "updateFor(address)", {"_gauge": p.address}, ),
-    "updateFor(uint256,uint256)": fun("0xc9ff6f4d", "updateFor(uint256,uint256)", {"start": p.uint256, "end": p.uint256}, ),
-    "updateFor(address[])": fun("0xd560b0d7", "updateFor(address[])", {"_gauges": p.array(p.address)}, ),
+    'updateFor(address)': fun("0x0e0a5968", "updateFor(address)", {"_gauge": p.address}, ),
+    'updateFor(uint256,uint256)': fun("0xc9ff6f4d", "updateFor(uint256,uint256)", {"start": p.uint256, "end": p.uint256}, ),
+    'updateFor(address[])': fun("0xd560b0d7", "updateFor(address[])", {"_gauges": p.array(p.address)}, ),
     usedWeights: viewFun("0x79e93824", "usedWeights(uint256)", {"_0": p.uint256}, p.uint256),
     ve: viewFun("0x1f850716", "ve()", {}, p.address),
     vote: fun("0x7ac09bf7", "vote(uint256,address[],uint256[])", {"_tokenId": p.uint256, "_poolVote": p.array(p.address), "_weights": p.array(p.uint256)}, ),
@@ -224,11 +224,11 @@ export type CreateGaugeReturn = FunctionReturn<typeof functions.createGauge>
 export type DepositManagedParams = FunctionArguments<typeof functions.depositManaged>
 export type DepositManagedReturn = FunctionReturn<typeof functions.depositManaged>
 
-export type DistributeParams_0 = FunctionArguments<typeof functions["distribute(address[])"]>
-export type DistributeReturn_0 = FunctionReturn<typeof functions["distribute(address[])"]>
+export type DistributeParams_0 = FunctionArguments<typeof functions['distribute(address[])']>
+export type DistributeReturn_0 = FunctionReturn<typeof functions['distribute(address[])']>
 
-export type DistributeParams_1 = FunctionArguments<typeof functions["distribute(uint256,uint256)"]>
-export type DistributeReturn_1 = FunctionReturn<typeof functions["distribute(uint256,uint256)"]>
+export type DistributeParams_1 = FunctionArguments<typeof functions['distribute(uint256,uint256)']>
+export type DistributeReturn_1 = FunctionReturn<typeof functions['distribute(uint256,uint256)']>
 
 export type EmergencyCouncilParams = FunctionArguments<typeof functions.emergencyCouncil>
 export type EmergencyCouncilReturn = FunctionReturn<typeof functions.emergencyCouncil>
@@ -335,14 +335,14 @@ export type SetMaxVotingNumReturn = FunctionReturn<typeof functions.setMaxVoting
 export type TotalWeightParams = FunctionArguments<typeof functions.totalWeight>
 export type TotalWeightReturn = FunctionReturn<typeof functions.totalWeight>
 
-export type UpdateForParams_0 = FunctionArguments<typeof functions["updateFor(address)"]>
-export type UpdateForReturn_0 = FunctionReturn<typeof functions["updateFor(address)"]>
+export type UpdateForParams_0 = FunctionArguments<typeof functions['updateFor(address)']>
+export type UpdateForReturn_0 = FunctionReturn<typeof functions['updateFor(address)']>
 
-export type UpdateForParams_1 = FunctionArguments<typeof functions["updateFor(uint256,uint256)"]>
-export type UpdateForReturn_1 = FunctionReturn<typeof functions["updateFor(uint256,uint256)"]>
+export type UpdateForParams_1 = FunctionArguments<typeof functions['updateFor(uint256,uint256)']>
+export type UpdateForReturn_1 = FunctionReturn<typeof functions['updateFor(uint256,uint256)']>
 
-export type UpdateForParams_2 = FunctionArguments<typeof functions["updateFor(address[])"]>
-export type UpdateForReturn_2 = FunctionReturn<typeof functions["updateFor(address[])"]>
+export type UpdateForParams_2 = FunctionArguments<typeof functions['updateFor(address[])']>
+export type UpdateForReturn_2 = FunctionReturn<typeof functions['updateFor(address[])']>
 
 export type UsedWeightsParams = FunctionArguments<typeof functions.usedWeights>
 export type UsedWeightsReturn = FunctionReturn<typeof functions.usedWeights>

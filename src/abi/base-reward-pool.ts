@@ -19,8 +19,8 @@ export const functions = {
     earned: viewFun("0x008cc262", "earned(address)", {"account": p.address}, p.uint256),
     extraRewards: viewFun("0x40c35446", "extraRewards(uint256)", {"_0": p.uint256}, p.address),
     extraRewardsLength: viewFun("0xd55a23f4", "extraRewardsLength()", {}, p.uint256),
-    "getReward()": fun("0x3d18b912", "getReward()", {}, p.bool),
-    "getReward(address,bool)": fun("0x7050ccd9", "getReward(address,bool)", {"_account": p.address, "_claimExtras": p.bool}, p.bool),
+    'getReward()': fun("0x3d18b912", "getReward()", {}, p.bool),
+    'getReward(address,bool)': fun("0x7050ccd9", "getReward(address,bool)", {"_account": p.address, "_claimExtras": p.bool}, p.bool),
     historicalRewards: viewFun("0x262d3d6d", "historicalRewards()", {}, p.uint256),
     lastTimeRewardApplicable: viewFun("0x80faa57d", "lastTimeRewardApplicable()", {}, p.uint256),
     lastUpdateTime: viewFun("0xc8f33c91", "lastUpdateTime()", {}, p.uint256),
@@ -177,11 +177,11 @@ export type ExtraRewardsReturn = FunctionReturn<typeof functions.extraRewards>
 export type ExtraRewardsLengthParams = FunctionArguments<typeof functions.extraRewardsLength>
 export type ExtraRewardsLengthReturn = FunctionReturn<typeof functions.extraRewardsLength>
 
-export type GetRewardParams_0 = FunctionArguments<typeof functions["getReward()"]>
-export type GetRewardReturn_0 = FunctionReturn<typeof functions["getReward()"]>
+export type GetRewardParams_0 = FunctionArguments<typeof functions['getReward()']>
+export type GetRewardReturn_0 = FunctionReturn<typeof functions['getReward()']>
 
-export type GetRewardParams_1 = FunctionArguments<typeof functions["getReward(address,bool)"]>
-export type GetRewardReturn_1 = FunctionReturn<typeof functions["getReward(address,bool)"]>
+export type GetRewardParams_1 = FunctionArguments<typeof functions['getReward(address,bool)']>
+export type GetRewardReturn_1 = FunctionReturn<typeof functions['getReward(address,bool)']>
 
 export type HistoricalRewardsParams = FunctionArguments<typeof functions.historicalRewards>
 export type HistoricalRewardsReturn = FunctionReturn<typeof functions.historicalRewards>

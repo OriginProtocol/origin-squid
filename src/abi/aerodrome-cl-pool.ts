@@ -15,10 +15,10 @@ export const events = {
 }
 
 export const functions = {
-    "burn(int24,int24,uint128,address)": fun("0x6f89244c", "burn(int24,int24,uint128,address)", {"tickLower": p.int24, "tickUpper": p.int24, "amount": p.uint128, "owner": p.address}, {"amount0": p.uint256, "amount1": p.uint256}),
-    "burn(int24,int24,uint128)": fun("0xa34123a7", "burn(int24,int24,uint128)", {"tickLower": p.int24, "tickUpper": p.int24, "amount": p.uint128}, {"amount0": p.uint256, "amount1": p.uint256}),
-    "collect(address,int24,int24,uint128,uint128,address)": fun("0x31338374", "collect(address,int24,int24,uint128,uint128,address)", {"recipient": p.address, "tickLower": p.int24, "tickUpper": p.int24, "amount0Requested": p.uint128, "amount1Requested": p.uint128, "owner": p.address}, {"amount0": p.uint128, "amount1": p.uint128}),
-    "collect(address,int24,int24,uint128,uint128)": fun("0x4f1eb3d8", "collect(address,int24,int24,uint128,uint128)", {"recipient": p.address, "tickLower": p.int24, "tickUpper": p.int24, "amount0Requested": p.uint128, "amount1Requested": p.uint128}, {"amount0": p.uint128, "amount1": p.uint128}),
+    'burn(int24,int24,uint128,address)': fun("0x6f89244c", "burn(int24,int24,uint128,address)", {"tickLower": p.int24, "tickUpper": p.int24, "amount": p.uint128, "owner": p.address}, {"amount0": p.uint256, "amount1": p.uint256}),
+    'burn(int24,int24,uint128)': fun("0xa34123a7", "burn(int24,int24,uint128)", {"tickLower": p.int24, "tickUpper": p.int24, "amount": p.uint128}, {"amount0": p.uint256, "amount1": p.uint256}),
+    'collect(address,int24,int24,uint128,uint128,address)': fun("0x31338374", "collect(address,int24,int24,uint128,uint128,address)", {"recipient": p.address, "tickLower": p.int24, "tickUpper": p.int24, "amount0Requested": p.uint128, "amount1Requested": p.uint128, "owner": p.address}, {"amount0": p.uint128, "amount1": p.uint128}),
+    'collect(address,int24,int24,uint128,uint128)': fun("0x4f1eb3d8", "collect(address,int24,int24,uint128,uint128)", {"recipient": p.address, "tickLower": p.int24, "tickUpper": p.int24, "amount0Requested": p.uint128, "amount1Requested": p.uint128}, {"amount0": p.uint128, "amount1": p.uint128}),
     collectFees: fun("0xc8796572", "collectFees()", {}, {"amount0": p.uint128, "amount1": p.uint128}),
     factory: viewFun("0xc45a0155", "factory()", {}, p.address),
     factoryRegistry: viewFun("0x3bf0c9fb", "factoryRegistry()", {}, p.address),
@@ -191,17 +191,17 @@ export type SetFeeProtocolEventArgs = EParams<typeof events.SetFeeProtocol>
 export type SwapEventArgs = EParams<typeof events.Swap>
 
 /// Function types
-export type BurnParams_0 = FunctionArguments<typeof functions["burn(int24,int24,uint128,address)"]>
-export type BurnReturn_0 = FunctionReturn<typeof functions["burn(int24,int24,uint128,address)"]>
+export type BurnParams_0 = FunctionArguments<typeof functions['burn(int24,int24,uint128,address)']>
+export type BurnReturn_0 = FunctionReturn<typeof functions['burn(int24,int24,uint128,address)']>
 
-export type BurnParams_1 = FunctionArguments<typeof functions["burn(int24,int24,uint128)"]>
-export type BurnReturn_1 = FunctionReturn<typeof functions["burn(int24,int24,uint128)"]>
+export type BurnParams_1 = FunctionArguments<typeof functions['burn(int24,int24,uint128)']>
+export type BurnReturn_1 = FunctionReturn<typeof functions['burn(int24,int24,uint128)']>
 
-export type CollectParams_0 = FunctionArguments<typeof functions["collect(address,int24,int24,uint128,uint128,address)"]>
-export type CollectReturn_0 = FunctionReturn<typeof functions["collect(address,int24,int24,uint128,uint128,address)"]>
+export type CollectParams_0 = FunctionArguments<typeof functions['collect(address,int24,int24,uint128,uint128,address)']>
+export type CollectReturn_0 = FunctionReturn<typeof functions['collect(address,int24,int24,uint128,uint128,address)']>
 
-export type CollectParams_1 = FunctionArguments<typeof functions["collect(address,int24,int24,uint128,uint128)"]>
-export type CollectReturn_1 = FunctionReturn<typeof functions["collect(address,int24,int24,uint128,uint128)"]>
+export type CollectParams_1 = FunctionArguments<typeof functions['collect(address,int24,int24,uint128,uint128)']>
+export type CollectReturn_1 = FunctionReturn<typeof functions['collect(address,int24,int24,uint128,uint128)']>
 
 export type CollectFeesParams = FunctionArguments<typeof functions.collectFees>
 export type CollectFeesReturn = FunctionReturn<typeof functions.collectFees>
