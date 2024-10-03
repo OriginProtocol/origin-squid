@@ -18,8 +18,8 @@ export const functions = {
     fees1: viewFun("0x4c02a21c", "fees1()", {}, p.uint256),
     feesVotingReward: viewFun("0x0fe2f711", "feesVotingReward()", {}, p.address),
     gaugeFactory: viewFun("0x0d52333c", "gaugeFactory()", {}, p.address),
-    'getReward(uint256)': fun("0x1c4b774b", "getReward(uint256)", {"tokenId": p.uint256}, ),
-    'getReward(address)': fun("0xc00007b0", "getReward(address)", {"account": p.address}, ),
+    "getReward(uint256)": fun("0x1c4b774b", "getReward(uint256)", {"tokenId": p.uint256}, ),
+    "getReward(address)": fun("0xc00007b0", "getReward(address)", {"account": p.address}, ),
     initialize: fun("0x391ffff8", "initialize(address,address,address,address,address,address,address,int24,bool)", {"_pool": p.address, "_feesVotingReward": p.address, "_rewardToken": p.address, "_voter": p.address, "_nft": p.address, "_token0": p.address, "_token1": p.address, "_tickSpacing": p.int24, "_isPool": p.bool}, ),
     isPool: viewFun("0xe2e1c6db", "isPool()", {}, p.bool),
     lastUpdateTime: viewFun("0x4bcddb1f", "lastUpdateTime(uint256)", {"_0": p.uint256}, p.uint256),
@@ -183,11 +183,11 @@ export type FeesVotingRewardReturn = FunctionReturn<typeof functions.feesVotingR
 export type GaugeFactoryParams = FunctionArguments<typeof functions.gaugeFactory>
 export type GaugeFactoryReturn = FunctionReturn<typeof functions.gaugeFactory>
 
-export type GetRewardParams_0 = FunctionArguments<typeof functions['getReward(uint256)']>
-export type GetRewardReturn_0 = FunctionReturn<typeof functions['getReward(uint256)']>
+export type GetRewardParams_0 = FunctionArguments<typeof functions["getReward(uint256)"]>
+export type GetRewardReturn_0 = FunctionReturn<typeof functions["getReward(uint256)"]>
 
-export type GetRewardParams_1 = FunctionArguments<typeof functions['getReward(address)']>
-export type GetRewardReturn_1 = FunctionReturn<typeof functions['getReward(address)']>
+export type GetRewardParams_1 = FunctionArguments<typeof functions["getReward(address)"]>
+export type GetRewardReturn_1 = FunctionReturn<typeof functions["getReward(address)"]>
 
 export type InitializeParams = FunctionArguments<typeof functions.initialize>
 export type InitializeReturn = FunctionReturn<typeof functions.initialize>

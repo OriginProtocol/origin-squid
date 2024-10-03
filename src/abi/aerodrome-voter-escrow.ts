@@ -73,8 +73,8 @@ export const functions = {
     ownerToNFTokenIdList: viewFun("0x8bf9d84c", "ownerToNFTokenIdList(address,uint256)", {"_0": p.address, "_1": p.uint256}, p.uint256),
     permanentLockBalance: viewFun("0x4d01cb66", "permanentLockBalance()", {}, p.uint256),
     pointHistory: viewFun("0x8ad4c447", "pointHistory(uint256)", {"_loc": p.uint256}, p.struct({"bias": p.int128, "slope": p.int128, "ts": p.uint256, "blk": p.uint256, "permanentLockBalance": p.uint256})),
-    'safeTransferFrom(address,address,uint256)': fun("0x42842e0e", "safeTransferFrom(address,address,uint256)", {"_from": p.address, "_to": p.address, "_tokenId": p.uint256}, ),
-    'safeTransferFrom(address,address,uint256,bytes)': fun("0xb88d4fde", "safeTransferFrom(address,address,uint256,bytes)", {"_from": p.address, "_to": p.address, "_tokenId": p.uint256, "_data": p.bytes}, ),
+    "safeTransferFrom(address,address,uint256)": fun("0x42842e0e", "safeTransferFrom(address,address,uint256)", {"_from": p.address, "_to": p.address, "_tokenId": p.uint256}, ),
+    "safeTransferFrom(address,address,uint256,bytes)": fun("0xb88d4fde", "safeTransferFrom(address,address,uint256,bytes)", {"_from": p.address, "_to": p.address, "_tokenId": p.uint256, "_data": p.bytes}, ),
     setAllowedManager: fun("0x9954a989", "setAllowedManager(address)", {"_allowedManager": p.address}, ),
     setApprovalForAll: fun("0xa22cb465", "setApprovalForAll(address,bool)", {"_operator": p.address, "_approved": p.bool}, ),
     setArtProxy: fun("0x2e720f7d", "setArtProxy(address)", {"_proxy": p.address}, ),
@@ -485,11 +485,11 @@ export type PermanentLockBalanceReturn = FunctionReturn<typeof functions.permane
 export type PointHistoryParams = FunctionArguments<typeof functions.pointHistory>
 export type PointHistoryReturn = FunctionReturn<typeof functions.pointHistory>
 
-export type SafeTransferFromParams_0 = FunctionArguments<typeof functions['safeTransferFrom(address,address,uint256)']>
-export type SafeTransferFromReturn_0 = FunctionReturn<typeof functions['safeTransferFrom(address,address,uint256)']>
+export type SafeTransferFromParams_0 = FunctionArguments<typeof functions["safeTransferFrom(address,address,uint256)"]>
+export type SafeTransferFromReturn_0 = FunctionReturn<typeof functions["safeTransferFrom(address,address,uint256)"]>
 
-export type SafeTransferFromParams_1 = FunctionArguments<typeof functions['safeTransferFrom(address,address,uint256,bytes)']>
-export type SafeTransferFromReturn_1 = FunctionReturn<typeof functions['safeTransferFrom(address,address,uint256,bytes)']>
+export type SafeTransferFromParams_1 = FunctionArguments<typeof functions["safeTransferFrom(address,address,uint256,bytes)"]>
+export type SafeTransferFromReturn_1 = FunctionReturn<typeof functions["safeTransferFrom(address,address,uint256,bytes)"]>
 
 export type SetAllowedManagerParams = FunctionArguments<typeof functions.setAllowedManager>
 export type SetAllowedManagerReturn = FunctionReturn<typeof functions.setAllowedManager>

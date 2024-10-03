@@ -12,8 +12,8 @@ export const events = {
 
 export const functions = {
     balanceOf: viewFun("0x70a08231", "balanceOf(address)", {"_0": p.address}, p.uint256),
-    'deposit(uint256,address)': fun("0x6e553f65", "deposit(uint256,address)", {"_amount": p.uint256, "_recipient": p.address}, ),
-    'deposit(uint256)': fun("0xb6b55f25", "deposit(uint256)", {"_amount": p.uint256}, ),
+    "deposit(uint256,address)": fun("0x6e553f65", "deposit(uint256,address)", {"_amount": p.uint256, "_recipient": p.address}, ),
+    "deposit(uint256)": fun("0xb6b55f25", "deposit(uint256)", {"_amount": p.uint256}, ),
     earned: viewFun("0x008cc262", "earned(address)", {"_account": p.address}, p.uint256),
     fees0: viewFun("0x93f1c442", "fees0()", {}, p.uint256),
     fees1: viewFun("0x4c02a21c", "fees1()", {}, p.uint256),
@@ -143,11 +143,11 @@ export type WithdrawEventArgs = EParams<typeof events.Withdraw>
 export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
 export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
 
-export type DepositParams_0 = FunctionArguments<typeof functions['deposit(uint256,address)']>
-export type DepositReturn_0 = FunctionReturn<typeof functions['deposit(uint256,address)']>
+export type DepositParams_0 = FunctionArguments<typeof functions["deposit(uint256,address)"]>
+export type DepositReturn_0 = FunctionReturn<typeof functions["deposit(uint256,address)"]>
 
-export type DepositParams_1 = FunctionArguments<typeof functions['deposit(uint256)']>
-export type DepositReturn_1 = FunctionReturn<typeof functions['deposit(uint256)']>
+export type DepositParams_1 = FunctionArguments<typeof functions["deposit(uint256)"]>
+export type DepositReturn_1 = FunctionReturn<typeof functions["deposit(uint256)"]>
 
 export type EarnedParams = FunctionArguments<typeof functions.earned>
 export type EarnedReturn = FunctionReturn<typeof functions.earned>

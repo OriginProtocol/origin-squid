@@ -28,8 +28,8 @@ export const functions = {
     castVoteWithReason: fun("0x7b3c71d3", "castVoteWithReason(uint256,uint8,string)", {"proposalId": p.uint256, "support": p.uint8, "reason": p.string}, p.uint256),
     castVoteWithReasonAndParams: fun("0x5f398a14", "castVoteWithReasonAndParams(uint256,uint8,string,bytes)", {"proposalId": p.uint256, "support": p.uint8, "reason": p.string, "params": p.bytes}, p.uint256),
     castVoteWithReasonAndParamsBySig: fun("0x03420181", "castVoteWithReasonAndParamsBySig(uint256,uint8,string,bytes,uint8,bytes32,bytes32)", {"proposalId": p.uint256, "support": p.uint8, "reason": p.string, "params": p.bytes, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, p.uint256),
-    'execute(address[],uint256[],bytes[],bytes32)': fun("0x2656227d", "execute(address[],uint256[],bytes[],bytes32)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "descriptionHash": p.bytes32}, p.uint256),
-    'execute(uint256)': fun("0xfe0d94c1", "execute(uint256)", {"proposalId": p.uint256}, ),
+    "execute(address[],uint256[],bytes[],bytes32)": fun("0x2656227d", "execute(address[],uint256[],bytes[],bytes32)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "descriptionHash": p.bytes32}, p.uint256),
+    "execute(uint256)": fun("0xfe0d94c1", "execute(uint256)", {"proposalId": p.uint256}, ),
     getActions: viewFun("0x328dd982", "getActions(uint256)", {"proposalId": p.uint256}, {"targets": p.array(p.address), "values": p.array(p.uint256), "signatures": p.array(p.string), "calldatas": p.array(p.bytes)}),
     getReceipt: viewFun("0xe23a9a52", "getReceipt(uint256,address)", {"proposalId": p.uint256, "voter": p.address}, p.struct({"hasVoted": p.bool, "support": p.uint8, "votes": p.uint256})),
     getVotes: viewFun("0xeb9019d4", "getVotes(address,uint256)", {"account": p.address, "blockNumber": p.uint256}, p.uint256),
@@ -46,10 +46,10 @@ export const functions = {
     proposalSnapshot: viewFun("0x2d63f693", "proposalSnapshot(uint256)", {"proposalId": p.uint256}, p.uint256),
     proposalThreshold: viewFun("0xb58131b0", "proposalThreshold()", {}, p.uint256),
     proposals: viewFun("0x013cf08b", "proposals(uint256)", {"proposalId": p.uint256}, {"id": p.uint256, "proposer": p.address, "eta": p.uint256, "startBlock": p.uint256, "endBlock": p.uint256, "forVotes": p.uint256, "againstVotes": p.uint256, "abstainVotes": p.uint256, "canceled": p.bool, "executed": p.bool}),
-    'propose(address[],uint256[],bytes[],string)': fun("0x7d5e81e2", "propose(address[],uint256[],bytes[],string)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "description": p.string}, p.uint256),
-    'propose(address[],uint256[],string[],bytes[],string)': fun("0xda95691a", "propose(address[],uint256[],string[],bytes[],string)", {"targets": p.array(p.address), "values": p.array(p.uint256), "signatures": p.array(p.string), "calldatas": p.array(p.bytes), "description": p.string}, p.uint256),
-    'queue(address[],uint256[],bytes[],bytes32)': fun("0x160cbed7", "queue(address[],uint256[],bytes[],bytes32)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "descriptionHash": p.bytes32}, p.uint256),
-    'queue(uint256)': fun("0xddf0b009", "queue(uint256)", {"proposalId": p.uint256}, ),
+    "propose(address[],uint256[],bytes[],string)": fun("0x7d5e81e2", "propose(address[],uint256[],bytes[],string)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "description": p.string}, p.uint256),
+    "propose(address[],uint256[],string[],bytes[],string)": fun("0xda95691a", "propose(address[],uint256[],string[],bytes[],string)", {"targets": p.array(p.address), "values": p.array(p.uint256), "signatures": p.array(p.string), "calldatas": p.array(p.bytes), "description": p.string}, p.uint256),
+    "queue(address[],uint256[],bytes[],bytes32)": fun("0x160cbed7", "queue(address[],uint256[],bytes[],bytes32)", {"targets": p.array(p.address), "values": p.array(p.uint256), "calldatas": p.array(p.bytes), "descriptionHash": p.bytes32}, p.uint256),
+    "queue(uint256)": fun("0xddf0b009", "queue(uint256)", {"proposalId": p.uint256}, ),
     quorum: viewFun("0xf8ce560a", "quorum(uint256)", {"blockNumber": p.uint256}, p.uint256),
     quorumDenominator: viewFun("0x97c3d334", "quorumDenominator()", {}, p.uint256),
     quorumNumerator: viewFun("0xa7713a70", "quorumNumerator()", {}, p.uint256),
@@ -224,11 +224,11 @@ export type CastVoteWithReasonAndParamsReturn = FunctionReturn<typeof functions.
 export type CastVoteWithReasonAndParamsBySigParams = FunctionArguments<typeof functions.castVoteWithReasonAndParamsBySig>
 export type CastVoteWithReasonAndParamsBySigReturn = FunctionReturn<typeof functions.castVoteWithReasonAndParamsBySig>
 
-export type ExecuteParams_0 = FunctionArguments<typeof functions['execute(address[],uint256[],bytes[],bytes32)']>
-export type ExecuteReturn_0 = FunctionReturn<typeof functions['execute(address[],uint256[],bytes[],bytes32)']>
+export type ExecuteParams_0 = FunctionArguments<typeof functions["execute(address[],uint256[],bytes[],bytes32)"]>
+export type ExecuteReturn_0 = FunctionReturn<typeof functions["execute(address[],uint256[],bytes[],bytes32)"]>
 
-export type ExecuteParams_1 = FunctionArguments<typeof functions['execute(uint256)']>
-export type ExecuteReturn_1 = FunctionReturn<typeof functions['execute(uint256)']>
+export type ExecuteParams_1 = FunctionArguments<typeof functions["execute(uint256)"]>
+export type ExecuteReturn_1 = FunctionReturn<typeof functions["execute(uint256)"]>
 
 export type GetActionsParams = FunctionArguments<typeof functions.getActions>
 export type GetActionsReturn = FunctionReturn<typeof functions.getActions>
@@ -278,17 +278,17 @@ export type ProposalThresholdReturn = FunctionReturn<typeof functions.proposalTh
 export type ProposalsParams = FunctionArguments<typeof functions.proposals>
 export type ProposalsReturn = FunctionReturn<typeof functions.proposals>
 
-export type ProposeParams_0 = FunctionArguments<typeof functions['propose(address[],uint256[],bytes[],string)']>
-export type ProposeReturn_0 = FunctionReturn<typeof functions['propose(address[],uint256[],bytes[],string)']>
+export type ProposeParams_0 = FunctionArguments<typeof functions["propose(address[],uint256[],bytes[],string)"]>
+export type ProposeReturn_0 = FunctionReturn<typeof functions["propose(address[],uint256[],bytes[],string)"]>
 
-export type ProposeParams_1 = FunctionArguments<typeof functions['propose(address[],uint256[],string[],bytes[],string)']>
-export type ProposeReturn_1 = FunctionReturn<typeof functions['propose(address[],uint256[],string[],bytes[],string)']>
+export type ProposeParams_1 = FunctionArguments<typeof functions["propose(address[],uint256[],string[],bytes[],string)"]>
+export type ProposeReturn_1 = FunctionReturn<typeof functions["propose(address[],uint256[],string[],bytes[],string)"]>
 
-export type QueueParams_0 = FunctionArguments<typeof functions['queue(address[],uint256[],bytes[],bytes32)']>
-export type QueueReturn_0 = FunctionReturn<typeof functions['queue(address[],uint256[],bytes[],bytes32)']>
+export type QueueParams_0 = FunctionArguments<typeof functions["queue(address[],uint256[],bytes[],bytes32)"]>
+export type QueueReturn_0 = FunctionReturn<typeof functions["queue(address[],uint256[],bytes[],bytes32)"]>
 
-export type QueueParams_1 = FunctionArguments<typeof functions['queue(uint256)']>
-export type QueueReturn_1 = FunctionReturn<typeof functions['queue(uint256)']>
+export type QueueParams_1 = FunctionArguments<typeof functions["queue(uint256)"]>
+export type QueueReturn_1 = FunctionReturn<typeof functions["queue(uint256)"]>
 
 export type QuorumParams = FunctionArguments<typeof functions.quorum>
 export type QuorumReturn = FunctionReturn<typeof functions.quorum>

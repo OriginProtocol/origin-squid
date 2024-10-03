@@ -21,12 +21,12 @@ export const functions = {
     auraRewardPoolAddress: viewFun("0x3132a21d", "auraRewardPoolAddress()", {}, p.address),
     balancerPoolId: viewFun("0xdbbb64b9", "balancerPoolId()", {}, p.bytes32),
     balancerVault: viewFun("0x158274a5", "balancerVault()", {}, p.address),
-    'checkBalance(address)': viewFun("0x5f515226", "checkBalance(address)", {"_asset": p.address}, p.uint256),
-    'checkBalance()': viewFun("0xc71daccb", "checkBalance()", {}, p.uint256),
+    "checkBalance(address)": viewFun("0x5f515226", "checkBalance(address)", {"_asset": p.address}, p.uint256),
+    "checkBalance()": viewFun("0xc71daccb", "checkBalance()", {}, p.uint256),
     claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
     collectRewardTokens: fun("0x5a063f63", "collectRewardTokens()", {}, ),
-    'deposit(address,uint256)': fun("0x47e7ef24", "deposit(address,uint256)", {"_0": p.address, "_1": p.uint256}, ),
-    'deposit(address[],uint256[])': fun("0xefc908a1", "deposit(address[],uint256[])", {"_0": p.array(p.address), "_1": p.array(p.uint256)}, ),
+    "deposit(address,uint256)": fun("0x47e7ef24", "deposit(address,uint256)", {"_0": p.address, "_1": p.uint256}, ),
+    "deposit(address[],uint256[])": fun("0xefc908a1", "deposit(address[],uint256[])", {"_0": p.array(p.address), "_1": p.array(p.uint256)}, ),
     depositAll: fun("0xde5f6268", "depositAll()", {}, ),
     frxETH: viewFun("0x565d3e6e", "frxETH()", {}, p.address),
     getRewardTokenAddresses: viewFun("0xf6ca71b0", "getRewardTokenAddresses()", {}, p.array(p.address)),
@@ -52,8 +52,8 @@ export const functions = {
     transferGovernance: fun("0xd38bfff4", "transferGovernance(address)", {"_newGovernor": p.address}, ),
     transferToken: fun("0x1072cbea", "transferToken(address,uint256)", {"_asset": p.address, "_amount": p.uint256}, ),
     vaultAddress: viewFun("0x430bf08a", "vaultAddress()", {}, p.address),
-    'withdraw(address,address,uint256)': fun("0xd9caed12", "withdraw(address,address,uint256)", {"_recipient": p.address, "_strategyAsset": p.address, "_strategyAmount": p.uint256}, ),
-    'withdraw(address,address[],uint256[])': fun("0xedbd7668", "withdraw(address,address[],uint256[])", {"_recipient": p.address, "_strategyAssets": p.array(p.address), "_strategyAmounts": p.array(p.uint256)}, ),
+    "withdraw(address,address,uint256)": fun("0xd9caed12", "withdraw(address,address,uint256)", {"_recipient": p.address, "_strategyAsset": p.address, "_strategyAmount": p.uint256}, ),
+    "withdraw(address,address[],uint256[])": fun("0xedbd7668", "withdraw(address,address[],uint256[])", {"_recipient": p.address, "_strategyAssets": p.array(p.address), "_strategyAmounts": p.array(p.uint256)}, ),
     withdrawAll: fun("0x853828b6", "withdrawAll()", {}, ),
     wstETH: viewFun("0x4aa07e64", "wstETH()", {}, p.address),
 }
@@ -76,12 +76,12 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.balancerVault, {})
     }
 
-    'checkBalance(address)'(_asset: CheckBalanceParams_0["_asset"]) {
-        return this.eth_call(functions['checkBalance(address)'], {_asset})
+    "checkBalance(address)"(_asset: CheckBalanceParams_0["_asset"]) {
+        return this.eth_call(functions["checkBalance(address)"], {_asset})
     }
 
-    'checkBalance()'() {
-        return this.eth_call(functions['checkBalance()'], {})
+    "checkBalance()"() {
+        return this.eth_call(functions["checkBalance()"], {})
     }
 
     frxETH() {
@@ -171,11 +171,11 @@ export type BalancerPoolIdReturn = FunctionReturn<typeof functions.balancerPoolI
 export type BalancerVaultParams = FunctionArguments<typeof functions.balancerVault>
 export type BalancerVaultReturn = FunctionReturn<typeof functions.balancerVault>
 
-export type CheckBalanceParams_0 = FunctionArguments<typeof functions['checkBalance(address)']>
-export type CheckBalanceReturn_0 = FunctionReturn<typeof functions['checkBalance(address)']>
+export type CheckBalanceParams_0 = FunctionArguments<typeof functions["checkBalance(address)"]>
+export type CheckBalanceReturn_0 = FunctionReturn<typeof functions["checkBalance(address)"]>
 
-export type CheckBalanceParams_1 = FunctionArguments<typeof functions['checkBalance()']>
-export type CheckBalanceReturn_1 = FunctionReturn<typeof functions['checkBalance()']>
+export type CheckBalanceParams_1 = FunctionArguments<typeof functions["checkBalance()"]>
+export type CheckBalanceReturn_1 = FunctionReturn<typeof functions["checkBalance()"]>
 
 export type ClaimGovernanceParams = FunctionArguments<typeof functions.claimGovernance>
 export type ClaimGovernanceReturn = FunctionReturn<typeof functions.claimGovernance>
@@ -183,11 +183,11 @@ export type ClaimGovernanceReturn = FunctionReturn<typeof functions.claimGoverna
 export type CollectRewardTokensParams = FunctionArguments<typeof functions.collectRewardTokens>
 export type CollectRewardTokensReturn = FunctionReturn<typeof functions.collectRewardTokens>
 
-export type DepositParams_0 = FunctionArguments<typeof functions['deposit(address,uint256)']>
-export type DepositReturn_0 = FunctionReturn<typeof functions['deposit(address,uint256)']>
+export type DepositParams_0 = FunctionArguments<typeof functions["deposit(address,uint256)"]>
+export type DepositReturn_0 = FunctionReturn<typeof functions["deposit(address,uint256)"]>
 
-export type DepositParams_1 = FunctionArguments<typeof functions['deposit(address[],uint256[])']>
-export type DepositReturn_1 = FunctionReturn<typeof functions['deposit(address[],uint256[])']>
+export type DepositParams_1 = FunctionArguments<typeof functions["deposit(address[],uint256[])"]>
+export type DepositReturn_1 = FunctionReturn<typeof functions["deposit(address[],uint256[])"]>
 
 export type DepositAllParams = FunctionArguments<typeof functions.depositAll>
 export type DepositAllReturn = FunctionReturn<typeof functions.depositAll>
@@ -264,11 +264,11 @@ export type TransferTokenReturn = FunctionReturn<typeof functions.transferToken>
 export type VaultAddressParams = FunctionArguments<typeof functions.vaultAddress>
 export type VaultAddressReturn = FunctionReturn<typeof functions.vaultAddress>
 
-export type WithdrawParams_0 = FunctionArguments<typeof functions['withdraw(address,address,uint256)']>
-export type WithdrawReturn_0 = FunctionReturn<typeof functions['withdraw(address,address,uint256)']>
+export type WithdrawParams_0 = FunctionArguments<typeof functions["withdraw(address,address,uint256)"]>
+export type WithdrawReturn_0 = FunctionReturn<typeof functions["withdraw(address,address,uint256)"]>
 
-export type WithdrawParams_1 = FunctionArguments<typeof functions['withdraw(address,address[],uint256[])']>
-export type WithdrawReturn_1 = FunctionReturn<typeof functions['withdraw(address,address[],uint256[])']>
+export type WithdrawParams_1 = FunctionArguments<typeof functions["withdraw(address,address[],uint256[])"]>
+export type WithdrawReturn_1 = FunctionReturn<typeof functions["withdraw(address,address[],uint256[])"]>
 
 export type WithdrawAllParams = FunctionArguments<typeof functions.withdrawAll>
 export type WithdrawAllReturn = FunctionReturn<typeof functions.withdrawAll>

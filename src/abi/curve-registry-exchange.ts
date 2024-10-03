@@ -8,20 +8,20 @@ export const events = {
 }
 
 export const functions = {
-    'exchange_with_best_rate(address,address,uint256,uint256)': fun("0x10e5e303", "exchange_with_best_rate(address,address,uint256,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    'exchange_with_best_rate(address,address,uint256,uint256,address)': fun("0x9f69a6a6", "exchange_with_best_rate(address,address,uint256,uint256,address)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
-    'exchange(address,address,address,uint256,uint256)': fun("0x4798ce5b", "exchange(address,address,address,uint256,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    'exchange(address,address,address,uint256,uint256,address)': fun("0x1a4c1ca3", "exchange(address,address,address,uint256,uint256,address)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
-    'exchange_multiple(address[9],uint256[3][4],uint256,uint256)': fun("0x353ca424", "exchange_multiple(address[9],uint256[3][4],uint256,uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
-    'exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])': fun("0x9db4f7aa", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
-    'exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)': fun("0x0651cb35", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4), "_receiver": p.address}, p.uint256),
-    'get_best_rate(address,address,uint256)': viewFun("0x4e21df75", "get_best_rate(address,address,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256}, {"_0": p.address, "_1": p.uint256}),
-    'get_best_rate(address,address,uint256,address[8])': viewFun("0x488de9af", "get_best_rate(address,address,uint256,address[8])", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_exclude_pools": p.fixedSizeArray(p.address, 8)}, {"_0": p.address, "_1": p.uint256}),
+    "exchange_with_best_rate(address,address,uint256,uint256)": fun("0x10e5e303", "exchange_with_best_rate(address,address,uint256,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange_with_best_rate(address,address,uint256,uint256,address)": fun("0x9f69a6a6", "exchange_with_best_rate(address,address,uint256,uint256,address)", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
+    "exchange(address,address,address,uint256,uint256)": fun("0x4798ce5b", "exchange(address,address,address,uint256,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange(address,address,address,uint256,uint256,address)": fun("0x1a4c1ca3", "exchange(address,address,address,uint256,uint256,address)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256, "_expected": p.uint256, "_receiver": p.address}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256)": fun("0x353ca424", "exchange_multiple(address[9],uint256[3][4],uint256,uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])": fun("0x9db4f7aa", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
+    "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)": fun("0x0651cb35", "exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_expected": p.uint256, "_pools": p.fixedSizeArray(p.address, 4), "_receiver": p.address}, p.uint256),
+    "get_best_rate(address,address,uint256)": viewFun("0x4e21df75", "get_best_rate(address,address,uint256)", {"_from": p.address, "_to": p.address, "_amount": p.uint256}, {"_0": p.address, "_1": p.uint256}),
+    "get_best_rate(address,address,uint256,address[8])": viewFun("0x488de9af", "get_best_rate(address,address,uint256,address[8])", {"_from": p.address, "_to": p.address, "_amount": p.uint256, "_exclude_pools": p.fixedSizeArray(p.address, 8)}, {"_0": p.address, "_1": p.uint256}),
     get_exchange_amount: viewFun("0x3973e834", "get_exchange_amount(address,address,address,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
     get_input_amount: viewFun("0x7fa5a654", "get_input_amount(address,address,address,uint256)", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amount": p.uint256}, p.uint256),
     get_exchange_amounts: viewFun("0x4be9ae42", "get_exchange_amounts(address,address,address,uint256[100])", {"_pool": p.address, "_from": p.address, "_to": p.address, "_amounts": p.fixedSizeArray(p.uint256, 100)}, p.fixedSizeArray(p.uint256, 100)),
-    'get_exchange_multiple_amount(address[9],uint256[3][4],uint256)': viewFun("0x7b3d22cf", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256}, p.uint256),
-    'get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])': viewFun("0xe6eabf23", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)": viewFun("0x7b3d22cf", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256}, p.uint256),
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])": viewFun("0xe6eabf23", "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])", {"_route": p.fixedSizeArray(p.address, 9), "_swap_params": p.fixedSizeArray(p.fixedSizeArray(p.uint256, 3), 4), "_amount": p.uint256, "_pools": p.fixedSizeArray(p.address, 4)}, p.uint256),
     get_calculator: viewFun("0x5d7dc825", "get_calculator(address)", {"_pool": p.address}, p.address),
     update_registry_address: fun("0x4bbc5b1f", "update_registry_address()", {}, p.bool),
     set_calculator: fun("0x188c7ee5", "set_calculator(address,address)", {"_pool": p.address, "_calculator": p.address}, p.bool),
@@ -37,12 +37,12 @@ export const functions = {
 
 export class Contract extends ContractBase {
 
-    'get_best_rate(address,address,uint256)'(_from: Get_best_rateParams_0["_from"], _to: Get_best_rateParams_0["_to"], _amount: Get_best_rateParams_0["_amount"]) {
-        return this.eth_call(functions['get_best_rate(address,address,uint256)'], {_from, _to, _amount})
+    "get_best_rate(address,address,uint256)"(_from: Get_best_rateParams_0["_from"], _to: Get_best_rateParams_0["_to"], _amount: Get_best_rateParams_0["_amount"]) {
+        return this.eth_call(functions["get_best_rate(address,address,uint256)"], {_from, _to, _amount})
     }
 
-    'get_best_rate(address,address,uint256,address[8])'(_from: Get_best_rateParams_1["_from"], _to: Get_best_rateParams_1["_to"], _amount: Get_best_rateParams_1["_amount"], _exclude_pools: Get_best_rateParams_1["_exclude_pools"]) {
-        return this.eth_call(functions['get_best_rate(address,address,uint256,address[8])'], {_from, _to, _amount, _exclude_pools})
+    "get_best_rate(address,address,uint256,address[8])"(_from: Get_best_rateParams_1["_from"], _to: Get_best_rateParams_1["_to"], _amount: Get_best_rateParams_1["_amount"], _exclude_pools: Get_best_rateParams_1["_exclude_pools"]) {
+        return this.eth_call(functions["get_best_rate(address,address,uint256,address[8])"], {_from, _to, _amount, _exclude_pools})
     }
 
     get_exchange_amount(_pool: Get_exchange_amountParams["_pool"], _from: Get_exchange_amountParams["_from"], _to: Get_exchange_amountParams["_to"], _amount: Get_exchange_amountParams["_amount"]) {
@@ -57,12 +57,12 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.get_exchange_amounts, {_pool, _from, _to, _amounts})
     }
 
-    'get_exchange_multiple_amount(address[9],uint256[3][4],uint256)'(_route: Get_exchange_multiple_amountParams_0["_route"], _swap_params: Get_exchange_multiple_amountParams_0["_swap_params"], _amount: Get_exchange_multiple_amountParams_0["_amount"]) {
-        return this.eth_call(functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256)'], {_route, _swap_params, _amount})
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256)"(_route: Get_exchange_multiple_amountParams_0["_route"], _swap_params: Get_exchange_multiple_amountParams_0["_swap_params"], _amount: Get_exchange_multiple_amountParams_0["_amount"]) {
+        return this.eth_call(functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256)"], {_route, _swap_params, _amount})
     }
 
-    'get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])'(_route: Get_exchange_multiple_amountParams_1["_route"], _swap_params: Get_exchange_multiple_amountParams_1["_swap_params"], _amount: Get_exchange_multiple_amountParams_1["_amount"], _pools: Get_exchange_multiple_amountParams_1["_pools"]) {
-        return this.eth_call(functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])'], {_route, _swap_params, _amount, _pools})
+    "get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])"(_route: Get_exchange_multiple_amountParams_1["_route"], _swap_params: Get_exchange_multiple_amountParams_1["_swap_params"], _amount: Get_exchange_multiple_amountParams_1["_amount"], _pools: Get_exchange_multiple_amountParams_1["_pools"]) {
+        return this.eth_call(functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])"], {_route, _swap_params, _amount, _pools})
     }
 
     get_calculator(_pool: Get_calculatorParams["_pool"]) {
@@ -95,32 +95,32 @@ export type TokenExchangeEventArgs = EParams<typeof events.TokenExchange>
 export type ExchangeMultipleEventArgs = EParams<typeof events.ExchangeMultiple>
 
 /// Function types
-export type Exchange_with_best_rateParams_0 = FunctionArguments<typeof functions['exchange_with_best_rate(address,address,uint256,uint256)']>
-export type Exchange_with_best_rateReturn_0 = FunctionReturn<typeof functions['exchange_with_best_rate(address,address,uint256,uint256)']>
+export type Exchange_with_best_rateParams_0 = FunctionArguments<typeof functions["exchange_with_best_rate(address,address,uint256,uint256)"]>
+export type Exchange_with_best_rateReturn_0 = FunctionReturn<typeof functions["exchange_with_best_rate(address,address,uint256,uint256)"]>
 
-export type Exchange_with_best_rateParams_1 = FunctionArguments<typeof functions['exchange_with_best_rate(address,address,uint256,uint256,address)']>
-export type Exchange_with_best_rateReturn_1 = FunctionReturn<typeof functions['exchange_with_best_rate(address,address,uint256,uint256,address)']>
+export type Exchange_with_best_rateParams_1 = FunctionArguments<typeof functions["exchange_with_best_rate(address,address,uint256,uint256,address)"]>
+export type Exchange_with_best_rateReturn_1 = FunctionReturn<typeof functions["exchange_with_best_rate(address,address,uint256,uint256,address)"]>
 
-export type ExchangeParams_0 = FunctionArguments<typeof functions['exchange(address,address,address,uint256,uint256)']>
-export type ExchangeReturn_0 = FunctionReturn<typeof functions['exchange(address,address,address,uint256,uint256)']>
+export type ExchangeParams_0 = FunctionArguments<typeof functions["exchange(address,address,address,uint256,uint256)"]>
+export type ExchangeReturn_0 = FunctionReturn<typeof functions["exchange(address,address,address,uint256,uint256)"]>
 
-export type ExchangeParams_1 = FunctionArguments<typeof functions['exchange(address,address,address,uint256,uint256,address)']>
-export type ExchangeReturn_1 = FunctionReturn<typeof functions['exchange(address,address,address,uint256,uint256,address)']>
+export type ExchangeParams_1 = FunctionArguments<typeof functions["exchange(address,address,address,uint256,uint256,address)"]>
+export type ExchangeReturn_1 = FunctionReturn<typeof functions["exchange(address,address,address,uint256,uint256,address)"]>
 
-export type Exchange_multipleParams_0 = FunctionArguments<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256)']>
-export type Exchange_multipleReturn_0 = FunctionReturn<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256)']>
+export type Exchange_multipleParams_0 = FunctionArguments<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256)"]>
+export type Exchange_multipleReturn_0 = FunctionReturn<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256)"]>
 
-export type Exchange_multipleParams_1 = FunctionArguments<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])']>
-export type Exchange_multipleReturn_1 = FunctionReturn<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])']>
+export type Exchange_multipleParams_1 = FunctionArguments<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])"]>
+export type Exchange_multipleReturn_1 = FunctionReturn<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4])"]>
 
-export type Exchange_multipleParams_2 = FunctionArguments<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)']>
-export type Exchange_multipleReturn_2 = FunctionReturn<typeof functions['exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)']>
+export type Exchange_multipleParams_2 = FunctionArguments<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)"]>
+export type Exchange_multipleReturn_2 = FunctionReturn<typeof functions["exchange_multiple(address[9],uint256[3][4],uint256,uint256,address[4],address)"]>
 
-export type Get_best_rateParams_0 = FunctionArguments<typeof functions['get_best_rate(address,address,uint256)']>
-export type Get_best_rateReturn_0 = FunctionReturn<typeof functions['get_best_rate(address,address,uint256)']>
+export type Get_best_rateParams_0 = FunctionArguments<typeof functions["get_best_rate(address,address,uint256)"]>
+export type Get_best_rateReturn_0 = FunctionReturn<typeof functions["get_best_rate(address,address,uint256)"]>
 
-export type Get_best_rateParams_1 = FunctionArguments<typeof functions['get_best_rate(address,address,uint256,address[8])']>
-export type Get_best_rateReturn_1 = FunctionReturn<typeof functions['get_best_rate(address,address,uint256,address[8])']>
+export type Get_best_rateParams_1 = FunctionArguments<typeof functions["get_best_rate(address,address,uint256,address[8])"]>
+export type Get_best_rateReturn_1 = FunctionReturn<typeof functions["get_best_rate(address,address,uint256,address[8])"]>
 
 export type Get_exchange_amountParams = FunctionArguments<typeof functions.get_exchange_amount>
 export type Get_exchange_amountReturn = FunctionReturn<typeof functions.get_exchange_amount>
@@ -131,11 +131,11 @@ export type Get_input_amountReturn = FunctionReturn<typeof functions.get_input_a
 export type Get_exchange_amountsParams = FunctionArguments<typeof functions.get_exchange_amounts>
 export type Get_exchange_amountsReturn = FunctionReturn<typeof functions.get_exchange_amounts>
 
-export type Get_exchange_multiple_amountParams_0 = FunctionArguments<typeof functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256)']>
-export type Get_exchange_multiple_amountReturn_0 = FunctionReturn<typeof functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256)']>
+export type Get_exchange_multiple_amountParams_0 = FunctionArguments<typeof functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256)"]>
+export type Get_exchange_multiple_amountReturn_0 = FunctionReturn<typeof functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256)"]>
 
-export type Get_exchange_multiple_amountParams_1 = FunctionArguments<typeof functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])']>
-export type Get_exchange_multiple_amountReturn_1 = FunctionReturn<typeof functions['get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])']>
+export type Get_exchange_multiple_amountParams_1 = FunctionArguments<typeof functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])"]>
+export type Get_exchange_multiple_amountReturn_1 = FunctionReturn<typeof functions["get_exchange_multiple_amount(address[9],uint256[3][4],uint256,address[4])"]>
 
 export type Get_calculatorParams = FunctionArguments<typeof functions.get_calculator>
 export type Get_calculatorReturn = FunctionReturn<typeof functions.get_calculator>

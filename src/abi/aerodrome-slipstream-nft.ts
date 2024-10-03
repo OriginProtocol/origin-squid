@@ -37,8 +37,8 @@ export const functions = {
     permit: fun("0x7ac2ff7b", "permit(address,uint256,uint256,uint8,bytes32,bytes32)", {"spender": p.address, "tokenId": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
     positions: viewFun("0x99fbab88", "positions(uint256)", {"tokenId": p.uint256}, {"nonce": p.uint96, "operator": p.address, "token0": p.address, "token1": p.address, "tickSpacing": p.int24, "tickLower": p.int24, "tickUpper": p.int24, "liquidity": p.uint128, "feeGrowthInside0LastX128": p.uint256, "feeGrowthInside1LastX128": p.uint256, "tokensOwed0": p.uint128, "tokensOwed1": p.uint128}),
     refundETH: fun("0x12210e8a", "refundETH()", {}, ),
-    'safeTransferFrom(address,address,uint256)': fun("0x42842e0e", "safeTransferFrom(address,address,uint256)", {"from": p.address, "to": p.address, "tokenId": p.uint256}, ),
-    'safeTransferFrom(address,address,uint256,bytes)': fun("0xb88d4fde", "safeTransferFrom(address,address,uint256,bytes)", {"from": p.address, "to": p.address, "tokenId": p.uint256, "_data": p.bytes}, ),
+    "safeTransferFrom(address,address,uint256)": fun("0x42842e0e", "safeTransferFrom(address,address,uint256)", {"from": p.address, "to": p.address, "tokenId": p.uint256}, ),
+    "safeTransferFrom(address,address,uint256,bytes)": fun("0xb88d4fde", "safeTransferFrom(address,address,uint256,bytes)", {"from": p.address, "to": p.address, "tokenId": p.uint256, "_data": p.bytes}, ),
     selfPermit: fun("0xf3995c67", "selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)", {"token": p.address, "value": p.uint256, "deadline": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
     selfPermitAllowed: fun("0x4659a494", "selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)", {"token": p.address, "nonce": p.uint256, "expiry": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
     selfPermitAllowedIfNecessary: fun("0xa4a78f0c", "selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)", {"token": p.address, "nonce": p.uint256, "expiry": p.uint256, "v": p.uint8, "r": p.bytes32, "s": p.bytes32}, ),
@@ -214,11 +214,11 @@ export type PositionsReturn = FunctionReturn<typeof functions.positions>
 export type RefundETHParams = FunctionArguments<typeof functions.refundETH>
 export type RefundETHReturn = FunctionReturn<typeof functions.refundETH>
 
-export type SafeTransferFromParams_0 = FunctionArguments<typeof functions['safeTransferFrom(address,address,uint256)']>
-export type SafeTransferFromReturn_0 = FunctionReturn<typeof functions['safeTransferFrom(address,address,uint256)']>
+export type SafeTransferFromParams_0 = FunctionArguments<typeof functions["safeTransferFrom(address,address,uint256)"]>
+export type SafeTransferFromReturn_0 = FunctionReturn<typeof functions["safeTransferFrom(address,address,uint256)"]>
 
-export type SafeTransferFromParams_1 = FunctionArguments<typeof functions['safeTransferFrom(address,address,uint256,bytes)']>
-export type SafeTransferFromReturn_1 = FunctionReturn<typeof functions['safeTransferFrom(address,address,uint256,bytes)']>
+export type SafeTransferFromParams_1 = FunctionArguments<typeof functions["safeTransferFrom(address,address,uint256,bytes)"]>
+export type SafeTransferFromReturn_1 = FunctionReturn<typeof functions["safeTransferFrom(address,address,uint256,bytes)"]>
 
 export type SelfPermitParams = FunctionArguments<typeof functions.selfPermit>
 export type SelfPermitReturn = FunctionReturn<typeof functions.selfPermit>
