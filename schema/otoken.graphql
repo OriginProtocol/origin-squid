@@ -111,7 +111,6 @@ type OTokenActivity @entity {
   data: JSON
 }
 
-
 enum OTokenActivityType {
   Approval
   Bridge
@@ -157,6 +156,8 @@ type OTokenDailyStat @entity {
 
   yield: BigInt!
   fees: BigInt!
+  cumulativeYield: BigInt!
+  cumulativeFees: BigInt!
 
   marketCapUSD: Float!
 }

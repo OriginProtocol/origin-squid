@@ -2,38 +2,35 @@ import 'tsconfig-paths/register'
 
 import { run } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
+import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { priceMap } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
 
 if (require.main === module) {
   console.log('process:test running')
   run({
-    chainId: 8453,
+    chainId: 1,
     stateSchema: 'test-processor',
     processors: [
       {
         name: 'test',
-        from: 19642044,
+        from: 20837855,
         setup: (p) => {
-          p.includeAllBlocks({ from: 19642044 })
+          p.includeAllBlocks({ from: 20837855 })
         },
         process: async (ctx) => {
           // Validate that we're getting otoken rates the way we want to.
 
-          // OUSD
-          // OUSD
-          // const OUSD_USD = await ensureExchangeRate(ctx, ctx.blocks[0], OUSD_ADDRESS, 'USD')
-          // const OUSD_ETH = await ensureExchangeRate(ctx, ctx.blocks[0], OUSD_ADDRESS, 'ETH')
-          // // OETH
-          // const OETH_USD = await ensureExchangeRate(ctx, ctx.blocks[0], OETH_ADDRESS, 'USD')
-          // const OETH_ETH = await ensureExchangeRate(ctx, ctx.blocks[0], OETH_ADDRESS, 'ETH')
-          // const ETH_OETH = await ensureExchangeRate(ctx, ctx.blocks[0], 'ETH', OETH_ADDRESS)
-          //
-          // const ETH_USD = await ensureExchangeRate(ctx, ctx.blocks[0], 'ETH', 'USD')
+          for (const [pair, [getPrice, decimals]] of Object.entries(priceMap)) {
+            const rate = await ensureExchangeRate(
+              ctx,
+              ctx.blocks[0],
+              pair.split('_')[0] as CurrencySymbol,
+              pair.split('_')[1] as CurrencySymbol,
+            )
+            console.log(`${pair} = ${Number(rate?.rate) / 10 ** decimals}`)
+          }
 
-          const ETH_superOETHb = await ensureExchangeRate(ctx, ctx.blocks[0], 'ETH', 'superOETHb')
-          const superOETHb_ETH = await ensureExchangeRate(ctx, ctx.blocks[0], 'superOETHb', 'ETH')
-
-          debugger
+          process.exit(0)
         },
       },
     ],

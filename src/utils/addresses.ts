@@ -1,5 +1,4 @@
 // Lowercase Addresses
-import { baseAddresses } from '@utils/addresses-base'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
@@ -53,6 +52,7 @@ export const OUSD_HARVESTER_ADDRESS = '0x21fb5812d70b3396880d30e90d9e5c1202266c8
 export const OUSD_DRIPPER_ADDRESS = '0x80c898ae5e56f888365e235ceb8cea3eb726cb58'
 export const OUSD_STABLE_OTOKENS = [OUSD_ADDRESS]
 export const OUSD_VAULT_ERC20_ADDRESSES = [DAI_ADDRESS, USDC_ADDRESS, USDT_ADDRESS]
+export const WOUSD_ADDRESS = '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62'
 
 // OETH Related
 export const OETH_ADDRESS = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'
@@ -98,10 +98,7 @@ export const tokens = {
   // Origin OTokens
   OETH: OETH_ADDRESS,
   OUSD: OUSD_ADDRESS,
-  superOETHb_base: baseAddresses.tokens.superOETHb,
-  wsuperOETHb_base: baseAddresses.tokens.wsuperOETHb,
   wOETH: WOETH_ADDRESS,
-  wOETH_arbitrum: WOETH_ARBITRUM_ADDRESS,
 
   // Dollar
   DAI: DAI_ADDRESS,
@@ -113,7 +110,6 @@ export const tokens = {
   // Ether
   ETH: ETH_ADDRESS,
   WETH: WETH_ADDRESS,
-  WETH_base: baseAddresses.tokens.WETH,
   stETH: STETH_ADDRESS,
   wstETH: WSTETH_ADDRESS,
   rETH: RETH_ADDRESS,
@@ -123,10 +119,7 @@ export const tokens = {
 
   // Non-stable
   BAL: BAL_ADDRESS,
-  AERO: baseAddresses.tokens.AERO,
 } as const
-export type TokenSymbol = keyof typeof tokens
-export type TokenAddress = (typeof tokens)[TokenSymbol]
 
 // Strategy Helper Objects & Types
 export const strategies = {
