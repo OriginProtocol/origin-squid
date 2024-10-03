@@ -18,9 +18,9 @@ import {
 import { Block, Context, Log } from '@processor'
 import { waitForERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { TokenAddress } from '@utils/addresses'
 import { calculateAPY2, convertApyToApr } from '@utils/calculateAPY'
 import { LogFilter, logFilter } from '@utils/logFilter'
+import { TokenAddress } from '@utils/symbols'
 
 interface State {
   // State Entities

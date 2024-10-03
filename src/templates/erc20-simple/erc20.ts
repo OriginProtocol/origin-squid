@@ -3,8 +3,9 @@ import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@mo
 import { Block, Context } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { ADDRESS_ZERO, TokenAddress } from '@utils/addresses'
+import { ADDRESS_ZERO } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
+import { TokenAddress } from '@utils/symbols'
 
 export const createERC20SimpleTracker = ({ from, address }: { from: number; address: TokenAddress | string }) => {
   let erc20: ERC20 | undefined

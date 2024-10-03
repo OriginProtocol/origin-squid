@@ -44,7 +44,9 @@ type StrategyBalance @entity {
   blockNumber: Int! @index
   strategy: String!
   asset: String!
+  symbol: String!
   balance: BigInt!
+  balanceETH: BigInt!
 }
 
 type StrategyYield @entity {

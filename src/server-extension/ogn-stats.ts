@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from 'graphql'
-import 'reflect-metadata'
 import { Field, Info, ObjectType, Query, Resolver } from 'type-graphql'
 import type { EntityManager } from 'typeorm'
 import { createPublicClient, fallback, formatEther, getContract, http, parseAbi } from 'viem'

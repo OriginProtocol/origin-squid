@@ -42,10 +42,14 @@ export class Balance {
   asset!: string
   @Field(() => Date, { nullable: false })
   timestamp!: Date
+  @Field(() => String, { nullable: false })
+  symbol!: string
   @Field(() => Int, { nullable: false })
   blockNumber!: number
   @Field(() => BigInt, { nullable: false })
   balance!: bigint
+  @Field(() => BigInt, { nullable: false })
+  balanceETH!: bigint
 
   constructor(props: Partial<Balance>) {
     Object.assign(this, props)
@@ -99,9 +103,11 @@ export class StrategyResolver {
             ),
           ).map((b) => ({
             asset: b.asset,
+            symbol: b.symbol,
             timestamp: b.timestamp,
             blockNumber: b.blockNumber,
             balance: b.balance,
+            balanceETH: b.balanceETH,
           })),
         }
       }),
