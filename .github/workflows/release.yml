@@ -38,4 +38,4 @@ jobs:
           echo "Updated squid.yaml version to: $VERSION"
       
       - name: Build and deploy squid
-        run: squid build && squid deploy .
+        run: sqd build && sqd deploy .
