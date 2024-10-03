@@ -7,9 +7,7 @@
 Ensure we don't miss anything on a release by following this checklist.
 
 - [ ] Go to github repository and create a release
-![image](https://github.com/user-attachments/assets/ddc39ba2-b38f-4b1a-96a1-14700d38cca0)
 - [ ] Create a new tag following the format `v<VERSION_NUMBER>` where `VERSION_NUMBER` is the squid version of the processor (i.e. `v54`)
-![image](https://github.com/user-attachments/assets/df3198ce-4889-43c2-b9eb-37ae146f0c68)
 - [ ] Generate the release notes automatically or fill them manually
 - [ ] Publish the release
 - [ ] Wait for processing to complete
