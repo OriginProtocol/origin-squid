@@ -37,5 +37,10 @@ jobs:
           # Optional: Print the updated version for verification
           echo "Updated squid.yaml version to: $VERSION"
       
+      - name: Authenticate to squid
+        env: 
+          API_TOKEN: ${{ secrets.SQUID_API_TOKEN }}
+        run: sqd auth -k $API_TOKEN
+
       - name: Build and deploy squid
         run: sqd build && sqd deploy .
