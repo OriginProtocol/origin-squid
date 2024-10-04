@@ -782,20 +782,42 @@ type ArmState @entity {
   assets1: BigInt!
   outstandingAssets1: BigInt!
   totalAssets: BigInt!
+  totalAssetsCap: BigInt!
   totalSupply: BigInt!
-  apr: Float!
-  yield: BigInt!
+  redemptionRate: BigInt!
   fees: BigInt!
 }
 
-type ArmWalletState @entity {
+type ArmDailyState @entity {
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index
+  assets0: BigInt!
+  assets1: BigInt!
+  outstandingAssets1: BigInt!
+  totalAssets: BigInt!
+  totalAssetsCap: BigInt!
+  totalSupply: BigInt!
+  redemptionRate: BigInt!
+  apr: Float!
+  apy: Float!
+  fees: BigInt!
+}
+
+type ArmRedemption @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
   account: String! @index
-  balance: BigInt!
+  requestId: BigInt!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
 }
 # State
 

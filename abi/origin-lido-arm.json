@@ -51,9 +51,27 @@
   {
     "inputs": [
       { "internalType": "uint8", "name": "bits", "type": "uint8" },
+      { "internalType": "int256", "name": "value", "type": "int256" }
+    ],
+    "name": "SafeCastOverflowedIntDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "int256", "name": "value", "type": "int256" }],
+    "name": "SafeCastOverflowedIntToUint",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "bits", "type": "uint8" },
       { "internalType": "uint256", "name": "value", "type": "uint256" }
     ],
     "name": "SafeCastOverflowedUintDowncast",
+    "type": "error"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "value", "type": "uint256" }],
+    "name": "SafeCastOverflowedUintToInt",
     "type": "error"
   },
   {
@@ -77,11 +95,18 @@
   },
   {
     "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "address", "name": "capManager", "type": "address" }],
+    "name": "CapManagerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "newFeesAccrued", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "assetIncrease", "type": "uint256" }
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "assets", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "shares", "type": "uint256" }
     ],
-    "name": "FeeCalculated",
+    "name": "Deposit",
     "type": "event"
   },
   {
@@ -109,14 +134,6 @@
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "uint64", "name": "version", "type": "uint64" }],
     "name": "Initialized",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "liquidityProviderController", "type": "address" }
-    ],
-    "name": "LiquidityProviderControllerUpdated",
     "type": "event"
   },
   {
@@ -214,11 +231,17 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  { "inputs": [], "name": "approveStETH", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
     "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
     "name": "balanceOf",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "capManager",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -234,6 +257,13 @@
     "name": "claimStETHWithdrawalForWETH",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimable",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -288,7 +318,7 @@
   {
     "inputs": [],
     "name": "feesAccrued",
-    "outputs": [{ "internalType": "uint112", "name": "", "type": "uint112" }],
+    "outputs": [{ "internalType": "uint256", "name": "fees", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -299,7 +329,7 @@
       { "internalType": "address", "name": "_operator", "type": "address" },
       { "internalType": "uint256", "name": "_fee", "type": "uint256" },
       { "internalType": "address", "name": "_feeCollector", "type": "address" },
-      { "internalType": "address", "name": "_liquidityProviderController", "type": "address" }
+      { "internalType": "address", "name": "_capManager", "type": "address" }
     ],
     "name": "initialize",
     "outputs": [],
@@ -308,21 +338,21 @@
   },
   {
     "inputs": [],
-    "name": "lastTotalAssets",
-    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "name": "lastAvailableAssets",
+    "outputs": [{ "internalType": "int128", "name": "", "type": "int128" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lidoWithdrawalQueueAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "liquidityAsset",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "liquidityProviderController",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
@@ -337,7 +367,7 @@
   {
     "inputs": [],
     "name": "nextWithdrawalIndex",
-    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -345,13 +375,6 @@
     "inputs": [],
     "name": "operator",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "outstandingEther",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -394,6 +417,13 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "address", "name": "_capManager", "type": "address" }],
+    "name": "setCapManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
     "name": "setFee",
     "outputs": [],
@@ -403,13 +433,6 @@
   {
     "inputs": [{ "internalType": "address", "name": "_feeCollector", "type": "address" }],
     "name": "setFeeCollector",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "_liquidityProviderController", "type": "address" }],
-    "name": "setLiquidityProviderController",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -588,30 +611,23 @@
       { "internalType": "address", "name": "withdrawer", "type": "address" },
       { "internalType": "bool", "name": "claimed", "type": "bool" },
       { "internalType": "uint40", "name": "claimTimestamp", "type": "uint40" },
-      { "internalType": "uint128", "name": "assets", "type": "uint128" },
-      { "internalType": "uint128", "name": "queued", "type": "uint128" }
+      { "internalType": "uint120", "name": "assets", "type": "uint120" },
+      { "internalType": "uint120", "name": "queued", "type": "uint120" }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "withdrawsClaimable",
-    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "withdrawsClaimed",
-    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "outputs": [{ "internalType": "uint120", "name": "", "type": "uint120" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "withdrawsQueued",
-    "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
+    "outputs": [{ "internalType": "uint120", "name": "", "type": "uint120" }],
     "stateMutability": "view",
     "type": "function"
   },

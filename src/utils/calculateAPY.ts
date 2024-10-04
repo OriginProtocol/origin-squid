@@ -25,3 +25,17 @@ export const convertApyToApr = (apy: number, compoundingPeriods: number = 365.25
 export const calculateAPY2 = (fromAmount: bigint, toAmount: bigint) => {
   return +formatUnits(((toAmount - fromAmount) * 10n ** 18n) / fromAmount, 18)
 }
+
+export const calculateAPR = (from: Date, to: Date, fromAmount: bigint, toAmount: bigint): number => {
+  if (fromAmount === 0n || toAmount === 0n) {
+    return 0
+  }
+
+  const diffTime = to.getTime() - from.getTime()
+  const yearFraction = diffTime / (1000 * 60 * 60 * 24 * 365.25)
+
+  const growth = Number(formatEther(toAmount)) / Number(formatEther(fromAmount)) - 1
+  const apr = growth / yearFraction
+
+  return apr
+}
