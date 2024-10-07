@@ -2,6 +2,8 @@
 
 ### [Design Decisions Notion Document](https://www.notion.so/originprotocol/Subsquid-Design-Decisions-04ef82ae0d6848d1b14de893e9929ce4#d8e8d367069c4a619809e926f72db074)
 
+#### See [docs/](./docs/) for specific tasks.
+
 ## Release Checklist
 
 Ensure we don't miss anything on a release by following this checklist.
@@ -18,7 +20,7 @@ Ensure we don't miss anything on a release by following this checklist.
 - [ ] Hibernate previous version(s)
 - [ ] Delete old versions (keep recently hibernated version as a backup)
 
-If a version has issues in deployment, fix it in the branch and later *cherry-pick* those fixes back to `main`.
+If a version has issues in deployment, fix it in the branch and later _cherry-pick_ those fixes back to `main`.
 
 ## Env Options
 
