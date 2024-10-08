@@ -490,7 +490,6 @@ const expectations = {
       rebasingSupply: '32229193002740154821849',
       yieldETH: '3515216722582402407',
       id: '2024-01-14',
-      holdersOverThreshold: 275,
       yieldUSD7Day: '65799451024795104161690',
       yieldUSDAllTime: '1744446969809430546091488',
       yieldUSD: '8973402170273773261269',
