@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class ArmDailyState {
-    constructor(props?: Partial<ArmDailyState>) {
+export class ArmDailyStat {
+    constructor(props?: Partial<ArmDailyStat>) {
         Object.assign(this, props)
     }
 

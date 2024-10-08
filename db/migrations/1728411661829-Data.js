@@ -1,5 +1,5 @@
-module.exports = class Data1728077140339 {
-    name = 'Data1728077140339'
+module.exports = class Data1728411661829 {
+    name = 'Data1728411661829'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -359,11 +359,11 @@ module.exports = class Data1728077140339 {
         await db.query(`CREATE INDEX "IDX_85852cf19a3ddc86a4762398dd" ON "arm_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d9779389f627b43d2f746323de" ON "arm_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b9db75a2ca9b9d6e6c5aa744ab" ON "arm_state" ("address") `)
-        await db.query(`CREATE TABLE "arm_daily_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "redemption_rate" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_6db54c32f4ebd91b4ba619c9cf7" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_044c06a46e3ced0560bcc8bd03" ON "arm_daily_state" ("chain_id") `)
-        await db.query(`CREATE INDEX "IDX_51261d35cd8e9cc55a57170de3" ON "arm_daily_state" ("timestamp") `)
-        await db.query(`CREATE INDEX "IDX_d9cabbd69fc7d1e20949ceb39c" ON "arm_daily_state" ("block_number") `)
-        await db.query(`CREATE INDEX "IDX_8ff665def7a18f10d78e5e0a95" ON "arm_daily_state" ("address") `)
+        await db.query(`CREATE TABLE "arm_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "redemption_rate" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_c780cd8a4ec31366f7173a30fb1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_6f3bbb5ed2de643316523b59b4" ON "arm_daily_stat" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_9ee28c589c9fa60a45412a64ba" ON "arm_daily_stat" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
         await db.query(`CREATE TABLE "arm_redemption" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, CONSTRAINT "PK_22a5abcbeda59afba42be60a32a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_018a94d60131c9491bf40e4486" ON "arm_redemption" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_cbd480559ec02ce77945ff8cdf" ON "arm_redemption" ("tx_hash") `)
@@ -1078,11 +1078,11 @@ module.exports = class Data1728077140339 {
         await db.query(`DROP INDEX "public"."IDX_85852cf19a3ddc86a4762398dd"`)
         await db.query(`DROP INDEX "public"."IDX_d9779389f627b43d2f746323de"`)
         await db.query(`DROP INDEX "public"."IDX_b9db75a2ca9b9d6e6c5aa744ab"`)
-        await db.query(`DROP TABLE "arm_daily_state"`)
-        await db.query(`DROP INDEX "public"."IDX_044c06a46e3ced0560bcc8bd03"`)
-        await db.query(`DROP INDEX "public"."IDX_51261d35cd8e9cc55a57170de3"`)
-        await db.query(`DROP INDEX "public"."IDX_d9cabbd69fc7d1e20949ceb39c"`)
-        await db.query(`DROP INDEX "public"."IDX_8ff665def7a18f10d78e5e0a95"`)
+        await db.query(`DROP TABLE "arm_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_6f3bbb5ed2de643316523b59b4"`)
+        await db.query(`DROP INDEX "public"."IDX_9ee28c589c9fa60a45412a64ba"`)
+        await db.query(`DROP INDEX "public"."IDX_052999e1ef63fabca403e9c3b8"`)
+        await db.query(`DROP INDEX "public"."IDX_9dbe5617230d5421831774b4b3"`)
         await db.query(`DROP TABLE "arm_redemption"`)
         await db.query(`DROP INDEX "public"."IDX_018a94d60131c9491bf40e4486"`)
         await db.query(`DROP INDEX "public"."IDX_cbd480559ec02ce77945ff8cdf"`)

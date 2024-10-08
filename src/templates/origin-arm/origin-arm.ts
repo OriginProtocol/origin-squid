@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLiquidityProviderControllerAbi from '@abi/origin-liquidity-provider-controller'
-import { Arm, ArmDailyState, ArmRedemption, ArmState } from '@model'
+import { Arm, ArmDailyStat, ArmRedemption, ArmState } from '@model'
 import { Context, Processor } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
@@ -71,7 +71,7 @@ export const createOriginARMProcessors = ({
       },
       process: async (ctx: Context) => {
         const states: ArmState[] = []
-        const dailyStatesMap = new Map<string, ArmDailyState>()
+        const dailyStatsMap = new Map<string, ArmDailyStat>()
         const redemptionMap = new Map<string, ArmRedemption>()
         await updater(ctx, async (ctx, block) => {
           const armContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
@@ -119,18 +119,18 @@ export const createOriginARMProcessors = ({
           const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
           const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
           const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
-          const previousArmDailyStateEntity =
-            dailyStatesMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyState, previousDayId))
+          const previousArmDailyStatEntity =
+            dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
           const startOfDay = dayjs(date).startOf('day').toDate()
           const endOfDay = dayjs(date).endOf('day').toDate()
-          const armStateApr = calculateAPY(
+          const armDayApy = calculateAPY(
             startOfDay,
             endOfDay,
-            previousArmDailyStateEntity?.redemptionRate ?? redemptionRate,
+            previousArmDailyStatEntity?.redemptionRate ?? redemptionRate,
             redemptionRate,
           )
 
-          const armDailyStateEntity = new ArmDailyState({
+          const armDailyStatEntity = new ArmDailyStat({
             id: currentDayId,
             chainId: ctx.chain.id,
             timestamp: new Date(block.header.timestamp),
@@ -143,12 +143,12 @@ export const createOriginARMProcessors = ({
             totalAssetsCap,
             totalSupply,
             redemptionRate,
-            apr: armStateApr.apr,
-            apy: armStateApr.apy,
+            apr: armDayApy.apr,
+            apy: armDayApy.apy,
             fees: feesAccrued,
           })
           states.push(armStateEntity)
-          dailyStatesMap.set(currentDayId, armDailyStateEntity)
+          dailyStatsMap.set(currentDayId, armDailyStatEntity)
         })
         for (const block of ctx.blocks) {
           for (const log of block.logs) {
@@ -181,7 +181,7 @@ export const createOriginARMProcessors = ({
           }
         }
         await ctx.store.insert(states)
-        await ctx.store.upsert([...dailyStatesMap.values()])
+        await ctx.store.upsert([...dailyStatsMap.values()])
         await ctx.store.upsert([...redemptionMap.values()])
       },
     },

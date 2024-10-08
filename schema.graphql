@@ -788,7 +788,7 @@ type ArmState @entity {
   fees: BigInt!
 }
 
-type ArmDailyState @entity {
+type ArmDailyStat @entity {
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
