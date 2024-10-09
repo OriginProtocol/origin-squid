@@ -3,7 +3,8 @@
     "inputs": [
       { "internalType": "address", "name": "_steth", "type": "address" },
       { "internalType": "address", "name": "_weth", "type": "address" },
-      { "internalType": "address", "name": "_lidoWithdrawalQueue", "type": "address" }
+      { "internalType": "address", "name": "_lidoWithdrawalQueue", "type": "address" },
+      { "internalType": "uint256", "name": "_claimDelay", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -185,13 +186,6 @@
   },
   {
     "inputs": [],
-    "name": "CLAIM_DELAY",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "FEE_SCALE",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -242,6 +236,13 @@
     "inputs": [],
     "name": "capManager",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimDelay",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },

@@ -1,12 +1,13 @@
 import assert from 'assert'
 import { pick, sortBy } from 'lodash'
 
-import { OTokenHistory, OTokenRebase, OUSDDailyStat, StrategyYield } from '@model'
+import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase, OUSDDailyStat, StrategyYield } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
 import { jsonify } from '@utils/jsonify'
+import { entities } from '@validation/entities'
 
 export const name = 'validate-ousd'
 
@@ -15,9 +16,12 @@ let firstBlock = true
 export const process = async (ctx: Context) => {
   if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
+    await validateExpectations(ctx, block, OToken, entities.ousd_oTokens)
+    await validateExpectations(ctx, block, OTokenAPY, entities.ousd_oTokenApies)
+    await validateExpectations(ctx, block, OTokenHistory, entities.ousd_oTokenHistories)
+    await validateExpectations(ctx, block, OTokenRebase, entities.ousd_oTokenRebases)
+    await validateExpectations(ctx, block, OTokenDailyStat, entities.ousd_oTokenDailyStats)
     await validateExpectations(ctx, block, StrategyYield, expectations.strategyYields)
-    await validateExpectations(ctx, block, OTokenHistory, expectations.oTokenHistories)
-    await validateExpectations(ctx, block, OTokenRebase, expectations.oTokenRebases)
     await validateExpectations(ctx, block, OUSDDailyStat, expectations.ousdDailyStats)
     firstBlock = false
   }

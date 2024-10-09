@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { last } from 'lodash'
+import { findLast, last } from 'lodash'
 import { LessThan, MoreThanOrEqual } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
@@ -124,14 +124,14 @@ export async function createRebaseAPY(
 
   // get last APY to compare with current one
   let lastApy =
-    apies.find((apy) => apy.date < dateId) ??
+    findLast(apies, (apy) => apy.date < dateId) ??
     (await ctx.store.findOne(OTokenAPY, {
       where: {
         chainId: ctx.chain.id,
         otoken: otokenAddress,
         date: LessThan(dateId),
       },
-      order: { id: 'DESC' },
+      order: { timestamp: 'DESC' },
     }))
 
   // check if there is already an APY for the current date

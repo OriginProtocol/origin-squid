@@ -19,7 +19,6 @@ export const events = {
 }
 
 export const functions = {
-    CLAIM_DELAY: viewFun("0xe18132c4", "CLAIM_DELAY()", {}, p.uint256),
     FEE_SCALE: viewFun("0x8a5fddd8", "FEE_SCALE()", {}, p.uint256),
     MAX_PRICE_DEVIATION: viewFun("0x96f277b7", "MAX_PRICE_DEVIATION()", {}, p.uint256),
     PRICE_SCALE: viewFun("0xc33f59d3", "PRICE_SCALE()", {}, p.uint256),
@@ -27,6 +26,7 @@ export const functions = {
     approve: fun("0x095ea7b3", "approve(address,uint256)", {"spender": p.address, "value": p.uint256}, p.bool),
     balanceOf: viewFun("0x70a08231", "balanceOf(address)", {"account": p.address}, p.uint256),
     capManager: viewFun("0x6d785a87", "capManager()", {}, p.address),
+    claimDelay: viewFun("0x1c8ec299", "claimDelay()", {}, p.uint256),
     claimRedeem: fun("0xe46cf747", "claimRedeem(uint256)", {"requestId": p.uint256}, p.uint256),
     claimStETHWithdrawalForWETH: fun("0xdbd5697e", "claimStETHWithdrawalForWETH(uint256[])", {"requestIds": p.array(p.uint256)}, ),
     claimable: viewFun("0xaf38d757", "claimable()", {}, p.uint256),
@@ -79,10 +79,6 @@ export const functions = {
 
 export class Contract extends ContractBase {
 
-    CLAIM_DELAY() {
-        return this.eth_call(functions.CLAIM_DELAY, {})
-    }
-
     FEE_SCALE() {
         return this.eth_call(functions.FEE_SCALE, {})
     }
@@ -105,6 +101,10 @@ export class Contract extends ContractBase {
 
     capManager() {
         return this.eth_call(functions.capManager, {})
+    }
+
+    claimDelay() {
+        return this.eth_call(functions.claimDelay, {})
     }
 
     claimable() {
@@ -240,9 +240,6 @@ export type TraderateChangedEventArgs = EParams<typeof events.TraderateChanged>
 export type TransferEventArgs = EParams<typeof events.Transfer>
 
 /// Function types
-export type CLAIM_DELAYParams = FunctionArguments<typeof functions.CLAIM_DELAY>
-export type CLAIM_DELAYReturn = FunctionReturn<typeof functions.CLAIM_DELAY>
-
 export type FEE_SCALEParams = FunctionArguments<typeof functions.FEE_SCALE>
 export type FEE_SCALEReturn = FunctionReturn<typeof functions.FEE_SCALE>
 
@@ -263,6 +260,9 @@ export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
 
 export type CapManagerParams = FunctionArguments<typeof functions.capManager>
 export type CapManagerReturn = FunctionReturn<typeof functions.capManager>
+
+export type ClaimDelayParams = FunctionArguments<typeof functions.claimDelay>
+export type ClaimDelayReturn = FunctionReturn<typeof functions.claimDelay>
 
 export type ClaimRedeemParams = FunctionArguments<typeof functions.claimRedeem>
 export type ClaimRedeemReturn = FunctionReturn<typeof functions.claimRedeem>

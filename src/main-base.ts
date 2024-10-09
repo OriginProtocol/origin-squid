@@ -8,6 +8,7 @@ import { processStatus } from '@templates/processor-status'
 import { baseERC20s, baseStrategies, bridgedWoethStrategy, superOETHb } from './base'
 import { aerodromeProcessors } from './base/aerodrome'
 import * as exchangeRatesProcessor from './base/exchange-rates'
+import * as validate from './base/validate'
 
 export const processor = {
   chainId: base.id,
@@ -21,7 +22,7 @@ export const processor = {
     exchangeRatesProcessor,
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('base')],
-  validators: [],
+  validators: [validate],
 }
 
 export default processor

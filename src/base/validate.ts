@@ -1,22 +1,26 @@
 import assert from 'assert'
-import { sortBy } from 'lodash'
+import { pick } from 'lodash'
 
-import { ERC20Balance, ERC20State } from '@model'
+import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
 import { jsonify } from '@utils/jsonify'
+import { entities } from '@validation/entities'
 
-export const name = 'validate-shared'
+export const name = 'validate-base'
 
 let firstBlock = true
 
 export const process = async (ctx: Context) => {
   if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
-    await validateExpectations(ctx, block, ERC20State, expectations.erc20States)
-    await validateExpectations(ctx, block, ERC20Balance, expectations.erc20Balances)
+    await validateExpectations(ctx, block, OToken, entities.superoethb_oTokens)
+    await validateExpectations(ctx, block, OTokenAPY, entities.superoethb_oTokenApies)
+    await validateExpectations(ctx, block, OTokenHistory, entities.superoethb_oTokenHistories)
+    await validateExpectations(ctx, block, OTokenRebase, entities.superoethb_oTokenRebases)
+    await validateExpectations(ctx, block, OTokenDailyStat, entities.superoethb_oTokenDailyStats)
     firstBlock = false
   }
 }
@@ -63,17 +67,12 @@ const validateExpectation = async <
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
   // We decide to only care about float decimal accuracy to the 8th.
   assert.deepEqual(
-    JSON.parse(jsonify(actual, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
+    JSON.parse(
+      jsonify(pick(actual, Object.keys(expectation)), (_key, value) =>
+        typeof value === 'number' ? Number(value.toFixed(8)) : value,
+      ),
+    ),
     JSON.parse(jsonify(expectation, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
   )
   ctx.log.info(`Validated entity: Entity=${Class.name} id=${expectation.id}`)
 }
-
-const e = (arr: any[]) => {
-  return sortBy(arr, (v) => v.blockNumber)
-}
-
-const expectations = {
-  erc20States: e([]), // TODO: Fill me up?
-  erc20Balances: e([]),
-} as const
