@@ -43,7 +43,14 @@ export const blockFrequencyTracker = (params: { from: number }) => {
   return (ctx: Context, block: Block) => {
     if (block.header.height < params.from) return
     const frequency = getFrequency(ctx.blockRate, block.header.timestamp)
-    return block.header.height % frequency === 0 || isAerodromeImportantBlock(ctx, block)
+    return (
+      // If our chain is Tenderly, we want to process all blocks.
+      // The frequency logic gets messed up on Tenderly forks.
+      (ctx._chain.client as any).url.includes('tenderly') ||
+      // Normal logic down below.
+      block.header.height % frequency === 0 ||
+      isAerodromeImportantBlock(ctx, block)
+    )
   }
 }
 
