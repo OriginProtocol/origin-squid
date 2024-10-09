@@ -6,7 +6,7 @@ import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
-import { jsonify } from '@utils/jsonify'
+import { compare } from '@validation/compare'
 
 export const name = 'validate-shared'
 
@@ -61,11 +61,7 @@ const validateExpectation = async <
   })
   assert(actual, `Expected entity does not exist: Entity=${Class.name} id=${expectation.id}`)
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
-  // We decide to only care about float decimal accuracy to the 8th.
-  assert.deepEqual(
-    JSON.parse(jsonify(actual, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
-    JSON.parse(jsonify(expectation, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
-  )
+  compare(expectation, actual)
   ctx.log.info(`Validated entity: Entity=${Class.name} id=${expectation.id}`)
 }
 

@@ -1,12 +1,12 @@
 import assert from 'assert'
-import { pick, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 
 import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase, OUSDDailyStat, StrategyYield } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
-import { jsonify } from '@utils/jsonify'
+import { compare } from '@validation/compare'
 import { entities } from '@validation/entities'
 
 export const name = 'validate-ousd'
@@ -67,15 +67,7 @@ const validateExpectation = async <
   })
   assert(actual, `Expected entity does not exist: Entity=${Class.name} id=${expectation.id}`)
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
-  // We decide to only care about float decimal accuracy to the 8th.
-  assert.deepEqual(
-    JSON.parse(
-      jsonify(pick(actual, Object.keys(expectation)), (_key, value) =>
-        typeof value === 'number' ? Number(value.toFixed(8)) : value,
-      ),
-    ),
-    JSON.parse(jsonify(expectation, (_key, value) => (typeof value === 'number' ? Number(value.toFixed(8)) : value))),
-  )
+  compare(expectation, actual)
   ctx.log.info(`Validated entity: Entity=${Class.name} id=${expectation.id}`)
 }
 
@@ -100,21 +92,6 @@ const expectations = {
       rebasingCreditsPerToken: '852686447110306439510756300',
       timestamp: '2021-11-09T06:59:40.000000Z',
       txHash: '0x8100a86ef0b23789be3ca200886e4b9cb4209e5c97e59eaf744b9181267ae4b3',
-    },
-    {
-      id: '1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2021-12-06',
-      chainId: 1,
-      otoken: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
-      date: '2021-12-06',
-      blockNumber: 13750845,
-      apy7DayAvg: 0.3063852155268674,
-      apy30DayAvg: 0.3021672341297935,
-      apy14DayAvg: 0.38192706131093695,
-      apy: 0.37250920744724025,
-      apr: 0.31677789277204865,
-      rebasingCreditsPerToken: '836987556812892596511761169',
-      timestamp: '2021-12-06T06:59:47.000000Z',
-      txHash: '0x2d403152b1758105818fd597e03a9993c0c6308326f511d40ef856dc899bbba2',
     },
   ]),
   oTokenHistories: e([

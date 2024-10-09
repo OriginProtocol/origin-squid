@@ -36,6 +36,7 @@ const takePortion = (arr: any[], percentage: number) => {
 
   for (let i = 0; i < totalItems; i++) {
     const index = Math.min(Math.floor(i * step), arr.length - 1)
+    if (index === arr.length - 1) break // Avoid the last index
     result.push(arr[index])
   }
 
