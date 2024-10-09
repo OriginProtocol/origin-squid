@@ -32,6 +32,37 @@ export const createOriginARMProcessors = ({
   })
   const updater = blockFrequencyUpdater({ from })
   let armEntity: Arm
+  let initialized = false
+  let initialize = async (ctx: Context) => {
+    if (ctx.blocks[0].header.height < from) return
+    const id = `${ctx.chain.id}:${armAddress}`
+    let entity = await ctx.store.get(Arm, id)
+    if (entity) {
+      armEntity = entity
+    } else {
+      const armContract = new originLidoArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
+      const [name, symbol, decimals, token0, token1] = await Promise.all([
+        armContract.name(),
+        armContract.symbol(),
+        armContract.decimals(),
+        armContract.token0(),
+        armContract.token1(),
+      ])
+      const arm = new Arm({
+        id: armAddress,
+        chainId: ctx.chain.id,
+        address: armAddress,
+        name,
+        symbol,
+        decimals,
+        token0,
+        token1,
+      })
+      await ctx.store.save(arm)
+      armEntity = arm
+    }
+    initialized = true
+  }
   return [
     {
       name,
@@ -41,35 +72,12 @@ export const createOriginARMProcessors = ({
         p.addLog(redeemRequestedFilter.value)
         p.addLog(redeemClaimedFilter.value)
       },
-      initialize: async (ctx: Context) => {
-        const id = `${ctx.chain.id}:${armAddress}`
-        let entity = await ctx.store.get(Arm, id)
-        if (entity) {
-          armEntity = entity
-        } else {
-          const armContract = new originLidoArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
-          const [name, symbol, decimals, token0, token1] = await Promise.all([
-            armContract.name(),
-            armContract.symbol(),
-            armContract.decimals(),
-            armContract.token0(),
-            armContract.token1(),
-          ])
-          const arm = new Arm({
-            id: armAddress,
-            chainId: ctx.chain.id,
-            address: armAddress,
-            name,
-            symbol,
-            decimals,
-            token0,
-            token1,
-          })
-          await ctx.store.save(arm)
-          armEntity = arm
-        }
-      },
+      initialize,
       process: async (ctx: Context) => {
+        if (!initialized) {
+          // We can only initialize once we've hit our target block.
+          await initialize(ctx)
+        }
         const states: ArmState[] = []
         const dailyStatsMap = new Map<string, ArmDailyStat>()
         const redemptionMap = new Map<string, ArmRedemption>()
