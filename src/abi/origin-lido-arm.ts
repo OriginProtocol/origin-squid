@@ -6,6 +6,7 @@ export const events = {
     AdminChanged: event("0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f", "AdminChanged(address,address)", {"previousAdmin": p.address, "newAdmin": p.address}),
     Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", "Approval(address,address,uint256)", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
     CapManagerUpdated: event("0xb8fd9afc34c38fcd13b9a3b7646482eb1fddcefb40af2c70609972816eba3208", "CapManagerUpdated(address)", {"capManager": indexed(p.address)}),
+    CrossPriceUpdated: event("0x6f938e86fbdbe7829d0289b348cd9e528f2f17c705f469f4a17a0a2796e007d0", "CrossPriceUpdated(uint256)", {"crossPrice": p.uint256}),
     Deposit: event("0x90890809c654f11d6e72a28fa60149770a0d11ec6c92319d6ceb2bb0a4ea1a15", "Deposit(address,uint256,uint256)", {"owner": indexed(p.address), "assets": p.uint256, "shares": p.uint256}),
     FeeCollected: event("0x06c5efeff5c320943d265dc4e5f1af95ad523555ce0c1957e367dda5514572df", "FeeCollected(address,uint256)", {"feeCollector": indexed(p.address), "fee": p.uint256}),
     FeeCollectorUpdated: event("0xe5693914d19c789bdee50a362998c0bc8d035a835f9871da5d51152f0582c34f", "FeeCollectorUpdated(address)", {"newFeeCollector": indexed(p.address)}),
@@ -16,25 +17,29 @@ export const events = {
     RedeemRequested: event("0xc04c86cfd81036557541f9c68971ace59cbc9057ecab7d48874a6177ad117f4f", "RedeemRequested(address,uint256,uint256,uint256,uint256)", {"withdrawer": indexed(p.address), "requestId": indexed(p.uint256), "assets": p.uint256, "queued": p.uint256, "claimTimestamp": p.uint256}),
     TraderateChanged: event("0xa2136948fd1e5333c2ee27c9e48848a560b693e6bbd18082623a738179ff2952", "TraderateChanged(uint256,uint256)", {"traderate0": p.uint256, "traderate1": p.uint256}),
     Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "Transfer(address,address,uint256)", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
+    ZapUpdated: event("0xbf633270e6b5b5b646ba917300610c382c077992c0e189d732c99f2361bfb9b5", "ZapUpdated(address)", {"zap": indexed(p.address)}),
 }
 
 export const functions = {
     FEE_SCALE: viewFun("0x8a5fddd8", "FEE_SCALE()", {}, p.uint256),
-    MAX_PRICE_DEVIATION: viewFun("0x96f277b7", "MAX_PRICE_DEVIATION()", {}, p.uint256),
+    MAX_CROSS_PRICE_DEVIATION: viewFun("0x090b78c5", "MAX_CROSS_PRICE_DEVIATION()", {}, p.uint256),
     PRICE_SCALE: viewFun("0xc33f59d3", "PRICE_SCALE()", {}, p.uint256),
     allowance: viewFun("0xdd62ed3e", "allowance(address,address)", {"owner": p.address, "spender": p.address}, p.uint256),
     approve: fun("0x095ea7b3", "approve(address,uint256)", {"spender": p.address, "value": p.uint256}, p.bool),
     balanceOf: viewFun("0x70a08231", "balanceOf(address)", {"account": p.address}, p.uint256),
+    baseAsset: viewFun("0xcdf456e1", "baseAsset()", {}, p.address),
     capManager: viewFun("0x6d785a87", "capManager()", {}, p.address),
     claimDelay: viewFun("0x1c8ec299", "claimDelay()", {}, p.uint256),
+    claimLidoWithdrawals: fun("0x4e1d1840", "claimLidoWithdrawals(uint256[])", {"requestIds": p.array(p.uint256)}, ),
     claimRedeem: fun("0xe46cf747", "claimRedeem(uint256)", {"requestId": p.uint256}, p.uint256),
-    claimStETHWithdrawalForWETH: fun("0xdbd5697e", "claimStETHWithdrawalForWETH(uint256[])", {"requestIds": p.array(p.uint256)}, ),
     claimable: viewFun("0xaf38d757", "claimable()", {}, p.uint256),
     collectFees: fun("0xc8796572", "collectFees()", {}, p.uint256),
     convertToAssets: viewFun("0x07a2d13a", "convertToAssets(uint256)", {"shares": p.uint256}, p.uint256),
     convertToShares: viewFun("0xc6e6f592", "convertToShares(uint256)", {"assets": p.uint256}, p.uint256),
+    crossPrice: viewFun("0xf5488330", "crossPrice()", {}, p.uint256),
     decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
-    deposit: fun("0xb6b55f25", "deposit(uint256)", {"assets": p.uint256}, p.uint256),
+    'deposit(uint256,address)': fun("0x6e553f65", "deposit(uint256,address)", {"assets": p.uint256, "liquidityProvider": p.address}, p.uint256),
+    'deposit(uint256)': fun("0xb6b55f25", "deposit(uint256)", {"assets": p.uint256}, p.uint256),
     fee: viewFun("0xddca3f43", "fee()", {}, p.uint16),
     feeCollector: viewFun("0xc415b95c", "feeCollector()", {}, p.address),
     feesAccrued: viewFun("0x94db0595", "feesAccrued()", {}, p.uint256),
@@ -48,14 +53,16 @@ export const functions = {
     owner: viewFun("0x8da5cb5b", "owner()", {}, p.address),
     previewDeposit: viewFun("0xef8b30f7", "previewDeposit(uint256)", {"assets": p.uint256}, p.uint256),
     previewRedeem: viewFun("0x4cdad506", "previewRedeem(uint256)", {"shares": p.uint256}, p.uint256),
+    requestLidoWithdrawals: fun("0x674eb980", "requestLidoWithdrawals(uint256[])", {"amounts": p.array(p.uint256)}, p.array(p.uint256)),
     requestRedeem: fun("0xaa2f892d", "requestRedeem(uint256)", {"shares": p.uint256}, {"requestId": p.uint256, "assets": p.uint256}),
-    requestStETHWithdrawalForETH: fun("0xf33d679e", "requestStETHWithdrawalForETH(uint256[])", {"amounts": p.array(p.uint256)}, p.array(p.uint256)),
     setCapManager: fun("0x0e608b30", "setCapManager(address)", {"_capManager": p.address}, ),
+    setCrossPrice: fun("0x30486f3c", "setCrossPrice(uint256)", {"newCrossPrice": p.uint256}, ),
     setFee: fun("0x69fe0e2d", "setFee(uint256)", {"_fee": p.uint256}, ),
     setFeeCollector: fun("0xa42dce80", "setFeeCollector(address)", {"_feeCollector": p.address}, ),
     setOperator: fun("0xb3ab15fb", "setOperator(address)", {"newOperator": p.address}, ),
     setOwner: fun("0x13af4035", "setOwner(address)", {"newOwner": p.address}, ),
     setPrices: fun("0x05fefda7", "setPrices(uint256,uint256)", {"buyT1": p.uint256, "sellT1": p.uint256}, ),
+    setZap: fun("0x6593c2c9", "setZap(address)", {"_zap": p.address}, ),
     steth: viewFun("0x953d7ee2", "steth()", {}, p.address),
     'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)': fun("0x38ed1739", "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)", {"amountIn": p.uint256, "amountOutMin": p.uint256, "path": p.array(p.address), "to": p.address, "deadline": p.uint256}, p.array(p.uint256)),
     'swapExactTokensForTokens(address,address,uint256,uint256,address)': fun("0x6c08c57e", "swapExactTokensForTokens(address,address,uint256,uint256,address)", {"inToken": p.address, "outToken": p.address, "amountIn": p.uint256, "amountOutMin": p.uint256, "to": p.address}, ),
@@ -75,6 +82,7 @@ export const functions = {
     withdrawalRequests: viewFun("0x937b2581", "withdrawalRequests(uint256)", {"requestId": p.uint256}, {"withdrawer": p.address, "claimed": p.bool, "claimTimestamp": p.uint40, "assets": p.uint120, "queued": p.uint120}),
     withdrawsClaimed: viewFun("0x35ce81c4", "withdrawsClaimed()", {}, p.uint120),
     withdrawsQueued: viewFun("0x6ec68625", "withdrawsQueued()", {}, p.uint120),
+    zap: viewFun("0x262d6152", "zap()", {}, p.address),
 }
 
 export class Contract extends ContractBase {
@@ -83,8 +91,8 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.FEE_SCALE, {})
     }
 
-    MAX_PRICE_DEVIATION() {
-        return this.eth_call(functions.MAX_PRICE_DEVIATION, {})
+    MAX_CROSS_PRICE_DEVIATION() {
+        return this.eth_call(functions.MAX_CROSS_PRICE_DEVIATION, {})
     }
 
     PRICE_SCALE() {
@@ -97,6 +105,10 @@ export class Contract extends ContractBase {
 
     balanceOf(account: BalanceOfParams["account"]) {
         return this.eth_call(functions.balanceOf, {account})
+    }
+
+    baseAsset() {
+        return this.eth_call(functions.baseAsset, {})
     }
 
     capManager() {
@@ -117,6 +129,10 @@ export class Contract extends ContractBase {
 
     convertToShares(assets: ConvertToSharesParams["assets"]) {
         return this.eth_call(functions.convertToShares, {assets})
+    }
+
+    crossPrice() {
+        return this.eth_call(functions.crossPrice, {})
     }
 
     decimals() {
@@ -222,12 +238,17 @@ export class Contract extends ContractBase {
     withdrawsQueued() {
         return this.eth_call(functions.withdrawsQueued, {})
     }
+
+    zap() {
+        return this.eth_call(functions.zap, {})
+    }
 }
 
 /// Event types
 export type AdminChangedEventArgs = EParams<typeof events.AdminChanged>
 export type ApprovalEventArgs = EParams<typeof events.Approval>
 export type CapManagerUpdatedEventArgs = EParams<typeof events.CapManagerUpdated>
+export type CrossPriceUpdatedEventArgs = EParams<typeof events.CrossPriceUpdated>
 export type DepositEventArgs = EParams<typeof events.Deposit>
 export type FeeCollectedEventArgs = EParams<typeof events.FeeCollected>
 export type FeeCollectorUpdatedEventArgs = EParams<typeof events.FeeCollectorUpdated>
@@ -238,13 +259,14 @@ export type RedeemClaimedEventArgs = EParams<typeof events.RedeemClaimed>
 export type RedeemRequestedEventArgs = EParams<typeof events.RedeemRequested>
 export type TraderateChangedEventArgs = EParams<typeof events.TraderateChanged>
 export type TransferEventArgs = EParams<typeof events.Transfer>
+export type ZapUpdatedEventArgs = EParams<typeof events.ZapUpdated>
 
 /// Function types
 export type FEE_SCALEParams = FunctionArguments<typeof functions.FEE_SCALE>
 export type FEE_SCALEReturn = FunctionReturn<typeof functions.FEE_SCALE>
 
-export type MAX_PRICE_DEVIATIONParams = FunctionArguments<typeof functions.MAX_PRICE_DEVIATION>
-export type MAX_PRICE_DEVIATIONReturn = FunctionReturn<typeof functions.MAX_PRICE_DEVIATION>
+export type MAX_CROSS_PRICE_DEVIATIONParams = FunctionArguments<typeof functions.MAX_CROSS_PRICE_DEVIATION>
+export type MAX_CROSS_PRICE_DEVIATIONReturn = FunctionReturn<typeof functions.MAX_CROSS_PRICE_DEVIATION>
 
 export type PRICE_SCALEParams = FunctionArguments<typeof functions.PRICE_SCALE>
 export type PRICE_SCALEReturn = FunctionReturn<typeof functions.PRICE_SCALE>
@@ -258,17 +280,20 @@ export type ApproveReturn = FunctionReturn<typeof functions.approve>
 export type BalanceOfParams = FunctionArguments<typeof functions.balanceOf>
 export type BalanceOfReturn = FunctionReturn<typeof functions.balanceOf>
 
+export type BaseAssetParams = FunctionArguments<typeof functions.baseAsset>
+export type BaseAssetReturn = FunctionReturn<typeof functions.baseAsset>
+
 export type CapManagerParams = FunctionArguments<typeof functions.capManager>
 export type CapManagerReturn = FunctionReturn<typeof functions.capManager>
 
 export type ClaimDelayParams = FunctionArguments<typeof functions.claimDelay>
 export type ClaimDelayReturn = FunctionReturn<typeof functions.claimDelay>
 
+export type ClaimLidoWithdrawalsParams = FunctionArguments<typeof functions.claimLidoWithdrawals>
+export type ClaimLidoWithdrawalsReturn = FunctionReturn<typeof functions.claimLidoWithdrawals>
+
 export type ClaimRedeemParams = FunctionArguments<typeof functions.claimRedeem>
 export type ClaimRedeemReturn = FunctionReturn<typeof functions.claimRedeem>
-
-export type ClaimStETHWithdrawalForWETHParams = FunctionArguments<typeof functions.claimStETHWithdrawalForWETH>
-export type ClaimStETHWithdrawalForWETHReturn = FunctionReturn<typeof functions.claimStETHWithdrawalForWETH>
 
 export type ClaimableParams = FunctionArguments<typeof functions.claimable>
 export type ClaimableReturn = FunctionReturn<typeof functions.claimable>
@@ -282,11 +307,17 @@ export type ConvertToAssetsReturn = FunctionReturn<typeof functions.convertToAss
 export type ConvertToSharesParams = FunctionArguments<typeof functions.convertToShares>
 export type ConvertToSharesReturn = FunctionReturn<typeof functions.convertToShares>
 
+export type CrossPriceParams = FunctionArguments<typeof functions.crossPrice>
+export type CrossPriceReturn = FunctionReturn<typeof functions.crossPrice>
+
 export type DecimalsParams = FunctionArguments<typeof functions.decimals>
 export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
 
-export type DepositParams = FunctionArguments<typeof functions.deposit>
-export type DepositReturn = FunctionReturn<typeof functions.deposit>
+export type DepositParams_0 = FunctionArguments<typeof functions['deposit(uint256,address)']>
+export type DepositReturn_0 = FunctionReturn<typeof functions['deposit(uint256,address)']>
+
+export type DepositParams_1 = FunctionArguments<typeof functions['deposit(uint256)']>
+export type DepositReturn_1 = FunctionReturn<typeof functions['deposit(uint256)']>
 
 export type FeeParams = FunctionArguments<typeof functions.fee>
 export type FeeReturn = FunctionReturn<typeof functions.fee>
@@ -327,14 +358,17 @@ export type PreviewDepositReturn = FunctionReturn<typeof functions.previewDeposi
 export type PreviewRedeemParams = FunctionArguments<typeof functions.previewRedeem>
 export type PreviewRedeemReturn = FunctionReturn<typeof functions.previewRedeem>
 
+export type RequestLidoWithdrawalsParams = FunctionArguments<typeof functions.requestLidoWithdrawals>
+export type RequestLidoWithdrawalsReturn = FunctionReturn<typeof functions.requestLidoWithdrawals>
+
 export type RequestRedeemParams = FunctionArguments<typeof functions.requestRedeem>
 export type RequestRedeemReturn = FunctionReturn<typeof functions.requestRedeem>
 
-export type RequestStETHWithdrawalForETHParams = FunctionArguments<typeof functions.requestStETHWithdrawalForETH>
-export type RequestStETHWithdrawalForETHReturn = FunctionReturn<typeof functions.requestStETHWithdrawalForETH>
-
 export type SetCapManagerParams = FunctionArguments<typeof functions.setCapManager>
 export type SetCapManagerReturn = FunctionReturn<typeof functions.setCapManager>
+
+export type SetCrossPriceParams = FunctionArguments<typeof functions.setCrossPrice>
+export type SetCrossPriceReturn = FunctionReturn<typeof functions.setCrossPrice>
 
 export type SetFeeParams = FunctionArguments<typeof functions.setFee>
 export type SetFeeReturn = FunctionReturn<typeof functions.setFee>
@@ -350,6 +384,9 @@ export type SetOwnerReturn = FunctionReturn<typeof functions.setOwner>
 
 export type SetPricesParams = FunctionArguments<typeof functions.setPrices>
 export type SetPricesReturn = FunctionReturn<typeof functions.setPrices>
+
+export type SetZapParams = FunctionArguments<typeof functions.setZap>
+export type SetZapReturn = FunctionReturn<typeof functions.setZap>
 
 export type StethParams = FunctionArguments<typeof functions.steth>
 export type StethReturn = FunctionReturn<typeof functions.steth>
@@ -407,4 +444,7 @@ export type WithdrawsClaimedReturn = FunctionReturn<typeof functions.withdrawsCl
 
 export type WithdrawsQueuedParams = FunctionArguments<typeof functions.withdrawsQueued>
 export type WithdrawsQueuedReturn = FunctionReturn<typeof functions.withdrawsQueued>
+
+export type ZapParams = FunctionArguments<typeof functions.zap>
+export type ZapReturn = FunctionReturn<typeof functions.zap>
 
