@@ -695,6 +695,7 @@ export const createOTokenProcessor = (params: {
         cumulativeFees: 0n,
 
         marketCapUSD: 0,
+        accountsOverThreshold: 0,
       })
       result.dailyStats.set(entity.id, { block, entity })
     } else {
