@@ -160,6 +160,7 @@ type OTokenDailyStat @entity {
   cumulativeFees: BigInt!
 
   marketCapUSD: Float!
+  accountsOverThreshold: Int!
 }
 
 type OTokenDripperState @entity {

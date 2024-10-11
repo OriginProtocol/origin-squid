@@ -824,6 +824,15 @@ type ArmWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
 }
+type CoinGeckoCoinData @entity {
+  id: ID!
+  product: String! @index
+  date: String! @index
+  vsCurrency: String!
+  price: Float!
+  marketCap: Float!
+  tradingVolume: Float!
+}
 # State
 
 type ESToken @entity {
@@ -1874,6 +1883,7 @@ type OTokenDailyStat @entity {
   cumulativeFees: BigInt!
 
   marketCapUSD: Float!
+  accountsOverThreshold: Int!
 }
 
 type OTokenDripperState @entity {

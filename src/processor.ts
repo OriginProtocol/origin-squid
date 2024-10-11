@@ -74,6 +74,7 @@ export interface Processor {
   setup?: (p: ReturnType<typeof createSquidProcessor>, chain: Chain) => void
   process: (ctx: Context) => Promise<void>
 }
+export const createProcessor = (p: Processor) => p
 
 let initialized = false
 

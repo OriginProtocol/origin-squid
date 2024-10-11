@@ -1,5 +1,5 @@
-module.exports = class Data1728620501835 {
-    name = 'Data1728620501835'
+module.exports = class Data1728677434037 {
+    name = 'Data1728677434037'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -372,6 +372,9 @@ module.exports = class Data1728620501835 {
         await db.query(`CREATE INDEX "IDX_f19a1f1ecd4b69d3def526cf6d" ON "arm_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_a66956c5f52400d8800132b21f" ON "arm_withdrawal_request" ("address") `)
         await db.query(`CREATE INDEX "IDX_87f6fbcd7e96024c7d413e0496" ON "arm_withdrawal_request" ("account") `)
+        await db.query(`CREATE TABLE "coin_gecko_coin_data" ("id" character varying NOT NULL, "product" text NOT NULL, "date" text NOT NULL, "vs_currency" text NOT NULL, "price" numeric NOT NULL, "market_cap" numeric NOT NULL, "trading_volume" numeric NOT NULL, CONSTRAINT "PK_abb8340f8d830c27b3288a1083c" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_55f8b56cad28caa22a995dfb83" ON "coin_gecko_coin_data" ("product") `)
+        await db.query(`CREATE INDEX "IDX_821542437abc5d0d6aa7959131" ON "coin_gecko_coin_data" ("date") `)
         await db.query(`CREATE TABLE "es_token" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_69bef9eb94d9a5d42d726d1e661" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_a234e56547c4f8b9135d80444b" ON "es_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_588f0be9f9bdc1d8dd29797fec" ON "es_token" ("block_number") `)
@@ -669,7 +672,7 @@ module.exports = class Data1728620501835 {
         await db.query(`CREATE INDEX "IDX_57bb1f7d2fd6fe063b9cd434b2" ON "o_token_activity" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d6cba0877ee9f5332e6d97e758" ON "o_token_activity" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b5826e68934ff671bbe28836ec" ON "o_token_activity" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7" numeric NOT NULL, "apy14" numeric NOT NULL, "apy30" numeric NOT NULL, "rate_usd" numeric NOT NULL, "rate_eth" numeric NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "amo_supply" numeric, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "cumulative_fees" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, CONSTRAINT "PK_eeabae008c52207e32e2171176d" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7" numeric NOT NULL, "apy14" numeric NOT NULL, "apy30" numeric NOT NULL, "rate_usd" numeric NOT NULL, "rate_eth" numeric NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "amo_supply" numeric, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "cumulative_fees" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "accounts_over_threshold" integer NOT NULL, CONSTRAINT "PK_eeabae008c52207e32e2171176d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98c1ae817f9436c4f602de04c7" ON "o_token_daily_stat" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_8da572d689803a6292f00f687c" ON "o_token_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_41df5fb0657b57079c5e011578" ON "o_token_daily_stat" ("timestamp") `)
@@ -1092,6 +1095,9 @@ module.exports = class Data1728620501835 {
         await db.query(`DROP INDEX "public"."IDX_f19a1f1ecd4b69d3def526cf6d"`)
         await db.query(`DROP INDEX "public"."IDX_a66956c5f52400d8800132b21f"`)
         await db.query(`DROP INDEX "public"."IDX_87f6fbcd7e96024c7d413e0496"`)
+        await db.query(`DROP TABLE "coin_gecko_coin_data"`)
+        await db.query(`DROP INDEX "public"."IDX_55f8b56cad28caa22a995dfb83"`)
+        await db.query(`DROP INDEX "public"."IDX_821542437abc5d0d6aa7959131"`)
         await db.query(`DROP TABLE "es_token"`)
         await db.query(`DROP INDEX "public"."IDX_a234e56547c4f8b9135d80444b"`)
         await db.query(`DROP INDEX "public"."IDX_588f0be9f9bdc1d8dd29797fec"`)

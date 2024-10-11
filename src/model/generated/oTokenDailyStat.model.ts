@@ -78,4 +78,7 @@ export class OTokenDailyStat {
 
     @FloatColumn_({nullable: false})
     marketCapUSD!: number
+
+    @IntColumn_({nullable: false})
+    accountsOverThreshold!: number
 }

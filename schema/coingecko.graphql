@@ -1,0 +1,9 @@
+type CoinGeckoCoinData @entity {
+  id: ID!
+  product: String! @index
+  date: String! @index
+  vsCurrency: String!
+  price: Float!
+  marketCap: Float!
+  tradingVolume: Float!
+}

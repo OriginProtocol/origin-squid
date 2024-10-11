@@ -1,3 +1,4 @@
+import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import 'tsconfig-paths/register'
 
 import { run } from '@processor'
@@ -39,6 +40,7 @@ export const processor = {
       yieldType: 'fixed',
     }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
+    coingeckoProcessor,
     ...createOriginARMProcessors({
       name: 'origin-arm',
       from: 20933088,

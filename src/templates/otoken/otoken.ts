@@ -56,6 +56,7 @@ export const createOTokenProcessor = (params: {
   upgrades?: {
     rebaseOptEvents: number | false
   }
+  accountsOverThresholdMinimum: bigint
 }) => {
   const setup = (processor: EvmBatchProcessor) => {
     if (params.upgrades?.rebaseOptEvents !== false) {
@@ -303,6 +304,9 @@ export const createOTokenProcessor = (params: {
         params.wotoken && block.header.height >= params.wotoken.from
           ? await new erc20.Contract(ctx, block.header, params.wotoken.address).totalSupply()
           : 0n
+      entity.accountsOverThreshold = Array.from(owners?.values() ?? []).filter(
+        (a) => a.balance >= params.accountsOverThresholdMinimum,
+      ).length
       ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
     }
 

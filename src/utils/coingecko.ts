@@ -74,8 +74,8 @@ export async function applyCoingeckoData(
   ctx: Context,
   props: {
     Entity: DailyStat
-    coinId: string
-    vsCurrency?: string
+    coinId: 'origin-dollar' | 'origin-ether' | 'origin-dollar-governance' | 'origin-protocol'
+    vsCurrency?: 'eth' | 'usd'
     startTimestamp?: number
   },
 ) {

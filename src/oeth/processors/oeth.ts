@@ -1,3 +1,5 @@
+import { parseEther } from 'viem'
+
 import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import { Context } from '@processor'
@@ -62,6 +64,7 @@ const otokenProcessor = createOTokenProcessor({
     ])
     return (poolBalance * rewardBalance) / rewardTotal
   },
+  accountsOverThresholdMinimum: parseEther('.1'),
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
