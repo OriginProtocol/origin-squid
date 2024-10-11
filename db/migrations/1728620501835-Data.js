@@ -1,5 +1,5 @@
-module.exports = class Data1728616103918 {
-    name = 'Data1728616103918'
+module.exports = class Data1728620501835 {
+    name = 'Data1728620501835'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -354,15 +354,16 @@ module.exports = class Data1728616103918 {
         await db.query(`CREATE INDEX "IDX_b465865a93cb044c6649523287" ON "aero_lp_position" ("position_id") `)
         await db.query(`CREATE INDEX "IDX_05aaf9416181ddc9012f41da2f" ON "aero_lp_position" ("account") `)
         await db.query(`CREATE TABLE "arm" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "symbol" text NOT NULL, "decimals" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, CONSTRAINT "PK_711e2a749a8c4baeccf8365290c" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "arm_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "redemption_rate" numeric NOT NULL, "total_deposits" numeric NOT NULL, "total_withdrawals" numeric NOT NULL, "total_yield" numeric NOT NULL, "total_fees" numeric NOT NULL, CONSTRAINT "PK_e58fff61dd95dfeac112204c378" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "total_deposits" numeric NOT NULL, "total_withdrawals" numeric NOT NULL, "total_yield" numeric NOT NULL, "total_fees" numeric NOT NULL, CONSTRAINT "PK_e58fff61dd95dfeac112204c378" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68943c1b73a665919e9377027e" ON "arm_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_85852cf19a3ddc86a4762398dd" ON "arm_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d9779389f627b43d2f746323de" ON "arm_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b9db75a2ca9b9d6e6c5aa744ab" ON "arm_state" ("address") `)
-        await db.query(`CREATE TABLE "arm_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "redemption_rate" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_c780cd8a4ec31366f7173a30fb1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "date" text NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_c780cd8a4ec31366f7173a30fb1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_6f3bbb5ed2de643316523b59b4" ON "arm_daily_stat" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9ee28c589c9fa60a45412a64ba" ON "arm_daily_stat" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_8da1e323ff87677d898da36c4c" ON "arm_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
         await db.query(`CREATE TABLE "arm_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, CONSTRAINT "PK_13dc23b0e4ee7f803645e930896" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_330af8826e0e9369301bebc3e7" ON "arm_withdrawal_request" ("chain_id") `)
@@ -1082,6 +1083,7 @@ module.exports = class Data1728616103918 {
         await db.query(`DROP INDEX "public"."IDX_6f3bbb5ed2de643316523b59b4"`)
         await db.query(`DROP INDEX "public"."IDX_9ee28c589c9fa60a45412a64ba"`)
         await db.query(`DROP INDEX "public"."IDX_052999e1ef63fabca403e9c3b8"`)
+        await db.query(`DROP INDEX "public"."IDX_8da1e323ff87677d898da36c4c"`)
         await db.query(`DROP INDEX "public"."IDX_9dbe5617230d5421831774b4b3"`)
         await db.query(`DROP TABLE "arm_withdrawal_request"`)
         await db.query(`DROP INDEX "public"."IDX_330af8826e0e9369301bebc3e7"`)

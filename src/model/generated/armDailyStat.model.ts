@@ -23,6 +23,10 @@ export class ArmDailyStat {
 
     @Index_()
     @StringColumn_({nullable: false})
+    date!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
     address!: string
 
     @BigIntColumn_({nullable: false})
@@ -44,7 +48,7 @@ export class ArmDailyStat {
     totalSupply!: bigint
 
     @BigIntColumn_({nullable: false})
-    redemptionRate!: bigint
+    assetsPerShare!: bigint
 
     @FloatColumn_({nullable: false})
     apr!: number

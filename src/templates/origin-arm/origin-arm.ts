@@ -26,18 +26,22 @@ export const createOriginARMProcessors = ({
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemRequested.topic],
+    range: { from },
   })
   const redeemClaimedFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemClaimed.topic],
+    range: { from },
   })
   const depositFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.Deposit.topic],
+    range: { from },
   })
   const withdrawalFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemRequested.topic],
+    range: { from },
   })
   const tracker = blockFrequencyTracker({ from })
   let armEntity: Arm
@@ -121,7 +125,7 @@ export const createOriginARMProcessors = ({
             totalAssets,
             totalAssetsCap,
             totalSupply,
-            redemptionRate,
+            assetsPerShare,
             feesAccrued,
           ] = await Promise.all([
             new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
@@ -146,7 +150,7 @@ export const createOriginARMProcessors = ({
             totalAssets,
             totalAssetsCap,
             totalSupply,
-            redemptionRate,
+            assetsPerShare,
             totalDeposits: (previousState?.totalDeposits ?? 0n) + (extra?.deposit ?? 0n),
             totalWithdrawals: (previousState?.totalWithdrawals ?? 0n) + (extra?.withdrawal ?? 0n),
             totalFees: feesAccrued,
@@ -178,8 +182,8 @@ export const createOriginARMProcessors = ({
             const armDayApy = calculateAPY(
               startOfDay,
               endOfDay,
-              previousDailyStat?.redemptionRate ?? state.redemptionRate,
-              state.redemptionRate,
+              previousDailyStat?.assetsPerShare ?? 10n ** 18n,
+              state.assetsPerShare,
             )
 
             const armDailyStatEntity = new ArmDailyStat({
@@ -187,6 +191,7 @@ export const createOriginARMProcessors = ({
               chainId: ctx.chain.id,
               timestamp: new Date(block.header.timestamp),
               blockNumber: block.header.height,
+              date: dateStr,
               address: armAddress,
               assets0: state.assets0,
               assets1: state.assets1,
@@ -194,7 +199,7 @@ export const createOriginARMProcessors = ({
               totalAssets: state.totalAssets,
               totalAssetsCap: state.totalAssetsCap,
               totalSupply: state.totalSupply,
-              redemptionRate: state.redemptionRate,
+              assetsPerShare: state.assetsPerShare,
               apr: armDayApy.apr,
               apy: armDayApy.apy,
               fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
@@ -229,7 +234,9 @@ export const createOriginARMProcessors = ({
                 redemptionEntity.claimed = true
                 redemptionMap.set(eventId, redemptionEntity)
               }
-            } else if (depositFilter.matches(log)) {
+            }
+            // Process these with separate `if` since there is filter overlap.
+            if (depositFilter.matches(log)) {
               const event = originLidoArmAbi.events.Deposit.decode(log)
               const state = await getCurrentState(block)
               state.totalDeposits += event.assets

@@ -44,7 +44,7 @@ export class ArmState {
     totalSupply!: bigint
 
     @BigIntColumn_({nullable: false})
-    redemptionRate!: bigint
+    assetsPerShare!: bigint
 
     @BigIntColumn_({nullable: false})
     totalDeposits!: bigint

@@ -784,7 +784,7 @@ type ArmState @entity {
   totalAssets: BigInt!
   totalAssetsCap: BigInt!
   totalSupply: BigInt!
-  redemptionRate: BigInt!
+  assetsPerShare: BigInt!
   totalDeposits: BigInt!
   totalWithdrawals: BigInt!
   totalYield: BigInt!
@@ -796,6 +796,7 @@ type ArmDailyStat @entity {
   chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  date: String! @index
   address: String! @index
   assets0: BigInt!
   assets1: BigInt!
@@ -803,7 +804,7 @@ type ArmDailyStat @entity {
   totalAssets: BigInt!
   totalAssetsCap: BigInt!
   totalSupply: BigInt!
-  redemptionRate: BigInt!
+  assetsPerShare: BigInt!
   apr: Float!
   apy: Float!
   yield: BigInt!
