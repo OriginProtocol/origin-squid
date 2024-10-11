@@ -41,7 +41,7 @@ export const processor = {
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     ...createOriginARMProcessors({
       name: 'origin-arm',
-      from: 20919108,
+      from: 20933088,
       armAddress: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
       liquidityProviderControllerAddress: '0x3817e247023B4f489352758397040b1fd33b300a',
     }),
