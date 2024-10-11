@@ -53,5 +53,8 @@ export class ArmDailyStat {
     apy!: number
 
     @BigIntColumn_({nullable: false})
+    yield!: bigint
+
+    @BigIntColumn_({nullable: false})
     fees!: bigint
 }

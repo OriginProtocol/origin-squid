@@ -47,5 +47,14 @@ export class ArmState {
     redemptionRate!: bigint
 
     @BigIntColumn_({nullable: false})
-    fees!: bigint
+    totalDeposits!: bigint
+
+    @BigIntColumn_({nullable: false})
+    totalWithdrawals!: bigint
+
+    @BigIntColumn_({nullable: false})
+    totalYield!: bigint
+
+    @BigIntColumn_({nullable: false})
+    totalFees!: bigint
 }

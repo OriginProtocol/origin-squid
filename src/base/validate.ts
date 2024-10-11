@@ -1,6 +1,6 @@
 import assert from 'assert'
 
-import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase } from '@model'
+import { ERC20Balance, OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
@@ -20,6 +20,7 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, OTokenHistory, entities.superoethb_oTokenHistories)
     await validateExpectations(ctx, block, OTokenRebase, entities.superoethb_oTokenRebases)
     await validateExpectations(ctx, block, OTokenDailyStat, entities.superoethb_oTokenDailyStats)
+    await validateExpectations(ctx, block, ERC20Balance, entities.superoethb_erc20Balances)
     firstBlock = false
   }
 }

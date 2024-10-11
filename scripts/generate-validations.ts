@@ -3,6 +3,8 @@ import fs from 'fs'
 import { addresses } from './../src/utils/addresses'
 import { baseAddresses } from './../src/utils/addresses-base'
 
+const LIMIT = 10
+
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
@@ -13,11 +15,13 @@ const executeQuery = async (query: string) => {
     },
     body: JSON.stringify({ query }),
   })
-  return response.json()
-}
-
-const isOfType = (type: { kind: string; ofType?: any }, kind: string): boolean => {
-  return type.kind === kind || (type.ofType && isOfType(type.ofType, kind))
+  const text = await response.text()
+  try {
+    return JSON.parse(text)
+  } catch (err) {
+    console.log(text)
+    throw err
+  }
 }
 
 const takePortion = (arr: any[], percentage: number) => {
@@ -43,26 +47,11 @@ const takePortion = (arr: any[], percentage: number) => {
   return result
 }
 
-const main = async () => {
-  const result = await executeQuery(query)
-  if (!result.data) {
-    console.log(result)
-    throw new Error('Query failed')
-  }
-
-  const data = result.data
-
-  for (const key of Object.keys(data)) {
-    data[key] = takePortion(data[key], 0.03) // Take 3% of the data spread evenly
-  }
-  fs.writeFileSync(__dirname + '/../src/validation/entities.json', JSON.stringify(result.data, null, 2))
-}
-
 const oTokens = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokens: oTokens(
-      limit: 1000,
-      orderBy: timestamp_ASC,
+      limit: ${LIMIT},
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -76,11 +65,12 @@ const oTokens = (prefix: string, address: string) => {
     }
   `)
 }
+
 const oTokenApies = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenApies: oTokenApies(
-      limit: 1000,
-      orderBy: timestamp_ASC,
+      limit: ${LIMIT},
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -99,10 +89,11 @@ const oTokenApies = (prefix: string, address: string) => {
     }
   `)
 }
+
 const oTokenHistories = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenHistories: oTokenHistories(
-      limit: 1000,
+      limit: ${LIMIT},
       orderBy: timestamp_ASC,
       where: { otoken_eq: "${address}" }
     ) {
@@ -122,8 +113,8 @@ const oTokenHistories = (prefix: string, address: string) => {
 const oTokenRebases = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenRebases: oTokenRebases(
-      limit: 1000,
-      orderBy: timestamp_ASC,
+      limit: ${LIMIT},
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -148,8 +139,8 @@ const oTokenRebases = (prefix: string, address: string) => {
 const oTokenVaults = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenVaults: oTokenVaults(
-      limit: 1000,
-      orderBy: timestamp_ASC,
+      limit: ${LIMIT},
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -166,8 +157,8 @@ const oTokenVaults = (prefix: string, address: string) => {
 const oTokenDailyStats = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenDailyStats: oTokenDailyStats(
-      limit: 1000,
-      orderBy: timestamp_ASC,
+      limit: ${LIMIT},
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -197,24 +188,60 @@ const oTokenDailyStats = (prefix: string, address: string) => {
   `)
 }
 
-const oToken = (otoken: string, address: string) =>
-  gql(`
-  ${oTokens(otoken, address)}
-  ${oTokenApies(otoken, address)}
-  ${oTokenHistories(otoken, address)}
-  ${oTokenRebases(otoken, address)}
-  ${oTokenVaults(otoken, address)}
-  ${oTokenDailyStats(otoken, address)}
-`)
+const oToken = (otoken: string, address: string) => [
+  oTokens(otoken, address),
+  oTokenApies(otoken, address),
+  oTokenHistories(otoken, address),
+  oTokenRebases(otoken, address),
+  oTokenVaults(otoken, address),
+  oTokenDailyStats(otoken, address),
+]
 
-const query = gql(`
-
-query MegaQuery {
-  ${oToken('oeth', addresses.oeth.address)}
-  ${oToken('ousd', addresses.ousd.address)}
-  ${oToken('superoethb', baseAddresses.superOETHb.address)}
+const erc20Balances = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_erc20Balances: erc20Balances(
+      limit: ${LIMIT},
+      orderBy: id_ASC,
+      where: { address_eq: "${address}" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      address
+      account
+      balance
+    }
+  `)
 }
 
-`)
+const main = async () => {
+  const queries: string[] = [
+    ...oToken('oeth', addresses.oeth.address),
+    ...oToken('ousd', addresses.ousd.address),
+    ...oToken('superoethb', baseAddresses.superOETHb.address),
+    erc20Balances('ogn', '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26'),
+    erc20Balances('ousd', '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'),
+    erc20Balances('oeth', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'),
+    erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
+  ].map((query) => `query Query { ${query} }`)
+
+  console.log('Total queries:', queries.length)
+  const entities = {} as Record<string, any[]>
+  for (let i = 0; i < queries.length; i++) {
+    const query = queries[i]
+    console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
+    const result = await executeQuery(query)
+    if (!result.data) {
+      console.log(result)
+      throw new Error('Query failed')
+    }
+    for (const key of Object.keys(result.data)) {
+      entities[key] = takePortion(result.data[key], 0.03) // Take 3% of the data spread evenly
+    }
+  }
+
+  fs.writeFileSync(__dirname + '/../src/validation/entities.json', JSON.stringify(entities, null, 2))
+}
 
 main()

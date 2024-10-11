@@ -1,13 +1,14 @@
 import dayjs from 'dayjs'
+import { last } from 'lodash'
 
 import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLiquidityProviderControllerAbi from '@abi/origin-liquidity-provider-controller'
-import { Arm, ArmDailyStat, ArmRedemption, ArmState } from '@model'
-import { Context, Processor } from '@processor'
+import { Arm, ArmDailyStat, ArmState, ArmWithdrawalRequest } from '@model'
+import { Block, Context, Processor } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { calculateAPY } from '@utils/calculateAPY'
 import { logFilter } from '@utils/logFilter'
 
@@ -30,7 +31,15 @@ export const createOriginARMProcessors = ({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemClaimed.topic],
   })
-  const updater = blockFrequencyUpdater({ from })
+  const depositFilter = logFilter({
+    address: [armAddress],
+    topic0: [originLidoArmAbi.events.Deposit.topic],
+  })
+  const withdrawalFilter = logFilter({
+    address: [armAddress],
+    topic0: [originLidoArmAbi.events.RedeemRequested.topic],
+  })
+  const tracker = blockFrequencyTracker({ from })
   let armEntity: Arm
   let initialized = false
   let initialize = async (ctx: Context) => {
@@ -71,6 +80,8 @@ export const createOriginARMProcessors = ({
         p.includeAllBlocks({ from })
         p.addLog(redeemRequestedFilter.value)
         p.addLog(redeemClaimedFilter.value)
+        p.addLog(depositFilter.value)
+        p.addLog(withdrawalFilter.value)
       },
       initialize,
       process: async (ctx: Context) => {
@@ -80,8 +91,23 @@ export const createOriginARMProcessors = ({
         }
         const states: ArmState[] = []
         const dailyStatsMap = new Map<string, ArmDailyStat>()
-        const redemptionMap = new Map<string, ArmRedemption>()
-        await updater(ctx, async (ctx, block) => {
+        const redemptionMap = new Map<string, ArmWithdrawalRequest>()
+        const getStateId = (block: Block) => `${ctx.chain.id}:${block.header.height}:${armAddress}`
+        const getPreviousState = async (block: Block) => {
+          return (
+            last(states) ??
+            (await ctx.store.findOne(ArmState, {
+              order: { timestamp: 'DESC' },
+              where: { chainId: ctx.chain.id, address: armAddress },
+            }))
+          )
+        }
+        const getCurrentState = async (block: Block, extra?: { deposit: bigint; withdrawal: bigint }) => {
+          const stateId = getStateId(block)
+          if (states[states.length - 1]?.id === stateId) {
+            return states[states.length - 1]
+          }
+          const previousState = await getPreviousState(block)
           const armContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLiquidityProviderControllerAbi.Contract(
             ctx,
@@ -109,7 +135,7 @@ export const createOriginARMProcessors = ({
           ])
           const date = new Date(block.header.timestamp)
           const armStateEntity = new ArmState({
-            id: `${ctx.chain.id}:${block.header.height}:${armAddress}`,
+            id: stateId,
             chainId: ctx.chain.id,
             timestamp: date,
             blockNumber: block.header.height,
@@ -121,49 +147,66 @@ export const createOriginARMProcessors = ({
             totalAssetsCap,
             totalSupply,
             redemptionRate,
-            fees: feesAccrued,
+            totalDeposits: (previousState?.totalDeposits ?? 0n) + (extra?.deposit ?? 0n),
+            totalWithdrawals: (previousState?.totalWithdrawals ?? 0n) + (extra?.withdrawal ?? 0n),
+            totalFees: feesAccrued,
+            totalYield: 0n,
           })
-          const dateStr = date.toISOString().slice(0, 10)
-          const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
-          const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
-          const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
-          const previousArmDailyStatEntity =
-            dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
-          const startOfDay = dayjs(date).startOf('day').toDate()
-          const endOfDay = dayjs(date).endOf('day').toDate()
-          const armDayApy = calculateAPY(
-            startOfDay,
-            endOfDay,
-            previousArmDailyStatEntity?.redemptionRate ?? redemptionRate,
-            redemptionRate,
-          )
-
-          const armDailyStatEntity = new ArmDailyStat({
-            id: currentDayId,
-            chainId: ctx.chain.id,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            address: armAddress,
-            assets0,
-            assets1,
-            outstandingAssets1,
-            totalAssets,
-            totalAssetsCap,
-            totalSupply,
-            redemptionRate,
-            apr: armDayApy.apr,
-            apy: armDayApy.apy,
-            fees: feesAccrued,
-          })
+          armStateEntity.totalYield = calculateTotalYield(armStateEntity)
           states.push(armStateEntity)
-          dailyStatsMap.set(currentDayId, armDailyStatEntity)
-        })
+          return armStateEntity
+        }
+        const calculateTotalYield = (state: ArmState) =>
+          state.totalAssets - state.totalDeposits + state.totalWithdrawals
+
+        // ArmWithdrawalRequest
         for (const block of ctx.blocks) {
+          if (tracker(ctx, block)) {
+            // ArmState
+            const state = await getCurrentState(block)
+
+            // ArmDailyStat
+            const date = new Date(block.header.timestamp)
+            const dateStr = date.toISOString().slice(0, 10)
+            const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
+            const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
+            const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
+            const previousDailyStat =
+              dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
+            const startOfDay = dayjs(date).startOf('day').toDate()
+            const endOfDay = dayjs(date).endOf('day').toDate()
+            const armDayApy = calculateAPY(
+              startOfDay,
+              endOfDay,
+              previousDailyStat?.redemptionRate ?? state.redemptionRate,
+              state.redemptionRate,
+            )
+
+            const armDailyStatEntity = new ArmDailyStat({
+              id: currentDayId,
+              chainId: ctx.chain.id,
+              timestamp: new Date(block.header.timestamp),
+              blockNumber: block.header.height,
+              address: armAddress,
+              assets0: state.assets0,
+              assets1: state.assets1,
+              outstandingAssets1: state.outstandingAssets1,
+              totalAssets: state.totalAssets,
+              totalAssetsCap: state.totalAssetsCap,
+              totalSupply: state.totalSupply,
+              redemptionRate: state.redemptionRate,
+              apr: armDayApy.apr,
+              apy: armDayApy.apy,
+              fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
+              yield: state.totalYield - (previousDailyStat?.yield ?? 0n),
+            })
+            dailyStatsMap.set(currentDayId, armDailyStatEntity)
+          }
           for (const log of block.logs) {
             if (redeemRequestedFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemRequested.decode(log)
               const eventId = `${ctx.chain.id}:${armAddress}:${event.requestId}`
-              const redemptionEntity = new ArmRedemption({
+              const redemptionEntity = new ArmWithdrawalRequest({
                 id: eventId,
                 chainId: ctx.chain.id,
                 txHash: log.transactionHash,
@@ -180,11 +223,22 @@ export const createOriginARMProcessors = ({
             } else if (redeemClaimedFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemClaimed.decode(log)
               const eventId = `${ctx.chain.id}:${armAddress}:${event.requestId}`
-              const redemptionEntity = redemptionMap.get(eventId) ?? (await ctx.store.get(ArmRedemption, eventId))
+              const redemptionEntity =
+                redemptionMap.get(eventId) ?? (await ctx.store.get(ArmWithdrawalRequest, eventId))
               if (redemptionEntity) {
                 redemptionEntity.claimed = true
                 redemptionMap.set(eventId, redemptionEntity)
               }
+            } else if (depositFilter.matches(log)) {
+              const event = originLidoArmAbi.events.Deposit.decode(log)
+              const state = await getCurrentState(block)
+              state.totalDeposits += event.assets
+              state.totalYield = calculateTotalYield(state)
+            } else if (withdrawalFilter.matches(log)) {
+              const event = originLidoArmAbi.events.RedeemRequested.decode(log)
+              const state = await getCurrentState(block)
+              state.totalWithdrawals += event.assets
+              state.totalYield = calculateTotalYield(state)
             }
           }
         }

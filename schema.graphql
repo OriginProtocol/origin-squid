@@ -785,7 +785,10 @@ type ArmState @entity {
   totalAssetsCap: BigInt!
   totalSupply: BigInt!
   redemptionRate: BigInt!
-  fees: BigInt!
+  totalDeposits: BigInt!
+  totalWithdrawals: BigInt!
+  totalYield: BigInt!
+  totalFees: BigInt!
 }
 
 type ArmDailyStat @entity {
@@ -803,10 +806,11 @@ type ArmDailyStat @entity {
   redemptionRate: BigInt!
   apr: Float!
   apy: Float!
+  yield: BigInt!
   fees: BigInt!
 }
 
-type ArmRedemption @entity {
+type ArmWithdrawalRequest @entity {
   id: ID!
   chainId: Int! @index
   txHash: String! @index

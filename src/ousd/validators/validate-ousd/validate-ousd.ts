@@ -1,7 +1,16 @@
 import assert from 'assert'
 import { sortBy } from 'lodash'
 
-import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase, OUSDDailyStat, StrategyYield } from '@model'
+import {
+  ERC20Balance,
+  OToken,
+  OTokenAPY,
+  OTokenDailyStat,
+  OTokenHistory,
+  OTokenRebase,
+  OUSDDailyStat,
+  StrategyYield,
+} from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
@@ -21,6 +30,7 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, OTokenHistory, entities.ousd_oTokenHistories)
     await validateExpectations(ctx, block, OTokenRebase, entities.ousd_oTokenRebases)
     await validateExpectations(ctx, block, OTokenDailyStat, entities.ousd_oTokenDailyStats)
+    await validateExpectations(ctx, block, ERC20Balance, entities.ousd_erc20Balances)
     await validateExpectations(ctx, block, StrategyYield, expectations.strategyYields)
     await validateExpectations(ctx, block, OUSDDailyStat, expectations.ousdDailyStats)
     firstBlock = false

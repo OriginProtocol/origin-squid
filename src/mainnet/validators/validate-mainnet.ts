@@ -1,12 +1,13 @@
 import assert from 'assert'
 import { sortBy } from 'lodash'
 
-import { ERC20Balance, ERC20State } from '@model'
+import { ERC20Balance } from '@model'
 import { Block, Context } from '@processor'
 import { EntityClass } from '@subsquid/typeorm-store'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { env } from '@utils/env'
 import { compare } from '@validation/compare'
+import { entities } from '@validation/entities'
 
 export const name = 'validate-shared'
 
@@ -15,8 +16,7 @@ let firstBlock = true
 export const process = async (ctx: Context) => {
   if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
-    await validateExpectations(ctx, block, ERC20State, expectations.erc20States)
-    await validateExpectations(ctx, block, ERC20Balance, expectations.erc20Balances)
+    await validateExpectations(ctx, block, ERC20Balance, entities.ogn_erc20Balances)
     firstBlock = false
   }
 }
@@ -68,8 +68,3 @@ const validateExpectation = async <
 const e = (arr: any[]) => {
   return sortBy(arr, (v) => v.blockNumber)
 }
-
-const expectations = {
-  erc20States: e([]), // TODO: Fill me up?
-  erc20Balances: e([]),
-} as const

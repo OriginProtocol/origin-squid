@@ -2,6 +2,7 @@ import assert from 'assert'
 import { sortBy } from 'lodash'
 
 import {
+  ERC20Balance,
   OETHDailyStat,
   OETHMorphoAave,
   OETHVault,
@@ -31,6 +32,7 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, OTokenHistory, entities.oeth_oTokenHistories)
     await validateExpectations(ctx, block, OTokenRebase, entities.oeth_oTokenRebases)
     await validateExpectations(ctx, block, OTokenDailyStat, entities.oeth_oTokenDailyStats)
+    await validateExpectations(ctx, block, ERC20Balance, entities.oeth_erc20Balances)
     await validateExpectations(ctx, block, OETHVault, expectations.oethVaults)
     await validateExpectations(ctx, block, OETHMorphoAave, expectations.oethMorphoAave)
     await validateExpectations(ctx, block, StrategyBalance, expectations.strategyBalances)
