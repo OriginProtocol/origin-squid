@@ -1,5 +1,5 @@
-module.exports = class Data1728677434037 {
-    name = 'Data1728677434037'
+module.exports = class Data1728680819636 {
+    name = 'Data1728680819636'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -672,11 +672,12 @@ module.exports = class Data1728677434037 {
         await db.query(`CREATE INDEX "IDX_57bb1f7d2fd6fe063b9cd434b2" ON "o_token_activity" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d6cba0877ee9f5332e6d97e758" ON "o_token_activity" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b5826e68934ff671bbe28836ec" ON "o_token_activity" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7" numeric NOT NULL, "apy14" numeric NOT NULL, "apy30" numeric NOT NULL, "rate_usd" numeric NOT NULL, "rate_eth" numeric NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "amo_supply" numeric, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "cumulative_fees" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "accounts_over_threshold" integer NOT NULL, CONSTRAINT "PK_eeabae008c52207e32e2171176d" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "date" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7" numeric NOT NULL, "apy14" numeric NOT NULL, "apy30" numeric NOT NULL, "rate_usd" numeric NOT NULL, "rate_eth" numeric NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "wrapped_supply" numeric NOT NULL, "amo_supply" numeric, "dripper_weth" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "cumulative_fees" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "accounts_over_threshold" integer NOT NULL, CONSTRAINT "PK_eeabae008c52207e32e2171176d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_98c1ae817f9436c4f602de04c7" ON "o_token_daily_stat" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_8da572d689803a6292f00f687c" ON "o_token_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_41df5fb0657b57079c5e011578" ON "o_token_daily_stat" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7581835374b0582ec62df30f28" ON "o_token_daily_stat" ("otoken") `)
+        await db.query(`CREATE INDEX "IDX_448a0a2ffd35d4dda520f1a98f" ON "o_token_daily_stat" ("date") `)
         await db.query(`CREATE TABLE "o_token_dripper_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "available_funds" numeric NOT NULL, "last_collect" numeric NOT NULL, "per_block" numeric NOT NULL, "drip_duration" numeric NOT NULL, CONSTRAINT "PK_8fd326f8158125b5a2be7e86803" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7671125bf3c842a221e9ada6da" ON "o_token_dripper_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_bd00c38c8ddaf6a21f00d71c7a" ON "o_token_dripper_state" ("block_number") `)
@@ -1400,6 +1401,7 @@ module.exports = class Data1728677434037 {
         await db.query(`DROP INDEX "public"."IDX_8da572d689803a6292f00f687c"`)
         await db.query(`DROP INDEX "public"."IDX_41df5fb0657b57079c5e011578"`)
         await db.query(`DROP INDEX "public"."IDX_7581835374b0582ec62df30f28"`)
+        await db.query(`DROP INDEX "public"."IDX_448a0a2ffd35d4dda520f1a98f"`)
         await db.query(`DROP TABLE "o_token_dripper_state"`)
         await db.query(`DROP INDEX "public"."IDX_7671125bf3c842a221e9ada6da"`)
         await db.query(`DROP INDEX "public"."IDX_bd00c38c8ddaf6a21f00d71c7a"`)

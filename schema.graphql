@@ -1859,6 +1859,7 @@ type OTokenDailyStat @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  date: String! @index
 
   apr: Float!
   apy: Float!

@@ -25,6 +25,10 @@ export class OTokenDailyStat {
     @StringColumn_({nullable: false})
     otoken!: string
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    date!: string
+
     @FloatColumn_({nullable: false})
     apr!: number
 

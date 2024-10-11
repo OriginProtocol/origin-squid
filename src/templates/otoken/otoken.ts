@@ -668,6 +668,7 @@ export const createOTokenProcessor = (params: {
         id,
         chainId: ctx.chain.id,
         timestamp: new Date(block.header.timestamp),
+        date: dayString,
         blockNumber: block.header.height,
         otoken: params.otokenAddress,
 
