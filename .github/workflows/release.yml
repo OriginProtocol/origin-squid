@@ -1,0 +1,46 @@
+name: Release squid
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install squid CLI
+        run: npm i -g @subsquid/cli
+
+      - name: npm install
+        run: npm i
+
+      - name: update squid.yml
+        run: |
+          # Get the tag from GitHub
+          TAG=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')
+          
+          # Extract the numeric part of the tag
+          VERSION=$(echo $TAG | sed 's/v//')
+          
+          # Update the version in squid.yaml
+          sed -i "s/^version: .*/version: $VERSION/" squid.yaml
+          
+          # Optional: Print the updated version for verification
+          echo "Updated squid.yaml version to: $VERSION"
+      
+      - name: Authenticate to squid
+        env: 
+          API_TOKEN: ${{ secrets.SQUID_API_TOKEN }}
+        run: sqd auth -k $API_TOKEN
+
+      - name: Build and deploy squid
+        run: sqd build && sqd deploy . -o origin --no-stream-logs
