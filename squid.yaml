@@ -19,52 +19,52 @@ deploy:
     ########## MAIN NETWORK ##########
     - name: mainnet-processor
       cmd: ['sqd', 'process:mainnet:prod']
-      env:
-        ### Fork Setup Stage 1
-        # ARCHIVE_ONLY: 'true'
-        # BLOCK_TO: 20933071
-        ### Fork Setup Stage 2
-        # DISABLE_ARCHIVE: 'true'
-        # RPC_ENV: RPC_ENDPOINT
-        # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-        ### Time Travel Fix
-        # BLOCK_FROM: 20919091
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: oeth-processor
       cmd: ['sqd', 'process:oeth:prod']
-      env:
-        ### Fork Setup Stage 1
-        # ARCHIVE_ONLY: 'true'
-        # BLOCK_TO: 20933071
-        ### Fork Setup Stage 2
-        # DISABLE_ARCHIVE: 'true'
-        # RPC_ENV: RPC_ENDPOINT
-        # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-        ### Time Travel Fix
-        # BLOCK_FROM: 20919091
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: ogv-processor
       cmd: ['sqd', 'process:ogv:prod']
-      env:
-        ### Fork Setup Stage 1
-        # ARCHIVE_ONLY: 'true'
-        # BLOCK_TO: 20933071
-        ### Fork Setup Stage 2
-        # DISABLE_ARCHIVE: 'true'
-        # RPC_ENV: RPC_ENDPOINT
-        # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-        ### Time Travel Fix
-        # BLOCK_FROM: 20919091
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: ousd-processor
       cmd: ['sqd', 'process:ousd:prod']
-      env:
-        ### Fork Setup Stage 1
-        # ARCHIVE_ONLY: 'true'
-        # BLOCK_TO: 20933071
-        ### Fork Setup Stage 2
-        # DISABLE_ARCHIVE: 'true'
-        # RPC_ENV: RPC_ENDPOINT
-        # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-        ### Time Travel Fix
-        # BLOCK_FROM: 20919091
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     ########## ARBITRUM NETWORK ##########
     - name: arbitrum-processor
       cmd: ['sqd', 'process:arbitrum:prod']
