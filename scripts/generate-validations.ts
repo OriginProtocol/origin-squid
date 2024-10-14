@@ -3,7 +3,7 @@ import fs from 'fs'
 import { addresses } from './../src/utils/addresses'
 import { baseAddresses } from './../src/utils/addresses-base'
 
-const LIMIT = 10
+const LIMIT = 1000
 
 const gql = (query: string) => query
 
@@ -23,28 +23,12 @@ const executeQuery = async (query: string) => {
     throw err
   }
 }
-
-const takePortion = (arr: any[], percentage: number) => {
-  if (percentage <= 0 || percentage > 1) {
-    throw new Error('Percentage must be between 0 and 1')
+const takePortion = (arr: any[], takeEvery: number) => {
+  if (takeEvery <= 0) {
+    throw new Error('takeEvery must be greater than 0')
   }
 
-  const totalItems = Math.max(1, Math.floor(arr.length * percentage))
-  const result: any[] = []
-
-  if (totalItems === 1) {
-    return [arr[Math.floor(arr.length / 2)]]
-  }
-
-  const step = arr.length / (totalItems - 1)
-
-  for (let i = 0; i < totalItems; i++) {
-    const index = Math.min(Math.floor(i * step), arr.length - 1)
-    if (index === arr.length - 1) break // Avoid the last index
-    result.push(arr[index])
-  }
-
-  return result
+  return arr.filter((_, index) => index % takeEvery === 0)
 }
 
 const oTokens = (prefix: string, address: string) => {
@@ -237,7 +221,7 @@ const main = async () => {
       throw new Error('Query failed')
     }
     for (const key of Object.keys(result.data)) {
-      entities[key] = takePortion(result.data[key], 0.03) // Take 3% of the data spread evenly
+      entities[key] = takePortion(result.data[key], 25)
     }
   }
 
