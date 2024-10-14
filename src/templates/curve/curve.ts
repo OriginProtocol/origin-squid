@@ -1,10 +1,5 @@
 import * as curveLpToken from '@abi/curve-lp-token'
-import {
-  CurvePool,
-  CurvePoolBalance,
-  CurvePoolRate,
-  LiquiditySourceType,
-} from '@model'
+import { CurvePool, CurvePoolBalance, CurvePoolRate, LiquiditySourceType } from '@model'
 import { Context } from '@processor'
 import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -18,10 +13,7 @@ interface ProcessResult {
   curvePoolRates: CurvePoolRate[]
 }
 
-export const createCurveSetup = (
-  from: number,
-  processor: EvmBatchProcessor,
-) => {
+export const createCurveSetup = (from: number, processor: EvmBatchProcessor) => {
   processor.includeAllBlocks({ from })
 }
 
@@ -75,15 +67,11 @@ export const createCurveProcessor = ({
       curvePoolRates: [],
     }
     await update(ctx, async (ctx, block) => {
-      const timestamp = new Date(block.header.timestamp)
-      const timestampId = timestamp.toISOString()
       const contract = new curveLpToken.Contract(ctx, block.header, address)
 
       // TODO: use `get_balances()` where possible
       const [balances, rates] = await Promise.all([
-        Promise.all(
-          range(tokens.length).map((n) => contract.balances(BigInt(n))),
-        ),
+        Promise.all(range(tokens.length).map((n) => contract.balances(BigInt(n)))),
         Promise.all(
           (ratesToPull ?? []).map(async ({ i, j, dx }) => {
             return {
@@ -94,7 +82,7 @@ export const createCurveProcessor = ({
         ),
       ])
       const curve = new CurvePoolBalance({
-        id: `${address}-${timestampId}`,
+        id: `${address}-${block.header.height}`,
         blockNumber: block.header.height,
         timestamp: new Date(block.header.timestamp),
         address: address,
@@ -112,7 +100,7 @@ export const createCurveProcessor = ({
         ...rates.map(
           (r) =>
             new CurvePoolRate({
-              id: `${address}-${timestampId}-${r.name}`,
+              id: `${address}-${block.header.height}-${r.name}`,
               blockNumber: block.header.height,
               timestamp: new Date(block.header.timestamp),
               address: address,
