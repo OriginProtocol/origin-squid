@@ -1893,6 +1893,7 @@ type OTokenDripperState @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  wethBalance: BigInt!
   availableFunds: BigInt!
   lastCollect: BigInt!
   perBlock: BigInt!

@@ -26,6 +26,9 @@ export class OTokenDripperState {
     otoken!: string
 
     @BigIntColumn_({nullable: false})
+    wethBalance!: bigint
+
+    @BigIntColumn_({nullable: false})
     availableFunds!: bigint
 
     @BigIntColumn_({nullable: false})

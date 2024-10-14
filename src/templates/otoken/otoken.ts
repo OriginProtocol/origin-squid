@@ -31,6 +31,7 @@ import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { multicall } from '@utils/multicall'
+import { tokensByChain } from '@utils/tokensByChain'
 import { getLatestEntity } from '@utils/utils'
 
 import { createAddress, createRebaseAPY } from './utils'
@@ -201,10 +202,11 @@ export const createOTokenProcessor = (params: {
 
       if (params.dripper && params.dripper.from <= block.header.height) {
         const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
-        const [dripDuration, { lastCollect, perBlock }, availableFunds] = await Promise.all([
+        const [dripDuration, { lastCollect, perBlock }, availableFunds, wethBalance] = await Promise.all([
           dripperContract.dripDuration(),
           dripperContract.drip(),
           dripperContract.availableFunds(),
+          new erc20.Contract(ctx, block.header, tokensByChain[ctx.chain.id].WETH).balanceOf(params.dripper.address),
         ])
         result.dripperStates.push(
           new OTokenDripperState({
@@ -217,6 +219,7 @@ export const createOTokenProcessor = (params: {
             lastCollect,
             perBlock,
             availableFunds,
+            wethBalance,
           }),
         )
       }
