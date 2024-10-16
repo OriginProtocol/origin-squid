@@ -6,7 +6,6 @@ import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
-import { createOriginARMProcessors } from '@templates/origin-arm'
 import { processStatus } from '@templates/processor-status'
 import {
   OGN_ADDRESS,
@@ -41,12 +40,12 @@ export const processor = {
     }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     coingeckoProcessor,
-    ...createOriginARMProcessors({
-      name: 'origin-arm',
-      from: 20933088,
-      armAddress: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
-      liquidityProviderControllerAddress: '0x3817e247023B4f489352758397040b1fd33b300a',
-    }),
+    // ...createOriginARMProcessors({
+    //   name: 'origin-arm',
+    //   from: 20933088,
+    //   armAddress: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
+    //   liquidityProviderControllerAddress: '0x3817e247023B4f489352758397040b1fd33b300a',
+    // }),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
   validators: [validate],
