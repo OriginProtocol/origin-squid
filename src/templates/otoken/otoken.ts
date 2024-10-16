@@ -53,6 +53,7 @@ export const createOTokenProcessor = (params: {
   dripper?: {
     address: string
     from: number
+    perSecondStartingBlock?: number
   }
   harvester?: {
     address: string
@@ -206,6 +207,7 @@ export const createOTokenProcessor = (params: {
 
     await frequencyUpdate(ctx, async (ctx, block) => {
       const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
       result.vaults.push(
         new OTokenVault({
           id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
@@ -214,7 +216,8 @@ export const createOTokenProcessor = (params: {
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
           address: params.otokenVaultAddress,
-          totalValue: await vaultContract.totalValue(),
+          vaultBuffer,
+          totalValue,
         }),
       )
 

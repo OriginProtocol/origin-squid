@@ -97,6 +97,7 @@ type OTokenVault @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index
+  vaultBuffer: BigInt!
   totalValue: BigInt!
 }
 
