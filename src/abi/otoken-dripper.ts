@@ -12,7 +12,7 @@ export const functions = {
     claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
     collect: fun("0xe5225381", "collect()", {}, ),
     collectAndRebase: fun("0x73796297", "collectAndRebase()", {}, ),
-    drip: viewFun("0x9f678cca", "drip()", {}, {"lastCollect": p.uint64, "perBlock": p.uint192}),
+    drip: viewFun("0x9f678cca", "drip()", {}, {"lastCollect": p.uint64, "perSecond": p.uint192}),
     dripDuration: viewFun("0xbb7a632e", "dripDuration()", {}, p.uint256),
     governor: viewFun("0x0c340a24", "governor()", {}, p.address),
     isGovernor: viewFun("0xc7af3352", "isGovernor()", {}, p.bool),

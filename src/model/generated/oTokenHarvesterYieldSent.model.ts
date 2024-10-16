@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class OTokenDripperState {
-    constructor(props?: Partial<OTokenDripperState>) {
+export class OTokenHarvesterYieldSent {
+    constructor(props?: Partial<OTokenHarvesterYieldSent>) {
         Object.assign(this, props)
     }
 
@@ -25,18 +25,12 @@ export class OTokenDripperState {
     @StringColumn_({nullable: false})
     otoken!: string
 
-    @BigIntColumn_({nullable: false})
-    wethBalance!: bigint
+    @StringColumn_({nullable: false})
+    txHash!: string
 
     @BigIntColumn_({nullable: false})
-    availableFunds!: bigint
+    yield!: bigint
 
     @BigIntColumn_({nullable: false})
-    lastCollect!: bigint
-
-    @BigIntColumn_({nullable: false})
-    perSecond!: bigint
-
-    @BigIntColumn_({nullable: false})
-    dripDuration!: bigint
+    fee!: bigint
 }

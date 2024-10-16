@@ -173,6 +173,17 @@ type OTokenDripperState @entity {
   wethBalance: BigInt!
   availableFunds: BigInt!
   lastCollect: BigInt!
-  perBlock: BigInt!
+  perSecond: BigInt!
   dripDuration: BigInt!
+}
+
+type OTokenHarvesterYieldSent @entity {
+  id: ID! # log.id
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  txHash: String!
+  yield: BigInt!
+  fee: BigInt!
 }
