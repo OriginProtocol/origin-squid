@@ -3,7 +3,7 @@ import { last } from 'lodash'
 
 import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
-import * as originLiquidityProviderControllerAbi from '@abi/origin-liquidity-provider-controller'
+import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmWithdrawalRequest } from '@model'
 import { Block, Context, Processor } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -16,12 +16,12 @@ export const createOriginARMProcessors = ({
   name,
   from,
   armAddress,
-  liquidityProviderControllerAddress,
+  capManagerAddress,
 }: {
   name: string
   from: number
   armAddress: string
-  liquidityProviderControllerAddress: string
+  capManagerAddress: string
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
@@ -113,11 +113,7 @@ export const createOriginARMProcessors = ({
           }
           const previousState = await getPreviousState(block)
           const armContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
-          const controllerContract = new originLiquidityProviderControllerAbi.Contract(
-            ctx,
-            block.header,
-            liquidityProviderControllerAddress,
-          )
+          const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
           const [
             assets0,
             assets1,
