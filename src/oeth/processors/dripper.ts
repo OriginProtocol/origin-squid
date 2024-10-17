@@ -1,7 +1,7 @@
 import { pad } from 'viem'
 
-import * as dripperAbi from '@abi/dripper'
 import * as erc20 from '@abi/erc20'
+import * as dripperAbi from '@abi/otoken-dripper'
 import { OETHDripper } from '@model'
 import { Context } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
@@ -57,18 +57,9 @@ const processTransfer = async (
       tokens: [WETH_ADDRESS],
       fn: async ({ log, token, change }) => {
         const timestampId = new Date(block.header.timestamp).toISOString()
-        const { latest, current } = await getLatestEntity(
-          ctx,
-          OETHDripper,
-          result.drippers,
-          timestampId,
-        )
+        const { latest, current } = await getLatestEntity(ctx, OETHDripper, result.drippers, timestampId)
 
-        const dripperContract = new dripperAbi.Contract(
-          ctx,
-          block.header,
-          OETH_DRIPPER_ADDRESS,
-        )
+        const dripperContract = new dripperAbi.Contract(ctx, block.header, OETH_DRIPPER_ADDRESS)
 
         let dripper = current
         if (!dripper) {
@@ -86,7 +77,7 @@ const processTransfer = async (
 
         dripper.weth += change
         dripper.lastCollectTimestamp = Number(drip.lastCollect)
-        dripper.dripRatePerBlock = drip.perBlock
+        dripper.dripRatePerBlock = drip.perSecond
         dripper.dripDuration = await dripperContract.dripDuration()
       },
     })

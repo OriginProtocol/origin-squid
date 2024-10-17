@@ -1,3 +1,5 @@
+import { parseEther } from 'viem'
+
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { getPositions } from '@templates/aerodrome/lp'
@@ -37,6 +39,7 @@ const otokenProcessor = createOTokenProcessor({
   upgrades: {
     rebaseOptEvents: false,
   },
+  accountsOverThresholdMinimum: parseEther('.1'),
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({

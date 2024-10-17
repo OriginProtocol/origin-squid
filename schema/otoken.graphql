@@ -97,6 +97,7 @@ type OTokenVault @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index
+  vaultBuffer: BigInt!
   totalValue: BigInt!
 }
 
@@ -136,6 +137,7 @@ type OTokenDailyStat @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  date: String! @index
 
   apr: Float!
   apy: Float!
@@ -160,6 +162,7 @@ type OTokenDailyStat @entity {
   cumulativeFees: BigInt!
 
   marketCapUSD: Float!
+  accountsOverThreshold: Int!
 }
 
 type OTokenDripperState @entity {
@@ -168,8 +171,20 @@ type OTokenDripperState @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  wethBalance: BigInt!
   availableFunds: BigInt!
   lastCollect: BigInt!
-  perBlock: BigInt!
+  perSecond: BigInt!
   dripDuration: BigInt!
+}
+
+type OTokenHarvesterYieldSent @entity {
+  id: ID! # log.id
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  txHash: String!
+  yield: BigInt!
+  fee: BigInt!
 }

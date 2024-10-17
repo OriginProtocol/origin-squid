@@ -30,5 +30,8 @@ export class OTokenVault {
     address!: string
 
     @BigIntColumn_({nullable: false})
+    vaultBuffer!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalValue!: bigint
 }

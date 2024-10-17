@@ -173,10 +173,17 @@ export const ogv = {
   governance: OGV_GOVERNANCE_ADDRESS,
 }
 
+export const arm = {
+  address: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
+  capManager: '0xf54ebff575f699d281645c6f14fe427dffe629cf',
+  zapper: '0x01f30b7358ba51f637d1aa05d9b4a60f76dad680',
+}
+
 export const addresses = {
   tokens,
   strategies,
   oeth,
   ousd,
   ogv,
+  arm,
 }

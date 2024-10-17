@@ -4,6 +4,8 @@ version: 999
 description: 'Origin Protocol 🦑'
 build:
 deploy:
+  env:
+    TS_NODE_BASEURL: './lib'
   addons:
     postgres:
     rpc:
@@ -14,37 +16,82 @@ deploy:
     - RPC_ENDPOINT
     - RPC_ENV
   processor:
+    ########## MAIN NETWORK ##########
     - name: mainnet-processor
       cmd: ['sqd', 'process:mainnet:prod']
-      env:
-        TS_NODE_BASEURL: './lib'
-    - name: arbitrum-processor
-      cmd: ['sqd', 'process:arbitrum:prod']
-      env:
-        RPC_ARBITRUM_ENV: RPC_ARBITRUM_ONE_HTTP
-        TS_NODE_BASEURL: './lib'
-    - name: base-processor
-      cmd: ['sqd', 'process:base:prod']
-      env:
-        RPC_BASE_ENV: RPC_BASE_HTTP
-        TS_NODE_BASEURL: './lib'
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: oeth-processor
       cmd: ['sqd', 'process:oeth:prod']
-      env:
-        TS_NODE_BASEURL: './lib'
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: ogv-processor
       cmd: ['sqd', 'process:ogv:prod']
-      env:
-        RPC_ENV: RPC_ENDPOINT
-        TS_NODE_BASEURL: './lib'
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
     - name: ousd-processor
       cmd: ['sqd', 'process:ousd:prod']
-      env:
-        RPC_ENV: RPC_ENDPOINT
-        TS_NODE_BASEURL: './lib'
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20933071
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
+    ########## ARBITRUM NETWORK ##########
+    - name: arbitrum-processor
+      cmd: ['sqd', 'process:arbitrum:prod']
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20919091
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/4fc58260-a74c-4d0f-bdca-77e1bbb1e86c
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
+    ########## BASE NETWORK ##########
+    - name: base-processor
+      cmd: ['sqd', 'process:base:prod']
+      # env:
+      #   ### Fork Setup Stage 1
+      #   # ARCHIVE_ONLY: 'true'
+      #   # BLOCK_TO: 20919091
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_ENV: RPC_ENDPOINT
+      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/4fc58260-a74c-4d0f-bdca-77e1bbb1e86c
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
   api:
-    env:
-      TS_NODE_BASEURL: './lib'
     cmd:
       - npx
       - squid-graphql-server
@@ -60,5 +107,5 @@ scale:
   dedicated: true
   addons:
     postgres:
-      storage: 20G
+      storage: 30G
       profile: medium

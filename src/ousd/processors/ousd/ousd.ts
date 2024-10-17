@@ -1,3 +1,5 @@
+import { parseEther } from 'viem'
+
 import { createOTokenProcessor } from '@templates/otoken'
 import {
   DAI_ADDRESS,
@@ -33,4 +35,5 @@ export const { from, setup, process } = createOTokenProcessor({
     { asset: DAI_ADDRESS, symbol: 'DAI' },
   ],
   getAmoSupply: async () => 0n,
+  accountsOverThresholdMinimum: parseEther('100'),
 })

@@ -24,6 +24,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 }
 
 export const initialize = async (ctx: Context) => {
+  if (global.process.env.BLOCK_FROM) return
   // Only add these if there are no pubkeys yet.
   const existing = await ctx.store.find(BeaconDepositPubkey, { take: 1 })
   if (existing.length > 0) return

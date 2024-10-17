@@ -1,3 +1,4 @@
+import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import 'tsconfig-paths/register'
 
 import { run } from '@processor'
@@ -5,6 +6,7 @@ import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
+import { createOriginARMProcessors } from '@templates/origin-arm'
 import { processStatus } from '@templates/processor-status'
 import {
   OGN_ADDRESS,
@@ -12,6 +14,7 @@ import {
   OGN_REWARDS_SOURCE_ADDRESS,
   OGV_GOVERNANCE_ADDRESS,
   XOGN_ADDRESS,
+  addresses,
 } from '@utils/addresses'
 
 import * as dailyStats from './mainnet/post-processors/daily-stats'
@@ -38,6 +41,13 @@ export const processor = {
       yieldType: 'fixed',
     }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
+    coingeckoProcessor,
+    ...createOriginARMProcessors({
+      name: 'origin-arm',
+      from: 20987226,
+      armAddress: addresses.arm.address,
+      liquidityProviderControllerAddress: addresses.arm.capManager,
+    }),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
   validators: [validate],

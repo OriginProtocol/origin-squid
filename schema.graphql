@@ -747,6 +747,92 @@ type AeroLPPosition @entity {
   sqrtRatioLower: BigInt!
   sqrtRatioUpper: BigInt!
 }
+# - P1: For UI
+#     - stETH ARM TVL
+#     - stETH ARM APY 30 day trailing
+#     - stETH ARM historical APY chart
+#     - Deposited balance per wallet address
+#     - stETH ARM deposits/ withdrawals (notification in bot channel)
+# - Nice to Have (not launch blocking):
+#     - Breakout of what is external liquidity vs. deposited by Origin
+#     - stETH ARM # of external LPs
+#     - stETH ARM size of holdings of external LPs
+#     - stETH  redemption queue length
+#     - Activity history (deposits/withdrawals per wallet address)
+#     - Earnings per wallet address
+
+type Arm @entity {
+  id: ID!
+  chainId: Int!
+  address: String!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  token0: String!
+  token1: String!
+}
+
+type ArmState @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  assets0: BigInt!
+  assets1: BigInt!
+  outstandingAssets1: BigInt!
+  totalAssets: BigInt!
+  totalAssetsCap: BigInt!
+  totalSupply: BigInt!
+  assetsPerShare: BigInt!
+  totalDeposits: BigInt!
+  totalWithdrawals: BigInt!
+  totalYield: BigInt!
+  totalFees: BigInt!
+}
+
+type ArmDailyStat @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  date: String! @index
+  address: String! @index
+  assets0: BigInt!
+  assets1: BigInt!
+  outstandingAssets1: BigInt!
+  totalAssets: BigInt!
+  totalAssetsCap: BigInt!
+  totalSupply: BigInt!
+  assetsPerShare: BigInt!
+  apr: Float!
+  apy: Float!
+  yield: BigInt!
+  fees: BigInt!
+}
+
+type ArmWithdrawalRequest @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  account: String! @index
+  requestId: BigInt!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
+}
+type CoinGeckoCoinData @entity {
+  id: ID!
+  product: String! @index
+  date: String! @index
+  vsCurrency: String!
+  price: Float!
+  marketCap: Float!
+  tradingVolume: Float!
+}
 # State
 
 type ESToken @entity {
@@ -1734,6 +1820,7 @@ type OTokenVault @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index
+  vaultBuffer: BigInt!
   totalValue: BigInt!
 }
 
@@ -1773,6 +1860,7 @@ type OTokenDailyStat @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  date: String! @index
 
   apr: Float!
   apy: Float!
@@ -1797,6 +1885,7 @@ type OTokenDailyStat @entity {
   cumulativeFees: BigInt!
 
   marketCapUSD: Float!
+  accountsOverThreshold: Int!
 }
 
 type OTokenDripperState @entity {
@@ -1805,10 +1894,22 @@ type OTokenDripperState @entity {
   blockNumber: Int! @index
   timestamp: DateTime! @index
   otoken: String! @index
+  wethBalance: BigInt!
   availableFunds: BigInt!
   lastCollect: BigInt!
-  perBlock: BigInt!
+  perSecond: BigInt!
   dripDuration: BigInt!
+}
+
+type OTokenHarvesterYieldSent @entity {
+  id: ID! # log.id
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  txHash: String!
+  yield: BigInt!
+  fee: BigInt!
 }
 """
 The Vault entity tracks the OUSD vault balance over time.

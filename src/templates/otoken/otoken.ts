@@ -3,9 +3,10 @@ import { findLast } from 'lodash'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
-import * as dripper from '@abi/dripper'
 import * as erc20 from '@abi/erc20'
 import * as otoken from '@abi/otoken'
+import * as otokenHarvester from '@abi/otoken-base-harvester'
+import * as otokenDripper from '@abi/otoken-dripper'
 import * as otokenVault from '@abi/otoken-vault'
 import {
   HistoryType,
@@ -16,6 +17,7 @@ import {
   OTokenAsset,
   OTokenDailyStat,
   OTokenDripperState,
+  OTokenHarvesterYieldSent,
   OTokenHistory,
   OTokenRebase,
   OTokenRebaseOption,
@@ -30,7 +32,9 @@ import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
+import { logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
+import { tokensByChain } from '@utils/tokensByChain'
 import { getLatestEntity } from '@utils/utils'
 
 import { createAddress, createRebaseAPY } from './utils'
@@ -49,6 +53,12 @@ export const createOTokenProcessor = (params: {
   dripper?: {
     address: string
     from: number
+    perSecondStartingBlock?: number
+  }
+  harvester?: {
+    address: string
+    from: number
+    yieldSent: boolean
   }
   otokenVaultAddress: string
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
@@ -56,7 +66,15 @@ export const createOTokenProcessor = (params: {
   upgrades?: {
     rebaseOptEvents: number | false
   }
+  accountsOverThresholdMinimum: bigint
 }) => {
+  const harvesterYieldSentFilter = params.harvester?.yieldSent
+    ? logFilter({
+        address: [params.harvester.address],
+        topic0: [otokenHarvester.events.YieldSent.topic],
+        range: { from: params.harvester.from },
+      })
+    : undefined
   const setup = (processor: EvmBatchProcessor) => {
     if (params.upgrades?.rebaseOptEvents !== false) {
       processor.addTrace({
@@ -105,6 +123,7 @@ export const createOTokenProcessor = (params: {
     activity: OTokenActivity[]
     vaults: OTokenVault[]
     dripperStates: OTokenDripperState[]
+    harvesterYieldSent: OTokenHarvesterYieldSent[]
     lastYieldDistributionEvent:
       | {
           fee: bigint
@@ -168,6 +187,7 @@ export const createOTokenProcessor = (params: {
       activity: [],
       vaults: [],
       dripperStates: [],
+      harvesterYieldSent: [],
       lastYieldDistributionEvent: undefined,
     }
 
@@ -181,11 +201,13 @@ export const createOTokenProcessor = (params: {
         await processYieldDistribution(ctx, result, block, log)
         await processTotalSupplyUpdatedHighres(ctx, result, block, log)
         await processRebaseOptEvent(ctx, result, block, log)
+        await processHarvesterYieldSent(ctx, result, block, log)
       }
     }
 
     await frequencyUpdate(ctx, async (ctx, block) => {
       const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
       result.vaults.push(
         new OTokenVault({
           id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
@@ -194,16 +216,18 @@ export const createOTokenProcessor = (params: {
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
           address: params.otokenVaultAddress,
-          totalValue: await vaultContract.totalValue(),
+          vaultBuffer,
+          totalValue,
         }),
       )
 
       if (params.dripper && params.dripper.from <= block.header.height) {
-        const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
-        const [dripDuration, { lastCollect, perBlock }, availableFunds] = await Promise.all([
+        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
+        const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
           dripperContract.dripDuration(),
           dripperContract.drip(),
           dripperContract.availableFunds(),
+          new erc20.Contract(ctx, block.header, tokensByChain[ctx.chain.id].WETH).balanceOf(params.dripper.address),
         ])
         result.dripperStates.push(
           new OTokenDripperState({
@@ -214,8 +238,9 @@ export const createOTokenProcessor = (params: {
             otoken: params.otokenAddress,
             dripDuration,
             lastCollect,
-            perBlock,
+            perSecond,
             availableFunds,
+            wethBalance,
           }),
         )
       }
@@ -273,7 +298,24 @@ export const createOTokenProcessor = (params: {
         })),
       )
       entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
-      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
+      if (params.harvester?.yieldSent) {
+        let yieldSentEvents = result.harvesterYieldSent.filter(
+          (event) => event.timestamp >= startOfDay && event.timestamp <= blockDate,
+        )
+        yieldSentEvents.push(
+          ...(await ctx.store.find(OTokenHarvesterYieldSent, {
+            order: { timestamp: 'desc' },
+            where: {
+              chainId: ctx.chain.id,
+              otoken: params.otokenAddress,
+              timestamp: Between(startOfDay, blockDate),
+            },
+          })),
+        )
+        entity.fees = yieldSentEvents.reduce((sum, current) => sum + current.fee, 0n)
+      } else {
+        entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
+      }
 
       const lastDayString = dayjs(block.header.timestamp).subtract(1, 'day').toISOString().substring(0, 10)
       const lastId = `${ctx.chain.id}-${params.otokenAddress}-${lastDayString}`
@@ -283,7 +325,7 @@ export const createOTokenProcessor = (params: {
 
       const getDripperAvailableFunds = async () => {
         if (!params.dripper || params.dripper.from > block.header.height) return 0n
-        const dripperContract = new dripper.Contract(ctx, block.header, params.dripper.address)
+        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
         return dripperContract.availableFunds()
       }
       const [rateETH, rateUSD, dripperWETH, amoSupply] = await Promise.all([
@@ -303,6 +345,9 @@ export const createOTokenProcessor = (params: {
         params.wotoken && block.header.height >= params.wotoken.from
           ? await new erc20.Contract(ctx, block.header, params.wotoken.address).totalSupply()
           : 0n
+      entity.accountsOverThreshold = Array.from(owners?.values() ?? []).filter(
+        (a) => a.balance >= params.accountsOverThresholdMinimum,
+      ).length
       ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
     }
 
@@ -319,6 +364,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.insert(result.activity),
       ctx.store.insert(result.vaults),
       ctx.store.insert(result.dripperStates),
+      ctx.store.insert(result.harvesterYieldSent),
       ctx.store.upsert([...result.dailyStats.values()].map((ds) => ds.entity)),
     ])
   }
@@ -628,6 +674,29 @@ export const createOTokenProcessor = (params: {
     }
   }
 
+  const processHarvesterYieldSent = async (
+    ctx: Context,
+    result: ProcessResult,
+    block: Context['blocks']['0'],
+    log: Context['blocks']['0']['logs']['0'],
+  ) => {
+    if (!harvesterYieldSentFilter?.matches(log)) return
+    await result.initialize()
+    const data = otokenHarvester.events.YieldSent.decode(log)
+    result.harvesterYieldSent.push(
+      new OTokenHarvesterYieldSent({
+        id: log.id,
+        chainId: ctx.chain.id,
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+        otoken: params.otokenAddress,
+        txHash: log.transactionHash,
+        yield: data.yield,
+        fee: data.fee,
+      }),
+    )
+  }
+
   const getLatestOTokenObject = async (ctx: Context, result: ProcessResult, block: Block) => {
     const timestamp = new Date(block.header.timestamp).toISOString()
     const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp}`
@@ -664,6 +733,7 @@ export const createOTokenProcessor = (params: {
         id,
         chainId: ctx.chain.id,
         timestamp: new Date(block.header.timestamp),
+        date: dayString,
         blockNumber: block.header.height,
         otoken: params.otokenAddress,
 
@@ -690,6 +760,7 @@ export const createOTokenProcessor = (params: {
         cumulativeFees: 0n,
 
         marketCapUSD: 0,
+        accountsOverThreshold: 0,
       })
       result.dailyStats.set(entity.id, { block, entity })
     } else {
