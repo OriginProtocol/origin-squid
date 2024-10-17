@@ -14,6 +14,7 @@ import {
   OGN_REWARDS_SOURCE_ADDRESS,
   OGV_GOVERNANCE_ADDRESS,
   XOGN_ADDRESS,
+  addresses,
 } from '@utils/addresses'
 
 import * as dailyStats from './mainnet/post-processors/daily-stats'
@@ -44,8 +45,8 @@ export const processor = {
     ...createOriginARMProcessors({
       name: 'origin-arm',
       from: 20987226,
-      armAddress: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
-      liquidityProviderControllerAddress: '0xf54ebff575f699d281645c6F14Fe427dFFE629CF',
+      armAddress: addresses.arm.address,
+      liquidityProviderControllerAddress: addresses.arm.capManager,
     }),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
