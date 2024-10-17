@@ -6,6 +6,7 @@ export const events = {
     AdminChanged: event("0x7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f", "AdminChanged(address,address)", {"previousAdmin": p.address, "newAdmin": p.address}),
     Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", "Approval(address,address,uint256)", {"owner": indexed(p.address), "spender": indexed(p.address), "value": p.uint256}),
     CapManagerUpdated: event("0xb8fd9afc34c38fcd13b9a3b7646482eb1fddcefb40af2c70609972816eba3208", "CapManagerUpdated(address)", {"capManager": indexed(p.address)}),
+    ClaimLidoWithdrawals: event("0xb7700a52345bff1ce6201d84f55fe81f2ea203b1b1bdc56a42571819aab2337a", "ClaimLidoWithdrawals(uint256[])", {"requestIds": p.array(p.uint256)}),
     CrossPriceUpdated: event("0x6f938e86fbdbe7829d0289b348cd9e528f2f17c705f469f4a17a0a2796e007d0", "CrossPriceUpdated(uint256)", {"crossPrice": p.uint256}),
     Deposit: event("0x90890809c654f11d6e72a28fa60149770a0d11ec6c92319d6ceb2bb0a4ea1a15", "Deposit(address,uint256,uint256)", {"owner": indexed(p.address), "assets": p.uint256, "shares": p.uint256}),
     FeeCollected: event("0x06c5efeff5c320943d265dc4e5f1af95ad523555ce0c1957e367dda5514572df", "FeeCollected(address,uint256)", {"feeCollector": indexed(p.address), "fee": p.uint256}),
@@ -15,9 +16,9 @@ export const events = {
     OperatorChanged: event("0x4721129e0e676ed6a92909bb24e853ccdd63ad72280cc2e974e38e480e0e6e54", "OperatorChanged(address)", {"newAdmin": p.address}),
     RedeemClaimed: event("0x36dd2c9b55f12509e3b5f4f4d765ddefc2776a28018b18da2335cf2ab93bb268", "RedeemClaimed(address,uint256,uint256)", {"withdrawer": indexed(p.address), "requestId": indexed(p.uint256), "assets": p.uint256}),
     RedeemRequested: event("0xc04c86cfd81036557541f9c68971ace59cbc9057ecab7d48874a6177ad117f4f", "RedeemRequested(address,uint256,uint256,uint256,uint256)", {"withdrawer": indexed(p.address), "requestId": indexed(p.uint256), "assets": p.uint256, "queued": p.uint256, "claimTimestamp": p.uint256}),
+    RequestLidoWithdrawals: event("0x3fdbeb02a84d41ebaf1c8edce1b73f1617e0d3675168dfeb8d86759c18782da4", "RequestLidoWithdrawals(uint256[],uint256[])", {"amounts": p.array(p.uint256), "requestIds": p.array(p.uint256)}),
     TraderateChanged: event("0xa2136948fd1e5333c2ee27c9e48848a560b693e6bbd18082623a738179ff2952", "TraderateChanged(uint256,uint256)", {"traderate0": p.uint256, "traderate1": p.uint256}),
     Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "Transfer(address,address,uint256)", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
-    ZapUpdated: event("0xbf633270e6b5b5b646ba917300610c382c077992c0e189d732c99f2361bfb9b5", "ZapUpdated(address)", {"zap": indexed(p.address)}),
 }
 
 export const functions = {
@@ -38,17 +39,18 @@ export const functions = {
     convertToShares: viewFun("0xc6e6f592", "convertToShares(uint256)", {"assets": p.uint256}, p.uint256),
     crossPrice: viewFun("0xf5488330", "crossPrice()", {}, p.uint256),
     decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
-    'deposit(uint256,address)': fun("0x6e553f65", "deposit(uint256,address)", {"assets": p.uint256, "liquidityProvider": p.address}, p.uint256),
+    'deposit(uint256,address)': fun("0x6e553f65", "deposit(uint256,address)", {"assets": p.uint256, "receiver": p.address}, p.uint256),
     'deposit(uint256)': fun("0xb6b55f25", "deposit(uint256)", {"assets": p.uint256}, p.uint256),
     fee: viewFun("0xddca3f43", "fee()", {}, p.uint16),
     feeCollector: viewFun("0xc415b95c", "feeCollector()", {}, p.address),
     feesAccrued: viewFun("0x94db0595", "feesAccrued()", {}, p.uint256),
     initialize: fun("0xb3ddda2a", "initialize(string,string,address,uint256,address,address)", {"_name": p.string, "_symbol": p.string, "_operator": p.address, "_fee": p.uint256, "_feeCollector": p.address, "_capManager": p.address}, ),
     lastAvailableAssets: viewFun("0x2eb6328b", "lastAvailableAssets()", {}, p.int128),
+    lidoWithdrawalQueue: viewFun("0xff3368a1", "lidoWithdrawalQueue()", {}, p.address),
     lidoWithdrawalQueueAmount: viewFun("0x31ca1c02", "lidoWithdrawalQueueAmount()", {}, p.uint256),
     liquidityAsset: viewFun("0x209b2bca", "liquidityAsset()", {}, p.address),
     name: viewFun("0x06fdde03", "name()", {}, p.string),
-    nextWithdrawalIndex: viewFun("0xbba9282e", "nextWithdrawalIndex()", {}, p.uint16),
+    nextWithdrawalIndex: viewFun("0xbba9282e", "nextWithdrawalIndex()", {}, p.uint256),
     operator: viewFun("0x570ca735", "operator()", {}, p.address),
     owner: viewFun("0x8da5cb5b", "owner()", {}, p.address),
     previewDeposit: viewFun("0xef8b30f7", "previewDeposit(uint256)", {"assets": p.uint256}, p.uint256),
@@ -62,7 +64,6 @@ export const functions = {
     setOperator: fun("0xb3ab15fb", "setOperator(address)", {"newOperator": p.address}, ),
     setOwner: fun("0x13af4035", "setOwner(address)", {"newOwner": p.address}, ),
     setPrices: fun("0x05fefda7", "setPrices(uint256,uint256)", {"buyT1": p.uint256, "sellT1": p.uint256}, ),
-    setZap: fun("0x6593c2c9", "setZap(address)", {"_zap": p.address}, ),
     steth: viewFun("0x953d7ee2", "steth()", {}, p.address),
     'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)': fun("0x38ed1739", "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)", {"amountIn": p.uint256, "amountOutMin": p.uint256, "path": p.array(p.address), "to": p.address, "deadline": p.uint256}, p.array(p.uint256)),
     'swapExactTokensForTokens(address,address,uint256,uint256,address)': fun("0x6c08c57e", "swapExactTokensForTokens(address,address,uint256,uint256,address)", {"inToken": p.address, "outToken": p.address, "amountIn": p.uint256, "amountOutMin": p.uint256, "to": p.address}, ),
@@ -78,11 +79,9 @@ export const functions = {
     transfer: fun("0xa9059cbb", "transfer(address,uint256)", {"to": p.address, "value": p.uint256}, p.bool),
     transferFrom: fun("0x23b872dd", "transferFrom(address,address,uint256)", {"from": p.address, "to": p.address, "value": p.uint256}, p.bool),
     weth: viewFun("0x3fc8cef3", "weth()", {}, p.address),
-    withdrawalQueue: viewFun("0x37d5fe99", "withdrawalQueue()", {}, p.address),
-    withdrawalRequests: viewFun("0x937b2581", "withdrawalRequests(uint256)", {"requestId": p.uint256}, {"withdrawer": p.address, "claimed": p.bool, "claimTimestamp": p.uint40, "assets": p.uint120, "queued": p.uint120}),
-    withdrawsClaimed: viewFun("0x35ce81c4", "withdrawsClaimed()", {}, p.uint120),
-    withdrawsQueued: viewFun("0x6ec68625", "withdrawsQueued()", {}, p.uint120),
-    zap: viewFun("0x262d6152", "zap()", {}, p.address),
+    withdrawalRequests: viewFun("0x937b2581", "withdrawalRequests(uint256)", {"requestId": p.uint256}, {"withdrawer": p.address, "claimed": p.bool, "claimTimestamp": p.uint40, "assets": p.uint128, "queued": p.uint128}),
+    withdrawsClaimed: viewFun("0x35ce81c4", "withdrawsClaimed()", {}, p.uint128),
+    withdrawsQueued: viewFun("0x6ec68625", "withdrawsQueued()", {}, p.uint128),
 }
 
 export class Contract extends ContractBase {
@@ -155,6 +154,10 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.lastAvailableAssets, {})
     }
 
+    lidoWithdrawalQueue() {
+        return this.eth_call(functions.lidoWithdrawalQueue, {})
+    }
+
     lidoWithdrawalQueueAmount() {
         return this.eth_call(functions.lidoWithdrawalQueueAmount, {})
     }
@@ -223,10 +226,6 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.weth, {})
     }
 
-    withdrawalQueue() {
-        return this.eth_call(functions.withdrawalQueue, {})
-    }
-
     withdrawalRequests(requestId: WithdrawalRequestsParams["requestId"]) {
         return this.eth_call(functions.withdrawalRequests, {requestId})
     }
@@ -238,16 +237,13 @@ export class Contract extends ContractBase {
     withdrawsQueued() {
         return this.eth_call(functions.withdrawsQueued, {})
     }
-
-    zap() {
-        return this.eth_call(functions.zap, {})
-    }
 }
 
 /// Event types
 export type AdminChangedEventArgs = EParams<typeof events.AdminChanged>
 export type ApprovalEventArgs = EParams<typeof events.Approval>
 export type CapManagerUpdatedEventArgs = EParams<typeof events.CapManagerUpdated>
+export type ClaimLidoWithdrawalsEventArgs = EParams<typeof events.ClaimLidoWithdrawals>
 export type CrossPriceUpdatedEventArgs = EParams<typeof events.CrossPriceUpdated>
 export type DepositEventArgs = EParams<typeof events.Deposit>
 export type FeeCollectedEventArgs = EParams<typeof events.FeeCollected>
@@ -257,9 +253,9 @@ export type InitializedEventArgs = EParams<typeof events.Initialized>
 export type OperatorChangedEventArgs = EParams<typeof events.OperatorChanged>
 export type RedeemClaimedEventArgs = EParams<typeof events.RedeemClaimed>
 export type RedeemRequestedEventArgs = EParams<typeof events.RedeemRequested>
+export type RequestLidoWithdrawalsEventArgs = EParams<typeof events.RequestLidoWithdrawals>
 export type TraderateChangedEventArgs = EParams<typeof events.TraderateChanged>
 export type TransferEventArgs = EParams<typeof events.Transfer>
-export type ZapUpdatedEventArgs = EParams<typeof events.ZapUpdated>
 
 /// Function types
 export type FEE_SCALEParams = FunctionArguments<typeof functions.FEE_SCALE>
@@ -334,6 +330,9 @@ export type InitializeReturn = FunctionReturn<typeof functions.initialize>
 export type LastAvailableAssetsParams = FunctionArguments<typeof functions.lastAvailableAssets>
 export type LastAvailableAssetsReturn = FunctionReturn<typeof functions.lastAvailableAssets>
 
+export type LidoWithdrawalQueueParams = FunctionArguments<typeof functions.lidoWithdrawalQueue>
+export type LidoWithdrawalQueueReturn = FunctionReturn<typeof functions.lidoWithdrawalQueue>
+
 export type LidoWithdrawalQueueAmountParams = FunctionArguments<typeof functions.lidoWithdrawalQueueAmount>
 export type LidoWithdrawalQueueAmountReturn = FunctionReturn<typeof functions.lidoWithdrawalQueueAmount>
 
@@ -385,9 +384,6 @@ export type SetOwnerReturn = FunctionReturn<typeof functions.setOwner>
 export type SetPricesParams = FunctionArguments<typeof functions.setPrices>
 export type SetPricesReturn = FunctionReturn<typeof functions.setPrices>
 
-export type SetZapParams = FunctionArguments<typeof functions.setZap>
-export type SetZapReturn = FunctionReturn<typeof functions.setZap>
-
 export type StethParams = FunctionArguments<typeof functions.steth>
 export type StethReturn = FunctionReturn<typeof functions.steth>
 
@@ -433,9 +429,6 @@ export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
 export type WethParams = FunctionArguments<typeof functions.weth>
 export type WethReturn = FunctionReturn<typeof functions.weth>
 
-export type WithdrawalQueueParams = FunctionArguments<typeof functions.withdrawalQueue>
-export type WithdrawalQueueReturn = FunctionReturn<typeof functions.withdrawalQueue>
-
 export type WithdrawalRequestsParams = FunctionArguments<typeof functions.withdrawalRequests>
 export type WithdrawalRequestsReturn = FunctionReturn<typeof functions.withdrawalRequests>
 
@@ -444,7 +437,4 @@ export type WithdrawsClaimedReturn = FunctionReturn<typeof functions.withdrawsCl
 
 export type WithdrawsQueuedParams = FunctionArguments<typeof functions.withdrawsQueued>
 export type WithdrawsQueuedReturn = FunctionReturn<typeof functions.withdrawsQueued>
-
-export type ZapParams = FunctionArguments<typeof functions.zap>
-export type ZapReturn = FunctionReturn<typeof functions.zap>
 

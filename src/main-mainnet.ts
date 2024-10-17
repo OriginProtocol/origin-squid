@@ -46,7 +46,7 @@ export const processor = {
       name: 'origin-arm',
       from: 20987226,
       armAddress: addresses.arm.address,
-      liquidityProviderControllerAddress: addresses.arm.capManager,
+      capManagerAddress: addresses.arm.capManager,
     }),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
