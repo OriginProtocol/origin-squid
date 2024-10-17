@@ -43,7 +43,7 @@ export const processor = {
     coingeckoProcessor,
     ...createOriginARMProcessors({
       name: 'origin-arm',
-      from: 20987227,
+      from: 20987226,
       armAddress: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
       liquidityProviderControllerAddress: '0xf54ebff575f699d281645c6F14Fe427dFFE629CF',
     }),

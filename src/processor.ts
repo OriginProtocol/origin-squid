@@ -71,7 +71,7 @@ export interface Processor {
   name?: string
   from?: number
   initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createSquidProcessor>, chain: Chain) => void
+  setup?: (p: ReturnType<typeof createSquidProcessor>, chain?: Chain) => void
   process: (ctx: Context) => Promise<void>
 }
 export const createProcessor = (p: Processor) => p
