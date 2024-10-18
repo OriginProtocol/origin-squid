@@ -1,9 +1,8 @@
-name: Release squid
-
+name: Release squid version
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'v[0-9]+'
 
 jobs:
   build_and_publish:
@@ -25,22 +24,22 @@ jobs:
 
       - name: update squid.yml
         run: |
-          # Get the tag from GitHub
-          TAG=$(echo ${{ github.ref }} | sed 's/refs\/tags\///')
-          
-          # Extract the numeric part of the tag
-          VERSION=$(echo $TAG | sed 's/v//')
-          
+          # Get the branch name from GitHub
+          BRANCH_NAME=${{ github.ref_name }}
+
+          # Extract the version from the branch name (assuming format 'vXX')
+          VERSION=$(echo $BRANCH_NAME | sed 's/^v//')
+
           # Update the version in squid.yaml
           sed -i "s/^version: .*/version: $VERSION/" squid.yaml
-          
+
           # Optional: Print the updated version for verification
           echo "Updated squid.yaml version to: $VERSION"
-      
+
       - name: Authenticate to squid
-        env: 
+        env:
           API_TOKEN: ${{ secrets.SQUID_API_TOKEN }}
         run: sqd auth -k $API_TOKEN
 
       - name: Build and deploy squid
-        run: sqd build && sqd deploy . -o origin --no-stream-logs
+        run: sqd build && sqd deploy . -o origin --no-stream-logs --allow-update
