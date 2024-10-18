@@ -43,6 +43,11 @@ export const createOriginARMProcessors = ({
     topic0: [originLidoArmAbi.events.RedeemRequested.topic],
     range: { from },
   })
+  const feeCollectedFilter = logFilter({
+    address: [armAddress],
+    topic0: [originLidoArmAbi.events.FeeCollected.topic],
+    range: { from },
+  })
   const tracker = blockFrequencyTracker({ from })
   let armEntity: Arm
   let initialized = false
@@ -86,6 +91,7 @@ export const createOriginARMProcessors = ({
         p.addLog(redeemClaimedFilter.value)
         p.addLog(depositFilter.value)
         p.addLog(withdrawalFilter.value)
+        p.addLog(feeCollectedFilter.value)
       },
       initialize,
       process: async (ctx: Context) => {
@@ -106,7 +112,7 @@ export const createOriginARMProcessors = ({
             }))
           )
         }
-        const getCurrentState = async (block: Block, extra?: { deposit: bigint; withdrawal: bigint }) => {
+        const getCurrentState = async (block: Block) => {
           const stateId = getStateId(block)
           if (states[states.length - 1]?.id === stateId) {
             return states[states.length - 1]
@@ -147,9 +153,9 @@ export const createOriginARMProcessors = ({
             totalAssetsCap,
             totalSupply,
             assetsPerShare,
-            totalDeposits: (previousState?.totalDeposits ?? 0n) + (extra?.deposit ?? 0n),
-            totalWithdrawals: (previousState?.totalWithdrawals ?? 0n) + (extra?.withdrawal ?? 0n),
-            totalFees: feesAccrued,
+            totalDeposits: previousState?.totalDeposits ?? 0n,
+            totalWithdrawals: previousState?.totalWithdrawals ?? 0n,
+            totalFees: previousState?.totalFees ?? 0n,
             totalYield: 0n,
           })
           armStateEntity.totalYield = calculateTotalYield(armStateEntity)
@@ -159,7 +165,6 @@ export const createOriginARMProcessors = ({
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
 
-        // ArmWithdrawalRequest
         for (const block of ctx.blocks) {
           if (tracker(ctx, block)) {
             // ArmState
@@ -204,6 +209,7 @@ export const createOriginARMProcessors = ({
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }
           for (const log of block.logs) {
+            // ArmWithdrawalRequest
             if (redeemRequestedFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemRequested.decode(log)
               const eventId = `${ctx.chain.id}:${armAddress}:${event.requestId}`
@@ -242,6 +248,11 @@ export const createOriginARMProcessors = ({
               const state = await getCurrentState(block)
               state.totalWithdrawals += event.assets
               state.totalYield = calculateTotalYield(state)
+            }
+            if (feeCollectedFilter.matches(log)) {
+              const event = originLidoArmAbi.events.FeeCollected.decode(log)
+              const state = await getCurrentState(block)
+              state.totalFees += event.fee
             }
           }
         }
