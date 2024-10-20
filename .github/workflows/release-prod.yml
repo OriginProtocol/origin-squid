@@ -1,0 +1,36 @@
+name: Set squid version to prod
+on:
+  push:
+    tags:
+      - 'prod'
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install squid CLI
+        run: npm i -g @subsquid/cli
+
+      - name: npm install
+        run: npm i
+
+      - name: Authenticate to squid
+        env:
+          API_TOKEN: ${{ secrets.SQUID_API_TOKEN }}
+        run: sqd auth -k $API_TOKEN
+
+      - name: update squid.yml
+        run: |
+          # Get the branch name from GitHub
+          BRANCH_NAME=${{ github.ref_name }}
+
+          # Update prod tag
+          sqd tags add prod --name origin-squid -s $BRANCH_NAME --allow-tag-reassign
