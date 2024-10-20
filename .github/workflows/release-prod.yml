@@ -2,7 +2,7 @@ name: Set squid version to prod
 on:
   push:
     tags:
-      - 'prod'
+      - 'prod-v*'
 
 jobs:
   build_and_publish:
@@ -30,7 +30,7 @@ jobs:
       - name: update squid.yml
         run: |
           # Get the branch name from GitHub
-          BRANCH_NAME=${{ github.ref_name }}
+          VERSION=${GITHUB_REF#refs/tags/prod-}
 
           # Update prod tag
           sqd tags add prod --name origin-squid -s $BRANCH_NAME --allow-tag-reassign
