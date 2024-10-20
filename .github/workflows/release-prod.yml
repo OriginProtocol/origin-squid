@@ -29,8 +29,8 @@ jobs:
 
       - name: update squid.yml
         run: |
-          # Get the branch name from GitHub
+          # Get the version from the tag
           VERSION=${GITHUB_REF#refs/tags/prod-}
 
           # Update prod tag
-          sqd tags add prod --name origin-squid -s $BRANCH_NAME --allow-tag-reassign
+          sqd tags add prod --name origin-squid -s $VERSION --allow-tag-reassign
