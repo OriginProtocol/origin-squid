@@ -103,6 +103,8 @@ deploy:
       - '100'
       - '--dumb-cache-max-age'
       - '1000'
+      - '--max-response-size'
+      - '1000000'
 scale:
   dedicated: true
   addons:
