@@ -24,9 +24,11 @@ export class ERC20Balance {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
     account!: string
 

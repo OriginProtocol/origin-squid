@@ -1,5 +1,5 @@
-module.exports = class Data1729047044814 {
-    name = 'Data1729047044814'
+module.exports = class Data1729704740947 {
+    name = 'Data1729704740947'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -492,6 +492,8 @@ module.exports = class Data1729047044814 {
         await db.query(`CREATE INDEX "IDX_40fd11c1a0d0f2562824894e85" ON "erc20" ("address") `)
         await db.query(`CREATE TABLE "erc20_holder" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "balance" numeric NOT NULL, CONSTRAINT "PK_3adce7edbac4bcb03c662c3a1ac" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_51b9e7c44702ef3a6f05d3702e" ON "erc20_holder" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_98f753777a7d77ff8950aee1c7" ON "erc20_holder" ("address") `)
+        await db.query(`CREATE INDEX "IDX_875601f8f24f9082f1c3551406" ON "erc20_holder" ("account") `)
         await db.query(`CREATE TABLE "erc20_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "total_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_eac1124b07bbdedafd4fff2f7b7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2b69abb250c647c7a4b5a5a715" ON "erc20_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_c3d08eb2dafe4b5b188924d835" ON "erc20_state" ("timestamp") `)
@@ -500,6 +502,8 @@ module.exports = class Data1729047044814 {
         await db.query(`CREATE INDEX "IDX_bb6a884e702f2887037d5a7eec" ON "erc20_balance" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_c9fbe21a3411d93ea586af2a4c" ON "erc20_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d1f50dc39003331b76fad8a640" ON "erc20_balance" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_5fe068d4a82a445e8b4155f802" ON "erc20_balance" ("address") `)
+        await db.query(`CREATE INDEX "IDX_5c45a4a58256ea383a4d096ec6" ON "erc20_balance" ("account") `)
         await db.query(`CREATE TABLE "erc20_transfer" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "from_balance" numeric NOT NULL, "to" text NOT NULL, "to_balance" numeric NOT NULL, "value" numeric NOT NULL, CONSTRAINT "PK_12764843146818a31e3d28fc577" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f914d2e140eb88375a5a2ef6c7" ON "erc20_transfer" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_6350ddb2def19c1e3a06d8b3ec" ON "erc20_transfer" ("address") `)
@@ -1221,6 +1225,8 @@ module.exports = class Data1729047044814 {
         await db.query(`DROP INDEX "public"."IDX_40fd11c1a0d0f2562824894e85"`)
         await db.query(`DROP TABLE "erc20_holder"`)
         await db.query(`DROP INDEX "public"."IDX_51b9e7c44702ef3a6f05d3702e"`)
+        await db.query(`DROP INDEX "public"."IDX_98f753777a7d77ff8950aee1c7"`)
+        await db.query(`DROP INDEX "public"."IDX_875601f8f24f9082f1c3551406"`)
         await db.query(`DROP TABLE "erc20_state"`)
         await db.query(`DROP INDEX "public"."IDX_2b69abb250c647c7a4b5a5a715"`)
         await db.query(`DROP INDEX "public"."IDX_c3d08eb2dafe4b5b188924d835"`)
@@ -1229,6 +1235,8 @@ module.exports = class Data1729047044814 {
         await db.query(`DROP INDEX "public"."IDX_bb6a884e702f2887037d5a7eec"`)
         await db.query(`DROP INDEX "public"."IDX_c9fbe21a3411d93ea586af2a4c"`)
         await db.query(`DROP INDEX "public"."IDX_d1f50dc39003331b76fad8a640"`)
+        await db.query(`DROP INDEX "public"."IDX_5fe068d4a82a445e8b4155f802"`)
+        await db.query(`DROP INDEX "public"."IDX_5c45a4a58256ea383a4d096ec6"`)
         await db.query(`DROP TABLE "erc20_transfer"`)
         await db.query(`DROP INDEX "public"."IDX_f914d2e140eb88375a5a2ef6c7"`)
         await db.query(`DROP INDEX "public"."IDX_6350ddb2def19c1e3a06d8b3ec"`)

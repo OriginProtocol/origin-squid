@@ -1,4 +1,4 @@
-import { compact, keyBy, omit, uniq } from 'lodash'
+import { compact, omit, uniq } from 'lodash'
 
 const superOETHb = {
   address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3',
@@ -11,7 +11,7 @@ const superOETHb = {
     amo: '0xf611cc500eee7e4e4763a05fe623e2363c86d2af',
   },
   zapper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
-  harvester: undefined,
+  harvester: '0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29',
   vaultTokens: ['0x4200000000000000000000000000000000000006'],
 } as const
 

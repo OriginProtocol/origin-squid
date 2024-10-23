@@ -108,6 +108,9 @@ export const createOTokenProcessor = (params: {
       topic0: [otokenVault.events.YieldDistribution.topic],
       range: { from: params.from },
     })
+    if (harvesterYieldSentFilter) {
+      processor.addLog(harvesterYieldSentFilter.value)
+    }
   }
 
   interface ProcessResult {
@@ -246,6 +249,7 @@ export const createOTokenProcessor = (params: {
       }
     })
 
+    // Daily Stats
     // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
     for (const { block, entity } of result.dailyStats.values()) {
       if (block.header.height < params.from) continue
@@ -298,24 +302,23 @@ export const createOTokenProcessor = (params: {
         })),
       )
       entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
-      if (params.harvester?.yieldSent) {
-        let yieldSentEvents = result.harvesterYieldSent.filter(
-          (event) => event.timestamp >= startOfDay && event.timestamp <= blockDate,
-        )
-        yieldSentEvents.push(
-          ...(await ctx.store.find(OTokenHarvesterYieldSent, {
-            order: { timestamp: 'desc' },
-            where: {
-              chainId: ctx.chain.id,
-              otoken: params.otokenAddress,
-              timestamp: Between(startOfDay, blockDate),
-            },
-          })),
-        )
-        entity.fees = yieldSentEvents.reduce((sum, current) => sum + current.fee, 0n)
-      } else {
-        entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
-      }
+      // let yieldSentEvents: OTokenHarvesterYieldSent[] = []
+      // if (params.harvester?.yieldSent) {
+      //   yieldSentEvents = result.harvesterYieldSent.filter(
+      //     (event) => event.timestamp >= startOfDay && event.timestamp <= blockDate,
+      //   )
+      //   yieldSentEvents.push(
+      //     ...(await ctx.store.find(OTokenHarvesterYieldSent, {
+      //       order: { timestamp: 'desc' },
+      //       where: {
+      //         chainId: ctx.chain.id,
+      //         otoken: params.otokenAddress,
+      //         timestamp: Between(startOfDay, blockDate),
+      //       },
+      //     })),
+      //   )
+      // }
+      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
 
       const lastDayString = dayjs(block.header.timestamp).subtract(1, 'day').toISOString().substring(0, 10)
       const lastId = `${ctx.chain.id}-${params.otokenAddress}-${lastDayString}`
@@ -436,8 +439,7 @@ export const createOTokenProcessor = (params: {
         const type = addressSub === address ? HistoryType.Sent : HistoryType.Received
         result.history.push(
           new OTokenHistory({
-            // we can't use {t.id} because it's not unique
-            id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`),
+            id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}`),
             chainId: ctx.chain.id,
             otoken: params.otokenAddress,
             address: address,
@@ -531,8 +533,7 @@ export const createOTokenProcessor = (params: {
       if (earned === 0n) continue
       result.history.push(
         new OTokenHistory({
-          id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}-${address.address}`),
-          // we can't use {t.id} because it's not unique
+          id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}`),
           chainId: ctx.chain.id,
           otoken: params.otokenAddress,
           address: address,

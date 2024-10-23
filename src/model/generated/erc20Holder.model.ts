@@ -16,9 +16,11 @@ export class ERC20Holder {
     @IntColumn_({nullable: false})
     chainId!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
     account!: string
 

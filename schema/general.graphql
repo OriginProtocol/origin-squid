@@ -110,8 +110,8 @@ type ERC20Holder @entity {
   """
   id: ID!
   chainId: Int! @index
-  address: String!
-  account: String!
+  address: String! @index
+  account: String! @index
   balance: BigInt!
 }
 
@@ -136,8 +136,8 @@ type ERC20Balance @entity {
   chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  address: String!
-  account: String!
+  address: String! @index
+  account: String! @index
   balance: BigInt!
 }
 

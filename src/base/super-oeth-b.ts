@@ -19,6 +19,11 @@ const otokenProcessor = createOTokenProcessor({
     address: baseAddresses.superOETHb.dripper,
     from: 18215706,
   },
+  harvester: {
+    address: baseAddresses.superOETHb.harvester,
+    from: 20464482,
+    yieldSent: true,
+  },
   otokenVaultAddress: baseAddresses.superOETHb.vault,
   oTokenAssets: [
     { asset: baseAddresses.tokens.superOETHb, symbol: 'superOETHb' },
