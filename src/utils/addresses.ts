@@ -72,6 +72,7 @@ export const OETH_NATIVE_STRATEGY_ADDRESSES = [
   '0x34edb2ee25751ee67f68a45813b22811687c0238',
   '0x4685db8bf2df743c861d71e6cfb5347222992076',
 ]
+export const OETH_NATIVE_STRATEGY_FEE_ACCUMULATOR_ADDRESS = '0x7ed4ccb74a1ee903af5fbd9be00ca8616f23d627'
 export const OETH_VAULT_ERC20_ADDRESSES = [WETH_ADDRESS, STETH_ADDRESS, RETH_ADDRESS, FRXETH_ADDRESS]
 
 // PrimeETH Related
@@ -128,6 +129,13 @@ export const strategies = {
     FraxETHStrategy: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
     MorphoAaveStrategy: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
+    ...OETH_NATIVE_STRATEGY_ADDRESSES.reduce(
+      (acc, address, i) => {
+        acc[`NativeStakingStrategy${i}`] = address
+        return acc
+      },
+      {} as Record<string, string>,
+    ),
   },
   ousd: {
     ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
@@ -157,6 +165,7 @@ export const oeth = {
   zapper: OETH_ZAPPER_ADDRESS,
   harvester: OETH_HARVESTER_ADDRESS,
   vaultTokens: OETH_VAULT_ERC20_ADDRESSES,
+  nativeStakingFeeAccumulator: OETH_NATIVE_STRATEGY_FEE_ACCUMULATOR_ADDRESS,
 }
 
 export const ousd = {

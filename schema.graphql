@@ -1384,7 +1384,7 @@ type LegacyStaker @entity {
   rewardAmount: BigInt!
 }
 
-type BeaconDepositEvent @entity  {
+type BeaconDepositEvent @entity {
   id: ID! # `chainId:logId`
   chainId: Int! @index
   address: String! @index
@@ -1400,13 +1400,33 @@ type BeaconDepositEvent @entity  {
   index: String!
 }
 
-type BeaconDepositPubkey @entity  {
+type BeaconDepositPubkey @entity {
   id: ID! # `pubkey`
   createDate: DateTime!
   lastUpdated: DateTime!
   count: Int!
   deposits: [BeaconDepositEvent!] @derivedFrom(field: "pubkey")
-}# OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
+}
+
+type AccountingConsensusRewards @entity {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  rewards: BigInt!
+}
+
+type ExecutionRewardsCollected @entity {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  strategy: String! @index
+  amount: BigInt!
+}
+# OETH Vault: 0x39254033945AA2E4809Cc2977E7087BEE48bd7Ab
 """
 The Vault entity tracks the OETH vault balance over time.
 """

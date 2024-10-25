@@ -1,5 +1,5 @@
-module.exports = class Data1729880820715 {
-    name = 'Data1729880820715'
+module.exports = class Data1729897704620 {
+    name = 'Data1729897704620'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -567,6 +567,17 @@ module.exports = class Data1729880820715 {
         await db.query(`CREATE INDEX "IDX_5a85c2519463653ac015291db4" ON "beacon_deposit_event" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_c27461303e85eb671a3cb730b4" ON "beacon_deposit_event" ("caller") `)
         await db.query(`CREATE INDEX "IDX_dff55f23cfcfa0ff664964572f" ON "beacon_deposit_event" ("pubkey_id") `)
+        await db.query(`CREATE TABLE "accounting_consensus_rewards" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "rewards" numeric NOT NULL, CONSTRAINT "PK_03b51dfe77b47e9b1e101b63bc9" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_1462da1457b990e5123cf45001" ON "accounting_consensus_rewards" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_6939b7ceec71dd6538ea8b3c19" ON "accounting_consensus_rewards" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_ef6a35f5cb2df22a66ce33a5d9" ON "accounting_consensus_rewards" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_675114d35efd23e2ff939e1076" ON "accounting_consensus_rewards" ("address") `)
+        await db.query(`CREATE TABLE "execution_rewards_collected" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "strategy" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_446ef4a1b9c9c93bb0e43118572" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_19ad101b857e82e9fcb312dcee" ON "execution_rewards_collected" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_a3187d19f5da0cade7f3bd22d9" ON "execution_rewards_collected" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_b883d5666bb2f8b5b1f7d9633a" ON "execution_rewards_collected" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_adcff42ecde1a20daeb870b3c4" ON "execution_rewards_collected" ("address") `)
+        await db.query(`CREATE INDEX "IDX_41665fa5e546780642bacf96c7" ON "execution_rewards_collected" ("strategy") `)
         await db.query(`CREATE TABLE "oeth_vault" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "weth" numeric NOT NULL, "st_eth" numeric NOT NULL, "r_eth" numeric NOT NULL, "frx_eth" numeric NOT NULL, CONSTRAINT "PK_9debaa84944fe2be9dc4219ba8f" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d6298a294864b4eaf793cf35a4" ON "oeth_vault" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_e20cb507a673817b2c68720415" ON "oeth_vault" ("block_number") `)
@@ -1304,6 +1315,17 @@ module.exports = class Data1729880820715 {
         await db.query(`DROP INDEX "public"."IDX_5a85c2519463653ac015291db4"`)
         await db.query(`DROP INDEX "public"."IDX_c27461303e85eb671a3cb730b4"`)
         await db.query(`DROP INDEX "public"."IDX_dff55f23cfcfa0ff664964572f"`)
+        await db.query(`DROP TABLE "accounting_consensus_rewards"`)
+        await db.query(`DROP INDEX "public"."IDX_1462da1457b990e5123cf45001"`)
+        await db.query(`DROP INDEX "public"."IDX_6939b7ceec71dd6538ea8b3c19"`)
+        await db.query(`DROP INDEX "public"."IDX_ef6a35f5cb2df22a66ce33a5d9"`)
+        await db.query(`DROP INDEX "public"."IDX_675114d35efd23e2ff939e1076"`)
+        await db.query(`DROP TABLE "execution_rewards_collected"`)
+        await db.query(`DROP INDEX "public"."IDX_19ad101b857e82e9fcb312dcee"`)
+        await db.query(`DROP INDEX "public"."IDX_a3187d19f5da0cade7f3bd22d9"`)
+        await db.query(`DROP INDEX "public"."IDX_b883d5666bb2f8b5b1f7d9633a"`)
+        await db.query(`DROP INDEX "public"."IDX_adcff42ecde1a20daeb870b3c4"`)
+        await db.query(`DROP INDEX "public"."IDX_41665fa5e546780642bacf96c7"`)
         await db.query(`DROP TABLE "oeth_vault"`)
         await db.query(`DROP INDEX "public"."IDX_d6298a294864b4eaf793cf35a4"`)
         await db.query(`DROP INDEX "public"."IDX_e20cb507a673817b2c68720415"`)

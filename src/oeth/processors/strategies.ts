@@ -1,6 +1,10 @@
+import * as feeAccumulatorAbi from '@abi/fee-accumulator'
+import * as nativeStakingAbi from '@abi/strategy-native-staking'
+import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
 import { Context } from '@processor'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import {
@@ -163,11 +167,50 @@ export const oethStrategies: readonly IStrategyData[] = [
 
 const strategies = oethStrategies
 
+const eventProcessors = [
+  ...OETH_NATIVE_STRATEGY_ADDRESSES.map((address) =>
+    createEventProcessor({
+      address,
+      eventName: 'AccountingConsensusRewards',
+      event: nativeStakingAbi.events.AccountingConsensusRewards,
+      from: 20046251,
+      Entity: AccountingConsensusRewards,
+      mapEntity: (ctx, block, log, decoded) =>
+        new AccountingConsensusRewards({
+          id: `${ctx.chain.id}:${log.id}`,
+          chainId: ctx.chain.id,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
+          address,
+          rewards: decoded.amount,
+        }),
+    }),
+  ),
+  createEventProcessor({
+    address: addresses.oeth.nativeStakingFeeAccumulator,
+    eventName: 'ExecutionRewardsCollected',
+    event: feeAccumulatorAbi.events.ExecutionRewardsCollected,
+    from: 20046238,
+    Entity: ExecutionRewardsCollected,
+    mapEntity: (ctx, block, log, decoded) =>
+      new ExecutionRewardsCollected({
+        id: `${ctx.chain.id}:${log.id}`,
+        chainId: ctx.chain.id,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        address: addresses.oeth.nativeStakingFeeAccumulator,
+        strategy: decoded.strategy,
+        amount: decoded.amount,
+      }),
+  }),
+]
+
 export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {
   strategies.forEach((s) => createStrategySetup(s)(processor))
   strategies.filter((s) => s.kind !== 'Vault').forEach((s) => createStrategyRewardSetup(s)(processor))
+  eventProcessors.forEach((p) => p.setup(processor))
 }
 
 const processors = [
@@ -176,5 +219,5 @@ const processors = [
 ]
 
 export const process = async (ctx: Context) => {
-  await Promise.all(processors.map((p) => p(ctx)))
+  await Promise.all([...processors.map((p) => p(ctx)), ...eventProcessors.map((p) => p.process(ctx))])
 }
