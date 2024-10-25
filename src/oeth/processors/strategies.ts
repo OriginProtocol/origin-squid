@@ -1,4 +1,3 @@
-import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -173,14 +172,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 const processors = [
   ...strategies.map(createStrategyProcessor),
-  ...strategies
-    .filter((s) => s.kind !== 'Vault')
-    .map((strategy) =>
-      createStrategyRewardProcessor({
-        ...strategy,
-        OTokenRewardTokenCollected: OETHRewardTokenCollected,
-      }),
-    ),
+  ...strategies.filter((s) => s.kind !== 'Vault').map((strategy) => createStrategyRewardProcessor(strategy)),
 ]
 
 export const process = async (ctx: Context) => {

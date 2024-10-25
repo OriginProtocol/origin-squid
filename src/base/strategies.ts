@@ -1,4 +1,3 @@
-import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
@@ -36,14 +35,7 @@ const strategies = oethbStrategies
 
 const processors = [
   ...strategies.map(createStrategyProcessor),
-  ...strategies
-    .filter((s) => s.kind !== 'Vault')
-    .map((strategy) =>
-      createStrategyRewardProcessor({
-        ...strategy,
-        OTokenRewardTokenCollected: OETHRewardTokenCollected,
-      }),
-    ),
+  ...strategies.filter((s) => s.kind !== 'Vault').map((strategy) => createStrategyRewardProcessor(strategy)),
 ]
 
 export const baseStrategies = {

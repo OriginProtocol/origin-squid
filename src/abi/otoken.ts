@@ -28,6 +28,7 @@ export const functions = {
     governor: viewFun("0x0c340a24", "governor()", {}, p.address),
     increaseAllowance: fun("0x39509351", "increaseAllowance(address,uint256)", {"_spender": p.address, "_addedValue": p.uint256}, p.bool),
     initialize: fun("0xf542033f", "initialize(string,string,address,uint256)", {"_nameArg": p.string, "_symbolArg": p.string, "_vaultAddress": p.address, "_initialCreditsPerToken": p.uint256}, ),
+    initialize2: fun("0x472abf68", "initialize2()", {}, ),
     isGovernor: viewFun("0xc7af3352", "isGovernor()", {}, p.bool),
     isUpgraded: viewFun("0x95ef84b9", "isUpgraded(address)", {"_0": p.address}, p.uint256),
     mint: fun("0x40c10f19", "mint(address,uint256)", {"_account": p.address, "_amount": p.uint256}, ),
@@ -186,6 +187,9 @@ export type IncreaseAllowanceReturn = FunctionReturn<typeof functions.increaseAl
 
 export type InitializeParams = FunctionArguments<typeof functions.initialize>
 export type InitializeReturn = FunctionReturn<typeof functions.initialize>
+
+export type Initialize2Params = FunctionArguments<typeof functions.initialize2>
+export type Initialize2Return = FunctionReturn<typeof functions.initialize2>
 
 export type IsGovernorParams = FunctionArguments<typeof functions.isGovernor>
 export type IsGovernorReturn = FunctionReturn<typeof functions.isGovernor>

@@ -1568,28 +1568,6 @@ type OETHCollateralDailyStat @entity {
   price: BigInt!
   value: BigInt!
 }
-
-type OETHRewardTokenCollected @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  strategy: String!
-  recipient: String!
-  rewardToken: String!
-  amount: BigInt!
-}
-
-type OETHWithdrawalRequest @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  requestId: BigInt!
-  withdrawer: String!
-  amount: BigInt!
-  queued: BigInt!
-  claimed: Boolean!
-  txHash: String! @index
-}
 type OGNDailyStat @entity {
   id: ID!
   blockNumber: Int! @index
@@ -1910,6 +1888,32 @@ type OTokenHarvesterYieldSent @entity {
   txHash: String!
   yield: BigInt!
   fee: BigInt!
+}
+
+type OTokenRewardTokenCollected @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  strategy: String!
+  recipient: String!
+  rewardToken: String!
+  amount: BigInt!
+}
+
+type OTokenWithdrawalRequest @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  requestId: BigInt!
+  withdrawer: String!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
+  txHash: String! @index
 }
 """
 The Vault entity tracks the OUSD vault balance over time.

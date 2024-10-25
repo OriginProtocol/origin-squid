@@ -5,6 +5,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { getPositions } from '@templates/aerodrome/lp'
 import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
+import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
 
 const otokenProcessor = createOTokenProcessor({
@@ -55,13 +56,23 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   cowSwap: false,
 })
 
+const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
+  oTokenAddress: baseAddresses.superOETHb.address,
+  from: 21544908,
+})
+
 export const superOETHb = {
   from: Math.min(otokenProcessor.from, otokenActivityProcessor.from),
   setup: (processor: EvmBatchProcessor) => {
     otokenProcessor.setup(processor)
     otokenActivityProcessor.setup(processor)
+    otokenWithdrawalsProcessor.setup(processor)
   },
   process: async (ctx: Context) => {
-    await Promise.all([otokenProcessor.process(ctx), otokenActivityProcessor.process(ctx)])
+    await Promise.all([
+      otokenProcessor.process(ctx),
+      otokenActivityProcessor.process(ctx),
+      otokenWithdrawalsProcessor.process(ctx),
+    ])
   },
 }

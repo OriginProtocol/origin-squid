@@ -1,4 +1,3 @@
-import { OETHRewardTokenCollected } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
@@ -50,12 +49,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 
 const processors = [
   ...strategies.map(createStrategyProcessor),
-  ...strategies.map((strategy) =>
-    createStrategyRewardProcessor({
-      ...strategy,
-      OTokenRewardTokenCollected: OETHRewardTokenCollected,
-    }),
-  ),
+  ...strategies.map((strategy) => createStrategyRewardProcessor(strategy)),
 ]
 
 export const process = async (ctx: Context) => {

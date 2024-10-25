@@ -188,3 +188,29 @@ type OTokenHarvesterYieldSent @entity {
   yield: BigInt!
   fee: BigInt!
 }
+
+type OTokenRewardTokenCollected @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  strategy: String!
+  recipient: String!
+  rewardToken: String!
+  amount: BigInt!
+}
+
+type OTokenWithdrawalRequest @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  otoken: String! @index
+  requestId: BigInt!
+  withdrawer: String!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
+  txHash: String! @index
+}

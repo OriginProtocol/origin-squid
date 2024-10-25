@@ -160,25 +160,3 @@ type OETHCollateralDailyStat @entity {
   price: BigInt!
   value: BigInt!
 }
-
-type OETHRewardTokenCollected @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  strategy: String!
-  recipient: String!
-  rewardToken: String!
-  amount: BigInt!
-}
-
-type OETHWithdrawalRequest @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  requestId: BigInt!
-  withdrawer: String!
-  amount: BigInt!
-  queued: BigInt!
-  claimed: Boolean!
-  txHash: String! @index
-}
