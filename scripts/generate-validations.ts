@@ -2,6 +2,7 @@ import fs from 'fs'
 
 import { addresses } from './../src/utils/addresses'
 import { baseAddresses } from './../src/utils/addresses-base'
+import { retry } from './../src/utils/retry'
 
 const LIMIT = 1000
 
@@ -23,7 +24,7 @@ const executeQuery = async (query: string) => {
     throw err
   }
 }
-const takePortion = (arr: any[], takeEvery: number) => {
+const takeEvery = (arr: any[], takeEvery: number) => {
   if (takeEvery <= 0) {
     throw new Error('takeEvery must be greater than 0')
   }
@@ -78,7 +79,7 @@ const oTokenHistories = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenHistories: oTokenHistories(
       limit: ${LIMIT},
-      orderBy: timestamp_ASC,
+      orderBy: id_ASC,
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -87,6 +88,7 @@ const oTokenHistories = (prefix: string, address: string) => {
       chainId
       balance
       otoken
+      address { address }
       type
       txHash
       value
@@ -185,7 +187,7 @@ const erc20Balances = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_erc20Balances: erc20Balances(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, account_ASC],
       where: { address_eq: "${address}" }
     ) {
       id
@@ -215,13 +217,13 @@ const main = async () => {
   for (let i = 0; i < queries.length; i++) {
     const query = queries[i]
     console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
-    const result = await executeQuery(query)
+    const result = await retry(() => executeQuery(query), 5)
     if (!result.data) {
       console.log(result)
       throw new Error('Query failed')
     }
     for (const key of Object.keys(result.data)) {
-      entities[key] = takePortion(result.data[key], 25)
+      entities[key] = takeEvery(result.data[key], 25)
     }
   }
 

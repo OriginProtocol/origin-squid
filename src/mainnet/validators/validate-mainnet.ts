@@ -12,6 +12,7 @@ export const process = async (ctx: Context) => {
   if (env.BLOCK_FROM) return
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.ogn_erc20Balances)
+    await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.oeth_erc20Balances)
     firstBlock = false
   }
 }

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { findLast, last } from 'lodash'
-import { LessThan, MoreThanOrEqual } from 'typeorm'
+import { In, LessThan, MoreThanOrEqual, Not } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
 import { OTokenAPY, OTokenAddress, OTokenRebase, RebasingOption } from '@model'
@@ -208,14 +208,18 @@ export async function createRebaseAPY(
     days: 30,
   }
 
-  const last30daysAPYs = await ctx.store.find(OTokenAPY, {
-    where: {
-      chainId: ctx.chain.id,
-      otoken: otokenAddress,
-      date: MoreThanOrEqual(last30daysDateId.value),
-    },
-    order: { id: 'asc' },
-  })
+  let last30daysAPYs: OTokenAPY[] = apies.filter((apy) => apy.date >= last30daysDateId.value)
+  last30daysAPYs = last30daysAPYs.concat(
+    await ctx.store.find(OTokenAPY, {
+      where: {
+        chainId: ctx.chain.id,
+        otoken: otokenAddress,
+        date: MoreThanOrEqual(last30daysDateId.value),
+        id: Not(In(last30daysAPYs.map((apy) => apy.id))),
+      },
+      order: { id: 'asc' },
+    }),
+  )
 
   const blockDateId = generateId(block.header.timestamp)
   for (const i of [last7daysDateId, last14daysDateId, last30daysDateId]) {
@@ -224,7 +228,7 @@ export async function createRebaseAPY(
       return dateId >= i.value && dateId < blockDateId
     })
     // console.log(i.days, pastAPYs.length)
-    apy![i.key] = pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) / (pastAPYs.length + 1)
+    apy![i.key] = pastAPYs.reduce((acc, cur) => acc + cur.apy, apy!.apy) / i.days
   }
 
   return rebase
