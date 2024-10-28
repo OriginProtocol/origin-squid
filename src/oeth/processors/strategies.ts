@@ -171,10 +171,8 @@ const eventProcessors = [
   ...OETH_NATIVE_STRATEGY_ADDRESSES.map((address) =>
     createEventProcessor({
       address,
-      eventName: 'AccountingConsensusRewards',
       event: nativeStakingAbi.events.AccountingConsensusRewards,
       from: 20046251,
-      Entity: AccountingConsensusRewards,
       mapEntity: (ctx, block, log, decoded) =>
         new AccountingConsensusRewards({
           id: `${ctx.chain.id}:${log.id}`,
@@ -188,10 +186,8 @@ const eventProcessors = [
   ),
   createEventProcessor({
     address: addresses.oeth.nativeStakingFeeAccumulator,
-    eventName: 'ExecutionRewardsCollected',
     event: feeAccumulatorAbi.events.ExecutionRewardsCollected,
     from: 20046238,
-    Entity: ExecutionRewardsCollected,
     mapEntity: (ctx, block, log, decoded) =>
       new ExecutionRewardsCollected({
         id: `${ctx.chain.id}:${log.id}`,

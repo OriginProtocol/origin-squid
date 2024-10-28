@@ -75,3 +75,14 @@ type ArmWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
 }
+
+type TraderateChanged @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  traderate0: BigInt!
+  traderate1: BigInt!
+}
