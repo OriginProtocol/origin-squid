@@ -58,6 +58,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 
 const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   oTokenAddress: baseAddresses.superOETHb.address,
+  oTokenVaultAddress: baseAddresses.superOETHb.vault,
   from: 21544908,
 })
 

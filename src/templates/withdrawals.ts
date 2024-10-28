@@ -10,14 +10,22 @@ interface ProcessResult {
   withdrawalRequests: Map<string, OTokenWithdrawalRequest>
 }
 
-export const createOTokenWithdrawalsProcessor = ({ oTokenAddress, from }: { oTokenAddress: string; from: number }) => {
+export const createOTokenWithdrawalsProcessor = ({
+  oTokenAddress,
+  oTokenVaultAddress,
+  from,
+}: {
+  oTokenAddress: string
+  oTokenVaultAddress: string
+  from: number
+}) => {
   const withdrawalRequestedFilter = logFilter({
-    address: [oTokenAddress],
+    address: [oTokenVaultAddress],
     topic0: [oethVault.events.WithdrawalRequested.topic],
     range: { from },
   })
   const withdrawalClaimedFilter = logFilter({
-    address: [oTokenAddress],
+    address: [oTokenVaultAddress],
     topic0: [oethVault.events.WithdrawalClaimed.topic],
     range: { from },
   })

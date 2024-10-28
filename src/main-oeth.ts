@@ -32,7 +32,11 @@ export const processor = {
     balancerMetaPoolStrategy,
     strategies,
     exchangeRates,
-    createOTokenWithdrawalsProcessor({ oTokenAddress: addresses.oeth.address, from: 20428558 }),
+    createOTokenWithdrawalsProcessor({
+      oTokenAddress: addresses.oeth.address,
+      oTokenVaultAddress: addresses.oeth.vault,
+      from: 20428558,
+    }),
   ],
   postProcessors: [exchangeRatesPostProcessor, dailyStats, processStatus('oeth')],
   validators: [validateOeth],
