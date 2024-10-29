@@ -15,7 +15,7 @@ export const processor = {
   stateSchema: 'base-processor',
   processors: [
     ...baseERC20s,
-    superOETHb,
+    ...superOETHb,
     baseStrategies,
     bridgedWoethStrategy,
     ...aerodromeProcessors,

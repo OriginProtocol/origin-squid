@@ -54,7 +54,7 @@ export const aerodromePools = {
       },
       { address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3', decimals: 18 },
     ],
-    lps: ['0xfd9e6005187f448957a0972a7d0c0a6da2911236'],
+    lps: [{ address: '0xfd9e6005187f448957a0972a7d0c0a6da2911236', maxLikelyPositions: 1 }],
     from: 18084976,
     gauge: {
       address: '0x147587251c3a4f8c907edbc0e5a5ea953bda743d',
@@ -72,43 +72,43 @@ export const aerodromePools = {
       },
       { address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3', decimals: 18 },
     ],
-    lps: [superOETHb.strategies.amo],
+    lps: [{ address: superOETHb.strategies.amo, maxLikelyPositions: 1 }],
     from: 18056601,
     gauge: {
       address: '0xdd234dbe2eff53bed9e8fc0e427ebcd74ed4f429',
       from: 18633733,
     },
   },
-  'CL1-cbETH/WETH': {
-    name: 'CL1-cbETH/WETH',
-    type: 'cl',
-    address: '0x47ca96ea59c13f72745928887f84c9f52c3d7348',
-    assets: [
-      {
-        address: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22',
-        decimals: 18,
-      },
-      { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
-    ],
-    lps: [],
-    from: 13900345,
-    gauge: { address: '0xf5550f8f0331b8caa165046667f4e6628e9e3aac', from: 13903874 },
-  },
-  'CL100-WETH/USDC': {
-    name: 'CL100-WETH/USDC',
-    type: 'cl',
-    address: '0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59',
-    from: 13899892,
-    assets: [
-      {
-        address: '0x4200000000000000000000000000000000000006',
-        decimals: 18,
-      },
-      { address: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', decimals: 6 },
-    ],
-    lps: ['0x0d90e61805c101d88ddc614344274c0249b793ef'],
-    gauge: { address: '0xf33a96b5932d9e9b9a0eda447abd8c9d48d2e0c8', from: 13903905 },
-  },
+  // 'CL1-cbETH/WETH': {
+  //   name: 'CL1-cbETH/WETH',
+  //   type: 'cl',
+  //   address: '0x47ca96ea59c13f72745928887f84c9f52c3d7348',
+  //   assets: [
+  //     {
+  //       address: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22',
+  //       decimals: 18,
+  //     },
+  //     { address: '0x4200000000000000000000000000000000000006', decimals: 18 },
+  //   ],
+  //   lps: [],
+  //   from: 13900345,
+  //   gauge: { address: '0xf5550f8f0331b8caa165046667f4e6628e9e3aac', from: 13903874 },
+  // },
+  // 'CL100-WETH/USDC': {
+  //   name: 'CL100-WETH/USDC',
+  //   type: 'cl',
+  //   address: '0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59',
+  //   from: 13899892,
+  //   assets: [
+  //     {
+  //       address: '0x4200000000000000000000000000000000000006',
+  //       decimals: 18,
+  //     },
+  //     { address: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913', decimals: 6 },
+  //   ],
+  //   lps: [],
+  //   gauge: { address: '0xf33a96b5932d9e9b9a0eda447abd8c9d48d2e0c8', from: 13903905 },
+  // },
 } as const
 
 export type PoolDefinition = (typeof aerodromePools)[keyof typeof aerodromePools]

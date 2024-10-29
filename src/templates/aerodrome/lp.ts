@@ -1,10 +1,9 @@
-import { uniqBy } from 'lodash'
-
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import { AeroLP, AeroLPPosition } from '@model'
 import { Block, Context, Processor } from '@processor'
 import { PoolDefinition, aerodromePools, baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { multicall } from '@utils/multicall'
 
 // For AMM Pools the sugar contract iterates through all the pools, according to the pool indices.
 // To shortcut - we can supply accurate offsets and limits.
@@ -23,32 +22,36 @@ export const ammPoolLookupOffset: Record<string, number | undefined> = {
 // (not perfect, but good enough?)
 export const clPoolFactory = '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a'
 export const clPoolLookupOffset: Record<string, number | undefined> = {
-  [aerodromePools['CL1-WETH/superOETHb'].address]: 113,
-  [aerodromePools['CL100-WETH/USDC'].address]: 1,
+  [aerodromePools['CL1-WETH/superOETHb'].address]: 114,
+  // [aerodromePools['CL100-WETH/USDC'].address]: 1,
 }
 
-const MAX_POSITIONS = 200
-
-export const getPositions = async (ctx: Context, height: number, pool: PoolDefinition, account: string) => {
+export const getPositions = async (
+  ctx: Context,
+  height: number,
+  pool: PoolDefinition,
+  account: string,
+  maxLikelyPositions = 10,
+) => {
   const sugar = new aerodromeLPSugarAbi.Contract(ctx, { height }, baseAddresses.aerodrome.sugarLPV3)
   const offset = pool.type === 'amm' ? ammPoolLookupOffset[pool.address] : clPoolLookupOffset[pool.address]
   const factoryAddress = pool.type === 'amm' ? ammPoolFactory : clPoolFactory
   if (!offset) throw new Error('Pool offset not found.')
   let positions = []
   if (pool.type === 'cl') {
-    // First pull from offset 0 to capture any unstaked positions.
-    positions = await sugar.positionsByFactory(MAX_POSITIONS, 0, account, factoryAddress)
-    // Then pull from pool offset + however many positions we just found and merge the result.
-    positions = uniqBy(
+    positions = await multicall(
+      ctx,
+      { height },
+      aerodromeLPSugarAbi.functions.positionsByFactory,
+      baseAddresses.aerodrome.sugarLPV3,
       [
-        ...positions,
-        ...(await sugar.positionsByFactory(MAX_POSITIONS, offset + positions.length, account, factoryAddress)),
+        { _limit: maxLikelyPositions, _offset: 0, _account: account, _factory: factoryAddress },
+        { _limit: maxLikelyPositions * 2, _offset: offset, _account: account, _factory: factoryAddress },
       ],
-      (p) => p.id,
-    )
+    ).then((positions) => positions.flat())
   } else {
     // No special logic needed for AMM.
-    positions = await sugar.positionsByFactory(MAX_POSITIONS, offset, account, factoryAddress)
+    positions = await sugar.positionsByFactory(maxLikelyPositions, offset, account, factoryAddress)
   }
   return positions
 }
@@ -56,10 +59,10 @@ export const getPositions = async (ctx: Context, height: number, pool: PoolDefin
 export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
   const from = Math.max(16962730, pool.from) // Sugar deploy date or from.
   const frequencyUpdater = blockFrequencyUpdater({ from })
-  return pool.lps.map((account) => {
+  return pool.lps.map((lp) => {
     const processor: Processor = {
       from,
-      name: `Aerodrome LP ${account}`,
+      name: `Aerodrome LP ${lp.address}`,
       setup: (processor) => {
         processor.includeAllBlocks({ from: pool.from })
       },
@@ -67,18 +70,18 @@ export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
         const lpStates: AeroLP[] = []
         const lpPositionStates: AeroLPPosition[] = []
         await frequencyUpdater(ctx, async (ctx: Context, block: Block) => {
-          const positions = await getPositions(ctx, block.header.height, pool, account)
+          const positions = await getPositions(ctx, block.header.height, pool, lp.address, lp.maxLikelyPositions)
           lpPositionStates.push(
             ...positions.map(
               (p) =>
                 new AeroLPPosition({
-                  id: `${ctx.chain.id}-${pool.address}-${account}-${p.id}-${block.header.height}`,
+                  id: `${ctx.chain.id}-${pool.address}-${lp.address}-${p.id}-${block.header.height}`,
                   chainId: ctx.chain.id,
                   blockNumber: block.header.height,
                   timestamp: new Date(block.header.timestamp),
                   pool: pool.address,
                   positionId: p.id,
-                  account: account,
+                  account: lp.address,
                   liquidity: p.liquidity,
                   staked: p.staked,
                   amount0: p.amount0,
@@ -97,12 +100,12 @@ export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
           )
           if (positions.length) {
             const lpState = new AeroLP({
-              id: `${ctx.chain.id}-${pool.address}-${account}-${block.header.height}`,
+              id: `${ctx.chain.id}-${pool.address}-${lp.address}-${block.header.height}`,
               chainId: ctx.chain.id,
               blockNumber: block.header.height,
               timestamp: new Date(block.header.timestamp),
               pool: pool.address,
-              account: account,
+              account: lp.address,
               liquidity: positions.reduce((sum, p) => sum + p.liquidity, 0n),
               staked: positions.reduce((sum, p) => sum + p.staked, 0n),
               amount0: positions.reduce((sum, p) => sum + p.amount0, 0n),

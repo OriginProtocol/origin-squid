@@ -1,6 +1,7 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
+import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
@@ -40,19 +41,27 @@ const simpleTracks: Record<string, Parameters<typeof createERC20SimpleTracker>[0
     address: tokens.primeETH,
   },
 }
-const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof createRebasingERC20Tracker>[0]> = {
   // Origin Specific
   OETH: {
     from: 16935276,
     address: tokens.OETH,
-    rebaseFilters: [
-      logFilter({
+    rebasing: {
+      rebaseEventFilter: logFilter({
         address: [OETH_ADDRESS],
         topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
         transaction: true,
         range: { from: 16935276 },
       }),
-    ],
+      getCredits: async (ctx, block, address) => {
+        const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
+        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
+      },
+      getCreditsPerToken: async (ctx, block) => {
+        const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
+        return oToken.rebasingCreditsPerTokenHighres()
+      },
+    },
   },
   wOETH: {
     from: 16933090,
@@ -120,10 +129,10 @@ export const addERC20Processing = (symbol: TokenSymbol, account: string) => {
     throw new Error('erc20s already initialized, check load order')
   }
   const track = tracks[symbol]
-  if (track) {
+  if ('accountFilter' in track) {
     // If there is no `accountFilter` then it is OK to have this as a noop. (we already want everything)
     track.accountFilter?.push(account)
-  } else {
+  } else if (!track) {
     throw new Error(`Symbol ${symbol} not added to \`tracks\``)
   }
 }

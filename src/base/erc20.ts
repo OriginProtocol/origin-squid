@@ -1,6 +1,7 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
+import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
 import { OGN_BASE_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
@@ -12,17 +13,25 @@ export const baseERC20s = [
     address: OGN_BASE_ADDRESS,
   }),
   // superOETHb
-  createERC20Tracker({
+  createRebasingERC20Tracker({
     from: 17819702,
     address: baseAddresses.tokens.superOETHb,
-    rebaseFilters: [
-      logFilter({
+    rebasing: {
+      rebaseEventFilter: logFilter({
         address: [baseAddresses.tokens.superOETHb],
         topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
         transaction: true,
         range: { from: 17819702 },
       }),
-    ],
+      getCredits: async (ctx, block, address) => {
+        const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
+        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
+      },
+      getCreditsPerToken: async (ctx, block) => {
+        const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
+        return oToken.rebasingCreditsPerTokenHighres()
+      },
+    },
   }),
   // wsuperOETHb
   createERC20SimpleTracker({

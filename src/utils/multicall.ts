@@ -2,7 +2,7 @@ import { toHex } from 'viem'
 import { arbitrum, mainnet } from 'viem/chains'
 
 import { Multicall } from '@abi/multicall'
-import { Block, Context } from '@processor'
+import { Context } from '@processor'
 import { type AbiFunction, type FunctionArguments } from '@subsquid/evm-abi'
 
 const MULTICALL_CONTRACTS: Record<number, undefined | { from: number; address: string }> = {
@@ -17,7 +17,7 @@ const MULTICALL_CONTRACTS: Record<number, undefined | { from: number; address: s
 }
 export const multicall = async <Function extends AbiFunction<any, any>>(
   ctx: Context,
-  header: Block['header'],
+  header: { height: number },
   func: Function,
   address: string,
   calls: FunctionArguments<Function>[],

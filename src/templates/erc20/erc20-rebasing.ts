@@ -1,55 +1,43 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Context } from '@processor'
+import { Block, Context } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
-import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
-import { logFilter } from '@utils/logFilter'
-import { multicall } from '@utils/multicall'
+import { LogFilter, logFilter } from '@utils/logFilter'
 import { TokenAddress } from '@utils/symbols'
 
 const duplicateTracker = new Set<string>()
 
-export const createERC20Tracker = ({
+export const createRebasingERC20Tracker = ({
   from,
   address,
-  accountFilter = undefined,
-  intervalTracking = false,
+  rebasing,
 }: {
   from: number
   address: TokenAddress
-  accountFilter?: string[]
-  intervalTracking?: boolean // To be used *with* `accountFilter`.
+  rebasing: {
+    rebaseEventFilter: LogFilter
+    getCredits: (ctx: Context, block: Block, account: string) => Promise<bigint>
+    getCreditsPerToken: (ctx: Context, block: Block) => Promise<bigint>
+  }
 }) => {
-  accountFilter = accountFilter?.map((a) => a.toLowerCase())
   if (duplicateTracker.has(address)) {
     throw new Error('An ERC20 tracker was already created for: ' + address)
   }
   duplicateTracker.add(address)
-  const accountFilterSet = accountFilter ? new Set(accountFilter.map((account) => account.toLowerCase())) : undefined
-
-  const intervalTracker = intervalTracking ? blockFrequencyTracker({ from }) : undefined
 
   let erc20: ERC20 | undefined
   // Keep an in-memory record of what our current holders are.
   // TODO: Consider doing this differently?
   //       Eventually memory may become a constraint.
-  let holders: Set<string>
-  const transferLogFilters = [
-    logFilter({
-      address: [address.toLowerCase()],
-      topic0: [abi.events.Transfer.topic],
-      topic1: accountFilter,
-      range: { from },
-    }),
-    logFilter({
-      address: [address.toLowerCase()],
-      topic0: [abi.events.Transfer.topic],
-      topic2: accountFilter,
-      range: { from },
-    }),
-  ]
+  let mostRecentState: ERC20State | undefined
+  let holders: Map<string, bigint>
+  const transferLogFilter = logFilter({
+    address: [address.toLowerCase()],
+    topic0: [abi.events.Transfer.topic],
+    range: { from },
+  })
   const initialize = async (ctx: Context) => {
     if (erc20) return
     const block = ctx.blocks.find((b) => b.header.height >= from)
@@ -76,20 +64,34 @@ export const createERC20Tracker = ({
   return {
     from,
     setup(processor: EvmBatchProcessor) {
-      if (intervalTracker) {
-        processor.includeAllBlocks({ from })
-      } else {
-        transferLogFilters.forEach((filter) => processor.addLog(filter.value))
-      }
+      processor.addLog(transferLogFilter.value)
+      processor.addLog(rebasing.rebaseEventFilter.value)
     },
     async process(ctx: Context) {
+      const debugLogging = global.process.env.DEBUG_PERF === 'true'
+      let start = Date.now()
+      const time = (name: string) => {
+        if (!debugLogging) return
+        const message = `${address} ${name} ${Date.now() - start}ms`
+        start = Date.now()
+        ctx.log.info(message)
+      }
+
       await initialize(ctx)
+      time('initialize')
+      if (!mostRecentState) {
+        mostRecentState = await ctx.store.findOne(ERC20State, {
+          where: { chainId: ctx.chain.id, address },
+          order: { blockNumber: 'DESC' },
+        })
+      }
       if (!holders) {
         const holdersArray = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
-        holders = new Set<string>()
+        holders = new Map<string, bigint>()
         for (const holder of holdersArray) {
-          holders.add(holder.account)
+          holders.set(holder.account, holder.rebasingCredits ?? 0n)
         }
+        time('initialize holders')
       }
       const result = {
         states: new Map<string, ERC20State>(),
@@ -103,7 +105,10 @@ export const createERC20Tracker = ({
         const contract = new abi.Contract(ctx, block.header, address)
         const updateState = async () => {
           const id = `${ctx.chain.id}-${block.header.height}-${address}`
-          const totalSupply = await contract.totalSupply()
+          const [totalSupply, rebasingCreditsPerToken] = await Promise.all([
+            contract.totalSupply(),
+            rebasing.getCreditsPerToken(ctx, block),
+          ])
           const state = new ERC20State({
             id,
             chainId: ctx.chain.id,
@@ -112,25 +117,24 @@ export const createERC20Tracker = ({
             blockNumber: block.header.height,
             totalSupply,
             holderCount: holders.size,
+            rebasingCreditsPerToken,
           })
+          mostRecentState = state
           result.states.set(id, state)
+          time('update state')
         }
-        const updateBalances = async (accounts: string[], doStateUpdate = false) => {
-          if (accountFilterSet) {
-            accounts = accounts.filter((a) => accountFilterSet.has(a))
-          }
+        const updateBalances = async (accounts: string[]) => {
+          let doStateUpdate = false
           if (accounts.length > 0) {
-            const balances = await multicall(
-              ctx,
-              block.header,
-              abi.functions.balanceOf,
-              address,
-              accounts.map((account) => ({ _owner: account })),
-            )
-            accounts.forEach((account, i) => {
-              if (account === ADDRESS_ZERO) return
-              account = account.toLowerCase()
+            const credits = await Promise.all(accounts.map((account) => rebasing.getCredits(ctx, block, account)))
+            for (let i = 0; i < accounts.length; i++) {
+              const account = accounts[i].toLowerCase()
+              if (account === ADDRESS_ZERO) continue
               const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
+              ctx.log.info(
+                { credits: credits[i], mostRecentState: mostRecentState?.rebasingCreditsPerToken },
+                'credits',
+              )
               const balance = new ERC20Balance({
                 id,
                 chainId: ctx.chain.id,
@@ -138,7 +142,10 @@ export const createERC20Tracker = ({
                 blockNumber: block.header.height,
                 address,
                 account,
-                balance: balances[i],
+                balance: mostRecentState?.rebasingCreditsPerToken
+                  ? (credits[i] * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
+                  : 0n,
+                rebasingCredits: credits[i],
               })
               result.balances.set(id, balance)
               if (balance.balance === 0n) {
@@ -153,32 +160,60 @@ export const createERC20Tracker = ({
                   address,
                   account,
                   balance: balance.balance,
+                  rebasingCredits: balance.rebasingCredits,
                 })
                 if (!holders.has(account)) {
                   doStateUpdate = true
-                  holders.add(account)
+                  holders.set(account, credits[i])
                 }
                 result.holders.set(holder.account, holder)
                 result.removedHolders.delete(holder.account)
               }
-            })
+            }
+            time('update balances')
           }
           if (doStateUpdate) {
             await updateState()
           }
         }
-        const accounts = new Set<string>()
-        let haveRebase = false
-        if (intervalTracker && intervalTracker(ctx, block) && accountFilter) {
-          await updateBalances(accountFilter)
+        const updateAllBalances = async () => {
+          for (const [account, rebasingCredits] of holders.entries()) {
+            const balance = mostRecentState?.rebasingCreditsPerToken
+              ? rebasingCredits / mostRecentState.rebasingCreditsPerToken
+              : 0n
+            result.holders.set(
+              account,
+              new ERC20Holder({
+                id: `${ctx.chain.id}-${address}-${account}`,
+                chainId: ctx.chain.id,
+                address,
+                account,
+                balance,
+                rebasingCredits,
+              }),
+            )
+            const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
+            result.balances.set(
+              id,
+              new ERC20Balance({
+                id,
+                chainId: ctx.chain.id,
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                address,
+                account,
+                balance,
+                rebasingCredits,
+              }),
+            )
+          }
+          time('update all balances')
         }
 
         for (const log of block.logs) {
-          const isTransferLog = transferLogFilters.find((l) => l.matches(log))
+          const isTransferLog = transferLogFilter.matches(log)
           if (isTransferLog) {
             const data = abi.events.Transfer.decode(log)
-            accounts.add(data.from.toLowerCase())
-            accounts.add(data.to.toLowerCase())
             await updateBalances([data.from.toLowerCase(), data.to.toLowerCase()])
             const fromHolder = result.holders.get(data.from.toLowerCase())
             const toHolder = result.holders.get(data.to.toLowerCase())
@@ -196,9 +231,15 @@ export const createERC20Tracker = ({
               value: data.value,
             })
             result.transfers.set(transfer.id, transfer)
+            time('transfer log')
+          }
+          const isRebaseLog = rebasing?.rebaseEventFilter.matches(log)
+          if (isRebaseLog) {
+            await updateState()
+            await updateAllBalances()
+            time('rebase log')
           }
         }
-        await updateBalances([...accounts])
       }
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
@@ -207,7 +248,9 @@ export const createERC20Tracker = ({
         ctx.store.insert([...result.transfers.values()]),
         ctx.store.remove([...result.removedHolders.values()].map((id) => new ERC20Holder({ id }))),
       ])
+      time('save')
       publishERC20State(ctx, address, result)
+      time('publish')
     },
   }
 }

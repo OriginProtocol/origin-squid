@@ -1,7 +1,5 @@
 import { parseEther } from 'viem'
 
-import { Context } from '@processor'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { getPositions } from '@templates/aerodrome/lp'
 import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
@@ -39,6 +37,7 @@ const otokenProcessor = createOTokenProcessor({
       height,
       aerodromePools['CL1-WETH/superOETHb'],
       baseAddresses.superOETHb.strategies.amo,
+      1,
     )
     return positions.reduce((acc, position) => acc + BigInt(position.amount1) + BigInt(position.staked1), 0n)
   },
@@ -62,18 +61,4 @@ const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   from: 21544908,
 })
 
-export const superOETHb = {
-  from: Math.min(otokenProcessor.from, otokenActivityProcessor.from),
-  setup: (processor: EvmBatchProcessor) => {
-    otokenProcessor.setup(processor)
-    otokenActivityProcessor.setup(processor)
-    otokenWithdrawalsProcessor.setup(processor)
-  },
-  process: async (ctx: Context) => {
-    await Promise.all([
-      otokenProcessor.process(ctx),
-      otokenActivityProcessor.process(ctx),
-      otokenWithdrawalsProcessor.process(ctx),
-    ])
-  },
-}
+export const superOETHb = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor]

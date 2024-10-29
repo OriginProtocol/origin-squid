@@ -32,4 +32,7 @@ export class ERC20State {
 
     @IntColumn_({nullable: false})
     holderCount!: number
+
+    @BigIntColumn_({nullable: true})
+    rebasingCreditsPerToken!: bigint | undefined | null
 }

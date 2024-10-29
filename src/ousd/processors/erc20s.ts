@@ -1,20 +1,29 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
+import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
 import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof createRebasingERC20Tracker>[0]> = {
   OUSD: {
     from: 11585978, // From Reset:
     address: tokens.OUSD,
-    rebaseFilters: [
-      logFilter({
+    rebasing: {
+      rebaseEventFilter: logFilter({
         address: [OUSD_ADDRESS],
         topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
         transaction: true,
         range: { from: 11585978 },
       }),
-    ],
+      getCredits: async (ctx, block, address) => {
+        const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
+        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
+      },
+      getCreditsPerToken: async (ctx, block) => {
+        const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
+        return oToken.rebasingCreditsPerTokenHighres()
+      },
+    },
   },
   // OUSD Related
   USDT: {
