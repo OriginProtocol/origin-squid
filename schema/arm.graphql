@@ -60,6 +60,7 @@ type ArmDailyStat @entity {
   apy: Float!
   yield: BigInt!
   fees: BigInt!
+  rateUSD: Float!
 }
 
 type ArmWithdrawalRequest @entity {

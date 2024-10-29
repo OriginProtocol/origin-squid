@@ -1,11 +1,13 @@
 import dayjs from 'dayjs'
 import { last } from 'lodash'
+import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmWithdrawalRequest, TraderateChanged } from '@model'
 import { Block, Context, Processor } from '@processor'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
@@ -179,6 +181,7 @@ export const createOriginARMProcessors = ({
           if (tracker(ctx, block)) {
             // ArmState
             const state = await getCurrentState(block)
+            const rateUSD = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
 
             // ArmDailyStat
             const date = new Date(block.header.timestamp)
@@ -215,6 +218,7 @@ export const createOriginARMProcessors = ({
               apy: armDayApy.apy,
               fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
               yield: state.totalYield - (previousDailyStat?.yield ?? 0n),
+              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, 8),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }

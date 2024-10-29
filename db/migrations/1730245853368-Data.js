@@ -1,5 +1,5 @@
-module.exports = class Data1730241139493 {
-    name = 'Data1730241139493'
+module.exports = class Data1730245853368 {
+    name = 'Data1730245853368'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -359,7 +359,7 @@ module.exports = class Data1730241139493 {
         await db.query(`CREATE INDEX "IDX_85852cf19a3ddc86a4762398dd" ON "arm_state" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_d9779389f627b43d2f746323de" ON "arm_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b9db75a2ca9b9d6e6c5aa744ab" ON "arm_state" ("address") `)
-        await db.query(`CREATE TABLE "arm_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "date" text NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, CONSTRAINT "PK_c780cd8a4ec31366f7173a30fb1" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_daily_stat" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "date" text NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "yield" numeric NOT NULL, "fees" numeric NOT NULL, "rate_usd" numeric NOT NULL, CONSTRAINT "PK_c780cd8a4ec31366f7173a30fb1" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_6f3bbb5ed2de643316523b59b4" ON "arm_daily_stat" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9ee28c589c9fa60a45412a64ba" ON "arm_daily_stat" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)

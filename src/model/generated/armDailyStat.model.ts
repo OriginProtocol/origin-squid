@@ -61,4 +61,7 @@ export class ArmDailyStat {
 
     @BigIntColumn_({nullable: false})
     fees!: bigint
+
+    @FloatColumn_({nullable: false})
+    rateUSD!: number
 }
