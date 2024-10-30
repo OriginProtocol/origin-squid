@@ -4,7 +4,7 @@ import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
 import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
-const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof createRebasingERC20Tracker>[0]> = {
+const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracker>[0]> = {
   OUSD: {
     from: 11585978, // From Reset:
     address: tokens.OUSD,
@@ -25,6 +25,9 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof creat
       },
     },
   },
+}
+
+const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   // OUSD Related
   USDT: {
     // from: 11362821,
@@ -65,4 +68,7 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof creat
 }
 
 // This is a function to allow others to subscribe to balance tracking
-export const erc20s = Object.values(tracks).map(createERC20Tracker)
+export const erc20s = () => [
+  ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
+  ...Object.values(tracks).map(createERC20Tracker),
+]

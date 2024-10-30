@@ -41,7 +41,8 @@ const simpleTracks: Record<string, Parameters<typeof createERC20SimpleTracker>[0
     address: tokens.primeETH,
   },
 }
-const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof createRebasingERC20Tracker>[0]> = {
+
+const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracker>[0]> = {
   // Origin Specific
   OETH: {
     from: 16935276,
@@ -63,6 +64,9 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker | typeof creat
       },
     },
   },
+}
+
+const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
   wOETH: {
     from: 16933090,
     address: WOETH_ADDRESS,
@@ -120,6 +124,7 @@ export const erc20s = () => {
   initialized = true
   return [
     ...Object.values(simpleTracks).map(createERC20SimpleTracker),
+    ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
     ...Object.values(tracks).map(createERC20Tracker),
   ]
 }
