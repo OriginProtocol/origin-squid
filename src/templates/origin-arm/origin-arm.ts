@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { last } from 'lodash'
+import { findLast, last } from 'lodash'
+import { LessThan } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
@@ -133,6 +134,16 @@ export const createOriginARMProcessors = ({
             }))
           )
         }
+        const getYesterdayState = async (block: Block) => {
+          const startOfToday = dayjs(block.header.timestamp).startOf('day').toDate()
+          return (
+            findLast(states, (state) => state.timestamp < startOfToday) ??
+            (await ctx.store.findOne(ArmState, {
+              order: { timestamp: 'DESC' },
+              where: { chainId: ctx.chain.id, address: armAddress, timestamp: LessThan(startOfToday) },
+            }))
+          )
+        }
         const getCurrentState = async (block: Block) => {
           const stateId = getStateId(block)
           if (states[states.length - 1]?.id === stateId) {
@@ -227,8 +238,11 @@ export const createOriginARMProcessors = ({
           }
           if (tracker(ctx, block)) {
             // ArmState
-            const state = await getCurrentState(block)
-            const rateUSD = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
+            const [state, yesterdayState, rateUSD] = await Promise.all([
+              getCurrentState(block),
+              getYesterdayState(block),
+              ensureExchangeRate(ctx, block, 'ETH', 'USD'),
+            ])
 
             // ArmDailyStat
             const date = new Date(block.header.timestamp)
@@ -263,8 +277,8 @@ export const createOriginARMProcessors = ({
               assetsPerShare: state.assetsPerShare,
               apr: armDayApy.apr,
               apy: armDayApy.apy,
-              fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
-              yield: state.totalYield - (previousDailyStat?.yield ?? 0n),
+              fees: state.totalFees - (yesterdayState?.totalFees ?? 0n),
+              yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, 8),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
