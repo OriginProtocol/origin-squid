@@ -14,7 +14,7 @@ import * as validateOusd from './ousd/validators/validate-ousd'
 
 export const processor = {
   stateSchema: 'ousd-processor',
-  processors: [ousd, strategies, curve, morphoMarketStatesProcessor, ...erc20s],
+  processors: [ousd, strategies, curve, morphoMarketStatesProcessor, ...erc20s()],
   postProcessors: [exchangeRatesPostProcessor, dailyStats, processStatus('ousd')],
   validators: [validateOusd],
 }
