@@ -178,50 +178,6 @@ export const createOriginARMProcessors = ({
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
 
         for (const block of ctx.blocks) {
-          if (tracker(ctx, block)) {
-            // ArmState
-            const state = await getCurrentState(block)
-            const rateUSD = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
-
-            // ArmDailyStat
-            const date = new Date(block.header.timestamp)
-            const dateStr = date.toISOString().slice(0, 10)
-            const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
-            const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
-            const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
-            const previousDailyStat =
-              dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
-            const startOfDay = dayjs(date).startOf('day').toDate()
-            const endOfDay = dayjs(date).endOf('day').toDate()
-            const armDayApy = calculateAPY(
-              startOfDay,
-              endOfDay,
-              previousDailyStat?.assetsPerShare ?? 10n ** 18n,
-              state.assetsPerShare,
-            )
-
-            const armDailyStatEntity = new ArmDailyStat({
-              id: currentDayId,
-              chainId: ctx.chain.id,
-              timestamp: new Date(block.header.timestamp),
-              blockNumber: block.header.height,
-              date: dateStr,
-              address: armAddress,
-              assets0: state.assets0,
-              assets1: state.assets1,
-              outstandingAssets1: state.outstandingAssets1,
-              totalAssets: state.totalAssets,
-              totalAssetsCap: state.totalAssetsCap,
-              totalSupply: state.totalSupply,
-              assetsPerShare: state.assetsPerShare,
-              apr: armDayApy.apr,
-              apy: armDayApy.apy,
-              fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
-              yield: state.totalYield - (previousDailyStat?.yield ?? 0n),
-              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, 8),
-            })
-            dailyStatsMap.set(currentDayId, armDailyStatEntity)
-          }
           for (const log of block.logs) {
             // ArmWithdrawalRequest
             if (redeemRequestedFilter.matches(log)) {
@@ -269,7 +225,52 @@ export const createOriginARMProcessors = ({
               state.totalFees += event.fee
             }
           }
+          if (tracker(ctx, block)) {
+            // ArmState
+            const state = await getCurrentState(block)
+            const rateUSD = await ensureExchangeRate(ctx, block, 'ETH', 'USD')
+
+            // ArmDailyStat
+            const date = new Date(block.header.timestamp)
+            const dateStr = date.toISOString().slice(0, 10)
+            const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
+            const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
+            const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
+            const previousDailyStat =
+              dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
+            const startOfDay = dayjs(date).startOf('day').toDate()
+            const endOfDay = dayjs(date).endOf('day').toDate()
+            const armDayApy = calculateAPY(
+              startOfDay,
+              endOfDay,
+              previousDailyStat?.assetsPerShare ?? 10n ** 18n,
+              state.assetsPerShare,
+            )
+
+            const armDailyStatEntity = new ArmDailyStat({
+              id: currentDayId,
+              chainId: ctx.chain.id,
+              timestamp: new Date(block.header.timestamp),
+              blockNumber: block.header.height,
+              date: dateStr,
+              address: armAddress,
+              assets0: state.assets0,
+              assets1: state.assets1,
+              outstandingAssets1: state.outstandingAssets1,
+              totalAssets: state.totalAssets,
+              totalAssetsCap: state.totalAssetsCap,
+              totalSupply: state.totalSupply,
+              assetsPerShare: state.assetsPerShare,
+              apr: armDayApy.apr,
+              apy: armDayApy.apy,
+              fees: state.totalFees - (previousDailyStat?.fees ?? 0n),
+              yield: state.totalYield - (previousDailyStat?.yield ?? 0n),
+              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, 8),
+            })
+            dailyStatsMap.set(currentDayId, armDailyStatEntity)
+          }
         }
+
         await ctx.store.insert(states)
         await ctx.store.upsert([...dailyStatsMap.values()])
         await ctx.store.upsert([...redemptionMap.values()])
