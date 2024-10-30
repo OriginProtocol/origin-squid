@@ -38,6 +38,11 @@ export const baseERC20s = [
     from: 17819702,
     address: baseAddresses.tokens.wsuperOETHb,
   }),
+  // bridgedWOETH
+  createERC20SimpleTracker({
+    from: 13327014,
+    address: baseAddresses.tokens.bridgedWOETH,
+  }),
   // AERO (limited)
   createERC20Tracker({
     from: 18689558,
