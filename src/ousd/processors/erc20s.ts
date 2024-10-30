@@ -17,10 +17,16 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
       }),
       getCredits: async (ctx, block, address) => {
         const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
+        if (block.header.height < 13533937) {
+          return oToken.creditsBalanceOf(address).then((credits) => credits._1)
+        }
         return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
       },
       getCreditsPerToken: async (ctx, block) => {
         const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
+        if (block.header.height < 13533937) {
+          return oToken.rebasingCreditsPerToken()
+        }
         return oToken.rebasingCreditsPerTokenHighres()
       },
     },
