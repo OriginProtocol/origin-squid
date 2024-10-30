@@ -131,10 +131,6 @@ export const createRebasingERC20Tracker = ({
               const account = accounts[i].toLowerCase()
               if (account === ADDRESS_ZERO) continue
               const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
-              ctx.log.info(
-                { credits: credits[i], mostRecentState: mostRecentState?.rebasingCreditsPerToken },
-                'credits',
-              )
               const balance = new ERC20Balance({
                 id,
                 chainId: ctx.chain.id,
