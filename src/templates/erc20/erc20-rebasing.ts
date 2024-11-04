@@ -175,7 +175,7 @@ export const createRebasingERC20Tracker = ({
         const updateAllBalances = async () => {
           for (const [account, rebasingCredits] of holders.entries()) {
             const balance = mostRecentState?.rebasingCreditsPerToken
-              ? rebasingCredits / mostRecentState.rebasingCreditsPerToken
+              ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
               : 0n
             result.holders.set(
               account,
