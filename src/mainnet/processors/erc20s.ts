@@ -56,7 +56,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
       }),
       getCredits: async (ctx, block, address) => {
         const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
-        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
+        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._0)
       },
       getCreditsPerToken: async (ctx, block) => {
         const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)

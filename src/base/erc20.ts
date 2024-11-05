@@ -25,7 +25,7 @@ export const baseERC20s = [
       }),
       getCredits: async (ctx, block, address) => {
         const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
-        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._1)
+        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._0)
       },
       getCreditsPerToken: async (ctx, block) => {
         const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
