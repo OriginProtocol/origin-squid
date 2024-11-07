@@ -553,21 +553,23 @@ type AeroVoterAbstained @entity {
 #  amount: BigInt!
 #}
 #
-#type AeroVoterGaugeCreated @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  poolFactory: String! @index
-#  votingRewardsFactory: String! @index
-#  gaugeFactory: String! @index
-#  pool: String!
-#  bribeVotingReward: String!
-#  feeVotingReward: String!
-#  gauge: String!
-#  creator: String!
-#}
+
+type AeroVoterGaugeCreated @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  poolFactory: String! @index
+  votingRewardsFactory: String! @index
+  gaugeFactory: String! @index
+  pool: String!
+  bribeVotingReward: String!
+  feeVotingReward: String!
+  gauge: String!
+  creator: String!
+}
+
 #
 #type AeroVoterGaugeKilled @entity {
 #  id: ID!

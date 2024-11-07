@@ -1,5 +1,5 @@
-module.exports = class Data1730245853368 {
-    name = 'Data1730245853368'
+module.exports = class Data1730966585064 {
+    name = 'Data1730966585064'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -309,6 +309,14 @@ module.exports = class Data1730245853368 {
         await db.query(`CREATE INDEX "IDX_bb6a84ce4e36fef8470e65830c" ON "aero_voter_abstained" ("voter") `)
         await db.query(`CREATE INDEX "IDX_0390201f92fc4f41311bb98457" ON "aero_voter_abstained" ("pool") `)
         await db.query(`CREATE INDEX "IDX_ca2ada1baa9e7357de5e0060f6" ON "aero_voter_abstained" ("token_id") `)
+        await db.query(`CREATE TABLE "aero_voter_gauge_created" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "pool_factory" text NOT NULL, "voting_rewards_factory" text NOT NULL, "gauge_factory" text NOT NULL, "pool" text NOT NULL, "bribe_voting_reward" text NOT NULL, "fee_voting_reward" text NOT NULL, "gauge" text NOT NULL, "creator" text NOT NULL, CONSTRAINT "PK_c96d43e26a5474fe42e6feb8525" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_60842e4b20e928204cc0790128" ON "aero_voter_gauge_created" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_74c2a7bf57c43f69f91b7c3b20" ON "aero_voter_gauge_created" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_d8be771bb35fe590c45a7d1af2" ON "aero_voter_gauge_created" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_19b4155090d82294060bb44366" ON "aero_voter_gauge_created" ("address") `)
+        await db.query(`CREATE INDEX "IDX_40d43ab503f180b7532f42f45a" ON "aero_voter_gauge_created" ("pool_factory") `)
+        await db.query(`CREATE INDEX "IDX_b4ffd29e88ac91115e44fc5b03" ON "aero_voter_gauge_created" ("voting_rewards_factory") `)
+        await db.query(`CREATE INDEX "IDX_fe01f00328010eac8a03879936" ON "aero_voter_gauge_created" ("gauge_factory") `)
         await db.query(`CREATE TABLE "aero_voter_voted" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "voter" text NOT NULL, "pool" text NOT NULL, "token_id" numeric NOT NULL, "weight" numeric NOT NULL, "total_weight" numeric NOT NULL, CONSTRAINT "PK_221f97fecad535588fc667d74fd" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_619b6d941dec261bf42c1baf66" ON "aero_voter_voted" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5ba9d8c53a6ceed65361f071b8" ON "aero_voter_voted" ("block_number") `)
@@ -1063,6 +1071,14 @@ module.exports = class Data1730245853368 {
         await db.query(`DROP INDEX "public"."IDX_bb6a84ce4e36fef8470e65830c"`)
         await db.query(`DROP INDEX "public"."IDX_0390201f92fc4f41311bb98457"`)
         await db.query(`DROP INDEX "public"."IDX_ca2ada1baa9e7357de5e0060f6"`)
+        await db.query(`DROP TABLE "aero_voter_gauge_created"`)
+        await db.query(`DROP INDEX "public"."IDX_60842e4b20e928204cc0790128"`)
+        await db.query(`DROP INDEX "public"."IDX_74c2a7bf57c43f69f91b7c3b20"`)
+        await db.query(`DROP INDEX "public"."IDX_d8be771bb35fe590c45a7d1af2"`)
+        await db.query(`DROP INDEX "public"."IDX_19b4155090d82294060bb44366"`)
+        await db.query(`DROP INDEX "public"."IDX_40d43ab503f180b7532f42f45a"`)
+        await db.query(`DROP INDEX "public"."IDX_b4ffd29e88ac91115e44fc5b03"`)
+        await db.query(`DROP INDEX "public"."IDX_fe01f00328010eac8a03879936"`)
         await db.query(`DROP TABLE "aero_voter_voted"`)
         await db.query(`DROP INDEX "public"."IDX_619b6d941dec261bf42c1baf66"`)
         await db.query(`DROP INDEX "public"."IDX_5ba9d8c53a6ceed65361f071b8"`)
