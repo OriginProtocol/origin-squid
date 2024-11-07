@@ -8,7 +8,7 @@ import { logFilter } from '@utils/logFilter'
 
 export const createEventProcessor = <T extends Struct, EventEntity extends Entity>(params: {
   event: ReturnType<typeof event<T>>
-  address: string
+  address?: string
   from: number
   mapEntity: (ctx: Context, block: Block, log: Log, decoded: DecodedStruct<IndexedCodecs<T>>) => EventEntity
   extraFilterArgs?: {
@@ -18,7 +18,7 @@ export const createEventProcessor = <T extends Struct, EventEntity extends Entit
   }
 }) => {
   const filter = logFilter({
-    address: [params.address],
+    address: params.address ? [params.address] : undefined,
     range: { from: params.from },
     topic0: [params.event.topic],
     ...params.extraFilterArgs,
