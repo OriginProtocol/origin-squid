@@ -43,7 +43,7 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
       baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].address,
     )
     const slot0 = await pool.slot0()
-    return getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96) - 10n ** 14n // minus .01% fee
+    return getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96)
   },
   superOETHb_ETH: async (ctx, height) => {
     if (height < baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].from) {
@@ -55,7 +55,7 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
       baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].address,
     )
     const slot0 = await pool.slot0()
-    return 10n ** 36n / getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96) - 10n ** 14n // minus .01% fee
+    return 10n ** 36n / getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96)
   },
   OGN_ETH: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_superOETHb: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
