@@ -1,6 +1,8 @@
+import * as aerodromeCLPoolFactoryAbi from '@abi/aerodrome-cl-pool-factory'
 import * as aerodromeGaugeAbi from '@abi/aerodrome-gauge'
+import * as aerodromePoolFactoryAbi from '@abi/aerodrome-pool-factory'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
-import { AeroGaugeNotifyReward, AeroVoterGaugeCreated } from '@model'
+import { AeroCLPoolCreated, AeroGaugeNotifyReward, AeroPoolCreated, AeroVoterGaugeCreated } from '@model'
 import { Processor } from '@processor'
 import { aerodromeCLGauge } from '@templates/aerodrome/cl-gauge'
 import { aerodromeCLPool } from '@templates/aerodrome/cl-pool'
@@ -77,6 +79,42 @@ export const aerodromeProcessors = pools
           blockNumber: block.header.height,
           address: log.address,
           ...decoded,
+        })
+      },
+    }),
+    createEventProcessor({
+      address: baseAddresses.aerodrome.poolFactory.amm,
+      event: aerodromePoolFactoryAbi.events.PoolCreated,
+      from: 3200559,
+      mapEntity: (ctx, block, log, decoded) => {
+        return new AeroPoolCreated({
+          id: `${ctx.chain.id}:${log.id}`,
+          chainId: ctx.chain.id,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
+          address: log.address,
+          pool: decoded.pool,
+          token0: decoded.token0,
+          token1: decoded.token1,
+          stable: decoded.stable,
+        })
+      },
+    }),
+    createEventProcessor({
+      address: baseAddresses.aerodrome.poolFactory.cl,
+      event: aerodromeCLPoolFactoryAbi.events.PoolCreated,
+      from: 13843704,
+      mapEntity: (ctx, block, log, decoded) => {
+        return new AeroCLPoolCreated({
+          id: `${ctx.chain.id}:${log.id}`,
+          chainId: ctx.chain.id,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
+          address: log.address,
+          pool: decoded.pool,
+          token0: decoded.token0,
+          token1: decoded.token1,
+          tickSpacing: decoded.tickSpacing,
         })
       },
     }),

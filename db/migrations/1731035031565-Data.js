@@ -1,5 +1,5 @@
-module.exports = class Data1730966585064 {
-    name = 'Data1730966585064'
+module.exports = class Data1731035031565 {
+    name = 'Data1731035031565'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -118,6 +118,16 @@ module.exports = class Data1730966585064 {
         await db.query(`CREATE INDEX "IDX_e5543f3d001fb59eb535ab63d7" ON "aero_gauge_withdraw" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_9fc2ffc2e3f92d5ddbd1a2b894" ON "aero_gauge_withdraw" ("address") `)
         await db.query(`CREATE INDEX "IDX_7c7831588b26b43f0c773ae3e3" ON "aero_gauge_withdraw" ("from") `)
+        await db.query(`CREATE TABLE "aero_pool_created" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "pool" text NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "stable" boolean NOT NULL, CONSTRAINT "PK_92121ac89556a501f1d9d9a3cc4" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_c0420757a8d67132c475450b37" ON "aero_pool_created" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_8e60b2e8b223efda676eff93d9" ON "aero_pool_created" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_7f98545a433bc1fa08c9b8d4ed" ON "aero_pool_created" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_6372821d7d9888a53637b6a7ad" ON "aero_pool_created" ("address") `)
+        await db.query(`CREATE TABLE "aero_cl_pool_created" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "pool" text NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "tick_spacing" integer NOT NULL, CONSTRAINT "PK_3c64e6a99fd4cf16f26d514fe32" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_3b7186dca3828117fb53ef0206" ON "aero_cl_pool_created" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_68fc780d94ec199f1eb50e68f7" ON "aero_cl_pool_created" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_ec5ee04a8c72b11d543e28e5e6" ON "aero_cl_pool_created" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_2701b481a50882398b9cb7e05b" ON "aero_cl_pool_created" ("address") `)
         await db.query(`CREATE TABLE "aero_pool_approval" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "owner" text NOT NULL, "spender" text NOT NULL, "value" numeric NOT NULL, CONSTRAINT "PK_fe1e872d70001801f68a0dc1d8b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f369e0d2196f44e4a67aae9480" ON "aero_pool_approval" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_b1ef5297a33f03c19b13a29876" ON "aero_pool_approval" ("block_number") `)
@@ -880,6 +890,16 @@ module.exports = class Data1730966585064 {
         await db.query(`DROP INDEX "public"."IDX_e5543f3d001fb59eb535ab63d7"`)
         await db.query(`DROP INDEX "public"."IDX_9fc2ffc2e3f92d5ddbd1a2b894"`)
         await db.query(`DROP INDEX "public"."IDX_7c7831588b26b43f0c773ae3e3"`)
+        await db.query(`DROP TABLE "aero_pool_created"`)
+        await db.query(`DROP INDEX "public"."IDX_c0420757a8d67132c475450b37"`)
+        await db.query(`DROP INDEX "public"."IDX_8e60b2e8b223efda676eff93d9"`)
+        await db.query(`DROP INDEX "public"."IDX_7f98545a433bc1fa08c9b8d4ed"`)
+        await db.query(`DROP INDEX "public"."IDX_6372821d7d9888a53637b6a7ad"`)
+        await db.query(`DROP TABLE "aero_cl_pool_created"`)
+        await db.query(`DROP INDEX "public"."IDX_3b7186dca3828117fb53ef0206"`)
+        await db.query(`DROP INDEX "public"."IDX_68fc780d94ec199f1eb50e68f7"`)
+        await db.query(`DROP INDEX "public"."IDX_ec5ee04a8c72b11d543e28e5e6"`)
+        await db.query(`DROP INDEX "public"."IDX_2701b481a50882398b9cb7e05b"`)
         await db.query(`DROP TABLE "aero_pool_approval"`)
         await db.query(`DROP INDEX "public"."IDX_f369e0d2196f44e4a67aae9480"`)
         await db.query(`DROP INDEX "public"."IDX_b1ef5297a33f03c19b13a29876"`)
