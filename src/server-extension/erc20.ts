@@ -26,6 +26,7 @@ export class ERC20Resolver {
 
   @Query(() => [ERC20StateByDay])
   async erc20StateByDay(
+    @Arg('chainId', () => String, { nullable: false }) chainId: number,
     @Arg('address', () => String, { nullable: false }) address: string,
     @Arg('from', () => String, { nullable: false }) from: string,
     @Arg('to', () => String, { nullable: true }) to: string | null,
@@ -56,6 +57,7 @@ export class ERC20Resolver {
             erc20_state
           WHERE
             address = $1
+            AND chain_id = $4
             AND timestamp >= $2
             AND ($3::timestamp IS NULL OR timestamp <= $3)
           ORDER BY
@@ -93,13 +95,11 @@ export class ERC20Resolver {
           filled_holder_count AS holder_count
         FROM
           filled_data
-        WHERE
-          chain_id is not null
         ORDER BY
           day;
 
     `,
-      [address, from, to],
+      [address, from, to, chainId],
     )
 
     return results.map(
