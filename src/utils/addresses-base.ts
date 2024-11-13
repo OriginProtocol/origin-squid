@@ -141,5 +141,9 @@ export const baseAddresses = {
     factoryRegistry: '0x5c3f18f06cc09ca1910767a34a20f771039e37c0',
     slipstreamNft: '0x827922686190790b37229fd06084350e74485b72',
     pools: aerodromePools,
+    poolFactory: {
+      amm: '0x420DD381b31aEf6683db6B902084cB0FFECe40Da',
+      cl: '0x5e7BB104d84c7CB9B682AaC2F3d509f5F406809A',
+    },
   },
 } as const

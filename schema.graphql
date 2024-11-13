@@ -217,6 +217,29 @@ type AeroGaugeWithdraw @entity {
   from: String! @index
   amount: BigInt!
 }
+type AeroPoolCreated @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  pool: String!
+  token0: String!
+  token1: String!
+  stable: Boolean!
+}
+
+type AeroCLPoolCreated @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  pool: String!
+  token0: String!
+  token1: String!
+  tickSpacing: Int!
+}
 type AeroPoolApproval @entity {
   id: ID!
   chainId: Int! @index
