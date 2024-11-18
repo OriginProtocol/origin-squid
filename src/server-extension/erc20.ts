@@ -73,8 +73,6 @@ SELECT
     coalesce(ldd.total_supply, 0) as total_supply,
     coalesce(ldd.holder_count, 0) as holder_count
 FROM
-    ldd.holder_count
-FROM
     date_series ds
 LEFT JOIN LATERAL (
     -- Find the most recent row from latest_daily_data for each day
