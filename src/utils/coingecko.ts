@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
@@ -90,9 +91,7 @@ export async function applyCoingeckoData(
   } else {
     whereClause.pegPrice = 0n
   }
-  if (props.startTimestamp) {
-    whereClause.timestamp = Between(new Date(props.startTimestamp), getStartOfDayTimestamp())
-  }
+  whereClause.timestamp = Between(dayjs().subtract(365, 'day').toDate(), getStartOfDayTimestamp())
   const statsWithNoPrice = await ctx.store.findBy(Entity as any, whereClause)
 
   if (statsWithNoPrice.length > 0) {
@@ -119,6 +118,7 @@ export async function applyCoingeckoData(
     if (!coingeckoJson) {
       console.log('No coingeckoJson :(')
     } else {
+      console.log('Processing coingecko data')
       const coingeckData = processCoingeckoData(coingeckoJson)
       for (const dayId in coingeckData) {
         const stat = statsWithNoPrice.find((s) => s.id === dayId) as
@@ -131,7 +131,9 @@ export async function applyCoingeckoData(
         if (stat && day.prices) {
           stat.tradingVolumeUSD = day.total_volumes || 0
           stat.marketCapUSD = day.market_caps || 0
-          if (stat instanceof OGVDailyStat || stat instanceof OGNDailyStat) {
+          console.log('stat', stat)
+          console.log('price data', day)
+          if ('priceUSD' in stat) {
             stat.priceUSD = day.prices
           } else {
             stat.pegPrice = parseEther(String(day.prices))
