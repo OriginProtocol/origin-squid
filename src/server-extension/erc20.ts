@@ -26,7 +26,7 @@ export class ERC20Resolver {
 
   @Query(() => [ERC20StateByDay])
   async erc20StateByDay(
-    @Arg('chainId', () => String, { nullable: false }) chainId: number,
+    @Arg('chainId', () => Number, { nullable: false }) chainId: number,
     @Arg('address', () => String, { nullable: false }) address: string,
     @Arg('from', () => String, { nullable: false }) from: string,
     @Arg('to', () => String, { nullable: true }) to: string | null,
@@ -108,7 +108,7 @@ export class ERC20Resolver {
           chainId: row.chain_id,
           address: row.address,
           day: row.day,
-          totalSupply: BigInt(row.total_supply),
+          totalSupply: BigInt(row.total_supply ?? 0n),
           holderCount: row.holder_count,
         }),
     )
