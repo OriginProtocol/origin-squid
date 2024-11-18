@@ -68,9 +68,11 @@ latest_daily_data AS (
 )
 SELECT
     ds.day,
-    ldd.chain_id,
-    ldd.address,
-    ldd.total_supply,
+    coalesce(ldd.chain_id, $4) as chain_id,
+    coalesce(ldd.address, $1) as address,
+    coalesce(ldd.total_supply, 0) as total_supply,
+    coalesce(ldd.holder_count, 0) as holder_count
+FROM
     ldd.holder_count
 FROM
     date_series ds
