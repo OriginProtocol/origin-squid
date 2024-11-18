@@ -35,69 +35,62 @@ export class ERC20Resolver {
     const manager = await this.tx()
     const results = await manager.query(
       `
-        WITH RECURSIVE date_series AS (
-          SELECT 
-            DATE_TRUNC('day', $2::timestamp) AS day
-          UNION
-          SELECT 
-            day + INTERVAL '1 day'
-          FROM 
-            date_series
-          WHERE 
-            day + INTERVAL '1 day' <= COALESCE($3::timestamp, NOW())
-        ),
-        latest_daily_data AS (
-          SELECT DISTINCT ON (DATE_TRUNC('day', timestamp))
-            DATE_TRUNC('day', timestamp) AS day,
-            chain_id,
-            address,
-            total_supply,
-            holder_count
-          FROM
-            erc20_state
-          WHERE
-            address = $1
-            AND chain_id = $4
-            AND timestamp >= $2
-            AND ($3::timestamp IS NULL OR timestamp <= $3)
-          ORDER BY
-            DATE_TRUNC('day', timestamp), timestamp DESC
-        ),
-        data_with_gaps AS (
-          SELECT
-            ds.day,
-            ldd.chain_id,
-            ldd.address,
-            ldd.total_supply,
-            ldd.holder_count
-          FROM 
-            date_series ds
-          LEFT JOIN 
-            latest_daily_data ldd ON ds.day = ldd.day
-        ),
-        filled_data AS (
-          SELECT
-            day,
-            chain_id,
-            address,
-            total_supply,
-            holder_count,
-            COALESCE(total_supply, LAG(total_supply) OVER (PARTITION BY address ORDER BY day)) AS filled_total_supply,
-            COALESCE(holder_count, LAG(holder_count) OVER (PARTITION BY address ORDER BY day)) AS filled_holder_count
-          FROM
-            data_with_gaps
-        )
-        SELECT
-          chain_id,
-          address,
-          day,
-          filled_total_supply AS total_supply,
-          filled_holder_count AS holder_count
-        FROM
-          filled_data
-        ORDER BY
-          day;
-
+WITH RECURSIVE date_series AS (
+    -- Generate a series of dates from the starting date to today
+    SELECT
+        DATE_TRUNC('day', $2::timestamp) AS day
+    UNION
+    SELECT
+        day + INTERVAL '1 day'
+    FROM
+        date_series
+    WHERE
+        day + INTERVAL '1 day' <= COALESCE($3::timestamp, NOW())
+),
+latest_daily_data AS (
+    -- Get the latest data for each day
+    SELECT DISTINCT ON (DATE_TRUNC('day', timestamp))
+        DATE_TRUNC('day', timestamp) AS day,
+        chain_id,
+        address,
+        total_supply,
+        holder_count,
+        timestamp
+    FROM
+        erc20_state
+    WHERE
+        address = $1
+        AND chain_id = $4
+        AND timestamp >= $2::timestamp
+        AND timestamp <= COALESCE($3::timestamp, NOW())
+    ORDER BY
+        DATE_TRUNC('day', timestamp), timestamp DESC
+)
+SELECT
+    ds.day,
+    ldd.chain_id,
+    ldd.address,
+    ldd.total_supply,
+    ldd.holder_count
+FROM
+    date_series ds
+LEFT JOIN LATERAL (
+    -- Find the most recent row from latest_daily_data for each day
+    SELECT
+        chain_id,
+        address,
+        total_supply,
+        holder_count
+    FROM
+        latest_daily_data
+    WHERE
+        latest_daily_data.timestamp <= ds.day + INTERVAL '1 day' - INTERVAL '1 second'
+    ORDER BY
+        timestamp DESC
+    LIMIT 1
+) ldd ON true
+ORDER BY
+    ds.day;
     `,
       [address, from, to, chainId],
     )
