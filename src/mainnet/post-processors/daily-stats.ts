@@ -5,7 +5,7 @@ import { FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm
 import { ERC20Balance, ERC20Holder, ERC20State, OGNDailyStat } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { applyCoingeckoData } from '@utils/coingecko'
+import { getCoingeckoData } from '@utils/coingecko2'
 
 dayjs.extend(utc)
 
@@ -31,33 +31,24 @@ export const process = async (ctx: Context) => {
 
   const ognDailyStats = [] as OGNDailyStat[]
 
+  const coingeckoData = await getCoingeckoData(ctx, {
+    coinId: 'origin-protocol',
+    vsCurrency: 'usd',
+  })
   for (const date of dates) {
-    const dailyOGNStatInserts = await updateOGNDailyStats(ctx, date)
-    if (dailyOGNStatInserts) {
-      ognDailyStats.push(dailyOGNStatInserts.dailyStat)
+    const newDailyStat = await createDailyStat(ctx, date)
+    if (newDailyStat) {
+      const day = coingeckoData[newDailyStat.id]
+      newDailyStat.priceUSD = day?.prices || 0
+      newDailyStat.marketCapUSD = day?.market_caps || 0
+      newDailyStat.tradingVolumeUSD = day?.total_volumes || 0
+      ognDailyStats.push(newDailyStat)
     }
   }
-
-  if (ctx.isHead) {
-    const updatedOGNStats = (await applyCoingeckoData(ctx, {
-      Entity: OGNDailyStat,
-      coinId: 'origin-protocol',
-      // startTimestamp: Date.UTC(2023, 4, 17),
-    })) as OGNDailyStat[]
-
-    const existingOGNIds = ognDailyStats.map((stat) => stat.id)
-    ognDailyStats.push(...updatedOGNStats.filter((stat) => existingOGNIds.indexOf(stat.id) < 0))
-  }
-
   await ctx.store.upsert(ognDailyStats)
 }
 
-async function updateOGNDailyStats(ctx: Context, date: Date) {
-  const queryParams = {
-    where: { timestamp: LessThanOrEqual(date) },
-    order: { timestamp: 'desc' as FindOptionsOrderValue },
-  }
-
+async function createDailyStat(ctx: Context, date: Date) {
   const [stakedBalance, holdersOverThreshold, totalSupply] = await Promise.all([
     ctx.store.findOne(ERC20Balance, {
       where: {
@@ -106,5 +97,5 @@ async function updateOGNDailyStats(ctx: Context, date: Date) {
     holdersOverThreshold,
   })
 
-  return { dailyStat }
+  return dailyStat
 }
