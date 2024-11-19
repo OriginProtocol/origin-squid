@@ -5,7 +5,6 @@ import { Arg, Field, Info, Int, ObjectType, Query, Resolver } from 'type-graphql
 import { EntityManager, LessThanOrEqual } from 'typeorm'
 
 import { StrategyBalance } from '@model'
-import { getStrategyMeta } from '@shared/strategies-meta'
 import { IStrategyData } from '@templates/strategy'
 import { addresses } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
@@ -31,8 +30,6 @@ export class Strategy {
   kind!: string
   @Field(() => [Balance], { nullable: false })
   balances!: Balance[]
-  @Field(() => StrategyMeta, { nullable: true })
-  meta!: StrategyMeta | null
 
   constructor(props: Partial<Strategy>) {
     Object.assign(this, props)
@@ -55,20 +52,6 @@ export class Balance {
   balanceETH!: bigint
 
   constructor(props: Partial<Balance>) {
-    Object.assign(this, props)
-  }
-}
-
-@ObjectType()
-export class StrategyMeta {
-  @Field(() => String, { nullable: false })
-  title!: string
-  @Field(() => String, { nullable: false })
-  description!: string
-  @Field(() => String, { nullable: false })
-  color!: string
-
-  constructor(props: Partial<StrategyMeta>) {
     Object.assign(this, props)
   }
 }
@@ -105,7 +88,6 @@ export class StrategyResolver {
           address: s.address,
           oTokenAddress: s.oTokenAddress,
           kind: s.kind,
-          meta: getStrategyMeta(s.oTokenAddress, s.address) ?? null,
           balances: compact(
             await Promise.all(
               s.assets.map((asset) =>
