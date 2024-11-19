@@ -1,5 +1,6 @@
-// Lowercase Addresses
+import { uniq } from 'lodash'
 
+// Lowercase Addresses
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const ETH_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 
@@ -130,13 +131,7 @@ export const strategies = {
     FraxETHStrategy: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
     MorphoAaveStrategy: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
-    ...OETH_NATIVE_STRATEGY_ADDRESSES.reduce(
-      (acc, address, i) => {
-        acc[`NativeStakingStrategy${i}`] = address
-        return acc
-      },
-      {} as Record<string, string>,
-    ),
+    NativeStakingStrategies: OETH_NATIVE_STRATEGY_ADDRESSES,
   },
   ousd: {
     ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
@@ -149,12 +144,13 @@ export const strategies = {
     ConvexStrategy: '0xea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3', // Deprecated
     LUSDMetaStrategy: '0x7A192DD9Cc4Ea9bdEdeC9992df74F1DA55e60a19', // Deprecated
     MetaMorphoStrategy: '0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0',
+    MakerStrategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
   },
 } as const
 
 export type OETHStrategyKey = keyof typeof strategies.oeth
 export type OETHStrategyAddress = (typeof strategies.oeth)[OETHStrategyKey]
-export const oethStrategyArray = Object.values(strategies.oeth)
+export const oethStrategyArray = uniq(Object.values(strategies.oeth).flat())
 export type OUSDStrategyKey = keyof typeof strategies.ousd
 export type OUSDStrategyAddress = (typeof strategies.ousd)[OUSDStrategyKey]
 export const ousdStrategyArray = Object.values(strategies.ousd)
