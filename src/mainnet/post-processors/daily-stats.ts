@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
+import { formatEther } from 'viem'
 
 import { ERC20Balance, ERC20Holder, ERC20State, OGNDailyStat } from '@model'
 import { Context } from '@processor'
@@ -42,6 +43,7 @@ export const process = async (ctx: Context) => {
       newDailyStat.priceUSD = day?.prices || 0
       newDailyStat.marketCapUSD = day?.market_caps || 0
       newDailyStat.tradingVolumeUSD = day?.total_volumes || 0
+      newDailyStat.totalSupplyUSD = Number(formatEther(newDailyStat.totalSupply)) * newDailyStat.priceUSD
       ognDailyStats.push(newDailyStat)
     }
   }
