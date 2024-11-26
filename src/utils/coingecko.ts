@@ -1,17 +1,12 @@
 import dayjs from 'dayjs'
 import { Between, LessThanOrEqual } from 'typeorm'
-import { parseEther } from 'viem'
 
-import { OETHDailyStat, OGNDailyStat, OGVDailyStat, OUSDDailyStat } from '@model'
+import { OGNDailyStat, OGVDailyStat } from '@model'
 import { Context } from '@processor'
 import { queryClient } from '@utils/queryClient'
 import { EntityClassT } from '@utils/type'
 
-type DailyStat =
-  | EntityClassT<OETHDailyStat>
-  | EntityClassT<OGVDailyStat>
-  | EntityClassT<OGNDailyStat>
-  | EntityClassT<OUSDDailyStat>
+type DailyStat = EntityClassT<OGVDailyStat> | EntityClassT<OGNDailyStat>
 
 export interface CoingeckoDataInput {
   prices: [number, number][]
@@ -121,11 +116,7 @@ export async function applyCoingeckoData(
       console.log('Processing coingecko data')
       const coingeckData = processCoingeckoData(coingeckoJson)
       for (const dayId in coingeckData) {
-        const stat = statsWithNoPrice.find((s) => s.id === dayId) as
-          | OETHDailyStat
-          | OUSDDailyStat
-          | OGVDailyStat
-          | OGNDailyStat
+        const stat = statsWithNoPrice.find((s) => s.id === dayId) as OGVDailyStat | OGNDailyStat
         const day = coingeckData[dayId]
 
         if (stat && day.prices) {
@@ -133,11 +124,7 @@ export async function applyCoingeckoData(
           stat.marketCapUSD = day.market_caps || 0
           console.log('stat', stat)
           console.log('price data', day)
-          if ('priceUSD' in stat) {
-            stat.priceUSD = day.prices
-          } else {
-            stat.pegPrice = parseEther(String(day.prices))
-          }
+          stat.priceUSD = day.prices
           updatedStats.push(stat)
         }
       }

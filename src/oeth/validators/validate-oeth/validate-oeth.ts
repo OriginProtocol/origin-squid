@@ -1,16 +1,6 @@
 import { sortBy } from 'lodash'
 
-import {
-  OETHDailyStat,
-  OETHMorphoAave,
-  OETHVault,
-  OToken,
-  OTokenAPY,
-  OTokenDailyStat,
-  OTokenHistory,
-  OTokenRebase,
-  StrategyBalance,
-} from '@model'
+import { OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase, StrategyBalance } from '@model'
 import { Context } from '@processor'
 import { env } from '@utils/env'
 import { entities } from '@validation/entities'
@@ -28,10 +18,7 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, OTokenHistory, firstBlock, entities.oeth_oTokenHistories)
     await validateExpectations(ctx, block, OTokenRebase, firstBlock, entities.oeth_oTokenRebases)
     await validateExpectations(ctx, block, OTokenDailyStat, firstBlock, entities.oeth_oTokenDailyStats)
-    await validateExpectations(ctx, block, OETHVault, firstBlock, expectations.oethVaults)
-    await validateExpectations(ctx, block, OETHMorphoAave, firstBlock, expectations.oethMorphoAave)
     await validateExpectations(ctx, block, StrategyBalance, firstBlock, expectations.strategyBalances)
-    await validateExpectations(ctx, block, OETHDailyStat, firstBlock, expectations.oethDailyStats)
     firstBlock = false
   }
 }

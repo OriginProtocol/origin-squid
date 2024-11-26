@@ -16,7 +16,7 @@ import './rpc-issues'
 dayjs.extend(duration)
 dayjs.extend(utc)
 
-export const createSquidProcessor = (config: ChainConfig) => {
+export const createEvmBatchProcessor = (config: ChainConfig) => {
   const url = config.endpoints[0] || 'http://localhost:8545'
   console.log(`RPC URL: ${url}`)
 
@@ -67,14 +67,24 @@ export const createSquidProcessor = (config: ChainConfig) => {
   return processor
 }
 
+export interface SquidProcessor {
+  chainId?: 1 | 42161 | 8453
+  stateSchema?: string
+  processors: Processor[]
+  postProcessors?: Processor[]
+  validators?: Pick<Processor, 'process' | 'name'>[]
+}
+
 export interface Processor {
   name?: string
   from?: number
   initialize?: (ctx: Context) => Promise<void> // To only be run once per `sqd process`.
-  setup?: (p: ReturnType<typeof createSquidProcessor>, chain?: Chain) => void
+  setup?: (p: ReturnType<typeof createEvmBatchProcessor>, chain?: Chain) => void
   process: (ctx: Context) => Promise<void>
 }
-export const createProcessor = (p: Processor) => p
+
+export const defineSquidProcessor = (p: SquidProcessor) => p
+export const defineProcessor = (p: Processor) => p
 
 let initialized = false
 
@@ -111,19 +121,7 @@ export const chainConfigs = {
   },
 } as const
 
-export const run = ({
-  chainId = 1,
-  stateSchema,
-  processors,
-  postProcessors,
-  validators,
-}: {
-  chainId?: 1 | 42161 | 8453
-  stateSchema?: string
-  processors: Processor[]
-  postProcessors?: Processor[]
-  validators?: Pick<Processor, 'process' | 'name'>[]
-}) => {
+export const run = ({ chainId = 1, stateSchema, processors, postProcessors, validators }: SquidProcessor) => {
   assert(!processors.find((p) => p.from === undefined), 'All processors must have a `from` defined')
 
   if (process.env.PROCESSOR) {
@@ -132,9 +130,9 @@ export const run = ({
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
-  const processor = createSquidProcessor(config)
+  const evmBatchProcessor = createEvmBatchProcessor(config)
 
-  processor.setBlockRange({
+  evmBatchProcessor.setBlockRange({
     from: process.env.BLOCK_FROM
       ? Number(process.env.BLOCK_FROM)
       : Math.min(
@@ -143,9 +141,9 @@ export const run = ({
         ),
     to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
   })
-  processors.forEach((p) => p.setup?.(processor, config.chain))
-  postProcessors?.forEach((p) => p.setup?.(processor, config.chain))
-  processor.run(
+  processors.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
+  postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
+  evmBatchProcessor.run(
     new TypeormDatabase({
       stateSchema,
       supportHotBlocks: true,
@@ -230,7 +228,7 @@ export const run = ({
   )
 }
 
-export type Fields = EvmBatchProcessorFields<ReturnType<typeof createSquidProcessor>>
+export type Fields = EvmBatchProcessorFields<ReturnType<typeof createEvmBatchProcessor>>
 export type Context = DataHandlerContext<Store, Fields> & {
   chain: Chain
   blockRate: number

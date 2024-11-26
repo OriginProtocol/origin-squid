@@ -1,12 +1,12 @@
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
+import { originArmProcessors } from 'mainnet/processors/origin-arm'
 import 'tsconfig-paths/register'
 
-import { run } from '@processor'
+import { defineSquidProcessor, run } from '@processor'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
-import { createOriginARMProcessors } from '@templates/origin-arm'
 import { processStatus } from '@templates/processor-status'
 import {
   OGN_ADDRESS,
@@ -14,7 +14,6 @@ import {
   OGN_REWARDS_SOURCE_ADDRESS,
   OGV_GOVERNANCE_ADDRESS,
   XOGN_ADDRESS,
-  addresses,
 } from '@utils/addresses'
 
 import * as dailyStats from './mainnet/post-processors/daily-stats'
@@ -24,7 +23,7 @@ import * as legacyStaking from './mainnet/processors/legacy-staking'
 import * as nativeStaking from './mainnet/processors/native-staking'
 import * as validate from './mainnet/validators/validate-mainnet'
 
-export const processor = {
+export const processor = defineSquidProcessor({
   stateSchema: 'mainnet-processor',
   processors: [
     nativeStaking,
@@ -42,16 +41,11 @@ export const processor = {
     }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     coingeckoProcessor,
-    ...createOriginARMProcessors({
-      name: 'origin-arm',
-      from: 20987226,
-      armAddress: addresses.arm.address,
-      capManagerAddress: addresses.arm.capManager,
-    }),
+    ...originArmProcessors,
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
   validators: [validate],
-}
+})
 export default processor
 
 if (require.main === module) {

@@ -9,7 +9,7 @@ import { IStrategyData } from '@templates/strategy'
 import { addresses } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 
-import { oethbStrategies } from '../base/strategies'
+import { strategies } from '../base/strategies'
 import { oethStrategies } from '../oeth/processors/strategies'
 
 /**
@@ -59,7 +59,7 @@ export class Balance {
 const otokens: Record<string, readonly IStrategyData[]> = {
   [addresses.oeth.address]: oethStrategies,
   [addresses.ousd.address]: ousdStrategies,
-  [baseAddresses.superOETHb.address]: oethbStrategies,
+  [baseAddresses.superOETHb.address]: strategies,
 }
 
 @Resolver()

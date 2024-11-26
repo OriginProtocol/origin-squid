@@ -1,10 +1,9 @@
-import { Context } from '@processor'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { defineProcessor } from '@processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import { baseAddresses } from '@utils/addresses-base'
 
-export const oethbStrategies: readonly IStrategyData[] = [
+export const strategies: readonly IStrategyData[] = [
   {
     chainId: 8453,
     from: 18689563,
@@ -31,20 +30,11 @@ export const oethbStrategies: readonly IStrategyData[] = [
   },
 ]
 
-const strategies = oethbStrategies
-
-const processors = [
-  ...strategies.map(createStrategyProcessor),
-  ...strategies.filter((s) => s.kind !== 'Vault').map((strategy) => createStrategyRewardProcessor(strategy)),
-]
-
-export const baseStrategies = {
-  from: Math.min(...strategies.map((s) => s.from)),
-  setup: (processor: EvmBatchProcessor) => {
-    strategies.forEach((s) => createStrategySetup(s)(processor))
-    strategies.filter((s) => s.kind !== 'Vault').forEach((s) => createStrategyRewardSetup(s)(processor))
-  },
-  process: async (ctx: Context) => {
-    await Promise.all(processors.map((p) => p(ctx)))
-  },
-}
+export const baseStrategies = strategies.map((s) => {
+  return defineProcessor({
+    name: s.name,
+    from: s.from,
+    setup: s.kind !== 'Vault' ? createStrategyRewardSetup(s) : createStrategySetup(s),
+    process: s.kind !== 'Vault' ? createStrategyRewardProcessor(s) : createStrategyProcessor(s),
+  })
+})

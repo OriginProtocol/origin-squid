@@ -1,12 +1,12 @@
 import { CoinGeckoCoinData } from '@model'
-import { createProcessor } from '@processor'
+import { defineProcessor } from '@processor'
 import { CoingeckoDataOutput } from '@utils/coingecko'
 import { getCoingeckoData } from '@utils/coingecko2'
 
 let throttleTimestamp = 0
 let lastProcessTimestamp = 0
 const from = 20933088
-export const coingeckoProcessor = createProcessor({
+export const coingeckoProcessor = defineProcessor({
   from, // This is irrelevant
   name: 'coingecko',
   setup: async (processor) => {
