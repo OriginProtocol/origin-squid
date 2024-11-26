@@ -11,7 +11,7 @@ import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
-  OETH_NATIVE_STRATEGY_ADDRESSES,
+  OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
   STETH_ADDRESS,
@@ -139,38 +139,29 @@ export const oethStrategies: readonly IStrategyData[] = [
       decimals: 18,
     })),
   },
-  {
-    chainId: 1,
-    from: 20046251,
-    name: 'OETH Native Staking 1',
-    contractName: 'NativeStakingSSVStrategy',
-    address: OETH_NATIVE_STRATEGY_ADDRESSES[0],
-    oTokenAddress: OETH_ADDRESS,
-    kind: 'NativeStaking',
-    base: { address: WETH_ADDRESS, decimals: 18 },
-    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
-    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
-  },
-  {
-    chainId: 1,
-    from: 20290461,
-    name: 'OETH Native Staking 2',
-    contractName: 'NativeStakingSSVStrategy',
-    address: OETH_NATIVE_STRATEGY_ADDRESSES[1],
-    oTokenAddress: OETH_ADDRESS,
-    kind: 'NativeStaking',
-    base: { address: WETH_ADDRESS, decimals: 18 },
-    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
-    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
-  },
+  ...OETH_NATIVE_STRATEGIES.map(
+    (strategy, index) =>
+      ({
+        chainId: 1,
+        from: strategy.from,
+        name: `OETH Native Staking ${index + 1}`,
+        contractName: 'NativeStakingSSVStrategy',
+        address: strategy.address,
+        oTokenAddress: OETH_ADDRESS,
+        kind: 'NativeStaking',
+        base: { address: WETH_ADDRESS, decimals: 18 },
+        assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+        earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+      }) as const,
+  ),
 ]
 
 const strategies = oethStrategies
 
 const eventProcessors = [
-  ...OETH_NATIVE_STRATEGY_ADDRESSES.map((address) =>
+  ...OETH_NATIVE_STRATEGIES.map((strategy) =>
     createEventProcessor({
-      address,
+      address: strategy.address,
       event: nativeStakingAbi.events.AccountingConsensusRewards,
       from: 20046251,
       mapEntity: (ctx, block, log, decoded) =>
@@ -179,7 +170,7 @@ const eventProcessors = [
           chainId: ctx.chain.id,
           timestamp: new Date(block.header.timestamp),
           blockNumber: block.header.height,
-          address,
+          address: strategy.address,
           rewards: decoded.amount,
         }),
     }),
