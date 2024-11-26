@@ -69,10 +69,10 @@ export const CURVE_ETH_OETH_POOL_ADDRESS = '0x94b17476a93b3262d87b9a326965d1e91f
 export const OETH_FRAX_STAKING_ADDRESS = '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5'
 export const OETH_MORPHO_AAVE_ADDRESS = '0xc1fc9e5ec3058921ea5025d703cbe31764756319'
 export const OETH_STRATEGY_BALANCER_ADDRESS = '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc'
-export const OETH_NATIVE_STRATEGY_ADDRESSES = [
-  '0x34edb2ee25751ee67f68a45813b22811687c0238',
-  '0x4685db8bf2df743c861d71e6cfb5347222992076',
-  '0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63',
+export const OETH_NATIVE_STRATEGIES = [
+  { address: '0x34edb2ee25751ee67f68a45813b22811687c0238', from: 20046251 },
+  { address: '0x4685db8bf2df743c861d71e6cfb5347222992076', from: 20290461 },
+  { address: '0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63', from: 21127497 },
 ]
 export const OETH_NATIVE_STRATEGY_FEE_ACCUMULATOR_ADDRESS = '0x7ed4ccb74a1ee903af5fbd9be00ca8616f23d627'
 export const OETH_VAULT_ERC20_ADDRESSES = [WETH_ADDRESS, STETH_ADDRESS, RETH_ADDRESS, FRXETH_ADDRESS]
@@ -131,7 +131,7 @@ export const strategies = {
     FraxETHStrategy: '0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5',
     MorphoAaveStrategy: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
-    NativeStakingStrategies: OETH_NATIVE_STRATEGY_ADDRESSES,
+    NativeStakingStrategies: OETH_NATIVE_STRATEGIES.map((s) => s.address),
   },
   ousd: {
     ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
