@@ -163,6 +163,18 @@ export const oethStrategies: readonly IStrategyData[] = [
     assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
+  {
+    chainId: 1,
+    from: 21127497,
+    name: 'OETH Native Staking 3',
+    contractName: 'NativeStakingSSVStrategy',
+    address: OETH_NATIVE_STRATEGY_ADDRESSES[2],
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'NativeStaking',
+    base: { address: WETH_ADDRESS, decimals: 18 },
+    assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
 ]
 
 const strategies = oethStrategies
