@@ -10,30 +10,28 @@ export const events = {
     PendingGovernorshipTransfer: event("0xa39cc5eb22d0f34d8beaefee8a3f17cc229c1a1d1ef87a5ad47313487b1c4f0d", "PendingGovernorshipTransfer(address,address)", {"previousGovernor": indexed(p.address), "newGovernor": indexed(p.address)}),
     TotalSupplyUpdatedHighres: event("0x41645eb819d3011b13f97696a8109d14bfcddfaca7d063ec0564d62a3e257235", "TotalSupplyUpdatedHighres(uint256,uint256,uint256)", {"totalSupply": p.uint256, "rebasingCredits": p.uint256, "rebasingCreditsPerToken": p.uint256}),
     Transfer: event("0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", "Transfer(address,address,uint256)", {"from": indexed(p.address), "to": indexed(p.address), "value": p.uint256}),
+    YieldDelegated: event("0x31e39e4bb9df9d4143551c8a3a4798fc19b0854768570ce84d966f6adffd01a3", "YieldDelegated(address,address)", {"source": p.address, "target": p.address}),
+    YieldUndelegated: event("0xa4fa89dd14422a509261a2d4d459f93abdc84c6e92c5e7ae5448243713967bd3", "YieldUndelegated(address,address)", {"source": p.address, "target": p.address}),
 }
 
 export const functions = {
-    _totalSupply: viewFun("0x3eaaf86b", "_totalSupply()", {}, p.uint256),
     allowance: viewFun("0xdd62ed3e", "allowance(address,address)", {"_owner": p.address, "_spender": p.address}, p.uint256),
     approve: fun("0x095ea7b3", "approve(address,uint256)", {"_spender": p.address, "_value": p.uint256}, p.bool),
     balanceOf: viewFun("0x70a08231", "balanceOf(address)", {"_account": p.address}, p.uint256),
-    burn: fun("0x9dc29fac", "burn(address,uint256)", {"account": p.address, "amount": p.uint256}, ),
+    burn: fun("0x9dc29fac", "burn(address,uint256)", {"_account": p.address, "_amount": p.uint256}, ),
     changeSupply: fun("0x39a7919f", "changeSupply(uint256)", {"_newTotalSupply": p.uint256}, ),
     claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
     creditsBalanceOf: viewFun("0xf9854bfc", "creditsBalanceOf(address)", {"_account": p.address}, {"_0": p.uint256, "_1": p.uint256}),
     creditsBalanceOfHighres: viewFun("0xe5c4fffe", "creditsBalanceOfHighres(address)", {"_account": p.address}, {"_0": p.uint256, "_1": p.uint256, "_2": p.bool}),
     decimals: viewFun("0x313ce567", "decimals()", {}, p.uint8),
-    decreaseAllowance: fun("0xa457c2d7", "decreaseAllowance(address,uint256)", {"_spender": p.address, "_subtractedValue": p.uint256}, p.bool),
+    delegateYield: fun("0x9d01fc72", "delegateYield(address,address)", {"_from": p.address, "_to": p.address}, ),
     governanceRebaseOptIn: fun("0xbaa9c9db", "governanceRebaseOptIn(address)", {"_account": p.address}, ),
     governor: viewFun("0x0c340a24", "governor()", {}, p.address),
-    increaseAllowance: fun("0x39509351", "increaseAllowance(address,uint256)", {"_spender": p.address, "_addedValue": p.uint256}, p.bool),
-    initialize: fun("0xf542033f", "initialize(string,string,address,uint256)", {"_nameArg": p.string, "_symbolArg": p.string, "_vaultAddress": p.address, "_initialCreditsPerToken": p.uint256}, ),
-    initialize2: fun("0x472abf68", "initialize2()", {}, ),
+    initialize: fun("0xcd6dc687", "initialize(address,uint256)", {"_vaultAddress": p.address, "_initialCreditsPerToken": p.uint256}, ),
     isGovernor: viewFun("0xc7af3352", "isGovernor()", {}, p.bool),
-    isUpgraded: viewFun("0x95ef84b9", "isUpgraded(address)", {"_0": p.address}, p.uint256),
     mint: fun("0x40c10f19", "mint(address,uint256)", {"_account": p.address, "_amount": p.uint256}, ),
     name: viewFun("0x06fdde03", "name()", {}, p.string),
-    nonRebasingCreditsPerToken: viewFun("0x609350cd", "nonRebasingCreditsPerToken(address)", {"_0": p.address}, p.uint256),
+    nonRebasingCreditsPerToken: viewFun("0x609350cd", "nonRebasingCreditsPerToken(address)", {"_account": p.address}, p.uint256),
     nonRebasingSupply: viewFun("0xe696393a", "nonRebasingSupply()", {}, p.uint256),
     rebaseOptIn: fun("0xf51b0fd4", "rebaseOptIn()", {}, ),
     rebaseOptOut: fun("0xc2376dff", "rebaseOptOut()", {}, ),
@@ -47,14 +45,13 @@ export const functions = {
     transfer: fun("0xa9059cbb", "transfer(address,uint256)", {"_to": p.address, "_value": p.uint256}, p.bool),
     transferFrom: fun("0x23b872dd", "transferFrom(address,address,uint256)", {"_from": p.address, "_to": p.address, "_value": p.uint256}, p.bool),
     transferGovernance: fun("0xd38bfff4", "transferGovernance(address)", {"_newGovernor": p.address}, ),
+    undelegateYield: fun("0x06a2da3d", "undelegateYield(address)", {"_from": p.address}, ),
     vaultAddress: viewFun("0x430bf08a", "vaultAddress()", {}, p.address),
+    yieldFrom: viewFun("0x6b96be39", "yieldFrom(address)", {"_0": p.address}, p.address),
+    yieldTo: viewFun("0x5f5a8577", "yieldTo(address)", {"_0": p.address}, p.address),
 }
 
 export class Contract extends ContractBase {
-
-    _totalSupply() {
-        return this.eth_call(functions._totalSupply, {})
-    }
 
     allowance(_owner: AllowanceParams["_owner"], _spender: AllowanceParams["_spender"]) {
         return this.eth_call(functions.allowance, {_owner, _spender})
@@ -84,16 +81,12 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.isGovernor, {})
     }
 
-    isUpgraded(_0: IsUpgradedParams["_0"]) {
-        return this.eth_call(functions.isUpgraded, {_0})
-    }
-
     name() {
         return this.eth_call(functions.name, {})
     }
 
-    nonRebasingCreditsPerToken(_0: NonRebasingCreditsPerTokenParams["_0"]) {
-        return this.eth_call(functions.nonRebasingCreditsPerToken, {_0})
+    nonRebasingCreditsPerToken(_account: NonRebasingCreditsPerTokenParams["_account"]) {
+        return this.eth_call(functions.nonRebasingCreditsPerToken, {_account})
     }
 
     nonRebasingSupply() {
@@ -131,6 +124,14 @@ export class Contract extends ContractBase {
     vaultAddress() {
         return this.eth_call(functions.vaultAddress, {})
     }
+
+    yieldFrom(_0: YieldFromParams["_0"]) {
+        return this.eth_call(functions.yieldFrom, {_0})
+    }
+
+    yieldTo(_0: YieldToParams["_0"]) {
+        return this.eth_call(functions.yieldTo, {_0})
+    }
 }
 
 /// Event types
@@ -141,11 +142,10 @@ export type GovernorshipTransferredEventArgs = EParams<typeof events.Governorshi
 export type PendingGovernorshipTransferEventArgs = EParams<typeof events.PendingGovernorshipTransfer>
 export type TotalSupplyUpdatedHighresEventArgs = EParams<typeof events.TotalSupplyUpdatedHighres>
 export type TransferEventArgs = EParams<typeof events.Transfer>
+export type YieldDelegatedEventArgs = EParams<typeof events.YieldDelegated>
+export type YieldUndelegatedEventArgs = EParams<typeof events.YieldUndelegated>
 
 /// Function types
-export type _totalSupplyParams = FunctionArguments<typeof functions._totalSupply>
-export type _totalSupplyReturn = FunctionReturn<typeof functions._totalSupply>
-
 export type AllowanceParams = FunctionArguments<typeof functions.allowance>
 export type AllowanceReturn = FunctionReturn<typeof functions.allowance>
 
@@ -173,8 +173,8 @@ export type CreditsBalanceOfHighresReturn = FunctionReturn<typeof functions.cred
 export type DecimalsParams = FunctionArguments<typeof functions.decimals>
 export type DecimalsReturn = FunctionReturn<typeof functions.decimals>
 
-export type DecreaseAllowanceParams = FunctionArguments<typeof functions.decreaseAllowance>
-export type DecreaseAllowanceReturn = FunctionReturn<typeof functions.decreaseAllowance>
+export type DelegateYieldParams = FunctionArguments<typeof functions.delegateYield>
+export type DelegateYieldReturn = FunctionReturn<typeof functions.delegateYield>
 
 export type GovernanceRebaseOptInParams = FunctionArguments<typeof functions.governanceRebaseOptIn>
 export type GovernanceRebaseOptInReturn = FunctionReturn<typeof functions.governanceRebaseOptIn>
@@ -182,20 +182,11 @@ export type GovernanceRebaseOptInReturn = FunctionReturn<typeof functions.govern
 export type GovernorParams = FunctionArguments<typeof functions.governor>
 export type GovernorReturn = FunctionReturn<typeof functions.governor>
 
-export type IncreaseAllowanceParams = FunctionArguments<typeof functions.increaseAllowance>
-export type IncreaseAllowanceReturn = FunctionReturn<typeof functions.increaseAllowance>
-
 export type InitializeParams = FunctionArguments<typeof functions.initialize>
 export type InitializeReturn = FunctionReturn<typeof functions.initialize>
 
-export type Initialize2Params = FunctionArguments<typeof functions.initialize2>
-export type Initialize2Return = FunctionReturn<typeof functions.initialize2>
-
 export type IsGovernorParams = FunctionArguments<typeof functions.isGovernor>
 export type IsGovernorReturn = FunctionReturn<typeof functions.isGovernor>
-
-export type IsUpgradedParams = FunctionArguments<typeof functions.isUpgraded>
-export type IsUpgradedReturn = FunctionReturn<typeof functions.isUpgraded>
 
 export type MintParams = FunctionArguments<typeof functions.mint>
 export type MintReturn = FunctionReturn<typeof functions.mint>
@@ -245,6 +236,15 @@ export type TransferFromReturn = FunctionReturn<typeof functions.transferFrom>
 export type TransferGovernanceParams = FunctionArguments<typeof functions.transferGovernance>
 export type TransferGovernanceReturn = FunctionReturn<typeof functions.transferGovernance>
 
+export type UndelegateYieldParams = FunctionArguments<typeof functions.undelegateYield>
+export type UndelegateYieldReturn = FunctionReturn<typeof functions.undelegateYield>
+
 export type VaultAddressParams = FunctionArguments<typeof functions.vaultAddress>
 export type VaultAddressReturn = FunctionReturn<typeof functions.vaultAddress>
+
+export type YieldFromParams = FunctionArguments<typeof functions.yieldFrom>
+export type YieldFromReturn = FunctionReturn<typeof functions.yieldFrom>
+
+export type YieldToParams = FunctionArguments<typeof functions.yieldTo>
+export type YieldToReturn = FunctionReturn<typeof functions.yieldTo>
 
