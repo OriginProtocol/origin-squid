@@ -62,6 +62,28 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
         const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
         return oToken.rebasingCreditsPerTokenHighres()
       },
+      enableRpcBalance: {
+        filter: logFilter({
+          address: [OETH_ADDRESS],
+          topic0: [otoken.events.YieldDelegated.topic],
+          range: { from: 21317452 },
+        }),
+        decode: (log) => {
+          const data = otoken.events.YieldDelegated.decode(log)
+          return { addresses: [data.source, data.target] }
+        },
+      },
+      disableRpcBalance: {
+        filter: logFilter({
+          address: [OETH_ADDRESS],
+          topic0: [otoken.events.YieldUndelegated.topic],
+          range: { from: 21317452 },
+        }),
+        decode: (log) => {
+          const data = otoken.events.YieldUndelegated.decode(log)
+          return { addresses: [data.source, data.target] }
+        },
+      },
     },
   },
 }

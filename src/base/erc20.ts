@@ -31,6 +31,28 @@ export const baseERC20s = [
         const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
         return oToken.rebasingCreditsPerTokenHighres()
       },
+      enableRpcBalance: {
+        filter: logFilter({
+          address: [baseAddresses.tokens.superOETHb],
+          topic0: [otoken.events.YieldDelegated.topic],
+          range: { from: 23192884 },
+        }),
+        decode: (log) => {
+          const data = otoken.events.YieldDelegated.decode(log)
+          return { addresses: [data.source, data.target] }
+        },
+      },
+      disableRpcBalance: {
+        filter: logFilter({
+          address: [baseAddresses.tokens.superOETHb],
+          topic0: [otoken.events.YieldUndelegated.topic],
+          range: { from: 23192884 },
+        }),
+        decode: (log) => {
+          const data = otoken.events.YieldUndelegated.decode(log)
+          return { addresses: [data.source, data.target] }
+        },
+      },
     },
   }),
   // wsuperOETHb

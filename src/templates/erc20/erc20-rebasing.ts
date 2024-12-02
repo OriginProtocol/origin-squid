@@ -1,6 +1,6 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, Log } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
@@ -20,6 +20,8 @@ export const createRebasingERC20Tracker = ({
     rebaseEventFilter: LogFilter
     getCredits: (ctx: Context, block: Block, account: string) => Promise<bigint>
     getCreditsPerToken: (ctx: Context, block: Block) => Promise<bigint>
+    enableRpcBalance?: { filter: LogFilter; decode: (log: Log) => { addresses: string[] } }
+    disableRpcBalance?: { filter: LogFilter; decode: (log: Log) => { addresses: string[] } }
   }
 }) => {
   if (duplicateTracker.has(address)) {
@@ -32,7 +34,7 @@ export const createRebasingERC20Tracker = ({
   // TODO: Consider doing this differently?
   //       Eventually memory may become a constraint.
   let mostRecentState: ERC20State | undefined
-  let holders: Map<string, bigint>
+  let holders: Map<string, bigint | null>
   const transferLogFilter = logFilter({
     address: [address.toLowerCase()],
     topic0: [abi.events.Transfer.topic],
@@ -131,6 +133,14 @@ export const createRebasingERC20Tracker = ({
               const account = accounts[i].toLowerCase()
               if (account === ADDRESS_ZERO) continue
               const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
+              const useRpcBalance = holders.get(account) === null
+              const rebasingCredits = useRpcBalance ? null : credits[i]
+              const newBalance =
+                rebasingCredits === null
+                  ? await contract.balanceOf(account)
+                  : mostRecentState?.rebasingCreditsPerToken
+                  ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
+                  : 0n
               const balance = new ERC20Balance({
                 id,
                 chainId: ctx.chain.id,
@@ -138,10 +148,8 @@ export const createRebasingERC20Tracker = ({
                 blockNumber: block.header.height,
                 address,
                 account,
-                balance: mostRecentState?.rebasingCreditsPerToken
-                  ? (credits[i] * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
-                  : 0n,
-                rebasingCredits: credits[i],
+                balance: newBalance,
+                rebasingCredits,
               })
               result.balances.set(id, balance)
               if (balance.balance === 0n) {
@@ -174,9 +182,12 @@ export const createRebasingERC20Tracker = ({
         }
         const updateAllBalances = async () => {
           for (const [account, rebasingCredits] of holders.entries()) {
-            const balance = mostRecentState?.rebasingCreditsPerToken
-              ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
-              : 0n
+            const balance =
+              rebasingCredits === null
+                ? await contract.balanceOf(account)
+                : mostRecentState?.rebasingCreditsPerToken
+                ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
+                : 0n
             result.holders.set(
               account,
               new ERC20Holder({
@@ -234,6 +245,20 @@ export const createRebasingERC20Tracker = ({
             await updateState()
             await updateAllBalances()
             time('rebase log')
+          }
+          const isEnableRpcBalanceLog = rebasing?.enableRpcBalance?.filter.matches(log)
+          if (isEnableRpcBalanceLog) {
+            const data = rebasing.enableRpcBalance?.decode(log)
+            for (const account of data?.addresses ?? []) {
+              holders.set(account, null)
+            }
+          }
+          const isDisableRpcBalanceLog = rebasing?.disableRpcBalance?.filter.matches(log)
+          if (isDisableRpcBalanceLog) {
+            const data = rebasing.disableRpcBalance?.decode(log)
+            for (const account of data?.addresses ?? []) {
+              holders.set(account, await rebasing.getCredits(ctx, block, account))
+            }
           }
         }
       }
