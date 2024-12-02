@@ -23,11 +23,6 @@ type ExchangeRate @entity {
   rate: BigInt!
 }
 
-enum RebasingOption {
-  OptIn
-  OptOut
-}
-
 enum HistoryType {
   Sent
   Received

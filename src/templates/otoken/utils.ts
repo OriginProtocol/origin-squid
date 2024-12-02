@@ -33,6 +33,7 @@ export async function createAddress(ctx: Context, otoken: string, addr: string, 
     credits: 0n,
     isContract,
     rebasingOption: isContract ? RebasingOption.OptOut : RebasingOption.OptIn,
+    delegatedTo: null,
     lastUpdated,
   })
 }

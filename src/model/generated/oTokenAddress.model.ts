@@ -26,7 +26,7 @@ export class OTokenAddress {
     @BooleanColumn_({nullable: false})
     isContract!: boolean
 
-    @Column_("varchar", {length: 6, nullable: false})
+    @Column_("varchar", {length: 21, nullable: false})
     rebasingOption!: RebasingOption
 
     @BigIntColumn_({nullable: false})
@@ -37,6 +37,9 @@ export class OTokenAddress {
 
     @BigIntColumn_({nullable: false})
     credits!: bigint
+
+    @StringColumn_({nullable: true})
+    delegatedTo!: string | undefined | null
 
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
