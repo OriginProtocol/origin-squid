@@ -1,6 +1,6 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
-import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
+import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 
@@ -29,28 +29,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
         }
         return oToken.rebasingCreditsPerTokenHighres()
       },
-      enableRpcBalance: {
-        filter: logFilter({
-          address: [OUSD_ADDRESS],
-          topic0: [otoken.events.YieldDelegated.topic],
-          range: { from: 21317452 },
-        }),
-        decode: (log) => {
-          const data = otoken.events.YieldDelegated.decode(log)
-          return { addresses: [data.source, data.target] }
-        },
-      },
-      disableRpcBalance: {
-        filter: logFilter({
-          address: [OUSD_ADDRESS],
-          topic0: [otoken.events.YieldUndelegated.topic],
-          range: { from: 21317452 },
-        }),
-        decode: (log) => {
-          const data = otoken.events.YieldUndelegated.decode(log)
-          return { addresses: [data.source, data.target] }
-        },
-      },
+      ...getErc20RebasingParams({ from: 11585978, address: OUSD_ADDRESS }),
     },
   },
 }

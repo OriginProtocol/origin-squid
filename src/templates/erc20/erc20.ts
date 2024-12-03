@@ -205,7 +205,11 @@ export const createERC20Tracker = ({
         ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
-        ctx.store.remove([...result.removedHolders.values()].map((id) => new ERC20Holder({ id }))),
+        ctx.store.remove(
+          [...result.removedHolders.values()].map(
+            (account) => new ERC20Holder({ id: `${ctx.chain.id}-${address}-${account}` }),
+          ),
+        ),
       ])
       publishERC20State(ctx, address, result)
     },

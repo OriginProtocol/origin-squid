@@ -5,6 +5,14 @@ type ProcessingStatus @entity {
 }
 
 """
+Simple KV store to store metadata for processors.
+"""
+type ProcessorMetadata @entity {
+  id: ID!
+  data: JSON!
+}
+
+"""
 Any entity which has a price associated with it should have that price go in here.
 Prices can change very frequently and we don't want those changes on the same track
 as values which change less frequently.
@@ -88,9 +96,6 @@ type NativeBalance @entity {
 }
 
 type ERC20 @entity {
-  """
-  Format: 'address'
-  """
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -100,9 +105,6 @@ type ERC20 @entity {
 }
 
 type ERC20Holder @entity {
-  """
-  Format: 'address:account'
-  """
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -112,9 +114,6 @@ type ERC20Holder @entity {
 }
 
 type ERC20State @entity {
-  """
-  Format: 'address:blockNumber'
-  """
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
@@ -126,9 +125,6 @@ type ERC20State @entity {
 }
 
 type ERC20Balance @entity {
-  """
-  Format: 'address:account:blockNumber'
-  """
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
