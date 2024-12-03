@@ -26,7 +26,15 @@ export const createRebasingERC20Tracker = ({
     isEligibleForRebasing?: (ctx: Context, block: Block, account: string) => Promise<boolean>
     hooks?: {
       filter: LogFilter
-      action: (ctx: Context, block: Block, log: Log) => Promise<void>
+      action: (
+        ctx: Context,
+        block: Block,
+        log: Log,
+        hooks: {
+          enableRebasing: (account: string) => Promise<void>
+          disableRebasing: (account: string) => Promise<void>
+        },
+      ) => Promise<void>
     }[]
   }
 }) => {
@@ -272,7 +280,16 @@ export const createRebasingERC20Tracker = ({
           }
           for (const hook of rebasing.hooks ?? []) {
             if (hook.filter.matches(log)) {
-              await hook.action(ctx, block, log)
+              await hook.action(ctx, block, log, {
+                async enableRebasing(account: string) {
+                  holders.set(account, await rebasing.getCredits(ctx, block, account))
+                  await updateBalances([account])
+                },
+                async disableRebasing(account: string) {
+                  holders.set(account, null)
+                  await updateBalances([account])
+                },
+              })
             }
           }
         }
@@ -342,13 +359,14 @@ export const getErc20RebasingParams = ({ from, address }: { from: number; addres
           topic0: [otoken.events.AccountRebasingEnabled.topic],
           range: { from },
         }),
-        action: async (ctx, block, log) => {
+        action: async (ctx, block, log, actions) => {
           const data = otoken.events.AccountRebasingEnabled.decode(log)
           const metadata = new ProcessorMetadata({
             id: `erc20-rebasing:${address}:${data.account}`,
             data: { rebasing: true },
           })
           await ctx.store.upsert(metadata)
+          await actions.enableRebasing(data.account)
         },
       },
       {
@@ -357,13 +375,14 @@ export const getErc20RebasingParams = ({ from, address }: { from: number; addres
           topic0: [otoken.events.AccountRebasingDisabled.topic],
           range: { from },
         }),
-        action: async (ctx, block, log) => {
+        action: async (ctx, block, log, actions) => {
           const data = otoken.events.AccountRebasingDisabled.decode(log)
           const metadata = new ProcessorMetadata({
             id: `erc20-rebasing:${address}:${data.account}`,
             data: { rebasing: false },
           })
           await ctx.store.upsert(metadata)
+          await actions.disableRebasing(data.account)
         },
       },
     ],
