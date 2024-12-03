@@ -183,10 +183,8 @@ export const createRebasingERC20Tracker = ({
                   balance: balance.balance,
                   rebasingCredits: balance.rebasingCredits,
                 })
-                if (!holders.has(account)) {
-                  doStateUpdate = true
-                  holders.set(account, rebasingCredits)
-                }
+                doStateUpdate = true
+                holders.set(account, rebasingCredits)
                 result.holders.set(holder.account, holder)
                 result.removedHolders.delete(holder.account)
               }
