@@ -62,7 +62,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
         const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
         return oToken.rebasingCreditsPerTokenHighres()
       },
-      ...getErc20RebasingParams({ from: 16935276, address: OETH_ADDRESS }),
+      ...getErc20RebasingParams({ from: 16935276, yieldDelegationFrom: 21325305, address: OETH_ADDRESS }),
     },
   },
 }

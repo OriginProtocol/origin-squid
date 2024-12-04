@@ -1,5 +1,5 @@
-module.exports = class Data1733248174412 {
-    name = 'Data1733248174412'
+module.exports = class Data1733327488810 {
+    name = 'Data1733327488810'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -494,7 +494,6 @@ module.exports = class Data1733248174412 {
         await db.query(`CREATE INDEX "IDX_7f49f2839212126c3d42fb4bf1" ON "frrs_strategist_updated" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_aab8ae0cb29505a7014438675b" ON "frrs_strategist_updated" ("tx_hash") `)
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "processor_metadata" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_6accadf4e3bd54d481c86cd810f" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2b58051dcc72cf0f02aa41ff14" ON "exchange_rate" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
@@ -1222,7 +1221,6 @@ module.exports = class Data1733248174412 {
         await db.query(`DROP INDEX "public"."IDX_7f49f2839212126c3d42fb4bf1"`)
         await db.query(`DROP INDEX "public"."IDX_aab8ae0cb29505a7014438675b"`)
         await db.query(`DROP TABLE "processing_status"`)
-        await db.query(`DROP TABLE "processor_metadata"`)
         await db.query(`DROP TABLE "exchange_rate"`)
         await db.query(`DROP INDEX "public"."IDX_2b58051dcc72cf0f02aa41ff14"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)

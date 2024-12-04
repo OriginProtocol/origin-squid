@@ -5,14 +5,6 @@ type ProcessingStatus @entity {
 }
 
 """
-Simple KV store to store metadata for processors.
-"""
-type ProcessorMetadata @entity {
-  id: ID!
-  data: JSON!
-}
-
-"""
 Any entity which has a price associated with it should have that price go in here.
 Prices can change very frequently and we don't want those changes on the same track
 as values which change less frequently.

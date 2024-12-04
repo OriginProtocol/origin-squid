@@ -31,7 +31,11 @@ export const baseERC20s = [
         const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
         return oToken.rebasingCreditsPerTokenHighres()
       },
-      ...getErc20RebasingParams({ from: 17819702, address: baseAddresses.tokens.superOETHb }),
+      ...getErc20RebasingParams({
+        from: 17819702,
+        yieldDelegationFrom: 23192884,
+        address: baseAddresses.tokens.superOETHb,
+      }),
     },
   }),
   // wsuperOETHb
