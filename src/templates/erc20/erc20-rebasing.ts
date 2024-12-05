@@ -207,9 +207,8 @@ export const createRebasingERC20Tracker = ({
             await updateState()
           }
         }
-        const updateAllBalances = async (rebasingOnly: boolean = false) => {
+        const updateAllBalances = async () => {
           for (const [account, rebasingCredits] of holders.entries()) {
-            if (rebasingOnly && rebasingCredits === null) continue
             const balance =
               rebasingCredits === null
                 ? await contract.balanceOf(account)
@@ -283,7 +282,7 @@ export const createRebasingERC20Tracker = ({
           const isRebaseLog = rebasing?.rebaseEventFilter.matches(log)
           if (isRebaseLog) {
             await updateState()
-            await updateAllBalances(true)
+            await updateAllBalances()
             time('rebase log')
           }
           const isEnableRpcBalanceLog = rebasing?.enableRpcBalance?.filter.matches(log)
