@@ -192,6 +192,7 @@ const eventProcessors = [
   }),
 ]
 
+export const name = 'strategies'
 export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {

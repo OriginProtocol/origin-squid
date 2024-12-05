@@ -6,9 +6,6 @@ export class ERC20State {
         Object.assign(this, props)
     }
 
-    /**
-     * Format: 'address:blockNumber'
-     */
     @PrimaryColumn_()
     id!: string
 

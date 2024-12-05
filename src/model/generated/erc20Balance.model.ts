@@ -6,9 +6,6 @@ export class ERC20Balance {
         Object.assign(this, props)
     }
 
-    /**
-     * Format: 'address:account:blockNumber'
-     */
     @PrimaryColumn_()
     id!: string
 

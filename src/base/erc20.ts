@@ -1,7 +1,7 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
-import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
+import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import { OGN_BASE_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { logFilter } from '@utils/logFilter'
@@ -31,6 +31,11 @@ export const baseERC20s = [
         const oToken = new otoken.Contract(ctx, block.header, baseAddresses.tokens.superOETHb)
         return oToken.rebasingCreditsPerTokenHighres()
       },
+      ...getErc20RebasingParams({
+        from: 17819702,
+        yieldDelegationFrom: 23192884,
+        address: baseAddresses.tokens.superOETHb,
+      }),
     },
   }),
   // wsuperOETHb

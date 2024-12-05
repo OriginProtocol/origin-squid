@@ -1,7 +1,7 @@
 import * as otoken from '@abi/otoken'
 import { createERC20Tracker } from '@templates/erc20'
 import { createERC20SimpleTracker } from '@templates/erc20-simple'
-import { createRebasingERC20Tracker } from '@templates/erc20/erc20-rebasing'
+import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
@@ -62,6 +62,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
         const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
         return oToken.rebasingCreditsPerTokenHighres()
       },
+      ...getErc20RebasingParams({ from: 16935276, yieldDelegationFrom: 21325305, address: OETH_ADDRESS }),
     },
   },
 }

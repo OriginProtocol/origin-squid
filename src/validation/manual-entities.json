@@ -1,0 +1,24 @@
+{
+  "erc20_discrepancy_testing": [
+    {
+      "id": "1-20329461-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-0x00000000009726632680fb29d3f7a9734e3010e2",
+      "chainId": 1,
+      "timestamp": "2024-07-17T23:13:59.000000Z",
+      "blockNumber": 20329461,
+      "address": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "account": "0x00000000009726632680fb29d3f7a9734e3010e2",
+      "balance": "0",
+      "rebasingCredits": null
+    },
+    {
+      "id": "1-15933628-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-0x00000000009726632680fb29d3f7a9734e3010e2",
+      "chainId": 1,
+      "timestamp": "2022-11-09T16:22:11.000000Z",
+      "blockNumber": 15933628,
+      "address": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "account": "0x00000000009726632680fb29d3f7a9734e3010e2",
+      "balance": "81689765193240680895",
+      "rebasingCredits": null
+    }
+  ]
+}

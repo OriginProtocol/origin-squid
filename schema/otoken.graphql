@@ -27,6 +27,7 @@ type OTokenAddress @entity {
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
+  delegatedTo: String
   lastUpdated: DateTime!
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
@@ -72,6 +73,7 @@ type OTokenRebaseOption @entity {
   txHash: String! @index
   address: OTokenAddress!
   status: RebasingOption!
+  delegatedTo: String
 }
 
 type OTokenAPY @entity {
@@ -213,4 +215,11 @@ type OTokenWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
   txHash: String! @index
+}
+
+enum RebasingOption {
+  OptIn
+  OptOut
+  YieldDelegationSource
+  YieldDelegationTarget
 }

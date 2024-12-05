@@ -1,5 +1,5 @@
-module.exports = class Data1732646488522 {
-    name = 'Data1732646488522'
+module.exports = class Data1733327488810 {
+    name = 'Data1733327488810'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -640,7 +640,7 @@ module.exports = class Data1732646488522 {
         await db.query(`CREATE INDEX "IDX_2f1457755464ec5951d1e96542" ON "o_token_history" ("address_id") `)
         await db.query(`CREATE INDEX "IDX_42142d191ea0408fb511f9f576" ON "o_token_history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_f87d86cfca9ef211ba1b18d2bc" ON "o_token_history" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(6) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "delegated_to" text, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7cbc465ce1e9ae06dfe3a8c625" ON "o_token_address" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5342c499e930e396bade7faeb6" ON "o_token_address" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_75c7d29bf71b393e99c4407885" ON "o_token_address" ("address") `)
@@ -658,7 +658,7 @@ module.exports = class Data1732646488522 {
         await db.query(`CREATE INDEX "IDX_b0c6feb890a83dcca572302371" ON "o_token_rebase" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_7170f89052507f34d8563f7016" ON "o_token_rebase" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_b8653270b96fc932f077b26441" ON "o_token_rebase" ("apy_id") `)
-        await db.query(`CREATE TABLE "o_token_rebase_option" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "status" character varying(6) NOT NULL, "address_id" character varying, CONSTRAINT "PK_8b52df258c40e8347a66922f63e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_rebase_option" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "status" character varying(21) NOT NULL, "delegated_to" text, "address_id" character varying, CONSTRAINT "PK_8b52df258c40e8347a66922f63e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5dfc53108b110d42994d02a832" ON "o_token_rebase_option" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5936af713ee8131983812703b2" ON "o_token_rebase_option" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_cb07bc901206c5da63eacff7df" ON "o_token_rebase_option" ("timestamp") `)

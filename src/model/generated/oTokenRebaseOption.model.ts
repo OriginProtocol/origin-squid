@@ -35,6 +35,9 @@ export class OTokenRebaseOption {
     @ManyToOne_(() => OTokenAddress, {nullable: true})
     address!: OTokenAddress
 
-    @Column_("varchar", {length: 6, nullable: false})
+    @Column_("varchar", {length: 21, nullable: false})
     status!: RebasingOption
+
+    @StringColumn_({nullable: true})
+    delegatedTo!: string | undefined | null
 }

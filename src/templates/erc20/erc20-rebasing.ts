@@ -1,11 +1,13 @@
 import * as abi from '@abi/erc20'
+import * as otoken from '@abi/otoken'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, Log, Trace } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
 import { LogFilter, logFilter } from '@utils/logFilter'
 import { TokenAddress } from '@utils/symbols'
+import { TraceFilter, traceFilter } from '@utils/traceFilter'
 
 const duplicateTracker = new Set<string>()
 
@@ -20,6 +22,22 @@ export const createRebasingERC20Tracker = ({
     rebaseEventFilter: LogFilter
     getCredits: (ctx: Context, block: Block, account: string) => Promise<bigint>
     getCreditsPerToken: (ctx: Context, block: Block) => Promise<bigint>
+    enableRpcBalance?: { filter: LogFilter; decode: (log: Log) => { addresses: string[] } }
+    disableRpcBalance?: { filter: LogFilter; decode: (log: Log) => { addresses: string[] } }
+    isEligibleForRebasing?: (ctx: Context, block: Block, account: string) => Promise<boolean>
+    hooks?: {
+      filter: LogFilter
+      traceFilter?: TraceFilter
+      action: (
+        ctx: Context,
+        block: Block,
+        params: { log: Log } | { trace: Trace },
+        hooks: {
+          enableRebasing: (account: string) => Promise<void>
+          disableRebasing: (account: string) => Promise<void>
+        },
+      ) => Promise<void>
+    }[]
   }
 }) => {
   if (duplicateTracker.has(address)) {
@@ -32,7 +50,7 @@ export const createRebasingERC20Tracker = ({
   // TODO: Consider doing this differently?
   //       Eventually memory may become a constraint.
   let mostRecentState: ERC20State | undefined
-  let holders: Map<string, bigint>
+  let holders: Map<string, bigint | null>
   const transferLogFilter = logFilter({
     address: [address.toLowerCase()],
     topic0: [abi.events.Transfer.topic],
@@ -61,11 +79,21 @@ export const createRebasingERC20Tracker = ({
       ctx.log.error({ height: block.header.height, err }, `Failed to get contract name for ${address}`)
     }
   }
+
+  let checkBalances = 0
+
   return {
+    name: `rebasing-erc20-${address}`,
     from,
     setup(processor: EvmBatchProcessor) {
       processor.addLog(transferLogFilter.value)
       processor.addLog(rebasing.rebaseEventFilter.value)
+      for (const hook of rebasing.hooks ?? []) {
+        processor.addLog(hook.filter.value)
+        if (hook.traceFilter) {
+          processor.addTrace(hook.traceFilter.value)
+        }
+      }
     },
     async process(ctx: Context) {
       const debugLogging = global.process.env.DEBUG_PERF === 'true'
@@ -89,7 +117,7 @@ export const createRebasingERC20Tracker = ({
         const holdersArray = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
         holders = new Map<string, bigint>()
         for (const holder of holdersArray) {
-          holders.set(holder.account, holder.rebasingCredits ?? 0n)
+          holders.set(holder.account, holder.rebasingCredits ?? null)
         }
         time('initialize holders')
       }
@@ -131,6 +159,17 @@ export const createRebasingERC20Tracker = ({
               const account = accounts[i].toLowerCase()
               if (account === ADDRESS_ZERO) continue
               const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
+              let useRpcBalance = holders.get(account) === null
+              if (!holders.has(account) && rebasing.isEligibleForRebasing) {
+                useRpcBalance = !(await rebasing.isEligibleForRebasing(ctx, block, account))
+              }
+              const rebasingCredits = useRpcBalance ? null : credits[i]
+              const newBalance =
+                rebasingCredits === null
+                  ? await contract.balanceOf(account)
+                  : mostRecentState?.rebasingCreditsPerToken
+                  ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
+                  : 0n
               const balance = new ERC20Balance({
                 id,
                 chainId: ctx.chain.id,
@@ -138,10 +177,8 @@ export const createRebasingERC20Tracker = ({
                 blockNumber: block.header.height,
                 address,
                 account,
-                balance: mostRecentState?.rebasingCreditsPerToken
-                  ? (credits[i] * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
-                  : 0n,
-                rebasingCredits: credits[i],
+                balance: newBalance,
+                rebasingCredits,
               })
               result.balances.set(id, balance)
               if (balance.balance === 0n) {
@@ -158,10 +195,8 @@ export const createRebasingERC20Tracker = ({
                   balance: balance.balance,
                   rebasingCredits: balance.rebasingCredits,
                 })
-                if (!holders.has(account)) {
-                  doStateUpdate = true
-                  holders.set(account, credits[i])
-                }
+                doStateUpdate = true
+                holders.set(account, rebasingCredits)
                 result.holders.set(holder.account, holder)
                 result.removedHolders.delete(holder.account)
               }
@@ -174,9 +209,12 @@ export const createRebasingERC20Tracker = ({
         }
         const updateAllBalances = async () => {
           for (const [account, rebasingCredits] of holders.entries()) {
-            const balance = mostRecentState?.rebasingCreditsPerToken
-              ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
-              : 0n
+            const balance =
+              rebasingCredits === null
+                ? await contract.balanceOf(account)
+                : mostRecentState?.rebasingCreditsPerToken
+                ? (rebasingCredits * 10n ** 18n) / mostRecentState.rebasingCreditsPerToken
+                : 0n
             result.holders.set(
               account,
               new ERC20Holder({
@@ -206,6 +244,18 @@ export const createRebasingERC20Tracker = ({
           time('update all balances')
         }
 
+        const hookActions = {
+          async enableRebasing(account: string) {
+            holders.set(account, await rebasing.getCredits(ctx, block, account))
+            await updateBalances([account])
+          },
+          async disableRebasing(account: string) {
+            holders.set(account, null)
+            await updateBalances([account])
+          },
+        }
+
+        // Iterate Logs
         for (const log of block.logs) {
           const isTransferLog = transferLogFilter.matches(log)
           if (isTransferLog) {
@@ -235,6 +285,35 @@ export const createRebasingERC20Tracker = ({
             await updateAllBalances()
             time('rebase log')
           }
+          const isEnableRpcBalanceLog = rebasing?.enableRpcBalance?.filter.matches(log)
+          if (isEnableRpcBalanceLog) {
+            const data = rebasing.enableRpcBalance?.decode(log)
+            for (const account of data?.addresses ?? []) {
+              holders.set(account, null)
+            }
+          }
+          const isDisableRpcBalanceLog = rebasing?.disableRpcBalance?.filter.matches(log)
+          if (isDisableRpcBalanceLog) {
+            const data = rebasing.disableRpcBalance?.decode(log)
+            for (const account of data?.addresses ?? []) {
+              holders.set(account, await rebasing.getCredits(ctx, block, account))
+            }
+          }
+
+          for (const hook of rebasing.hooks ?? []) {
+            if (hook.filter.matches(log)) {
+              await hook.action(ctx, block, { log }, hookActions)
+            }
+          }
+        }
+
+        // Iterate Traces
+        for (const trace of block.traces) {
+          for (const hook of rebasing.hooks ?? []) {
+            if (hook.traceFilter?.matches(trace)) {
+              await hook.action(ctx, block, { trace }, hookActions)
+            }
+          }
         }
       }
       await Promise.all([
@@ -242,11 +321,148 @@ export const createRebasingERC20Tracker = ({
         ctx.store.insert([...result.states.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
-        ctx.store.remove([...result.removedHolders.values()].map((id) => new ERC20Holder({ id }))),
+        ctx.store.remove(
+          [...result.removedHolders.values()].map(
+            (account) => new ERC20Holder({ id: `${ctx.chain.id}-${address}-${account}` }),
+          ),
+        ),
       ])
       time('save')
       publishERC20State(ctx, address, result)
       time('publish')
+
+      const lastBlock = ctx.blocks[ctx.blocks.length - 1]
+      if (checkBalances < Math.floor(lastBlock.header.height / 100000) && lastBlock.header.height > 14085199) {
+        checkBalances = Math.floor(lastBlock.header.height / 100000)
+        console.time('Checking balances')
+        let correctBalances = 0
+        const holderEntities = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
+        for (const holder of holderEntities) {
+          const account = holder.account
+          const contract = new otoken.Contract(ctx, lastBlock.header, address)
+          const balance = await contract.balanceOf(account)
+          if (holder.balance === balance) {
+            correctBalances++
+          }
+        }
+        console.timeEnd('Checking balances')
+        console.log(
+          `Correct balances: ${correctBalances}/${holderEntities.length} (${(
+            (correctBalances / holderEntities.length) *
+            100
+          ).toFixed(2)}%)`,
+        )
+      }
     },
   }
+}
+
+export const getErc20RebasingParams = ({
+  from,
+  yieldDelegationFrom,
+  address,
+}: {
+  from: number
+  yieldDelegationFrom: number
+  address: string
+}) => {
+  const data: Pick<
+    Parameters<typeof createRebasingERC20Tracker>[0]['rebasing'],
+    'enableRpcBalance' | 'disableRpcBalance' | 'isEligibleForRebasing' | 'hooks'
+  > = {
+    enableRpcBalance: {
+      filter: logFilter({
+        address: [address],
+        topic0: [otoken.events.YieldDelegated.topic],
+        range: { from: yieldDelegationFrom },
+      }),
+      decode: (log) => {
+        const data = otoken.events.YieldDelegated.decode(log)
+        return { addresses: [data.source, data.target] }
+      },
+    },
+    disableRpcBalance: {
+      filter: logFilter({
+        address: [address],
+        topic0: [otoken.events.YieldUndelegated.topic],
+        range: { from: yieldDelegationFrom },
+      }),
+      decode: (log) => {
+        const data = otoken.events.YieldUndelegated.decode(log)
+        return { addresses: [data.source, data.target] }
+      },
+    },
+    isEligibleForRebasing: async (ctx, block, account: string) => {
+      const contract = new otoken.Contract(ctx, block.header, address)
+      const rebaseState = await contract.rebaseState(account)
+      if (rebaseState === 0) {
+        let isContract: boolean = false
+        if (account !== '0x0000000000000000000000000000000000000000') {
+          isContract =
+            (await ctx._chain.client.call('eth_getCode', [account, `0x${block.header.height.toString(16)}`])) !== '0x'
+        }
+        return !isContract
+      }
+      return rebaseState === 2
+    },
+    hooks: [
+      {
+        filter: logFilter({
+          address: [address],
+          topic0: [otoken.events.AccountRebasingEnabled.topic],
+          range: { from },
+        }),
+        traceFilter: traceFilter({
+          callTo: [address],
+          type: ['call'],
+          callSighash: [otoken.functions.rebaseOptIn.selector],
+          range: { from },
+        }),
+        action: async (ctx, block, params, actions) => {
+          let account: string | undefined = undefined
+          if ('log' in params) {
+            const data = otoken.events.AccountRebasingEnabled.decode(params.log)
+            account = data.account
+          }
+          if ('trace' in params && params.trace.type === 'call') {
+            account = params.trace.action.from
+          }
+          if (account) {
+            await actions.enableRebasing(account)
+          } else {
+            throw new Error('No account found for rebasing opt-in')
+          }
+        },
+      },
+      {
+        filter: logFilter({
+          address: [address],
+          topic0: [otoken.events.AccountRebasingDisabled.topic],
+          range: { from },
+        }),
+        traceFilter: traceFilter({
+          callTo: [address],
+          type: ['call'],
+          callSighash: [otoken.functions.rebaseOptOut.selector],
+          range: { from },
+        }),
+        action: async (ctx, block, params, actions) => {
+          let account: string | undefined = undefined
+          if ('log' in params) {
+            const data = otoken.events.AccountRebasingDisabled.decode(params.log)
+            account = data.account
+          }
+          if ('trace' in params && params.trace.type === 'call') {
+            account = params.trace.action.from
+          }
+          if (account) {
+            await actions.disableRebasing(account)
+          } else {
+            throw new Error('No account found for rebasing opt-out')
+          }
+        },
+      },
+    ],
+  }
+  return data
 }

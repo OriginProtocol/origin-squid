@@ -1,7 +1,7 @@
 import { ERC20Balance, OToken, OTokenAPY, OTokenDailyStat, OTokenHistory, OTokenRebase } from '@model'
 import { Context } from '@processor'
 import { env } from '@utils/env'
-import { entities } from '@validation/entities'
+import { entities, manualEntities } from '@validation/entities'
 import { validateExpectations } from '@validation/validate'
 
 export const name = 'validate-ousd'
@@ -17,6 +17,7 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, OTokenRebase, firstBlock, entities.ousd_oTokenRebases)
     await validateExpectations(ctx, block, OTokenDailyStat, firstBlock, entities.ousd_oTokenDailyStats)
     await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.ousd_erc20Balances)
+    await validateExpectations(ctx, block, ERC20Balance, firstBlock, manualEntities.erc20_discrepancy_testing)
     firstBlock = false
   }
 }

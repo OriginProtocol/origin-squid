@@ -1082,11 +1082,6 @@ type ExchangeRate @entity {
   rate: BigInt!
 }
 
-enum RebasingOption {
-  OptIn
-  OptOut
-}
-
 enum HistoryType {
   Sent
   Received
@@ -1152,9 +1147,6 @@ type NativeBalance @entity {
 }
 
 type ERC20 @entity {
-  """
-  Format: 'address'
-  """
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -1164,9 +1156,6 @@ type ERC20 @entity {
 }
 
 type ERC20Holder @entity {
-  """
-  Format: 'address:account'
-  """
   id: ID!
   chainId: Int! @index
   address: String! @index
@@ -1176,9 +1165,6 @@ type ERC20Holder @entity {
 }
 
 type ERC20State @entity {
-  """
-  Format: 'address:blockNumber'
-  """
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
@@ -1190,9 +1176,6 @@ type ERC20State @entity {
 }
 
 type ERC20Balance @entity {
-  """
-  Format: 'address:account:blockNumber'
-  """
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
@@ -1626,6 +1609,7 @@ type OTokenAddress @entity {
   balance: BigInt!
   earned: BigInt!
   credits: BigInt!
+  delegatedTo: String
   lastUpdated: DateTime!
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
@@ -1671,6 +1655,7 @@ type OTokenRebaseOption @entity {
   txHash: String! @index
   address: OTokenAddress!
   status: RebasingOption!
+  delegatedTo: String
 }
 
 type OTokenAPY @entity {
@@ -1812,6 +1797,13 @@ type OTokenWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
   txHash: String! @index
+}
+
+enum RebasingOption {
+  OptIn
+  OptOut
+  YieldDelegationSource
+  YieldDelegationTarget
 }
 type MorphoMarketState @entity {
   id: ID!
