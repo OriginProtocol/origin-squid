@@ -181,5 +181,5 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
     await ctx.store.upsert([...result.bridgeTransferStates.values()])
   }
 
-  return { from, setup, process }
+  return { name: `ccip-${params.chainId}`, from, setup, process }
 }

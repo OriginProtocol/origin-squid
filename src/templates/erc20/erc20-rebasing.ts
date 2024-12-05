@@ -79,7 +79,11 @@ export const createRebasingERC20Tracker = ({
       ctx.log.error({ height: block.header.height, err }, `Failed to get contract name for ${address}`)
     }
   }
+
+  let checkBalances = 0
+
   return {
+    name: `rebasing-erc20-${address}`,
     from,
     setup(processor: EvmBatchProcessor) {
       processor.addLog(transferLogFilter.value)
@@ -328,20 +332,28 @@ export const createRebasingERC20Tracker = ({
       publishERC20State(ctx, address, result)
       time('publish')
 
-      // const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-      // if (lastBlock.header.height === 23192884) {
-      //   for (const account of holders.keys()) {
-      //     const contract = new otoken.Contract(ctx, lastBlock.header, address)
-      //     const balance = await contract.balanceOf(account)
-      //     const state = await contract.rebaseState(account)
-      //     const blah = holders.get(account)
-      //     const holder = await ctx.store.get(ERC20Holder, `${ctx.chain.id}-${address}-${account}`)
-      //     if (holder?.balance !== balance) {
-      //       console.log('mismatch', account, holder?.balance, balance, state, blah)
-      //       process.exit(1)
-      //     }
-      //   }
-      // }
+      const lastBlock = ctx.blocks[ctx.blocks.length - 1]
+      if (checkBalances < Math.floor(lastBlock.header.height / 100000) && lastBlock.header.height > 14085199) {
+        checkBalances = Math.floor(lastBlock.header.height / 100000)
+        console.time('Checking balances')
+        let correctBalances = 0
+        const holderEntities = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
+        for (const holder of holderEntities) {
+          const account = holder.account
+          const contract = new otoken.Contract(ctx, lastBlock.header, address)
+          const balance = await contract.balanceOf(account)
+          if (holder.balance === balance) {
+            correctBalances++
+          }
+        }
+        console.timeEnd('Checking balances')
+        console.log(
+          `Correct balances: ${correctBalances}/${holderEntities.length} (${(
+            (correctBalances / holderEntities.length) *
+            100
+          ).toFixed(2)}%)`,
+        )
+      }
     },
   }
 }

@@ -11,6 +11,7 @@ export const processStatus = (id: string) => {
   }
 
   return {
+    name: `processor-status-${id}`,
     async process(ctx: Context) {
       const header = ctx.blocks[ctx.blocks.length - 1].header
       if (header) {

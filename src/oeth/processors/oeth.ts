@@ -92,6 +92,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   },
 })
 
+export const name = 'oeth'
 export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)
 export const setup = (processor: EvmBatchProcessor) => {
   otokenProcessor.setup(processor)

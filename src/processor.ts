@@ -128,6 +128,8 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
     processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))
   }
 
+  console.log('Processors:\n  - ', processors.map((p) => p.name).join('\n  - '))
+
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
   const evmBatchProcessor = createEvmBatchProcessor(config)
