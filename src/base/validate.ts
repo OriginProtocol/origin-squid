@@ -9,7 +9,7 @@ export const name = 'validate-base'
 let firstBlock = true
 
 export const process = async (ctx: Context) => {
-  if (env.BLOCK_FROM) return
+  if (env.BLOCK_FROM || env.PROCESSOR) return
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, OToken, firstBlock, entities.superoethb_oTokens)
     await validateExpectations(ctx, block, OTokenAPY, firstBlock, entities.superoethb_oTokenApies)

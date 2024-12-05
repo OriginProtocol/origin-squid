@@ -4,6 +4,19 @@ type ProcessingStatus @entity {
   blockNumber: Int!
 }
 
+type TransactionDetails @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  from: String! @index
+  to: String! @index
+  gasUsed: BigInt!
+  effectiveGasPrice: BigInt!
+  gasCost: BigInt!
+}
+
 """
 Any entity which has a price associated with it should have that price go in here.
 Prices can change very frequently and we don't want those changes on the same track

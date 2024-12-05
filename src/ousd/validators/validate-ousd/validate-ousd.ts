@@ -9,7 +9,7 @@ export const name = 'validate-ousd'
 let firstBlock = true
 
 export const process = async (ctx: Context) => {
-  if (env.BLOCK_FROM) return
+  if (env.BLOCK_FROM || env.PROCESSOR) return
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, OToken, firstBlock, entities.ousd_oTokens)
     await validateExpectations(ctx, block, OTokenAPY, firstBlock, entities.ousd_oTokenApies)

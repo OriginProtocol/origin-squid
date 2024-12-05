@@ -1,5 +1,5 @@
-module.exports = class Data1733327488810 {
-    name = 'Data1733327488810'
+module.exports = class Data1733437765397 {
+    name = 'Data1733437765397'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -494,6 +494,13 @@ module.exports = class Data1733327488810 {
         await db.query(`CREATE INDEX "IDX_7f49f2839212126c3d42fb4bf1" ON "frrs_strategist_updated" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_aab8ae0cb29505a7014438675b" ON "frrs_strategist_updated" ("tx_hash") `)
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "transaction_details" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "gas_used" numeric NOT NULL, "effective_gas_price" numeric NOT NULL, "gas_cost" numeric NOT NULL, CONSTRAINT "PK_b9397af1203ca3a78ca6631e4b7" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_035179d5845a24726b74795cb5" ON "transaction_details" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_9e0953446c15e89dfe68dbe5bd" ON "transaction_details" ("tx_hash") `)
+        await db.query(`CREATE INDEX "IDX_ec29c6dbcba374ae8819275f22" ON "transaction_details" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_1ada02a88b8355495e0917b49b" ON "transaction_details" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_81a859fb3a14a34f194e1d8606" ON "transaction_details" ("from") `)
+        await db.query(`CREATE INDEX "IDX_ae3e0f0414a1deb6e4840e2e44" ON "transaction_details" ("to") `)
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2b58051dcc72cf0f02aa41ff14" ON "exchange_rate" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
@@ -1221,6 +1228,13 @@ module.exports = class Data1733327488810 {
         await db.query(`DROP INDEX "public"."IDX_7f49f2839212126c3d42fb4bf1"`)
         await db.query(`DROP INDEX "public"."IDX_aab8ae0cb29505a7014438675b"`)
         await db.query(`DROP TABLE "processing_status"`)
+        await db.query(`DROP TABLE "transaction_details"`)
+        await db.query(`DROP INDEX "public"."IDX_035179d5845a24726b74795cb5"`)
+        await db.query(`DROP INDEX "public"."IDX_9e0953446c15e89dfe68dbe5bd"`)
+        await db.query(`DROP INDEX "public"."IDX_ec29c6dbcba374ae8819275f22"`)
+        await db.query(`DROP INDEX "public"."IDX_1ada02a88b8355495e0917b49b"`)
+        await db.query(`DROP INDEX "public"."IDX_81a859fb3a14a34f194e1d8606"`)
+        await db.query(`DROP INDEX "public"."IDX_ae3e0f0414a1deb6e4840e2e44"`)
         await db.query(`DROP TABLE "exchange_rate"`)
         await db.query(`DROP INDEX "public"."IDX_2b58051dcc72cf0f02aa41ff14"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)

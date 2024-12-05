@@ -9,7 +9,7 @@ export const name = 'validate-mainnet'
 let firstBlock = true
 
 export const process = async (ctx: Context) => {
-  if (env.BLOCK_FROM) return
+  if (env.BLOCK_FROM || env.PROCESSOR) return
   for (const block of ctx.blocks) {
     await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.ogn_erc20Balances)
     await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.oeth_erc20Balances)

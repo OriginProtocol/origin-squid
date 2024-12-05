@@ -8,6 +8,7 @@ import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
 import { processStatus } from '@templates/processor-status'
+import { createTransactionProcessor } from '@templates/transactions'
 import {
   OGN_ADDRESS,
   OGN_GOVERNANCE_ADDRESS,
@@ -42,6 +43,8 @@ export const processor = defineSquidProcessor({
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     coingeckoProcessor,
     ...originArmProcessors,
+    // Defender Relayer for Lido ARM
+    createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
   validators: [validate],
