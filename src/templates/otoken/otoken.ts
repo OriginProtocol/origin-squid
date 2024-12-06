@@ -696,6 +696,11 @@ export const createOTokenProcessor = (params: {
 
     owner.delegatedTo = null
     if (option === RebasingOption.OptIn) {
+      const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+      const otokenContract = new otoken.Contract(ctx, block.header, params.otokenAddress)
+      owner.credits = afterHighResUpgrade
+        ? await otokenContract.creditsBalanceOfHighres(owner.address).then((c) => c._0)
+        : await otokenContract.creditsBalanceOf(owner.address).then((c) => c._0 * 1000000000n)
       rebaseOption.status = RebasingOption.OptIn
       owner.rebasingOption = RebasingOption.OptIn
       otokenObject.nonRebasingSupply -= owner.balance
