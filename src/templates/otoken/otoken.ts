@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { findLast } from 'lodash'
+import { findLast, sortBy } from 'lodash'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
@@ -553,7 +553,7 @@ export const createOTokenProcessor = (params: {
     )
     const yieldDelegationBalances = await getYieldDelegationBalances(ctx, block)
 
-    for (const address of owners!.values()) {
+    for (const address of sortBy([...owners!.values()], 'address')) {
       if (!address.credits || address.rebasingOption === RebasingOption.OptOut) {
         continue
       }

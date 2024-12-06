@@ -343,6 +343,8 @@ export const createRebasingERC20Tracker = ({
           const balance = await contract.balanceOf(account)
           if (holder.balance === balance) {
             correctBalances++
+          } else {
+            console.log(`${account} has incorrect balance: ${holder.balance} vs ${balance}`)
           }
         }
         console.timeEnd('Checking balances')
