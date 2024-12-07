@@ -656,6 +656,7 @@ export const createOTokenProcessor = (params: {
     }
   }
 
+  const rebaseOptsHandled = new Set<string>()
   const processRebaseOpt = async ({
     ctx,
     result,
@@ -673,6 +674,8 @@ export const createOTokenProcessor = (params: {
     option: RebasingOption
     delegate?: string
   }) => {
+    if (rebaseOptsHandled.has(hash)) return
+    rebaseOptsHandled.add(hash)
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
     const otokenObject = await getLatestOTokenObject(ctx, result, block)
@@ -931,5 +934,10 @@ export const createOTokenProcessor = (params: {
     return new Map<string, bigint>(delegatedAddresses.map((address, index) => [address, delegateBalances[index]]))
   }
 
-  return { from: params.from, setup, process }
+  return {
+    name: `otoken-${params.otokenAddress}`,
+    from: params.from,
+    setup,
+    process,
+  }
 }

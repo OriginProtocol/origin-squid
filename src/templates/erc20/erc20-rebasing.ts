@@ -331,40 +331,42 @@ export const createRebasingERC20Tracker = ({
       publishERC20State(ctx, address, result)
       time('publish')
 
-      const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-      if (checkBalances < Math.floor(lastBlock.header.height / 100000) && lastBlock.header.height > 14085199) {
-        checkBalances = Math.floor(lastBlock.header.height / 100000)
-        console.time('Checking balances')
-        let correctBalances = 0
-        const holderEntities = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
-        for (const holder of holderEntities) {
-          const account = holder.account
-          const contract = new otoken.Contract(ctx, lastBlock.header, address)
-          const balance = await contract.balanceOf(account)
-          if (holder.balance === balance) {
-            correctBalances++
-          } else {
-            console.log(`${account} has incorrect balance: ${holder.balance} vs ${balance}`)
-          }
-        }
-        console.timeEnd('Checking balances')
-        console.log(
-          `Correct balances: ${correctBalances}/${holderEntities.length} (${(
-            (correctBalances / holderEntities.length) *
-            100
-          ).toFixed(2)}%)`,
-        )
-      }
+      // const lastBlock = ctx.blocks[ctx.blocks.length - 1]
+      // if (checkBalances < Math.floor(lastBlock.header.height / 100000) && lastBlock.header.height > 14085199) {
+      //   checkBalances = Math.floor(lastBlock.header.height / 100000)
+      //   console.time('Checking balances')
+      //   let correctBalances = 0
+      //   const holderEntities = await ctx.store.findBy(ERC20Holder, { chainId: ctx.chain.id, address })
+      //   for (const holder of holderEntities) {
+      //     const account = holder.account
+      //     const contract = new otoken.Contract(ctx, lastBlock.header, address)
+      //     const balance = await contract.balanceOf(account)
+      //     if (holder.balance === balance) {
+      //       correctBalances++
+      //     } else {
+      //       console.log(`${account} has incorrect balance: ${holder.balance} vs ${balance}`)
+      //     }
+      //   }
+      //   console.timeEnd('Checking balances')
+      //   console.log(
+      //     `Correct balances: ${correctBalances}/${holderEntities.length} (${(
+      //       (correctBalances / holderEntities.length) *
+      //       100
+      //     ).toFixed(2)}%)`,
+      //   )
+      // }
     },
   }
 }
 
 export const getErc20RebasingParams = ({
   from,
+  rebaseOptTraceUntil,
   yieldDelegationFrom,
   address,
 }: {
   from: number
+  rebaseOptTraceUntil?: number
   yieldDelegationFrom: number
   address: string
 }) => {
@@ -414,12 +416,14 @@ export const getErc20RebasingParams = ({
           topic0: [otoken.events.AccountRebasingEnabled.topic],
           range: { from },
         }),
-        traceFilter: traceFilter({
-          callTo: [address],
-          type: ['call'],
-          callSighash: [otoken.functions.rebaseOptIn.selector],
-          range: { from },
-        }),
+        traceFilter: rebaseOptTraceUntil
+          ? traceFilter({
+              callTo: [address],
+              type: ['call'],
+              callSighash: [otoken.functions.rebaseOptIn.selector],
+              range: { from, to: rebaseOptTraceUntil },
+            })
+          : undefined,
         action: async (ctx, block, params, actions) => {
           let account: string | undefined = undefined
           if ('log' in params) {

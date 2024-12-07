@@ -30,7 +30,12 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
         }
         return oToken.rebasingCreditsPerTokenHighres()
       },
-      ...getErc20RebasingParams({ from: 11585978, yieldDelegationFrom: 21325305, address: OUSD_ADDRESS }),
+      ...getErc20RebasingParams({
+        from: 11585978,
+        yieldDelegationFrom: 21325305,
+        address: OUSD_ADDRESS,
+        rebaseOptTraceUntil: 20000000,
+      }),
     },
   },
 }
