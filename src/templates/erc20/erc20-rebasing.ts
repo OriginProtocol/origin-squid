@@ -446,12 +446,14 @@ export const getErc20RebasingParams = ({
           topic0: [otoken.events.AccountRebasingDisabled.topic],
           range: { from },
         }),
-        traceFilter: traceFilter({
-          callTo: [address],
-          type: ['call'],
-          callSighash: [otoken.functions.rebaseOptOut.selector],
-          range: { from },
-        }),
+        traceFilter: rebaseOptTraceUntil
+          ? traceFilter({
+              callTo: [address],
+              type: ['call'],
+              callSighash: [otoken.functions.rebaseOptOut.selector],
+              range: { from, to: rebaseOptTraceUntil },
+            })
+          : undefined,
         action: async (ctx, block, params, actions) => {
           let account: string | undefined = undefined
           if ('log' in params) {

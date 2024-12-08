@@ -674,8 +674,8 @@ export const createOTokenProcessor = (params: {
     option: RebasingOption
     delegate?: string
   }) => {
-    if (rebaseOptsHandled.has(hash)) return
-    rebaseOptsHandled.add(hash)
+    if (rebaseOptsHandled.has(`${hash}-${address}-${option}`)) return
+    rebaseOptsHandled.add(`${hash}-${address}-${option}`)
     const timestamp = new Date(block.header.timestamp)
     const blockNumber = block.header.height
     const otokenObject = await getLatestOTokenObject(ctx, result, block)
