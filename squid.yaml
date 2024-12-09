@@ -15,6 +15,7 @@ deploy:
   secrets:
     - RPC_ENDPOINT
     - RPC_ENV
+    - RPC_BASE_ENV
   processor:
     ########## MAIN NETWORK ##########
     - name: mainnet-processor
