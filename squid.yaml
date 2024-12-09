@@ -14,6 +14,7 @@ deploy:
       - base.http
   secrets:
     - RPC_ENDPOINT
+    - RPC_BASE_ALCHEMY
     - RPC_ENV
     - RPC_BASE_ENV
   processor:
