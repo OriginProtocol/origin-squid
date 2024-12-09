@@ -14,9 +14,9 @@ deploy:
       - base.http
   secrets:
     - RPC_ENDPOINT
-    - RPC_BASE_ALCHEMY
     - RPC_ENV
-    - RPC_BASE_ENV
+    - RPC_ENDPOINT_ARBITRUM
+    - RPC_ENDPOINT_BASE
   processor:
     ########## MAIN NETWORK ##########
     - name: mainnet-processor
