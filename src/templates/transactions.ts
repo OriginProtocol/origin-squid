@@ -31,7 +31,7 @@ export const createTransactionProcessor = (params: { from: number; address: stri
                 to: transaction.to,
                 gasUsed: transaction.gasUsed,
                 effectiveGasPrice: transaction.effectiveGasPrice,
-                gasCost: transaction.gasUsed * transaction.effectiveGasPrice * BigInt(10 ** 9),
+                transactionFee: transaction.gasUsed * transaction.effectiveGasPrice,
               }),
             )
           }

@@ -1,5 +1,5 @@
-module.exports = class Data1733437765397 {
-    name = 'Data1733437765397'
+module.exports = class Data1733765677921 {
+    name = 'Data1733765677921'
 
     async up(db) {
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
@@ -494,7 +494,7 @@ module.exports = class Data1733437765397 {
         await db.query(`CREATE INDEX "IDX_7f49f2839212126c3d42fb4bf1" ON "frrs_strategist_updated" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_aab8ae0cb29505a7014438675b" ON "frrs_strategist_updated" ("tx_hash") `)
         await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "transaction_details" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "gas_used" numeric NOT NULL, "effective_gas_price" numeric NOT NULL, "gas_cost" numeric NOT NULL, CONSTRAINT "PK_b9397af1203ca3a78ca6631e4b7" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "transaction_details" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "gas_used" numeric NOT NULL, "effective_gas_price" numeric NOT NULL, "transaction_fee" numeric NOT NULL, CONSTRAINT "PK_b9397af1203ca3a78ca6631e4b7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_035179d5845a24726b74795cb5" ON "transaction_details" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9e0953446c15e89dfe68dbe5bd" ON "transaction_details" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_ec29c6dbcba374ae8819275f22" ON "transaction_details" ("timestamp") `)

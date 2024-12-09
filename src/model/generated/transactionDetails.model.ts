@@ -40,5 +40,5 @@ export class TransactionDetails {
     effectiveGasPrice!: bigint
 
     @BigIntColumn_({nullable: false})
-    gasCost!: bigint
+    transactionFee!: bigint
 }

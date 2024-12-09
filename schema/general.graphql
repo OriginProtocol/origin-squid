@@ -14,7 +14,7 @@ type TransactionDetails @entity {
   to: String! @index
   gasUsed: BigInt!
   effectiveGasPrice: BigInt!
-  gasCost: BigInt!
+  transactionFee: BigInt!
 }
 
 """
