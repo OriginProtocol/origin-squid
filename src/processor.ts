@@ -18,8 +18,7 @@ dayjs.extend(utc)
 
 export const createEvmBatchProcessor = (config: ChainConfig) => {
   const url = config.endpoints[0] || 'http://localhost:8545'
-  console.log(`RPC URL: ${url}`)
-
+  console.log('rpc url', url)
   const processor = new EvmBatchProcessor()
     .setRpcEndpoint({
       url,
@@ -134,6 +133,8 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
 
   const config = chainConfigs[chainId]
   if (!config) throw new Error('No chain configuration found.')
+  // console.log('env', JSON.stringify(process.env, null, 2))
+  // console.log('config', JSON.stringify(config, null, 2))
   const evmBatchProcessor = createEvmBatchProcessor(config)
 
   evmBatchProcessor.setBlockRange({
