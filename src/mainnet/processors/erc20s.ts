@@ -1,6 +1,6 @@
 import * as otoken from '@abi/otoken'
-import { createERC20Tracker } from '@templates/erc20'
-import { createERC20SimpleTracker } from '@templates/erc20-simple'
+import { createERC20EventTracker } from '@templates/erc20/erc20-event'
+import { createERC20PollingTracker } from '@templates/erc20/erc20-polling'
 import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import {
   OETH_ADDRESS,
@@ -18,7 +18,7 @@ import { TokenSymbol } from '@utils/symbols'
 
 let initialized = false
 
-const simpleTracks: Record<string, Parameters<typeof createERC20SimpleTracker>[0]> = {
+const simpleTracks: Record<string, Parameters<typeof createERC20EventTracker>[0]> = {
   // Origin Specific
   OGN: {
     from: 6436154,
@@ -72,7 +72,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
   },
 }
 
-const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = {
   wOETH: {
     from: 16933090,
     address: WOETH_ADDRESS,
@@ -129,9 +129,9 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
 export const erc20s = () => {
   initialized = true
   return [
-    ...Object.values(simpleTracks).map(createERC20SimpleTracker),
+    ...Object.values(simpleTracks).map(createERC20EventTracker),
     ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
-    ...Object.values(tracks).map(createERC20Tracker),
+    ...Object.values(tracks).map(createERC20PollingTracker),
   ]
 }
 

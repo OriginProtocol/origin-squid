@@ -11,7 +11,10 @@ import { TokenAddress } from '@utils/symbols'
 
 const duplicateTracker = new Set<string>()
 
-export const createERC20Tracker = ({
+/**
+ * Track partial ERC20 state using polling.
+ */
+export const createERC20PollingTracker = ({
   from,
   address,
   accountFilter = undefined,

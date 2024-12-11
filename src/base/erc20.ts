@@ -1,6 +1,6 @@
 import * as otoken from '@abi/otoken'
-import { createERC20Tracker } from '@templates/erc20'
-import { createERC20SimpleTracker } from '@templates/erc20-simple'
+import { createERC20EventTracker } from '@templates/erc20/erc20-event'
+import { createERC20PollingTracker } from '@templates/erc20/erc20-polling'
 import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import { OGN_BASE_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
@@ -8,7 +8,7 @@ import { logFilter } from '@utils/logFilter'
 
 export const baseERC20s = [
   // OGN
-  createERC20SimpleTracker({
+  createERC20EventTracker({
     from: 15676145,
     address: OGN_BASE_ADDRESS,
   }),
@@ -39,24 +39,24 @@ export const baseERC20s = [
     },
   }),
   // wsuperOETHb
-  createERC20SimpleTracker({
+  createERC20EventTracker({
     from: 17819702,
     address: baseAddresses.tokens.wsuperOETHb,
   }),
   // bridgedWOETH
-  createERC20SimpleTracker({
+  createERC20EventTracker({
     from: 13327014,
     address: baseAddresses.tokens.bridgedWOETH,
   }),
   // AERO (limited)
-  createERC20Tracker({
+  createERC20PollingTracker({
     from: 18689558,
     address: baseAddresses.tokens.AERO,
     accountFilter: [baseAddresses.superOETHb.strategies.amo, baseAddresses.multisig.reservoir],
     intervalTracking: true,
   }),
   // WETH (limited)
-  createERC20Tracker({
+  createERC20PollingTracker({
     from: 18689558,
     address: baseAddresses.tokens.WETH,
     accountFilter: [baseAddresses.superOETHb.dripper, baseAddresses.superOETHb.vault, baseAddresses.multisig.reservoir],

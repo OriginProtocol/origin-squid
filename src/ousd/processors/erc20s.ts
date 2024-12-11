@@ -1,6 +1,6 @@
 import * as otoken from '@abi/otoken'
 import * as otokenOld from '@abi/otoken-old'
-import { createERC20Tracker } from '@templates/erc20'
+import { createERC20PollingTracker } from '@templates/erc20'
 import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
 import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
@@ -40,7 +40,7 @@ const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracke
   },
 }
 
-const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
+const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = {
   // OUSD Related
   USDT: {
     // from: 11362821,
@@ -83,5 +83,5 @@ const tracks: Record<string, Parameters<typeof createERC20Tracker>[0]> = {
 // This is a function to allow others to subscribe to balance tracking
 export const erc20s = () => [
   ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
-  ...Object.values(tracks).map(createERC20Tracker),
+  ...Object.values(tracks).map(createERC20PollingTracker),
 ]

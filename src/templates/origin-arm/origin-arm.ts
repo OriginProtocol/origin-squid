@@ -10,7 +10,7 @@ import { Arm, ArmDailyStat, ArmState, ArmWithdrawalRequest, TraderateChanged } f
 import { Block, Context, Processor } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { createERC20SimpleTracker } from '@templates/erc20-simple'
+import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { calculateAPY } from '@utils/calculateAPY'
@@ -292,7 +292,7 @@ export const createOriginARMProcessors = ({
       },
     },
     // The ARM is an ERC20, so we can use the ERC20SimpleTracker to track holder balances
-    createERC20SimpleTracker({
+    createERC20EventTracker({
       from,
       address: armAddress,
     }),

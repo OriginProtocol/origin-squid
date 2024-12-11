@@ -7,7 +7,10 @@ import { ADDRESS_ZERO } from '@utils/addresses'
 import { logFilter } from '@utils/logFilter'
 import { TokenAddress } from '@utils/symbols'
 
-export const createERC20SimpleTracker = ({ from, address }: { from: number; address: TokenAddress | string }) => {
+/**
+ * Track ERC20 state using events.
+ */
+export const createERC20EventTracker = ({ from, address }: { from: number; address: TokenAddress | string }) => {
   let erc20: ERC20 | undefined
   let lastState: ERC20State | undefined
   const transferLogFilters = [

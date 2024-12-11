@@ -11,6 +11,9 @@ import { TraceFilter, traceFilter } from '@utils/traceFilter'
 
 const duplicateTracker = new Set<string>()
 
+/**
+ * Track ERC20 state for rebasing tokens.
+ */
 export const createRebasingERC20Tracker = ({
   from,
   address,
