@@ -1,6 +1,6 @@
+import type { FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
+import { ContractBase, fun, viewFun } from '@subsquid/evm-abi'
 import * as p from '@subsquid/evm-codec'
-import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
-import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const functions = {
     WETH9: viewFun("0x4aa4a4fc", "WETH9()", {}, p.address),
@@ -28,6 +28,10 @@ export class Contract extends ContractBase {
 
     quoteExactInputSingleV2(params: QuoteExactInputSingleV2Params["params"]) {
         return this.eth_call(functions.quoteExactInputSingleV2, {params})
+    }
+
+    quoteExactInputSingleV3(params: QuoteExactInputSingleV3Params["params"]) {
+        return this.eth_call(functions.quoteExactInputSingleV3, {params})
     }
 }
 

@@ -2,7 +2,7 @@ import 'tsconfig-paths/register'
 import { formatUnits } from 'viem'
 
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
-import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter'
+import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
 import { Context, run } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'

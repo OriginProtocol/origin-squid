@@ -1,6 +1,6 @@
-import * as p from '@subsquid/evm-codec'
-import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
 import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
+import { ContractBase, event, fun, indexed, viewFun } from '@subsquid/evm-abi'
+import * as p from '@subsquid/evm-codec'
 
 export const events = {
     Approval: event("0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925", "Approval(address,address,uint256)", {"owner": indexed(p.address), "spender": indexed(p.address), "amount": p.uint256}),
