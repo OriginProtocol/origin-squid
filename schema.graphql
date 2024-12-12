@@ -1,244 +1,40 @@
 # GENERATED, DO NOT MODIFY
 
-type AeroCLGaugeClaimFees @entity {
+type OGNDailyStat @entity {
   id: ID!
-  chainId: Int! @index
   blockNumber: Int! @index
   timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  claimed0: BigInt!
-  claimed1: BigInt!
+
+  totalSupply: BigInt!
+  totalSupplyUSD: Float!
+  totalStaked: BigInt!
+  tradingVolumeUSD: Float!
+  marketCapUSD: Float!
+  priceUSD: Float!
+  holdersOverThreshold: Int!
 }
 
-type AeroCLGaugeClaimRewards @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  amount: BigInt!
+
+type LegacyStaker @entity {
+  id: ID! @index
+  inputAmount: BigInt!
+  outputAmount: BigInt!
+  balance: BigInt!
+  rewardAmount: BigInt!
 }
 
-type AeroCLGaugeDeposit @entity {
+type MorphoMarketState @entity {
   id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  user: String! @index
-  tokenId: BigInt! @index
-  liquidityToStake: BigInt!
-}
-
-type AeroCLGaugeNotifyReward @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  amount: BigInt!
-}
-
-type AeroCLGaugeWithdraw @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  user: String! @index
-  tokenId: BigInt! @index
-  liquidityToStake: BigInt!
-}
-type AeroCLPoolBurn @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  owner: String! @index
-  tickLower: Int!
-  tickUpper: Int!
-  amount: BigInt!
-  amount0: BigInt!
-  amount1: BigInt!
-}
-
-type AeroCLPoolCollect @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  owner: String! @index
-  recipient: String!
-  tickLower: Int!
-  tickUpper: Int!
-  amount0: BigInt!
-  amount1: BigInt!
-}
-
-type AeroCLPoolCollectFees @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  recipient: String! @index
-  amount0: BigInt!
-  amount1: BigInt!
-}
-
-type AeroCLPoolFlash @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  sender: String! @index
-  recipient: String! @index
-  amount0: BigInt!
-  amount1: BigInt!
-  paid0: BigInt!
-  paid1: BigInt!
-}
-
-type AeroCLPoolIncreaseObservationCardinalityNext @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  observationCardinalityNextOld: Int!
-  observationCardinalityNextNew: Int!
-}
-
-type AeroCLPoolInitialize @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  sqrtPriceX96: BigInt!
-  tick: Int!
-}
-
-type AeroCLPoolMint @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  sender: String!
-  owner: String! @index
-  tickLower: Int!
-  tickUpper: Int!
-  amount: BigInt!
-  amount0: BigInt!
-  amount1: BigInt!
-}
-
-type AeroCLPoolSetFeeProtocol @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  feeProtocol0Old: Int!
-  feeProtocol1Old: Int!
-  feeProtocol0New: Int!
-  feeProtocol1New: Int!
-}
-
-type AeroCLPoolSwap @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  sender: String! @index
-  recipient: String! @index
-  amount0: BigInt!
-  amount1: BigInt!
-  sqrtPriceX96: BigInt!
-  liquidity: BigInt!
-  tick: Int!
-}
-type AeroGaugeClaimFees @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  claimed0: BigInt!
-  claimed1: BigInt!
-}
-
-type AeroGaugeClaimRewards @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  amount: BigInt!
-}
-
-type AeroGaugeDeposit @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  to: String! @index
-  amount: BigInt!
-}
-
-type AeroGaugeNotifyReward @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  amount: BigInt!
-}
-
-type AeroGaugeWithdraw @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  from: String! @index
-  amount: BigInt!
-}
-type AeroPoolCreated @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  pool: String!
-  token0: String!
-  token1: String!
-  stable: Boolean!
-}
-
-type AeroCLPoolCreated @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  pool: String!
-  token0: String!
-  token1: String!
-  tickSpacing: Int!
+  chainId: Int!
+  timestamp: DateTime!
+  blockNumber: Int!
+  marketId: String!
+  totalSupplyAssets: BigInt!
+  totalSupplyShares: BigInt!
+  totalBorrowAssets: BigInt!
+  totalBorrowShares: BigInt!
+  lastUpdate: BigInt!
+  fee: BigInt!
 }
 type AeroPoolApproval @entity {
   id: ID!
@@ -338,6 +134,109 @@ type AeroPoolTransfer @entity {
   from: String! @index
   to: String! @index
   value: BigInt!
+}
+type AeroGaugeClaimFees @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  claimed0: BigInt!
+  claimed1: BigInt!
+}
+
+type AeroGaugeClaimRewards @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  amount: BigInt!
+}
+
+type AeroGaugeDeposit @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  to: String! @index
+  amount: BigInt!
+}
+
+type AeroGaugeNotifyReward @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  amount: BigInt!
+}
+
+type AeroGaugeWithdraw @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  amount: BigInt!
+}
+type AeroCLGaugeClaimFees @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  claimed0: BigInt!
+  claimed1: BigInt!
+}
+
+type AeroCLGaugeClaimRewards @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  amount: BigInt!
+}
+
+type AeroCLGaugeDeposit @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  user: String! @index
+  tokenId: BigInt! @index
+  liquidityToStake: BigInt!
+}
+
+type AeroCLGaugeNotifyReward @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  from: String! @index
+  amount: BigInt!
+}
+
+type AeroCLGaugeWithdraw @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  user: String! @index
+  tokenId: BigInt! @index
+  liquidityToStake: BigInt!
 }
 type AeroVoterEscrowApproval @entity {
   id: ID!
@@ -552,111 +451,6 @@ type AeroVoterEscrowWithdrawManaged @entity {
   weight: BigInt!
   ts: BigInt!
 }
-type AeroVoterAbstained @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  voter: String! @index
-  pool: String! @index
-  tokenId: BigInt! @index
-  weight: BigInt!
-  totalWeight: BigInt!
-}
-#
-#type AeroVoterDistributeReward @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  sender: String! @index
-#  gauge: String! @index
-#  amount: BigInt!
-#}
-#
-
-type AeroVoterGaugeCreated @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  poolFactory: String! @index
-  votingRewardsFactory: String! @index
-  gaugeFactory: String! @index
-  pool: String!
-  bribeVotingReward: String!
-  feeVotingReward: String!
-  gauge: String!
-  creator: String!
-}
-
-#
-#type AeroVoterGaugeKilled @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  gauge: String! @index
-#}
-#
-#type AeroVoterGaugeRevived @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  gauge: String! @index
-#}
-#
-#type AeroVoterNotifyReward @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  sender: String! @index
-#  reward: String! @index
-#  amount: BigInt!
-#}
-
-type AeroVoterVoted @entity {
-  id: ID!
-  chainId: Int! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  address: String! @index
-  voter: String! @index
-  pool: String! @index
-  tokenId: BigInt! @index
-  weight: BigInt!
-  totalWeight: BigInt!
-}
-#
-#type AeroVoterWhitelistNFT @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  whitelister: String! @index
-#  tokenId: BigInt! @index
-#  bool: Boolean! @index
-#}
-#
-#type AeroVoterWhitelistToken @entity {
-#  id: ID!
-#  chainId: Int! @index
-#  blockNumber: Int! @index
-#  timestamp: DateTime! @index
-#  address: String! @index
-#  whitelister: String! @index
-#  token: String! @index
-#  bool: Boolean! @index
-#}
 type AeroPoolState @entity {
   id: ID! # chainId:poolAddress:blockNumber
   chainId: Int! @index
@@ -772,253 +566,247 @@ type AeroLPPosition @entity {
   sqrtRatioLower: BigInt!
   sqrtRatioUpper: BigInt!
 }
-# - P1: For UI
-#     - stETH ARM TVL
-#     - stETH ARM APY 30 day trailing
-#     - stETH ARM historical APY chart
-#     - Deposited balance per wallet address
-#     - stETH ARM deposits/ withdrawals (notification in bot channel)
-# - Nice to Have (not launch blocking):
-#     - Breakout of what is external liquidity vs. deposited by Origin
-#     - stETH ARM # of external LPs
-#     - stETH ARM size of holdings of external LPs
-#     - stETH  redemption queue length
-#     - Activity history (deposits/withdrawals per wallet address)
-#     - Earnings per wallet address
-
-type Arm @entity {
+type AeroVoterAbstained @entity {
   id: ID!
-  chainId: Int!
-  address: String!
-  name: String!
-  symbol: String!
-  decimals: Int!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  voter: String! @index
+  pool: String! @index
+  tokenId: BigInt! @index
+  weight: BigInt!
+  totalWeight: BigInt!
+}
+#
+#type AeroVoterDistributeReward @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  sender: String! @index
+#  gauge: String! @index
+#  amount: BigInt!
+#}
+#
+
+type AeroVoterGaugeCreated @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  poolFactory: String! @index
+  votingRewardsFactory: String! @index
+  gaugeFactory: String! @index
+  pool: String!
+  bribeVotingReward: String!
+  feeVotingReward: String!
+  gauge: String!
+  creator: String!
+}
+
+#
+#type AeroVoterGaugeKilled @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  gauge: String! @index
+#}
+#
+#type AeroVoterGaugeRevived @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  gauge: String! @index
+#}
+#
+#type AeroVoterNotifyReward @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  sender: String! @index
+#  reward: String! @index
+#  amount: BigInt!
+#}
+
+type AeroVoterVoted @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  voter: String! @index
+  pool: String! @index
+  tokenId: BigInt! @index
+  weight: BigInt!
+  totalWeight: BigInt!
+}
+#
+#type AeroVoterWhitelistNFT @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  whitelister: String! @index
+#  tokenId: BigInt! @index
+#  bool: Boolean! @index
+#}
+#
+#type AeroVoterWhitelistToken @entity {
+#  id: ID!
+#  chainId: Int! @index
+#  blockNumber: Int! @index
+#  timestamp: DateTime! @index
+#  address: String! @index
+#  whitelister: String! @index
+#  token: String! @index
+#  bool: Boolean! @index
+#}
+type AeroCLPoolBurn @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  owner: String! @index
+  tickLower: Int!
+  tickUpper: Int!
+  amount: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolCollect @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  owner: String! @index
+  recipient: String!
+  tickLower: Int!
+  tickUpper: Int!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolCollectFees @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolFlash @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+  paid0: BigInt!
+  paid1: BigInt!
+}
+
+type AeroCLPoolIncreaseObservationCardinalityNext @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  observationCardinalityNextOld: Int!
+  observationCardinalityNextNew: Int!
+}
+
+type AeroCLPoolInitialize @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sqrtPriceX96: BigInt!
+  tick: Int!
+}
+
+type AeroCLPoolMint @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String!
+  owner: String! @index
+  tickLower: Int!
+  tickUpper: Int!
+  amount: BigInt!
+  amount0: BigInt!
+  amount1: BigInt!
+}
+
+type AeroCLPoolSetFeeProtocol @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  feeProtocol0Old: Int!
+  feeProtocol1Old: Int!
+  feeProtocol0New: Int!
+  feeProtocol1New: Int!
+}
+
+type AeroCLPoolSwap @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  sender: String! @index
+  recipient: String! @index
+  amount0: BigInt!
+  amount1: BigInt!
+  sqrtPriceX96: BigInt!
+  liquidity: BigInt!
+  tick: Int!
+}
+type AeroPoolCreated @entity {
+  id: ID!
+  chainId: Int! @index
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  address: String! @index
+  pool: String!
   token0: String!
   token1: String!
+  stable: Boolean!
 }
 
-type ArmState @entity {
+type AeroCLPoolCreated @entity {
   id: ID!
   chainId: Int! @index
-  timestamp: DateTime! @index
   blockNumber: Int! @index
-  address: String! @index
-  assets0: BigInt!
-  assets1: BigInt!
-  outstandingAssets1: BigInt!
-  totalAssets: BigInt!
-  totalAssetsCap: BigInt!
-  totalSupply: BigInt!
-  assetsPerShare: BigInt!
-  totalDeposits: BigInt!
-  totalWithdrawals: BigInt!
-  totalYield: BigInt!
-  totalFees: BigInt!
-}
-
-type ArmDailyStat @entity {
-  id: ID!
-  chainId: Int! @index
   timestamp: DateTime! @index
-  blockNumber: Int! @index
-  date: String! @index
   address: String! @index
-  assets0: BigInt!
-  assets1: BigInt!
-  outstandingAssets1: BigInt!
-  totalAssets: BigInt!
-  totalAssetsCap: BigInt!
-  totalSupply: BigInt!
-  assetsPerShare: BigInt!
-  apr: Float!
-  apy: Float!
-  yield: BigInt!
-  fees: BigInt!
-  rateUSD: Float!
-}
-
-type ArmWithdrawalRequest @entity {
-  id: ID!
-  chainId: Int! @index
-  txHash: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  address: String! @index
-  account: String! @index
-  requestId: BigInt!
-  amount: BigInt!
-  queued: BigInt!
-  claimed: Boolean!
-}
-
-type TraderateChanged @entity {
-  id: ID!
-  chainId: Int! @index
-  txHash: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  address: String! @index
-  traderate0: BigInt!
-  traderate1: BigInt!
-}
-type CoinGeckoCoinData @entity {
-  id: ID!
-  product: String! @index
-  date: String! @index
-  vsCurrency: String!
-  price: Float!
-  marketCap: Float!
-  tradingVolume: Float!
-}
-# State
-
-type ESToken @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  circulating: BigInt!
-  staked: BigInt!
-  total: BigInt!
-}
-
-type ESAccount @entity {
-  id: ID! # `chainId:address:account`
-  chainId: Int! @index
-  address: String! @index
-  account: String! @index
-  assetBalance: BigInt!
-  stakedBalance: BigInt!
-  balance: BigInt!
-  votingPower: BigInt!
-  delegateTo: ESAccount
-  delegatesFrom: [ESAccount]! @derivedFrom(field: "delegateTo")
-}
-
-type ESYield @entity {
-  id: ID!
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  assetBalance: BigInt!
-  rewardsPerSecond: BigInt!
-  apr: Float!
-  apy: Float!
-}
-
-type ESLockup @entity  {
-  id: ID! # `chainId:address:account:lockupId` or `lockupId`
-  chainId: Int! @index
-  address: String! @index
-  account: String! @index
-  lockupId: BigInt! @index
-  timestamp: DateTime!
-  txHash: String! @index
-  lastUpdated: DateTime!
-  amount: BigInt!
-  end: DateTime!
-  points: BigInt!
-  withdrawAmount: BigInt!
-  penalty: BigInt!
-  state: ESLockupState
-  events: [ESLockupEvent]! @derivedFrom(field: "lockup")
-}
-
-enum ESLockupState {
-  Open
-  Closed
-}
-
-enum ESLockupEventType {
-  Staked
-  Unstaked
-  Extended
-}
-
-type ESLockupEvent @entity {
-  id: ID!
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  event: ESLockupEventType!
-  lockup: ESLockup!
-}
-
-# Events
-type ESDelegateChanged @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  delegator: String! @index
-  fromDelegate: String!
-  toDelegate: String!
-}
-
-type ESDelegateVotesChanged @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  delegate: String! @index
-  previousBalance: BigInt!
-  newBalance: BigInt!
-}
-
-type ESPenalty @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  account: String! @index
-  amount: BigInt!
-}
-
-type ESReward @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  account: String! @index
-  amount: BigInt!
-}
-
-type ESStake @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  account: String! @index
-  lockupId: BigInt! @index
-  amount: BigInt!
-  end: BigInt!
-  points: BigInt!
-}
-
-type ESUnstake @entity  {
-  id: ID! # `chainId:logId`
-  chainId: Int! @index
-  address: String! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  account: String! @index
-  lockupId: BigInt! @index
-  amount: BigInt!
-  end: BigInt!
-  points: BigInt!
+  pool: String!
+  token0: String!
+  token1: String!
+  tickSpacing: Int!
 }
 type FRRSRewardCollected @entity {
   id: ID!
@@ -1344,82 +1132,6 @@ type BridgeTransferState @entity {
   txHash: String! @index
   state: Int!
 }
-enum GovernanceProposalState {
-  Pending
-  Active
-  Canceled
-  Defeated
-  Succeeded
-  Queued
-  Expired
-  Executed
-}
-
-enum GovernanceProposalEventType {
-  Created
-  Queued
-  Canceled
-  Extended
-  Executed
-}
-
-enum GovernanceVoteType {
-  Against
-  For
-  Abstain
-}
-
-type GovernanceProposalEvent @entity {
-  id: ID!
-  txHash: String! @index
-  event: GovernanceProposalEventType!
-  timestamp: DateTime!
-  proposal: GovernanceProposal! @index
-}
-
-type GovernanceProposal @entity {
-  id: ID! @index
-  chainId: Int! @index
-  address: String! @index
-  proposalId: BigInt!
-  description: String
-  proposer: String!
-  timestamp: DateTime!
-  txHash: String! @index
-  startBlock: BigInt!
-  endBlock: BigInt!
-  targets: [String]!
-  values: [String]!
-  signatures: [String]!
-  calldatas: [String]!
-  lastUpdated: DateTime!
-  status: GovernanceProposalState!
-  events: [GovernanceProposalEvent]! @derivedFrom(field: "proposal")
-  quorum: BigInt!
-  choices: [String]!
-  scores: [String]!
-}
-
-type GovernanceProposalVote @entity {
-  id: ID!
-  chainId: Int!
-  address: String!
-  proposal: GovernanceProposal! @index
-  voter: String! @index
-  weight: BigInt!
-  type: GovernanceVoteType!
-  txHash: String!
-  timestamp: DateTime!
-}
-
-type LegacyStaker @entity {
-  id: ID! @index
-  inputAmount: BigInt!
-  outputAmount: BigInt!
-  balance: BigInt!
-  rewardAmount: BigInt!
-}
-
 type BeaconDepositEvent @entity {
   id: ID! # `chainId:logId`
   chainId: Int! @index
@@ -1462,18 +1174,102 @@ type ExecutionRewardsCollected @entity {
   strategy: String! @index
   amount: BigInt!
 }
-type OGNDailyStat @entity {
+type EventWOETHPriceUpdated @entity {
   id: ID!
-  blockNumber: Int! @index
+  chainId: Int! @index
   timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  oldValue: BigInt!
+  newValue: BigInt!
+}# - P1: For UI
+#     - stETH ARM TVL
+#     - stETH ARM APY 30 day trailing
+#     - stETH ARM historical APY chart
+#     - Deposited balance per wallet address
+#     - stETH ARM deposits/ withdrawals (notification in bot channel)
+# - Nice to Have (not launch blocking):
+#     - Breakout of what is external liquidity vs. deposited by Origin
+#     - stETH ARM # of external LPs
+#     - stETH ARM size of holdings of external LPs
+#     - stETH  redemption queue length
+#     - Activity history (deposits/withdrawals per wallet address)
+#     - Earnings per wallet address
 
+type Arm @entity {
+  id: ID!
+  chainId: Int!
+  address: String!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  token0: String!
+  token1: String!
+}
+
+type ArmState @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  assets0: BigInt!
+  assets1: BigInt!
+  outstandingAssets1: BigInt!
+  totalAssets: BigInt!
+  totalAssetsCap: BigInt!
   totalSupply: BigInt!
-  totalSupplyUSD: Float!
-  totalStaked: BigInt!
-  tradingVolumeUSD: Float!
-  marketCapUSD: Float!
-  priceUSD: Float!
-  holdersOverThreshold: Int!
+  assetsPerShare: BigInt!
+  totalDeposits: BigInt!
+  totalWithdrawals: BigInt!
+  totalYield: BigInt!
+  totalFees: BigInt!
+}
+
+type ArmDailyStat @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  date: String! @index
+  address: String! @index
+  assets0: BigInt!
+  assets1: BigInt!
+  outstandingAssets1: BigInt!
+  totalAssets: BigInt!
+  totalAssetsCap: BigInt!
+  totalSupply: BigInt!
+  assetsPerShare: BigInt!
+  apr: Float!
+  apy: Float!
+  yield: BigInt!
+  fees: BigInt!
+  rateUSD: Float!
+}
+
+type ArmWithdrawalRequest @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  account: String! @index
+  requestId: BigInt!
+  amount: BigInt!
+  queued: BigInt!
+  claimed: Boolean!
+}
+
+type TraderateChanged @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  traderate0: BigInt!
+  traderate1: BigInt!
 }
 type OGV @entity {
   id: ID!
@@ -1592,6 +1388,165 @@ type OGVDailyStat @entity {
   marketCapUSD: Float!
   priceUSD: Float!
   holdersOverThreshold: Int!
+}
+type CoinGeckoCoinData @entity {
+  id: ID!
+  product: String! @index
+  date: String! @index
+  vsCurrency: String!
+  price: Float!
+  marketCap: Float!
+  tradingVolume: Float!
+}
+# State
+
+type ESToken @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  circulating: BigInt!
+  staked: BigInt!
+  total: BigInt!
+}
+
+type ESAccount @entity {
+  id: ID! # `chainId:address:account`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  assetBalance: BigInt!
+  stakedBalance: BigInt!
+  balance: BigInt!
+  votingPower: BigInt!
+  delegateTo: ESAccount
+  delegatesFrom: [ESAccount]! @derivedFrom(field: "delegateTo")
+}
+
+type ESYield @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  assetBalance: BigInt!
+  rewardsPerSecond: BigInt!
+  apr: Float!
+  apy: Float!
+}
+
+type ESLockup @entity  {
+  id: ID! # `chainId:address:account:lockupId` or `lockupId`
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  timestamp: DateTime!
+  txHash: String! @index
+  lastUpdated: DateTime!
+  amount: BigInt!
+  end: DateTime!
+  points: BigInt!
+  withdrawAmount: BigInt!
+  penalty: BigInt!
+  state: ESLockupState
+  events: [ESLockupEvent]! @derivedFrom(field: "lockup")
+}
+
+enum ESLockupState {
+  Open
+  Closed
+}
+
+enum ESLockupEventType {
+  Staked
+  Unstaked
+  Extended
+}
+
+type ESLockupEvent @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  event: ESLockupEventType!
+  lockup: ESLockup!
+}
+
+# Events
+type ESDelegateChanged @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  delegator: String! @index
+  fromDelegate: String!
+  toDelegate: String!
+}
+
+type ESDelegateVotesChanged @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  delegate: String! @index
+  previousBalance: BigInt!
+  newBalance: BigInt!
+}
+
+type ESPenalty @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  account: String! @index
+  amount: BigInt!
+}
+
+type ESReward @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  account: String! @index
+  amount: BigInt!
+}
+
+type ESStake @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  amount: BigInt!
+  end: BigInt!
+  points: BigInt!
+}
+
+type ESUnstake @entity  {
+  id: ID! # `chainId:logId`
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  account: String! @index
+  lockupId: BigInt! @index
+  amount: BigInt!
+  end: BigInt!
+  points: BigInt!
 }
 type OToken @entity {
   id: ID! @index
@@ -1818,25 +1773,70 @@ enum RebasingOption {
   YieldDelegationSource
   YieldDelegationTarget
 }
-type MorphoMarketState @entity {
+enum GovernanceProposalState {
+  Pending
+  Active
+  Canceled
+  Defeated
+  Succeeded
+  Queued
+  Expired
+  Executed
+}
+
+enum GovernanceProposalEventType {
+  Created
+  Queued
+  Canceled
+  Extended
+  Executed
+}
+
+enum GovernanceVoteType {
+  Against
+  For
+  Abstain
+}
+
+type GovernanceProposalEvent @entity {
+  id: ID!
+  txHash: String! @index
+  event: GovernanceProposalEventType!
+  timestamp: DateTime!
+  proposal: GovernanceProposal! @index
+}
+
+type GovernanceProposal @entity {
+  id: ID! @index
+  chainId: Int! @index
+  address: String! @index
+  proposalId: BigInt!
+  description: String
+  proposer: String!
+  timestamp: DateTime!
+  txHash: String! @index
+  startBlock: BigInt!
+  endBlock: BigInt!
+  targets: [String]!
+  values: [String]!
+  signatures: [String]!
+  calldatas: [String]!
+  lastUpdated: DateTime!
+  status: GovernanceProposalState!
+  events: [GovernanceProposalEvent]! @derivedFrom(field: "proposal")
+  quorum: BigInt!
+  choices: [String]!
+  scores: [String]!
+}
+
+type GovernanceProposalVote @entity {
   id: ID!
   chainId: Int!
+  address: String!
+  proposal: GovernanceProposal! @index
+  voter: String! @index
+  weight: BigInt!
+  type: GovernanceVoteType!
+  txHash: String!
   timestamp: DateTime!
-  blockNumber: Int!
-  marketId: String!
-  totalSupplyAssets: BigInt!
-  totalSupplyShares: BigInt!
-  totalBorrowAssets: BigInt!
-  totalBorrowShares: BigInt!
-  lastUpdate: BigInt!
-  fee: BigInt!
-}
-type EventWOETHPriceUpdated @entity {
-  id: ID!
-  chainId: Int! @index
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  address: String! @index
-  oldValue: BigInt!
-  newValue: BigInt!
 }
