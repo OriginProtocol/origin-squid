@@ -17,7 +17,7 @@ import {
   XOGN_ADDRESS,
 } from '@utils/addresses'
 
-import * as dailyStats from './mainnet/post-processors/daily-stats'
+import * as dailyStats from './mainnet/post-processors/ogn-daily-stats'
 import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
 import * as legacyStaking from './mainnet/processors/legacy-staking'

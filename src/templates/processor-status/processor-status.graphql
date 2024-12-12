@@ -1,0 +1,5 @@
+type ProcessingStatus @entity {
+  id: ID!
+  timestamp: DateTime!
+  blockNumber: Int!
+}

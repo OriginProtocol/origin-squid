@@ -1,0 +1,12 @@
+type TransactionDetails @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  from: String! @index
+  to: String! @index
+  gasUsed: BigInt!
+  effectiveGasPrice: BigInt!
+  transactionFee: BigInt!
+}
