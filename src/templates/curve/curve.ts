@@ -1,12 +1,9 @@
 import * as curveLpToken from '@abi/curve-lp-token'
-import { CurvePool, CurvePoolBalance, CurvePoolRate, LiquiditySourceType } from '@model'
+import { CurvePool, CurvePoolBalance, CurvePoolRate } from '@model'
 import { Context } from '@processor'
-import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { range } from '@utils/range'
-
-import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]
@@ -26,9 +23,6 @@ export const createCurveInitializer = ({
   address: string
   tokens: [string, string] | [string, string, string]
 }) => {
-  for (const token of tokens) {
-    registerLiquiditySource(address, LiquiditySourceType.CurvePool, token)
-  }
   return async (ctx: Context) => {
     const pool = await ctx.store.findOneBy(CurvePool, { id: address })
     if (!pool) {
@@ -89,11 +83,6 @@ export const createCurveProcessor = ({
         balance0: balances[0] ?? 0n,
         balance1: balances[1] ?? 0n,
         balance2: balances[2] ?? 0n,
-      })
-      updateLiquidityBalances(ctx, block, {
-        address,
-        tokens,
-        balances,
       })
       result.curvePoolBalances.push(curve)
       result.curvePoolRates.push(

@@ -1,6 +1,8 @@
 projects:
   separate:
-    schema: schema/**/*.graphql
+    schema:
+      - schema/**/*.graphql
+      - src/**/*.graphql
     include:
       - types.graphql
   combined:

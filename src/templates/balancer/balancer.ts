@@ -3,16 +3,13 @@ import * as balancerMetaStablePoolAbi from '@abi/balancer-meta-stable-pool'
 import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import * as balancerWeightedPool from '@abi/balancer-weighted-pool-2-token'
-import { BalancerPool, BalancerPoolBalance, BalancerPoolRate, LiquiditySourceType } from '@model'
+import { BalancerPool, BalancerPoolBalance, BalancerPoolRate } from '@model'
 import { Context } from '@processor'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, BALANCER_VAULT } from '@utils/addresses'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-
-import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 
 const eth1 = BigInt('1000000000000000000')
 
@@ -34,9 +31,6 @@ export const createBalancerInitializer = ({
   poolAddress: string
   tokens: [string, string] | [string, string, string] | [string, string, string, string]
 }) => {
-  for (const token of tokens) {
-    registerLiquiditySource(poolAddress, LiquiditySourceType.BalancerPool, token)
-  }
   return async (ctx: Context) => {
     const pool = await ctx.store.findOneBy(BalancerPool, { id: poolAddress })
     if (!pool) {
@@ -84,11 +78,6 @@ export const createBalancerProcessor = (
         balance1: balances[1],
         balance2: balances.length > 2 ? balances[2] : 0n,
         balance3: balances.length > 3 ? balances[3] : 0n,
-      })
-      updateLiquidityBalances(ctx, block, {
-        address: poolAddress,
-        tokens,
-        balances,
       })
 
       result.balancerPoolBalances.push(balance)

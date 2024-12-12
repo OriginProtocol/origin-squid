@@ -1,0 +1,53 @@
+type ERC20 @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  name: String!
+  decimals: Int!
+  symbol: String!
+}
+
+type ERC20Holder @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  account: String! @index
+  balance: BigInt!
+  rebasingCredits: BigInt # Only used for rebasing tokens
+}
+
+type ERC20State @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String!
+  totalSupply: BigInt!
+  holderCount: Int!
+  rebasingCreditsPerToken: BigInt # Only used for rebasing tokens
+}
+
+type ERC20Balance @entity {
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  address: String! @index
+  account: String! @index
+  balance: BigInt!
+  rebasingCredits: BigInt # Only used for rebasing tokens
+}
+
+type ERC20Transfer @entity {
+  id: ID!
+  chainId: Int! @index
+  txHash: String!
+  blockNumber: Int!
+  timestamp: DateTime!
+  address: String! @index
+  from: String! @index
+  fromBalance: BigInt!
+  to: String! @index
+  toBalance: BigInt!
+  value: BigInt!
+}

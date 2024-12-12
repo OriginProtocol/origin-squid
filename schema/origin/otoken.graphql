@@ -223,3 +223,9 @@ enum RebasingOption {
   YieldDelegationSource
   YieldDelegationTarget
 }
+
+enum HistoryType {
+  Sent
+  Received
+  Yield
+}

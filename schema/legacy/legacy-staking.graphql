@@ -1,5 +1,3 @@
-
-
 type LegacyStaker @entity {
   id: ID! @index
   inputAmount: BigInt!
@@ -7,4 +5,3 @@ type LegacyStaker @entity {
   balance: BigInt!
   rewardAmount: BigInt!
 }
-

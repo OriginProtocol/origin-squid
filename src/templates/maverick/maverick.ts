@@ -1,11 +1,8 @@
 import * as maverickPool from '@abi/maverick-pool'
-import { LiquiditySourceType, MaverickPool, MaverickPoolBalance } from '@model'
+import { MaverickPool, MaverickPoolBalance } from '@model'
 import { Context } from '@processor'
-import { updateLiquidityBalances } from '@shared/post-processors/liquidity'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-
-import { registerLiquiditySource } from '../../mainnet/processors/liquidity-sources'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
 
@@ -13,10 +10,7 @@ interface ProcessResult {
   maverickPoolBalances: MaverickPoolBalance[]
 }
 
-export const createMaverickSetup = (
-  from: number,
-  processor: EvmBatchProcessor,
-) => {
+export const createMaverickSetup = (from: number, processor: EvmBatchProcessor) => {
   processor.includeAllBlocks({ from })
 }
 
@@ -29,9 +23,6 @@ export const createMaverickInitializer = ({
   address: string
   tokens: [string, string]
 }) => {
-  for (const token of tokens) {
-    registerLiquiditySource(address, LiquiditySourceType.MaverickPool, token)
-  }
   return async (ctx: Context) => {
     const pool = await ctx.store.findOneBy(MaverickPool, { id: address })
     if (!pool) {
@@ -70,10 +61,7 @@ export const createMaverickProcessor = ({
       const contract = new maverickPool.Contract(ctx, block.header, address)
 
       // TODO: use `get_balances()` where possible
-      const [binBalanceA, binBalanceB] = await Promise.all([
-        contract.binBalanceA(),
-        contract.binBalanceB(),
-      ])
+      const [binBalanceA, binBalanceB] = await Promise.all([contract.binBalanceA(), contract.binBalanceB()])
       const curve = new MaverickPoolBalance({
         id: `${address}-${timestampId}`,
         blockNumber: block.header.height,
@@ -83,11 +71,6 @@ export const createMaverickProcessor = ({
         binBalanceB: binBalanceB ?? 0n,
       })
       result.maverickPoolBalances.push(curve)
-      updateLiquidityBalances(ctx, block, {
-        address,
-        tokens,
-        balances: [binBalanceA, binBalanceB],
-      })
     })
     await ctx.store.insert(result.maverickPoolBalances)
   }
