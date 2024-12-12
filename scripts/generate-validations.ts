@@ -201,6 +201,80 @@ const erc20Balances = (prefix: string, address: string) => {
   `)
 }
 
+const arm = (prefix: string, armAddress: string) => {
+  return [
+    gql(`
+      ${prefix}_armStates: armStates(
+        limit: ${LIMIT},
+        orderBy: id_ASC,
+        where: { address_eq: "${armAddress}" }
+      ) {
+        id
+        chainId
+        timestamp
+        blockNumber
+        address
+        assets0
+        assets1
+        assetsPerShare
+        outstandingAssets1
+        totalAssets
+        totalAssetsCap
+        totalDeposits
+        totalFees
+        totalSupply
+        totalWithdrawals
+        totalYield
+      }
+    `),
+    gql(`
+      ${prefix}_armWithdrawalRequests: armWithdrawalRequests(
+        limit: ${LIMIT},
+        orderBy: id_ASC,
+        where: { address_eq: "${armAddress}" }
+      ) {
+        id
+        blockNumber
+        timestamp
+        address
+        account
+        amount
+        chainId
+        claimed
+        queued
+        requestId
+        txHash
+      }
+    `),
+    gql(`
+      ${prefix}_armDailyStats: armDailyStats(
+        limit: ${LIMIT},
+        orderBy: id_ASC,
+        where: { address_eq: "${armAddress}" }
+      )  {
+        id
+        chainId
+        blockNumber
+        timestamp
+        address
+        apr
+        apy
+        assets0
+        assets1
+        assetsPerShare
+        date
+        fees
+        outstandingAssets1
+        rateUSD
+        totalAssets
+        totalAssetsCap
+        totalSupply
+        yield
+      }
+    `),
+  ]
+}
+
 const main = async () => {
   const queries: string[] = [
     ...oToken('oeth', addresses.oeth.address),
@@ -210,6 +284,7 @@ const main = async () => {
     erc20Balances('ousd', '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'),
     erc20Balances('oeth', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'),
     erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
+    ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
