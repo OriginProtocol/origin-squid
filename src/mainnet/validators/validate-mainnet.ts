@@ -1,4 +1,12 @@
-import { ArmDailyStat, ArmState, ArmWithdrawalRequest, ERC20Balance } from '@model'
+import {
+  ArmDailyStat,
+  ArmState,
+  ArmWithdrawalRequest,
+  BeaconDepositEvent,
+  ERC20Balance,
+  OGNDailyStat,
+  TransactionDetails,
+} from '@model'
 import { Context } from '@processor'
 import { env } from '@utils/env'
 import { entities } from '@validation/entities'
@@ -16,6 +24,9 @@ export const process = async (ctx: Context) => {
     await validateExpectations(ctx, block, ArmDailyStat, firstBlock, entities.lidoarm_armDailyStats)
     await validateExpectations(ctx, block, ArmState, firstBlock, entities.lidoarm_armStates)
     await validateExpectations(ctx, block, ArmWithdrawalRequest, firstBlock, entities.lidoarm_armWithdrawalRequests)
+    await validateExpectations(ctx, block, TransactionDetails, firstBlock, entities.lidoarm_transactionDetails)
+    await validateExpectations(ctx, block, OGNDailyStat, firstBlock, entities.ognDailyStats)
+    await validateExpectations(ctx, block, BeaconDepositEvent, firstBlock, entities.beaconDepositEvents)
     firstBlock = false
   }
 }

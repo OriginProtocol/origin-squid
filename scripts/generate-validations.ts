@@ -1,8 +1,11 @@
 import fs from 'fs'
 
-import { addresses } from './../src/utils/addresses'
-import { baseAddresses } from './../src/utils/addresses-base'
-import { retry } from './../src/utils/retry'
+import { oethStrategies } from '../src/oeth/processors/strategies'
+import { ousdStrategies } from '../src/ousd/processors/strategies'
+import { IStrategyData } from '../src/templates/strategy'
+import { addresses } from '../src/utils/addresses'
+import { baseAddresses } from '../src/utils/addresses-base'
+import { retry } from '../src/utils/retry'
 
 const LIMIT = 1000
 
@@ -275,8 +278,118 @@ const arm = (prefix: string, armAddress: string) => {
   ]
 }
 
+const ognDailyStats = () => {
+  return gql(`
+    ognDailyStats: ognDailyStats(
+      limit: ${LIMIT},
+      orderBy: id_ASC,
+    ) {
+      id
+      blockNumber
+      timestamp
+      holdersOverThreshold
+      totalStaked
+    }
+  `)
+  // Due to coingecko dependency, we can't validate these fields.
+  // totalSupplymarketCapUSD
+  // priceUSD
+  // totalSupplyUSD
+  // tradingVolumeUSD
+}
+
+export const beaconDepositEvents = (address: string) => {
+  return gql(`
+    beaconDepositEvents: beaconDepositEvents(
+      limit: ${LIMIT},
+      orderBy: id_ASC,
+      where: { address_eq: "${address}" }
+    ) {
+      id
+      chainId
+      index
+      caller
+      blockNumber
+      amount
+      address
+      signature
+      timestamp
+      txHash
+      withdrawalCredentials
+      pubkey {
+        id
+      }
+    }
+  `)
+}
+
+export const transactionDetails = (prefix: string, from: string) => {
+  return gql(`
+    ${prefix}_transactionDetails: transactionDetails(
+      limit: ${LIMIT},
+      orderBy: id_ASC,
+      where: { from_eq: "${from}" }
+    ) {
+      id
+      chainId
+      timestamp
+      blockNumber
+      txHash
+      from
+      to
+      gasCost
+      gasUsed
+      effectiveGasPrice
+    }
+  `)
+}
+
+const strategy = (prefix: string, strategies: string) => {
+  return [
+    gql(`
+      strategyBalances_${prefix}: strategyBalances(
+        limit: ${LIMIT},
+        orderBy: id_ASC,
+        where: { strategy_eq: "${strategies}" }
+      ) {
+        id
+        blockNumber
+        timestamp
+        asset
+        balance
+        balanceETH
+        chainId
+        symbol
+        strategy
+      }
+    `),
+    gql(`
+      strategyDailyYields_${prefix}: strategyDailyYields(
+        limit: ${LIMIT},
+        orderBy: id_ASC,
+        where: { strategy_eq: "${strategies}" }
+      ) {
+        id
+        timestamp
+        blockNumber
+        strategy
+        apr
+        apy
+        asset
+        balance
+        balanceWeight
+        earnings
+        earningsChange
+      }
+    `),
+  ]
+}
+
 const main = async () => {
   const queries: string[] = [
+    ...oethStrategies.map((s: IStrategyData) => strategy(`oeth_${s.address}`, s.address)),
+    ...ousdStrategies.map((s: IStrategyData) => strategy(`ousd_${s.address}`, s.address)),
+    ...Object.values(baseAddresses.superOETHb.strategies).map((s: string) => strategy(`superoethb_${s}`, s)),
     ...oToken('oeth', addresses.oeth.address),
     ...oToken('ousd', addresses.ousd.address),
     ...oToken('superoethb', baseAddresses.superOETHb.address),
@@ -285,6 +398,9 @@ const main = async () => {
     erc20Balances('oeth', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'),
     erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
     ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
+    ognDailyStats(),
+    beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
+    transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
