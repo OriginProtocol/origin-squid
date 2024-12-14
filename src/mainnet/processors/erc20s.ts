@@ -1,16 +1,6 @@
-import * as otoken from '@abi/otoken'
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createERC20PollingTracker } from '@templates/erc20/erc20-polling'
-import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
-import {
-  OETH_ADDRESS,
-  OETH_DRIPPER_ADDRESS,
-  OETH_VAULT_ADDRESS,
-  WOETH_ADDRESS,
-  oethStrategyArray,
-  tokens,
-} from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
+import { OETH_DRIPPER_ADDRESS, OETH_VAULT_ADDRESS, WOETH_ADDRESS, oethStrategyArray, tokens } from '@utils/addresses'
 import { TokenSymbol } from '@utils/symbols'
 
 // TODO: Would be nice if interested parties could register their desires here from other parts of the code,
@@ -39,36 +29,6 @@ const simpleTracks: Record<string, Parameters<typeof createERC20EventTracker>[0]
   primeETH: {
     from: 19138973,
     address: tokens.primeETH,
-  },
-}
-
-const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracker>[0]> = {
-  // Origin Specific
-  OETH: {
-    from: 16935276,
-    address: tokens.OETH,
-    rebasing: {
-      rebaseEventFilter: logFilter({
-        address: [OETH_ADDRESS],
-        topic0: [otoken.events.TotalSupplyUpdatedHighres.topic],
-        transaction: true,
-        range: { from: 16935276 },
-      }),
-      getCredits: async (ctx, block, address) => {
-        const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
-        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._0)
-      },
-      getCreditsPerToken: async (ctx, block) => {
-        const oToken = new otoken.Contract(ctx, block.header, tokens.OETH)
-        return oToken.rebasingCreditsPerTokenHighres()
-      },
-      ...getErc20RebasingParams({
-        from: 16935276,
-        yieldDelegationFrom: 21325305,
-        address: OETH_ADDRESS,
-        rebaseOptTraceUntil: 20000000,
-      }),
-    },
   },
 }
 
@@ -130,7 +90,6 @@ export const erc20s = () => {
   initialized = true
   return [
     ...Object.values(simpleTracks).map(createERC20EventTracker),
-    ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
     ...Object.values(tracks).map(createERC20PollingTracker),
   ]
 }

@@ -15,7 +15,9 @@ import {
 // export const from = 11585978 // OUSDReset
 // export const from = 13533937 // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
 
-export const { from, setup, process } = createOTokenProcessor({
+export const { name, from, setup, process } = createOTokenProcessor({
+  name: 'OUSD',
+  symbol: 'OUSD',
   from: 11585978, // OUSDReset
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf

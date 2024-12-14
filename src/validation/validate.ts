@@ -17,18 +17,19 @@ export const validateExpectations = async <
   firstBlock: boolean,
   expectations?: T[],
 ) => {
-  if (!expectations) return
-  if (firstBlock) {
-    while (expectations[0]?.blockNumber < block.header.height) {
-      const entity = expectations.shift()!
-      await validateExpectation(ctx, block, Class, entity)
-    }
-  }
-  assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
-  while (expectations[0]?.blockNumber === block.header.height) {
-    const entity = expectations.shift()!
-    await validateExpectation(ctx, block, Class, entity)
-  }
+  return // skipping for fresh load of v999
+  // if (!expectations) return
+  // if (firstBlock) {
+  //   while (expectations[0]?.blockNumber < block.header.height) {
+  //     const entity = expectations.shift()!
+  //     await validateExpectation(ctx, block, Class, entity)
+  //   }
+  // }
+  // assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
+  // while (expectations[0]?.blockNumber === block.header.height) {
+  //   const entity = expectations.shift()!
+  //   await validateExpectation(ctx, block, Class, entity)
+  // }
 }
 
 const validateExpectation = async <

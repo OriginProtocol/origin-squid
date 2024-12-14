@@ -33,4 +33,7 @@ export class OToken {
 
     @BigIntColumn_({nullable: false})
     nonRebasingSupply!: bigint
+
+    @IntColumn_({nullable: false})
+    holderCount!: number
 }

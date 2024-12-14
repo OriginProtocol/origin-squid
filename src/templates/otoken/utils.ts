@@ -5,7 +5,7 @@ import { In, LessThan, MoreThanOrEqual, Not } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
 import { OTokenAPY, OTokenAddress, OTokenRebase, RebasingOption } from '@model'
-import { Context } from '@processor'
+import { Block, Context } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
@@ -16,7 +16,7 @@ dayjs.extend(utc)
 /**
  * Create a new Address entity
  */
-export async function createAddress(ctx: Context, otoken: string, addr: string, lastUpdated?: Date) {
+export async function createAddress(ctx: Context, otoken: string, addr: string, block: Block) {
   let isContract: boolean = false
   if (addr !== '0x0000000000000000000000000000000000000000') {
     isContract = (await ctx._chain.client.call('eth_getCode', [addr, 'latest'])) !== '0x'
@@ -25,7 +25,6 @@ export async function createAddress(ctx: Context, otoken: string, addr: string, 
   // ctx.log.info(`New address ${rawAddress}`);
   return new OTokenAddress({
     id: `${ctx.chain.id}-${otoken}-${addr}`, // TODO: this change likely affects other behavior
-    chainId: ctx.chain.id,
     otoken,
     address: addr,
     balance: 0n,
@@ -34,7 +33,9 @@ export async function createAddress(ctx: Context, otoken: string, addr: string, 
     isContract,
     rebasingOption: isContract ? RebasingOption.OptOut : RebasingOption.OptIn,
     delegatedTo: null,
-    lastUpdated,
+    chainId: ctx.chain.id,
+    blockNumber: block.header.height,
+    lastUpdated: new Date(block.header.timestamp),
   })
 }
 

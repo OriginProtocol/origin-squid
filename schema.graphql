@@ -325,6 +325,7 @@ type OToken @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+  holderCount: Int!
 }
 
 type OTokenAsset @entity {
@@ -346,6 +347,7 @@ type OTokenAddress @entity {
   earned: BigInt!
   credits: BigInt!
   delegatedTo: String
+  blockNumber: Int!
   lastUpdated: DateTime!
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
@@ -651,7 +653,6 @@ type ERC20Holder @entity {
   address: String! @index
   account: String! @index
   balance: BigInt!
-  rebasingCredits: BigInt # Only used for rebasing tokens
 }
 
 type ERC20State @entity {
@@ -662,7 +663,6 @@ type ERC20State @entity {
   address: String!
   totalSupply: BigInt!
   holderCount: Int!
-  rebasingCreditsPerToken: BigInt # Only used for rebasing tokens
 }
 
 type ERC20Balance @entity {
@@ -673,7 +673,6 @@ type ERC20Balance @entity {
   address: String! @index
   account: String! @index
   balance: BigInt!
-  rebasingCredits: BigInt # Only used for rebasing tokens
 }
 
 type ERC20Transfer @entity {
