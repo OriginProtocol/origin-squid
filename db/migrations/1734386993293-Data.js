@@ -1,5 +1,5 @@
-module.exports = class Data1734140116447 {
-    name = 'Data1734140116447'
+module.exports = class Data1734386993293 {
+    name = 'Data1734386993293'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -218,7 +218,7 @@ module.exports = class Data1734140116447 {
         await db.query(`CREATE INDEX "IDX_6350ddb2def19c1e3a06d8b3ec" ON "erc20_transfer" ("address") `)
         await db.query(`CREATE INDEX "IDX_eca70565083880d00e9110b000" ON "erc20_transfer" ("from") `)
         await db.query(`CREATE INDEX "IDX_9fdc9d58b6ae0cb13b9c7f8226" ON "erc20_transfer" ("to") `)
-        await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "processing_status" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "start_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "head_timestamp" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_85f5e2467b74fb70fac1a053021" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "aero_cl_gauge_claim_fees" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "claimed0" numeric NOT NULL, "claimed1" numeric NOT NULL, CONSTRAINT "PK_324db7f817fe71a6a8dfc04701a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1be41b9f9191217eb3637a5c02" ON "aero_cl_gauge_claim_fees" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_059ed2b30e2737ed924c42f2d2" ON "aero_cl_gauge_claim_fees" ("block_number") `)
