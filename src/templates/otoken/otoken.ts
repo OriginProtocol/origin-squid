@@ -39,7 +39,6 @@ import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
-import { parallel } from '@utils/parallel'
 import { tokensByChain } from '@utils/tokensByChain'
 
 import { createAddress, createRebaseAPY } from './utils'
@@ -269,6 +268,48 @@ export const createOTokenProcessor = (params: {
       },
     }
 
+    await result.initialize()
+
+    // Prepare data for transfer processing
+    const transferLogs = ctx.blocks.map((block) => {
+      const logs = block.logs.filter((l) => transferFilter.matches(l)).map((log) => ({ block, log }))
+      const addresses = logs.flatMap(({ log }) => {
+        const transfer = otoken.events.Transfer.decode(log)
+        return [transfer.from.toLowerCase(), transfer.to.toLowerCase()]
+      })
+      return {
+        block,
+        addresses,
+      }
+    })
+
+    const transferLogsCredits = new Map<number, { address: string; credits: [bigint, bigint] }[]>(
+      await Promise.all(
+        transferLogs.map(({ block, addresses }) => {
+          const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
+          return multicall(
+            ctx,
+            block.header,
+            afterHighResUpgrade
+              ? otoken.functions.creditsBalanceOfHighres
+              : (otoken.functions.creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
+            params.otokenAddress,
+            addresses.map((_account) => ({ _account })),
+          ).then((results) => {
+            const mod = afterHighResUpgrade ? 1n : 1000000000n
+            return [
+              block.header.height,
+              results.map((result, index) => ({
+                address: addresses[index],
+                credits: [result._0 * mod, result._1 * mod],
+              })),
+            ] as [number, { address: string; credits: [bigint, bigint] }[]]
+          })
+        }),
+      ),
+    )
+    time('processTransfer preparation')
+
     const processTransfer = async (block: Context['blocks']['0'], log: Context['blocks']['0']['logs']['0']) => {
       const dataRaw = otoken.events.Transfer.decode(log)
       const data = {
@@ -277,6 +318,13 @@ export const createOTokenProcessor = (params: {
         value: dataRaw.value,
       }
       if (data.value === 0n) return
+
+      const fromCreditsBalanceOf = transferLogsCredits
+        .get(block.header.height)!
+        .find(({ address }) => address === data.from)!.credits
+      const toCreditsBalanceOf = transferLogsCredits
+        .get(block.header.height)!
+        .find(({ address }) => address === data.to)!.credits
 
       const ensureAddress = async (address: string) => {
         let entity = owners!.get(address)
@@ -289,26 +337,10 @@ export const createOTokenProcessor = (params: {
         return entity
       }
 
-      const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
-      const [otokenObject, addressSub, addressAdd, [fromCreditsBalanceOf, toCreditsBalanceOf]] = await Promise.all([
+      const [otokenObject, addressSub, addressAdd] = await Promise.all([
         getOTokenObject(block),
         ensureAddress(data.from),
         ensureAddress(data.to),
-        multicall(
-          ctx,
-          block.header,
-          afterHighResUpgrade
-            ? otoken.functions.creditsBalanceOfHighres
-            : (otoken.functions.creditsBalanceOf as unknown as typeof otoken.functions.creditsBalanceOfHighres),
-          params.otokenAddress,
-          [{ _account: data.from }, { _account: data.to }],
-        ).then((results) => {
-          if (afterHighResUpgrade) {
-            return results.map((r) => [r._0, r._1])
-          } else {
-            return results.map((r) => [r._0 * 1000000000n, r._1 * 1000000000n])
-          }
-        }) as Promise<[bigint, bigint][]>,
       ])
 
       /**
@@ -809,7 +841,6 @@ export const createOTokenProcessor = (params: {
       return new Map<string, bigint>(delegatedAddresses.map((address, index) => [address, delegateBalances[index]]))
     }
 
-    await result.initialize()
     for (const block of ctx.blocksWithContent) {
       const possiblePromise = getOTokenDailyStat(block)
       if (possiblePromise instanceof Promise) {
@@ -831,18 +862,18 @@ export const createOTokenProcessor = (params: {
         if (log.address === params.otokenVaultAddress && log.topics[0] === otokenVault.events.YieldDistribution.topic) {
           processYieldDistribution(block, log)
         }
-        if (log.address === params.otokenAddress) {
-          if (log.topics[0] === otoken.events.TotalSupplyUpdatedHighres.topic) {
-            await processTotalSupplyUpdatedHighres(block, log)
-          }
-          if (rebaseEventTopics[log.topics[0]]) {
-            await processRebaseOptEvent(block, log)
-          }
+        if (log.address === params.otokenAddress && rebaseEventTopics[log.topics[0]]) {
+          await processRebaseOptEvent(block, log)
+        }
+        if (log.address === params.otokenAddress && log.topics[0] === otoken.events.TotalSupplyUpdatedHighres.topic) {
+          await processTotalSupplyUpdatedHighres(block, log)
         }
         if (harvesterYieldSentFilter?.matches(log)) {
           await processHarvesterYieldSent(block, log)
         }
-
+        if (transferFilter.matches(log)) {
+          await processTransfer(block, log)
+        }
         if (yieldDelegatedFilter.matches(log)) {
           await processYieldDelegated(block, log)
         }
@@ -851,20 +882,6 @@ export const createOTokenProcessor = (params: {
         }
       }
     }
-
-    // Process Transfers
-    const transferLogs = ctx.blocksWithContent.flatMap((block) =>
-      block.logs.filter((log) => transferFilter.matches(log)).map((log) => ({ block, log })),
-    )
-    await parallel(
-      transferLogs.map(
-        ({ block, log }) =>
-          () =>
-            processTransfer(block, log),
-      ),
-      10,
-    )
-    time('processTransfers')
 
     await frequencyUpdate(ctx, async (ctx, block) => {
       const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
