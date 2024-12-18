@@ -24,7 +24,7 @@ export const { name, from, setup, process } = createOTokenProcessor({
   otokenAddress: OUSD_ADDRESS,
   wotoken: {
     address: WOUSD_ADDRESS,
-    from: 14566204, // https://etherscan.io/tx/0x5b16078d43861bf0e7a08aa3f061dbfce1c76bc5fc7cedaa96e2156d15651df1
+    from: 14566215, // https://etherscan.io/tx/0x5b16078d43861bf0e7a08aa3f061dbfce1c76bc5fc7cedaa96e2156d15651df1
   },
   dripper: {
     address: OUSD_DRIPPER_ADDRESS,

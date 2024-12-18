@@ -1,10 +1,10 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Context } from '@processor'
+import { Block, Context } from '@processor'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
-import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
+import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
 import { TokenAddress } from '@utils/symbols'
@@ -32,7 +32,7 @@ export const createERC20PollingTracker = ({
   duplicateTracker.add(address)
   const accountFilterSet = accountFilter ? new Set(accountFilter.map((account) => account.toLowerCase())) : undefined
 
-  const intervalTracker = intervalTracking ? blockFrequencyTracker({ from }) : undefined
+  const frequencyUpdater = intervalTracking ? blockFrequencyUpdater({ from, parallelProcessing: true }) : undefined
 
   let erc20: ERC20 | undefined
   // Keep an in-memory record of what our current holders are.
@@ -79,7 +79,7 @@ export const createERC20PollingTracker = ({
   return {
     from,
     setup(processor: EvmBatchProcessor) {
-      if (intervalTracker) {
+      if (frequencyUpdater) {
         processor.includeAllBlocks({ from })
       } else {
         transferLogFilters.forEach((filter) => processor.addLog(filter.value))
@@ -101,80 +101,84 @@ export const createERC20PollingTracker = ({
         holders: new Map<string, ERC20Holder>(),
         removedHolders: new Set<string>(),
       }
-      for (const block of ctx.blocks) {
-        if (block.header.height < from) continue
+
+      const updateState = async (ctx: Context, block: Block) => {
         const contract = new abi.Contract(ctx, block.header, address)
-        const updateState = async () => {
-          const id = `${ctx.chain.id}-${block.header.height}-${address}`
-          const totalSupply = await contract.totalSupply()
-          const state = new ERC20State({
-            id,
-            chainId: ctx.chain.id,
-            address,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            totalSupply,
-            holderCount: holders.size,
-          })
-          result.states.set(id, state)
+        const id = `${ctx.chain.id}-${block.header.height}-${address}`
+        const totalSupply = await contract.totalSupply()
+        const state = new ERC20State({
+          id,
+          chainId: ctx.chain.id,
+          address,
+          timestamp: new Date(block.header.timestamp),
+          blockNumber: block.header.height,
+          totalSupply,
+          holderCount: holders.size,
+        })
+        result.states.set(id, state)
+      }
+      const updateBalances = async (ctx: Context, block: Block, accounts: string[], doStateUpdate = false) => {
+        if (accountFilterSet) {
+          accounts = accounts.filter((a) => accountFilterSet.has(a))
         }
-        const updateBalances = async (accounts: string[], doStateUpdate = false) => {
-          if (accountFilterSet) {
-            accounts = accounts.filter((a) => accountFilterSet.has(a))
-          }
-          if (accounts.length > 0) {
-            const balances = await multicall(
-              ctx,
-              block.header,
-              abi.functions.balanceOf,
+        if (accounts.length > 0) {
+          const balances = await multicall(
+            ctx,
+            block.header,
+            abi.functions.balanceOf,
+            address,
+            accounts.map((account) => ({ _owner: account })),
+          )
+          accounts.forEach((account, i) => {
+            if (account === ADDRESS_ZERO) return
+            account = account.toLowerCase()
+            const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
+            const balance = new ERC20Balance({
+              id,
+              chainId: ctx.chain.id,
+              timestamp: new Date(block.header.timestamp),
+              blockNumber: block.header.height,
               address,
-              accounts.map((account) => ({ _owner: account })),
-            )
-            accounts.forEach((account, i) => {
-              if (account === ADDRESS_ZERO) return
-              account = account.toLowerCase()
-              const id = `${ctx.chain.id}-${block.header.height}-${address}-${account}`
-              const balance = new ERC20Balance({
-                id,
+              account,
+              balance: balances[i],
+            })
+            result.balances.set(id, balance)
+            if (balance.balance === 0n) {
+              doStateUpdate = true
+              holders.delete(account)
+              result.holders.delete(account)
+              result.removedHolders.add(account)
+            } else {
+              const holder = new ERC20Holder({
+                id: `${ctx.chain.id}-${address}-${account}`,
                 chainId: ctx.chain.id,
-                timestamp: new Date(block.header.timestamp),
-                blockNumber: block.header.height,
                 address,
                 account,
-                balance: balances[i],
+                balance: balance.balance,
               })
-              result.balances.set(id, balance)
-              if (balance.balance === 0n) {
+              if (!holders.has(account)) {
                 doStateUpdate = true
-                holders.delete(account)
-                result.holders.delete(account)
-                result.removedHolders.add(account)
-              } else {
-                const holder = new ERC20Holder({
-                  id: `${ctx.chain.id}-${address}-${account}`,
-                  chainId: ctx.chain.id,
-                  address,
-                  account,
-                  balance: balance.balance,
-                })
-                if (!holders.has(account)) {
-                  doStateUpdate = true
-                  holders.add(account)
-                }
-                result.holders.set(holder.account, holder)
-                result.removedHolders.delete(holder.account)
+                holders.add(account)
               }
-            })
-          }
-          if (doStateUpdate) {
-            await updateState()
-          }
+              result.holders.set(holder.account, holder)
+              result.removedHolders.delete(holder.account)
+            }
+          })
         }
+        if (doStateUpdate) {
+          await updateState(ctx, block)
+        }
+      }
+
+      if (frequencyUpdater && accountFilter) {
+        await frequencyUpdater(ctx, async (ctx, block) => {
+          await updateBalances(ctx, block, accountFilter!)
+        })
+      }
+
+      for (const block of ctx.blocksWithContent) {
+        if (block.header.height < from) continue
         const accounts = new Set<string>()
-        let haveRebase = false
-        if (intervalTracker && intervalTracker(ctx, block) && accountFilter) {
-          await updateBalances(accountFilter)
-        }
 
         for (const log of block.logs) {
           const isTransferLog = transferLogFilters.find((l) => l.matches(log))
@@ -182,7 +186,7 @@ export const createERC20PollingTracker = ({
             const data = abi.events.Transfer.decode(log)
             accounts.add(data.from.toLowerCase())
             accounts.add(data.to.toLowerCase())
-            await updateBalances([data.from.toLowerCase(), data.to.toLowerCase()])
+            await updateBalances(ctx, block, [data.from.toLowerCase(), data.to.toLowerCase()])
             const fromHolder = result.holders.get(data.from.toLowerCase())
             const toHolder = result.holders.get(data.to.toLowerCase())
             const transfer = new ERC20Transfer({
@@ -201,7 +205,7 @@ export const createERC20PollingTracker = ({
             result.transfers.set(transfer.id, transfer)
           }
         }
-        await updateBalances([...accounts])
+        await updateBalances(ctx, block, [...accounts])
       }
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),

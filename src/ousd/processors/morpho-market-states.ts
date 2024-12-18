@@ -4,7 +4,6 @@ import { MorphoMarketState } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { META_MORPHO_ADDRESS, MORPHO_ADDRESS } from '@utils/addresses'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { multicall } from '@utils/multicall'
 import { range } from '@utils/range'
 
@@ -14,12 +13,10 @@ const setup = (processor: EvmBatchProcessor) => {
   processor.includeAllBlocks({ from })
 }
 
-const tracker = blockFrequencyUpdater({ from })
-
 const process = async (ctx: Context) => {
   const states: MorphoMarketState[] = []
-
-  await tracker(ctx, async (ctx, block) => {
+  for (const block of ctx.frequencyBlocks) {
+    if (block.header.height < from) continue
     const metaMorphoContract = new metaMorpho.Contract(ctx, block.header, META_MORPHO_ADDRESS)
     const supplyLength = await metaMorphoContract.supplyQueueLength()
     const marketIds = await multicall(
@@ -56,7 +53,7 @@ const process = async (ctx: Context) => {
         })
       }),
     )
-  })
+  }
 
   await ctx.store.insert(states)
 }

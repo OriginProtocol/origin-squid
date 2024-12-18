@@ -9,7 +9,9 @@ import { arbitrum, base, mainnet } from 'viem/chains'
 import { KnownArchivesEVM, lookupArchive } from '@subsquid/archive-registry'
 import { DataHandlerContext, EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { calculateBlockRate } from '@utils/calculateBlockRate'
+import { printStats } from '@utils/processing-stats'
 
 import './polyfills/rpc-issues'
 
@@ -23,6 +25,7 @@ export const createEvmBatchProcessor = (config: ChainConfig) => {
     .setRpcEndpoint({
       url,
       maxBatchCallSize: url.includes('alchemy.com') ? 1 : 100,
+      // rateLimit: url.includes('sqd_rpc') ? 100 : undefined,
     })
     .setRpcDataIngestionSettings({
       disabled: process.env.ARCHIVE_ONLY === 'true',
@@ -137,17 +140,20 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
   // console.log('config', JSON.stringify(config, null, 2))
   const evmBatchProcessor = createEvmBatchProcessor(config)
 
+  const from = process.env.BLOCK_FROM
+    ? Number(process.env.BLOCK_FROM)
+    : Math.min(
+        ...(processors.map((p) => p.from).filter((x) => x) as number[]),
+        ...((postProcessors ?? []).map((p) => p.from).filter((x) => x) as number[]),
+      )
+  const to = process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined
   evmBatchProcessor.setBlockRange({
-    from: process.env.BLOCK_FROM
-      ? Number(process.env.BLOCK_FROM)
-      : Math.min(
-          ...(processors.map((p) => p.from).filter((x) => x) as number[]),
-          ...((postProcessors ?? []).map((p) => p.from).filter((x) => x) as number[]),
-        ),
-    to: process.env.BLOCK_TO ? Number(process.env.BLOCK_TO) : undefined,
+    from,
+    to,
   })
   processors.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
+  const frequencyTracker = blockFrequencyTracker({ from })
   evmBatchProcessor.run(
     new TypeormDatabase({
       stateSchema,
@@ -155,14 +161,18 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
       isolationLevel: 'READ COMMITTED',
     }),
     async (_ctx) => {
+      const contextTime = Date.now()
       const ctx = _ctx as Context
       try {
         ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
         if (ctx.blocks.length >= 1) {
           ctx.blockRate = await calculateBlockRate(ctx)
-          // ctx.log.info({ bps: ctx.bps, length: ctx.blocks.length })
         }
+        ctx.blocksWithContent = ctx.blocks.filter(
+          (b) => b.logs.length > 0 || b.traces.length > 0 || b.transactions.length > 0,
+        )
+        ctx.frequencyBlocks = ctx.blocks.filter((b) => frequencyTracker(ctx, b))
 
         let start: number
         const time = (name: string) => () => {
@@ -178,10 +188,16 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
           const times = await Promise.all([
             ...processors
               .filter((p) => p.initialize)
-              .map((p, index) => p.initialize!(ctx).then(time(p.name ?? `initializing processor-${index}`))),
+              .map((p, index) =>
+                p.initialize!(ctx).then(time(p.name ? `initializing ${p.name}` : `initializing processor-${index}`)),
+              ),
             ...(postProcessors ?? [])
               .filter((p) => p.initialize)
-              .map((p, index) => p.initialize!(ctx).then(time(p.name ?? `initializing postProcessors-${index}`))),
+              .map((p, index) =>
+                p.initialize!(ctx).then(
+                  time(p.name ? `initializing ${p.name}` : `initializing postProcessors-${index}`),
+                ),
+              ),
           ])
           times.forEach((t) => t())
         }
@@ -192,6 +208,7 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
           processors.map((p, index) => p.process(ctx).then(time(p.name ?? `processor-${index}`))),
         )
         if (process.env.DEBUG_PERF === 'true') {
+          ctx.log.info('===== Processor Times =====')
           times.forEach((t) => t())
         }
 
@@ -202,6 +219,7 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
             postProcessors.map((p, index) => p.process(ctx).then(time(p.name ?? `postProcessor-${index}`))),
           )
           if (process.env.DEBUG_PERF === 'true') {
+            ctx.log.info('===== Post Processor Times =====')
             postTimes.forEach((t) => t())
           }
         }
@@ -213,21 +231,13 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
             validators.map((p, index) => p.process(ctx).then(time(p.name ?? `validator-${index}`))),
           )
           if (process.env.DEBUG_PERF === 'true') {
+            ctx.log.info('===== Validator Times =====')
             validatorTimes.forEach((t) => t())
           }
         }
-      } catch (err) {
-        ctx.log.info({
-          blocks: ctx.blocks.length,
-          logs: ctx.blocks.reduce((sum, block) => sum + block.logs.length, 0),
-          traces: ctx.blocks.reduce((sum, block) => sum + block.traces.length, 0),
-          transactions: ctx.blocks.reduce((sum, block) => sum + block.transactions.length, 0),
-          // logArray: ctx.blocks.reduce(
-          //   (logs, block) => [...logs, ...block.logs],
-          //   [] as Log[],
-          // ),
-        })
-        throw err
+      } finally {
+        printStats(ctx)
+        ctx.log.info(`===== End of Context ===== (${Date.now() - contextTime}ms, ${ctx.blocks.at(-1)?.header.height})`)
       }
     },
   )
@@ -237,6 +247,8 @@ export type Fields = EvmBatchProcessorFields<ReturnType<typeof createEvmBatchPro
 export type Context = DataHandlerContext<Store, Fields> & {
   chain: Chain
   blockRate: number
+  blocksWithContent: Block[]
+  frequencyBlocks: Block[]
   __state: Map<string, unknown>
 }
 export type Block = Context['blocks']['0']

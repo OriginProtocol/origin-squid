@@ -2,6 +2,7 @@
 // import * as fs from 'node:fs'
 import { CallOptions, RpcClient } from '@subsquid/rpc-client'
 import { RpcCall } from '@subsquid/rpc-client/src/interfaces'
+import { processingStats } from '@utils/processing-stats'
 
 ;(RpcClient.prototype as any)._call = RpcClient.prototype.call
 ;(RpcClient.prototype as any)._batchCall = RpcClient.prototype.batchCall
@@ -12,6 +13,7 @@ RpcClient.prototype.call = async function <T = any>(
   params?: any[],
   options?: CallOptions<T>,
 ): Promise<T> {
+  processingStats.rpcCalls++
   const response = await (this as any)._call(method, params, options)
   if (method === 'debug_traceBlockByHash') {
     fixSelfDestructs(response)
@@ -21,6 +23,7 @@ RpcClient.prototype.call = async function <T = any>(
   return response
 }
 RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], options?: CallOptions<T>): Promise<T[]> {
+  processingStats.rpcCalls += batch.length
   const response = await (this as any)._batchCall(batch, options)
   for (let i = 0; i < batch.length; i++) {
     if (batch[i].method === 'debug_traceBlockByHash') {

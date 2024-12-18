@@ -54,7 +54,8 @@ export const blockFrequencyTracker = (params: { from: number }) => {
   }
 }
 
-export const blockFrequencyUpdater = (params: { from: number }) => {
+export const blockFrequencyUpdater = (params: { from: number; parallelProcessing?: boolean }) => {
+  const parallelLimit = 10
   const tracker = blockFrequencyTracker(params)
   return async (ctx: Context, fn: (ctx: Context, block: Block) => Promise<void>) => {
     if (!ctx.blocks.length) return
@@ -62,9 +63,18 @@ export const blockFrequencyUpdater = (params: { from: number }) => {
       // No applicable blocks in current context.
       return
     }
-    for (let i = 0; i < ctx.blocks.length; i++) {
-      if (tracker(ctx, ctx.blocks[i])) {
-        await fn(ctx, ctx.blocks[i])
+
+    const blocksToProcess = ctx.blocks.filter((block) => tracker(ctx, block))
+    if (params.parallelProcessing) {
+      // Process blocks in parallel with a limit
+      for (let i = 0; i < blocksToProcess.length; i += parallelLimit) {
+        const chunk = blocksToProcess.slice(i, i + parallelLimit)
+        await Promise.all(chunk.map((block) => fn(ctx, block)))
+      }
+    } else {
+      // Process blocks sequentially
+      for (const block of blocksToProcess) {
+        await fn(ctx, block)
       }
     }
   }

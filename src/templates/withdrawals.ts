@@ -40,7 +40,7 @@ export const createOTokenWithdrawalsProcessor = ({
       withdrawalRequests: new Map<string, OTokenWithdrawalRequest>(),
     }
 
-    for (const block of ctx.blocks) {
+    for (const block of ctx.blocksWithContent) {
       for (const log of block.logs) {
         if (withdrawalRequestedFilter.matches(log)) {
           await processWithdrawalRequested(ctx, result, block, log)
