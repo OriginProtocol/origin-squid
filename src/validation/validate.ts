@@ -1,11 +1,38 @@
 import assert from 'assert'
+import { compact } from 'lodash'
 
 import { Block, Context } from '@processor'
 import { Entity, EntityClass } from '@subsquid/typeorm-store/lib/store'
+import { env } from '@utils/env'
 
 import { compare } from './compare'
 
-export const validateExpectations = async <
+export const validateBlocks = async (
+  ctx: Context,
+  expectationSets: {
+    entity: EntityClass<any>
+    expectations: (Entity & {
+      timestamp: string
+      blockNumber: number
+    })[]
+  }[],
+) => {
+  let firstBlock = true
+  if (env.BLOCK_FROM || env.PROCESSOR) return
+  let promises: Promise<void>[] = []
+  for (const block of ctx.blocks) {
+    const validations = []
+    for (const { entity, expectations } of expectationSets) {
+      validations.push(validateExpectations(ctx, block, entity, firstBlock, expectations))
+      firstBlock = false
+    }
+    promises.push(...compact(validations))
+  }
+  await Promise.all(promises)
+}
+
+// If there is nothing to validate, we don't return a promise. (for performance)
+export const validateExpectations = <
   T extends Entity & {
     timestamp: string
     blockNumber: number
@@ -16,19 +43,26 @@ export const validateExpectations = async <
   Class: EntityClass<any>,
   firstBlock: boolean,
   expectations?: T[],
-) => {
+): Promise<void> | undefined => {
   if (!expectations) return
-  if (firstBlock) {
-    while (expectations[0]?.blockNumber < block.header.height) {
-      const entity = expectations.shift()!
-      await validateExpectation(ctx, block, Class, entity)
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (firstBlock) {
+        while (expectations[0]?.blockNumber < block.header.height) {
+          const entity = expectations.shift()!
+          await validateExpectation(ctx, block, Class, entity)
+        }
+      }
+      assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
+      while (expectations[0]?.blockNumber === block.header.height) {
+        const entity = expectations.shift()!
+        await validateExpectation(ctx, block, Class, entity)
+      }
+      resolve()
+    } catch (e) {
+      reject(e)
     }
-  }
-  assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
-  while (expectations[0]?.blockNumber === block.header.height) {
-    const entity = expectations.shift()!
-    await validateExpectation(ctx, block, Class, entity)
-  }
+  })
 }
 
 const validateExpectation = async <
