@@ -1,5 +1,4 @@
 import assert from 'assert'
-import { compact } from 'lodash'
 
 import { Block, Context } from '@processor'
 import { Entity, EntityClass } from '@subsquid/typeorm-store/lib/store'
@@ -19,16 +18,14 @@ export const validateBlocks = async (
 ) => {
   let firstBlock = true
   if (env.BLOCK_FROM || env.PROCESSOR) return
-  let promises: Promise<void>[] = []
   for (const block of ctx.blocks) {
-    const validations = []
-    for (const { entity, expectations } of expectationSets) {
-      validations.push(validateExpectations(ctx, block, entity, firstBlock, expectations))
-      firstBlock = false
-    }
-    promises.push(...compact(validations))
+    await Promise.all(
+      expectationSets.map(({ entity, expectations }) =>
+        validateExpectations(ctx, block, entity, firstBlock, expectations),
+      ),
+    )
+    firstBlock = false
   }
-  await Promise.all(promises)
 }
 
 // If there is nothing to validate, we don't return a promise. (for performance)
