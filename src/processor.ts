@@ -237,7 +237,11 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
         }
       } finally {
         printStats(ctx)
-        ctx.log.info(`===== End of Context ===== (${Date.now() - contextTime}ms, ${ctx.blocks.at(-1)?.header.height})`)
+        if (process.env.DEBUG_PERF === 'true') {
+          ctx.log.info(
+            `===== End of Context ===== (${Date.now() - contextTime}ms, ${ctx.blocks.at(-1)?.header.height})`,
+          )
+        }
       }
     },
   )
