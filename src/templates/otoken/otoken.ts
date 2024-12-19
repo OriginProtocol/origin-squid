@@ -738,7 +738,7 @@ export const createOTokenProcessor = (params: {
       const timestamp = new Date(block.header.timestamp)
       const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp.toISOString()}`
       const latest =
-        result.otokens.find((o) => o.id <= otokenId) ??
+        findLast(result.otokens, (o) => o.id <= otokenId) ??
         (await ctx.store.findOne(OToken, {
           where: {
             chainId: ctx.chain.id,
