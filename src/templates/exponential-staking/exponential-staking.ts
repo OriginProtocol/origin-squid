@@ -513,7 +513,7 @@ export const createESTracker = ({
         // Local State Tracking
         rewardsPerSecond: [],
       }
-      for (const block of ctx.blocks) {
+      for (const block of ctx.blocksWithContent) {
         for (const log of block.logs) {
           for (const subProcessor of subProcessors) {
             if (Array.isArray(subProcessor.filter)) {

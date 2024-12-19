@@ -18,7 +18,8 @@
     "process:ogv": "sqd process:ogv",
     "process:mainnet": "sqd process:mainnet",
     "process:test": "sqd process:test",
-    "process": "sqd process"
+    "process": "sqd process",
+    "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts"
   },
   "dependencies": {
     "@subsquid/archive-registry": "^3.3.2",

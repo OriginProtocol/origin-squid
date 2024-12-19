@@ -35,7 +35,7 @@ export const waitForEvents = ({
       if (requirementsMet >= logFilters.length) {
         return processor.process(ctx)
       } else {
-        for (const block of ctx.blocks) {
+        for (const block of ctx.blocksWithContent) {
           if (requirementsMet >= logFilters.length) {
             return processor.process(ctx)
           } else {

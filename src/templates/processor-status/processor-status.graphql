@@ -2,4 +2,6 @@ type ProcessingStatus @entity {
   id: ID!
   timestamp: DateTime!
   blockNumber: Int!
+  startTimestamp: DateTime! # when we started processing
+  headTimestamp: DateTime # when we first hit head block
 }

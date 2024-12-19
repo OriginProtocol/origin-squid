@@ -1,6 +1,6 @@
 import { compact, groupBy } from 'lodash'
 
-import { OTokenActivity, OTokenActivityType } from '@model'
+import { OTokenActivity } from '@model'
 import { Context } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { approvalActivityProcessor } from '@templates/otoken/activity-processor/sub/approval'
@@ -14,7 +14,6 @@ import { vaultActivityProcessor } from '@templates/otoken/activity-processor/sub
 import { wrappedActivityProcessor } from '@templates/otoken/activity-processor/sub/wrapped'
 import { zapperActivityProcessor } from '@templates/otoken/activity-processor/sub/zapper'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
-import { Activity } from '@templates/otoken/activity-types'
 
 export const createOTokenActivityProcessor = (params: {
   from: number
@@ -102,7 +101,7 @@ export const createOTokenActivityProcessor = (params: {
   const process = async (ctx: Context) => {
     const activities: OTokenActivity[] = []
     // Loop through each block
-    for (const block of ctx.blocks) {
+    for (const block of ctx.blocksWithContent) {
       // Group logs by transaction
       const transactions = groupBy(block.logs, (l) => l.transactionHash)
       // Loop through each transaction's set of logs.

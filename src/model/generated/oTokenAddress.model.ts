@@ -41,6 +41,9 @@ export class OTokenAddress {
     @StringColumn_({nullable: true})
     delegatedTo!: string | undefined | null
 
+    @IntColumn_({nullable: false})
+    blockNumber!: number
+
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
 

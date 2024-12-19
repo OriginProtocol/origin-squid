@@ -10,7 +10,7 @@ export const setup = (processor: EvmBatchProcessor) => {
 }
 
 export const process = async (ctx: Context) => {
-  const blockFrequencyUpdate = blockFrequencyUpdater({ from })
+  const blockFrequencyUpdate = blockFrequencyUpdater({ from, parallelProcessing: true })
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
     await ensureExchangeRates(ctx, block, [
       ['ETH', 'USD'],

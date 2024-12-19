@@ -13,7 +13,6 @@ type ERC20Holder @entity {
   address: String! @index
   account: String! @index
   balance: BigInt!
-  rebasingCredits: BigInt # Only used for rebasing tokens
 }
 
 type ERC20State @entity {
@@ -24,7 +23,6 @@ type ERC20State @entity {
   address: String!
   totalSupply: BigInt!
   holderCount: Int!
-  rebasingCreditsPerToken: BigInt # Only used for rebasing tokens
 }
 
 type ERC20Balance @entity {
@@ -35,7 +33,6 @@ type ERC20Balance @entity {
   address: String! @index
   account: String! @index
   balance: BigInt!
-  rebasingCredits: BigInt # Only used for rebasing tokens
 }
 
 type ERC20Transfer @entity {

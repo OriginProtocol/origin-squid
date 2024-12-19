@@ -29,7 +29,7 @@ export const process = async (ctx: Context) => {
     legacyStakers: new Map<string, LegacyStaker>(),
   }
 
-  for (const block of ctx.blocks) {
+  for (const block of ctx.blocksWithContent) {
     for (const log of block.logs) {
       const firstTopic = log.topics[0]
 

@@ -145,7 +145,7 @@ export const createFRRSProcessor = ({ from, address }: { from: number; address: 
       rewardsTargetChange: new Map<string, FRRSRewardsTargetChange>(),
       strategistUpdated: new Map<string, FRRSStrategistUpdated>(),
     }
-    for (const block of ctx.blocks) {
+    for (const block of ctx.blocksWithContent) {
       for (const log of block.logs) {
         for (const subProcessor of subProcessors) {
           if (subProcessor.filter.matches(log)) {
