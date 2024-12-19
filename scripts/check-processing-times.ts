@@ -13,6 +13,9 @@ const executeQuery = async <T>(query: string): Promise<T> => {
     body: JSON.stringify({ query }),
   })
   const text = await response.text()
+  if (response.status !== 200) {
+    throw new Error(`Failed to execute query: ${text}`)
+  }
   try {
     return JSON.parse(text)
   } catch (err) {
@@ -35,7 +38,7 @@ const main = async () => {
   }>(
     gql(`
     query MyQuery {
-      processingStatuses(limit: 10) {
+      processingStatuses(limit: 10, orderBy: id_ASC) {
         id
         startTimestamp
         headTimestamp
