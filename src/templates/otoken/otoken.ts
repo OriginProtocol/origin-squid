@@ -33,7 +33,7 @@ import { Block, Context, Log } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
+import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS, OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
@@ -839,6 +839,22 @@ export const createOTokenProcessor = (params: {
         delegatedAddresses.map((_account) => ({ _account })),
       )
       return new Map<string, bigint>(delegatedAddresses.map((address, index) => [address, delegateBalances[index]]))
+    }
+
+    // Trigger ensureExchangeRate asynchronously ahead of time.
+    // We know we need it for TotalSupplyUpdatedHighres events.
+    for (const block of ctx.blocksWithContent) {
+      const log = block.logs.some(
+        (l) => l.address === params.otokenAddress && l.topics[0] === otoken.events.TotalSupplyUpdatedHighres.topic,
+      )
+      if (log) {
+        ensureExchangeRate(
+          ctx,
+          block,
+          params.otokenAddress,
+          OUSD_STABLE_OTOKENS.includes(params.otokenAddress) ? 'ETH' : 'USD',
+        )
+      }
     }
 
     for (const block of ctx.blocksWithContent) {
