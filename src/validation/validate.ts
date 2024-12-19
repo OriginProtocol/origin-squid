@@ -53,7 +53,9 @@ export const validateExpectations = <
           await validateExpectation(ctx, block, Class, entity)
         }
       }
-      assert(!expectations.length || expectations[0]?.blockNumber >= block.header.height, 'Something is missing')
+      if (expectations.length && expectations[0]?.blockNumber < block.header.height) {
+        throw new Error(`Something is missing: ${expectations[0].id}`)
+      }
       while (expectations[0]?.blockNumber === block.header.height) {
         const entity = expectations.shift()!
         await validateExpectation(ctx, block, Class, entity)
