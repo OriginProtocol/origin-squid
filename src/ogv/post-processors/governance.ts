@@ -1,5 +1,3 @@
-import { formatEther } from 'viem'
-
 import * as governanceAbi from '@abi/governance'
 import {
   OGVAddress,
@@ -58,8 +56,9 @@ export const initialize = async (ctx: Context) => {
 }
 
 export const process = async (ctx: Context) => {
-  if (ctx.blocks[ctx.blocks.length - 1]?.header.height < from) return
-
+  if (!ctx.blocksWithContent.length || ctx.blocksWithContent[ctx.blocksWithContent.length - 1].header.height < from) {
+    return
+  }
   const result: IProcessResult = {
     addresses: new Map<string, OGVAddress>(),
     proposals: new Map<string, OGVProposal>(),
@@ -68,7 +67,7 @@ export const process = async (ctx: Context) => {
   }
 
   _updateStatusBlocks()
-  for (const block of ctx.blocks) {
+  for (const block of ctx.blocksWithContent) {
     for (const log of block.logs) {
       if (log.address !== OGV_GOVERNANCE_ADDRESS) continue
 

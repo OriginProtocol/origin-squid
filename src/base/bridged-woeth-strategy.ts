@@ -10,13 +10,14 @@ const filter = logFilter({
   topic0: [bridgedWOETHStrategyABI.events.WOETHPriceUpdated.topic],
 })
 export const bridgedWoethStrategy = {
+  name: 'bridged-woeth-strategy',
   from: 18689567,
   setup: (processor: EvmBatchProcessor) => {
     processor.addLog(filter.value)
   },
   process: async (ctx: Context) => {
     const result: EventWOETHPriceUpdated[] = []
-    for (const block of ctx.blocks) {
+    for (const block of ctx.blocksWithContent) {
       if (block.header.height < bridgedWoethStrategy.from) continue
       for (const log of block.logs) {
         if (filter.matches(log)) {

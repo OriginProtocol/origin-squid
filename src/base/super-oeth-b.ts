@@ -7,6 +7,8 @@ import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
 
 const otokenProcessor = createOTokenProcessor({
+  name: 'Super OETHb',
+  symbol: 'superOETHb',
   from: 17819702,
   vaultFrom: 17819702,
   otokenAddress: baseAddresses.tokens.superOETHb,

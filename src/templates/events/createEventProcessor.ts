@@ -7,6 +7,7 @@ import { Entity } from '@subsquid/typeorm-store/lib/store'
 import { logFilter } from '@utils/logFilter'
 
 export const createEventProcessor = <T extends Struct, EventEntity extends Entity>(params: {
+  name?: string
   event: ReturnType<typeof event<T>>
   address?: string
   from: number
@@ -28,7 +29,7 @@ export const createEventProcessor = <T extends Struct, EventEntity extends Entit
   }
   const process = async (ctx: Context) => {
     const entities: EventEntity[] = []
-    for (const block of ctx.blocks) {
+    for (const block of ctx.blocksWithContent) {
       for (const log of block.logs) {
         if (filter.matches(log)) {
           const decoded = params.event.decode(log)
@@ -40,5 +41,5 @@ export const createEventProcessor = <T extends Struct, EventEntity extends Entit
     await ctx.store.insert(entities)
   }
 
-  return { from: params.from, setup, process }
+  return { name: `event: ${params.name ?? params.event.topic}`, from: params.from, setup, process }
 }

@@ -44,7 +44,7 @@ export const aerodromeCLGauge = (params: NonNullable<PoolDefinition['gauge']>): 
     },
     process: async (ctx) => {
       const entities = new Map<string, NonNullable<ReturnType<(typeof eventProcessors)[number]['process']>>[]>()
-      for (const block of ctx.blocks) {
+      for (const block of ctx.blocksWithContent) {
         for (const log of block.logs) {
           for (const { name, process } of eventProcessors) {
             const entity = process(ctx, block, log)

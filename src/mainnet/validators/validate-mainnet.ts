@@ -8,25 +8,22 @@ import {
   TransactionDetails,
 } from '@model'
 import { Context } from '@processor'
-import { env } from '@utils/env'
 import { entities } from '@validation/entities'
-import { validateExpectations } from '@validation/validate'
+import { validateBlocks } from '@validation/validate'
 
 export const name = 'validate-mainnet'
 
-let firstBlock = true
+const expectationSets = [
+  { entity: ERC20Balance, expectations: entities.ogn_erc20Balances },
+  { entity: ERC20Balance, expectations: entities.oeth_erc20Balances },
+  { entity: ArmDailyStat, expectations: entities.lidoarm_armDailyStats },
+  { entity: ArmState, expectations: entities.lidoarm_armStates },
+  { entity: ArmWithdrawalRequest, expectations: entities.lidoarm_armWithdrawalRequests },
+  { entity: TransactionDetails, expectations: entities.lidoarm_transactionDetails },
+  { entity: OGNDailyStat, expectations: entities.ognDailyStats },
+  { entity: BeaconDepositEvent, expectations: entities.beaconDepositEvents },
+]
 
 export const process = async (ctx: Context) => {
-  if (env.BLOCK_FROM || env.PROCESSOR) return
-  for (const block of ctx.blocks) {
-    await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.ogn_erc20Balances)
-    await validateExpectations(ctx, block, ERC20Balance, firstBlock, entities.oeth_erc20Balances)
-    await validateExpectations(ctx, block, ArmDailyStat, firstBlock, entities.lidoarm_armDailyStats)
-    await validateExpectations(ctx, block, ArmState, firstBlock, entities.lidoarm_armStates)
-    await validateExpectations(ctx, block, ArmWithdrawalRequest, firstBlock, entities.lidoarm_armWithdrawalRequests)
-    await validateExpectations(ctx, block, TransactionDetails, firstBlock, entities.lidoarm_transactionDetails)
-    await validateExpectations(ctx, block, OGNDailyStat, firstBlock, entities.ognDailyStats)
-    await validateExpectations(ctx, block, BeaconDepositEvent, firstBlock, entities.beaconDepositEvents)
-    firstBlock = false
-  }
+  await validateBlocks(ctx, expectationSets)
 }

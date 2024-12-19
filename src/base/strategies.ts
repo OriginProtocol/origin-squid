@@ -30,11 +30,23 @@ export const strategies: readonly IStrategyData[] = [
   },
 ]
 
-export const baseStrategies = strategies.map((s) => {
-  return defineProcessor({
-    name: s.name,
-    from: s.from,
-    setup: s.kind !== 'Vault' ? createStrategyRewardSetup(s) : createStrategySetup(s),
-    process: s.kind !== 'Vault' ? createStrategyRewardProcessor(s) : createStrategyProcessor(s),
-  })
-})
+export const baseStrategies = [
+  ...strategies.map((s) => {
+    return defineProcessor({
+      name: s.name,
+      from: s.from,
+      setup: createStrategySetup(s),
+      process: createStrategyProcessor(s),
+    })
+  }),
+  ...strategies
+    .filter((s) => s.kind !== 'Vault')
+    .map((s) => {
+      return defineProcessor({
+        name: s.name,
+        from: s.from,
+        setup: createStrategyRewardSetup(s),
+        process: createStrategyRewardProcessor(s),
+      })
+    }),
+]

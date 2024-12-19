@@ -42,10 +42,10 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
       },
     }
   })
-  const frequencyUpdater = blockFrequencyUpdater({ from: params.from })
+  const frequencyUpdater = blockFrequencyUpdater({ from: params.from, parallelProcessing: true })
   return {
     from: params.from,
-    name: `Aerodrome Pool ${params.address}`,
+    name: `Aerodrome CL Pool ${params.address}`,
     setup: (processor) => {
       processor.includeAllBlocks({ from: params.from })
       for (const { filter } of eventProcessors) {
@@ -55,7 +55,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
     process: async (ctx) => {
       const eventProcessing = async () => {
         const entities = new Map<string, NonNullable<ReturnType<(typeof eventProcessors)[number]['process']>>[]>()
-        for (const block of ctx.blocks) {
+        for (const block of ctx.blocksWithContent) {
           for (const log of block.logs) {
             for (const { name, process } of eventProcessors) {
               const entity = process(ctx, block, log)
@@ -78,21 +78,21 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
         const epochs: AeroPoolEpochState[] = []
         const updateState = async (ctx: Context, block: Block) => {
           const poolContract = new aerodromeCLPoolAbi.Contract(ctx, block.header, params.address)
-          const totalVoteWeight = await getVoterTotalWeight(ctx, block)
           const voterContract = new aerodromeVoterAbi.Contract(ctx, block.header, baseAddresses.aerodrome.voter)
-          const voteWeight = await voterContract.weights(params.address)
-          const votePercentage = (voteWeight * 10n ** 18n) / totalVoteWeight
-
           const token0Contract = new erc20Abi.Contract(ctx, block.header, params.assets[0].address)
           const token1Contract = new erc20Abi.Contract(ctx, block.header, params.assets[1].address)
-          const [liquidity, stakedLiquidity, reserve0, reserve1, slot0] = await Promise.all([
-            poolContract.liquidity(),
-            poolContract.stakedLiquidity(),
-            token0Contract.balanceOf(params.address),
-            token1Contract.balanceOf(params.address),
-            poolContract.slot0(),
-          ])
+          const [totalVoteWeight, voteWeight, liquidity, stakedLiquidity, reserve0, reserve1, slot0] =
+            await Promise.all([
+              getVoterTotalWeight(ctx, block),
+              voterContract.weights(params.address),
+              poolContract.liquidity(),
+              poolContract.stakedLiquidity(),
+              token0Contract.balanceOf(params.address),
+              token1Contract.balanceOf(params.address),
+              poolContract.slot0(),
+            ])
 
+          const votePercentage = (voteWeight * 10n ** 18n) / totalVoteWeight
           const tick = await poolContract.ticks(slot0.tick)
           const tickPrice = getPriceFromSqrtPriceX96(slot0.sqrtPriceX96)
 
@@ -116,9 +116,10 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
             secondsOutside: tick.secondsOutside,
           })
 
-          const [reserve0Usd, reserve1Usd] = await Promise.all([
+          const [reserve0Usd, reserve1Usd, epochState] = await Promise.all([
             convertRate(ctx, block, params.assets[0].address, baseAddresses.tokens.USDC, reserve0),
             convertRate(ctx, block, params.assets[1].address, baseAddresses.tokens.USDC, reserve1),
+            createAeroPoolEpoch(ctx, block, params.address),
           ])
 
           const state = new AeroCLPoolState({
@@ -139,7 +140,6 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
             sqrtPriceX96: slot0.sqrtPriceX96,
           })
 
-          const epochState = await createAeroPoolEpoch(ctx, block, params.address)
           if (epochState) {
             epochs.push(epochState)
           }
@@ -148,9 +148,7 @@ export const aerodromeCLPool = (params: PoolDefinition): Processor => {
           ticks.push(currentTick)
         }
         await frequencyUpdater(ctx, updateState)
-        await ctx.store.insert(ticks)
-        await ctx.store.insert(states)
-        await ctx.store.insert(epochs)
+        await Promise.all([ctx.store.insert(ticks), ctx.store.insert(states), ctx.store.insert(epochs)])
       }
       await Promise.all([eventProcessing(), aeroPoolStateProcessing()])
     },

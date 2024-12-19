@@ -7,6 +7,7 @@ type OToken @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+  holderCount: Int!
 }
 
 type OTokenAsset @entity {
@@ -28,6 +29,7 @@ type OTokenAddress @entity {
   earned: BigInt!
   credits: BigInt!
   delegatedTo: String
+  blockNumber: Int!
   lastUpdated: DateTime!
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }

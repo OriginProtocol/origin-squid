@@ -23,7 +23,4 @@ export class ERC20Holder {
 
     @BigIntColumn_({nullable: false})
     balance!: bigint
-
-    @BigIntColumn_({nullable: true})
-    rebasingCredits!: bigint | undefined | null
 }
