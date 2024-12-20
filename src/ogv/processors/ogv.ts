@@ -1,11 +1,6 @@
 import * as erc20Abi from '@abi/erc20'
 import * as veogvAbi from '@abi/veogv'
-import {
-  OGVAddress,
-  OGVLockup,
-  OGVLockupEventType,
-  OGVLockupTxLog,
-} from '@model'
+import { OGVAddress, OGVLockup, OGVLockupEventType, OGVLockupTxLog } from '@model'
 import { Block, Context, Log } from '@processor'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
@@ -45,7 +40,7 @@ export const process = async (ctx: Context) => {
     lockupEvents: [],
   }
 
-  for (const block of ctx.blocks) {
+  for (const block of ctx.blocksWithContent) {
     for (const log of block.logs) {
       const firstTopic = log.topics[0]
 
@@ -67,21 +62,12 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.upsert(
-    Array.from(result.addresses.values()).sort((a, b) =>
-      a.delegatee?.id ? 1 : -1,
-    ),
-  )
+  await ctx.store.upsert(Array.from(result.addresses.values()).sort((a, b) => (a.delegatee?.id ? 1 : -1)))
   await ctx.store.upsert(Array.from(result.lockups.values()))
   await ctx.store.upsert(result.lockupEvents)
 }
 
-const _processTransfer = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processTransfer = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   const { addresses } = result
   let { from, to, value } = erc20Abi.events.Transfer.decode(log)
 
@@ -116,12 +102,7 @@ const _processTransfer = async (
   }
 }
 
-const _processDelegateChanged = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processDelegateChanged = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   const { addresses } = result
   let { delegator, toDelegate } = veogvAbi.events.DelegateChanged.decode(log)
   delegator = delegator.toLowerCase()
@@ -136,15 +117,9 @@ const _processDelegateChanged = async (
   addresses.set(delegator, address)
 }
 
-const _processDelegateVotesChanged = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processDelegateVotesChanged = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   const { addresses } = result
-  let { delegate, newBalance } =
-    veogvAbi.events.DelegateVotesChanged.decode(log)
+  let { delegate, newBalance } = veogvAbi.events.DelegateVotesChanged.decode(log)
   delegate = delegate.toLowerCase()
 
   const address = await _getAddress(ctx, delegate, result)
@@ -155,16 +130,10 @@ const _processDelegateVotesChanged = async (
   addresses.set(delegate, address)
 }
 
-const _processStake = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processStake = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   const { lockups } = result
 
-  const { lockupId, amount, user, points, end } =
-    veogvAbi.events.Stake.decode(log)
+  const { lockupId, amount, user, points, end } = veogvAbi.events.Stake.decode(log)
   const address = await _getAddress(ctx, user, result)
   const lockup = await _getLockup(ctx, lockupId.toString(), address, result)
 
@@ -206,12 +175,7 @@ const _processStake = async (
   await _updateVotingPowers(ctx, result, block, address)
 }
 
-const _processUnstake = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  log: Log,
-) => {
+const _processUnstake = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
   const { lockupId, user, amount } = veogvAbi.events.Unstake.decode(log)
   const address = await _getAddress(ctx, user, result)
   const lockup = await _getLockup(ctx, lockupId.toString(), address, result)
@@ -234,12 +198,7 @@ const _processUnstake = async (
   await _updateVotingPowers(ctx, result, block, address)
 }
 
-const _updateVotingPowers = async (
-  ctx: Context,
-  result: IProcessResult,
-  block: Block,
-  address: OGVAddress,
-) => {
+const _updateVotingPowers = async (ctx: Context, result: IProcessResult, block: Block, address: OGVAddress) => {
   const { addresses } = result
   const veogv = new veogvAbi.Contract(ctx, block.header, VEOGV_ADDRESS)
 
@@ -256,11 +215,7 @@ const _updateVotingPowers = async (
   }
 }
 
-const _getAddress = async (
-  ctx: Context,
-  id: string,
-  result: IProcessResult,
-): Promise<OGVAddress> => {
+const _getAddress = async (ctx: Context, id: string, result: IProcessResult): Promise<OGVAddress> => {
   id = id.toLowerCase()
   const { addresses } = result
 

@@ -17,7 +17,7 @@ export const createTransactionProcessor = (params: { from: number; address: stri
     },
     process: async (ctx) => {
       const results: TransactionDetails[] = []
-      for (const block of ctx.blocks) {
+      for (const block of ctx.blocksWithContent) {
         for (const transaction of block.transactions) {
           if (addressSet.has(transaction.from)) {
             results.push(

@@ -58,7 +58,7 @@ export const getPositions = async (
 
 export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
   const from = Math.max(16962730, pool.from) // Sugar deploy date or from.
-  const frequencyUpdater = blockFrequencyUpdater({ from })
+  const frequencyUpdater = blockFrequencyUpdater({ from, parallelProcessing: true })
   return pool.lps.map((lp) => {
     const processor: Processor = {
       from,
@@ -135,8 +135,7 @@ export const aerodromeLP = (pool: PoolDefinition): Processor[] => {
             lpStates.push(lpState)
           }
         })
-        await ctx.store.insert(lpStates)
-        await ctx.store.insert(lpPositionStates)
+        await Promise.all([ctx.store.insert(lpStates), ctx.store.insert(lpPositionStates)])
       },
     }
     return processor

@@ -1,44 +1,5 @@
-import * as otoken from '@abi/otoken'
-import * as otokenOld from '@abi/otoken-old'
 import { createERC20PollingTracker } from '@templates/erc20'
-import { createRebasingERC20Tracker, getErc20RebasingParams } from '@templates/erc20/erc20-rebasing'
-import { OUSD_ADDRESS, OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
-
-const rebasingTracks: Record<string, Parameters<typeof createRebasingERC20Tracker>[0]> = {
-  OUSD: {
-    from: 11585978, // From Reset:
-    address: tokens.OUSD,
-    rebasing: {
-      rebaseEventFilter: logFilter({
-        address: [OUSD_ADDRESS],
-        topic0: [otokenOld.events.TotalSupplyUpdated.topic, otoken.events.TotalSupplyUpdatedHighres.topic],
-        transaction: true,
-        range: { from: 11585978 },
-      }),
-      getCredits: async (ctx, block, address) => {
-        const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
-        if (block.header.height < 13533937) {
-          return oToken.creditsBalanceOf(address).then((credits) => credits._0 * 1000000000n)
-        }
-        return oToken.creditsBalanceOfHighres(address).then((credits) => credits._0)
-      },
-      getCreditsPerToken: async (ctx, block) => {
-        const oToken = new otoken.Contract(ctx, block.header, tokens.OUSD)
-        if (block.header.height < 13533937) {
-          return oToken.rebasingCreditsPerToken().then((cpt) => cpt * 1000000000n)
-        }
-        return oToken.rebasingCreditsPerTokenHighres()
-      },
-      ...getErc20RebasingParams({
-        from: 11585978,
-        yieldDelegationFrom: 21325305,
-        address: OUSD_ADDRESS,
-        rebaseOptTraceUntil: 20000000,
-      }),
-    },
-  },
-}
+import { OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
 
 const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = {
   // OUSD Related
@@ -81,7 +42,4 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
 }
 
 // This is a function to allow others to subscribe to balance tracking
-export const erc20s = () => [
-  ...Object.values(rebasingTracks).map(createRebasingERC20Tracker),
-  ...Object.values(tracks).map(createERC20PollingTracker),
-]
+export const erc20s = () => [...Object.values(tracks).map(createERC20PollingTracker)]

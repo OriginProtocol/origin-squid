@@ -1,4 +1,3 @@
-import { add } from 'lodash'
 import { Hex } from 'viem'
 
 import * as governanceAbi from '@abi/governance'

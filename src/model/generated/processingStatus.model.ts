@@ -14,4 +14,10 @@ export class ProcessingStatus {
 
     @IntColumn_({nullable: false})
     blockNumber!: number
+
+    @DateTimeColumn_({nullable: false})
+    startTimestamp!: Date
+
+    @DateTimeColumn_({nullable: true})
+    headTimestamp!: Date | undefined | null
 }

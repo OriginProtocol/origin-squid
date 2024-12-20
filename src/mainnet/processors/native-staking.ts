@@ -54,12 +54,14 @@ interface Result {
 }
 
 export const process = async (ctx: Context) => {
-  if (ctx.blocks[ctx.blocks.length - 1].header.height < from) return
+  if (!ctx.blocksWithContent.length || ctx.blocksWithContent[ctx.blocksWithContent.length - 1].header.height < from) {
+    return
+  }
   const result: Result = {
     pubkeys: new Map<string, BeaconDepositPubkey>(),
     deposits: new Map<string, BeaconDepositEvent>(),
   }
-  for (const block of ctx.blocks) {
+  for (const block of ctx.blocksWithContent) {
     if (block.header.height < from) continue
     for (const log of block.logs) {
       if (beaconDepositFilter.matches(log)) {

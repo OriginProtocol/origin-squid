@@ -17,8 +17,13 @@ export const createStrategyRewardSetup = ({ address, from }: { address: string; 
 export const createStrategyRewardProcessor = (params: { oTokenAddress: string; address: string; from: number }) => {
   return async (ctx: Context) => {
     const events: OTokenRewardTokenCollected[] = []
-    if (ctx.blocks[ctx.blocks.length - 1].header.height < params.from) return
-    for (const block of ctx.blocks) {
+    if (
+      !ctx.blocksWithContent.length ||
+      ctx.blocksWithContent[ctx.blocksWithContent.length - 1].header.height < params.from
+    ) {
+      return
+    }
+    for (const block of ctx.blocksWithContent) {
       if (block.header.height < params.from) continue
       for (const log of block.logs) {
         if (log.address === params.address && log.topics[0] === iat.events.RewardTokenCollected.topic) {

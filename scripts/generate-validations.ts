@@ -12,7 +12,7 @@ const LIMIT = 1000
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch('https://origin.squids.live/origin-squid/graphql', {
+  const response = await fetch('https://origin.squids.live/origin-squid@v65/api/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -27,12 +27,9 @@ const executeQuery = async (query: string) => {
     throw err
   }
 }
-const takeEvery = (arr: any[], takeEvery: number) => {
-  if (takeEvery <= 0) {
-    throw new Error('takeEvery must be greater than 0')
-  }
 
-  return arr.filter((_, index) => index % takeEvery === 0)
+const takeValidationEntries = (arr: any[]) => {
+  return arr.filter((entry) => entry.blockNumber % 100000 === 0)
 }
 
 const oTokens = (prefix: string, address: string) => {
@@ -337,9 +334,9 @@ export const transactionDetails = (prefix: string, from: string) => {
       txHash
       from
       to
-      gasCost
       gasUsed
       effectiveGasPrice
+      transactionFee
     }
   `)
 }
@@ -414,7 +411,7 @@ const main = async () => {
       throw new Error('Query failed')
     }
     for (const key of Object.keys(result.data)) {
-      entities[key] = takeEvery(result.data[key], 25)
+      entities[key] = takeValidationEntries(result.data[key])
     }
   }
 

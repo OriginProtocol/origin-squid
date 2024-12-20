@@ -10,18 +10,31 @@ export const processStatus = (id: string) => {
     processorIds.add(id)
   }
 
+  let status: ProcessingStatus | undefined = undefined
+
   return {
     name: `processor-status-${id}`,
     async process(ctx: Context) {
+      if (!status) {
+        status = await ctx.store.get(ProcessingStatus, id)
+        if (!status) {
+          status = new ProcessingStatus({
+            blockNumber: 0,
+            timestamp: new Date(0),
+            id,
+            startTimestamp: new Date(),
+            headTimestamp: null,
+          })
+        }
+      }
       const header = ctx.blocks[ctx.blocks.length - 1].header
       if (header) {
-        await ctx.store.upsert([
-          new ProcessingStatus({
-            id,
-            blockNumber: header.height,
-            timestamp: new Date(header.timestamp),
-          }),
-        ])
+        status.blockNumber = header.height
+        status.timestamp = new Date(header.timestamp)
+        if (!status.headTimestamp && ctx.isHead) {
+          status.headTimestamp = new Date()
+        }
+        await ctx.store.upsert(status)
       }
     },
   }

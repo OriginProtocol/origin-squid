@@ -15,14 +15,16 @@ import {
 // export const from = 11585978 // OUSDReset
 // export const from = 13533937 // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
 
-export const { from, setup, process } = createOTokenProcessor({
+export const { name, from, setup, process } = createOTokenProcessor({
+  name: 'OUSD',
+  symbol: 'OUSD',
   from: 11585978, // OUSDReset
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
   otokenAddress: OUSD_ADDRESS,
   wotoken: {
     address: WOUSD_ADDRESS,
-    from: 14566204, // https://etherscan.io/tx/0x5b16078d43861bf0e7a08aa3f061dbfce1c76bc5fc7cedaa96e2156d15651df1
+    from: 14566215, // https://etherscan.io/tx/0x5b16078d43861bf0e7a08aa3f061dbfce1c76bc5fc7cedaa96e2156d15651df1
   },
   dripper: {
     address: OUSD_DRIPPER_ADDRESS,

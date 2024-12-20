@@ -129,7 +129,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
         return holder
       }
 
-      for (const block of ctx.blocks) {
+      for (const block of ctx.blocksWithContent) {
         if (block.header.height < from) continue
 
         for (const log of block.logs) {
