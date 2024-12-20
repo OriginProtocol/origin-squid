@@ -9,7 +9,7 @@ import {
   StrategyDailyYield,
 } from '@model'
 import { Context } from '@processor'
-import { entities, manualEntities } from '@validation/entities'
+import { entities } from '@validation/entities'
 import { validateBlocks } from '@validation/validate'
 
 export const name = 'validate-ousd'
@@ -28,7 +28,6 @@ const expectationSets = [
   { entity: OTokenRebase, expectations: entities.ousd_oTokenRebases },
   { entity: OTokenDailyStat, expectations: entities.ousd_oTokenDailyStats },
   { entity: ERC20Balance, expectations: entities.ousd_erc20Balances },
-  { entity: ERC20Balance, expectations: manualEntities.erc20_discrepancy_testing },
   ...strategyBalances.map((entities) => ({ entity: StrategyBalance, expectations: entities })),
   ...strategyDailyYields.map((entities) => ({ entity: StrategyDailyYield, expectations: entities })),
 ]
