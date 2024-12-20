@@ -49,7 +49,7 @@ export const blockFrequencyTracker = (params: { from: number }) => {
       (ctx._chain.client as any).url.includes('tenderly') ||
       // Normal logic down below.
       block.header.height % frequency === 0 ||
-      block.header.height % 100000 || // For validation generation we need something reliable and unchanging.
+      block.header.height % 100000 === 0 || // For validation generation we need something reliable and unchanging.
       isAerodromeImportantBlock(ctx, block)
     )
   }

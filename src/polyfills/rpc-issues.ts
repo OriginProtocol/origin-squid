@@ -13,6 +13,7 @@ RpcClient.prototype.call = async function <T = any>(
   params?: any[],
   options?: CallOptions<T>,
 ): Promise<T> {
+  const time = Date.now()
   processingStats.rpcCalls++
   const response = await (this as any)._call(method, params, options)
   if (method === 'debug_traceBlockByHash') {
@@ -20,9 +21,11 @@ RpcClient.prototype.call = async function <T = any>(
   }
   // fs.writeFileSync(`rpcResponse${count}-in.json`, JSON.stringify({ method, params, options }, null, 2))
   // fs.writeFileSync(`rpcResponse${count++}.json`, JSON.stringify(response, null, 2))
+  processingStats.rpcCallTime += Date.now() - time
   return response
 }
 RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], options?: CallOptions<T>): Promise<T[]> {
+  const time = Date.now()
   processingStats.rpcCalls += batch.length
   const response = await (this as any)._batchCall(batch, options)
   for (let i = 0; i < batch.length; i++) {
@@ -32,6 +35,7 @@ RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], optio
   }
   // fs.writeFileSync(`rpcResponse$${count}-in.json`, JSON.stringify({ batch, options }, null, 2))
   // fs.writeFileSync(`rpcResponse$${count++}.json`, JSON.stringify(response, null, 2))
+  processingStats.rpcCallTime += Date.now() - time
   return response
 }
 
