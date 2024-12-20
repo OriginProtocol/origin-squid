@@ -6,7 +6,7 @@ import { formatUnits } from 'viem'
 import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
-import { Arm, ArmDailyStat, ArmState, ArmWithdrawalRequest, TraderateChanged } from '@model'
+import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
 import { Block, Context, Processor } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -15,6 +15,7 @@ import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { calculateAPY } from '@utils/calculateAPY'
 import { logFilter } from '@utils/logFilter'
+import { traceFilter } from '@utils/traceFilter'
 
 export const createOriginARMProcessors = ({
   name,
@@ -52,6 +53,20 @@ export const createOriginARMProcessors = ({
     topic0: [originLidoArmAbi.events.FeeCollected.topic],
     range: { from },
   })
+  const swapFilter = traceFilter({
+    type: ['call'],
+    callTo: [armAddress],
+    callSighash: [
+      originLidoArmAbi.functions['swapExactTokensForTokens(uint256,uint256,address[],address,uint256)'].sighash,
+      originLidoArmAbi.functions['swapExactTokensForTokens(address,address,uint256,uint256,address)'].sighash,
+      originLidoArmAbi.functions['swapTokensForExactTokens(uint256,uint256,address[],address,uint256)'].sighash,
+      originLidoArmAbi.functions['swapTokensForExactTokens(address,address,uint256,uint256,address)'].sighash,
+    ],
+    range: { from },
+    transaction: true,
+    transactionLogs: true,
+  })
+
   const tradeRateProcessor = createEventProcessor({
     event: originLidoArmAbi.events.TraderateChanged,
     address: armAddress,
@@ -113,6 +128,7 @@ export const createOriginARMProcessors = ({
         p.addLog(depositFilter.value)
         p.addLog(withdrawalFilter.value)
         p.addLog(feeCollectedFilter.value)
+        p.addTrace(swapFilter.value)
         tradeRateProcessor.setup(p)
       },
       initialize,
@@ -124,6 +140,7 @@ export const createOriginARMProcessors = ({
         const states: ArmState[] = []
         const dailyStatsMap = new Map<string, ArmDailyStat>()
         const redemptionMap = new Map<string, ArmWithdrawalRequest>()
+        const swaps: ArmSwap[] = []
         const getStateId = (block: Block) => `${ctx.chain.id}:${block.header.height}:${armAddress}`
         const getPreviousState = async () => {
           return (
@@ -188,7 +205,7 @@ export const createOriginARMProcessors = ({
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
 
-        for (const block of ctx.blocks) {
+        for (const block of ctx.blocksWithContent) {
           for (const log of block.logs) {
             // ArmWithdrawalRequest
             if (redeemRequestedFilter.matches(log)) {
@@ -236,6 +253,61 @@ export const createOriginARMProcessors = ({
               state.totalFees += event.fee
             }
           }
+
+          const swapHandledTransactions = new Set<string>()
+          for (const trace of block.traces) {
+            if (trace.type === 'call' && swapFilter.matches(trace)) {
+              const transactionHash = trace.transaction?.hash ?? ''
+              if (!swapHandledTransactions.has(transactionHash)) {
+                swapHandledTransactions.add(transactionHash)
+                if (!trace.transaction) throw new Error('Transaction not found')
+                const transfers = trace.transaction.logs.filter(
+                  (log) => log.topics[0] === erc20Abi.events.Transfer.topic,
+                )
+                const transfers0 = transfers
+                  .filter((log) => log.address === armEntity.token0)
+                  .map((log) => erc20Abi.events.Transfer.decode(log))
+                const transfers1 = transfers
+                  .filter((log) => log.address === armEntity.token1)
+                  .map((log) => erc20Abi.events.Transfer.decode(log))
+
+                const assets0 = transfers0.reduce(
+                  (acc, data) =>
+                    data.from.toLowerCase() === armAddress
+                      ? acc - data.value
+                      : data.to.toLowerCase() === armAddress
+                      ? acc + data.value
+                      : acc,
+                  0n,
+                )
+                const assets1 = transfers1.reduce(
+                  (acc, data) =>
+                    data.from.toLowerCase() === armAddress
+                      ? acc - data.value
+                      : data.to.toLowerCase() === armAddress
+                      ? acc + data.value
+                      : acc,
+                  0n,
+                )
+
+                swaps.push(
+                  new ArmSwap({
+                    id: `${ctx.chain.id}::${transactionHash}:${trace.traceAddress.join(':')}`,
+                    chainId: ctx.chain.id,
+                    txHash: transactionHash,
+                    timestamp: new Date(block.header.timestamp),
+                    blockNumber: block.header.height,
+                    address: armAddress,
+                    from: trace.action.from,
+                    assets0,
+                    assets1,
+                  }),
+                )
+              }
+            }
+          }
+        }
+        for (const block of ctx.blocks) {
           if (tracker(ctx, block)) {
             // ArmState
             const [state, yesterdayState, rateUSD] = await Promise.all([
@@ -288,6 +360,7 @@ export const createOriginARMProcessors = ({
         await ctx.store.insert(states)
         await ctx.store.upsert([...dailyStatsMap.values()])
         await ctx.store.upsert([...redemptionMap.values()])
+        await ctx.store.insert(swaps)
         await tradeRateProcessor.process(ctx)
       },
     },

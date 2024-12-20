@@ -760,7 +760,7 @@ export const createOTokenProcessor = (params: {
           totalSupply: latest?.totalSupply ?? 0n,
           rebasingSupply: latest?.rebasingSupply ?? 0n,
           nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
-          holderCount: owners!.size ?? 0n,
+          holderCount: [...(owners?.values() ?? [])].reduce((acc, owner) => acc + (owner.balance > 0 ? 1 : 0), 0),
         })
         result.otokens.push(otokenObject)
       }

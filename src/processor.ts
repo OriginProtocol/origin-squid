@@ -131,6 +131,9 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
   if (process.env.PROCESSOR) {
     processors = processors.filter((p) => p.name?.includes(process.env.PROCESSOR!))
   }
+  if (process.env.PROCESSOR) {
+    postProcessors = postProcessors?.filter((p) => p.name?.includes(process.env.PROCESSOR!))
+  }
 
   console.log('Processors:\n  - ', processors.map((p) => p.name).join('\n  - '))
 
@@ -154,6 +157,7 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
   processors.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   postProcessors?.forEach((p) => p.setup?.(evmBatchProcessor, config.chain))
   const frequencyTracker = blockFrequencyTracker({ from })
+  let contextTime = Date.now()
   evmBatchProcessor.run(
     new TypeormDatabase({
       stateSchema,
@@ -161,8 +165,10 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
       isolationLevel: 'READ COMMITTED',
     }),
     async (_ctx) => {
-      const contextTime = Date.now()
       const ctx = _ctx as Context
+      if (!ctx.isHead && Date.now() - contextTime > 5000) {
+        ctx.log.info(`===== !! Slow Context !! ===== (${Date.now() - contextTime}ms)`)
+      }
       try {
         ctx.chain = config.chain
         ctx.__state = new Map<string, unknown>()
@@ -242,6 +248,7 @@ export const run = ({ chainId = 1, stateSchema, processors, postProcessors, vali
             `===== End of Context ===== (${Date.now() - contextTime}ms, ${ctx.blocks.at(-1)?.header.height})`,
           )
         }
+        contextTime = Date.now()
       }
     },
   )

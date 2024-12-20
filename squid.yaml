@@ -6,6 +6,7 @@ build:
 deploy:
   env:
     TS_NODE_BASEURL: './lib'
+    # DEBUG_PERF: 'true'
   addons:
     postgres:
     rpc:

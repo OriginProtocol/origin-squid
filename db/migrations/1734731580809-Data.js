@@ -1,5 +1,5 @@
-module.exports = class Data1734386993293 {
-    name = 'Data1734386993293'
+module.exports = class Data1734731580809 {
+    name = 'Data1734731580809'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -190,6 +190,12 @@ module.exports = class Data1734386993293 {
         await db.query(`CREATE INDEX "IDX_f19a1f1ecd4b69d3def526cf6d" ON "arm_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_a66956c5f52400d8800132b21f" ON "arm_withdrawal_request" ("address") `)
         await db.query(`CREATE INDEX "IDX_87f6fbcd7e96024c7d413e0496" ON "arm_withdrawal_request" ("account") `)
+        await db.query(`CREATE TABLE "arm_swap" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, CONSTRAINT "PK_e598ac0f753595d846714dec664" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_00432fd8b1a0b810192cb5a3c7" ON "arm_swap" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_a3664c1263a7551c8283b7f799" ON "arm_swap" ("tx_hash") `)
+        await db.query(`CREATE INDEX "IDX_10f61e220f24b8f06c3eb447a9" ON "arm_swap" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_cf05b522d87effcf53fb673ad1" ON "arm_swap" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_b52012d22a97bdb609cb8b7ad5" ON "arm_swap" ("address") `)
         await db.query(`CREATE TABLE "traderate_changed" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "traderate0" numeric NOT NULL, "traderate1" numeric NOT NULL, CONSTRAINT "PK_479a7665a7814427a59d0acf7b9" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d556cdea4a5d7c1bbe68af5540" ON "traderate_changed" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_705910a32dde2d3bb5afe3baaf" ON "traderate_changed" ("tx_hash") `)
@@ -920,6 +926,12 @@ module.exports = class Data1734386993293 {
         await db.query(`DROP INDEX "public"."IDX_f19a1f1ecd4b69d3def526cf6d"`)
         await db.query(`DROP INDEX "public"."IDX_a66956c5f52400d8800132b21f"`)
         await db.query(`DROP INDEX "public"."IDX_87f6fbcd7e96024c7d413e0496"`)
+        await db.query(`DROP TABLE "arm_swap"`)
+        await db.query(`DROP INDEX "public"."IDX_00432fd8b1a0b810192cb5a3c7"`)
+        await db.query(`DROP INDEX "public"."IDX_a3664c1263a7551c8283b7f799"`)
+        await db.query(`DROP INDEX "public"."IDX_10f61e220f24b8f06c3eb447a9"`)
+        await db.query(`DROP INDEX "public"."IDX_cf05b522d87effcf53fb673ad1"`)
+        await db.query(`DROP INDEX "public"."IDX_b52012d22a97bdb609cb8b7ad5"`)
         await db.query(`DROP TABLE "traderate_changed"`)
         await db.query(`DROP INDEX "public"."IDX_d556cdea4a5d7c1bbe68af5540"`)
         await db.query(`DROP INDEX "public"."IDX_705910a32dde2d3bb5afe3baaf"`)
