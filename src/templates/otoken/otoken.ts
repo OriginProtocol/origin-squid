@@ -857,11 +857,11 @@ export const createOTokenProcessor = (params: {
       }
     }
 
+    for (const block of ctx.blocks) {
+      await getOTokenDailyStat(block)
+    }
+
     for (const block of ctx.blocksWithContent) {
-      const possiblePromise = getOTokenDailyStat(block)
-      if (possiblePromise instanceof Promise) {
-        await possiblePromise
-      }
       for (const trace of block.traces) {
         if (
           trace.type === 'call' &&
