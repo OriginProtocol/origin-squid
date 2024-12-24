@@ -12,7 +12,7 @@ const LIMIT = 1000
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch('https://origin.squids.live/origin-squid@v65/api/graphql', {
+  const response = await fetch('https://origin.squids.live/origin-squid@v66/api/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,6 +30,10 @@ const executeQuery = async (query: string) => {
 
 const takeValidationEntries = (arr: any[]) => {
   return arr.filter((entry) => entry.blockNumber % 100000 === 0)
+}
+
+const takeEvery = (arr: any[], n: number = 25) => {
+  return arr.filter((_, i) => i % n === 0)
 }
 
 const oTokens = (prefix: string, address: string) => {
@@ -412,6 +416,9 @@ const main = async () => {
     }
     for (const key of Object.keys(result.data)) {
       entities[key] = takeValidationEntries(result.data[key])
+      if (entities[key].length < 5) {
+        entities[key] = takeEvery(result.data[key], 25)
+      }
     }
   }
 

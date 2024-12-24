@@ -773,6 +773,9 @@ export const createOTokenProcessor = (params: {
       const id = `${ctx.chain.id}-${params.otokenAddress}-${dayString}`
       let entity = result.dailyStats.get(id)?.entity
       if (entity) {
+        result.dailyStats.set(entity.id, { block, entity })
+        entity.timestamp = new Date(block.header.timestamp)
+        entity.blockNumber = block.header.height
         return entity
       }
 
@@ -859,9 +862,6 @@ export const createOTokenProcessor = (params: {
 
     for (const block of ctx.blocks) {
       await getOTokenDailyStat(block)
-    }
-
-    for (const block of ctx.blocksWithContent) {
       for (const trace of block.traces) {
         if (
           trace.type === 'call' &&
