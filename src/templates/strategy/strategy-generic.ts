@@ -4,25 +4,43 @@ import { Block, Context } from '@processor'
 import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
+import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
+import { logFilter } from '@utils/logFilter'
 import { addressToSymbol } from '@utils/symbols'
 
 import { IStrategyData } from './index'
 import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
 
+const getFilter = (strategyData: IStrategyData) => {
+  return {
+    depositFilter: logFilter({
+      address: [strategyData.address],
+      topic0: [abstractStrategyAbi.events.Deposit.topic],
+    }),
+    withdrawFilter: logFilter({
+      address: [strategyData.address],
+      topic0: [abstractStrategyAbi.events.Withdrawal.topic],
+    }),
+  }
+}
+
 export const setup = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {
+  const { depositFilter, withdrawFilter } = getFilter(strategyData)
+  processor.addLog(depositFilter.value)
+  processor.addLog(withdrawFilter.value)
   processor.includeAllBlocks({ from: strategyData.from })
   setupStrategyEarnings(processor, strategyData)
 }
 
-const trackers = new Map<string, ReturnType<typeof blockFrequencyUpdater>>()
+const trackers = new Map<string, ReturnType<typeof blockFrequencyTracker>>()
 export const process = async (ctx: Context, strategyData: IStrategyData) => {
   if (!trackers.has(strategyData.address)) {
-    trackers.set(strategyData.address, blockFrequencyUpdater({ from: strategyData.from }))
+    trackers.set(strategyData.address, blockFrequencyTracker({ from: strategyData.from }))
   }
-  const blockFrequencyUpdate = trackers.get(strategyData.address)!
+  const { depositFilter, withdrawFilter } = getFilter(strategyData)
+  const tracker = trackers.get(strategyData.address)!
   const strategyBalances: StrategyBalance[] = []
-  await blockFrequencyUpdate(ctx, async (ctx, block) => {
+  const processStrategyBalance = async (ctx: Context, block: Block) => {
     await ensureExchangeRates(
       ctx,
       block,
@@ -30,7 +48,14 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     )
     const results = await getStrategyHoldings(ctx, block, strategyData)
     strategyBalances.push(...results)
-  })
+  }
+  for (const block of ctx.blocks) {
+    const intervalMatch = tracker(ctx, block)
+    const match = intervalMatch || block.logs.find((log) => depositFilter.matches(log) || withdrawFilter.matches(log))
+    if (match) {
+      await processStrategyBalance(ctx, block)
+    }
+  }
   await ctx.store.insert(strategyBalances)
   await processStrategyEarnings(ctx, strategyData, getStrategyBalances)
 }

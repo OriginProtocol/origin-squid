@@ -1,5 +1,5 @@
-module.exports = class Data1735338605623 {
-    name = 'Data1735338605623'
+module.exports = class Data1735588699900 {
+    name = 'Data1735588699900'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -18,7 +18,7 @@ module.exports = class Data1735338605623 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "meta" jsonb NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f196efecb1b717f74494c4416b" ON "protocol_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_a5af597a96fb8752dc00093192" ON "protocol_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "protocol_daily_stat_detail" ("id" character varying NOT NULL, "date" text NOT NULL, "product" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_279e9e0ad3c5c1b9f34fd93684a" PRIMARY KEY ("id"))`)

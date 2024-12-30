@@ -2,7 +2,14 @@ import dayjs from 'dayjs'
 import { uniq } from 'lodash'
 import { In, LessThanOrEqual } from 'typeorm'
 
-import { ArmDailyStat, OTokenDailyStat, ProcessingStatus, ProtocolDailyStat, ProtocolDailyStatDetail } from '@model'
+import {
+  ArmDailyStat,
+  OTokenDailyStat,
+  ProcessingStatus,
+  ProtocolDailyStat,
+  ProtocolDailyStatDetail,
+  StrategyBalance,
+} from '@model'
 import { Context, defineProcessor } from '@processor'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { OETH_ADDRESS, OUSD_ADDRESS, arm } from '@utils/addresses'
@@ -58,6 +65,33 @@ export const protocolProcessor = defineProcessor({
         dailyStat.tvl === 0n
           ? 0
           : dateDetails.reduce((acc, detail) => acc + detail.apy * Number(detail.tvl), 0) / Number(dailyStat.tvl)
+
+      // Find overlapping TVL
+      const superOETHbWrappedOETH = await ctx.store.findOne(StrategyBalance, {
+        where: {
+          strategy: baseAddresses.superOETHb.strategies.bridgedWOETH,
+          timestamp: LessThanOrEqual(dayjs.utc(date).endOf('day').toDate()),
+        },
+        order: {
+          timestamp: 'desc',
+        },
+      })
+      const tvlAdjustment = -(superOETHbWrappedOETH?.balanceETH ?? 0n)
+
+      // Add the TVL adjustment
+      dailyStat.tvl += tvlAdjustment
+      dailyStat.meta = {
+        tvlAdjustments: superOETHbWrappedOETH
+          ? [
+              {
+                name: 'Super OETHb Wrapped OETH Strategy',
+                blockNumber: superOETHbWrappedOETH.blockNumber,
+                timestamp: superOETHbWrappedOETH.timestamp,
+                balanceETH: superOETHbWrappedOETH.balanceETH.toString(),
+              },
+            ]
+          : [],
+      }
 
       dailyStats.push(dailyStat)
     }

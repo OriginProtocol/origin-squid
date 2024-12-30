@@ -72,6 +72,7 @@ type ProtocolDailyStat @entity {
   tvl: BigInt!
   revenue: BigInt!
   apy: Float!
+  meta: JSON!
 }
 
 type ProtocolDailyStatDetail @entity {

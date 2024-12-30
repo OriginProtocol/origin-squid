@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, FloatColumn as FloatColumn_, JSONColumn as JSONColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class ProtocolDailyStat {
@@ -31,4 +31,7 @@ export class ProtocolDailyStat {
 
     @FloatColumn_({nullable: false})
     apy!: number
+
+    @JSONColumn_({nullable: false})
+    meta!: unknown
 }
