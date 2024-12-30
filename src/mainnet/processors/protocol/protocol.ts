@@ -142,26 +142,23 @@ const getProtocolDailyStat = async (ctx: Context, date: string) => {
   })
 }
 const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: string) => {
-  const dailyStatDetails = await ctx.store.find(ProtocolDailyStatDetail, {
-    where: { date: LessThanOrEqual(date), product },
+  const dailyStatDetail = await ctx.store.findOne(ProtocolDailyStatDetail, {
+    where: { date, product },
     order: { date: 'desc' },
-    take: 2,
   })
-  const dateDetails = dailyStatDetails.find((d) => d.date === date)
-  if (dateDetails) {
-    return dateDetails
+  if (dailyStatDetail) {
+    return dailyStatDetail
   }
-  const previousDateDetail = dailyStatDetails.find((d) => d.date < date)
   return new ProtocolDailyStatDetail({
     id: `${date}-${product}`,
     date,
     product,
     timestamp: dayjs.utc(date).endOf('day').toDate(),
-    rateUSD: previousDateDetail?.rateUSD ?? 0n,
-    earningTVL: previousDateDetail?.earningTVL ?? 0n,
-    tvl: previousDateDetail?.tvl ?? 0n,
-    revenue: previousDateDetail?.revenue ?? 0n,
-    apy: previousDateDetail?.apy ?? 0,
+    rateUSD: 0n,
+    earningTVL: 0n,
+    tvl: 0n,
+    revenue: 0n,
+    apy: 0,
   })
 }
 
