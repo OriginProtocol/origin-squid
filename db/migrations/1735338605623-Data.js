@@ -1,5 +1,5 @@
-module.exports = class Data1734731580809 {
-    name = 'Data1734731580809'
+module.exports = class Data1735338605623 {
+    name = 'Data1735338605623'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -18,6 +18,13 @@ module.exports = class Data1734731580809 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
+        await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_f196efecb1b717f74494c4416b" ON "protocol_daily_stat" ("date") `)
+        await db.query(`CREATE INDEX "IDX_a5af597a96fb8752dc00093192" ON "protocol_daily_stat" ("timestamp") `)
+        await db.query(`CREATE TABLE "protocol_daily_stat_detail" ("id" character varying NOT NULL, "date" text NOT NULL, "product" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_279e9e0ad3c5c1b9f34fd93684a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_25e652f34770b8661d5ea7139e" ON "protocol_daily_stat_detail" ("date") `)
+        await db.query(`CREATE INDEX "IDX_c0025cac7d806e2a33cd61c0c9" ON "protocol_daily_stat_detail" ("product") `)
+        await db.query(`CREATE INDEX "IDX_8f2fcc9fbd33954d90f69c280f" ON "protocol_daily_stat_detail" ("timestamp") `)
         await db.query(`CREATE TABLE "beacon_deposit_pubkey" ("id" character varying NOT NULL, "create_date" TIMESTAMP WITH TIME ZONE NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "count" integer NOT NULL, CONSTRAINT "PK_4741993dcf81760e9777dec18a7" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "beacon_deposit_event" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "caller" text NOT NULL, "withdrawal_credentials" text NOT NULL, "amount" text NOT NULL, "signature" text NOT NULL, "index" text NOT NULL, "pubkey_id" character varying, CONSTRAINT "PK_1ebc083560d266f487bd7098f43" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_4b157d82fc2a709b1cdd1b056a" ON "beacon_deposit_event" ("chain_id") `)
@@ -754,6 +761,13 @@ module.exports = class Data1734731580809 {
         await db.query(`DROP TABLE "curve_pool_rate"`)
         await db.query(`DROP INDEX "public"."IDX_561faf9883f4bb00ae6df34cc1"`)
         await db.query(`DROP INDEX "public"."IDX_cefe6315e78e235fa4ab3de663"`)
+        await db.query(`DROP TABLE "protocol_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_f196efecb1b717f74494c4416b"`)
+        await db.query(`DROP INDEX "public"."IDX_a5af597a96fb8752dc00093192"`)
+        await db.query(`DROP TABLE "protocol_daily_stat_detail"`)
+        await db.query(`DROP INDEX "public"."IDX_25e652f34770b8661d5ea7139e"`)
+        await db.query(`DROP INDEX "public"."IDX_c0025cac7d806e2a33cd61c0c9"`)
+        await db.query(`DROP INDEX "public"."IDX_8f2fcc9fbd33954d90f69c280f"`)
         await db.query(`DROP TABLE "beacon_deposit_pubkey"`)
         await db.query(`DROP TABLE "beacon_deposit_event"`)
         await db.query(`DROP INDEX "public"."IDX_4b157d82fc2a709b1cdd1b056a"`)

@@ -1,5 +1,6 @@
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { originArmProcessors } from 'mainnet/processors/origin-arm'
+import { protocolProcessor } from 'mainnet/processors/protocol'
 import 'tsconfig-paths/register'
 
 import { defineSquidProcessor, run } from '@processor'
@@ -46,7 +47,7 @@ export const processor = defineSquidProcessor({
     // Defender Relayer for Lido ARM
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
   ],
-  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet')],
+  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolProcessor],
   validators: [validate],
 })
 export default processor

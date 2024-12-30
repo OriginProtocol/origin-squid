@@ -1,4 +1,5 @@
 import { compact } from 'lodash'
+import { LessThanOrEqual } from 'typeorm'
 
 import { ExchangeRate } from '@model'
 import { Block, Context } from '@processor'
@@ -51,6 +52,18 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
 
 export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
   return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
+}
+
+export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, date: Date) => {
+  return await ctx.store.findOne(ExchangeRate, {
+    where: {
+      pair,
+      timestamp: LessThanOrEqual(date),
+    },
+    order: {
+      timestamp: 'desc',
+    },
+  })
 }
 
 const E18 = 10n ** 18n

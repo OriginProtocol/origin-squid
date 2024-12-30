@@ -63,6 +63,28 @@ type CurvePoolRate @entity {
   name: String!
   rate: BigInt!
 }
+type ProtocolDailyStat @entity {
+  id: ID!
+  date: String! @index
+  timestamp: DateTime! @index
+  rateUSD: BigInt!
+  earningTVL: BigInt!
+  tvl: BigInt!
+  revenue: BigInt!
+  apy: Float!
+}
+
+type ProtocolDailyStatDetail @entity {
+  id: ID!
+  date: String! @index
+  product: String! @index
+  timestamp: DateTime! @index
+  rateUSD: BigInt!
+  earningTVL: BigInt!
+  tvl: BigInt!
+  revenue: BigInt!
+  apy: Float!
+}
 type BeaconDepositEvent @entity {
   id: ID! # `chainId:logId`
   chainId: Int! @index
