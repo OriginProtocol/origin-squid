@@ -57,6 +57,7 @@ export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Cu
 export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, date: Date) => {
   return await ctx.store.findOne(ExchangeRate, {
     where: {
+      chainId: ctx.chain.id,
       pair,
       timestamp: LessThanOrEqual(date),
     },

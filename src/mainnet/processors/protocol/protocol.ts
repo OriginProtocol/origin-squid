@@ -56,7 +56,7 @@ export const protocolProcessor = defineProcessor({
       const dateDetails = details.filter((d) => d.date === date)
       const dailyStat = await getProtocolDailyStat(ctx, date)
       dailyStat.rateUSD = await getLatestExchangeRateForDate(ctx, 'ETH_USD', dailyStat.timestamp).then(
-        (rate) => rate?.rate ?? dateDetails.find((d) => d.rateUSD > 0n)?.rateUSD ?? 0n,
+        (rate) => (rate?.rate ?? 0n) * 10n ** 10n,
       )
       dailyStat.earningTVL = sumBigIntBy(dateDetails, 'earningTVL')
       dailyStat.tvl = sumBigIntBy(dateDetails, 'tvl')
