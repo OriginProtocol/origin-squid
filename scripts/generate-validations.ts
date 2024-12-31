@@ -12,7 +12,7 @@ const LIMIT = 1000
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch('https://origin.squids.live/origin-squid@v66/api/graphql', {
+  const response = await fetch('https://origin.squids.live/origin-squid:prod/api/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
