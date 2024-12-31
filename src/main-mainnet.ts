@@ -21,6 +21,7 @@ import {
 import * as dailyStats from './mainnet/post-processors/ogn-daily-stats'
 import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
+import * as mainnetExchangeRates from './mainnet/processors/exchange-rates'
 import * as legacyStaking from './mainnet/processors/legacy-staking'
 import * as nativeStaking from './mainnet/processors/native-staking'
 import * as validate from './mainnet/validators/validate-mainnet'
@@ -28,6 +29,7 @@ import * as validate from './mainnet/validators/validate-mainnet'
 export const processor = defineSquidProcessor({
   stateSchema: 'mainnet-processor',
   processors: [
+    mainnetExchangeRates,
     nativeStaking,
     legacyStaking,
     curve,
