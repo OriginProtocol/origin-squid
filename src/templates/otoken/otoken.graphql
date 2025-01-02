@@ -10,6 +10,17 @@ type OToken @entity {
   holderCount: Int!
 }
 
+type WOToken @entity {
+  id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  totalAssets: BigInt!
+  totalSupply: BigInt!
+  assetsPerShare: BigInt!
+}
+
 type OTokenAsset @entity {
   id: ID! @index
   chainId: Int! @index

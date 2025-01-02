@@ -8,6 +8,7 @@ import * as otoken from '@abi/otoken'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenDripper from '@abi/otoken-dripper'
 import * as otokenVault from '@abi/otoken-vault'
+import * as wotoken from '@abi/woeth'
 import {
   ERC20,
   ERC20Balance,
@@ -28,6 +29,7 @@ import {
   OTokenRebaseOption,
   OTokenVault,
   RebasingOption,
+  WOToken,
 } from '@model'
 import { Block, Context, Log } from '@processor'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
@@ -159,6 +161,7 @@ export const createOTokenProcessor = (params: {
     initialize: () => Promise<void>
     dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }>
     otokens: OToken[]
+    wotokens: WOToken[]
     assets: OTokenAsset[]
     history: OTokenHistory[]
     rebases: OTokenRebase[]
@@ -249,6 +252,7 @@ export const createOTokenProcessor = (params: {
       },
       dailyStats: new Map<string, { block: Block; entity: OTokenDailyStat }>(),
       otokens: [],
+      wotokens: [],
       assets: [],
       history: [],
       rebases: [],
@@ -914,6 +918,27 @@ export const createOTokenProcessor = (params: {
           totalValue,
         }),
       )
+
+      if (params.wotoken) {
+        const wrappedContract = new wotoken.Contract(ctx, block.header, params.wotoken.address)
+        const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
+          wrappedContract.totalAssets(),
+          wrappedContract.totalSupply(),
+          wrappedContract.previewRedeem(10n ** 18n),
+        ])
+        result.wotokens.push(
+          new WOToken({
+            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}`,
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            timestamp: new Date(block.header.timestamp),
+            blockNumber: block.header.height,
+            totalAssets,
+            totalSupply,
+            assetsPerShare,
+          }),
+        )
+      }
 
       if (params.dripper && params.dripper.from <= block.header.height) {
         const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)

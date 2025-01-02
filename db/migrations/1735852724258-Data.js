@@ -1,5 +1,5 @@
-module.exports = class Data1735588699900 {
-    name = 'Data1735588699900'
+module.exports = class Data1735852724258 {
+    name = 'Data1735852724258'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -104,6 +104,11 @@ module.exports = class Data1735588699900 {
         await db.query(`CREATE INDEX "IDX_0851d95d178f682d279a04ebf9" ON "o_token" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_7889d6ce061da066df89309e51" ON "o_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_4633929013f5ba465cb00e5a95" ON "o_token" ("block_number") `)
+        await db.query(`CREATE TABLE "wo_token" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_assets" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, CONSTRAINT "PK_4305ea14cb58bef31b227a8e529" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_ed8d2cd8eaa28f1f48af676dcf" ON "wo_token" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_46a8bdc64b39c46a0aa37bb768" ON "wo_token" ("otoken") `)
+        await db.query(`CREATE INDEX "IDX_3d57d694c426c319d925b846f8" ON "wo_token" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_f14aa07c5a85a39318a017d421" ON "wo_token" ("block_number") `)
         await db.query(`CREATE TABLE "o_token_asset" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "symbol" text NOT NULL, CONSTRAINT "PK_eb502dc2745e676b217ea3e0323" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2eb2f24563a058f9d6e746ed47" ON "o_token_asset" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_7a26c80564bf5fe4e414125e99" ON "o_token_asset" ("otoken") `)
@@ -847,6 +852,11 @@ module.exports = class Data1735588699900 {
         await db.query(`DROP INDEX "public"."IDX_0851d95d178f682d279a04ebf9"`)
         await db.query(`DROP INDEX "public"."IDX_7889d6ce061da066df89309e51"`)
         await db.query(`DROP INDEX "public"."IDX_4633929013f5ba465cb00e5a95"`)
+        await db.query(`DROP TABLE "wo_token"`)
+        await db.query(`DROP INDEX "public"."IDX_ed8d2cd8eaa28f1f48af676dcf"`)
+        await db.query(`DROP INDEX "public"."IDX_46a8bdc64b39c46a0aa37bb768"`)
+        await db.query(`DROP INDEX "public"."IDX_3d57d694c426c319d925b846f8"`)
+        await db.query(`DROP INDEX "public"."IDX_f14aa07c5a85a39318a017d421"`)
         await db.query(`DROP TABLE "o_token_asset"`)
         await db.query(`DROP INDEX "public"."IDX_2eb2f24563a058f9d6e746ed47"`)
         await db.query(`DROP INDEX "public"."IDX_7a26c80564bf5fe4e414125e99"`)
