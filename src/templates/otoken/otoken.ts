@@ -919,7 +919,7 @@ export const createOTokenProcessor = (params: {
         }),
       )
 
-      if (params.wotoken) {
+      if (params.wotoken && block.header.height >= params.wotoken.from) {
         const wrappedContract = new wotoken.Contract(ctx, block.header, params.wotoken.address)
         const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
           wrappedContract.totalAssets(),
