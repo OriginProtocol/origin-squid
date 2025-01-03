@@ -64,7 +64,7 @@ const rewardTokenCollectedTransfersFilter = (strategyData: IStrategyData) =>
   logFilter({
     address: [oTokenValues[strategyData.oTokenAddress].rewardConversionToken],
     topic0: [erc20.events.Transfer.topic],
-    topic1: [oTokenValues[strategyData.oTokenAddress].harvester],
+    topic1: [...oTokenValues[strategyData.oTokenAddress].harvester],
     topic2: [oTokenValues[strategyData.oTokenAddress].dripper],
     range: { from: strategyData.from },
   })
@@ -73,19 +73,19 @@ const oTokenValues = {
   [OUSD_ADDRESS]: {
     rewardConversionToken: USDT_ADDRESS,
     rewardConversionTokenDecimals: 6,
-    harvester: OUSD_HARVESTER_ADDRESS,
+    harvester: [OUSD_HARVESTER_ADDRESS],
     dripper: OUSD_DRIPPER_ADDRESS,
   },
   [OETH_ADDRESS]: {
     rewardConversionToken: WETH_ADDRESS,
     rewardConversionTokenDecimals: 18,
-    harvester: OETH_HARVESTER_ADDRESS,
+    harvester: [OETH_HARVESTER_ADDRESS],
     dripper: OETH_DRIPPER_ADDRESS,
   },
   [baseAddresses.superOETHb.address]: {
     rewardConversionToken: baseAddresses.tokens.WETH,
     rewardConversionTokenDecimals: 18,
-    harvester: baseAddresses.multisig['2/8'],
+    harvester: [baseAddresses.multisig['2/8'], baseAddresses.multisig['multichain-guardian']],
     dripper: baseAddresses.superOETHb.dripper,
   },
 } as const

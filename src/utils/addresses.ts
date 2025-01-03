@@ -185,6 +185,10 @@ export const arm = {
   zapper: '0x01f30b7358ba51f637d1aa05d9b4a60f76dad680',
 }
 
+export const multisig = {
+  'multichain-guardian': '0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971',
+}
+
 export const addresses = {
   tokens,
   strategies,

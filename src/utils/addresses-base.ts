@@ -118,6 +118,7 @@ export const baseAddresses = {
   multisig: {
     '5/8': '0x92a19381444a001d62ce67baff066fa1111d7202',
     '2/8': '0x28bce2ee5775b652d92bb7c2891a89f036619703',
+    'multichain-guardian': '0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971',
     reservoir: '0xb6d85ce798660076152d6fd3a484129668839c95',
   },
   baseHotWallet: '0x3c112e20141b65041c252a68a611ef145f58b7bc',
