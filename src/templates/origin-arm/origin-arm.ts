@@ -163,8 +163,9 @@ export const createOriginARMProcessors = ({
         }
         const getCurrentState = async (block: Block) => {
           const stateId = getStateId(block)
-          if (states[states.length - 1]?.id === stateId) {
-            return states[states.length - 1]
+          let armStateEntity = states.find((state) => state.id === stateId)
+          if (armStateEntity) {
+            return armStateEntity
           }
           const previousState = await getPreviousState()
           const armContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
@@ -180,7 +181,7 @@ export const createOriginARMProcessors = ({
               armContract.previewRedeem(10n ** 18n),
             ])
           const date = new Date(block.header.timestamp)
-          const armStateEntity = new ArmState({
+          armStateEntity = new ArmState({
             id: stateId,
             chainId: ctx.chain.id,
             timestamp: date,
