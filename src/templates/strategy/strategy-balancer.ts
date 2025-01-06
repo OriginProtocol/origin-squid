@@ -35,6 +35,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
           chainId: ctx.chain.id,
           blockNumber: block.header.height,
           timestamp: new Date(block.header.timestamp),
+          otoken: strategyData.oTokenAddress,
           strategy: address,
           asset,
           symbol: addressToSymbol(asset),

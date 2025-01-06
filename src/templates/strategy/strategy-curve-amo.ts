@@ -45,6 +45,7 @@ const getCurveAMOStrategyHoldings = async (
       new StrategyBalance({
         id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
         chainId: ctx.chain.id,
+        otoken: strategyData.oTokenAddress,
         strategy: address,
         asset,
         symbol: addressToSymbol(asset),

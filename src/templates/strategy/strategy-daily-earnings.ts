@@ -11,11 +11,7 @@ import { IStrategyData } from './strategy'
 
 const eth1 = 1000000000000000000n
 
-export const processStrategyDailyEarnings = async (
-  ctx: Context,
-  blocks: Block[],
-  strategyData: IStrategyData,
-) => {
+export const processStrategyDailyEarnings = async (ctx: Context, blocks: Block[], strategyData: IStrategyData) => {
   const results: StrategyDailyYield[] = []
   for (const block of blocks) {
     if (block.header.height < strategyData.from) return
@@ -30,6 +26,7 @@ export const processStrategyDailyEarnings = async (
         id,
         timestamp: dayjs.utc(block.header.timestamp).endOf('day').toDate(),
         blockNumber: block.header.height,
+        otoken: strategyData.oTokenAddress,
         strategy: strategyData.address,
         balance: latest?.balance ?? 0n,
         balanceWeight: latest?.balanceWeight ?? 1,
@@ -47,10 +44,7 @@ export const processStrategyDailyEarnings = async (
       where: {
         strategy: strategyData.address,
         asset: strategyData.base.address,
-        blockNumber: Between(
-          (latest?.blockNumber ?? 0) + 1,
-          block.header.height,
-        ),
+        blockNumber: Between((latest?.blockNumber ?? 0) + 1, block.header.height),
       },
       order: { id: 'asc' },
     })
@@ -82,10 +76,7 @@ export const processStrategyDailyEarnings = async (
     // The sum of perpetual earnings, so we want to use whatever is latest.
     const earnings = yields[0]?.earnings ?? 0n
     // The sum of the earnings change per record.
-    const earningsChange = todayYields.reduce(
-      (sum, y) => sum + y.earningsChange,
-      0n,
-    )
+    const earningsChange = todayYields.reduce((sum, y) => sum + y.earningsChange, 0n)
 
     // Apply ETH values
     current.balance = balance
@@ -122,12 +113,7 @@ export const processStrategyDailyEarnings = async (
   await ctx.store.upsert(results)
 }
 
-const getLatest = async (
-  ctx: Context,
-  results: StrategyDailyYield[],
-  strategyData: IStrategyData,
-  id: string,
-) => {
+const getLatest = async (ctx: Context, results: StrategyDailyYield[], strategyData: IStrategyData, id: string) => {
   let latest =
     lastExcept(results, id) ??
     (await ctx.store.findOne(StrategyDailyYield, {

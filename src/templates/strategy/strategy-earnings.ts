@@ -375,6 +375,7 @@ const processDepositWithdrawal = async (
       id,
       blockNumber: block.header.height,
       timestamp,
+      otoken: strategyData.oTokenAddress,
       strategy: strategyData.address,
       asset: strategyData.base.address,
       balance,

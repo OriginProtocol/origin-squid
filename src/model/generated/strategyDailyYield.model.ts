@@ -6,9 +6,6 @@ export class StrategyDailyYield {
         Object.assign(this, props)
     }
 
-    /**
-     * Format: 'strategy:asset:blockNumber'
-     */
     @PrimaryColumn_()
     id!: string
 
@@ -20,6 +17,11 @@ export class StrategyDailyYield {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    otoken!: string
+
+    @Index_()
     @StringColumn_({nullable: false})
     strategy!: string
 

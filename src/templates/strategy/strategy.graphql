@@ -1,12 +1,10 @@
 type StrategyBalance @entity {
-  """
-  Format: 'chainId:strategy:asset:blockNumber'
-  """
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  strategy: String!
+  otoken: String! @index
+  strategy: String! @index
   asset: String!
   symbol: String!
   balance: BigInt!
@@ -14,13 +12,11 @@ type StrategyBalance @entity {
 }
 
 type StrategyYield @entity {
-  """
-  Format: 'strategy:asset:blockNumber'
-  """
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  strategy: String!
+  otoken: String! @index
+  strategy: String! @index
   asset: String!
   balance: BigInt!
   balanceWeight: Float!
@@ -29,13 +25,11 @@ type StrategyYield @entity {
 }
 
 type StrategyDailyYield @entity {
-  """
-  Format: 'strategy:asset:blockNumber'
-  """
   id: ID!
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  strategy: String!
+  otoken: String! @index
+  strategy: String! @index
   asset: String!
   balance: BigInt!
   balanceWeight: Float!

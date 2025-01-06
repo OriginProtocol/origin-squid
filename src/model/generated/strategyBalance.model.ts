@@ -6,9 +6,6 @@ export class StrategyBalance {
         Object.assign(this, props)
     }
 
-    /**
-     * Format: 'chainId:strategy:asset:blockNumber'
-     */
     @PrimaryColumn_()
     id!: string
 
@@ -24,6 +21,11 @@ export class StrategyBalance {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    otoken!: string
+
+    @Index_()
     @StringColumn_({nullable: false})
     strategy!: string
 

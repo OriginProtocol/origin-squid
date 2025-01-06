@@ -76,6 +76,7 @@ const getStrategyHoldings = async (
         chainId: ctx.chain.id,
         blockNumber: block.header.height,
         timestamp: new Date(block.header.timestamp),
+        otoken: strategyData.oTokenAddress,
         strategy: address,
         asset,
         symbol: addressToSymbol(asset),
