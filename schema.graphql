@@ -345,6 +345,7 @@ type OToken @entity {
   otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
+  unallocatedSupply: BigInt!
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!

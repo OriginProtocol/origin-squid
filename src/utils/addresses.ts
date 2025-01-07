@@ -139,12 +139,14 @@ export const strategies = {
     MorphoCompoundStrategy: '0x5a4eee58744d1430876d5ca93cab5ccb763c037d',
     MorphoAaveStrategy: '0x79f2188ef9350a1dc11a062cca0abe90684b0197',
     FluxStrategy: '0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44',
-    Generalized4626Strategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
+    MakerDsrStrategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
     CompoundStrategy: '0x9c459eeb3fa179a40329b81c1635525e9a0ef094', // Deprecated
     ConvexStrategy: '0xea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3', // Deprecated
     LUSDMetaStrategy: '0x7A192DD9Cc4Ea9bdEdeC9992df74F1DA55e60a19', // Deprecated
     MetaMorphoStrategy: '0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0',
     MakerStrategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
+    GauntletPrimeUSDCStrategy: '0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1',
+    GauntletPrimeUSDTStrategy: '0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26',
   },
 } as const
 

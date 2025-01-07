@@ -1,5 +1,5 @@
-module.exports = class Data1736192405171 {
-    name = 'Data1736192405171'
+module.exports = class Data1736203023690 {
+    name = 'Data1736203023690'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -99,7 +99,7 @@ module.exports = class Data1736192405171 {
         await db.query(`CREATE INDEX "IDX_1ada02a88b8355495e0917b49b" ON "transaction_details" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_81a859fb3a14a34f194e1d8606" ON "transaction_details" ("from") `)
         await db.query(`CREATE INDEX "IDX_ae3e0f0414a1deb6e4840e2e44" ON "transaction_details" ("to") `)
-        await db.query(`CREATE TABLE "o_token" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_4450ef96d5e51ef55bc8ea0b53e" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "unallocated_supply" numeric NOT NULL, "total_supply" numeric NOT NULL, "rebasing_supply" numeric NOT NULL, "non_rebasing_supply" numeric NOT NULL, "holder_count" integer NOT NULL, CONSTRAINT "PK_4450ef96d5e51ef55bc8ea0b53e" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_1da06ba7d2c0a02d01d1b7a6c0" ON "o_token" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_0851d95d178f682d279a04ebf9" ON "o_token" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_7889d6ce061da066df89309e51" ON "o_token" ("timestamp") `)

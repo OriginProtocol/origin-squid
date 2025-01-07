@@ -26,6 +26,9 @@ export class OToken {
     blockNumber!: number
 
     @BigIntColumn_({nullable: false})
+    unallocatedSupply!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalSupply!: bigint
 
     @BigIntColumn_({nullable: false})

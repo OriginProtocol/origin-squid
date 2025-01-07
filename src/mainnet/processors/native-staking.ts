@@ -93,6 +93,7 @@ export const process = async (ctx: Context) => {
       }
     }
   }
+
   await ctx.store.upsert([...result.pubkeys.values()])
   await ctx.store.insert([...result.deposits.values()])
 }

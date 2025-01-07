@@ -1,9 +1,12 @@
 import { Context } from '@processor'
+import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
+import * as mainnetAddresses from '@utils/addresses'
 
 import { aaveStrategy } from './aave-strategy'
+import { USDC, USDT } from './const'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'
 import { makerDsrStrategy } from './maker-dsr-strategy'
@@ -19,7 +22,30 @@ export const ousdStrategies: readonly IStrategyData[] = [
   fluxStrategy,
   makerDsrStrategy,
   metamorphoStrategy,
-
+  {
+    chainId: 1,
+    from: 21425796,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Gauntlet Prime USDC',
+    contractName: 'Generalized4626Strategy',
+    address: mainnetAddresses.strategies.ousd.GauntletPrimeUSDCStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDC],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
+  {
+    chainId: 1,
+    from: 21425837,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Gauntlet Prime USDT',
+    contractName: 'Generalized4626Strategy',
+    address: mainnetAddresses.strategies.ousd.GauntletPrimeUSDTStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDT],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
   // Deprecated
   // {
   //   from: 13369299,

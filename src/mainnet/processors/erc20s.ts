@@ -1,6 +1,13 @@
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createERC20PollingTracker } from '@templates/erc20/erc20-polling'
-import { OETH_DRIPPER_ADDRESS, OETH_VAULT_ADDRESS, WOETH_ADDRESS, oethStrategyArray, tokens } from '@utils/addresses'
+import {
+  OETH_DRIPPER_ADDRESS,
+  OETH_NATIVE_STRATEGIES,
+  OETH_VAULT_ADDRESS,
+  WOETH_ADDRESS,
+  oethStrategyArray,
+  tokens,
+} from '@utils/addresses'
 import { TokenSymbol } from '@utils/symbols'
 
 // TODO: Would be nice if interested parties could register their desires here from other parts of the code,
@@ -45,6 +52,7 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
       ...oethStrategyArray,
       OETH_VAULT_ADDRESS,
       OETH_DRIPPER_ADDRESS,
+      ...OETH_NATIVE_STRATEGIES.map((s) => s.address),
       // '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap wstETH/WETH
       // '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap rETH/WETH
     ],

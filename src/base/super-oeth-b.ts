@@ -26,6 +26,7 @@ const otokenProcessor = createOTokenProcessor({
     yieldSent: true,
   },
   otokenVaultAddress: baseAddresses.superOETHb.vault,
+  redemptionAsset: { asset: baseAddresses.tokens.WETH, symbol: 'WETH' },
   oTokenAssets: [
     { asset: baseAddresses.tokens.superOETHb, symbol: 'superOETHb' },
     {

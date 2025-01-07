@@ -4,10 +4,10 @@ import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20 from '@abi/erc20'
+import * as otokenVault from '@abi/oeth-vault'
 import * as otoken from '@abi/otoken'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenDripper from '@abi/otoken-dripper'
-import * as otokenVault from '@abi/otoken-vault'
 import * as wotoken from '@abi/woeth'
 import {
   ERC20,
@@ -69,6 +69,7 @@ export const createOTokenProcessor = (params: {
     yieldSent: boolean
   }
   otokenVaultAddress: string
+  redemptionAsset?: { asset: CurrencyAddress; symbol: CurrencySymbol }
   oTokenAssets: { asset: CurrencyAddress; symbol: CurrencySymbol }[]
   getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
   upgrades?: {
@@ -91,6 +92,15 @@ export const createOTokenProcessor = (params: {
   const yieldUndelegatedFilter = logFilter({
     address: [params.otokenAddress],
     topic0: [otoken.events.YieldUndelegated.topic],
+    range: { from: params.from },
+  })
+  const withdrawalRelatedFilter = logFilter({
+    address: [params.otokenVaultAddress],
+    topic0: [
+      otokenVault.events.WithdrawalRequested.topic,
+      otokenVault.events.WithdrawalClaimable.topic,
+      otokenVault.events.WithdrawalClaimed.topic,
+    ],
     range: { from: params.from },
   })
 
@@ -137,6 +147,7 @@ export const createOTokenProcessor = (params: {
     if (harvesterYieldSentFilter) {
       processor.addLog(harvesterYieldSentFilter.value)
     }
+    processor.addLog(withdrawalRelatedFilter.value)
   }
 
   const initialize = async (ctx: Context) => {
@@ -738,6 +749,20 @@ export const createOTokenProcessor = (params: {
       time('processHarvesterYieldSent')
     }
 
+    // Update the unallocatedSupply of OToken.
+    const processWithdrawalRelated = async (block: Block, log: Log) => {
+      if (!params.redemptionAsset) return
+      const vault = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+      const redeemingAsset = new erc20.Contract(ctx, block.header, params.redemptionAsset.asset)
+      const [otokenObject, withdrawalQueueMetadata, redeemingAssetBalance] = await Promise.all([
+        getOTokenObject(block),
+        vault.withdrawalQueueMetadata(),
+        redeemingAsset.balanceOf(params.otokenVaultAddress),
+      ])
+      const claimableSupply = withdrawalQueueMetadata.queued - withdrawalQueueMetadata.claimed
+      otokenObject.unallocatedSupply = redeemingAssetBalance - claimableSupply
+    }
+
     const getOTokenObject = async (block: Block) => {
       const timestamp = new Date(block.header.timestamp)
       const otokenId = `${ctx.chain.id}-${params.otokenAddress}-${timestamp.toISOString()}`
@@ -761,6 +786,7 @@ export const createOTokenProcessor = (params: {
           otoken: params.otokenAddress,
           timestamp: new Date(block.header.timestamp),
           blockNumber: block.header.height,
+          unallocatedSupply: latest?.unallocatedSupply ?? 0n,
           totalSupply: latest?.totalSupply ?? 0n,
           rebasingSupply: latest?.rebasingSupply ?? 0n,
           nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
@@ -899,6 +925,9 @@ export const createOTokenProcessor = (params: {
         }
         if (yieldUndelegatedFilter.matches(log)) {
           await processYieldUndelegated(block, log)
+        }
+        if (withdrawalRelatedFilter.matches(log)) {
+          await processWithdrawalRelated(block, log)
         }
       }
     }

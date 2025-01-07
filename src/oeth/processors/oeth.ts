@@ -42,6 +42,7 @@ const otokenProcessor = createOTokenProcessor({
     from: 17067707,
   },
   otokenVaultAddress: OETH_VAULT_ADDRESS,
+  redemptionAsset: { asset: WETH_ADDRESS, symbol: 'WETH' },
   oTokenAssets: [
     { asset: ETH_ADDRESS, symbol: 'ETH' },
     { asset: WETH_ADDRESS, symbol: 'WETH' },
