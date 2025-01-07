@@ -292,6 +292,7 @@ const processRewardTokenCollected = async (
       id,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
+      otoken: strategyData.oTokenAddress,
       strategy: strategyData.address,
       asset: strategyData.base.address,
       balance: latest?.balance ?? 0n,
