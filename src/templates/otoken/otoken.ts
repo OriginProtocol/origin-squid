@@ -1149,6 +1149,7 @@ export const createOTokenProcessor = (params: {
     await ctx.store.upsert(result.apies)
     await Promise.all([
       ctx.store.insert(result.otokens),
+      ctx.store.insert(result.wotokens),
       ctx.store.insert(result.assets),
       ctx.store.insert(result.history),
       ctx.store.insert(result.rebases),
