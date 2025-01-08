@@ -61,10 +61,6 @@ export const protocolProcessor = defineProcessor({
       dailyStat.earningTVL = sumBigIntBy(dateDetails, 'earningTVL')
       dailyStat.tvl = sumBigIntBy(dateDetails, 'tvl')
       dailyStat.revenue = sumBigIntBy(dateDetails, 'revenue')
-      dailyStat.apy =
-        dailyStat.tvl === 0n
-          ? 0
-          : dateDetails.reduce((acc, detail) => acc + detail.apy * Number(detail.tvl), 0) / Number(dailyStat.tvl)
 
       // Find overlapping TVL
       const superOETHbWrappedOETH = await ctx.store.findOne(StrategyBalance, {
@@ -76,10 +72,19 @@ export const protocolProcessor = defineProcessor({
           timestamp: 'desc',
         },
       })
-      const tvlAdjustment = -(superOETHbWrappedOETH?.balanceETH ?? 0n)
+      const superOETHbWrappedOethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
 
-      // Add the TVL adjustment
-      dailyStat.tvl += tvlAdjustment
+      // Adjust TVL for overlapping strategy balance.
+      dailyStat.tvl -= superOETHbWrappedOethBalance
+      dailyStat.apy =
+        dailyStat.tvl === 0n
+          ? 0
+          : dateDetails.reduce((acc, detail) => {
+              // We lessen the OETH TVL for APY calculation since that APY is also included in Super OETHb.
+              const tvl = detail.id === 'OETH' ? detail.tvl - superOETHbWrappedOethBalance : detail.tvl
+              return acc + detail.apy * Number(tvl)
+            }, 0) / Number(dailyStat.tvl)
+
       dailyStat.meta = {
         tvlAdjustments: superOETHbWrappedOETH
           ? [
