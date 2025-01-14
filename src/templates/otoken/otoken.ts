@@ -76,6 +76,7 @@ export const createOTokenProcessor = (params: {
     rebaseOptEvents: number | false
   }
   accountsOverThresholdMinimum: bigint
+  feeOverride?: bigint // out of 100
 }) => {
   const harvesterYieldSentFilter = params.harvester?.yieldSent
     ? logFilter({
@@ -483,6 +484,7 @@ export const createOTokenProcessor = (params: {
         log,
         data,
         result.lastYieldDistributionEvent,
+        params.feeOverride,
       )
       const yieldDelegationBalances = await getYieldDelegationBalances(ctx, block)
 

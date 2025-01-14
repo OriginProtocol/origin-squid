@@ -56,6 +56,7 @@ export async function createRebaseAPY(
         yield: bigint
       }
     | undefined,
+  feeOverride?: bigint,
 ) {
   let feeETH = 0n
   let yieldETH = 0n
@@ -86,6 +87,10 @@ export async function createRebaseAPY(
       _fee = (_yield * 25n) / 100n
       _yield += _fee // YieldDistributionEvent yield includes the fee so let's add that here.
     }
+  }
+  if (feeOverride) {
+    // If an override is set, we need to calculate the fee based on the yield.
+    _fee = (_yield * feeOverride) / (100n - feeOverride)
   }
 
   if (OUSD_STABLE_OTOKENS.includes(otokenAddress)) {

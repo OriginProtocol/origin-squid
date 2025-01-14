@@ -48,6 +48,7 @@ const otokenProcessor = createOTokenProcessor({
     rebaseOptEvents: false,
   },
   accountsOverThresholdMinimum: parseEther('.1'),
+  feeOverride: 20n,
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
