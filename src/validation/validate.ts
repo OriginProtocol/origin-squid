@@ -75,7 +75,16 @@ const validateExpectation = async <
   Class: EntityClass<any>,
   expectation: T,
 ) => {
-  const actual = await ctx.store.get(Class, expectation.id)
+  const relations = Object.keys(expectation)
+    .filter((key) => typeof expectation[key as keyof typeof expectation] === 'object')
+    .reduce(
+      (acc, key) => {
+        acc[key] = true
+        return acc
+      },
+      {} as Record<string, boolean>,
+    )
+  const actual = await ctx.store.findOne(Class, { where: { id: expectation.id }, relations })
   assert(
     actual,
     `Expected entity does not exist: block=${block.header.height} Entity=${Class.name} id=${expectation.id}`,

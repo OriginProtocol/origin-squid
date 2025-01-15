@@ -90,7 +90,7 @@ export async function createRebaseAPY(
   }
   if (feeOverride) {
     // If an override is set, we need to calculate the fee based on the yield.
-    _fee = (_yield * feeOverride) / (100n - feeOverride)
+    _fee = (_yield * feeOverride) / 100n
   }
 
   if (OUSD_STABLE_OTOKENS.includes(otokenAddress)) {
