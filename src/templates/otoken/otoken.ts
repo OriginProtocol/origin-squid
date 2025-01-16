@@ -349,6 +349,7 @@ export const createOTokenProcessor = (params: {
           owners!.set(entity.address, entity)
           ownersHistorical.push(entity)
         }
+        entity.blockNumber = block.header.height
         entity.lastUpdated = new Date(block.header.timestamp)
         return entity
       }

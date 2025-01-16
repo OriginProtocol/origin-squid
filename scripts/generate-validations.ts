@@ -40,7 +40,7 @@ const oTokens = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokens: oTokens(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -59,7 +59,7 @@ const oTokenApies = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenApies: oTokenApies(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -83,7 +83,7 @@ const oTokenHistories = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenHistories: oTokenHistories(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -104,7 +104,7 @@ const oTokenRebases = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenRebases: oTokenRebases(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -130,7 +130,7 @@ const oTokenVaults = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenVaults: oTokenVaults(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -148,7 +148,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokenDailyStats: oTokenDailyStats(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { otoken_eq: "${address}" }
     ) {
       id
@@ -191,7 +191,7 @@ const erc20Balances = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_erc20Balances: erc20Balances(
       limit: ${LIMIT},
-      orderBy: [blockNumber_ASC, account_ASC],
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { address_eq: "${address}" }
     ) {
       id
@@ -210,7 +210,7 @@ const arm = (prefix: string, armAddress: string) => {
     gql(`
       ${prefix}_armStates: armStates(
         limit: ${LIMIT},
-        orderBy: id_ASC,
+        orderBy: [blockNumber_ASC, id_ASC],
         where: { address_eq: "${armAddress}" }
       ) {
         id
@@ -234,7 +234,7 @@ const arm = (prefix: string, armAddress: string) => {
     gql(`
       ${prefix}_armWithdrawalRequests: armWithdrawalRequests(
         limit: ${LIMIT},
-        orderBy: id_ASC,
+        orderBy: [blockNumber_ASC, id_ASC],
         where: { address_eq: "${armAddress}" }
       ) {
         id
@@ -253,7 +253,7 @@ const arm = (prefix: string, armAddress: string) => {
     gql(`
       ${prefix}_armDailyStats: armDailyStats(
         limit: ${LIMIT},
-        orderBy: id_ASC,
+        orderBy: [blockNumber_ASC, id_ASC],
         where: { address_eq: "${armAddress}" }
       )  {
         id
@@ -283,7 +283,7 @@ const ognDailyStats = () => {
   return gql(`
     ognDailyStats: ognDailyStats(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
     ) {
       id
       blockNumber
@@ -303,7 +303,7 @@ export const beaconDepositEvents = (address: string) => {
   return gql(`
     beaconDepositEvents: beaconDepositEvents(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { address_eq: "${address}" }
     ) {
       id
@@ -328,7 +328,7 @@ export const transactionDetails = (prefix: string, from: string) => {
   return gql(`
     ${prefix}_transactionDetails: transactionDetails(
       limit: ${LIMIT},
-      orderBy: id_ASC,
+      orderBy: [blockNumber_ASC, id_ASC],
       where: { from_eq: "${from}" }
     ) {
       id
@@ -350,7 +350,7 @@ const strategy = (prefix: string, strategies: string) => {
     gql(`
       strategyBalances_${prefix}: strategyBalances(
         limit: ${LIMIT},
-        orderBy: id_ASC,
+        orderBy: [blockNumber_ASC, id_ASC],
         where: { strategy_eq: "${strategies}" }
       ) {
         id
@@ -367,7 +367,7 @@ const strategy = (prefix: string, strategies: string) => {
     gql(`
       strategyDailyYields_${prefix}: strategyDailyYields(
         limit: ${LIMIT},
-        orderBy: id_ASC,
+        orderBy: [blockNumber_ASC, id_ASC],
         where: { strategy_eq: "${strategies}" }
       ) {
         id
