@@ -1,4 +1,5 @@
 import { parseEther } from 'viem'
+import { mainnet } from 'viem/_types/chains/definitions/mainnet'
 
 import { createOTokenProcessor } from '@templates/otoken'
 import {
@@ -10,6 +11,7 @@ import {
   USDT_ADDRESS,
   WOUSD_ADDRESS,
 } from '@utils/addresses'
+import { tokensByChain } from '@utils/tokensByChain'
 
 // export const from = 10884563 // https://etherscan.io/tx/0x9141921f5ebf072e58c00fe56332b6bee0c02f0ae4f54c42999b8a3a88662681
 // export const from = 11585978 // OUSDReset
@@ -28,6 +30,7 @@ export const { name, from, setup, process } = createOTokenProcessor({
   },
   dripper: {
     address: OUSD_DRIPPER_ADDRESS,
+    token: tokensByChain[mainnet.id].WETH,
     from: 14250273,
   },
   otokenVaultAddress: OUSD_VAULT_ADDRESS,

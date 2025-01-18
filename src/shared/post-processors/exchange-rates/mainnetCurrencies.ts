@@ -5,6 +5,8 @@ import {
 } from '@shared/post-processors/exchange-rates/price-routing-base'
 import { invertMap } from '@utils/invertMap'
 
+import { SonicCurrencyAddress, SonicCurrencySymbol } from './price-routing-sonic'
+
 export const mainnetCurrencies = {
   USD: '0x0000000000000000000000000000000000000348', // Chainlink Denominations.USD
   DAI: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -36,7 +38,7 @@ export type MainnetCurrencyAddress = (typeof mainnetCurrencies)[keyof typeof mai
 
 export type MainnetCurrency = MainnetCurrencySymbol | MainnetCurrencyAddress
 
-export type CurrencySymbol = MainnetCurrencySymbol | BaseCurrencySymbol
-export type CurrencyAddress = MainnetCurrencyAddress | BaseCurrencyAddress
+export type CurrencySymbol = MainnetCurrencySymbol | BaseCurrencySymbol | SonicCurrencySymbol
+export type CurrencyAddress = MainnetCurrencyAddress | BaseCurrencyAddress | SonicCurrencyAddress
 
 export type Currency = CurrencySymbol | CurrencyAddress

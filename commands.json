@@ -3,79 +3,42 @@
   "commands": {
     "clean": {
       "description": "delete all build artifacts",
-      "cmd": [
-        "npx",
-        "--yes",
-        "rimraf",
-        "lib"
-      ]
+      "cmd": ["npx", "--yes", "rimraf", "lib"]
     },
     "build": {
       "description": "Build the squid project",
-      "deps": [
-        "clean"
-      ],
-      "cmd": [
-        "tsc"
-      ]
+      "deps": ["clean"],
+      "cmd": ["tsc"]
     },
     "up": {
       "description": "Start a PG database",
-      "cmd": [
-        "docker-compose",
-        "up",
-        "-d"
-      ]
+      "cmd": ["docker-compose", "up", "-d"]
     },
     "down": {
       "description": "Drop a PG database",
-      "cmd": [
-        "docker-compose",
-        "down"
-      ]
+      "cmd": ["docker-compose", "down"]
     },
     "migration:apply": {
       "description": "Apply the DB migrations",
-      "cmd": [
-        "squid-typeorm-migration",
-        "apply"
-      ]
+      "cmd": ["squid-typeorm-migration", "apply"]
     },
     "migration:generate": {
       "description": "Generate a DB migration matching the TypeORM entities",
-      "deps": [
-        "build",
-        "migration:clean"
-      ],
-      "cmd": [
-        "squid-typeorm-migration",
-        "generate"
-      ]
+      "deps": ["build", "migration:clean"],
+      "cmd": ["squid-typeorm-migration", "generate"]
     },
     "migration:clean": {
       "description": "Clean the migrations folder",
-      "cmd": [
-        "npx",
-        "--yes",
-        "rimraf",
-        "./db/migrations"
-      ]
+      "cmd": ["npx", "--yes", "rimraf", "./db/migrations"]
     },
     "migration": {
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "squid-typeorm-migration",
-        "generate"
-      ],
+      "deps": ["build"],
+      "cmd": ["squid-typeorm-migration", "generate"],
       "hidden": true
     },
     "codegen": {
       "description": "Generate TypeORM entities from the schema file",
-      "cmd": [
-        "squid-typeorm-codegen"
-      ]
+      "cmd": ["squid-typeorm-codegen"]
     },
     "typegen": {
       "description": "Generate data access classes for an ABI file(s) in the ./abi folder",
@@ -90,178 +53,94 @@
     },
     "process": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build",
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main.js"
-      ]
+      "deps": ["build", "migration:apply"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main.js"]
     },
     "process:arbitrum": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-arbitrum.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-arbitrum.js"]
     },
     "process:base": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-base.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-base.js"]
+    },
+    "process:sonic": {
+      "description": "Load .env and start the squid processor",
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-sonic.js"]
     },
     "process:oeth": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-oeth.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-oeth.js"]
     },
     "process:ousd": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-ousd.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-ousd.js"]
     },
     "process:ogv": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-ogv.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-ogv.js"]
     },
     "process:mainnet": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-mainnet.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-mainnet.js"]
     },
     "process:test": {
       "description": "Load .env and start the squid processor",
-      "deps": [
-        "build"
-      ],
-      "cmd": [
-        "node",
-        "--require=dotenv/config",
-        "--require=tsconfig-paths/register",
-        "lib/main-test.js"
-      ]
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-test.js"]
     },
     "process:arbitrum:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-arbitrum.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-arbitrum.js"],
       "hidden": true
     },
     "process:base:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-base.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-base.js"],
+      "hidden": true
+    },
+    "process:sonic:prod": {
+      "description": "Start the squid processor",
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-sonic.js"],
       "hidden": true
     },
     "process:oeth:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-oeth.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-oeth.js"],
       "hidden": true
     },
     "process:ousd:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-ousd.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-ousd.js"],
       "hidden": true
     },
     "process:ogv:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-ogv.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-ogv.js"],
       "hidden": true
     },
     "process:mainnet:prod": {
       "description": "Start the squid processor",
-      "deps": [
-        "migration:apply"
-      ],
-      "cmd": [
-        "node",
-        "--require=tsconfig-paths/register",
-        "lib/main-mainnet.js"
-      ],
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-mainnet.js"],
       "hidden": true
     },
     "serve": {
       "description": "Start the GraphQL API server",
-      "cmd": [
-        "squid-graphql-server"
-      ]
+      "cmd": ["squid-graphql-server"]
     },
     "serve:prod": {
       "description": "Start the GraphQL API server with caching and limits",
@@ -278,33 +157,17 @@
       ]
     },
     "check-updates": {
-      "cmd": [
-        "npx",
-        "--yes",
-        "npm-check-updates",
-        "--filter=/subsquid/",
-        "--upgrade"
-      ],
+      "cmd": ["npx", "--yes", "npm-check-updates", "--filter=/subsquid/", "--upgrade"],
       "hidden": true
     },
     "bump": {
       "description": "Bump @subsquid packages to the latest versions",
-      "deps": [
-        "check-updates"
-      ],
-      "cmd": [
-        "npm",
-        "i",
-        "-f"
-      ]
+      "deps": ["check-updates"],
+      "cmd": ["npm", "i", "-f"]
     },
     "open": {
       "description": "Open a local browser window",
-      "cmd": [
-        "npx",
-        "--yes",
-        "opener"
-      ]
+      "cmd": ["npx", "--yes", "opener"]
     }
   }
 }

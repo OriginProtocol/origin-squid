@@ -1,10 +1,12 @@
 import { parseEther } from 'viem'
+import { base } from 'viem/chains'
 
 import { getPositions } from '@templates/aerodrome/lp'
 import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
+import { tokensByChain } from '@utils/tokensByChain'
 
 const otokenProcessor = createOTokenProcessor({
   name: 'Super OETHb',
@@ -18,6 +20,7 @@ const otokenProcessor = createOTokenProcessor({
   },
   dripper: {
     address: baseAddresses.superOETHb.dripper,
+    token: tokensByChain[base.id].WETH,
     from: 18215706,
   },
   harvester: {

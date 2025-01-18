@@ -13,6 +13,7 @@
     "serve": "sqd serve",
     "process:arbitrum": "sqd process:arbitrum",
     "process:base": "sqd process:base",
+    "process:sonic": "sqd process:sonic",
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
@@ -22,7 +23,6 @@
     "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts"
   },
   "dependencies": {
-    "@subsquid/archive-registry": "^3.3.2",
     "@subsquid/evm-processor": "^1.26.1",
     "@subsquid/graphql-server": "^4.9.0",
     "@subsquid/typeorm-migration": "^1.3.0",
@@ -42,7 +42,7 @@
     "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.16",
     "uuid": "^9.0.0",
-    "viem": "^1.10.13"
+    "viem": "^1.21.4"
   },
   "devDependencies": {
     "@subsquid/evm-typegen": "^4.3.0",

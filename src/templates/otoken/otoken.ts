@@ -37,15 +37,19 @@ import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchang
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS, OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
+import { sonicAddresses } from '@utils/addresses-sonic'
 import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { DECIMALS_18 } from '@utils/constants'
 import { logFilter } from '@utils/logFilter'
 import { multicall } from '@utils/multicall'
-import { tokensByChain } from '@utils/tokensByChain'
 
 import { createAddress, createRebaseAPY } from './utils'
 
-export type OTokenContractAddress = typeof OUSD_ADDRESS | typeof OETH_ADDRESS | typeof baseAddresses.superOETHb.address
+export type OTokenContractAddress =
+  | typeof OUSD_ADDRESS
+  | typeof OETH_ADDRESS
+  | typeof baseAddresses.superOETHb.address
+  | typeof sonicAddresses.tokens.OS
 
 export const createOTokenProcessor = (params: {
   name: string
@@ -61,6 +65,7 @@ export const createOTokenProcessor = (params: {
   dripper?: {
     address: string
     from: number
+    token: string
     perSecondStartingBlock?: number
   }
   harvester?: {
@@ -978,7 +983,7 @@ export const createOTokenProcessor = (params: {
           dripperContract.dripDuration(),
           dripperContract.drip(),
           dripperContract.availableFunds(),
-          new erc20.Contract(ctx, block.header, tokensByChain[ctx.chain.id].WETH).balanceOf(params.dripper.address),
+          new erc20.Contract(ctx, block.header, params.dripper.token).balanceOf(params.dripper.address),
         ])
         result.dripperStates.push(
           new OTokenDripperState({

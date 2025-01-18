@@ -21,6 +21,7 @@ import {
   WETH_ADDRESS,
 } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
+import { sonicAddresses } from '@utils/addresses-sonic'
 import { blockFrequencyTracker } from '@utils/blockFrequencyUpdater'
 import { logFilter } from '@utils/logFilter'
 import { convertDecimals, lastExcept } from '@utils/utils'
@@ -87,6 +88,12 @@ const oTokenValues = {
     rewardConversionTokenDecimals: 18,
     harvester: [baseAddresses.multisig['2/8'], baseAddresses.multisig['multichain-guardian']],
     dripper: baseAddresses.superOETHb.dripper,
+  },
+  [sonicAddresses.OS.address]: {
+    rewardConversionToken: sonicAddresses.tokens.wS,
+    rewardConversionTokenDecimals: 18,
+    harvester: [sonicAddresses.OS.harvester],
+    dripper: sonicAddresses.OS.dripper,
   },
 } as const
 

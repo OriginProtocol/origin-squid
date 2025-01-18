@@ -1,4 +1,5 @@
 import { parseEther } from 'viem'
+import { mainnet } from 'viem/chains'
 
 import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
@@ -26,6 +27,7 @@ import {
   WSTETH_ADDRESS,
   strategies,
 } from '@utils/addresses'
+import { tokensByChain } from '@utils/tokensByChain'
 
 const otokenProcessor = createOTokenProcessor({
   name: 'OETH',
@@ -39,6 +41,7 @@ const otokenProcessor = createOTokenProcessor({
   },
   dripper: {
     address: OETH_DRIPPER_ADDRESS,
+    token: tokensByChain[mainnet.id].WETH,
     from: 17067707,
   },
   otokenVaultAddress: OETH_VAULT_ADDRESS,
