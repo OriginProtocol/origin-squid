@@ -3,25 +3,36 @@ import { Context } from '@processor'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { invertMap } from '@utils/invertMap'
 
-const ONE_S = 10n ** 18n
+const PRECISION_DECIMALS = 18n
+const PRECISION = 10n ** PRECISION_DECIMALS
 
-const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
+const createChainlinkPriceFeed = (address: string, decimals: bigint, from: number) => {
   return async (ctx: Context, height: number) => {
-    const feedContract = new eacAggregatorProxy.Contract(ctx, { height }, address)
-    const result = await feedContract.latestAnswer()
-    return result * 10n ** (18n - decimals)
+    if (height < from) return 0n
+    try {
+      const feedContract = new eacAggregatorProxy.Contract(ctx, { height }, address)
+      const result = await feedContract.latestAnswer()
+      return result * 10n ** (PRECISION_DECIMALS - decimals)
+    } catch (err) {
+      console.log('Failed to get price for: ', address, height)
+      throw err
+    }
   }
 }
 
 const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
-  // ETH_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
-  // superOETHb_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
-  // AERO_USD: createChainlinkPriceFeed('0x4EC5970fC728C5f65ba413992CD5fF6FD70fcfF0', 8n),
+  ETH_USD: createChainlinkPriceFeed('0x824364077993847f71293B24ccA8567c00c2de11', 8n, 3394229),
+  S_ETH: async (ctx, height) => {
+    const sUsd = await chainlinkPriceFeeds.S_USD(ctx, height)
+    const ethUsd = await chainlinkPriceFeeds.ETH_USD(ctx, height)
+    return (sUsd * PRECISION) / ethUsd
+  },
+  S_USD: createChainlinkPriceFeed('0xc76dfb89ff298145b417d221b2c747d84952e01d', 8n, 4189824),
 }
 
 export const sonicCurrenciesByAddress = invertMap(sonicAddresses.tokens)
 
-export type SonicCurrencySymbol = keyof typeof sonicAddresses.tokens | 'USD'
+export type SonicCurrencySymbol = keyof typeof sonicAddresses.tokens | 'USD' | 'S' | 'ETH'
 export type SonicCurrencyAddress = (typeof sonicAddresses.tokens)[keyof typeof sonicAddresses.tokens]
 export type SonicCurrency = SonicCurrencySymbol | SonicCurrencyAddress
 
@@ -44,5 +55,8 @@ export const getSonicPrice = async (ctx: Context, height: number, base: SonicCur
 export const translateSonicSymbol = (symbol: SonicCurrency): SonicCurrencySymbol => {
   symbol = sonicCurrenciesByAddress[symbol as SonicCurrencyAddress] || symbol
   if (symbol === 'USDC') return 'USD'
+  if (symbol === 'wS') return 'S'
+  if (symbol === 'OS') return 'S'
+  if (symbol === 'WETH') return 'ETH'
   return symbol
 }
