@@ -37,6 +37,9 @@ export const processStrategyDailyEarnings = async (ctx: Context, blocks: Block[]
         apy: latest?.apy ?? 0,
       })
       results.push(current)
+    } else {
+      current.blockNumber = block.header.height
+      current.timestamp = new Date(block.header.timestamp)
     }
 
     // Get the latest StrategyYield results.
