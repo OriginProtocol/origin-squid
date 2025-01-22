@@ -60,9 +60,9 @@ export const createOTokenWithdrawalsProcessor = ({
     log: Context['blocks'][number]['logs'][number],
   ) => {
     const data = oethVault.events.WithdrawalRequested.decode(log)
-
+    const id = `${ctx.chain.id}:${oTokenAddress}:${data._withdrawer.toLowerCase()}:${data._requestId}`
     const withdrawalRequest = new OTokenWithdrawalRequest({
-      id: `${data._withdrawer.toLowerCase()}:${data._requestId}`,
+      id,
       chainId: ctx.chain.id,
       blockNumber: block.header.height,
       timestamp: new Date(block.header.timestamp),
@@ -84,7 +84,7 @@ export const createOTokenWithdrawalsProcessor = ({
     log: Context['blocks'][number]['logs'][number],
   ) => {
     const data = oethVault.events.WithdrawalClaimed.decode(log)
-    const id = `${data._withdrawer.toLowerCase()}:${data._requestId}`
+    const id = `${ctx.chain.id}:${oTokenAddress}:${data._withdrawer.toLowerCase()}:${data._requestId}`
     let updated
     if (result.withdrawalRequests.has(id)) {
       updated = result.withdrawalRequests.get(id)
