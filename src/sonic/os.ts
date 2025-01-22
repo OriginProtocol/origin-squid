@@ -42,7 +42,7 @@ const otokenProcessor = createOTokenProcessor({
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
-  from: 17819702,
+  from: sonicAddresses.OS.initializeBlock,
   otokenAddress: sonicAddresses.tokens.OS,
   wotokenAddress: sonicAddresses.tokens.wOS,
   vaultAddress: sonicAddresses.OS.vault,
@@ -52,7 +52,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   oTokenAddress: sonicAddresses.OS.address,
   oTokenVaultAddress: sonicAddresses.OS.vault,
-  from: 21544908,
+  from: sonicAddresses.OS.initializeBlock,
 })
 
 export const OS = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor]
