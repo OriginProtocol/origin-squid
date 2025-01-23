@@ -1,10 +1,9 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, logFilter } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
 import { TokenAddress } from '@utils/symbols'
 
 /**

@@ -1,6 +1,6 @@
 import 'tsconfig-paths/register'
 
-import { defineSquidProcessor, run } from '@processor'
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 

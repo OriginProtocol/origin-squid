@@ -1,4 +1,4 @@
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 
 import { processCoingeckoData } from './coingecko'
 import { queryClient } from './queryClient'

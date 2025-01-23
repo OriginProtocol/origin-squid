@@ -1,10 +1,9 @@
 import * as aerodromeClPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromePoolAbi from '@abi/aerodrome-pool'
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Context } from '@processor'
+import { Context, invertMap } from '@originprotocol/squid-utils'
 import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
-import { invertMap } from '@utils/invertMap'
 
 const ONE_ETH = 10n ** 18n
 

@@ -1,7 +1,6 @@
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
-import { Block, Context } from '@processor'
+import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
 import { baseAddresses } from '@utils/addresses-base'
-import { useProcessorState } from '@utils/state'
 
 export const getVoterTotalWeight = async (ctx: Context, block: Block) => {
   const [totalWeight, setTotalWeight] = useProcessorState<bigint | undefined>(ctx, 'aerodrome-totalWeight')

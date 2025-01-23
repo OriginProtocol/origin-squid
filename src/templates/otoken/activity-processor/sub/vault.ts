@@ -3,11 +3,11 @@ import { uniq } from 'lodash'
 import * as otokenVaultAbi from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
 import { OTokenActivity } from '@model'
+import { logFilter } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { MintActivity, RedeemActivity } from '@templates/otoken/activity-types'
 import { ETH_ADDRESS } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
 
 export const vaultActivityProcessor = ({
   otokenAddress,

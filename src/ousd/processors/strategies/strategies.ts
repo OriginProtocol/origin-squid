@@ -1,4 +1,4 @@
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'

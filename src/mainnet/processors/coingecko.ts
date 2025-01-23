@@ -1,5 +1,5 @@
 import { CoinGeckoCoinData } from '@model'
-import { defineProcessor } from '@processor'
+import { defineProcessor } from '@originprotocol/squid-utils'
 import { CoingeckoDataOutput } from '@utils/coingecko'
 import { getCoingeckoData } from '@utils/coingecko2'
 

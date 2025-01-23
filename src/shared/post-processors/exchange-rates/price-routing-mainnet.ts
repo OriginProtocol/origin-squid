@@ -9,7 +9,7 @@ import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
 import * as woethAbi from '@abi/woeth'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
 import {

@@ -1,7 +1,7 @@
 import { compact, groupBy } from 'lodash'
 
 import { OTokenActivity } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { approvalActivityProcessor } from '@templates/otoken/activity-processor/sub/approval'
 import { balancerActivityProcessor } from '@templates/otoken/activity-processor/sub/balancer'

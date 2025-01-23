@@ -2,8 +2,7 @@ import { pick } from 'lodash'
 
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as models from '@model'
-import { Block, Context, Log, Processor } from '@processor'
-import { logFilter } from '@utils/logFilter'
+import { Block, Context, Log, Processor, logFilter } from '@originprotocol/squid-utils'
 
 export const aerodromeVoter = (params: { address: string; pools: string[]; from: number }): Processor => {
   const aeroVoterEvents = pick(aerodromeVoterAbi.events, ['Voted', 'Abstained'])

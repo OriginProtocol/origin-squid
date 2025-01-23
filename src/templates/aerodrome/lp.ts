@@ -1,9 +1,7 @@
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import { AeroLP, AeroLPPosition } from '@model'
-import { Block, Context, Processor } from '@processor'
+import { Block, Context, Processor, blockFrequencyUpdater, multicall } from '@originprotocol/squid-utils'
 import { PoolDefinition, aerodromePools, baseAddresses } from '@utils/addresses-base'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { multicall } from '@utils/multicall'
 
 // For AMM Pools the sugar contract iterates through all the pools, according to the pool indices.
 // To shortcut - we can supply accurate offsets and limits.

@@ -1,6 +1,4 @@
-import { Context, Processor } from '@processor'
-
-import { LogFilter } from './logFilter'
+import { Context, LogFilter, Processor } from '@originprotocol/squid-utils'
 
 /**
  * *** not fully tested ***

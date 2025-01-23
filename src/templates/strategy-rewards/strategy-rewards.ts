@@ -1,6 +1,6 @@
 import * as iat from '@abi/initializable-abstract-strategy'
 import { OTokenRewardTokenCollected } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 export const createStrategyRewardSetup = ({ address, from }: { address: string; from: number }) => {

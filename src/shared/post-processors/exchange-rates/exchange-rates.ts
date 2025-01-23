@@ -2,9 +2,8 @@ import { compact } from 'lodash'
 import { LessThanOrEqual } from 'typeorm'
 
 import { ExchangeRate } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
 import { getPrice, translateSymbol } from '@shared/post-processors/exchange-rates/price-routing'
-import { useProcessorState } from '@utils/state'
 
 import { Currency } from './mainnetCurrencies'
 

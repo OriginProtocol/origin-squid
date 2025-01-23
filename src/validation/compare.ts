@@ -2,7 +2,7 @@ import assert from 'assert'
 import { detailedDiff } from 'deep-object-diff'
 import { pick } from 'lodash'
 
-import { jsonify } from '@utils/jsonify'
+import { jsonify } from '@originprotocol/squid-utils'
 
 export const compare = (expectation: any, actual: any) => {
   // We decide to only care about float decimal accuracy to the 8th.

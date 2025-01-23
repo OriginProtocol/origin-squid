@@ -1,11 +1,9 @@
-import { Context } from '@processor'
+import { Context, LogFilter, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OTokenContractAddress } from '@templates/otoken'
 import { OETH_ADDRESS } from '@utils/addresses'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { LogFilter } from '@utils/logFilter'
 import { TraceFilter } from '@utils/traceFilter'
 
 import * as strategyBalancer from './strategy-balancer'

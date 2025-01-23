@@ -1,5 +1,5 @@
 import { TransactionDetails } from '@model'
-import { defineProcessor } from '@processor'
+import { defineProcessor } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 export const createTransactionProcessor = (params: { from: number; address: string[] }) => {

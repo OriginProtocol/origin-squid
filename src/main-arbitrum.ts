@@ -1,7 +1,7 @@
 import 'tsconfig-paths/register'
 import { arbitrum } from 'viem/chains'
 
-import { defineSquidProcessor, run } from '@processor'
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import { processStatus } from '@templates/processor-status/processor-status'
 
 import { arbitrumERC20s } from './arbitrum'

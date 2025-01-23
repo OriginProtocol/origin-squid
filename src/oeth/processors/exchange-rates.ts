@@ -1,7 +1,6 @@
-import { Context } from '@processor'
+import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
 export const from = 16933090 // OETH Deploy
 

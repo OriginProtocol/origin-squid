@@ -6,9 +6,9 @@
 // import * as curveLpAbi from '@abi/curve-lp-token.abi'
 // import * as oethAbi from '@abi/oeth.abi'
 // import * as oethVaultAbi from '@abi/otoken-vault.abi'
-// import { Block, Context, Log } from '@processor'
+// import { Block, Context, Log } from '@originprotocol/squid-utils'
 // import { Activity, SwapActivity } from '@templates/otoken/activity-types'
-// import { logFilter } from '@utils/logFilter'
+// import { logFilter } from '@originprotocol/squid-utils'
 //
 // import {
 //   BALANCER_VAULT_ADDRESS,

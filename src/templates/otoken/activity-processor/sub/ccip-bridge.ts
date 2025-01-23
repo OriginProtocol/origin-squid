@@ -1,9 +1,8 @@
 import { OTokenActivity } from '@model'
-import { Context } from '@processor'
+import { Context, waitForProcessorState } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { BridgeActivity } from '@templates/otoken/activity-types'
-import { waitForProcessorState } from '@utils/state'
 
 import { CCIPProcessorResult } from '../../../../oeth/processors/ccip'
 

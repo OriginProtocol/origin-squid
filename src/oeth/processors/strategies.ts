@@ -1,7 +1,7 @@
 import * as feeAccumulatorAbi from '@abi/fee-accumulator'
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createEventProcessor } from '@templates/events/createEventProcessor'

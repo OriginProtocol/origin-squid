@@ -1,6 +1,6 @@
 import 'tsconfig-paths/register'
 
-import { defineSquidProcessor, run } from '@processor'
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import { processStatus } from '@templates/processor-status'
 
 import * as dailyStats from './ogv/post-processors/daily-stats'

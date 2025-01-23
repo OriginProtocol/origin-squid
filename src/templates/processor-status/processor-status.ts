@@ -1,5 +1,5 @@
 import { ProcessingStatus } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 
 const processorIds = new Set<string>()
 

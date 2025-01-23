@@ -1,6 +1,7 @@
 import { base as baseChain, mainnet } from 'viem/chains'
+import { sonic } from 'viem/chains'
 
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { Currency, MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import {
   BaseCurrency,
@@ -8,7 +9,6 @@ import {
   translateBaseSymbol,
 } from '@shared/post-processors/exchange-rates/price-routing-base'
 import { getMainnetPrice, translateMainnetSymbol } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
-import { sonic } from '@utils/chains'
 
 import { SonicCurrency, getSonicPrice, translateSonicSymbol } from './price-routing-sonic'
 

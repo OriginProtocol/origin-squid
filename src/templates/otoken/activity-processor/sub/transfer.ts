@@ -1,12 +1,11 @@
 import * as otokenAbi from '@abi/otoken'
 import * as wotokenAbi from '@abi/woeth'
 import { OTokenActivity } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, logFilter } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { SwapActivity, TransferActivity } from '@templates/otoken/activity-types'
 import { ONEINCH_AGGREGATION_ROUTER_ADDRESS } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
 
 export const transferActivityProcessor = ({ otokenAddress }: { otokenAddress: string }): ActivityProcessor => {
   const transferFilter = logFilter({

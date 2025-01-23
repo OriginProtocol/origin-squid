@@ -10,12 +10,16 @@ import {
   ProtocolDailyStatDetail,
   StrategyBalance,
 } from '@model'
-import { Context, defineProcessor } from '@processor'
+import {
+  Context,
+  defineProcessor,
+  getDateForTimestamp,
+  getDatesBetween,
+  sumBigIntBy,
+} from '@originprotocol/squid-utils'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { OETH_ADDRESS, OUSD_ADDRESS, arm } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-import { getDateForTimestamp, getDatesBetween } from '@utils/dates'
-import { sumBigIntBy } from '@utils/math'
 
 const startDate = '2022-01-01'
 

@@ -1,9 +1,8 @@
 import crypto from 'crypto'
 
 import { OTokenActivity, OTokenActivityType } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, useProcessorState } from '@originprotocol/squid-utils'
 import { Activity } from '@templates/otoken/activity-types'
-import { useProcessorState } from '@utils/state'
 
 export const useActivityState = (ctx: Context) =>
   useProcessorState(ctx, 'activity-state', {

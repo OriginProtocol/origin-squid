@@ -1,12 +1,13 @@
+import { sonic } from 'viem/chains'
+
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards } from '@model'
-import { Context, defineProcessor } from '@processor'
+import { Context, defineProcessor } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import { sonicAddresses } from '@utils/addresses-sonic'
-import { sonic } from '@utils/chains'
 
 export const oethStrategies: readonly IStrategyData[] = [
   ...sonicAddresses.OS.strategies.map(

@@ -1,9 +1,7 @@
 import * as curveLpToken from '@abi/curve-lp-token'
 import { CurvePool, CurvePoolBalance, CurvePoolRate } from '@model'
-import { Context } from '@processor'
+import { Context, blockFrequencyUpdater, range } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { range } from '@utils/range'
 
 interface ProcessResult {
   curvePoolBalances: CurvePoolBalance[]

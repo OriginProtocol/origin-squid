@@ -1,10 +1,10 @@
 import { pad as viemPad } from 'viem'
 
 import * as aaveLendingPool from '@abi/aave-lending-pool'
+import { logFilter } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { IStrategyData } from '@templates/strategy'
 import { OUSD_ADDRESS } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
 
 import { DAI, USDT } from './const'
 

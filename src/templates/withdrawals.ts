@@ -1,8 +1,7 @@
 import * as oethVault from '@abi/oeth-vault'
 import { OTokenWithdrawalRequest } from '@model'
-import { Context } from '@processor'
+import { Context, logFilter } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { logFilter } from '@utils/logFilter'
 
 // export const from = 20428558
 

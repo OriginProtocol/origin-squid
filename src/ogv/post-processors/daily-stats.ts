@@ -1,13 +1,9 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import {
-  FindOptionsOrderValue,
-  LessThanOrEqual,
-  MoreThanOrEqual,
-} from 'typeorm'
+import { FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
 
 import { OGV, OGVAddress, OGVDailyStat } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { applyCoingeckoData } from '@utils/coingecko'
 
@@ -20,8 +16,7 @@ export const setup = async (processor: EvmBatchProcessor) => {
 }
 
 export const process = async (ctx: Context) => {
-  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)
-    ?.header.timestamp
+  const firstBlockTimestamp = ctx.blocks.find((b) => b.header.height >= from)?.header.timestamp
   if (!firstBlockTimestamp) return
 
   const firstBlock = ctx.blocks[0]
@@ -30,11 +25,7 @@ export const process = async (ctx: Context) => {
   const endDate = dayjs.utc(lastBlock.header.timestamp).endOf('day')
 
   let dates: Date[] = []
-  for (
-    let date = startDate;
-    !date.isAfter(endDate);
-    date = date.add(1, 'day').endOf('day')
-  ) {
+  for (let date = startDate; !date.isAfter(endDate); date = date.add(1, 'day').endOf('day')) {
     dates.push(date.toDate())
   }
 
@@ -55,9 +46,7 @@ export const process = async (ctx: Context) => {
     })) as OGVDailyStat[]
 
     const existingIds = dailyStats.map((stat) => stat.id)
-    dailyStats.push(
-      ...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0),
-    )
+    dailyStats.push(...updatedStats.filter((stat) => existingIds.indexOf(stat.id) < 0))
   }
 
   await ctx.store.upsert(dailyStats)

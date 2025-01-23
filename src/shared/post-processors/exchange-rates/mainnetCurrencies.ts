@@ -1,9 +1,9 @@
+import { invertMap } from '@originprotocol/squid-utils'
 import {
   BaseCurrencyAddress,
   BaseCurrencySymbol,
   baseCurrenciesByAddress,
 } from '@shared/post-processors/exchange-rates/price-routing-base'
-import { invertMap } from '@utils/invertMap'
 
 import { SonicCurrencyAddress, SonicCurrencySymbol } from './price-routing-sonic'
 

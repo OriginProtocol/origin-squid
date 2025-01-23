@@ -1,7 +1,7 @@
 import * as erc20Abi from '@abi/erc20'
 import * as veogvAbi from '@abi/veogv'
 import { OGVAddress, OGVLockup, OGVLockupEventType, OGVLockupTxLog } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
 

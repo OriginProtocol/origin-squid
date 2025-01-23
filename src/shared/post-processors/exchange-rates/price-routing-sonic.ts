@@ -1,7 +1,6 @@
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Context } from '@processor'
+import { Context, invertMap } from '@originprotocol/squid-utils'
 import { sonicAddresses } from '@utils/addresses-sonic'
-import { invertMap } from '@utils/invertMap'
 
 const PRECISION_DECIMALS = 18n
 const PRECISION = 10n ** PRECISION_DECIMALS

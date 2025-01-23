@@ -1,10 +1,9 @@
 import * as wotokenAbi from '@abi/woeth'
 import { OTokenActivity } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, logFilter } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
-import { createActivity, useActivityState } from '@templates/otoken/activity-processor/utils'
+import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { UnwrapActivity, WrapActivity } from '@templates/otoken/activity-types'
-import { logFilter } from '@utils/logFilter'
 
 export const wrappedActivityProcessor = ({
   otokenAddress,

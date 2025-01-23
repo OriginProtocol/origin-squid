@@ -3,7 +3,7 @@ import { mainnet } from 'viem/chains'
 
 import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'

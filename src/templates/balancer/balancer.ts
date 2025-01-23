@@ -4,12 +4,11 @@ import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import * as balancerWeightedPool from '@abi/balancer-weighted-pool-2-token'
 import { BalancerPool, BalancerPoolBalance, BalancerPoolRate } from '@model'
-import { Context } from '@processor'
+import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, BALANCER_VAULT } from '@utils/addresses'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 
 const eth1 = BigInt('1000000000000000000')
 

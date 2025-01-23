@@ -1,12 +1,9 @@
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, blockFrequencyUpdater, logFilter, multicall } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { logFilter } from '@utils/logFilter'
-import { multicall } from '@utils/multicall'
 import { TokenAddress } from '@utils/symbols'
 
 const duplicateTracker = new Set<string>()

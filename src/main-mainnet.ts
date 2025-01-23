@@ -3,7 +3,7 @@ import { originArmProcessors } from 'mainnet/processors/origin-arm'
 import { protocolProcessor } from 'mainnet/processors/protocol'
 import 'tsconfig-paths/register'
 
-import { defineSquidProcessor, run } from '@processor'
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'

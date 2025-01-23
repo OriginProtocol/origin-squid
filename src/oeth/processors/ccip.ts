@@ -3,11 +3,9 @@ import * as ccipOnRampAbi from '@abi/ccip-evm2evmonramp'
 import * as ccipRouter from '@abi/ccip-router'
 import * as erc20Abi from '@abi/erc20'
 import { BridgeTransfer, BridgeTransferState } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, logFilter, publishProcessorState } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { WOETH_ADDRESS, WOETH_ARBITRUM_ADDRESS } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
-import { publishProcessorState } from '@utils/state'
 import { traceFilter } from '@utils/traceFilter'
 
 // Code Reference: https://github.com/smartcontractkit/smart-contract-examples/tree/main/ccip-offchain

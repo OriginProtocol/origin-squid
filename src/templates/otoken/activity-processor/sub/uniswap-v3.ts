@@ -1,10 +1,9 @@
 import * as uniswapV3Abi from '@abi/uniswap-v3'
 import { OTokenActivity } from '@model'
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, logFilter } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { SwapActivity } from '@templates/otoken/activity-types'
-import { logFilter } from '@utils/logFilter'
 
 export const uniswapV3ActivityProcessor = ({
   otokenAddress,

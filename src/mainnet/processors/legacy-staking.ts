@@ -1,6 +1,6 @@
 import * as legacyStakingAbi from '@abi/legacy-staking'
 import { LegacyStaker } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { LEGACY_OGN_STAKING } from '@utils/addresses'
 

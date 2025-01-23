@@ -2,13 +2,11 @@ import * as aerodromePoolAbi from '@abi/aerodrome-pool'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import * as models from '@model'
 import { AeroPoolEpochState, AeroPoolState } from '@model'
-import { Block, Context, Log, Processor } from '@processor'
+import { Block, Context, Log, Processor, blockFrequencyUpdater, logFilter } from '@originprotocol/squid-utils'
 import { convertRate } from '@shared/post-processors/exchange-rates'
 import { createAeroPoolEpoch } from '@templates/aerodrome/epoch'
 import { getVoterTotalWeight } from '@templates/aerodrome/shared'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
-import { logFilter } from '@utils/logFilter'
 
 export const aerodromePool = (params: PoolDefinition): Processor => {
   const eventProcessors = Object.entries(aerodromePoolAbi.events).map(([eventName, event]) => {

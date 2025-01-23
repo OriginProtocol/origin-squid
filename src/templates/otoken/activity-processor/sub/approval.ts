@@ -1,9 +1,9 @@
 import * as otokenAbi from '@abi/otoken'
 import { OTokenActivity } from '@model'
+import { logFilter } from '@originprotocol/squid-utils'
 import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { ApprovalActivity } from '@templates/otoken/activity-types'
-import { logFilter } from '@utils/logFilter'
 
 export const approvalActivityProcessor = ({ otokenAddress }: { otokenAddress: string }): ActivityProcessor => {
   const approvalFilter = logFilter({ address: [otokenAddress], topic0: [otokenAbi.events.Approval.topic] })

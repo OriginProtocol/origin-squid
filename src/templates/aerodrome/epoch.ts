@@ -1,6 +1,6 @@
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import { AeroPoolEpochState, TokenAmount } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context } from '@originprotocol/squid-utils'
 import { baseAddresses } from '@utils/addresses-base'
 
 const sugarDeployBlock = 16962730

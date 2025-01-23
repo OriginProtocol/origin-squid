@@ -1,4 +1,5 @@
 import { parseEther } from 'viem'
+import { mainnet } from 'viem/chains'
 
 import { createOTokenProcessor } from '@templates/otoken'
 import {
@@ -10,7 +11,6 @@ import {
   USDT_ADDRESS,
   WOUSD_ADDRESS,
 } from '@utils/addresses'
-import { mainnet } from '@utils/chains'
 import { tokensByChain } from '@utils/tokensByChain'
 
 // export const from = 10884563 // https://etherscan.io/tx/0x9141921f5ebf072e58c00fe56332b6bee0c02f0ae4f54c42999b8a3a88662681

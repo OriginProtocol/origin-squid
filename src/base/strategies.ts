@@ -1,4 +1,4 @@
-import { defineProcessor } from '@processor'
+import { defineProcessor } from '@originprotocol/squid-utils'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import { baseAddresses } from '@utils/addresses-base'

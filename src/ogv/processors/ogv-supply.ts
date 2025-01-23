@@ -1,6 +1,6 @@
 import * as erc20Abi from '@abi/erc20'
 import { OGV } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
 

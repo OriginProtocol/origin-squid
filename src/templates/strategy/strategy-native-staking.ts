@@ -1,12 +1,11 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
-import { Context } from '@processor'
+import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { convertRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData } from '@templates/strategy/strategy'
 import { processStrategyEarnings, setupStrategyEarnings } from '@templates/strategy/strategy-earnings'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { addressToSymbol } from '@utils/symbols'
 
 export const setup = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {

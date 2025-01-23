@@ -1,10 +1,8 @@
 import * as beaconAbi from '@abi/beacon-deposit-contract'
 import { BeaconDepositEvent, BeaconDepositPubkey } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, logFilter, readLinesFromUrlInBatches } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OETH_NATIVE_STRATEGIES } from '@utils/addresses'
-import { logFilter } from '@utils/logFilter'
-import { readLinesFromUrlInBatches } from '@utils/readLinesFromUrlInBatches'
 
 export const from = 20029793 // Dump contains pubkeys up until 20029793.
 

@@ -1,10 +1,6 @@
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import {
-  createCurveInitializer,
-  createCurveProcessor,
-  createCurveSetup,
-} from '@templates/curve'
+import { createCurveInitializer, createCurveProcessor, createCurveSetup } from '@templates/curve'
 import { tokens } from '@utils/addresses'
 
 const ousdResetFrom = 11585978
@@ -12,8 +8,7 @@ const oethDeployFrom = 16933090
 
 export const from = Math.min(ousdResetFrom, oethDeployFrom)
 
-const pools: (Parameters<typeof createCurveInitializer>['0'] &
-  Parameters<typeof createCurveProcessor>['0'])[] = [
+const pools: (Parameters<typeof createCurveInitializer>['0'] & Parameters<typeof createCurveProcessor>['0'])[] = [
   // Curve (OUSD)
   {
     name: 'ThreePool',

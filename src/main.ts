@@ -1,6 +1,6 @@
 import 'tsconfig-paths/register'
 
-import { run } from '@processor'
+import { run } from '@originprotocol/squid-utils'
 
 import arbitrum from './main-arbitrum'
 import base from './main-base'

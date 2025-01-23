@@ -1,6 +1,5 @@
 import { ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
-import { Context } from '@processor'
-import { publishProcessorState, waitForProcessorState } from '@utils/state'
+import { Context, publishProcessorState, waitForProcessorState } from '@originprotocol/squid-utils'
 
 interface State {
   states: Map<string, ERC20State>

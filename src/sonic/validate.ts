@@ -1,4 +1,4 @@
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { Entity, EntityClass } from '@subsquid/typeorm-store/lib/store'
 import { validateBlocks } from '@validation/validate'
 

@@ -1,4 +1,4 @@
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 

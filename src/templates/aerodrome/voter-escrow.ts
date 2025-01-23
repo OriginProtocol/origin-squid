@@ -1,7 +1,6 @@
 import * as aerodromeVoterEscrowAbi from '@abi/aerodrome-voter-escrow'
 import * as models from '@model'
-import { Block, Context, Log, Processor } from '@processor'
-import { logFilter } from '@utils/logFilter'
+import { Block, Context, Log, Processor, logFilter } from '@originprotocol/squid-utils'
 
 export const aerodromeVoterEscrow = (params: { address: string; from: number }): Processor => {
   const aeroVoterEvents = aerodromeVoterEscrowAbi.events

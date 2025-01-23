@@ -1,6 +1,5 @@
 import { OTokenActivity } from '@model'
-import { Block, Context, Log } from '@processor'
-import { LogFilter } from '@utils/logFilter'
+import { Block, Context, Log, LogFilter } from '@originprotocol/squid-utils'
 
 export interface ActivityProcessor {
   name: string

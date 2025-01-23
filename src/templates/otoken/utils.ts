@@ -5,11 +5,10 @@ import { In, LessThan, MoreThanOrEqual, Not } from 'typeorm'
 
 import * as otoken from '@abi/otoken'
 import { OTokenAPY, OTokenAddress, OTokenRebase, RebasingOption } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, calculateAPY } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
-import { calculateAPY } from '@utils/calculateAPY'
 
 dayjs.extend(utc)
 

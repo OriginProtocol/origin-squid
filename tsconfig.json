@@ -16,7 +16,6 @@
     "paths": {
       "@abi/*": ["abi/*"],
       "@model": ["model"],
-      "@processor": ["processor"],
       "@shared/*": ["shared/*"],
       "@templates/*": ["templates/*"],
       "@utils/*": ["utils/*"],

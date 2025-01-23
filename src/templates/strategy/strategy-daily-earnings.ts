@@ -3,8 +3,7 @@ import { Between, LessThan, LessThanOrEqual } from 'typeorm'
 import { parseEther } from 'viem'
 
 import { StrategyDailyYield, StrategyYield } from '@model'
-import { Block, Context } from '@processor'
-import { calculateAPY } from '@utils/calculateAPY'
+import { Block, Context, calculateAPY } from '@originprotocol/squid-utils'
 import { lastExcept, max } from '@utils/utils'
 
 import { IStrategyData } from './strategy'

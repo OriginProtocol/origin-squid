@@ -5,7 +5,7 @@ import { createPublicClient, fallback, formatEther, getContract, http, parseAbi 
 import { mainnet } from 'viem/chains'
 
 import * as Erc20ABI from '@abi/erc20.abi'
-import { chainConfigs } from '@processor'
+import { chainConfigs } from '@originprotocol/squid-utils'
 import { OGN_ADDRESS } from '@utils/addresses'
 
 import './fetch-polyfill'
@@ -18,7 +18,7 @@ const publicClient = createPublicClient({
 const ogn = getContract({
   address: OGN_ADDRESS,
   abi: Erc20ABI.ABI_JSON,
-  publicClient,
+  client: publicClient,
 })
 
 @ObjectType()
@@ -105,7 +105,7 @@ async function getCirculatingSupply(): Promise<number> {
     })),
   ] as never
 
-  const balances = await publicClient.multicall({ contracts: contractCalls })
+  const balances = await publicClient.multicall<{ result: bigint }[]>({ contracts: contractCalls })
 
   const circulatingSupply = balances.slice(1).reduce((m, o) => {
     if (o.status !== 'success') return m

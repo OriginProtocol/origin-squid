@@ -1,11 +1,9 @@
 import * as metaMorpho from '@abi/meta-morpho'
 import * as morpho from '@abi/morpho'
 import { MorphoMarketState } from '@model'
-import { Context } from '@processor'
+import { Context, multicall, range } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { META_MORPHO_ADDRESS, MORPHO_ADDRESS } from '@utils/addresses'
-import { multicall } from '@utils/multicall'
-import { range } from '@utils/range'
 
 const from = 20685100
 

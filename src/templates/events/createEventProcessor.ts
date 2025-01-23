@@ -1,10 +1,9 @@
-import { Block, Context, Log } from '@processor'
+import { Block, Context, Log, logFilter } from '@originprotocol/squid-utils'
 import { event } from '@subsquid/evm-abi'
 import { IndexedCodecs } from '@subsquid/evm-abi/lib/abi-components/event'
 import { DecodedStruct, Struct } from '@subsquid/evm-codec'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { Entity } from '@subsquid/typeorm-store/lib/store'
-import { logFilter } from '@utils/logFilter'
 
 export const createEventProcessor = <T extends Struct, EventEntity extends Entity>(params: {
   name?: string

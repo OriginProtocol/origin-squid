@@ -1,8 +1,8 @@
 // Fix RPC issues
 // import * as fs from 'node:fs'
+import { processingStats } from '@originprotocol/squid-utils'
 import { CallOptions, RpcClient } from '@subsquid/rpc-client'
 import { RpcCall } from '@subsquid/rpc-client/src/interfaces'
-import { processingStats } from '@utils/processing-stats'
 
 ;(RpcClient.prototype as any)._call = RpcClient.prototype.call
 ;(RpcClient.prototype as any)._batchCall = RpcClient.prototype.batchCall

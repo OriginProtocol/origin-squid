@@ -1,8 +1,7 @@
 import * as aerodromeCLGaugeAbi from '@abi/aerodrome-cl-gauge'
 import * as models from '@model'
-import { Block, Context, Log, Processor } from '@processor'
+import { Block, Context, Log, Processor, logFilter } from '@originprotocol/squid-utils'
 import { PoolDefinition } from '@utils/addresses-base'
-import { logFilter } from '@utils/logFilter'
 
 export const aerodromeCLGauge = (params: NonNullable<PoolDefinition['gauge']>): Processor => {
   const eventProcessors = Object.entries(aerodromeCLGaugeAbi.events).map(([eventName, event]) => {

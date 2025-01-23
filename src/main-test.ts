@@ -3,7 +3,7 @@ import { formatUnits } from 'viem'
 
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
-import { Context, run } from '@processor'
+import { Context, run } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { priceMap } from '@shared/post-processors/exchange-rates/price-routing-mainnet'

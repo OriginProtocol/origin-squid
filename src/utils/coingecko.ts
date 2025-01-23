@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { Between, LessThanOrEqual } from 'typeorm'
 
 import { OGNDailyStat, OGVDailyStat } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { queryClient } from '@utils/queryClient'
 import { EntityClassT } from '@utils/type'
 

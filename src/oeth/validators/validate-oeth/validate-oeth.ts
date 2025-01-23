@@ -7,7 +7,7 @@ import {
   StrategyBalance,
   StrategyDailyYield,
 } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { entities } from '@validation/entities'
 import { validateBlocks } from '@validation/validate'
 

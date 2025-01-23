@@ -4,7 +4,7 @@ import { FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm
 import { formatEther } from 'viem'
 
 import { ERC20Balance, ERC20Holder, ERC20State, OGNDailyStat } from '@model'
-import { Context } from '@processor'
+import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { getCoingeckoData } from '@utils/coingecko2'
 

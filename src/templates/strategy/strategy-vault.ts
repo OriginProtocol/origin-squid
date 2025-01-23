@@ -1,10 +1,9 @@
 import * as erc20 from '@abi/erc20'
 import { StrategyBalance } from '@model'
-import { Block, Context } from '@processor'
+import { Block, Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { convertRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { blockFrequencyUpdater } from '@utils/blockFrequencyUpdater'
 import { addressToSymbol } from '@utils/symbols'
 import { convertDecimals } from '@utils/utils'
 
