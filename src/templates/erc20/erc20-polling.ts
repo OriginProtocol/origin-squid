@@ -151,6 +151,7 @@ export const createERC20PollingTracker = ({
                 chainId: ctx.chain.id,
                 address,
                 account,
+                since: new Date(block.header.timestamp),
                 balance: balance.balance,
               })
               if (!holders.has(account)) {

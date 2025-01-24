@@ -201,6 +201,7 @@ export const createOTokenProcessor = (params: {
   }
 
   let owners: Map<string, OTokenAddress> | undefined = undefined
+  let ownerSince = new Map<string, Date>()
   let ownersHistorical: OTokenAddress[] = []
 
   let idMap: Map<string, number>
@@ -399,6 +400,11 @@ export const createOTokenProcessor = (params: {
           }),
         )
         address.credits = BigInt(credits[0]) // token credits
+        if (address.balance === 0n && newBalance > 0n) {
+          ownerSince.set(address.address, new Date(block.header.timestamp))
+        } else if (newBalance === 0n) {
+          ownerSince.delete(address.address)
+        }
         address.balance = newBalance // token balance
       }
 
@@ -1127,6 +1133,7 @@ export const createOTokenProcessor = (params: {
         chainId: ctx.chain.id,
         address: owner.otoken,
         account: owner.address,
+        since: ownerSince.get(owner.address),
         balance: owner.balance,
       })
       result.erc20.holders.set(erc20Holder.id, erc20Holder)

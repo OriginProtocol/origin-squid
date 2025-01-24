@@ -104,7 +104,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
           }),
         )
       }
-      const getHolder = async (ctx: Context, account: string) => {
+      const getHolder = async (ctx: Context, account: string, block: Block) => {
         if (account === ADDRESS_ZERO) return undefined
         const id = `${ctx.chain.id}-${address}-${account}`
         if (result.holders.has(id)) {
@@ -122,6 +122,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
           chainId: ctx.chain.id,
           address,
           account,
+          since: new Date(block.header.timestamp),
           balance: 0n,
         })
         result.holders.set(id, holder)
@@ -157,8 +158,8 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
 
             const [state, fromHolder, toHolder] = await Promise.all([
               await getState(ctx, block),
-              await getHolder(ctx, from),
-              await getHolder(ctx, to),
+              await getHolder(ctx, from, block),
+              await getHolder(ctx, to, block),
             ])
             // Handle Total Supply Changes
             if (from === ADDRESS_ZERO) {

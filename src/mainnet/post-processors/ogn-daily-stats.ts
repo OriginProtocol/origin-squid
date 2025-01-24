@@ -63,6 +63,7 @@ async function createDailyStat(ctx: Context, date: Date) {
     ctx.store.countBy(ERC20Holder, {
       balance: MoreThanOrEqual(10n ** 20n),
       address: '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26',
+      since: LessThanOrEqual(date),
     }), // 100 OGN
     ctx.store.findOne(ERC20State, {
       where: {

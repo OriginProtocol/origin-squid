@@ -12,6 +12,7 @@ type ERC20Holder @entity {
   chainId: Int! @index
   address: String! @index
   account: String! @index
+  since: DateTime! @index
   balance: BigInt!
 }
 

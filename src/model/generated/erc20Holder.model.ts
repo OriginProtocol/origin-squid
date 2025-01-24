@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class ERC20Holder {
@@ -20,6 +20,10 @@ export class ERC20Holder {
     @Index_()
     @StringColumn_({nullable: false})
     account!: string
+
+    @Index_()
+    @DateTimeColumn_({nullable: false})
+    since!: Date
 
     @BigIntColumn_({nullable: false})
     balance!: bigint
