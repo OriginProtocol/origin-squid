@@ -1025,11 +1025,12 @@ export const createOTokenProcessor = (params: {
       entity.nonRebasingSupply = otokenObject.nonRebasingSupply ?? 0n
       entity.rebasingSupply = otokenObject.rebasingSupply ?? 0n
 
-      let apy = findLast(result.apies, (apy) => apy.timestamp <= blockDate)
+      const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
+      let apy = findLast(result.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
       if (!apy) {
         apy = await ctx.store.findOne(OTokenAPY, {
           order: { timestamp: 'desc' },
-          where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: LessThanOrEqual(blockDate) },
+          where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
         })
       }
       if (apy) {
@@ -1039,7 +1040,6 @@ export const createOTokenProcessor = (params: {
         entity.apy14 = apy.apy14DayAvg
         entity.apy30 = apy.apy30DayAvg
       }
-      const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
       // These should remain unique since any result rebases have not been stored in the database yet.
       let rebases = result.rebases.filter((rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate)
       rebases.push(
