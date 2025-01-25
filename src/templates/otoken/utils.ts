@@ -35,6 +35,7 @@ export async function createAddress(ctx: Context, otoken: string, addr: string, 
     chainId: ctx.chain.id,
     blockNumber: block.header.height,
     lastUpdated: new Date(block.header.timestamp),
+    since: new Date(block.header.timestamp),
   })
 }
 

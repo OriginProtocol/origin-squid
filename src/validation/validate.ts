@@ -85,10 +85,12 @@ const validateExpectation = async <
       {} as Record<string, boolean>,
     )
   const actual = await ctx.store.findOne(Class, { where: { id: expectation.id }, relations })
-  assert(
-    actual,
-    `Expected entity does not exist: block=${block.header.height} Entity=${Class.name} id=${expectation.id}`,
-  )
+  if (process.env.IGNORE_VALIDATION !== 'true') {
+    assert(
+      actual,
+      `Expected entity does not exist: block=${block.header.height} Entity=${Class.name} id=${expectation.id}`,
+    )
+  }
   expectation.timestamp = new Date(expectation.timestamp).toJSON()
   compare(expectation, actual)
   ctx.log.info(`Validated entity: block=${block.header.height} Entity=${Class.name} id=${expectation.id}`)

@@ -201,7 +201,6 @@ export const createOTokenProcessor = (params: {
   }
 
   let owners: Map<string, OTokenAddress> | undefined = undefined
-  let ownerSince = new Map<string, Date>()
   let ownersHistorical: OTokenAddress[] = []
 
   let idMap: Map<string, number>
@@ -401,9 +400,9 @@ export const createOTokenProcessor = (params: {
         )
         address.credits = BigInt(credits[0]) // token credits
         if (address.balance === 0n && newBalance > 0n) {
-          ownerSince.set(address.address, new Date(block.header.timestamp))
+          address.since = new Date(block.header.timestamp)
         } else if (newBalance === 0n) {
-          ownerSince.delete(address.address)
+          address.since = null
         }
         address.balance = newBalance // token balance
       }
@@ -525,6 +524,11 @@ export const createOTokenProcessor = (params: {
           }),
         )
 
+        if (address.balance === 0n && newBalance > 0n) {
+          address.since = new Date(block.header.timestamp)
+        } else if (newBalance === 0n) {
+          address.since = null
+        }
         address.balance = newBalance
         address.earned += earned
       }
@@ -1128,15 +1132,22 @@ export const createOTokenProcessor = (params: {
       result.erc20.states.set(erc20State.id, erc20State)
     }
     for (const owner of owners?.values() ?? []) {
-      const erc20Holder = new ERC20Holder({
-        id: `${ctx.chain.id}-${owner.otoken}-${owner.address}`,
-        chainId: ctx.chain.id,
-        address: owner.otoken,
-        account: owner.address,
-        since: ownerSince.get(owner.address),
-        balance: owner.balance,
-      })
-      result.erc20.holders.set(erc20Holder.id, erc20Holder)
+      if (owner.balance === 0n) {
+        result.erc20.removedHolders.add(owner.address)
+      } else {
+        const erc20Holder = new ERC20Holder({
+          id: `${ctx.chain.id}-${owner.otoken}-${owner.address}`,
+          chainId: ctx.chain.id,
+          address: owner.otoken,
+          account: owner.address,
+          since: owner.since!,
+          balance: owner.balance,
+        })
+        if (!erc20Holder.since) {
+          debugger
+        }
+        result.erc20.holders.set(erc20Holder.id, erc20Holder)
+      }
     }
     for (const owner of ownersHistorical) {
       result.erc20.balances.set(
@@ -1176,6 +1187,11 @@ export const createOTokenProcessor = (params: {
       ctx.store.upsert([...result.erc20.holders.values()]),
       ctx.store.insert([...result.erc20.balances.values()]),
       ctx.store.insert([...result.erc20.transfers.values()]),
+      ctx.store.remove(
+        [...result.erc20.removedHolders.values()].map(
+          (account) => new ERC20Holder({ id: `${ctx.chain.id}-${params.otokenAddress}-${account}` }),
+        ),
+      ),
     ])
   }
 

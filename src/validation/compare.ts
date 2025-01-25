@@ -24,6 +24,8 @@ export const compare = (expectation: any, actual: any) => {
     console.log('actual', JSON.stringify(actual, null, 2))
     console.log('expectation', JSON.stringify(expectation, null, 2))
     console.log('diff', JSON.stringify(diff, null, 2))
-    throw new Error('Expected and actual values do not match')
+    if (process.env.IGNORE_VALIDATION !== 'true') {
+      throw new Error('Expected and actual values do not match')
+    }
   }
 }

@@ -1,18 +1,21 @@
 import fs from 'fs'
 
+import { retry } from '@originprotocol/squid-utils'
+
 import { oethStrategies } from '../src/oeth/processors/strategies'
 import { ousdStrategies } from '../src/ousd/processors/strategies'
 import { IStrategyData } from '../src/templates/strategy'
 import { addresses } from '../src/utils/addresses'
 import { baseAddresses } from '../src/utils/addresses-base'
-import { retry } from '../src/utils/retry'
 
 const LIMIT = 1000
+
+const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch('https://origin.squids.live/origin-squid:prod/api/graphql', {
+  const response = await fetch('https://origin.squids.live/origin-squid@v74/api/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -41,7 +44,7 @@ const oTokens = (prefix: string, address: string) => {
     ${prefix}_oTokens: oTokens(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -60,7 +63,7 @@ const oTokenApies = (prefix: string, address: string) => {
     ${prefix}_oTokenApies: oTokenApies(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -105,7 +108,7 @@ const oTokenRebases = (prefix: string, address: string) => {
     ${prefix}_oTokenRebases: oTokenRebases(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -131,7 +134,7 @@ const oTokenVaults = (prefix: string, address: string) => {
     ${prefix}_oTokenVaults: oTokenVaults(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -149,7 +152,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
     ${prefix}_oTokenDailyStats: oTokenDailyStats(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -192,7 +195,7 @@ const erc20Balances = (prefix: string, address: string) => {
     ${prefix}_erc20Balances: erc20Balances(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { address_eq: "${address}" }
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       timestamp
@@ -211,7 +214,7 @@ const arm = (prefix: string, armAddress: string) => {
       ${prefix}_armStates: armStates(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { address_eq: "${armAddress}" }
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
       ) {
         id
         chainId
@@ -235,7 +238,7 @@ const arm = (prefix: string, armAddress: string) => {
       ${prefix}_armWithdrawalRequests: armWithdrawalRequests(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { address_eq: "${armAddress}" }
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
       ) {
         id
         blockNumber
@@ -254,7 +257,7 @@ const arm = (prefix: string, armAddress: string) => {
       ${prefix}_armDailyStats: armDailyStats(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { address_eq: "${armAddress}" }
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
       )  {
         id
         chainId
@@ -284,6 +287,7 @@ const ognDailyStats = () => {
     ognDailyStats: ognDailyStats(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       blockNumber
@@ -304,7 +308,7 @@ export const beaconDepositEvents = (address: string) => {
     beaconDepositEvents: beaconDepositEvents(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { address_eq: "${address}" }
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       chainId
@@ -329,7 +333,7 @@ export const transactionDetails = (prefix: string, from: string) => {
     ${prefix}_transactionDetails: transactionDetails(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { from_eq: "${from}" }
+      where: { from_eq: "${from}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
     ) {
       id
       chainId
@@ -351,7 +355,7 @@ const strategy = (prefix: string, strategies: string) => {
       strategyBalances_${prefix}: strategyBalances(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { strategy_eq: "${strategies}" }
+        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
       ) {
         id
         blockNumber
@@ -368,7 +372,7 @@ const strategy = (prefix: string, strategies: string) => {
       strategyDailyYields_${prefix}: strategyDailyYields(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { strategy_eq: "${strategies}" }
+        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
       ) {
         id
         timestamp
@@ -417,7 +421,7 @@ const main = async () => {
     for (const key of Object.keys(result.data)) {
       entities[key] = takeValidationEntries(result.data[key])
       if (entities[key].length < 5) {
-        entities[key] = takeEvery(result.data[key], 25)
+        entities[key] = takeEvery(result.data[key], 50)
       }
     }
   }

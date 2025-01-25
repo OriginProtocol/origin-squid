@@ -47,6 +47,9 @@ export class OTokenAddress {
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date
 
+    @DateTimeColumn_({nullable: true})
+    since!: Date | undefined | null
+
     @OneToMany_(() => OTokenHistory, e => e.address)
     history!: OTokenHistory[]
 }

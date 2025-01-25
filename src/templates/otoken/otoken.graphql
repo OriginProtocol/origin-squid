@@ -43,6 +43,7 @@ type OTokenAddress @entity {
   delegatedTo: String
   blockNumber: Int!
   lastUpdated: DateTime!
+  since: DateTime
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
 

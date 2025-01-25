@@ -1,5 +1,5 @@
-module.exports = class Data1737743233487 {
-    name = 'Data1737743233487'
+module.exports = class Data1737759683597 {
+    name = 'Data1737759683597'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -119,7 +119,7 @@ module.exports = class Data1737743233487 {
         await db.query(`CREATE INDEX "IDX_2f1457755464ec5951d1e96542" ON "o_token_history" ("address_id") `)
         await db.query(`CREATE INDEX "IDX_42142d191ea0408fb511f9f576" ON "o_token_history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_f87d86cfca9ef211ba1b18d2bc" ON "o_token_history" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "delegated_to" text, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "credits" numeric NOT NULL, "delegated_to" text, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7cbc465ce1e9ae06dfe3a8c625" ON "o_token_address" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5342c499e930e396bade7faeb6" ON "o_token_address" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_75c7d29bf71b393e99c4407885" ON "o_token_address" ("address") `)
