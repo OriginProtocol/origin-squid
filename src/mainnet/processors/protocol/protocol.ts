@@ -20,6 +20,7 @@ import {
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { OETH_ADDRESS, OUSD_ADDRESS, arm } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
+import { sonicAddresses } from '@utils/addresses-sonic'
 
 const startDate = '2022-01-01'
 
@@ -33,6 +34,7 @@ export const protocolProcessor = defineProcessor({
       { product: 'OUSD', processorId: 'ousd', otokenAddress: OUSD_ADDRESS },
       { product: 'OETH', processorId: 'oeth', otokenAddress: OETH_ADDRESS },
       { product: 'superOETHb', processorId: 'base', otokenAddress: baseAddresses.superOETHb.address },
+      { product: 'OS', processorId: 'sonic', otokenAddress: sonicAddresses.OS.address },
     ]
 
     const armProducts = [{ product: 'ARM-WETH-stETH', processorId: 'mainnet', armAddress: arm.address }]
