@@ -1171,7 +1171,7 @@ export const createOTokenProcessor = (params: {
     }
     await ctx.store.upsert(result.apies)
     await Promise.all([
-      ctx.store.insert(result.otokens),
+      ctx.store.upsert(result.otokens), // TODO: Consider changing otoken ID to block number instead of timestamp.
       ctx.store.insert(result.wotokens),
       ctx.store.insert(result.assets),
       ctx.store.insert(result.history),
