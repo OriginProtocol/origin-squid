@@ -292,15 +292,16 @@ const ognDailyStats = () => {
       id
       blockNumber
       timestamp
-      holdersOverThreshold
       totalStaked
     }
   `)
+  // Due to issue we don't validate:
+  // - holdersOverThreshold
   // Due to coingecko dependency, we can't validate these fields.
-  // totalSupplymarketCapUSD
-  // priceUSD
-  // totalSupplyUSD
-  // tradingVolumeUSD
+  // - totalSupplymarketCapUSD
+  // - priceUSD
+  // - totalSupplyUSD
+  // - tradingVolumeUSD
 }
 
 export const beaconDepositEvents = (address: string) => {

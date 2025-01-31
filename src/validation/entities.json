@@ -22904,126 +22904,108 @@
       "id": "2022-09-07",
       "blockNumber": 15493265,
       "timestamp": "2022-09-07T23:54:59.000000Z",
-      "holdersOverThreshold": 12493,
       "totalStaked": "0"
     },
     {
       "id": "2022-10-27",
       "blockNumber": 15842750,
       "timestamp": "2022-10-27T23:40:23.000000Z",
-      "holdersOverThreshold": 12664,
       "totalStaked": "0"
     },
     {
       "id": "2022-12-16",
       "blockNumber": 16200658,
       "timestamp": "2022-12-16T23:52:59.000000Z",
-      "holdersOverThreshold": 13980,
       "totalStaked": "0"
     },
     {
       "id": "2023-02-04",
       "blockNumber": 16558789,
       "timestamp": "2023-02-04T23:46:11.000000Z",
-      "holdersOverThreshold": 14349,
       "totalStaked": "0"
     },
     {
       "id": "2023-03-26",
       "blockNumber": 16914974,
       "timestamp": "2023-03-26T23:50:23.000000Z",
-      "holdersOverThreshold": 14537,
       "totalStaked": "0"
     },
     {
       "id": "2023-05-15",
       "blockNumber": 17268342,
       "timestamp": "2023-05-15T23:10:47.000000Z",
-      "holdersOverThreshold": 14697,
       "totalStaked": "0"
     },
     {
       "id": "2023-07-04",
       "blockNumber": 17623678,
       "timestamp": "2023-07-04T22:59:23.000000Z",
-      "holdersOverThreshold": 14997,
       "totalStaked": "0"
     },
     {
       "id": "2023-08-23",
       "blockNumber": 17980579,
       "timestamp": "2023-08-23T23:05:47.000000Z",
-      "holdersOverThreshold": 15269,
       "totalStaked": "0"
     },
     {
       "id": "2023-10-12",
       "blockNumber": 18337620,
       "timestamp": "2023-10-12T23:29:59.000000Z",
-      "holdersOverThreshold": 15424,
       "totalStaked": "0"
     },
     {
       "id": "2023-12-01",
       "blockNumber": 18694702,
       "timestamp": "2023-12-01T23:00:11.000000Z",
-      "holdersOverThreshold": 15707,
       "totalStaked": "0"
     },
     {
       "id": "2024-01-20",
       "blockNumber": 19051513,
       "timestamp": "2024-01-20T23:59:47.000000Z",
-      "holdersOverThreshold": 15852,
       "totalStaked": "0"
     },
     {
       "id": "2024-03-10",
       "blockNumber": 19408109,
       "timestamp": "2024-03-10T23:55:11.000000Z",
-      "holdersOverThreshold": 15853,
       "totalStaked": "0"
     },
     {
       "id": "2024-04-29",
       "blockNumber": 19764213,
       "timestamp": "2024-04-29T23:22:11.000000Z",
-      "holdersOverThreshold": 15861,
       "totalStaked": "0"
     },
     {
       "id": "2024-06-18",
       "blockNumber": 20121858,
       "timestamp": "2024-06-18T23:16:11.000000Z",
-      "holdersOverThreshold": 15971,
       "totalStaked": "322203112417760265708866388"
     },
     {
       "id": "2024-08-07",
       "blockNumber": 20480127,
       "timestamp": "2024-08-07T23:57:11.000000Z",
-      "holdersOverThreshold": 16078,
       "totalStaked": "326286760446710977169867721"
     },
     {
       "id": "2024-09-26",
       "blockNumber": 20838020,
       "timestamp": "2024-09-26T23:17:11.000000Z",
-      "holdersOverThreshold": 16120,
       "totalStaked": "449076561046062125883866952"
     },
     {
       "id": "2024-11-15",
       "blockNumber": 21196425,
       "timestamp": "2024-11-15T23:38:35.000000Z",
-      "holdersOverThreshold": 16009,
       "totalStaked": "472086820461900260698973612"
     },
     {
       "id": "2025-01-04",
       "blockNumber": 21554512,
       "timestamp": "2025-01-04T23:50:47.000000Z",
-      "holdersOverThreshold": 15992,
       "totalStaked": "474223509584150466404061218"
     }
   ],
