@@ -44,7 +44,7 @@ const oTokens = (prefix: string, address: string) => {
     ${prefix}_oTokens: oTokens(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -63,7 +63,7 @@ const oTokenApies = (prefix: string, address: string) => {
     ${prefix}_oTokenApies: oTokenApies(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -87,7 +87,7 @@ const oTokenHistories = (prefix: string, address: string) => {
     ${prefix}_oTokenHistories: oTokenHistories(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -108,7 +108,7 @@ const oTokenRebases = (prefix: string, address: string) => {
     ${prefix}_oTokenRebases: oTokenRebases(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -134,7 +134,7 @@ const oTokenVaults = (prefix: string, address: string) => {
     ${prefix}_oTokenVaults: oTokenVaults(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -152,7 +152,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
     ${prefix}_oTokenDailyStats: oTokenDailyStats(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -195,7 +195,7 @@ const erc20Balances = (prefix: string, address: string) => {
     ${prefix}_erc20Balances: erc20Balances(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       timestamp
@@ -238,7 +238,7 @@ const arm = (prefix: string, armAddress: string) => {
       ${prefix}_armWithdrawalRequests: armWithdrawalRequests(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
       ) {
         id
         blockNumber
@@ -257,7 +257,7 @@ const arm = (prefix: string, armAddress: string) => {
       ${prefix}_armDailyStats: armDailyStats(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
       )  {
         id
         chainId
@@ -287,7 +287,7 @@ const ognDailyStats = () => {
     ognDailyStats: ognDailyStats(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       blockNumber
@@ -308,7 +308,7 @@ export const beaconDepositEvents = (address: string) => {
     beaconDepositEvents: beaconDepositEvents(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       chainId
@@ -333,7 +333,7 @@ export const transactionDetails = (prefix: string, from: string) => {
     ${prefix}_transactionDetails: transactionDetails(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { from_eq: "${from}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+      where: { from_eq: "${from}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
     ) {
       id
       chainId
@@ -355,7 +355,7 @@ const strategy = (prefix: string, strategies: string) => {
       strategyBalances_${prefix}: strategyBalances(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
       ) {
         id
         blockNumber
@@ -372,7 +372,7 @@ const strategy = (prefix: string, strategies: string) => {
       strategyDailyYields_${prefix}: strategyDailyYields(
         limit: ${LIMIT},
         orderBy: [blockNumber_ASC, id_ASC],
-        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+        where: { strategy_eq: "${strategies}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
       ) {
         id
         timestamp
