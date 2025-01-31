@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { findLast, sortBy } from 'lodash'
+import { findLast, sortBy, uniq } from 'lodash'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
@@ -291,10 +291,12 @@ export const createOTokenProcessor = (params: {
     // Prepare data for transfer processing
     const transferLogs = ctx.blocks.map((block) => {
       const logs = block.logs.filter((l) => transferFilter.matches(l)).map((log) => ({ block, log }))
-      const addresses = logs.flatMap(({ log }) => {
-        const transfer = otoken.events.Transfer.decode(log)
-        return [transfer.from.toLowerCase(), transfer.to.toLowerCase()]
-      })
+      const addresses = uniq(
+        logs.flatMap(({ log }) => {
+          const transfer = otoken.events.Transfer.decode(log)
+          return [transfer.from.toLowerCase(), transfer.to.toLowerCase()]
+        }),
+      )
       return {
         block,
         addresses,
