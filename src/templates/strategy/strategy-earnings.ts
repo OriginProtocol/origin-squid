@@ -265,7 +265,7 @@ export const processStrategyEarnings = async (
         tracker = blockFrequencyTracker({ from: strategyData.from })
         trackers.set(strategyData.address, tracker)
       }
-      if (tracker(ctx, block)) {
+      if (tracker(ctx, block) || ctx.latestBlockOfDay(block)) {
         const balances = await getBalances({ compare: 0 })
         await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances)
       }

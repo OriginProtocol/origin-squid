@@ -306,7 +306,7 @@ export const createOriginARMProcessors = ({
           }
         }
         for (const block of ctx.blocks) {
-          if (tracker(ctx, block)) {
+          if (tracker(ctx, block) || ctx.latestBlockOfDay(block)) {
             // ArmState
             const [state, yesterdayState, rateUSD] = await Promise.all([
               getCurrentState(block),
