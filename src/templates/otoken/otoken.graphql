@@ -169,6 +169,7 @@ type OTokenDailyStat @entity {
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
   wrappedSupply: BigInt!
+  rateWrapped: BigInt!
 
   amoSupply: BigInt
   dripperWETH: BigInt!

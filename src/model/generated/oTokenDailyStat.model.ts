@@ -62,6 +62,9 @@ export class OTokenDailyStat {
     @BigIntColumn_({nullable: false})
     wrappedSupply!: bigint
 
+    @BigIntColumn_({nullable: false})
+    rateWrapped!: bigint
+
     @BigIntColumn_({nullable: true})
     amoSupply!: bigint | undefined | null
 

@@ -8,7 +8,7 @@ import * as otokenVault from '@abi/oeth-vault'
 import * as otoken from '@abi/otoken'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenDripper from '@abi/otoken-dripper'
-import * as wotoken from '@abi/woeth'
+import * as wotokenAbi from '@abi/woeth'
 import {
   ERC20,
   ERC20Balance,
@@ -966,7 +966,7 @@ export const createOTokenProcessor = (params: {
       )
 
       if (params.wotoken && block.header.height >= params.wotoken.from) {
-        const wrappedContract = new wotoken.Contract(ctx, block.header, params.wotoken.address)
+        const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
         const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
           wrappedContract.totalAssets(),
           wrappedContract.totalSupply(),
@@ -1109,10 +1109,16 @@ export const createOTokenProcessor = (params: {
 
       entity.dripperWETH = dripperWETH
       entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
-      entity.wrappedSupply =
+      const wotokenContract =
         params.wotoken && block.header.height >= params.wotoken.from
-          ? await new erc20.Contract(ctx, block.header, params.wotoken.address).totalSupply()
-          : 0n
+          ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
+          : null
+      const [wrappedSupply, wrappedRate] = await Promise.all([
+        wotokenContract ? wotokenContract.totalSupply() : 0n,
+        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
+      ])
+      entity.wrappedSupply = wrappedSupply
+      entity.rateWrapped = wrappedRate
       entity.accountsOverThreshold = Array.from(owners?.values() ?? []).filter(
         (a) => a.balance >= params.accountsOverThresholdMinimum,
       ).length
