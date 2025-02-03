@@ -850,6 +850,7 @@ export const createOTokenProcessor = (params: {
             rebasingSupply: 0n,
             nonRebasingSupply: 0n,
             wrappedSupply: 0n,
+            rateWrapped: 0n,
 
             amoSupply: 0n,
             dripperWETH: 0n,
