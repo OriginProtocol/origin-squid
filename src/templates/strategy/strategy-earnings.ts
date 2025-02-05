@@ -14,6 +14,7 @@ import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
   OETH_HARVESTER_ADDRESS,
+  OETH_HARVESTER_SIMPLE_ADDRESS,
   OUSD_ADDRESS,
   OUSD_DRIPPER_ADDRESS,
   OUSD_HARVESTER_ADDRESS,
@@ -78,7 +79,7 @@ const oTokenValues = {
   [OETH_ADDRESS]: {
     rewardConversionToken: WETH_ADDRESS,
     rewardConversionTokenDecimals: 18,
-    harvester: [OETH_HARVESTER_ADDRESS],
+    harvester: [OETH_HARVESTER_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS],
     dripper: OETH_DRIPPER_ADDRESS,
   },
   [baseAddresses.superOETHb.address]: {
