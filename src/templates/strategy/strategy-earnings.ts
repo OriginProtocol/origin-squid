@@ -8,7 +8,7 @@ import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
 import { Block, Context, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
 import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { CurrencyAddress, MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
@@ -20,6 +20,8 @@ import {
   OUSD_HARVESTER_ADDRESS,
   USDT_ADDRESS,
   WETH_ADDRESS,
+  addresses,
+  tokens,
 } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { sonicAddresses } from '@utils/addresses-sonic'
@@ -62,37 +64,38 @@ const rewardTokenCollectedFilter = (strategyData: IStrategyData) =>
 
 const rewardTokenCollectedTransfersFilter = (strategyData: IStrategyData) =>
   logFilter({
-    address: [oTokenValues[strategyData.oTokenAddress].rewardConversionToken],
+    address: [...oTokenValues[strategyData.oTokenAddress].rewardConversionToken],
     topic0: [erc20.events.Transfer.topic],
     topic1: [...oTokenValues[strategyData.oTokenAddress].harvester],
-    topic2: [oTokenValues[strategyData.oTokenAddress].dripper],
+    topic2: [...oTokenValues[strategyData.oTokenAddress].harvesterTargets],
     range: { from: strategyData.from },
   })
 
 const oTokenValues = {
   [OUSD_ADDRESS]: {
-    rewardConversionToken: USDT_ADDRESS,
+    rewardConversionToken: [USDT_ADDRESS],
     rewardConversionTokenDecimals: 6,
     harvester: [OUSD_HARVESTER_ADDRESS],
-    dripper: OUSD_DRIPPER_ADDRESS,
+    harvesterTargets: [OUSD_DRIPPER_ADDRESS, addresses.multisig['multichain-guardian']],
   },
   [OETH_ADDRESS]: {
-    rewardConversionToken: WETH_ADDRESS,
+    rewardConversionToken: [WETH_ADDRESS, tokens.CRV, tokens.CVX],
     rewardConversionTokenDecimals: 18,
+    saveAsAsset: WETH_ADDRESS,
     harvester: [OETH_HARVESTER_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS],
-    dripper: OETH_DRIPPER_ADDRESS,
+    harvesterTargets: [OETH_DRIPPER_ADDRESS, addresses.multisig['multichain-guardian']],
   },
   [baseAddresses.superOETHb.address]: {
-    rewardConversionToken: baseAddresses.tokens.WETH,
+    rewardConversionToken: [baseAddresses.tokens.WETH],
     rewardConversionTokenDecimals: 18,
     harvester: [baseAddresses.multisig['2/8'], baseAddresses.multisig['multichain-guardian']],
-    dripper: baseAddresses.superOETHb.dripper,
+    harvesterTargets: [baseAddresses.superOETHb.dripper, baseAddresses.multisig['multichain-guardian']],
   },
   [sonicAddresses.OS.address]: {
-    rewardConversionToken: sonicAddresses.tokens.wS,
+    rewardConversionToken: [sonicAddresses.tokens.wS],
     rewardConversionTokenDecimals: 18,
     harvester: [sonicAddresses.OS.harvester],
-    dripper: sonicAddresses.OS.dripper,
+    harvesterTargets: [sonicAddresses.OS.dripper, sonicAddresses.multisig['multichain-guardian']],
   },
 } as const
 
@@ -234,7 +237,24 @@ export const processStrategyEarnings = async (
           (l) =>
             l.transactionHash === log.transactionHash && rewardTokenCollectedTransfersFilter(strategyData).matches(l),
         )
-        const amount = earningsTransferLogs.reduce((sum, l) => sum + BigInt(l.data), 0n)
+
+        const values = oTokenValues[strategyData.oTokenAddress]
+        const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
+        let amount = 0n
+        for (const log of earningsTransferLogs) {
+          const data = erc20.events.Transfer.decode(log)
+          amount += await convertRate(
+            ctx,
+            block,
+            log.address as CurrencyAddress,
+            saveAsAsset ?? (log.address as CurrencyAddress),
+            data.value,
+          )
+        }
+
+        if (earningsTransferLogs.find((l) => l.address !== WETH_ADDRESS)) {
+          debugger
+        }
 
         await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
           token: strategyData.base.address,

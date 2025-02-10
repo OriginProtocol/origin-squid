@@ -69,6 +69,7 @@ export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, d
 const E18 = 10n ** 18n
 export const convertUsingRate = (value: bigint, rate: bigint) => (value * rate) / E18
 export const convertRate = async (ctx: Context, block: Block, from: Currency, to: Currency, value: bigint) => {
+  if (from === to) return value
   const exchangeRate = await ensureExchangeRate(ctx, block, from, to)
   if (!exchangeRate) return 0n
   return convertUsingRate(value, exchangeRate.rate)

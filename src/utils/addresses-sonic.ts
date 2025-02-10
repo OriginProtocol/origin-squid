@@ -24,11 +24,17 @@ export const sonicOrigin = {
   timelock: '0x31a91336414d3b955e494e7d485a6b06b55fc8fb',
 } as const
 
+export const sonicMultisig = {
+  'multichain-guardian': '0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971',
+} as const
+
 export const sonicContracts = {
   SFC: '0xfc00face00000000000000000000000000000000',
   Multicall3: '0xca11bde05977b3631167028862be2a173976ca11',
 } as const
+
 export const sonicAddresses = {
+  multisig: sonicMultisig,
   tokens: sonicTokens,
   origin: sonicOrigin,
   contracts: sonicContracts,

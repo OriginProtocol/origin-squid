@@ -123,6 +123,8 @@ export const tokens = {
 
   // Non-stable
   BAL: BAL_ADDRESS,
+  CVX: '0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b',
+  CRV: '0xd533a949740bb3306d119cc777fa900ba034cd52',
 } as const
 
 // Strategy Helper Objects & Types
@@ -193,6 +195,7 @@ export const multisig = {
 }
 
 export const addresses = {
+  multisig,
   tokens,
   strategies,
   oeth,

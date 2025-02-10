@@ -23,6 +23,7 @@ export const mainnetCurrencies = {
   frxETH: '0x5e8422345238f34275888049021821e8e08caa1f',
   sfrxETH: '0xac3e018457b222d93114458476f3e3416abbe38f',
   CRV: '0xd533a949740bb3306d119cc777fa900ba034cd52',
+  CVX: '0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b',
   BAL: '0xba100000625a3754423978a60c9317c58a424e3d',
 } as const
 
