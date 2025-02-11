@@ -1,0 +1,340 @@
+[
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_targetChainId", "type": "uint256" },
+      { "internalType": "address", "name": "_rewardToken", "type": "address" },
+      { "internalType": "address", "name": "_gauge", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "campaignId", "type": "uint256" }],
+    "name": "CampaignClosed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "internalType": "address", "name": "gauge", "type": "address" },
+      { "indexed": false, "internalType": "address", "name": "rewardToken", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "maxRewardPerVote", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "totalRewardAmount", "type": "uint256" }
+    ],
+    "name": "CampaignCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "newId", "type": "uint256" }],
+    "name": "CampaignIdUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "newCampaignRemoteManager", "type": "address" }],
+    "name": "CampaignRemoteManagerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "internalType": "address", "name": "feeCollector", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "feeAmount", "type": "uint256" }
+    ],
+    "name": "FeeCollected",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "newFeeCollector", "type": "address" }],
+    "name": "FeeCollectorUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint16", "name": "newFee", "type": "uint16" }],
+    "name": "FeeUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "previousGovernor", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "newGovernor", "type": "address" }
+    ],
+    "name": "GovernorshipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint8", "name": "extraNumberOfPeriods", "type": "uint8" }],
+    "name": "NumberOfPeriodsUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "previousGovernor", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "newGovernor", "type": "address" }
+    ],
+    "name": "PendingGovernorshipTransfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "newMaxRewardPerVote", "type": "uint256" }],
+    "name": "RewardPerVoteUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "_address", "type": "address" }],
+    "name": "StrategistUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "internalType": "address", "name": "token", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" },
+      { "indexed": false, "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "TokensRescued",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "extraTotalRewardAmount", "type": "uint256" }],
+    "name": "TotalRewardAmountUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "newVotemarket", "type": "address" }],
+    "name": "VotemarketUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "FEE_BASE",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignRemoteManager",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "inputs": [], "name": "claimGovernance", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_campaignId", "type": "uint256" },
+      { "internalType": "uint256", "name": "bridgeFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "additionalGasLimit", "type": "uint256" }
+    ],
+    "name": "closeCampaign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "numberOfPeriods", "type": "uint8" },
+      { "internalType": "uint256", "name": "maxRewardPerVote", "type": "uint256" },
+      { "internalType": "address[]", "name": "blacklist", "type": "address[]" },
+      { "internalType": "uint256", "name": "bridgeFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "additionalGasLimit", "type": "uint256" }
+    ],
+    "name": "createCampaign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fee",
+    "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeCollector",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "gauge",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governor",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_strategist", "type": "address" },
+      { "internalType": "uint16", "name": "_fee", "type": "uint16" },
+      { "internalType": "address", "name": "_feeCollector", "type": "address" },
+      { "internalType": "address", "name": "_campaignRemoteManager", "type": "address" },
+      { "internalType": "address", "name": "_votemarket", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "isGovernor",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint8", "name": "extraNumberOfPeriods", "type": "uint8" },
+      { "internalType": "uint256", "name": "bridgeFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "additionalGasLimit", "type": "uint256" }
+    ],
+    "name": "manageNumberOfPeriods",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "newMaxRewardPerVote", "type": "uint256" },
+      { "internalType": "uint256", "name": "bridgeFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "additionalGasLimit", "type": "uint256" }
+    ],
+    "name": "manageRewardPerVote",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "bridgeFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "additionalGasLimit", "type": "uint256" }
+    ],
+    "name": "manageTotalRewardAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "receiver", "type": "address" }],
+    "name": "rescueETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token", "type": "address" },
+      { "internalType": "address", "name": "receiver", "type": "address" }
+    ],
+    "name": "rescueToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewardToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_campaignId", "type": "uint256" }],
+    "name": "setCampaignId",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_campaignRemoteManager", "type": "address" }],
+    "name": "setCampaignRemoteManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint16", "name": "_fee", "type": "uint16" }],
+    "name": "setFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_feeCollector", "type": "address" }],
+    "name": "setFeeCollector",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_address", "type": "address" }],
+    "name": "setStrategistAddr",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_votemarket", "type": "address" }],
+    "name": "setVotemarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strategistAddr",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "targetChainId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_newGovernor", "type": "address" }],
+    "name": "transferGovernance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "votemarket",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  { "stateMutability": "payable", "type": "receive" }
+]

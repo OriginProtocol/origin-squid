@@ -1,0 +1,11 @@
+type CurvePoolBoosterBribeCreated @entity {
+  id: ID! @index
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  otoken: String! @index
+  gauge: String!
+  maxRewardPerVote: BigInt!
+  rewardToken: String!
+  totalRewardAmount: BigInt!
+}
