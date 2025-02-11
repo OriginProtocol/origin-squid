@@ -361,6 +361,18 @@ type PoolBoosterFeeCollected @entity {
   feeAmount: BigInt!
   txHash: String!
 }
+
+type PoolBoosterTokensRescued @entity {
+  id: ID! @index
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  token: String!
+  amount: BigInt!
+  receiver: String!
+  txHash: String!
+}
 type OToken @entity {
   id: ID! @index
   chainId: Int! @index
