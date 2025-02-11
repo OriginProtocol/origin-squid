@@ -3,6 +3,7 @@ import { base } from 'viem/chains'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
 import { processStatus } from '@templates/processor-status'
 
 import { baseERC20s, baseStrategies, bridgedWoethStrategy, superOETHb } from './base'
@@ -20,6 +21,7 @@ export const processor = defineSquidProcessor({
     ...aerodromeProcessors,
     bridgedWoethStrategy,
     exchangeRatesProcessor,
+    createCurvePoolBoosterProcessor({ from: 26255636 }),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('base')],
   validators: [validate],

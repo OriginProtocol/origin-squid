@@ -1,3 +1,43 @@
-- We are a subsquid project which extracts data from EVM blockchains.
-- We reference `README.md` for instructions on how to use and contribute to our project.
-- When saving entities, use `.insert()` or `.upsert()`.
+# Origin Protocol Squid Project Rules
+
+## Database Operations
+
+- Use `.insert()` or `.upsert()` for saving entities
+- Batch database operations by collecting entities in maps and saving at the end of context processing
+- When fetching and modifying entities from the database, store them in a map for later upserting
+
+## GraphQL Schema
+
+- Order fields with indexed fields first
+- Include clear comments for complex ID formats
+- Use descriptive names for entities prefixed with their context (e.g., PoolBooster\*)
+- Only add @index directive when the field needs to be queried
+
+## Event Processing
+
+- Create separate filter for each event type
+- Use descriptive filter names that match the event (e.g., feeCollectedFilter)
+- Decode events using their respective ABI definitions
+- Handle each event in its own conditional block
+- Create helper functions for repeated operations (e.g., getCampaign)
+
+## Code Organization
+
+- Group related event handlers together
+- Keep processor setup clean and organized
+- Use clear variable names that indicate their purpose
+- Use maps to collect entities during processing
+- Add TODO comments for future improvements or validations
+
+## Error Handling
+
+- Validate entity existence before updates
+- Use optional chaining and null checks where appropriate
+- Add appropriate error logging
+
+## Performance
+
+- Minimize database operations by batching
+- Use maps for in-memory entity tracking
+- Only fetch data that's needed
+- Reuse entities from memory when possible
