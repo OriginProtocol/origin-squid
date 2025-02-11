@@ -339,6 +339,17 @@ type TransactionDetails @entity {
   effectiveGasPrice: BigInt!
   transactionFee: BigInt!
 }
+type PoolBoosterCampaign @entity {
+  id: ID! @index
+  chainId: Int! @index
+  address: String! @index
+  gauge: String! @index
+  rewardToken: String!
+  maxRewardPerVote: BigInt!
+  totalRewardAmount: BigInt!
+  campaignId: BigInt!
+  closed: Boolean!
+}
 type OToken @entity {
   id: ID! @index
   chainId: Int! @index
