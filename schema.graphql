@@ -344,11 +344,22 @@ type PoolBoosterCampaign @entity {
   chainId: Int! @index
   address: String! @index
   gauge: String! @index
+  campaignId: BigInt
   rewardToken: String!
   maxRewardPerVote: BigInt!
   totalRewardAmount: BigInt!
-  campaignId: BigInt!
   closed: Boolean!
+}
+
+type PoolBoosterFeeCollected @entity {
+  id: ID! @index
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  feeCollector: String!
+  feeAmount: BigInt!
+  txHash: String!
 }
 type OToken @entity {
   id: ID! @index

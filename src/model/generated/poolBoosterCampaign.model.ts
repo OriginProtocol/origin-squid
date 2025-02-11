@@ -21,6 +21,9 @@ export class PoolBoosterCampaign {
     @StringColumn_({nullable: false})
     gauge!: string
 
+    @BigIntColumn_({nullable: true})
+    campaignId!: bigint | undefined | null
+
     @StringColumn_({nullable: false})
     rewardToken!: string
 
@@ -29,9 +32,6 @@ export class PoolBoosterCampaign {
 
     @BigIntColumn_({nullable: false})
     totalRewardAmount!: bigint
-
-    @BigIntColumn_({nullable: false})
-    campaignId!: bigint
 
     @BooleanColumn_({nullable: false})
     closed!: boolean
