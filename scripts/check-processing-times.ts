@@ -25,6 +25,7 @@ const executeQuery = async <T>(query: string): Promise<T> => {
 }
 
 const main = async () => {
+  console.log(`Checking processing times for: ${process.argv[2]}`)
   const result = await executeQuery<{
     data: {
       processingStatuses: {

@@ -5,7 +5,6 @@
     "codegen": "echo '# GENERATED, DO NOT MODIFY\n' > schema.graphql && cat $(find src -name '*.graphql') >> schema.graphql && sqd codegen && git add src/model/generated/*",
     "migration:generate": "sqd down && sqd up && sqd migration:generate && git add db/migrations/*",
     "generate": "npm-run-all codegen migration:generate",
-    "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
     "build": "rm -rf lib && tsc",
     "prettier-check": "prettier --check src",
     "prettier-fix": "prettier --write src",
@@ -20,7 +19,9 @@
     "process:mainnet": "sqd process:mainnet",
     "process:test": "sqd process:test",
     "process": "sqd process",
-    "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts"
+    "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
+    "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts",
+    "postdeploy": "sh -c 'npm run log:processing-times $1 && npm run generate:validations $1' --"
   },
   "dependencies": {
     "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#main",

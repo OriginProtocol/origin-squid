@@ -15,7 +15,7 @@ const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch('https://origin.squids.live/origin-squid@v78/api/graphql', {
+  const response = await fetch(`https://origin.squids.live/origin-squid@${process.argv[2]}/api/graphql`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -392,6 +392,7 @@ const strategy = (prefix: string, strategies: string) => {
 }
 
 const main = async () => {
+  console.log(`Generating validations for: ${process.argv[2]}`)
   const queries: string[] = [
     ...oethStrategies.map((s: IStrategyData) => strategy(`oeth_${s.address}`, s.address)),
     ...ousdStrategies.map((s: IStrategyData) => strategy(`ousd_${s.address}`, s.address)),
