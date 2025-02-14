@@ -201,8 +201,6 @@ export const createOTokenProcessor = (params: {
   }
 
   let owners: Map<string, OTokenAddress> | undefined = undefined
-  let ownersHistorical: OTokenAddress[] = []
-
   let idMap: Map<string, number>
   const getUniqueId = (partialId: string) => {
     const nextId = (idMap.get(partialId) ?? 0) + 1
@@ -220,7 +218,6 @@ export const createOTokenProcessor = (params: {
       start = Date.now()
     }
     idMap = new Map<string, number>()
-    ownersHistorical = []
 
     const transferFilter = logFilter({
       address: [params.otokenAddress],
@@ -351,7 +348,6 @@ export const createOTokenProcessor = (params: {
         if (!entity) {
           entity = await createAddress(ctx, params.otokenAddress, address, block)
           owners!.set(entity.address, entity)
-          ownersHistorical.push(entity)
         }
         entity.blockNumber = block.header.height
         entity.lastUpdated = new Date(block.header.timestamp)
@@ -606,7 +602,6 @@ export const createOTokenProcessor = (params: {
       if (!owner) {
         owner = await createAddress(ctx, params.otokenAddress, address, block)
         owners!.set(address, owner)
-        ownersHistorical.push(owner)
       }
       const rebaseOption = new OTokenRebaseOption({
         id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${hash}-${owner.address}`),
@@ -651,7 +646,6 @@ export const createOTokenProcessor = (params: {
       if (!sourceOwner) {
         sourceOwner = await createAddress(ctx, params.otokenAddress, sourceAddress, block)
         owners!.set(sourceAddress, sourceOwner)
-        ownersHistorical.push(sourceOwner)
       }
       sourceOwner.rebasingOption = RebasingOption.YieldDelegationSource
       sourceOwner.delegatedTo = targetAddress
@@ -673,7 +667,6 @@ export const createOTokenProcessor = (params: {
       if (!targetOwner) {
         targetOwner = await createAddress(ctx, params.otokenAddress, targetAddress, block)
         owners!.set(targetAddress, targetOwner)
-        ownersHistorical.push(targetOwner)
       }
       targetOwner.rebasingOption = RebasingOption.YieldDelegationTarget
       targetOwner.delegatedTo = null
@@ -704,7 +697,6 @@ export const createOTokenProcessor = (params: {
       if (!sourceOwner) {
         sourceOwner = await createAddress(ctx, params.otokenAddress, sourceAddress, block)
         owners!.set(sourceAddress, sourceOwner)
-        ownersHistorical.push(sourceOwner)
       }
       sourceOwner.rebasingOption = RebasingOption.OptOut
       sourceOwner.delegatedTo = null
@@ -726,7 +718,6 @@ export const createOTokenProcessor = (params: {
       if (!targetOwner) {
         targetOwner = await createAddress(ctx, params.otokenAddress, targetAddress, block)
         owners!.set(targetAddress, targetOwner)
-        ownersHistorical.push(targetOwner)
       }
       targetOwner.rebasingOption = RebasingOption.OptIn
       targetOwner.delegatedTo = null
@@ -1158,17 +1149,18 @@ export const createOTokenProcessor = (params: {
         result.erc20.holders.set(erc20Holder.id, erc20Holder)
       }
     }
-    for (const owner of ownersHistorical) {
+    for (const history of result.history) {
+      const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address}`
       result.erc20.balances.set(
-        owner.id,
+        id,
         new ERC20Balance({
-          id: `${ctx.chain.id}-${owner.blockNumber}-${owner.otoken}-${owner.address}`,
+          id,
           chainId: ctx.chain.id,
-          address: owner.otoken,
-          account: owner.address,
-          timestamp: owner.lastUpdated,
-          blockNumber: owner.blockNumber,
-          balance: owner.balance,
+          address: history.otoken,
+          account: history.address.address,
+          timestamp: history.timestamp,
+          blockNumber: history.blockNumber,
+          balance: history.balance,
         }),
       )
     }
