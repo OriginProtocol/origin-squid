@@ -1,5 +1,5 @@
 import * as abi from '@abi/erc20'
-import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20StateByDay, ERC20Transfer } from '@model'
 import { Block, Context, logFilter } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -60,6 +60,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
       await initialize(ctx)
       const result = {
         states: new Map<string, ERC20State>(),
+        statesByDay: new Map<string, ERC20StateByDay>(),
         balances: new Map<string, ERC20Balance>(),
         transfers: new Map<string, ERC20Transfer>(),
         holders: new Map<string, ERC20Holder>(),
@@ -191,9 +192,34 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
         }
       }
 
+      // Generate ERC20StateByDay entities.
+      let lastStateByDay = await ctx.store.findOne(ERC20StateByDay, {
+        where: { chainId: ctx.chain.id, address },
+        order: { timestamp: 'DESC' },
+      })
+      const uniqueDays = new Set<string>()
+      for (const state of result.states.values()) {
+        const date = new Date(state.timestamp).toISOString().slice(0, 10)
+        uniqueDays.add(date)
+      }
+
+      for (const date of uniqueDays) {
+        const statesForDay = [...result.states.values()].filter(
+          (state) => new Date(state.timestamp).toISOString().slice(0, 10) === date,
+        )
+        const stateByDay = new ERC20StateByDay({
+          ...(statesForDay[0] ?? lastStateByDay),
+          id: `${ctx.chain.id}-${date}-${address}`,
+          date,
+        })
+        lastStateByDay = stateByDay
+        result.statesByDay.set(stateByDay.id, stateByDay)
+      }
+
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
+        ctx.store.insert([...result.statesByDay.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
       ])

@@ -8,7 +8,8 @@ const superOETHb = {
   dripper: '0x02f2c609950e90934ce99e58b4d7326ad0d7f8d6',
   strategies: {
     bridgedWOETH: '0x80c864704dd06c3693ed5179190786ee38acf835',
-    amo: '0xf611cc500eee7e4e4763a05fe623e2363c86d2af',
+    aerodromeAMO: '0xf611cc500eee7e4e4763a05fe623e2363c86d2af',
+    curveAMO: '0x9cfcaf81600155e01c63e4d2993a8a81a8205829',
   },
   zapper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
   harvester: '0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29',
@@ -72,7 +73,7 @@ export const aerodromePools = {
       },
       { address: '0xdbfefd2e8460a6ee4955a68582f85708baea60a3', decimals: 18 },
     ],
-    lps: [{ address: superOETHb.strategies.amo, maxLikelyPositions: 1 }],
+    lps: [{ address: superOETHb.strategies.aerodromeAMO, maxLikelyPositions: 1 }],
     from: 18056601,
     gauge: {
       address: '0xdd234dbe2eff53bed9e8fc0e427ebcd74ed4f429',

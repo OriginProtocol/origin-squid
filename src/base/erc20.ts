@@ -23,7 +23,7 @@ export const baseERC20s = [
   createERC20PollingTracker({
     from: 18689558,
     address: baseAddresses.tokens.AERO,
-    accountFilter: [baseAddresses.superOETHb.strategies.amo, baseAddresses.multisig.reservoir],
+    accountFilter: [baseAddresses.superOETHb.strategies.aerodromeAMO, baseAddresses.multisig.reservoir],
     intervalTracking: true,
   }),
   // WETH (limited)

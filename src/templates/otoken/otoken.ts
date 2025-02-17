@@ -14,6 +14,7 @@ import {
   ERC20Balance,
   ERC20Holder,
   ERC20State,
+  ERC20StateByDay,
   ERC20Transfer,
   HistoryType,
   OToken,
@@ -193,6 +194,7 @@ export const createOTokenProcessor = (params: {
       | undefined
     erc20: {
       states: Map<string, ERC20State>
+      statesByDay: Map<string, ERC20StateByDay>
       balances: Map<string, ERC20Balance>
       transfers: Map<string, ERC20Transfer>
       holders: Map<string, ERC20Holder>
@@ -276,6 +278,7 @@ export const createOTokenProcessor = (params: {
       lastYieldDistributionEvent: undefined,
       erc20: {
         states: new Map<string, ERC20State>(),
+        statesByDay: new Map<string, ERC20StateByDay>(),
         balances: new Map<string, ERC20Balance>(),
         transfers: new Map<string, ERC20Transfer>(),
         holders: new Map<string, ERC20Holder>(),
@@ -1163,6 +1166,29 @@ export const createOTokenProcessor = (params: {
           balance: history.balance,
         }),
       )
+    }
+    // Generate ERC20StateByDay entities.
+    let lastStateByDay = await ctx.store.findOne(ERC20StateByDay, {
+      where: { chainId: ctx.chain.id, address: params.otokenAddress },
+      order: { timestamp: 'DESC' },
+    })
+    const uniqueDays = new Set<string>()
+    for (const state of result.erc20.states.values()) {
+      const date = new Date(state.timestamp).toISOString().slice(0, 10)
+      uniqueDays.add(date)
+    }
+
+    for (const date of uniqueDays) {
+      const statesForDay = [...result.erc20.states.values()].filter(
+        (state) => new Date(state.timestamp).toISOString().slice(0, 10) === date,
+      )
+      const stateByDay = new ERC20StateByDay({
+        ...(statesForDay[0] ?? lastStateByDay),
+        id: `${ctx.chain.id}-${date}-${params.otokenAddress}`,
+        date,
+      })
+      lastStateByDay = stateByDay
+      result.erc20.statesByDay.set(stateByDay.id, stateByDay)
     }
     time('erc20 instances')
 

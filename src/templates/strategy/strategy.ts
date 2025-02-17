@@ -38,6 +38,7 @@ export type IStrategyData = {
   assets: {
     address: string
     decimals: number
+    checkBalance?: boolean // default is true
     convertTo?: {
       address: string
       decimals: number
