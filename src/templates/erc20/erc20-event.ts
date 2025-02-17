@@ -219,7 +219,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
-        ctx.store.insert([...result.statesByDay.values()]),
+        ctx.store.upsert([...result.statesByDay.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
       ])

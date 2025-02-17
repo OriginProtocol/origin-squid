@@ -1211,6 +1211,7 @@ export const createOTokenProcessor = (params: {
       ctx.store.upsert([...result.dailyStats.values()].map((ds) => ds.entity)),
       // ERC20
       ctx.store.insert([...result.erc20.states.values()]),
+      ctx.store.upsert([...result.erc20.statesByDay.values()]),
       ctx.store.upsert([...result.erc20.holders.values()]),
       ctx.store.insert([...result.erc20.balances.values()]),
       ctx.store.insert([...result.erc20.transfers.values()]),
