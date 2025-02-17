@@ -3,10 +3,10 @@ import { GraphQLResolveInfo } from 'graphql'
 import { Arg, Field, Info, Int, ObjectType, Query, Resolver } from 'type-graphql'
 import { Between, EntityManager } from 'typeorm'
 
-import { ERC20StateByDay as ERC20StateByDayEntity } from '@model'
+import { ERC20StateByDay } from '@model'
 
 @ObjectType()
-export class ERC20StateByDay {
+export class ERC20StateByDayR {
   @Field(() => String, { nullable: false })
   chainId!: number
   @Field(() => String, { nullable: false })
@@ -18,7 +18,7 @@ export class ERC20StateByDay {
   @Field(() => Int, { nullable: false })
   holderCount!: number
 
-  constructor(props: Partial<ERC20StateByDay>) {
+  constructor(props: Partial<ERC20StateByDayR>) {
     Object.assign(this, props)
   }
 }
@@ -27,16 +27,16 @@ export class ERC20StateByDay {
 export class ERC20Resolver {
   constructor(private tx: () => Promise<EntityManager>) {}
 
-  @Query(() => [ERC20StateByDay])
+  @Query(() => [ERC20StateByDayR])
   async erc20StateByDay(
-    @Arg('chainId', () => Number, { nullable: false }) chainId: number,
+    @Arg('chainId', () => String, { nullable: false }) chainId: number,
     @Arg('address', () => String, { nullable: false }) address: string,
     @Arg('from', () => String, { nullable: false }) from: string,
     @Arg('to', () => String, { nullable: true }) to: string | null,
     @Info() info: GraphQLResolveInfo,
-  ): Promise<ERC20StateByDay[]> {
+  ): Promise<ERC20StateByDayR[]> {
     const manager = await this.tx()
-    const repository = manager.getRepository(ERC20StateByDayEntity)
+    const repository = manager.getRepository(ERC20StateByDay)
 
     const states = await repository.find({
       where: {
@@ -51,7 +51,7 @@ export class ERC20Resolver {
 
     return states.map(
       (state) =>
-        new ERC20StateByDay({
+        new ERC20StateByDayR({
           chainId: state.chainId,
           address: state.address,
           day: new Date(state.date),
