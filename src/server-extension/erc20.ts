@@ -29,7 +29,7 @@ export class ERC20Resolver {
 
   @Query(() => [ERC20StateByDayR])
   async erc20StateByDay(
-    @Arg('chainId', () => String, { nullable: false }) chainId: number,
+    @Arg('chainId', () => Int, { nullable: false }) chainId: number,
     @Arg('address', () => String, { nullable: false }) address: string,
     @Arg('from', () => String, { nullable: false }) from: string,
     @Arg('to', () => String, { nullable: true }) to: string | null,
