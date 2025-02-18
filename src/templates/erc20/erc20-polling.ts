@@ -122,7 +122,7 @@ export const createERC20PollingTracker = ({
           id: `${ctx.chain.id}-${dateString}-${address}`,
           date: dateString,
         })
-        result.statesByDay.set(id, stateByDay)
+        result.statesByDay.set(stateByDay.id, stateByDay)
       }
       const updateBalances = async (ctx: Context, block: Block, accounts: string[], doStateUpdate = false) => {
         if (accountFilterSet) {
