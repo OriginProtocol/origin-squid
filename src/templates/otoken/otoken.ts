@@ -1153,7 +1153,7 @@ export const createOTokenProcessor = (params: {
       }
     }
     for (const history of result.history) {
-      const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address}`
+      const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address.address}`
       result.erc20.balances.set(
         id,
         new ERC20Balance({
@@ -1172,23 +1172,25 @@ export const createOTokenProcessor = (params: {
       where: { chainId: ctx.chain.id, address: params.otokenAddress },
       order: { timestamp: 'DESC' },
     })
-    const uniqueDays = new Set<string>()
-    for (const state of result.erc20.states.values()) {
-      const date = new Date(state.timestamp).toISOString().slice(0, 10)
-      uniqueDays.add(date)
-    }
 
-    for (const date of uniqueDays) {
-      const statesForDay = [...result.erc20.states.values()].filter(
-        (state) => new Date(state.timestamp).toISOString().slice(0, 10) === date,
-      )
+    const states = [...result.erc20.states.values()]
+    const startDate = lastStateByDay 
+      ? dayjs.utc(lastStateByDay.timestamp).endOf('day')
+      : dayjs.utc(states[0].timestamp).endOf('day')
+    const endDate = dayjs.utc(ctx.blocks[ctx.blocks.length - 1].header.timestamp).endOf('day')
+
+    // Ensure we create an entry for every day
+    for (let day = startDate; day.isBefore(endDate) || day.isSame(endDate, 'day'); day = day.add(1, 'day')) {
+      const date = day.format('YYYY-MM-DD')
+      const dayEnd = day.endOf('day')
+      const mostRecentState = findLast(states, (s) => dayjs.utc(s.timestamp).isBefore(dayEnd) || dayjs.utc(s.timestamp).isSame(dayEnd))
       const stateByDay = new ERC20StateByDay({
-        ...(statesForDay[0] ?? lastStateByDay),
+        ...(mostRecentState ?? lastStateByDay ?? states[0]), // Fallback to first state if no previous state exists
         id: `${ctx.chain.id}-${date}-${params.otokenAddress}`,
         date,
       })
-      lastStateByDay = stateByDay
       result.erc20.statesByDay.set(stateByDay.id, stateByDay)
+      lastStateByDay = stateByDay
     }
     time('erc20 instances')
 
@@ -1219,7 +1221,6 @@ export const createOTokenProcessor = (params: {
         [...result.erc20.removedHolders.values()].map(
           (account) => new ERC20Holder({ id: `${ctx.chain.id}-${params.otokenAddress}-${account}` }),
         ),
-      ),
     ])
   }
 
