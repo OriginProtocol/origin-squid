@@ -204,24 +204,28 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
       const states = [...result.states.values()]
       const startDate = lastStateByDay
         ? dayjs.utc(lastStateByDay.timestamp).endOf('day')
-        : dayjs.utc(states[0].timestamp).endOf('day')
-      const endDate = dayjs.utc(ctx.blocks[ctx.blocks.length - 1].header.timestamp).endOf('day')
+        : states[0]
+        ? dayjs.utc(states[0].timestamp).endOf('day')
+        : null
+      if (startDate) {
+        const endDate = dayjs.utc(ctx.blocks[ctx.blocks.length - 1].header.timestamp).endOf('day')
 
-      // Ensure we create an entry for every day
-      for (let day = startDate; day.isBefore(endDate) || day.isSame(endDate, 'day'); day = day.add(1, 'day')) {
-        const date = day.format('YYYY-MM-DD')
-        const dayEnd = day.endOf('day')
-        const mostRecentState = findLast(
-          states,
-          (s) => dayjs.utc(s.timestamp).isBefore(dayEnd) || dayjs.utc(s.timestamp).isSame(dayEnd),
-        )
-        const stateByDay = new ERC20StateByDay({
-          ...(mostRecentState ?? lastStateByDay ?? states[0]), // Fallback to first state if no previous state exists
-          id: `${ctx.chain.id}-${date}-${address}`,
-          date,
-        })
-        result.statesByDay.set(stateByDay.id, stateByDay)
-        lastStateByDay = stateByDay
+        // Ensure we create an entry for every day
+        for (let day = startDate; day.isBefore(endDate) || day.isSame(endDate, 'day'); day = day.add(1, 'day')) {
+          const date = day.format('YYYY-MM-DD')
+          const dayEnd = day.endOf('day')
+          const mostRecentState = findLast(
+            states,
+            (s) => dayjs.utc(s.timestamp).isBefore(dayEnd) || dayjs.utc(s.timestamp).isSame(dayEnd),
+          )
+          const stateByDay = new ERC20StateByDay({
+            ...(mostRecentState ?? lastStateByDay ?? states[0]), // Fallback to first state if no previous state exists
+            id: `${ctx.chain.id}-${date}-${address}`,
+            date,
+          })
+          result.statesByDay.set(stateByDay.id, stateByDay)
+          lastStateByDay = stateByDay
+        }
       }
 
       await Promise.all([
