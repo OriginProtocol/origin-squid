@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class PoolBoosterCampaign {
-    constructor(props?: Partial<PoolBoosterCampaign>) {
+export class CurvePoolBoosterCampaign {
+    constructor(props?: Partial<CurvePoolBoosterCampaign>) {
         Object.assign(this, props)
     }
 

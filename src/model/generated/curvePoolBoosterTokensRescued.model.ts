@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class PoolBoosterFeeCollected {
-    constructor(props?: Partial<PoolBoosterFeeCollected>) {
+export class CurvePoolBoosterTokensRescued {
+    constructor(props?: Partial<CurvePoolBoosterTokensRescued>) {
         Object.assign(this, props)
     }
 
@@ -26,10 +26,13 @@ export class PoolBoosterFeeCollected {
     blockNumber!: number
 
     @StringColumn_({nullable: false})
-    feeCollector!: string
+    token!: string
 
     @BigIntColumn_({nullable: false})
-    feeAmount!: bigint
+    amount!: bigint
+
+    @StringColumn_({nullable: false})
+    receiver!: string
 
     @StringColumn_({nullable: false})
     txHash!: string

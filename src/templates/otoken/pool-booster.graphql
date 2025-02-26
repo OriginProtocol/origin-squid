@@ -4,8 +4,8 @@ type PoolBooster @entity {
   chainId: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  registry: String! @index
   address: String! @index
+  registryAddress: String! @index
   ammPoolAddress: String! @index
   factoryAddress: String! @index
   poolBoosterType: Int!
@@ -20,4 +20,5 @@ type PoolBoosterBribeExecuted @entity {
   blockNumber: Int! @index
   txHash: String!
   amount: BigInt!
+  fee: BigInt!
 }

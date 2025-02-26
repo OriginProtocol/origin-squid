@@ -1,5 +1,5 @@
 import * as curvePoolBoosterAbi from '@abi/otoken-curve-pool-booster'
-import { PoolBoosterCampaign, PoolBoosterFeeCollected, PoolBoosterTokensRescued } from '@model'
+import { CurvePoolBoosterCampaign, CurvePoolBoosterFeeCollected, CurvePoolBoosterTokensRescued } from '@model'
 import { Context, defineProcessor, logFilter } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
@@ -46,13 +46,13 @@ export const createCurvePoolBoosterProcessor = (params: { from: number }) => {
       processor.addLog(totalRewardAmountUpdatedFilter.value)
     },
     process: async (ctx: Context) => {
-      const campaigns = new Map<string, PoolBoosterCampaign>()
-      const feesCollected = new Map<string, PoolBoosterFeeCollected>()
-      const tokensRescued = new Map<string, PoolBoosterTokensRescued>()
+      const campaigns = new Map<string, CurvePoolBoosterCampaign>()
+      const feesCollected = new Map<string, CurvePoolBoosterFeeCollected>()
+      const tokensRescued = new Map<string, CurvePoolBoosterTokensRescued>()
 
-      const getCampaign = async (address: string): Promise<PoolBoosterCampaign | undefined> => {
+      const getCampaign = async (address: string): Promise<CurvePoolBoosterCampaign | undefined> => {
         const id = `${ctx.chain.id}-${address}`
-        let campaign = campaigns.get(id) || (await ctx.store.get(PoolBoosterCampaign, id))
+        let campaign = campaigns.get(id) || (await ctx.store.get(CurvePoolBoosterCampaign, id))
         if (campaign) {
           campaigns.set(id, campaign)
         }
@@ -66,7 +66,7 @@ export const createCurvePoolBoosterProcessor = (params: { from: number }) => {
             if (campaignCreatedFilter.matches(log)) {
               const data = curvePoolBoosterAbi.events.CampaignCreated.decode(log)
               const id = `${ctx.chain.id}-${log.address}`
-              const campaign = new PoolBoosterCampaign({
+              const campaign = new CurvePoolBoosterCampaign({
                 id,
                 chainId: ctx.chain.id,
                 address: log.address,
@@ -104,7 +104,7 @@ export const createCurvePoolBoosterProcessor = (params: { from: number }) => {
               const campaign = await getCampaign(log.address)
               if (campaign) {
                 const data = curvePoolBoosterAbi.events.FeeCollected.decode(log)
-                const feeCollected = new PoolBoosterFeeCollected({
+                const feeCollected = new CurvePoolBoosterFeeCollected({
                   id: `${ctx.chain.id}-${log.id}`,
                   chainId: ctx.chain.id,
                   address: log.address,
@@ -118,7 +118,7 @@ export const createCurvePoolBoosterProcessor = (params: { from: number }) => {
               }
             } else if (tokensRescuedFilter.matches(log)) {
               const data = curvePoolBoosterAbi.events.TokensRescued.decode(log)
-              const tokensRescuedEvent = new PoolBoosterTokensRescued({
+              const tokensRescuedEvent = new CurvePoolBoosterTokensRescued({
                 id: `${ctx.chain.id}-${log.id}`,
                 chainId: ctx.chain.id,
                 address: log.address,
