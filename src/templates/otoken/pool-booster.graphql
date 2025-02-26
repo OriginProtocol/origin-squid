@@ -1,0 +1,23 @@
+# Pool Booster Events
+type PoolBooster @entity {
+  id: ID! @index # chainId-address
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  registry: String! @index
+  address: String! @index
+  ammPoolAddress: String! @index
+  factoryAddress: String! @index
+  poolBoosterType: Int!
+  active: Boolean!
+}
+
+type PoolBoosterBribeExecuted @entity {
+  id: ID! @index # chainId-address-txHash
+  chainId: Int! @index
+  address: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String!
+  amount: BigInt!
+}
