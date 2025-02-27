@@ -7,7 +7,7 @@ deploy:
   env:
     TS_NODE_BASEURL: './lib'
     IGNORE_VALIDATION: 'true'
-    # DEBUG_PERF: 'true'
+    DEBUG_PERF: 'true'
   addons:
     postgres:
     rpc:

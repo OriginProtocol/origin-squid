@@ -219,6 +219,7 @@ export const createOTokenProcessor = (params: {
       ctx.log.info(message)
       start = Date.now()
     }
+    time('start')
     idMap = new Map<string, number>()
 
     const transferFilter = logFilter({
@@ -1091,11 +1092,20 @@ export const createOTokenProcessor = (params: {
         const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
         return dripperContract.availableFunds()
       }
-      const [rateETH, rateUSD, dripperWETH, amoSupply] = await Promise.all([
-        ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((e) => e?.rate ?? 0n),
-        ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((e) => e?.rate ?? 0n),
+
+      const wotokenContract =
+        params.wotoken && block.header.height >= params.wotoken.from
+          ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
+          : null
+
+      const start = Date.now()
+      const [rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] = await Promise.all([
+        ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((a) => a?.rate ?? 0n),
+        ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((a) => a?.rate ?? 0n),
         getDripperAvailableFunds(),
         params.getAmoSupply(ctx, block.header.height),
+        wotokenContract ? wotokenContract.totalSupply() : 0n,
+        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
       ])
 
       entity.rateETH = rateETH
@@ -1104,14 +1114,6 @@ export const createOTokenProcessor = (params: {
 
       entity.dripperWETH = dripperWETH
       entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
-      const wotokenContract =
-        params.wotoken && block.header.height >= params.wotoken.from
-          ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
-          : null
-      const [wrappedSupply, wrappedRate] = await Promise.all([
-        wotokenContract ? wotokenContract.totalSupply() : 0n,
-        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
-      ])
       entity.wrappedSupply = wrappedSupply
       entity.rateWrapped = wrappedRate
       entity.accountsOverThreshold = Array.from(owners?.values() ?? []).filter(
@@ -1230,6 +1232,27 @@ export const createOTokenProcessor = (params: {
         ),
       ),
     ])
+
+    // Log the count of each entity type
+    ctx.log.info(`Processed ${result.otokens.length} OTokens`)
+    ctx.log.info(`Processed ${result.wotokens.length} WOTokens`)
+    ctx.log.info(`Processed ${result.assets.length} OTokenAssets`)
+    ctx.log.info(`Processed ${result.history.length} OTokenHistory entries`)
+    ctx.log.info(`Processed ${result.rebases.length} OTokenRebases`)
+    ctx.log.info(`Processed ${result.rebaseOptions.length} OTokenRebaseOptions`)
+    ctx.log.info(`Processed ${result.activity.length} OTokenActivities`)
+    ctx.log.info(`Processed ${result.vaults.length} OTokenVaults`)
+    ctx.log.info(`Processed ${result.dripperStates.length} OTokenDripperStates`)
+    ctx.log.info(`Processed ${result.harvesterYieldSent.length} OTokenHarvesterYieldSent entries`)
+    ctx.log.info(`Processed ${result.dailyStats.size} OTokenDailyStats`)
+    ctx.log.info(`Processed ${result.erc20.states.size} ERC20States`)
+    ctx.log.info(`Processed ${result.erc20.statesByDay.size} ERC20StatesByDay`)
+    ctx.log.info(`Processed ${result.erc20.holders.size} ERC20Holders`)
+    ctx.log.info(`Processed ${result.erc20.balances.size} ERC20Balances`)
+    ctx.log.info(`Processed ${result.erc20.transfers.size} ERC20Transfers`)
+    ctx.log.info(`Removed ${result.erc20.removedHolders.size} ERC20Holders`)
+
+    time('save to database')
   }
 
   return {
