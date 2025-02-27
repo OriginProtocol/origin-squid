@@ -1,3 +1,4 @@
+import { sonicErc20s } from 'sonic/erc20'
 import { OS } from 'sonic/os'
 import { sonicStrategies } from 'sonic/strategies'
 import 'tsconfig-paths/register'
@@ -13,7 +14,7 @@ import * as validate from './sonic/validate'
 export const processor = defineSquidProcessor({
   chainId: sonic.id,
   stateSchema: 'sonic-processor',
-  processors: [...OS, sonicStrategies, createCurvePoolBoosterProcessor({ from: 7436660 })],
+  processors: [...OS, ...sonicErc20s, sonicStrategies, createCurvePoolBoosterProcessor({ from: 7436660 })],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
   validators: [validate],
 })
