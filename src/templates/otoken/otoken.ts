@@ -1203,7 +1203,9 @@ export const createOTokenProcessor = (params: {
 
     // Save to database
     if (owners) {
+      const ownerCount = owners.size
       await ctx.store.upsert([...owners.values()])
+      ctx.log.info(`Saved ${ownerCount} OTokenAddress entities`)
     }
     await ctx.store.upsert(result.apies)
     await Promise.all([
@@ -1230,6 +1232,29 @@ export const createOTokenProcessor = (params: {
         ),
       ),
     ])
+
+    // Log entity counts
+    ctx.log.info(`Saved entities:
+      APYs: ${result.apies.length}
+      OTokens: ${result.otokens.length}
+      WOTokens: ${result.wotokens.length}
+      Assets: ${result.assets.length}
+      History: ${result.history.length}
+      Rebases: ${result.rebases.length}
+      RebaseOptions: ${result.rebaseOptions.length}
+      Activity: ${result.activity.length}
+      Vaults: ${result.vaults.length}
+      DripperStates: ${result.dripperStates.length}
+      HarvesterYieldSent: ${result.harvesterYieldSent.length}
+      DailyStats: ${result.dailyStats.size}
+      ERC20:
+        - States: ${result.erc20.states.size}
+        - StatesByDay: ${result.erc20.statesByDay.size}
+        - Holders: ${result.erc20.holders.size}
+        - Balances: ${result.erc20.balances.size}
+        - Transfers: ${result.erc20.transfers.size}
+        - RemovedHolders: ${result.erc20.removedHolders.size}
+    `)
   }
 
   return {
