@@ -510,6 +510,8 @@ export const createOTokenProcessor = (params: {
         if (!address.credits || address.rebasingOption === RebasingOption.OptOut) {
           continue
         }
+        ownersChanged.set(address.address, address) // We have to mark that this has changed.
+
         const involvedInYieldDelegation =
           address.rebasingOption === RebasingOption.YieldDelegationSource ||
           address.rebasingOption === RebasingOption.YieldDelegationTarget
