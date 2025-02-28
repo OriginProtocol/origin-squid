@@ -85,12 +85,12 @@ deploy:
     ########## BASE NETWORK ##########
     - name: base-processor
       cmd: ['sqd', 'process:base:prod']
-      env:
-        #   ### Fork Setup Stage 1
-        #   ARCHIVE_ONLY: 'true'
-        #   BLOCK_TO: 21527081
-        #   ### Fork Setup Stage 2
-        DISABLE_ARCHIVE: 'true'
+      # env:
+      #   ### Fork Setup Stage 1
+      #   ARCHIVE_ONLY: 'true'
+      #   BLOCK_TO: 21527081
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
       #   # RPC_BASE_ENV: RPC_BASE_ENDPOINT
       #   # RPC_BASE_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
       #   ### Time Travel Fix
