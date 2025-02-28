@@ -287,6 +287,18 @@ export const createOTokenProcessor = (params: {
       },
     }
 
+    /* Owners which have been pulled or updated in the current context. */
+    let ownersChanged = new Map<string, OTokenAddress>()
+    let getOwner = async (ctx: Context, address: string, block: Block) => {
+      let owner = owners!.get(address)
+      if (!owner) {
+        owner = await createAddress(ctx, params.otokenAddress, address, block)
+        owners!.set(owner.address, owner)
+      }
+      ownersChanged.set(owner.address, owner)
+      return owner
+    }
+
     await result.initialize()
 
     // Prepare data for transfer processing
@@ -348,11 +360,7 @@ export const createOTokenProcessor = (params: {
         .find(({ address }) => address === data.to)!.credits
 
       const ensureAddress = async (address: string) => {
-        let entity = owners!.get(address)
-        if (!entity) {
-          entity = await createAddress(ctx, params.otokenAddress, address, block)
-          owners!.set(entity.address, entity)
-        }
+        let entity = await getOwner(ctx, address, block)
         entity.blockNumber = block.header.height
         entity.lastUpdated = new Date(block.header.timestamp)
         return entity
@@ -602,11 +610,7 @@ export const createOTokenProcessor = (params: {
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
       const otokenObject = await getOTokenObject(block)
-      let owner = owners!.get(address)
-      if (!owner) {
-        owner = await createAddress(ctx, params.otokenAddress, address, block)
-        owners!.set(address, owner)
-      }
+      let owner = await getOwner(ctx, address, block)
       const rebaseOption = new OTokenRebaseOption({
         id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${hash}-${owner.address}`),
         chainId: ctx.chain.id,
@@ -646,11 +650,7 @@ export const createOTokenProcessor = (params: {
       const sourceAddress = data.source.toLowerCase()
       const targetAddress = data.target.toLowerCase()
       // Source
-      let sourceOwner = owners!.get(sourceAddress)
-      if (!sourceOwner) {
-        sourceOwner = await createAddress(ctx, params.otokenAddress, sourceAddress, block)
-        owners!.set(sourceAddress, sourceOwner)
-      }
+      let sourceOwner = await getOwner(ctx, sourceAddress, block)
       sourceOwner.rebasingOption = RebasingOption.YieldDelegationSource
       sourceOwner.delegatedTo = targetAddress
       result.rebaseOptions.push(
@@ -667,11 +667,7 @@ export const createOTokenProcessor = (params: {
         }),
       )
       // Target
-      let targetOwner = owners!.get(targetAddress)
-      if (!targetOwner) {
-        targetOwner = await createAddress(ctx, params.otokenAddress, targetAddress, block)
-        owners!.set(targetAddress, targetOwner)
-      }
+      let targetOwner = await getOwner(ctx, targetAddress, block)
       targetOwner.rebasingOption = RebasingOption.YieldDelegationTarget
       targetOwner.delegatedTo = null
       result.rebaseOptions.push(
@@ -697,11 +693,7 @@ export const createOTokenProcessor = (params: {
       const sourceAddress = data.source.toLowerCase()
       const targetAddress = data.target.toLowerCase()
       // Source
-      let sourceOwner = owners!.get(sourceAddress)
-      if (!sourceOwner) {
-        sourceOwner = await createAddress(ctx, params.otokenAddress, sourceAddress, block)
-        owners!.set(sourceAddress, sourceOwner)
-      }
+      let sourceOwner = await getOwner(ctx, sourceAddress, block)
       sourceOwner.rebasingOption = RebasingOption.OptOut
       sourceOwner.delegatedTo = null
       result.rebaseOptions.push(
@@ -718,11 +710,7 @@ export const createOTokenProcessor = (params: {
         }),
       )
       // Target
-      let targetOwner = owners!.get(targetAddress)
-      if (!targetOwner) {
-        targetOwner = await createAddress(ctx, params.otokenAddress, targetAddress, block)
-        owners!.set(targetAddress, targetOwner)
-      }
+      let targetOwner = await getOwner(ctx, targetAddress, block)
       targetOwner.rebasingOption = RebasingOption.OptIn
       targetOwner.delegatedTo = null
       result.rebaseOptions.push(
@@ -1136,7 +1124,8 @@ export const createOTokenProcessor = (params: {
       })
       result.erc20.states.set(erc20State.id, erc20State)
     }
-    for (const owner of owners?.values() ?? []) {
+    const ownersToUpdate = [...(ownersChanged.values() ?? [])]
+    for (const owner of ownersToUpdate) {
       if (owner.balance === 0n) {
         result.erc20.removedHolders.add(owner.address)
       } else {
@@ -1204,9 +1193,7 @@ export const createOTokenProcessor = (params: {
     time('erc20 instances')
 
     // Save to database
-    if (owners) {
-      await ctx.store.upsert([...owners.values()])
-    }
+    await ctx.store.upsert(ownersToUpdate)
     await ctx.store.upsert(result.apies)
     await Promise.all([
       ctx.store.upsert(result.otokens), // TODO: Consider changing otoken ID to block number instead of timestamp.
@@ -1233,6 +1220,30 @@ export const createOTokenProcessor = (params: {
       ),
     ])
     time('save to database')
+
+    // Log entity counts
+    ctx.log.info(`Saved ${ownersToUpdate.length} OTokenAddress entities`)
+    ctx.log.info(`Saved entities:
+      APYs: ${result.apies.length}
+      OTokens: ${result.otokens.length}
+      WOTokens: ${result.wotokens.length}
+      Assets: ${result.assets.length}
+      History: ${result.history.length}
+      Rebases: ${result.rebases.length}
+      RebaseOptions: ${result.rebaseOptions.length}
+      Activity: ${result.activity.length}
+      Vaults: ${result.vaults.length}
+      DripperStates: ${result.dripperStates.length}
+      HarvesterYieldSent: ${result.harvesterYieldSent.length}
+      DailyStats: ${result.dailyStats.size}
+      ERC20:
+        - States: ${result.erc20.states.size}
+        - StatesByDay: ${result.erc20.statesByDay.size}
+        - Holders: ${result.erc20.holders.size}
+        - Balances: ${result.erc20.balances.size}
+        - Transfers: ${result.erc20.transfers.size}
+        - RemovedHolders: ${result.erc20.removedHolders.size}
+    `)
   }
 
   return {
