@@ -1221,9 +1221,10 @@ export const createOTokenProcessor = (params: {
     ])
     time('save to database')
 
-    // Log entity counts
-    ctx.log.info(`Saved ${ownersToUpdate.length} OTokenAddress entities`)
-    ctx.log.info(`Saved entities:
+    if (global.process.env.DEBUG_PERF !== 'true') {
+      // Log entity counts
+      ctx.log.info(`Saved ${ownersToUpdate.length} OTokenAddress entities`)
+      ctx.log.info(`Saved entities:
       APYs: ${result.apies.length}
       OTokens: ${result.otokens.length}
       WOTokens: ${result.wotokens.length}
@@ -1244,6 +1245,7 @@ export const createOTokenProcessor = (params: {
         - Transfers: ${result.erc20.transfers.size}
         - RemovedHolders: ${result.erc20.removedHolders.size}
     `)
+    }
   }
 
   return {
