@@ -1232,26 +1232,6 @@ export const createOTokenProcessor = (params: {
         ),
       ),
     ])
-
-    // Log the count of each entity type
-    ctx.log.info(`Processed ${result.otokens.length} OTokens`)
-    ctx.log.info(`Processed ${result.wotokens.length} WOTokens`)
-    ctx.log.info(`Processed ${result.assets.length} OTokenAssets`)
-    ctx.log.info(`Processed ${result.history.length} OTokenHistory entries`)
-    ctx.log.info(`Processed ${result.rebases.length} OTokenRebases`)
-    ctx.log.info(`Processed ${result.rebaseOptions.length} OTokenRebaseOptions`)
-    ctx.log.info(`Processed ${result.activity.length} OTokenActivities`)
-    ctx.log.info(`Processed ${result.vaults.length} OTokenVaults`)
-    ctx.log.info(`Processed ${result.dripperStates.length} OTokenDripperStates`)
-    ctx.log.info(`Processed ${result.harvesterYieldSent.length} OTokenHarvesterYieldSent entries`)
-    ctx.log.info(`Processed ${result.dailyStats.size} OTokenDailyStats`)
-    ctx.log.info(`Processed ${result.erc20.states.size} ERC20States`)
-    ctx.log.info(`Processed ${result.erc20.statesByDay.size} ERC20StatesByDay`)
-    ctx.log.info(`Processed ${result.erc20.holders.size} ERC20Holders`)
-    ctx.log.info(`Processed ${result.erc20.balances.size} ERC20Balances`)
-    ctx.log.info(`Processed ${result.erc20.transfers.size} ERC20Transfers`)
-    ctx.log.info(`Removed ${result.erc20.removedHolders.size} ERC20Holders`)
-
     time('save to database')
   }
 
