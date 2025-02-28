@@ -1223,7 +1223,7 @@ export const createOTokenProcessor = (params: {
     ])
     time('save to database')
 
-    if (global.process.env.DEBUG_PERF !== 'true') {
+    if (global.process.env.DEBUG_PERF === 'true') {
       // Log entity counts
       ctx.log.info(`Saved ${ownersToUpdate.length} OTokenAddress entities`)
       ctx.log.info(`Saved entities:
