@@ -407,6 +407,7 @@ type OToken @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+  creditsPerToken: BigInt!
   holderCount: Int!
 }
 
@@ -436,10 +437,12 @@ type OTokenAddress @entity {
   address: String! @index
   isContract: Boolean!
   rebasingOption: RebasingOption!
-  balance: BigInt!
-  earned: BigInt!
   credits: BigInt!
-  delegatedTo: String
+  alternativeCreditsPerToken: BigInt! # For non-rebasing accounts
+  yieldTo: OTokenAddress # For delegation source
+  yieldFrom: OTokenAddress # For delegation target
+  balance: BigInt!
+  balanceEarned: BigInt!
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime

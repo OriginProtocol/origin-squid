@@ -1,14 +1,15 @@
 import { parseEther } from 'viem'
 
-import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken2'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
-const otokenProcessor = createOTokenProcessor({
+const otokenProcessor = createOTokenProcessor2({
   name: 'OS',
   symbol: 'OS',
   from: sonicAddresses.OS.initializeBlock,
+  initialRebasingCreditsPerToken: 1000000000000000000000000000n,
   vaultFrom: sonicAddresses.OS.initializeBlock,
   otokenAddress: sonicAddresses.OS.address,
   wotoken: {

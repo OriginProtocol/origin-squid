@@ -5,8 +5,8 @@ import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
-import { createOTokenProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken2'
 import {
   CURVE_ETH_OETH_POOL_ADDRESS,
   CURVE_FRXETH_OETH_POOL_ADDRESS,
@@ -29,12 +29,14 @@ import {
 } from '@utils/addresses'
 import { tokensByChain } from '@utils/tokensByChain'
 
-const otokenProcessor = createOTokenProcessor({
+const otokenProcessor = createOTokenProcessor2({
   name: 'OETH',
   symbol: 'OETH',
-  from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+  // from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
+  from: 17058299, // Block soon before first transfers are seen.
   vaultFrom: 17084107,
   otokenAddress: OETH_ADDRESS,
+  initialRebasingCreditsPerToken: 1000000000000000000n,
   wotoken: {
     address: WOETH_ADDRESS,
     from: 17080507,
@@ -98,7 +100,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
   },
 })
 
-export const name = 'oeth'
+export const name = 'otoken'
 export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)
 export const setup = (processor: EvmBatchProcessor) => {
   otokenProcessor.setup(processor)

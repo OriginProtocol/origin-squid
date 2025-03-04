@@ -37,6 +37,9 @@ export class OToken {
     @BigIntColumn_({nullable: false})
     nonRebasingSupply!: bigint
 
+    @BigIntColumn_({nullable: false})
+    creditsPerToken!: bigint
+
     @IntColumn_({nullable: false})
     holderCount!: number
 }

@@ -1,7 +1,7 @@
 import { parseEther } from 'viem'
 import { mainnet } from 'viem/chains'
 
-import { createOTokenProcessor } from '@templates/otoken'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken2'
 import {
   DAI_ADDRESS,
   OUSD_ADDRESS,
@@ -17,12 +17,13 @@ import { tokensByChain } from '@utils/tokensByChain'
 // export const from = 11585978 // OUSDReset
 // export const from = 13533937 // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
 
-export const { name, from, setup, process } = createOTokenProcessor({
+export const { name, from, setup, process } = createOTokenProcessor2({
   name: 'OUSD',
   symbol: 'OUSD',
-  from: 11585978, // OUSDReset
+  from: 10884563, // OUSDReset
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
+  initialRebasingCreditsPerToken: 1000000000000000000n,
   otokenAddress: OUSD_ADDRESS,
   wotoken: {
     address: WOUSD_ADDRESS,
