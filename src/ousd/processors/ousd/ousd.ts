@@ -1,7 +1,7 @@
 import { parseEther } from 'viem'
 import { mainnet } from 'viem/chains'
 
-import { createOTokenProcessor2 } from '@templates/otoken/otoken2'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import {
   DAI_ADDRESS,
   OUSD_ADDRESS,

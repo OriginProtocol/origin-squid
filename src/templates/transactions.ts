@@ -7,7 +7,7 @@ export const createTransactionProcessor = (params: { from: number; address: stri
   return defineProcessor({
     name: `transactions - ${params.address.join(',')}`,
     from: params.from,
-    setup: async (processor: EvmBatchProcessor) => {
+    setup: (processor: EvmBatchProcessor) => {
       processor.addTransaction({
         from: params.address,
         range: {

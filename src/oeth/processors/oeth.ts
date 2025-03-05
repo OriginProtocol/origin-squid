@@ -6,7 +6,7 @@ import * as erc20 from '@abi/erc20'
 import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
-import { createOTokenProcessor2 } from '@templates/otoken/otoken2'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import {
   CURVE_ETH_OETH_POOL_ADDRESS,
   CURVE_FRXETH_OETH_POOL_ADDRESS,
