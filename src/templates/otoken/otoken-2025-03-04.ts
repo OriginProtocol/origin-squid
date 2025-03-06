@@ -6,6 +6,7 @@
  */
 import { Block, Context } from '@originprotocol/squid-utils'
 
+import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { isContract } from './utils/isContract'
 
 /**
@@ -40,7 +41,7 @@ export class OToken_2025_03_04 {
 
   // State variables
   public totalSupply: bigint = 0n
-  private allowances: Map<string, Map<string, bigint>> = new Map()
+  public allowances: Map<string, Map<string, bigint>> = new Map()
   public vaultAddress: string = ''
   public creditBalances: Map<string, bigint> = new Map()
   public rebasingCredits: bigint = 0n
@@ -52,6 +53,18 @@ export class OToken_2025_03_04 {
   public yieldTo: Map<string, string> = new Map()
   public yieldFrom: Map<string, string> = new Map()
   public governor: string = ''
+
+  copyState(other: OToken_2023_12_21): void {
+    this.totalSupply = other.totalSupply
+    this.allowances = other._allowances
+    this.vaultAddress = other.vaultAddress
+    this.creditBalances = other.creditBalances
+    this.rebasingCredits = other._rebasingCredits
+    this.rebasingCreditsPerToken = other._rebasingCreditsPerToken
+    this.nonRebasingSupply = other.nonRebasingSupply
+    this.rebasingSupply = other.totalSupply - other.nonRebasingSupply
+    this.rebaseState = other.rebaseState
+  }
 
   /**
    * Initialize the contract

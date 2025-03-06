@@ -9,7 +9,6 @@ const otokenProcessor = createOTokenProcessor2({
   name: 'OS',
   symbol: 'OS',
   from: sonicAddresses.OS.initializeBlock,
-  initialRebasingCreditsPerToken: 1000000000000000000000000000n,
   vaultFrom: sonicAddresses.OS.initializeBlock,
   otokenAddress: sonicAddresses.OS.address,
   wotoken: {

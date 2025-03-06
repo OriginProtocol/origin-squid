@@ -1,6 +1,5 @@
 import { Block, Context } from '@originprotocol/squid-utils'
 
-import { SafeMath } from './utils/SafeMath'
 import { isContract } from './utils/isContract'
 
 /**
@@ -16,13 +15,13 @@ enum RebaseOptions {
 }
 
 export class OToken_2023_12_21 {
-  public readonly MAX_SUPPLY = BigInt('340282366920938463463374607431768211455') // (2^128) - 1
-  public _totalSupply: bigint = 0n
+  public readonly MAX_SUPPLY = 2n ** 128n - 1n // (2^128) - 1
+  public totalSupply: bigint = 0n
   public _allowances: Map<string, Map<string, bigint>> = new Map()
   public vaultAddress: string = '0x0000000000000000000000000000000000000000'
   public creditBalances: Map<string, bigint> = new Map()
-  public rebasingCredits: bigint = 0n
-  public rebasingCreditsPerToken: bigint = 0n
+  public _rebasingCredits: bigint = 0n
+  public _rebasingCreditsPerToken: bigint = 0n
   public nonRebasingSupply: bigint = 0n
   public nonRebasingCreditsPerToken: Map<string, bigint> = new Map()
   public rebaseState: Map<string, RebaseOptions> = new Map()
@@ -48,27 +47,48 @@ export class OToken_2023_12_21 {
       throw new Error('Already initialized')
     }
     this.governor = governor
-    this.rebasingCreditsPerToken = initialCreditsPerToken
+    this._rebasingCreditsPerToken = initialCreditsPerToken
     this.vaultAddress = vaultAddress
   }
 
   private onlyVault(caller: string): void {
     if (caller !== this.vaultAddress) {
-      throw new Error('Caller is not the Vault')
+      this.ctx.log.warn('Caller is not the Vault')
     }
   }
 
   private onlyGovernor(caller: string): void {
     if (caller !== this.governor) {
-      throw new Error('Caller is not the Governor')
+      this.ctx.log.warn('Caller is not the Governor')
     }
   }
 
   /**
-   * @dev Get the total supply of OUSD
+   * @return Low resolution rebasingCreditsPerToken
    */
-  public totalSupply(): bigint {
-    return this._totalSupply
+  public rebasingCreditsPerToken(): bigint {
+    return this._rebasingCreditsPerToken / this.RESOLUTION_INCREASE
+  }
+
+  /**
+   * @return Low resolution total number of rebasing credits
+   */
+  public rebasingCredits(): bigint {
+    return this._rebasingCredits / this.RESOLUTION_INCREASE
+  }
+
+  /**
+   * @return High resolution rebasingCreditsPerToken
+   */
+  public rebasingCreditsPerTokenHighres(): bigint {
+    return this._rebasingCreditsPerToken
+  }
+
+  /**
+   * @return High resolution total number of rebasing credits
+   */
+  public rebasingCreditsHighres(): bigint {
+    return this._rebasingCredits
   }
 
   /**
@@ -77,7 +97,24 @@ export class OToken_2023_12_21 {
   public balanceOf(account: string): bigint {
     const credits = this.creditBalances.get(account) || 0n
     if (credits === 0n) return 0n
-    return SafeMath.divPrecisely(credits, this._creditsPerToken(account))
+    return (credits * 10n ** 18n) / this._creditsPerToken(account)
+  }
+
+  public creditsBalanceOf(account: string): [bigint, bigint] {
+    const cpt = this._creditsPerToken(account)
+    if (cpt === 10n ** 27n) {
+      // For a period before the resolution upgrade, we created all new
+      // contract accounts at high resolution. Since they are not changing
+      // as a result of this upgrade, we will return their true values
+      return [this.creditBalances.get(account) || 0n, cpt]
+    } else {
+      return [(this.creditBalances.get(account) || 0n) / this.RESOLUTION_INCREASE, cpt / this.RESOLUTION_INCREASE]
+    }
+  }
+
+  public creditsBalanceOfHighres(account: string): [bigint, bigint, boolean] {
+    const cpt = this._creditsPerToken(account)
+    return [this.creditBalances.get(account) || 0n, cpt, this.isUpgraded.get(account) === 1n]
   }
 
   /**
@@ -90,10 +127,13 @@ export class OToken_2023_12_21 {
     const fromBalance = this.balanceOf(caller)
     if (value > fromBalance) {
       this.ctx.log.warn(`Transfer amount exceeds balance: requested ${value}, available ${fromBalance}`)
+      debugger
     }
 
     await this._executeTransfer(caller, to, value)
+
     // this.emitTransfer(caller, to, value)
+
     return true
   }
 
@@ -103,10 +143,13 @@ export class OToken_2023_12_21 {
     }
     if (value > this.balanceOf(from)) {
       this.ctx.log.warn(`Transfer greater than balance: requested ${value}, available ${this.balanceOf(from)}`)
+      debugger
     }
 
-    const allowance = this._allowances.get(from)?.get(caller) || 0n
-    this._allowances.set(from, (this._allowances.get(from) || new Map()).set(caller, SafeMath.sub(allowance, value)))
+    const allowances = this._allowances.get(from) || new Map()
+    const allowance = allowances.get(caller) || 0n
+    allowances.set(caller, allowance - value)
+    this._allowances.set(from, allowances)
 
     await this._executeTransfer(from, to, value)
 
@@ -116,45 +159,33 @@ export class OToken_2023_12_21 {
   }
 
   /**
-   * @dev Get credits balance of an account
-   */
-  public creditsBalanceOf(account: string): [bigint, bigint] {
-    const cpt = this._creditsPerToken(account)
-    if (cpt === BigInt('1' + '0'.repeat(27))) {
-      // 1e27
-      return [this.creditBalances.get(account) || 0n, cpt]
-    } else {
-      return [
-        SafeMath.div(this.creditBalances.get(account) || 0n, this.RESOLUTION_INCREASE),
-        SafeMath.div(cpt, this.RESOLUTION_INCREASE),
-      ]
-    }
-  }
-
-  /**
    * @dev Internal function to handle transfers
    */
   private async _executeTransfer(from: string, to: string, value: bigint): Promise<void> {
     const isNonRebasingTo = await this._isNonRebasingAccount(to)
     const isNonRebasingFrom = await this._isNonRebasingAccount(from)
 
-    const creditsCredited = SafeMath.mulTruncate(value, this._creditsPerToken(to))
-    const creditsDeducted = SafeMath.mulTruncate(value, this._creditsPerToken(from))
+    const creditsCredited = (value * this._creditsPerToken(to)) / 10n ** 18n
+    const creditsDeducted = (value * this._creditsPerToken(from)) / 10n ** 18n
 
-    const fromCredits = this.creditBalances.get(from) || 0n
-    if (fromCredits < creditsDeducted) {
-      this.ctx.log.warn(`Transfer amount exceeds balance: requested ${creditsDeducted}, available ${fromCredits}`)
+    if ((this.creditBalances.get(from) || 0n) < creditsDeducted) {
+      this.ctx.log.warn(
+        `Transfer amount exceeds balance: requested ${creditsDeducted}, available ${
+          this.creditBalances.get(from) || 0n
+        }`,
+      )
+      debugger
     }
 
-    this.creditBalances.set(from, fromCredits - creditsDeducted)
+    this.creditBalances.set(from, (this.creditBalances.get(from) || 0n) - creditsDeducted)
     this.creditBalances.set(to, (this.creditBalances.get(to) || 0n) + creditsCredited)
 
     if (isNonRebasingTo && !isNonRebasingFrom) {
       this.nonRebasingSupply += value
-      this.rebasingCredits -= creditsDeducted
+      this._rebasingCredits -= creditsDeducted
     } else if (!isNonRebasingTo && isNonRebasingFrom) {
       this.nonRebasingSupply -= value
-      this.rebasingCredits += creditsCredited
+      this._rebasingCredits += creditsCredited
     }
   }
 
@@ -200,24 +231,19 @@ export class OToken_2023_12_21 {
    * @param _addedValue The amount of tokens to increase the allowance by.
    */
   public increaseAllowance(caller: string, _spender: string, _addedValue: bigint): boolean {
-    const currentAllowance = this.allowance(caller, _spender)
-    const newAllowance = SafeMath.add(currentAllowance, _addedValue)
-
-    if (!this._allowances.has(caller)) {
-      this._allowances.set(caller, new Map())
-    }
-    this._allowances.get(caller)?.set(_spender, newAllowance)
+    const newAllowance = this.allowance(caller, _spender) + _addedValue
+    this.approve(caller, _spender, newAllowance)
     // this.emitApproval(caller, _spender, newAllowance)
     return true
   }
 
   /**
-     * @dev Decrease the amount of tokens that an owner has allowed to
-            `_spender`.
-     * @param _spender The address which will spend the funds.
-     * @param _subtractedValue The amount of tokens to decrease the allowance
-     *        by.
-     */
+   * @dev Decrease the amount of tokens that an owner has allowed to
+   *      `_spender`.
+   * @param _spender The address which will spend the funds.
+   * @param _subtractedValue The amount of tokens to decrease the allowance
+   *        by.
+   */
   public decreaseAllowance(caller: string, _spender: string, _subtractedValue: bigint): boolean {
     const oldValue = this.allowance(caller, _spender)
     let newAllowance: bigint
@@ -225,13 +251,10 @@ export class OToken_2023_12_21 {
     if (_subtractedValue >= oldValue) {
       newAllowance = 0n
     } else {
-      newAllowance = SafeMath.sub(oldValue, _subtractedValue)
+      newAllowance = oldValue - _subtractedValue
     }
 
-    if (!this._allowances.has(caller)) {
-      this._allowances.set(caller, new Map())
-    }
-    this._allowances.get(caller)?.set(_spender, newAllowance)
+    this.approve(caller, _spender, newAllowance)
     // this.emitApproval(caller, _spender, newAllowance)
     return true
   }
@@ -259,20 +282,20 @@ export class OToken_2023_12_21 {
 
     const isNonRebasingAccount = await this._isNonRebasingAccount(_account)
 
-    const creditAmount = SafeMath.mulTruncate(_amount, this._creditsPerToken(_account))
-    this.creditBalances.set(_account, SafeMath.add(this.creditBalances.get(_account) || 0n, creditAmount))
+    const creditAmount = (_amount * this._creditsPerToken(_account)) / 10n ** 18n
+    this.creditBalances.set(_account, (this.creditBalances.get(_account) || 0n) + creditAmount)
 
     // If the account is non rebasing and doesn't have a set creditsPerToken
     // then set it i.e. this is a mint from a fresh contract
     if (isNonRebasingAccount) {
-      this.nonRebasingSupply = SafeMath.add(this.nonRebasingSupply, _amount)
+      this.nonRebasingSupply = this.nonRebasingSupply + _amount
     } else {
-      this.rebasingCredits = SafeMath.add(this.rebasingCredits, creditAmount)
+      this._rebasingCredits = this._rebasingCredits + creditAmount
     }
 
-    this._totalSupply = SafeMath.add(this._totalSupply, _amount)
+    this.totalSupply = this.totalSupply + _amount
 
-    if (this._totalSupply >= this.MAX_SUPPLY) throw new Error('Max supply')
+    if (this.totalSupply >= this.MAX_SUPPLY) throw new Error('Max supply')
 
     // this.emitTransfer('', _account, _amount)
   }
@@ -303,27 +326,30 @@ export class OToken_2023_12_21 {
     }
 
     const isNonRebasingAccount = await this._isNonRebasingAccount(_account)
-    const creditAmount = SafeMath.mulTruncate(_amount, this._creditsPerToken(_account))
+    const creditAmount = (_amount * this._creditsPerToken(_account)) / 10n ** 18n
     const currentCredits = this.creditBalances.get(_account) || 0n
 
     // Remove the credits, burning rounding errors
-    if (currentCredits === creditAmount || currentCredits - BigInt(1) === creditAmount) {
+    if (currentCredits === creditAmount || currentCredits - 1n === creditAmount) {
       // Handle dust from rounding
       this.creditBalances.set(_account, 0n)
     } else if (currentCredits > creditAmount) {
-      this.creditBalances.set(_account, SafeMath.sub(currentCredits, creditAmount))
+      this.creditBalances.set(_account, currentCredits - creditAmount)
     } else {
-      throw new Error('Remove exceeds balance')
+      this.ctx.log.warn(
+        `Remove exceeds balance: requested ${_amount}, available ${currentCredits / this._creditsPerToken(_account)}`,
+      )
+      debugger
     }
 
     // Remove from the credit tallies and non-rebasing supply
     if (isNonRebasingAccount) {
-      this.nonRebasingSupply = SafeMath.sub(this.nonRebasingSupply, _amount)
+      this.nonRebasingSupply = this.nonRebasingSupply - _amount
     } else {
-      this.rebasingCredits = SafeMath.sub(this.rebasingCredits, creditAmount)
+      this._rebasingCredits = this._rebasingCredits - creditAmount
     }
 
-    this._totalSupply = SafeMath.sub(this._totalSupply, _amount)
+    this.totalSupply = this.totalSupply - _amount
 
     // this.emitTransfer(_account, '', _amount)
   }
@@ -332,14 +358,15 @@ export class OToken_2023_12_21 {
    * @dev Get credits per token for an account
    */
   private _creditsPerToken(account: string): bigint {
-    return this.nonRebasingCreditsPerToken.get(account) || this.rebasingCreditsPerToken
+    return this.nonRebasingCreditsPerToken.get(account) || this._rebasingCreditsPerToken
   }
 
   /**
    * @dev Check if an account is non-rebasing
    */
   private async _isNonRebasingAccount(account: string): Promise<boolean> {
-    if ((await isContract(this.ctx, account)) && this.rebaseState.get(account) === RebaseOptions.NotSet) {
+    const rebasingState = this.rebaseState.get(account) ?? RebaseOptions.NotSet
+    if ((await isContract(this.ctx, account)) && rebasingState === RebaseOptions.NotSet) {
       this._ensureRebasingMigration(account)
     }
     return (this.nonRebasingCreditsPerToken.get(account) || 0n) > 0n
@@ -351,18 +378,19 @@ export class OToken_2023_12_21 {
    */
   private _ensureRebasingMigration(account: string): void {
     if (!this.nonRebasingCreditsPerToken.has(account)) {
+      const creditBalance = this.creditBalances.get(account) || 0n
       // this.emitAccountRebasingDisabled(account)
-      if (!this.creditBalances.has(account) || this.creditBalances.get(account) === 0n) {
+      if (creditBalance === 0n) {
         // Since there is no existing balance, we can directly set to high resolution
-        this.nonRebasingCreditsPerToken.set(account, BigInt('1' + '0'.repeat(27))) // 1e27
+        this.nonRebasingCreditsPerToken.set(account, 10n ** 27n) // 1e27
       } else {
         // Migrate an existing account
         // Set fixed credits per token for this account
-        this.nonRebasingCreditsPerToken.set(account, this.rebasingCreditsPerToken)
+        this.nonRebasingCreditsPerToken.set(account, this._rebasingCreditsPerToken)
         // Update non rebasing supply
-        this.nonRebasingSupply = SafeMath.add(this.nonRebasingSupply, this.balanceOf(account))
+        this.nonRebasingSupply = this.nonRebasingSupply + this.balanceOf(account)
         // Update credit tallies
-        this.rebasingCredits = SafeMath.sub(this.rebasingCredits, this.creditBalances.get(account) || 0n)
+        this._rebasingCredits = this._rebasingCredits - creditBalance
       }
     }
   }
@@ -400,19 +428,17 @@ export class OToken_2023_12_21 {
     // }
 
     // Convert balance into the same amount at the current exchange rate
-    const newCreditBalance = SafeMath.div(
-      SafeMath.mul(this.creditBalances.get(account) || 0n, this.rebasingCreditsPerToken),
-      this._creditsPerToken(account),
-    )
+    const creditsBalance = this.creditBalances.get(account) || 0n
+    const newCreditBalance = (creditsBalance * this._rebasingCreditsPerToken) / this._creditsPerToken(account)
 
     // Decreasing non rebasing supply
-    this.nonRebasingSupply = SafeMath.sub(this.nonRebasingSupply, this.balanceOf(account))
+    this.nonRebasingSupply = this.nonRebasingSupply - this.balanceOf(account)
 
     this.creditBalances.set(account, newCreditBalance)
 
     // Increase rebasing credits, totalSupply remains unchanged so no
     // adjustment necessary
-    this.rebasingCredits = SafeMath.add(this.rebasingCredits, this.creditBalances.get(account) || 0n)
+    this._rebasingCredits = this._rebasingCredits + newCreditBalance
 
     this.rebaseState.set(account, RebaseOptions.OptIn)
 
@@ -433,25 +459,20 @@ export class OToken_2023_12_21 {
     // }
 
     // Increase non rebasing supply
-    this.nonRebasingSupply = SafeMath.add(this.nonRebasingSupply, this.balanceOf(caller))
+    this.nonRebasingSupply = this.nonRebasingSupply + this.balanceOf(caller)
 
     // Set fixed credits per token
-    this.nonRebasingCreditsPerToken.set(caller, this.rebasingCreditsPerToken)
+    this.nonRebasingCreditsPerToken.set(caller, this._rebasingCreditsPerToken)
 
     // Decrease rebasing credits, total supply remains unchanged so no
     // adjustment necessary
-    this.rebasingCredits = SafeMath.sub(this.rebasingCredits, this.creditBalances.get(caller) || 0n)
+    this._rebasingCredits = this._rebasingCredits - (this.creditBalances.get(caller) || 0n)
 
     // Mark explicitly opted out of rebasing
     this.rebaseState.set(caller, RebaseOptions.OptOut)
 
     // Mock event emission - replace with actual implementation
     // this.emitAccountRebasingDisabled(caller)
-  }
-
-  // Mock event emission - replace with actual implementation
-  private emitAccountRebasingEnabled(account: string): void {
-    console.log('AccountRebasingEnabled', { account })
   }
 
   /**
@@ -462,35 +483,29 @@ export class OToken_2023_12_21 {
   public changeSupply(caller: string, _newTotalSupply: bigint): void {
     this.onlyVault(caller)
 
-    if (this._totalSupply <= 0n) {
+    if (this.totalSupply <= 0n) {
       throw new Error('Cannot increase 0 supply')
     }
 
-    if (this._totalSupply === _newTotalSupply) {
+    if (this.totalSupply === _newTotalSupply) {
       // Mock event emission - replace with actual implementation
-      console.log('TotalSupplyUpdatedHighres', {
-        totalSupply: this._totalSupply.toString(),
-        rebasingCredits: this.rebasingCredits.toString(),
-        rebasingCreditsPerToken: this.rebasingCreditsPerToken.toString(),
-      })
+      // console.log('TotalSupplyUpdatedHighres', {
+      //   totalSupply: this.totalSupply.toString(),
+      //   rebasingCredits: this.rebasingCredits.toString(),
+      //   rebasingCreditsPerToken: this.rebasingCreditsPerToken.toString(),
+      // })
       return
     }
 
-    this._totalSupply = _newTotalSupply > this.MAX_SUPPLY ? this.MAX_SUPPLY : _newTotalSupply
+    this.totalSupply = _newTotalSupply > this.MAX_SUPPLY ? this.MAX_SUPPLY : _newTotalSupply
 
-    this.rebasingCreditsPerToken = SafeMath.divPrecisely(
-      this.rebasingCredits,
-      SafeMath.sub(this._totalSupply, this.nonRebasingSupply),
-    )
+    this._rebasingCreditsPerToken = (this._rebasingCredits * 10n ** 18n) / (this.totalSupply - this.nonRebasingSupply)
 
-    if (this.rebasingCreditsPerToken <= 0n) {
+    if (this._rebasingCreditsPerToken <= 0n) {
       throw new Error('Invalid change in supply')
     }
 
-    this._totalSupply = SafeMath.add(
-      SafeMath.divPrecisely(this.rebasingCredits, this.rebasingCreditsPerToken),
-      this.nonRebasingSupply,
-    )
+    this.totalSupply = (this._rebasingCredits * 10n ** 18n) / this._rebasingCreditsPerToken + this.nonRebasingSupply
 
     // Mock event emission - replace with actual implementation
     // console.log('TotalSupplyUpdatedHighres', {

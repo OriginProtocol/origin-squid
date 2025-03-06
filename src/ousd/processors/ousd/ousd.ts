@@ -23,7 +23,6 @@ export const { name, from, setup, process } = createOTokenProcessor2({
   from: 10884563, // OUSDReset
   vaultFrom: 11596942,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
-  initialRebasingCreditsPerToken: 1000000000000000000n,
   otokenAddress: OUSD_ADDRESS,
   wotoken: {
     address: WOUSD_ADDRESS,
