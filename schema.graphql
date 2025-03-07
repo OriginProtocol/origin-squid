@@ -411,6 +411,16 @@ type OToken @entity {
   holderCount: Int!
 }
 
+type OTokenRawData @entity {
+  id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  type: String!
+  data: JSON!
+}
+
 type WOToken @entity {
   id: ID! @index
   chainId: Int! @index

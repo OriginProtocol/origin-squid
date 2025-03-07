@@ -41,17 +41,17 @@ export class OToken_2025_03_04 {
 
   // State variables
   public totalSupply: bigint = 0n
-  public allowances: Map<string, Map<string, bigint>> = new Map()
+  public allowances: Record<string, Record<string, bigint>> = {}
   public vaultAddress: string = ''
-  public creditBalances: Map<string, bigint> = new Map()
+  public creditBalances: Record<string, bigint> = {}
   public rebasingCredits: bigint = 0n
   public rebasingCreditsPerToken: bigint = 0n
   public nonRebasingSupply: bigint = 0n
   public rebasingSupply: bigint = 0n
-  public alternativeCreditsPerToken: Map<string, bigint> = new Map()
-  public rebaseState: Map<string, RebaseOptions> = new Map()
-  public yieldTo: Map<string, string> = new Map()
-  public yieldFrom: Map<string, string> = new Map()
+  public alternativeCreditsPerToken: Record<string, bigint> = {}
+  public rebaseState: Record<string, RebaseOptions> = {}
+  public yieldTo: Record<string, string> = {}
+  public yieldFrom: Record<string, string> = {}
   public governor: string = ''
 
   copyState(other: OToken_2023_12_21): void {
@@ -62,8 +62,10 @@ export class OToken_2025_03_04 {
     this.rebasingCredits = other._rebasingCredits
     this.rebasingCreditsPerToken = other._rebasingCreditsPerToken
     this.nonRebasingSupply = other.nonRebasingSupply
+    // this.nonRebasingCreditsPerToken = other.nonRebasingCreditsPerToken
     this.rebasingSupply = other.totalSupply - other.nonRebasingSupply
     this.rebaseState = other.rebaseState
+    this.governor = other.governor
   }
 
   /**
@@ -87,13 +89,13 @@ export class OToken_2025_03_04 {
    */
   private onlyGovernor(caller: string): void {
     if (caller !== this.governor) {
-      throw new Error('Caller is not the Governor')
+      this.ctx.log.warn('Caller is not the Governor')
     }
   }
 
   private onlyVault(caller: string): void {
     if (caller !== this.vaultAddress) {
-      throw new Error('Caller is not the Vault')
+      this.ctx.log.warn('Caller is not the Vault')
     }
   }
 
@@ -152,22 +154,22 @@ export class OToken_2025_03_04 {
    * @return The balance of the specified address
    */
   balanceOf(_account: string): bigint {
-    const state = this.rebaseState.get(_account) || RebaseOptions.NotSet
+    const state = this.rebaseState[_account] || RebaseOptions.NotSet
 
     if (state === RebaseOptions.YieldDelegationSource) {
       // Saves a slot read when transferring to or from a yield delegating source
       // since we know creditBalances equals the balance.
-      return this.creditBalances.get(_account) || 0n
+      return this.creditBalances[_account] || 0n
     }
 
     const creditsPerToken = this._creditsPerToken(_account)
-    const creditBalance = this.creditBalances.get(_account) || 0n
+    const creditBalance = this.creditBalances[_account] || 0n
     const baseBalance = (creditBalance * 10n ** 18n) / creditsPerToken
 
     if (state === RebaseOptions.YieldDelegationTarget) {
       // creditBalances of yieldFrom accounts equals token balances
-      const yieldFromAccount = this.yieldFrom.get(_account) || ''
-      const yieldFromBalance = this.creditBalances.get(yieldFromAccount) || 0n
+      const yieldFromAccount = this.yieldFrom[_account] || ''
+      const yieldFromBalance = this.creditBalances[yieldFromAccount] || 0n
       return baseBalance - yieldFromBalance
     }
 
@@ -181,7 +183,7 @@ export class OToken_2025_03_04 {
    */
   creditsBalanceOf(_account: string): [bigint, bigint] {
     const cpt = this._creditsPerToken(_account)
-    return [this.creditBalances.get(_account) || 0n, cpt]
+    return [this.creditBalances[_account] || 0n, cpt]
   }
 
   /**
@@ -191,7 +193,7 @@ export class OToken_2025_03_04 {
    */
   creditsBalanceOfHighres(_account: string): [bigint, bigint, boolean] {
     return [
-      this.creditBalances.get(_account) || 0n,
+      this.creditBalances[_account] || 0n,
       this._creditsPerToken(_account),
       true, // All accounts are considered upgraded in this implementation
     ]
@@ -201,7 +203,7 @@ export class OToken_2025_03_04 {
    * Backwards compatible view
    */
   nonRebasingCreditsPerToken(_account: string): bigint {
-    return this.alternativeCreditsPerToken.get(_account) || 0n
+    return this.alternativeCreditsPerToken[_account] || 0n
   }
 
   /**
@@ -231,16 +233,15 @@ export class OToken_2025_03_04 {
   async transferFrom(caller: string, _from: string, _to: string, _value: bigint): Promise<boolean> {
     this.requireAddress(_to, 'Transfer to zero address')
 
-    const userAllowance = this.allowances.get(_from)?.get(caller) || 0n
+    const userAllowance = this.allowances[_from]?.[caller] || 0n
     if (_value > userAllowance) {
-      debugger
       throw new Error('Allowance exceeded')
     }
 
     // Update allowance
-    const fromAllowances = this.allowances.get(_from) || new Map<string, bigint>()
-    fromAllowances.set(caller, userAllowance - _value)
-    this.allowances.set(_from, fromAllowances)
+    const fromAllowances = this.allowances[_from] || {}
+    fromAllowances[caller] = userAllowance - _value
+    this.allowances[_from] = fromAllowances
 
     await this._executeTransfer(_from, _to, _value)
 
@@ -257,12 +258,8 @@ export class OToken_2025_03_04 {
    * @param _value The amount to be transferred
    */
   private async _executeTransfer(_from: string, _to: string, _value: bigint): Promise<void> {
-    const result = await Promise.all([
-      this._adjustAccount(_from, -BigInt(_value)),
-      this._adjustAccount(_to, BigInt(_value)),
-    ])
-    const [fromRebasingCreditsDiff, fromNonRebasingSupplyDiff] = result[0]
-    const [toRebasingCreditsDiff, toNonRebasingSupplyDiff] = result[1]
+    const [fromRebasingCreditsDiff, fromNonRebasingSupplyDiff] = await this._adjustAccount(_from, -_value)
+    const [toRebasingCreditsDiff, toNonRebasingSupplyDiff] = await this._adjustAccount(_to, _value)
 
     this._adjustGlobals(
       fromRebasingCreditsDiff + toRebasingCreditsDiff,
@@ -277,14 +274,12 @@ export class OToken_2025_03_04 {
    * @return Changes to rebasing credits and non-rebasing supply
    */
   private async _adjustAccount(_account: string, _balanceChange: bigint): Promise<[bigint, bigint]> {
-    const state = this.rebaseState.get(_account) || RebaseOptions.NotSet
-    const currentBalance = this.balanceOf(_account)
+    const state = this.rebaseState[_account] || RebaseOptions.NotSet
 
-    let newBalance = currentBalance + _balanceChange
+    let newBalance = this.balanceOf(_account) + _balanceChange
     if (newBalance < 0n) {
       if (newBalance < -10n) {
-        debugger
-        throw new Error(`Transfer amount exceeds balance: ${newBalance} for account: ${_account}`)
+        this.ctx.log.warn(`Transfer amount exceeds balance: ${newBalance} for account: ${_account}`)
       }
     }
 
@@ -292,34 +287,34 @@ export class OToken_2025_03_04 {
     let nonRebasingSupplyDiff = 0n
 
     if (state === RebaseOptions.YieldDelegationSource) {
-      const target = this.yieldTo.get(_account) || ''
+      const target = this.yieldTo[_account] || ''
       const targetOldBalance = this.balanceOf(target)
       const targetNewCredits = this._balanceToRebasingCredits(targetOldBalance + newBalance)
 
-      rebasingCreditsDiff = targetNewCredits - (this.creditBalances.get(target) || 0n)
+      rebasingCreditsDiff = targetNewCredits - (this.creditBalances[target] || 0n)
 
-      this.creditBalances.set(_account, newBalance)
-      this.creditBalances.set(target, targetNewCredits)
+      this.creditBalances[_account] = newBalance
+      this.creditBalances[target] = targetNewCredits
     } else if (state === RebaseOptions.YieldDelegationTarget) {
-      const source = this.yieldFrom.get(_account) || ''
-      const newCredits = this._balanceToRebasingCredits(newBalance + (this.creditBalances.get(source) || 0n))
+      const source = this.yieldFrom[_account] || ''
+      const newCredits = this._balanceToRebasingCredits(newBalance + (this.creditBalances[source] || 0n))
 
-      rebasingCreditsDiff = newCredits - (this.creditBalances.get(_account) || 0n)
-      this.creditBalances.set(_account, newCredits)
+      rebasingCreditsDiff = newCredits - (this.creditBalances[_account] || 0n)
+      this.creditBalances[_account] = newCredits
     } else {
       await this._autoMigrate(_account)
-      const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken.get(_account) || 0n
+      const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken[_account] || 0n
 
       if (alternativeCreditsPerTokenMem > 0n) {
         nonRebasingSupplyDiff = _balanceChange
         if (alternativeCreditsPerTokenMem !== 10n ** 18n) {
-          this.alternativeCreditsPerToken.set(_account, 10n ** 18n)
+          this.alternativeCreditsPerToken[_account] = 10n ** 18n
         }
-        this.creditBalances.set(_account, newBalance)
+        this.creditBalances[_account] = newBalance
       } else {
         const newCredits = this._balanceToRebasingCredits(newBalance)
-        rebasingCreditsDiff = newCredits - (this.creditBalances.get(_account) || 0n)
-        this.creditBalances.set(_account, newCredits)
+        rebasingCreditsDiff = newCredits - (this.creditBalances[_account] || 0n)
+        this.creditBalances[_account] = newCredits
       }
     }
 
@@ -348,7 +343,7 @@ export class OToken_2025_03_04 {
    * @return The amount of tokens still available for the spender
    */
   allowance(_owner: string, _spender: string): bigint {
-    return this.allowances.get(_owner)?.get(_spender) || 0n
+    return this.allowances[_owner]?.[_spender] || 0n
   }
 
   /**
@@ -359,9 +354,9 @@ export class OToken_2025_03_04 {
    * @return true on success
    */
   approve(caller: string, _spender: string, _value: bigint): boolean {
-    const callerAllowances = this.allowances.get(caller) || new Map<string, bigint>()
-    callerAllowances.set(_spender, _value)
-    this.allowances.set(caller, callerAllowances)
+    const callerAllowances = this.allowances[caller] || {}
+    callerAllowances[_spender] = _value
+    this.allowances[caller] = callerAllowances
 
     // Emit event (would be handled by event system in actual implementation)
     // emit Approval(caller, _spender, _value)
@@ -425,7 +420,7 @@ export class OToken_2025_03_04 {
    * @return Credits per token
    */
   public _creditsPerToken(_account: string): bigint {
-    const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken.get(_account) || 0n
+    const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken[_account] || 0n
 
     if (alternativeCreditsPerTokenMem !== 0n) {
       return alternativeCreditsPerTokenMem
@@ -443,9 +438,9 @@ export class OToken_2025_03_04 {
     // rebaseState[_account] set to RebaseOptions.NonRebasing when migrated
     // therefore we check the actual accounting used on the account instead.
     if (
-      (await isContract(this.ctx, _account)) &&
-      (this.rebaseState.get(_account) || RebaseOptions.NotSet) === RebaseOptions.NotSet &&
-      (this.alternativeCreditsPerToken.get(_account) || 0n) === 0n
+      (await isContract(this.ctx, this.block, _account)) &&
+      (this.rebaseState[_account] || RebaseOptions.NotSet) === RebaseOptions.NotSet &&
+      (this.alternativeCreditsPerToken[_account] || 0n) === 0n
     ) {
       this._rebaseOptOut(_account)
     }
@@ -489,14 +484,14 @@ export class OToken_2025_03_04 {
    */
   private _rebaseOptIn(_account: string): void {
     const balance = this.balanceOf(_account)
-    const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken.get(_account) || 0n
-    const creditBalanceMem = this.creditBalances.get(_account) || 0n
+    const alternativeCreditsPerTokenMem = this.alternativeCreditsPerToken[_account] || 0n
+    const creditBalanceMem = this.creditBalances[_account] || 0n
 
     if (!(alternativeCreditsPerTokenMem > 0n || creditBalanceMem === 0n)) {
       throw new Error('Account must be non-rebasing')
     }
 
-    const state = this.rebaseState.get(_account) || RebaseOptions.NotSet
+    const state = this.rebaseState[_account] || RebaseOptions.NotSet
 
     if (!(state === RebaseOptions.StdNonRebasing || state === RebaseOptions.NotSet)) {
       throw new Error('Only standard non-rebasing accounts can opt in')
@@ -505,9 +500,9 @@ export class OToken_2025_03_04 {
     const newCredits = this._balanceToRebasingCredits(balance)
 
     // Account
-    this.rebaseState.set(_account, RebaseOptions.StdRebasing)
-    this.alternativeCreditsPerToken.set(_account, 0n)
-    this.creditBalances.set(_account, newCredits)
+    this.rebaseState[_account] = RebaseOptions.StdRebasing
+    this.alternativeCreditsPerToken[_account] = 0n
+    this.creditBalances[_account] = newCredits
 
     // Globals
     this._adjustGlobals(newCredits, -balance)
@@ -529,23 +524,23 @@ export class OToken_2025_03_04 {
    * @param _account Address of the account
    */
   private _rebaseOptOut(_account: string): void {
-    if ((this.alternativeCreditsPerToken.get(_account) || 0n) !== 0n) {
+    if ((this.alternativeCreditsPerToken[_account] || 0n) !== 0n) {
       this.ctx.log.error('Account must be rebasing')
     }
 
-    const state = this.rebaseState.get(_account) || RebaseOptions.NotSet
+    const state = this.rebaseState[_account] || RebaseOptions.NotSet
 
     if (!(state === RebaseOptions.StdRebasing || state === RebaseOptions.NotSet)) {
       this.ctx.log.error('Only standard rebasing accounts can opt out')
     }
 
-    const oldCredits = this.creditBalances.get(_account) || 0n
+    const oldCredits = this.creditBalances[_account] || 0n
     const balance = this.balanceOf(_account)
 
     // Account
-    this.rebaseState.set(_account, RebaseOptions.StdNonRebasing)
-    this.alternativeCreditsPerToken.set(_account, 10n ** 18n)
-    this.creditBalances.set(_account, balance)
+    this.rebaseState[_account] = RebaseOptions.StdNonRebasing
+    this.alternativeCreditsPerToken[_account] = 10n ** 18n
+    this.creditBalances[_account] = balance
 
     // Globals
     this._adjustGlobals(-oldCredits, balance)
@@ -609,16 +604,16 @@ export class OToken_2025_03_04 {
     }
 
     if (
-      this.yieldFrom.get(_to) !== undefined ||
-      this.yieldTo.get(_to) !== undefined ||
-      this.yieldFrom.get(_from) !== undefined ||
-      this.yieldTo.get(_from) !== undefined
+      this.yieldFrom[_to] !== undefined ||
+      this.yieldTo[_to] !== undefined ||
+      this.yieldFrom[_from] !== undefined ||
+      this.yieldTo[_from] !== undefined
     ) {
       throw new Error('Blocked by existing yield delegation')
     }
 
-    const stateFrom = this.rebaseState.get(_from) || RebaseOptions.NotSet
-    const stateTo = this.rebaseState.get(_to) || RebaseOptions.NotSet
+    const stateFrom = this.rebaseState[_from] || RebaseOptions.NotSet
+    const stateTo = this.rebaseState[_to] || RebaseOptions.NotSet
 
     if (
       !(
@@ -640,29 +635,29 @@ export class OToken_2025_03_04 {
       throw new Error('Invalid rebaseState to')
     }
 
-    if ((this.alternativeCreditsPerToken.get(_from) || 0n) === 0n) {
+    if ((this.alternativeCreditsPerToken[_from] || 0n) === 0n) {
       this._rebaseOptOut(_from)
     }
 
-    if ((this.alternativeCreditsPerToken.get(_to) || 0n) > 0n) {
+    if ((this.alternativeCreditsPerToken[_to] || 0n) > 0n) {
       this._rebaseOptIn(_to)
     }
 
     const fromBalance = this.balanceOf(_from)
     const toBalance = this.balanceOf(_to)
-    const oldToCredits = this.creditBalances.get(_to) || 0n
+    const oldToCredits = this.creditBalances[_to] || 0n
     const newToCredits = this._balanceToRebasingCredits(fromBalance + toBalance)
 
     // Set up the bidirectional links
-    this.yieldTo.set(_from, _to)
-    this.yieldFrom.set(_to, _from)
+    this.yieldTo[_from] = _to
+    this.yieldFrom[_to] = _from
 
     // Local
-    this.rebaseState.set(_from, RebaseOptions.YieldDelegationSource)
-    this.alternativeCreditsPerToken.set(_from, 10n ** 18n)
-    this.creditBalances.set(_from, fromBalance)
-    this.rebaseState.set(_to, RebaseOptions.YieldDelegationTarget)
-    this.creditBalances.set(_to, newToCredits)
+    this.rebaseState[_from] = RebaseOptions.YieldDelegationSource
+    this.alternativeCreditsPerToken[_from] = 10n ** 18n
+    this.creditBalances[_from] = fromBalance
+    this.rebaseState[_to] = RebaseOptions.YieldDelegationTarget
+    this.creditBalances[_to] = newToCredits
 
     // Global
     const creditsChange = newToCredits - oldToCredits
@@ -681,27 +676,27 @@ export class OToken_2025_03_04 {
     this.onlyGovernor(caller)
 
     // Require a delegation, which will also ensure a valid delegation
-    if (this.yieldTo.get(_from) === undefined) {
+    if (this.yieldTo[_from] === undefined) {
       throw new Error('Zero address not allowed')
     }
 
-    const to = this.yieldTo.get(_from) || ''
+    const to = this.yieldTo[_from] || ''
     const fromBalance = this.balanceOf(_from)
     const toBalance = this.balanceOf(to)
-    const oldToCredits = this.creditBalances.get(to) || 0n
+    const oldToCredits = this.creditBalances[to] || 0n
     const newToCredits = this._balanceToRebasingCredits(toBalance)
 
     // Remove the bidirectional links
-    this.yieldFrom.delete(to)
-    this.yieldTo.delete(_from)
+    delete this.yieldFrom[to]
+    delete this.yieldTo[_from]
 
     // Local
-    this.rebaseState.set(_from, RebaseOptions.StdNonRebasing)
+    this.rebaseState[_from] = RebaseOptions.StdNonRebasing
     // alternativeCreditsPerToken[from] already 1e18 from `delegateYield()`
-    this.creditBalances.set(_from, fromBalance)
-    this.rebaseState.set(to, RebaseOptions.StdRebasing)
+    this.creditBalances[_from] = fromBalance
+    this.rebaseState[to] = RebaseOptions.StdRebasing
     // alternativeCreditsPerToken[to] already 0 from `delegateYield()`
-    this.creditBalances.set(to, newToCredits)
+    this.creditBalances[to] = newToCredits
 
     // Global
     const creditsChange = newToCredits - oldToCredits
