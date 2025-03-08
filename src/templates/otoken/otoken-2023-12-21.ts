@@ -1,6 +1,5 @@
 import { Block, Context } from '@originprotocol/squid-utils'
-
-import { isContract } from './utils/isContract'
+import { isContract } from '@utils/isContract'
 
 /**
  * @title OUSD Token Contract
@@ -65,6 +64,10 @@ export class OToken_2023_12_21 {
     if (caller !== this.governor) {
       this.ctx.log.warn('Caller is not the Governor')
     }
+  }
+
+  public get rebasingSupply(): bigint {
+    return this.totalSupply - this.nonRebasingSupply
   }
 
   /**

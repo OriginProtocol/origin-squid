@@ -3,7 +3,7 @@ import { base } from 'viem/chains'
 
 import * as erc20Abi from '@abi/erc20'
 import { getPositions } from '@templates/aerodrome/lp'
-import { createOTokenProcessor } from '@templates/otoken'
+import { createOTokenLegacyProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
@@ -11,7 +11,7 @@ import { tokensByChain } from '@utils/tokensByChain'
 
 import { baseCurveAMO } from './strategies'
 
-const otokenProcessor = createOTokenProcessor({
+const otokenProcessor = createOTokenLegacyProcessor({
   name: 'Super OETHb',
   symbol: 'superOETHb',
   from: 17819702,

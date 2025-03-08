@@ -5,9 +5,9 @@
  * @author Origin Protocol Inc
  */
 import { Block, Context } from '@originprotocol/squid-utils'
+import { isContract } from '@utils/isContract'
 
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
-import { isContract } from './utils/isContract'
 
 /**
  * Enum for rebasing options
@@ -48,8 +48,8 @@ export class OToken_2025_03_04 {
   public rebasingSupply: bigint = 0n
   public alternativeCreditsPerToken: Record<string, bigint> = {}
   public rebaseState: Record<string, RebaseOptions> = {}
-  public yieldTo: Record<string, string> = {}
-  public yieldFrom: Record<string, string> = {}
+  public yieldTo: Record<string, string | undefined> = {}
+  public yieldFrom: Record<string, string | undefined> = {}
   public governor: string = ''
 
   copyState(other: OToken_2023_12_21): void {
