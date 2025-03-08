@@ -294,7 +294,7 @@ export const createOTokenProcessor2 = (params: {
           // if (transaction.status !== 1) {
           //   continue // skip failed transactions
           // }
-          // if (transaction.hash === '0x40f4d5281617efd84e0d92a6478d473bcac2a9b5f886544f8b0af36b577e9c1b') debugger
+          // if (transaction.hash === '0xbabc3015340865866d1e3a27708f96427917de1b02f30aaa3803183fa1ee58a4') debugger
           const consumedLogs = new Set<string>()
           const transferLogs = transaction.logs
             .filter((log) => log.address === otokenAddress && log.topics[0] === otokenAbi.events.Transfer.topic)
@@ -462,11 +462,9 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (trace.action.to === otokenAddress) {
                 let fun
-                for (const value of Object.values(otokenAbi20241221.functions)) {
-                  if (trace.action.input.startsWith(value.selector)) {
-                    fun = value
-                  }
-                }
+                fun = Object.values(otokenAbi20241221.functions).find((value) =>
+                  trace.action.input.startsWith(value.selector),
+                )
                 if (fun) {
                   if (!fun.isView) {
                     ctx.log.info({ data: trace.action.input, hash: trace.transaction?.hash }, fun.signature)

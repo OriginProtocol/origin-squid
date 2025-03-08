@@ -10,8 +10,8 @@ import { isContract } from './utils/isContract'
 
 enum RebaseOptions {
   NotSet,
-  OptOut,
-  OptIn,
+  StdNonRebasing = 1,
+  StdRebasing = 2,
 }
 
 export class OToken_2023_12_21 {
@@ -438,7 +438,7 @@ export class OToken_2023_12_21 {
     // adjustment necessary
     this._rebasingCredits = this._rebasingCredits + newCreditBalance
 
-    this.rebaseState[account] = RebaseOptions.OptIn
+    this.rebaseState[account] = RebaseOptions.StdRebasing
 
     // Delete any fixed credits per token
     delete this.nonRebasingCreditsPerToken[account]
@@ -467,7 +467,7 @@ export class OToken_2023_12_21 {
     this._rebasingCredits = this._rebasingCredits - (this.creditBalances[caller] || 0n)
 
     // Mark explicitly opted out of rebasing
-    this.rebaseState[caller] = RebaseOptions.OptOut
+    this.rebaseState[caller] = RebaseOptions.StdNonRebasing
 
     // Mock event emission - replace with actual implementation
     // this.emitAccountRebasingDisabled(caller)

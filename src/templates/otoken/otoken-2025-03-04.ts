@@ -14,12 +14,10 @@ import { isContract } from './utils/isContract'
  */
 export enum RebaseOptions {
   NotSet = 0,
-  OptOut = 1,
-  OptIn = 2,
+  StdNonRebasing = 1,
+  StdRebasing = 2,
   YieldDelegationSource = 3,
   YieldDelegationTarget = 4,
-  StdNonRebasing = 5,
-  StdRebasing = 6,
 }
 
 /**
@@ -62,7 +60,7 @@ export class OToken_2025_03_04 {
     this.rebasingCredits = other._rebasingCredits
     this.rebasingCreditsPerToken = other._rebasingCreditsPerToken
     this.nonRebasingSupply = other.nonRebasingSupply
-    // this.nonRebasingCreditsPerToken = other.nonRebasingCreditsPerToken
+    this.alternativeCreditsPerToken = other.nonRebasingCreditsPerToken
     this.rebasingSupply = other.totalSupply - other.nonRebasingSupply
     this.rebaseState = other.rebaseState
     this.governor = other.governor
@@ -278,9 +276,7 @@ export class OToken_2025_03_04 {
 
     let newBalance = this.balanceOf(_account) + _balanceChange
     if (newBalance < 0n) {
-      if (newBalance < -10n) {
-        this.ctx.log.warn(`Transfer amount exceeds balance: ${newBalance} for account: ${_account}`)
-      }
+      this.ctx.log.warn(`Transfer amount exceeds balance: ${newBalance} for account: ${_account}`)
     }
 
     let rebasingCreditsDiff = 0n
@@ -452,10 +448,6 @@ export class OToken_2025_03_04 {
    * @return Rebasing credits
    */
   private _balanceToRebasingCredits(_balance: bigint): bigint {
-    // Rounds up, because we need to ensure that accounts always have
-    // at least the balance that they should have.
-    if (_balance === 0n) return 0n
-
     return (_balance * this.rebasingCreditsPerToken + 10n ** 18n - 1n) / 10n ** 18n
   }
 
