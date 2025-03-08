@@ -13,6 +13,7 @@ import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 import { OTokenContractAddress } from './otoken'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
+import { loadIsContractCache, saveIsContractCache } from './utils/isContract'
 
 export const createOTokenProcessor2 = (params: {
   name: string
@@ -219,15 +220,17 @@ export const createOTokenProcessor2 = (params: {
      * @param ctx The context containing logs and traces
      */
     async process(ctx: Context): Promise<void> {
+      await loadIsContractCache(ctx)
       if (otoken) {
         otoken.ctx = ctx
       }
 
       const updateOToken = (block: Block, implementationHash: string) => {
         const implementations: Record<string, typeof OToken_2023_12_21 | typeof OToken_2025_03_04 | undefined> = {
-          ['9ad3a9e43e4bdd6a974ef5db2c3fe9da590cbc6ad6709000f524896422abd5b8']: OToken_2023_12_21,
-          ['eb5e67df57270fd5381abb6733ed1d61fc4afd08e1de9993f2f5b4ca95118f59']: OToken_2023_12_21,
-          ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04,
+          ['9ad3a9e43e4bdd6a974ef5db2c3fe9da590cbc6ad6709000f524896422abd5b8']: OToken_2023_12_21, // OETH
+          ['eb5e67df57270fd5381abb6733ed1d61fc4afd08e1de9993f2f5b4ca95118f59']: OToken_2023_12_21, // OETH
+          ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04, // OETH
+          ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS
         }
         const OTokenClass = implementations[implementationHash]
         if (OTokenClass) {
@@ -303,7 +306,7 @@ export const createOTokenProcessor2 = (params: {
           for (const trace of transaction.traces) {
             if (trace.type === 'call') {
               if (errorParent(trace)) {
-                ctx.log.info({ block: block.header.height, hash: trace.transaction?.hash }, 'errorLineage')
+                // ctx.log.info({ block: block.header.height, hash: trace.transaction?.hash }, 'errorLineage')
                 continue // skip traces with error parents
               }
               const sender = trace.action.from.toLowerCase()
@@ -313,6 +316,15 @@ export const createOTokenProcessor2 = (params: {
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyInitialize')
                 const hash = await hashImplementation(block, data._logic.toLowerCase())
                 updateOToken(block, hash)
+                if (data._data) {
+                  if (otoken instanceof OToken_2025_03_04) {
+                    const initializeTrace = otokenAbi.functions.initialize.decode(data._data)
+                    otoken.initialize(sender, initializeTrace._vaultAddress, initializeTrace._initialCreditsPerToken)
+                  } else if (otoken instanceof OToken_2023_12_21) {
+                    const initializeTrace = otokenAbi20241221.functions.initialize.decode(data._data)
+                    otoken.initialize(sender, initializeTrace._vaultAddress, initializeTrace._initialCreditsPerToken)
+                  }
+                }
                 ///////////////////////////////
               } else if (proxyUpgradeToTraceFilter.matches(trace)) {
                 const data = proxyAbi.functions.upgradeTo.decode(trace.action.input)
@@ -337,37 +349,37 @@ export const createOTokenProcessor2 = (params: {
                 otoken.initialize(sender, data._vaultAddress, data._initialCreditsPerToken)
                 ///////////////////////////////
               } else if (rebaseOptInTraceFilter.matches(trace)) {
-                ctx.log.info(trace, 'rebaseOptIn')
+                // ctx.log.info(trace, 'rebaseOptIn')
                 await otoken.rebaseOptIn(sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (rebaseOptOutTraceFilter.matches(trace)) {
-                ctx.log.info(trace, 'rebaseOptOut')
+                // ctx.log.info(trace, 'rebaseOptOut')
                 await otoken.rebaseOptOut(sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (governanceRebaseOptInTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.governanceRebaseOptIn.decode(trace.action.input)
-                ctx.log.info(trace, 'governanceRebaseOptIn')
+                // ctx.log.info(trace, 'governanceRebaseOptIn')
                 await otoken.governanceRebaseOptIn(sender, data._account)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
               } else if (mintTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.mint.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'mint')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'mint')
                 await otoken.mint(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
               } else if (burnTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.burn.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'burn')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'burn')
                 await otoken.burn(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
               } else if (transferTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.transfer.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'transfer')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transfer')
                 const transferLog = transferLogs.find(
                   (log) =>
                     !consumedLogs.has(log.id) &&
@@ -385,7 +397,7 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (transferFromTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferFrom')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferFrom')
                 const transferLog = transferLogs.find(
                   (log) =>
                     !consumedLogs.has(log.id) &&
@@ -404,14 +416,14 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (approveTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.approve.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'approve')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'approve')
                 otoken.approve(sender, data._spender.toLowerCase(), data._value)
                 addressesToCheck.add(data._spender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (increaseAllowanceTraceFilter.matches(trace)) {
                 const data = otokenAbi20241221.functions.increaseAllowance.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'increaseAllowance')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'increaseAllowance')
                 const otoken20231221 = otoken as OToken_2023_12_21
                 otoken20231221.increaseAllowance(sender, data._spender.toLowerCase(), data._addedValue)
                 addressesToCheck.add(data._spender)
@@ -419,7 +431,7 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (decreaseAllowanceTraceFilter.matches(trace)) {
                 const data = otokenAbi20241221.functions.decreaseAllowance.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'decreaseAllowance')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'decreaseAllowance')
                 const otoken20231221 = otoken as OToken_2023_12_21
                 otoken20231221.decreaseAllowance(sender, data._spender.toLowerCase(), data._subtractedValue)
                 addressesToCheck.add(data._spender)
@@ -427,13 +439,13 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (changeSupplyTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.changeSupply.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'changeSupply')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'changeSupply')
                 otoken.changeSupply(sender, data._newTotalSupply)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (delegateYieldTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.delegateYield.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'delegateYield')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'delegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
@@ -442,7 +454,7 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (undelegateYieldTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.undelegateYield.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'undelegateYield')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'undelegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
@@ -450,13 +462,13 @@ export const createOTokenProcessor2 = (params: {
                 ///////////////////////////////
               } else if (transferGovernanceTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.transferGovernance.decode(trace.action.input)
-                ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferGovernance')
+                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferGovernance')
                 // otoken.transferGovernance(sender, data._newGovernor)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._newGovernor)
                 ///////////////////////////////
               } else if (claimGovernanceTraceFilter.matches(trace)) {
-                ctx.log.info(trace, 'claimGovernance')
+                // ctx.log.info(trace, 'claimGovernance')
                 // await otoken.claimGovernance()
                 addressesToCheck.add(sender)
                 ///////////////////////////////
@@ -481,7 +493,7 @@ export const createOTokenProcessor2 = (params: {
           }
         }
         if (otoken) {
-          await checkState(ctx, block, otoken, new Set())
+          // await checkState(ctx, block, otoken, new Set())
           // await checkState(ctx, block, otoken, addressesToCheck)
         }
       }
@@ -515,7 +527,7 @@ export const createOTokenProcessor2 = (params: {
                   : [
                       // OToken_2025_03_04
                       'totalSupply',
-                      '_allowances',
+                      'allowances',
                       'vaultAddress',
                       'creditBalances',
                       'rebasingCredits',
@@ -537,6 +549,7 @@ export const createOTokenProcessor2 = (params: {
           debugger
         }
       }
+      await saveIsContractCache(ctx)
     },
   }
 }
@@ -642,7 +655,7 @@ const checkState = async (
 
 const errorParent = (trace: Trace): boolean => {
   if (trace.error) {
-    console.log('errorLineage', trace.error)
+    // console.log('errorLineage', trace.error)
     // if (!trace.error.toLowerCase().includes('revert') && !trace.error.includes('out of gas')) {
     //   debugger
     // }
@@ -654,7 +667,7 @@ const errorParent = (trace: Trace): boolean => {
 
 const errorChildren = (trace: Trace): boolean => {
   if (trace.error) {
-    console.log('errorLineage', trace.error)
+    // console.log('errorLineage', trace.error)
     // if (!trace.error.toLowerCase().includes('revert') && trace.error.toLowerCase() !== 'out of gas') {
     //   debugger
     // }

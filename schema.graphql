@@ -373,6 +373,10 @@ type CurvePoolBoosterTokensRescued @entity {
   receiver: String!
   txHash: String!
 }
+type UtilCache @entity {
+  id: ID! @index
+  data: JSON!
+}
 # Pool Booster Events
 type PoolBooster @entity {
   id: ID! @index # chainId-address

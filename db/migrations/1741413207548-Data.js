@@ -1,5 +1,5 @@
-module.exports = class Data1741303689592 {
-    name = 'Data1741303689592'
+module.exports = class Data1741413207548 {
+    name = 'Data1741413207548'
 
     async up(db) {
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
@@ -113,6 +113,7 @@ module.exports = class Data1741303689592 {
         await db.query(`CREATE INDEX "IDX_260344a123765d6bf9a1887c32" ON "curve_pool_booster_tokens_rescued" ("address") `)
         await db.query(`CREATE INDEX "IDX_2a323bed0afc57f70185f57291" ON "curve_pool_booster_tokens_rescued" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7d7a98e0d63faa39054f7c70b8" ON "curve_pool_booster_tokens_rescued" ("block_number") `)
+        await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "pool_booster" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "registry_address" text NOT NULL, "amm_pool_address" text NOT NULL, "factory_address" text NOT NULL, "pool_booster_type" integer NOT NULL, "active" boolean NOT NULL, CONSTRAINT "PK_85efb2983184555953408176314" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c46c14abc58edf2c6bbd1e8d09" ON "pool_booster" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_2c38cf60d95bd998304076c11c" ON "pool_booster" ("timestamp") `)
@@ -911,6 +912,7 @@ module.exports = class Data1741303689592 {
         await db.query(`DROP INDEX "public"."IDX_260344a123765d6bf9a1887c32"`)
         await db.query(`DROP INDEX "public"."IDX_2a323bed0afc57f70185f57291"`)
         await db.query(`DROP INDEX "public"."IDX_7d7a98e0d63faa39054f7c70b8"`)
+        await db.query(`DROP TABLE "util_cache"`)
         await db.query(`DROP TABLE "pool_booster"`)
         await db.query(`DROP INDEX "public"."IDX_c46c14abc58edf2c6bbd1e8d09"`)
         await db.query(`DROP INDEX "public"."IDX_2c38cf60d95bd998304076c11c"`)
