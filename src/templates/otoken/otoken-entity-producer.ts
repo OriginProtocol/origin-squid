@@ -11,8 +11,8 @@ import { OToken_2025_03_04 } from './otoken-2025-03-04'
 
 export class OTokenEntityProducer {
   otoken: OToken_2023_12_21 | OToken_2025_03_04
-  private ctx: Context
-  private block: Block
+  public ctx: Context
+  public block: Block
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
   private histories: OTokenHistory[] = []

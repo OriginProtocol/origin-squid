@@ -19,7 +19,6 @@ import {
   HistoryType,
   OToken,
   OTokenAPY,
-  OTokenActivity,
   OTokenAddress,
   OTokenAsset,
   OTokenDailyStat,
@@ -32,7 +31,7 @@ import {
   RebasingOption,
   WOToken,
 } from '@model'
-import { Block, Context, Log, blockFrequencyUpdater, logFilter, multicall } from '@originprotocol/squid-utils'
+import { Block, Context, Log, logFilter, multicall } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -41,6 +40,7 @@ import { baseAddresses } from '@utils/addresses-base'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { DECIMALS_18 } from '@utils/constants'
 
+import { otokenFrequencyProcessor } from './otoken-frequency'
 import { createAddress, createRebaseAPY } from './utils'
 
 export type OTokenContractAddress =
@@ -81,6 +81,7 @@ export const createOTokenLegacyProcessor = (params: {
   accountsOverThresholdMinimum: bigint
   feeOverride?: bigint // out of 100
 }) => {
+  const frequencyUpdater = otokenFrequencyProcessor(params)
   const harvesterYieldSentFilter = params.harvester?.yieldSent
     ? logFilter({
         address: [params.harvester.address],
@@ -182,7 +183,6 @@ export const createOTokenLegacyProcessor = (params: {
     rebases: OTokenRebase[]
     rebaseOptions: OTokenRebaseOption[]
     apies: OTokenAPY[]
-    activity: OTokenActivity[]
     vaults: OTokenVault[]
     dripperStates: OTokenDripperState[]
     harvesterYieldSent: OTokenHarvesterYieldSent[]
@@ -209,7 +209,6 @@ export const createOTokenLegacyProcessor = (params: {
     idMap.set(partialId, nextId)
     return `${partialId}-${nextId}`
   }
-  const frequencyUpdate = blockFrequencyUpdater({ from: params.vaultFrom })
 
   const process = async (ctx: Context) => {
     let start: number = Date.now()
@@ -272,7 +271,6 @@ export const createOTokenLegacyProcessor = (params: {
       rebases: [],
       rebaseOptions: [],
       apies: [],
-      activity: [],
       vaults: [],
       dripperStates: [],
       harvesterYieldSent: [],
@@ -901,67 +899,10 @@ export const createOTokenLegacyProcessor = (params: {
       }
     }
 
-    await frequencyUpdate(ctx, async (ctx, block) => {
-      const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
-      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
-      result.vaults.push(
-        new OTokenVault({
-          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-          chainId: ctx.chain.id,
-          otoken: params.otokenAddress,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          address: params.otokenVaultAddress,
-          vaultBuffer,
-          totalValue,
-        }),
-      )
-
-      if (params.wotoken && block.header.height >= params.wotoken.from) {
-        const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
-        const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
-          wrappedContract.totalAssets(),
-          wrappedContract.totalSupply(),
-          wrappedContract.previewRedeem(10n ** 18n),
-        ])
-        result.wotokens.push(
-          new WOToken({
-            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}`,
-            chainId: ctx.chain.id,
-            otoken: params.otokenAddress,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            totalAssets,
-            totalSupply,
-            assetsPerShare,
-          }),
-        )
-      }
-
-      if (params.dripper && params.dripper.from <= block.header.height) {
-        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
-        const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
-          dripperContract.dripDuration(),
-          dripperContract.drip(),
-          dripperContract.availableFunds(),
-          new erc20.Contract(ctx, block.header, params.dripper.token).balanceOf(params.dripper.address),
-        ])
-        result.dripperStates.push(
-          new OTokenDripperState({
-            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-            chainId: ctx.chain.id,
-            blockNumber: block.header.height,
-            timestamp: new Date(block.header.timestamp),
-            otoken: params.otokenAddress,
-            dripDuration,
-            lastCollect,
-            perSecond,
-            availableFunds,
-            wethBalance,
-          }),
-        )
-      }
-    })
+    const frequencyUpdateResults = await frequencyUpdater(ctx)
+    result.vaults.push(...frequencyUpdateResults.vaults)
+    result.wotokens.push(...frequencyUpdateResults.wotokens)
+    result.dripperStates.push(...frequencyUpdateResults.dripperStates)
     time('frequencyUpdate')
 
     // Daily Stats
@@ -1170,7 +1111,6 @@ export const createOTokenLegacyProcessor = (params: {
       ctx.store.insert(result.history),
       ctx.store.insert(result.rebases),
       ctx.store.insert(result.rebaseOptions),
-      ctx.store.insert(result.activity),
       ctx.store.insert(result.vaults),
       ctx.store.insert(result.dripperStates),
       ctx.store.insert(result.harvesterYieldSent),
@@ -1200,7 +1140,6 @@ export const createOTokenLegacyProcessor = (params: {
       History: ${result.history.length}
       Rebases: ${result.rebases.length}
       RebaseOptions: ${result.rebaseOptions.length}
-      Activity: ${result.activity.length}
       Vaults: ${result.vaults.length}
       DripperStates: ${result.dripperStates.length}
       HarvesterYieldSent: ${result.harvesterYieldSent.length}

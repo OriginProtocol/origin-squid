@@ -13,6 +13,8 @@ import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 import { loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
+import { OTokenEntityProducer } from './otoken-entity-producer'
+import { otokenFrequencyProcessor } from './otoken-frequency'
 import { OTokenContractAddress } from './otoken-legacy'
 
 export const createOTokenProcessor2 = (params: {
@@ -48,6 +50,8 @@ export const createOTokenProcessor2 = (params: {
   feeOverride?: bigint // out of 100
 }) => {
   const { otokenAddress, from } = params
+
+  const frequencyUpdater = otokenFrequencyProcessor(params)
 
   // Create trace filter for rebase opt events
   const generalTraceParams = {
@@ -179,6 +183,7 @@ export const createOTokenProcessor2 = (params: {
   })
 
   let otoken: OToken_2025_03_04 | OToken_2023_12_21
+  let producer: OTokenEntityProducer
 
   return {
     name: `otoken2-${otokenAddress}`,
@@ -208,9 +213,15 @@ export const createOTokenProcessor2 = (params: {
      */
     async process(ctx: Context): Promise<void> {
       await loadIsContractCache(ctx)
+      const frequencyUpdatePromise = frequencyUpdater(ctx)
+
       if (otoken) {
         otoken.ctx = ctx
       }
+      if (!producer) {
+        producer = new OTokenEntityProducer(otoken, ctx, ctx.blocks[0])
+      }
+      producer.ctx = ctx
 
       const updateOToken = (block: Block, implementationHash: string) => {
         const implementations: Record<string, typeof OToken_2023_12_21 | typeof OToken_2025_03_04 | undefined> = {
@@ -276,6 +287,7 @@ export const createOTokenProcessor2 = (params: {
       for (const block of ctx.blocks) {
         if (otoken) {
           otoken.block = block
+          producer.block = block
         }
         const addressesToCheck = new Set<string>()
         // Process traces
@@ -509,7 +521,14 @@ export const createOTokenProcessor2 = (params: {
           // await checkState(ctx, lastBlock, otoken, new Set([...Object.keys(otoken.creditBalances)]))
         }
       }
-      await saveIsContractCache(ctx)
+      const frequencyUpdateResults = await frequencyUpdatePromise
+      await Promise.all([
+        saveIsContractCache(ctx),
+        producer.save(),
+        ctx.store.insert(frequencyUpdateResults.vaults),
+        ctx.store.insert(frequencyUpdateResults.wotokens),
+        ctx.store.insert(frequencyUpdateResults.dripperStates),
+      ])
     },
   }
 }
