@@ -206,6 +206,9 @@ export const createOTokenProcessor2 = (params: {
         callTo: [otokenAddress],
         ...generalTraceParams,
       })
+
+      // For the frequency updater
+      processor.includeAllBlocks({ from })
     },
     /**
      * Process events from logs and traces to update the OToken state
@@ -242,6 +245,7 @@ export const createOTokenProcessor2 = (params: {
             newImplementation.copyState(otoken)
           }
           otoken = newImplementation
+          producer.otoken = newImplementation
         } else {
           throw new Error('Implementation hash not found.')
         }
@@ -280,6 +284,7 @@ export const createOTokenProcessor2 = (params: {
             otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
             Object.assign(otoken, bigintJsonParse(entity.data as string))
           }
+          producer.otoken = otoken
         }
       }
 
@@ -343,17 +348,20 @@ export const createOTokenProcessor2 = (params: {
               } else if (rebaseOptInTraceFilter.matches(trace)) {
                 // ctx.log.info(trace, 'rebaseOptIn')
                 await otoken.rebaseOptIn(sender)
+                await producer.afterRebaseOptIn(sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (rebaseOptOutTraceFilter.matches(trace)) {
                 // ctx.log.info(trace, 'rebaseOptOut')
                 await otoken.rebaseOptOut(sender)
+                await producer.afterRebaseOptOut(sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (governanceRebaseOptInTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.governanceRebaseOptIn.decode(trace.action.input)
                 // ctx.log.info(trace, 'governanceRebaseOptIn')
                 await otoken.governanceRebaseOptIn(sender, data._account)
+                await producer.afterRebaseOptIn(data._account)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
@@ -361,18 +369,21 @@ export const createOTokenProcessor2 = (params: {
                 const data = otokenAbi.functions.mint.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'mint')
                 await otoken.mint(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
+                await producer.afterMint(trace, data._account, data._amount)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
               } else if (burnTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.burn.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'burn')
                 await otoken.burn(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
+                await producer.afterBurn(trace, data._account, data._amount)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
               } else if (transferTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.transfer.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transfer')
                 await otoken.transfer(sender, data._to.toLowerCase(), data._value)
+                await producer.afterTransfer(trace, sender, data._to.toLowerCase(), data._value)
                 addressesToCheck.add(data._to)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
@@ -380,6 +391,7 @@ export const createOTokenProcessor2 = (params: {
                 const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferFrom')
                 await otoken.transferFrom(sender, data._from.toLowerCase(), data._to.toLowerCase(), data._value)
+                await producer.afterTransferFrom(trace, data._from.toLowerCase(), data._to.toLowerCase(), data._value)
                 addressesToCheck.add(data._from)
                 addressesToCheck.add(data._to)
                 addressesToCheck.add(sender)
@@ -410,7 +422,9 @@ export const createOTokenProcessor2 = (params: {
               } else if (changeSupplyTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.changeSupply.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'changeSupply')
+                const totalSupplyDiff = data._newTotalSupply - otoken.totalSupply
                 otoken.changeSupply(sender, data._newTotalSupply)
+                await producer.afterChangeSupply(trace, data._newTotalSupply, totalSupplyDiff)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (delegateYieldTraceFilter.matches(trace)) {
@@ -418,6 +432,7 @@ export const createOTokenProcessor2 = (params: {
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'delegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
+                await producer.afterDelegateYield(data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
                 addressesToCheck.add(data._to)
@@ -427,6 +442,7 @@ export const createOTokenProcessor2 = (params: {
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'undelegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
+                await producer.afterUndelegateYield(sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
                 ///////////////////////////////
