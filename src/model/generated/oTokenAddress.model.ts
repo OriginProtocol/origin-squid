@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {RebasingOption} from "./_rebasingOption"
 import {OTokenHistory} from "./oTokenHistory.model"
 
@@ -41,13 +41,11 @@ export class OTokenAddress {
     @BigIntColumn_({nullable: false})
     earned!: bigint
 
-    @Index_()
-    @ManyToOne_(() => OTokenAddress, {nullable: true})
-    yieldTo!: OTokenAddress | undefined | null
+    @StringColumn_({nullable: true})
+    yieldTo!: string | undefined | null
 
-    @Index_()
-    @ManyToOne_(() => OTokenAddress, {nullable: true})
-    yieldFrom!: OTokenAddress | undefined | null
+    @StringColumn_({nullable: true})
+    yieldFrom!: string | undefined | null
 
     @IntColumn_({nullable: false})
     blockNumber!: number

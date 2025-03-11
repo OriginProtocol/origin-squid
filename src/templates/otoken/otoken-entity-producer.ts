@@ -152,8 +152,8 @@ export class OTokenEntityProducer {
     address.earned = earned
     address.blockNumber = this.otoken.block.header.height
     address.lastUpdated = new Date(this.otoken.block.header.timestamp)
-    address.yieldFrom = yieldFrom ? this.addressMap.get(yieldFrom) ?? (await this.getOrCreateAddress(yieldFrom)) : null
-    address.yieldTo = yieldTo ? this.addressMap.get(yieldTo) ?? (await this.getOrCreateAddress(yieldTo)) : null
+    address.yieldFrom = yieldFrom ?? null
+    address.yieldTo = yieldTo ?? null
     address.isContract = await isContract(this.ctx, this.otoken.block, account)
 
     // Update rebasing option based on token state
@@ -485,7 +485,7 @@ export class OTokenEntityProducer {
         txHash: trace.transaction!.hash,
         address,
         status: address.rebasingOption,
-        delegatedTo: address.yieldTo?.address ?? null,
+        delegatedTo: address.yieldTo ?? null,
       }),
     )
   }

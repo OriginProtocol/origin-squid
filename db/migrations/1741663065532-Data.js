@@ -1,5 +1,5 @@
-module.exports = class Data1741632833515 {
-    name = 'Data1741632833515'
+module.exports = class Data1741663065532 {
+    name = 'Data1741663065532'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -152,12 +152,10 @@ module.exports = class Data1741632833515 {
         await db.query(`CREATE INDEX "IDX_2f1457755464ec5951d1e96542" ON "o_token_history" ("address_id") `)
         await db.query(`CREATE INDEX "IDX_42142d191ea0408fb511f9f576" ON "o_token_history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_f87d86cfca9ef211ba1b18d2bc" ON "o_token_history" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "credits" numeric NOT NULL, "credits_per_token" numeric NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, "yield_to_id" character varying, "yield_from_id" character varying, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "credits" numeric NOT NULL, "credits_per_token" numeric NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "yield_to" text, "yield_from" text, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7cbc465ce1e9ae06dfe3a8c625" ON "o_token_address" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5342c499e930e396bade7faeb6" ON "o_token_address" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_75c7d29bf71b393e99c4407885" ON "o_token_address" ("address") `)
-        await db.query(`CREATE INDEX "IDX_f6d953080fe505cce434cc33d2" ON "o_token_address" ("yield_to_id") `)
-        await db.query(`CREATE INDEX "IDX_e85317def330f0346cd1f13f58" ON "o_token_address" ("yield_from_id") `)
         await db.query(`CREATE TABLE "o_token_apy" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "date" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, CONSTRAINT "PK_132f1c9570d48b38184ca5ac4cc" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5d9294486b1c57df8c3aad5145" ON "o_token_apy" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_4d4f1b0d9e7f6903a2038c6c38" ON "o_token_apy" ("otoken") `)
@@ -789,8 +787,6 @@ module.exports = class Data1741632833515 {
         await db.query(`ALTER TABLE "ogv_proposal_vote" ADD CONSTRAINT "FK_58d732bc6523c2609d2725cc0ac" FOREIGN KEY ("proposal_id") REFERENCES "ogv_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "ogv_proposal_vote" ADD CONSTRAINT "FK_2fd621aea353448fb3f17721bc8" FOREIGN KEY ("voter_id") REFERENCES "ogv_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "o_token_history" ADD CONSTRAINT "FK_2f1457755464ec5951d1e96542a" FOREIGN KEY ("address_id") REFERENCES "o_token_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
-        await db.query(`ALTER TABLE "o_token_address" ADD CONSTRAINT "FK_f6d953080fe505cce434cc33d2a" FOREIGN KEY ("yield_to_id") REFERENCES "o_token_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
-        await db.query(`ALTER TABLE "o_token_address" ADD CONSTRAINT "FK_e85317def330f0346cd1f13f58b" FOREIGN KEY ("yield_from_id") REFERENCES "o_token_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "o_token_rebase" ADD CONSTRAINT "FK_b8653270b96fc932f077b26441d" FOREIGN KEY ("apy_id") REFERENCES "o_token_apy"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "o_token_rebase_option" ADD CONSTRAINT "FK_da7296f8011232dc8675477b841" FOREIGN KEY ("address_id") REFERENCES "o_token_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "aero_cl_pool_state" ADD CONSTRAINT "FK_02aa86fe0e78999620744402a0c" FOREIGN KEY ("tick_id") REFERENCES "aero_cl_pool_tick"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -955,8 +951,6 @@ module.exports = class Data1741632833515 {
         await db.query(`DROP INDEX "public"."IDX_7cbc465ce1e9ae06dfe3a8c625"`)
         await db.query(`DROP INDEX "public"."IDX_5342c499e930e396bade7faeb6"`)
         await db.query(`DROP INDEX "public"."IDX_75c7d29bf71b393e99c4407885"`)
-        await db.query(`DROP INDEX "public"."IDX_f6d953080fe505cce434cc33d2"`)
-        await db.query(`DROP INDEX "public"."IDX_e85317def330f0346cd1f13f58"`)
         await db.query(`DROP TABLE "o_token_apy"`)
         await db.query(`DROP INDEX "public"."IDX_5d9294486b1c57df8c3aad5145"`)
         await db.query(`DROP INDEX "public"."IDX_4d4f1b0d9e7f6903a2038c6c38"`)
@@ -1588,8 +1582,6 @@ module.exports = class Data1741632833515 {
         await db.query(`ALTER TABLE "ogv_proposal_vote" DROP CONSTRAINT "FK_58d732bc6523c2609d2725cc0ac"`)
         await db.query(`ALTER TABLE "ogv_proposal_vote" DROP CONSTRAINT "FK_2fd621aea353448fb3f17721bc8"`)
         await db.query(`ALTER TABLE "o_token_history" DROP CONSTRAINT "FK_2f1457755464ec5951d1e96542a"`)
-        await db.query(`ALTER TABLE "o_token_address" DROP CONSTRAINT "FK_f6d953080fe505cce434cc33d2a"`)
-        await db.query(`ALTER TABLE "o_token_address" DROP CONSTRAINT "FK_e85317def330f0346cd1f13f58b"`)
         await db.query(`ALTER TABLE "o_token_rebase" DROP CONSTRAINT "FK_b8653270b96fc932f077b26441d"`)
         await db.query(`ALTER TABLE "o_token_rebase_option" DROP CONSTRAINT "FK_da7296f8011232dc8675477b841"`)
         await db.query(`ALTER TABLE "aero_cl_pool_state" DROP CONSTRAINT "FK_02aa86fe0e78999620744402a0c"`)

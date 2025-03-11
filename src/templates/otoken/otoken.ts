@@ -637,7 +637,7 @@ export const createOTokenLegacyProcessor = (params: {
       // Source
       sourceOwner.rebasingOption = RebasingOption.YieldDelegationSource
       sourceOwner.yieldFrom = null
-      sourceOwner.yieldTo = targetOwner
+      sourceOwner.yieldTo = targetAddress
       result.rebaseOptions.push(
         new OTokenRebaseOption({
           id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.transactionHash}-${sourceAddress}`),
@@ -653,7 +653,7 @@ export const createOTokenLegacyProcessor = (params: {
       )
       // Target
       targetOwner.rebasingOption = RebasingOption.YieldDelegationTarget
-      targetOwner.yieldFrom = sourceOwner
+      targetOwner.yieldFrom = sourceAddress
       targetOwner.yieldTo = null
       result.rebaseOptions.push(
         new OTokenRebaseOption({

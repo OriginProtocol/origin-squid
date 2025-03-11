@@ -52,8 +52,8 @@ type OTokenAddress @entity {
   creditsPerToken: BigInt!
   balance: BigInt!
   earned: BigInt!
-  yieldTo: OTokenAddress # For delegation source
-  yieldFrom: OTokenAddress # For delegation target
+  yieldTo: String # For delegation source
+  yieldFrom: String # For delegation target
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime
