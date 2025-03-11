@@ -434,25 +434,28 @@ export const createOTokenProcessor = (params: {
         otokenObject.totalSupply -= data.value
       }
 
-      if (addressAdd.rebasingOption === RebasingOption.OptOut && data.from === ADDRESS_ZERO) {
+      const addIsRebasing =
+        addressAdd.rebasingOption === RebasingOption.OptIn ||
+        addressAdd.rebasingOption === RebasingOption.YieldDelegationSource ||
+        addressAdd.rebasingOption === RebasingOption.YieldDelegationTarget
+      const subIsRebasing =
+        addressSub.rebasingOption === RebasingOption.OptIn ||
+        addressSub.rebasingOption === RebasingOption.YieldDelegationSource ||
+        addressSub.rebasingOption === RebasingOption.YieldDelegationTarget
+
+      if (data.from === ADDRESS_ZERO && !addIsRebasing) {
         // If it's a mint and minter has opted out of rebasing,
         // add to non-rebasing supply
         otokenObject.nonRebasingSupply += data.value
-      } else if (data.to === ADDRESS_ZERO && addressSub.rebasingOption === RebasingOption.OptOut) {
+      } else if (data.to === ADDRESS_ZERO && !subIsRebasing) {
         // If it's a redeem and redeemer has opted out of rebasing,
         // subtract non-rebasing supply
         otokenObject.nonRebasingSupply -= data.value
-      } else if (
-        addressAdd.rebasingOption === RebasingOption.OptOut &&
-        addressSub.rebasingOption === RebasingOption.OptIn
-      ) {
+      } else if (!addIsRebasing && subIsRebasing) {
         // If receiver has opted out but sender hasn't,
         // Add to non-rebasing supply
         otokenObject.nonRebasingSupply += data.value
-      } else if (
-        addressAdd.rebasingOption === RebasingOption.OptIn &&
-        addressSub.rebasingOption === RebasingOption.OptOut
-      ) {
+      } else if (addIsRebasing && !subIsRebasing) {
         // If sender has opted out but receiver hasn't,
         // Subtract non-rebasing supply
         otokenObject.nonRebasingSupply -= data.value
@@ -646,6 +649,7 @@ export const createOTokenProcessor = (params: {
     }
 
     const processYieldDelegated = async (block: Block, log: Log) => {
+      const otokenObject = await getOTokenObject(block)
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
       const data = otoken.events.YieldDelegated.decode(log)
@@ -685,10 +689,14 @@ export const createOTokenProcessor = (params: {
           delegatedTo: null,
         }),
       )
+      const otokenContract = new otoken.Contract(ctx, block.header, params.otokenAddress)
+      otokenObject.nonRebasingSupply = await otokenContract.nonRebasingSupply()
+      otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       time('processYieldDelegated')
     }
 
     const processYieldUndelegated = async (block: Block, log: Log) => {
+      const otokenObject = await getOTokenObject(block)
       const timestamp = new Date(block.header.timestamp)
       const blockNumber = block.header.height
       const data = otoken.events.YieldUndelegated.decode(log)
@@ -728,6 +736,9 @@ export const createOTokenProcessor = (params: {
           delegatedTo: null,
         }),
       )
+      const otokenContract = new otoken.Contract(ctx, block.header, params.otokenAddress)
+      otokenObject.nonRebasingSupply = await otokenContract.nonRebasingSupply()
+      otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
       time('processYieldUndelegated')
     }
 
