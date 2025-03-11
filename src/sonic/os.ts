@@ -9,16 +9,16 @@ const otokenProcessor = createOTokenProcessor({
   name: 'OS',
   symbol: 'OS',
   from: sonicAddresses.OS.initializeBlock,
-  vaultFrom: sonicAddresses.OS.initializeBlock,
+  vaultFrom: 3884318,
   otokenAddress: sonicAddresses.OS.address,
   wotoken: {
     address: sonicAddresses.OS.wrapped,
-    from: sonicAddresses.OS.initializeBlock,
+    from: 4025393,
   },
   dripper: {
     address: sonicAddresses.OS.dripper,
     token: sonicAddresses.tokens.wS,
-    from: sonicAddresses.OS.initializeBlock,
+    from: 3884406,
   },
   harvester: {
     address: sonicAddresses.OS.harvester,
