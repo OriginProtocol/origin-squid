@@ -316,10 +316,10 @@ export const createOTokenProcessor2 = (params: {
         if (entity) {
           if (entity.type === 'OToken_2023_12_21') {
             otoken = new OToken_2023_12_21(ctx, ctx.blocks[0], otokenAddress)
-            Object.assign(otoken, bigintJsonParse(entity.data as string))
+            Object.assign(otoken, bigintJsonParse(JSON.stringify(entity.data)))
           } else if (entity.type === 'OToken_2025_03_04') {
             otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
-            Object.assign(otoken, bigintJsonParse(entity.data as string))
+            Object.assign(otoken, bigintJsonParse(JSON.stringify(entity.data)))
           }
           producer.otoken = otoken
         }
@@ -518,9 +518,9 @@ export const createOTokenProcessor2 = (params: {
                 }
               }
             }
-            await producer.afterBlock(params)
           }
         }
+        await producer.afterBlock(params)
         for (const log of block.logs) {
           if (harvesterYieldSentFilter?.matches(log)) {
             await producer.processHarvesterYieldSent(ctx, block, log)
@@ -545,39 +545,41 @@ export const createOTokenProcessor2 = (params: {
             timestamp: new Date(lastBlock.header.timestamp),
             blockNumber: lastBlock.header.height,
             type: otoken.constructor.name,
-            data: bigintJsonStringify(
-              pick(
-                otoken,
-                otoken instanceof OToken_2023_12_21
-                  ? [
-                      'totalSupply',
-                      '_allowances',
-                      'vaultAddress',
-                      'creditBalances',
-                      '_rebasingCredits',
-                      '_rebasingCreditsPerToken',
-                      'nonRebasingSupply',
-                      'nonRebasingCreditsPerToken',
-                      'rebaseState',
-                      'isUpgraded',
-                      'governor',
-                    ]
-                  : [
-                      // OToken_2025_03_04
-                      'totalSupply',
-                      'allowances',
-                      'vaultAddress',
-                      'creditBalances',
-                      'rebasingCredits',
-                      'rebasingCreditsPerToken',
-                      'nonRebasingSupply',
-                      'rebasingSupply',
-                      'alternativeCreditsPerToken',
-                      'rebaseState',
-                      'yieldTo',
-                      'yieldFrom',
-                      'governor',
-                    ],
+            data: JSON.parse(
+              bigintJsonStringify(
+                pick(
+                  otoken,
+                  otoken instanceof OToken_2023_12_21
+                    ? [
+                        'totalSupply',
+                        '_allowances',
+                        'vaultAddress',
+                        'creditBalances',
+                        '_rebasingCredits',
+                        '_rebasingCreditsPerToken',
+                        'nonRebasingSupply',
+                        'nonRebasingCreditsPerToken',
+                        'rebaseState',
+                        'isUpgraded',
+                        'governor',
+                      ]
+                    : [
+                        // OToken_2025_03_04
+                        'totalSupply',
+                        'allowances',
+                        'vaultAddress',
+                        'creditBalances',
+                        'rebasingCredits',
+                        'rebasingCreditsPerToken',
+                        'nonRebasingSupply',
+                        'rebasingSupply',
+                        'alternativeCreditsPerToken',
+                        'rebaseState',
+                        'yieldTo',
+                        'yieldFrom',
+                        'governor',
+                      ],
+                ),
               ),
             ),
           }),

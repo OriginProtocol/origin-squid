@@ -107,6 +107,15 @@ export class OTokenEntityProducer {
     return token
   }
 
+  private async getAddress(account: string): Promise<OTokenAddress | undefined> {
+    const id = `${this.ctx.chain.id}:${this.otoken.address}:${account}`
+    let address = this.addressMap.get(account)
+    if (!address) {
+      address = await this.ctx.store.get(OTokenAddress, id)
+    }
+    return address
+  }
+
   private async getOrCreateAddress(account: string): Promise<OTokenAddress> {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${account}`
     let address = this.addressMap.get(account)
@@ -149,7 +158,7 @@ export class OTokenEntityProducer {
     address.credits = credits
     address.creditsPerToken = creditsPerToken
     address.balance = balance
-    address.earned = earned
+    address.earned += earned
     address.blockNumber = this.otoken.block.header.height
     address.lastUpdated = new Date(this.otoken.block.header.timestamp)
     address.yieldFrom = yieldFrom ?? null
@@ -466,7 +475,24 @@ export class OTokenEntityProducer {
     await Promise.all(
       Object.keys(this.otoken.creditBalances).map((account) => {
         return (async () => {
-          await this.getOrCreateAddress(account)
+          let address = await this.getAddress(account)
+          const earned = address?.earned ?? 0n
+          address = await this.getOrCreateAddress(account)
+          const earnedDiff = address.earned - earned
+          this.histories.push(
+            new OTokenHistory({
+              id: `${this.ctx.chain.id}-${trace.transaction!.hash}-${trace.traceAddress.join('-')}-${account}`,
+              chainId: this.ctx.chain.id,
+              otoken: this.otoken.address,
+              address: await this.getOrCreateAddress(account),
+              timestamp: new Date(this.otoken.block.header.timestamp),
+              blockNumber: this.otoken.block.header.height,
+              txHash: this.otoken.block.header.hash,
+              type: HistoryType.Yield,
+              value: earnedDiff,
+              balance: this.otoken.balanceOf(account),
+            }),
+          )
         })()
       }),
     )
@@ -554,7 +580,7 @@ export class OTokenEntityProducer {
 
     await this.ctx.store.upsert([...this.addressMap.values()]) // These must be saved first.
     await Promise.all([
-      this.ctx.store.upsert([...this.otokenMap.values()]),
+      this.ctx.store.insert([...this.otokenMap.values()]),
       this.ctx.store.upsert([...this.apyMap.values()]),
       this.ctx.store.insert([...this.rebaseMap.values()]),
       this.ctx.store.insert(this.histories),
