@@ -1,1 +1,1 @@
-export * from './otoken-legacy'
+export * from './otoken'

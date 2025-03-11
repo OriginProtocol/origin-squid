@@ -23,11 +23,11 @@ import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetC
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { isContract } from '@utils/isContract'
 
+import { createOTokenLegacyProcessor } from './otoken'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { processOTokenDailyStats } from './otoken-daily-stats'
 import { processOTokenERC20 } from './otoken-erc20'
-import { createOTokenLegacyProcessor } from './otoken-legacy'
 
 dayjs.extend(utc)
 
