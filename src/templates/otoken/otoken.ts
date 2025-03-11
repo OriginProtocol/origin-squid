@@ -520,6 +520,7 @@ export const createOTokenLegacyProcessor = (params: {
           address.since = null
         }
         address.balance = newBalance
+        address.creditsPerToken = data.rebasingCreditsPerToken
         address.earned += earned
       }
       const entity = await rebase

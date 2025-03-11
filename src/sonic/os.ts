@@ -1,7 +1,7 @@
 import { parseEther } from 'viem'
 
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
-import { createOTokenProcessor2 } from '@templates/otoken/otoken'
+import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
