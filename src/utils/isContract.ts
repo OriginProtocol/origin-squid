@@ -15,13 +15,30 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
     return cache.get(account)!
   }
   const start = Date.now()
-  const codeAtBlock = await ctx._chain.client.call('eth_getCode', [account, `0x${block.header.height.toString(16)}`])
-  if (!ctx.isHead) {
-    const codeAtLatest = await ctx._chain.client.call('eth_getCode', [account, `0x${block.header.height.toString(16)}`])
+
+  let codeAtBlock
+  let codeAtLatest
+
+  if (ctx.isHead) {
+    codeAtBlock = await ctx._chain.client.call('eth_getCode', [account, `0x${block.header.height.toString(16)}`])
+  } else {
+    const batchResult = await ctx._chain.client.batchCall([
+      {
+        method: 'eth_getCode',
+        params: [account, `latest`],
+      },
+      {
+        method: 'eth_getCode',
+        params: [account, `0x${block.header.height.toString(16)}`],
+      },
+    ])
+    codeAtLatest = batchResult[0]
+    codeAtBlock = batchResult[1]
     if (codeAtBlock === codeAtLatest) {
       cache.set(account, codeAtLatest !== '0x')
     }
   }
+
   time += Date.now() - start
   count++
   if (true || process.env.DEBUG_PERF === 'true') {

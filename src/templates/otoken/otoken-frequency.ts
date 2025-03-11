@@ -19,26 +19,30 @@ export const otokenFrequencyProcessor = (params: {
     from: number
   }
 }) => {
-  const frequencyUpdate = blockFrequencyUpdater({ from: params.vaultFrom })
+  const frequencyUpdate = blockFrequencyUpdater({
+    from: Math.min(params.vaultFrom, params.wotoken?.from ?? 0, params.dripper?.from ?? 0),
+  })
   return async (ctx: Context) => {
     const vaults: OTokenVault[] = []
     const wotokens: WOToken[] = []
     const dripperStates: OTokenDripperState[] = []
     await frequencyUpdate(ctx, async (ctx, block) => {
-      const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
-      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
-      vaults.push(
-        new OTokenVault({
-          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-          chainId: ctx.chain.id,
-          otoken: params.otokenAddress,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          address: params.otokenVaultAddress,
-          vaultBuffer,
-          totalValue,
-        }),
-      )
+      if (block.header.height >= params.vaultFrom) {
+        const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+        const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
+        vaults.push(
+          new OTokenVault({
+            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+            address: params.otokenVaultAddress,
+            vaultBuffer,
+            totalValue,
+          }),
+        )
+      }
 
       if (params.wotoken && block.header.height >= params.wotoken.from) {
         const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)

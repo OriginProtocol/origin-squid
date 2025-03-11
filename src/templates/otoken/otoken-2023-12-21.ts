@@ -26,6 +26,7 @@ export class OToken_2023_12_21 {
   public rebaseState: Record<string, RebaseOptions> = {}
   public isUpgraded: Record<string, bigint> = {}
   public readonly RESOLUTION_INCREASE: bigint = BigInt(1e9)
+  public readonly RESOLUTION_DECIMALS: bigint = 27n
 
   public governor: string = ''
   public ctx: Context

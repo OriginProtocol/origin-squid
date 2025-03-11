@@ -16,6 +16,7 @@ const otokenProcessor = createOTokenLegacyProcessor({
   symbol: 'superOETHb',
   from: 17819702,
   vaultFrom: 17819702,
+  // fee: 20n,
   otokenAddress: baseAddresses.tokens.superOETHb,
   wotoken: {
     address: baseAddresses.tokens.wsuperOETHb,

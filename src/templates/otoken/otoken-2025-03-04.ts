@@ -36,6 +36,7 @@ export class OToken_2025_03_04 {
   // Constants
   private readonly MAX_SUPPLY: bigint = BigInt('340282366920938463463374607431768211455') // uint128 max
   private readonly RESOLUTION_INCREASE: bigint = BigInt('1000000000') // 1e9
+  public readonly RESOLUTION_DECIMALS: bigint = 27n
 
   // State variables
   public totalSupply: bigint = 0n
@@ -572,7 +573,7 @@ export class OToken_2025_03_04 {
       this.rebasingCreditsPerToken = (this.rebasingCredits * 10n ** 18n + rebasingSupply - 1n) / rebasingSupply
     }
 
-    if (this.rebasingCreditsPerToken === 0n) {
+    if (this.rebasingCreditsPerToken <= 0n) {
       throw new Error('Invalid change in supply')
     }
 

@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { findLast, sortBy, uniq } from 'lodash'
-import { Between, LessThanOrEqual } from 'typeorm'
-import { formatUnits } from 'viem'
+import { LessThanOrEqual } from 'typeorm'
 
 import * as erc20 from '@abi/erc20'
 import * as otokenVault from '@abi/oeth-vault'
@@ -31,7 +30,7 @@ import {
   RebasingOption,
   WOToken,
 } from '@model'
-import { Block, Context, Log, logFilter, multicall } from '@originprotocol/squid-utils'
+import { Block, Context, Log, blockFrequencyUpdater, logFilter, multicall } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -40,7 +39,7 @@ import { baseAddresses } from '@utils/addresses-base'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { DECIMALS_18 } from '@utils/constants'
 
-import { otokenFrequencyProcessor } from './otoken-frequency'
+import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
 import { createAddress, createRebaseAPY } from './utils'
 
 export type OTokenContractAddress =
@@ -81,7 +80,6 @@ export const createOTokenLegacyProcessor = (params: {
   accountsOverThresholdMinimum: bigint
   feeOverride?: bigint // out of 100
 }) => {
-  const frequencyUpdater = otokenFrequencyProcessor(params)
   const harvesterYieldSentFilter = params.harvester?.yieldSent
     ? logFilter({
         address: [params.harvester.address],
@@ -209,6 +207,7 @@ export const createOTokenLegacyProcessor = (params: {
     idMap.set(partialId, nextId)
     return `${partialId}-${nextId}`
   }
+  const frequencyUpdate = blockFrequencyUpdater({ from: params.vaultFrom })
 
   const process = async (ctx: Context) => {
     let start: number = Date.now()
@@ -382,10 +381,14 @@ export const createOTokenLegacyProcessor = (params: {
         address: OTokenAddress
         credits: [bigint, bigint]
       }) => {
-        const balance = getOTokenBalance(otokenObject, address, address.yieldFrom)
-        address.credits = BigInt(credits[0]) // token credits
-        const newBalance = getOTokenBalance(otokenObject, address, address.yieldFrom)
-        const change = newBalance - balance
+        const otokenContract = new otoken.Contract(ctx, block.header, params.otokenAddress)
+        const involvedInYieldDelegation =
+          address.rebasingOption === RebasingOption.YieldDelegationSource ||
+          address.rebasingOption === RebasingOption.YieldDelegationTarget
+        const newBalance = involvedInYieldDelegation
+          ? await otokenContract.balanceOf(address.address)! // It should exist.
+          : (credits[0] * DECIMALS_18) / credits[1]
+        const change = newBalance - address.balance
         if (change === 0n) return
         const type = addressSub === address ? HistoryType.Sent : HistoryType.Received
         result.history.push(
@@ -402,12 +405,13 @@ export const createOTokenLegacyProcessor = (params: {
             type,
           }),
         )
-        if (address.credits === 0n) {
+        address.credits = BigInt(credits[0]) // token credits
+        if (address.balance === 0n && newBalance > 0n) {
           address.since = new Date(block.header.timestamp)
         } else if (newBalance === 0n) {
           address.since = null
         }
-        address.credits = BigInt(credits[0]) // token credits
+        address.balance = newBalance // token balance
       }
 
       await Promise.all([
@@ -453,6 +457,24 @@ export const createOTokenLegacyProcessor = (params: {
 
       // Update rebasing supply in all cases
       otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
+
+      const erc20Id = `${ctx.chain.id}-${log.id}`
+      result.erc20.transfers.set(
+        erc20Id,
+        new ERC20Transfer({
+          id: erc20Id,
+          chainId: ctx.chain.id,
+          txHash: log.transactionHash,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          address: params.otokenAddress,
+          from: data.from,
+          fromBalance: addressSub.balance,
+          to: data.to,
+          toBalance: addressAdd.balance,
+          value: data.value,
+        }),
+      )
     }
 
     const processTotalSupplyUpdatedHighres = async (
@@ -496,13 +518,28 @@ export const createOTokenLegacyProcessor = (params: {
         const earned = newBalance - address.balance
 
         if (earned === 0n) continue
+        result.history.push(
+          new OTokenHistory({
+            id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.id}`),
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            address: address,
+            value: earned,
+            balance: newBalance,
+            timestamp: new Date(block.header.timestamp),
+            blockNumber: block.header.height,
+            txHash: log.transactionHash,
+            type: HistoryType.Yield,
+          }),
+        )
+
         if (address.balance === 0n && newBalance > 0n) {
           address.since = new Date(block.header.timestamp)
         } else if (newBalance === 0n) {
           address.since = null
         }
         address.balance = newBalance
-        address.balanceEarned += earned
+        address.earned += earned
       }
       const entity = await rebase
       result.rebases.push(entity)
@@ -586,6 +623,7 @@ export const createOTokenLegacyProcessor = (params: {
       })
       result.rebaseOptions.push(rebaseOption)
 
+      owner.yieldFrom = null
       owner.yieldTo = null
       if (option === RebasingOption.OptIn) {
         const afterHighResUpgrade = block.header.height >= (params.Upgrade_CreditsBalanceOfHighRes ?? 0)
@@ -660,7 +698,6 @@ export const createOTokenLegacyProcessor = (params: {
       let sourceOwner = await getOwner(ctx, sourceAddress, block)
       sourceOwner.rebasingOption = RebasingOption.OptOut
       sourceOwner.yieldFrom = null
-      sourceOwner.yieldTo = null
       result.rebaseOptions.push(
         new OTokenRebaseOption({
           id: getUniqueId(`${ctx.chain.id}-${params.otokenAddress}-${log.transactionHash}-${sourceAddress}`),
@@ -677,7 +714,6 @@ export const createOTokenLegacyProcessor = (params: {
       // Target
       let targetOwner = await getOwner(ctx, targetAddress, block)
       targetOwner.rebasingOption = RebasingOption.OptIn
-      targetOwner.yieldFrom = null
       targetOwner.yieldTo = null
       result.rebaseOptions.push(
         new OTokenRebaseOption({
@@ -764,65 +800,6 @@ export const createOTokenLegacyProcessor = (params: {
       return otokenObject
     }
 
-    const getOTokenDailyStat = (block: Block) => {
-      const dayString = new Date(block.header.timestamp).toISOString().substring(0, 10)
-      const id = `${ctx.chain.id}-${params.otokenAddress}-${dayString}`
-      let entity = result.dailyStats.get(id)?.entity
-      if (entity) {
-        result.dailyStats.set(entity.id, { block, entity })
-        entity.timestamp = new Date(block.header.timestamp)
-        entity.blockNumber = block.header.height
-        return entity
-      }
-
-      return new Promise(async (resolve, reject) => {
-        let entity = await ctx.store.get(OTokenDailyStat, id).catch(reject)
-        if (!entity) {
-          entity = new OTokenDailyStat({
-            id,
-            chainId: ctx.chain.id,
-            timestamp: new Date(block.header.timestamp),
-            date: dayString,
-            blockNumber: block.header.height,
-            otoken: params.otokenAddress,
-
-            apr: 0,
-            apy: 0,
-            apy7: 0,
-            apy14: 0,
-            apy30: 0,
-
-            rateUSD: 0n,
-            rateETH: 0n,
-
-            totalSupply: 0n,
-            rebasingSupply: 0n,
-            nonRebasingSupply: 0n,
-            wrappedSupply: 0n,
-            rateWrapped: 0n,
-
-            amoSupply: 0n,
-            dripperWETH: 0n,
-
-            yield: 0n,
-            fees: 0n,
-            cumulativeYield: 0n,
-            cumulativeFees: 0n,
-
-            marketCapUSD: 0,
-            accountsOverThreshold: 0,
-          })
-          result.dailyStats.set(entity.id, { block, entity })
-        } else {
-          result.dailyStats.set(entity.id, { block, entity })
-          entity.timestamp = new Date(block.header.timestamp)
-          entity.blockNumber = block.header.height
-        }
-
-        resolve(entity)
-      })
-    }
-
     const getYieldDelegationBalances = async (ctx: Context, block: Block) => {
       const delegatedAddresses = Array.from(owners!.values())
         .filter(
@@ -853,12 +830,14 @@ export const createOTokenLegacyProcessor = (params: {
           block,
           params.otokenAddress,
           OUSD_STABLE_OTOKENS.includes(params.otokenAddress) ? 'ETH' : 'USD',
-        )
+        ).catch((err) => {
+          throw err
+        })
       }
     }
 
     for (const block of ctx.blocks) {
-      await getOTokenDailyStat(block)
+      await getOTokenDailyStat(ctx, block, params.otokenAddress, result.dailyStats)
       for (const trace of block.traces) {
         if (
           trace.type === 'call' &&
@@ -899,125 +878,74 @@ export const createOTokenLegacyProcessor = (params: {
       }
     }
 
-    const frequencyUpdateResults = await frequencyUpdater(ctx)
-    result.vaults.push(...frequencyUpdateResults.vaults)
-    result.wotokens.push(...frequencyUpdateResults.wotokens)
-    result.dripperStates.push(...frequencyUpdateResults.dripperStates)
+    await frequencyUpdate(ctx, async (ctx, block) => {
+      const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
+      result.vaults.push(
+        new OTokenVault({
+          id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+          chainId: ctx.chain.id,
+          otoken: params.otokenAddress,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          address: params.otokenVaultAddress,
+          vaultBuffer,
+          totalValue,
+        }),
+      )
+
+      if (params.wotoken && block.header.height >= params.wotoken.from) {
+        const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
+        const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
+          wrappedContract.totalAssets(),
+          wrappedContract.totalSupply(),
+          wrappedContract.previewRedeem(10n ** 18n),
+        ])
+        result.wotokens.push(
+          new WOToken({
+            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}`,
+            chainId: ctx.chain.id,
+            otoken: params.otokenAddress,
+            timestamp: new Date(block.header.timestamp),
+            blockNumber: block.header.height,
+            totalAssets,
+            totalSupply,
+            assetsPerShare,
+          }),
+        )
+      }
+
+      if (params.dripper && params.dripper.from <= block.header.height) {
+        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
+        const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
+          dripperContract.dripDuration(),
+          dripperContract.drip(),
+          dripperContract.availableFunds(),
+          new erc20.Contract(ctx, block.header, params.dripper.token).balanceOf(params.dripper.address),
+        ])
+        result.dripperStates.push(
+          new OTokenDripperState({
+            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+            chainId: ctx.chain.id,
+            blockNumber: block.header.height,
+            timestamp: new Date(block.header.timestamp),
+            otoken: params.otokenAddress,
+            dripDuration,
+            lastCollect,
+            perSecond,
+            availableFunds,
+            wethBalance,
+          }),
+        )
+      }
+    })
     time('frequencyUpdate')
 
-    // Daily Stats
-    // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
-    for (const { block, entity } of result.dailyStats.values()) {
-      if (block.header.height < params.from) continue
-      const blockDate = new Date(block.header.timestamp)
-      // Get the latest otokenObject for the blockDate in question. We cannot use `getLatestOTokenObject`.
-      let otokenObject = findLast(result.otokens, (o) => o.timestamp <= blockDate)
-      if (!otokenObject) {
-        otokenObject = await ctx.store.findOne(OToken, {
-          where: {
-            chainId: ctx.chain.id,
-            otoken: params.otokenAddress,
-            timestamp: LessThanOrEqual(blockDate),
-          },
-          order: { timestamp: 'desc' },
-        })
-      }
-      if (!otokenObject) {
-        continue
-        // throw new Error('otokenObject not found for daily stat processing')
-      }
-      entity.totalSupply = otokenObject.totalSupply ?? 0n
-      entity.nonRebasingSupply = otokenObject.nonRebasingSupply ?? 0n
-      entity.rebasingSupply = otokenObject.rebasingSupply ?? 0n
-
-      const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
-      let apy = findLast(result.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
-      if (!apy) {
-        apy = await ctx.store.findOne(OTokenAPY, {
-          order: { timestamp: 'desc' },
-          where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
-        })
-      }
-      if (apy) {
-        entity.apr = apy.apr
-        entity.apy = apy.apy
-        entity.apy7 = apy.apy7DayAvg
-        entity.apy14 = apy.apy14DayAvg
-        entity.apy30 = apy.apy30DayAvg
-      }
-      // These should remain unique since any result rebases have not been stored in the database yet.
-      let rebases = result.rebases.filter((rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate)
-      rebases.push(
-        ...(await ctx.store.find(OTokenRebase, {
-          order: { timestamp: 'desc' },
-          where: {
-            chainId: ctx.chain.id,
-            otoken: params.otokenAddress,
-            timestamp: Between(startOfDay, blockDate),
-          },
-        })),
-      )
-      entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
-      // There was a time when this was considered to be used, but I think we will *not* do that now.
-      // Leaving it here for now...
-      // let yieldSentEvents: OTokenHarvesterYieldSent[] = []
-      // if (params.harvester?.yieldSent) {
-      //   yieldSentEvents = result.harvesterYieldSent.filter(
-      //     (event) => event.timestamp >= startOfDay && event.timestamp <= blockDate,
-      //   )
-      //   yieldSentEvents.push(
-      //     ...(await ctx.store.find(OTokenHarvesterYieldSent, {
-      //       order: { timestamp: 'desc' },
-      //       where: {
-      //         chainId: ctx.chain.id,
-      //         otoken: params.otokenAddress,
-      //         timestamp: Between(startOfDay, blockDate),
-      //       },
-      //     })),
-      //   )
-      // }
-      entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
-
-      const lastDayString = dayjs(block.header.timestamp).subtract(1, 'day').toISOString().substring(0, 10)
-      const lastId = `${ctx.chain.id}-${params.otokenAddress}-${lastDayString}`
-      const last = result.dailyStats.get(lastId)?.entity ?? (await ctx.store.get(OTokenDailyStat, lastId))
-      entity.cumulativeYield = (last?.cumulativeYield ?? 0n) + entity.yield
-      entity.cumulativeFees = (last?.cumulativeFees ?? 0n) + entity.fees
-
-      const getDripperAvailableFunds = async () => {
-        if (!params.dripper || params.dripper.from > block.header.height) return 0n
-        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
-        return dripperContract.availableFunds()
-      }
-
-      const wotokenContract =
-        params.wotoken && block.header.height >= params.wotoken.from
-          ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
-          : null
-
-      const start = Date.now()
-      const [rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] = await Promise.all([
-        ensureExchangeRate(ctx, block, params.otokenAddress, 'ETH').then((a) => a?.rate ?? 0n),
-        ensureExchangeRate(ctx, block, params.otokenAddress, 'USD').then((a) => a?.rate ?? 0n),
-        getDripperAvailableFunds(),
-        params.getAmoSupply(ctx, block.header.height),
-        wotokenContract ? wotokenContract.totalSupply() : 0n,
-        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
-      ])
-
-      entity.rateETH = rateETH
-      entity.rateUSD = rateUSD
-      entity.amoSupply = amoSupply
-
-      entity.dripperWETH = dripperWETH
-      entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
-      entity.wrappedSupply = wrappedSupply
-      entity.rateWrapped = wrappedRate
-      entity.accountsOverThreshold = Array.from(owners?.values() ?? []).filter(
-        (a) => a.balance >= params.accountsOverThresholdMinimum,
-      ).length
-      ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
-    }
+    await processOTokenDailyStats(ctx, {
+      ...params,
+      ...result,
+      balances: new Map(Array.from(owners!.values()).map((owner) => [owner.address, owner.balance])),
+    })
     time('dailyStats')
 
     // Create ERC20 entities based on OToken entities
@@ -1162,22 +1090,4 @@ export const createOTokenLegacyProcessor = (params: {
     initialize,
     process,
   }
-}
-
-export const getOTokenBalance = (otoken: OToken, account: OTokenAddress, yieldFrom?: OTokenAddress | null): bigint => {
-  const state = account.rebasingOption
-  if (state === RebasingOption.YieldDelegationSource) {
-    // Saves a slot read when transferring to or from a yield delegating source
-    // since we know creditBalances equals the balance.
-    return account.credits
-  }
-  const baseBalance = (account.credits * BigInt(1e18)) / otoken.creditsPerToken
-  if (state === RebasingOption.YieldDelegationTarget) {
-    if (!yieldFrom) {
-      throw new Error('Yield delegation target without yield from')
-    }
-    // creditBalances of yieldFrom accounts equals token balances
-    return baseBalance - yieldFrom.credits
-  }
-  return baseBalance
 }

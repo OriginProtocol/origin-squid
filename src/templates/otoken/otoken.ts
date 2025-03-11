@@ -4,8 +4,9 @@ import { pick } from 'lodash'
 import * as proxyAbi from '@abi/governed-upgradeability-proxy'
 import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
-import { OTokenRawData } from '@model'
-import { Block, Context, multicall, traceFilter } from '@originprotocol/squid-utils'
+import * as otokenHarvester from '@abi/otoken-base-harvester'
+import { OTokenAsset, OTokenRawData } from '@model'
+import { Block, Context, Processor, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
@@ -22,6 +23,7 @@ export const createOTokenProcessor2 = (params: {
   symbol: string
   from: number
   vaultFrom: number
+  fee: bigint // out of 100
   Upgrade_CreditsBalanceOfHighRes?: number
   otokenAddress: OTokenContractAddress
   wotoken?: {
@@ -48,7 +50,7 @@ export const createOTokenProcessor2 = (params: {
   }
   accountsOverThresholdMinimum: bigint
   feeOverride?: bigint // out of 100
-}) => {
+}): Processor => {
   const { otokenAddress, from } = params
 
   const frequencyUpdater = otokenFrequencyProcessor(params)
@@ -181,6 +183,13 @@ export const createOTokenProcessor2 = (params: {
     callSighash: [otokenAbi.functions.claimGovernance.selector],
     ...generalTraceParams,
   })
+  const harvesterYieldSentFilter = params.harvester?.yieldSent
+    ? logFilter({
+        address: [params.harvester.address],
+        topic0: [otokenHarvester.events.YieldSent.topic],
+        range: { from: params.harvester.from },
+      })
+    : undefined
 
   let otoken: OToken_2025_03_04 | OToken_2023_12_21
   let producer: OTokenEntityProducer
@@ -207,8 +216,32 @@ export const createOTokenProcessor2 = (params: {
         ...generalTraceParams,
       })
 
+      // Event
+      if (harvesterYieldSentFilter) {
+        processor.addLog(harvesterYieldSentFilter.value)
+      }
+
       // For the frequency updater
       processor.includeAllBlocks({ from })
+    },
+    initialize: async (ctx: Context) => {
+      const assetsCount = await ctx.store.count(OTokenAsset, {
+        where: { chainId: ctx.chain.id, otoken: params.otokenAddress },
+      })
+      if (assetsCount === 0) {
+        await ctx.store.insert(
+          params.oTokenAssets.map(
+            ({ asset, symbol }) =>
+              new OTokenAsset({
+                id: `${ctx.chain.id}-${params.otokenAddress}-${asset}`,
+                chainId: ctx.chain.id,
+                otoken: params.otokenAddress,
+                address: asset,
+                symbol: symbol,
+              }),
+          ),
+        )
+      }
     },
     /**
      * Process events from logs and traces to update the OToken state
@@ -222,15 +255,18 @@ export const createOTokenProcessor2 = (params: {
         otoken.ctx = ctx
       }
       if (!producer) {
-        producer = new OTokenEntityProducer(otoken, ctx, ctx.blocks[0])
+        producer = new OTokenEntityProducer(otoken, { ctx, block: ctx.blocks[0], fee: params.fee, from: params.from })
       }
       producer.ctx = ctx
 
       const updateOToken = (block: Block, implementationHash: string) => {
         const implementations: Record<string, typeof OToken_2023_12_21 | typeof OToken_2025_03_04 | undefined> = {
           ['9ad3a9e43e4bdd6a974ef5db2c3fe9da590cbc6ad6709000f524896422abd5b8']: OToken_2023_12_21, // OETH
-          ['eb5e67df57270fd5381abb6733ed1d61fc4afd08e1de9993f2f5b4ca95118f59']: OToken_2023_12_21, // OETH
+          ['eb5e67df57270fd5381abb6733ed1d61fc4afd08e1de9993f2f5b4ca95118f59']: OToken_2023_12_21, // OETH & superOETHb
+          ['a6222a94f4fa7e48bb9acd1f7c484bc6f07d8a29269a34d0d9cd29af9d3fca28']: OToken_2023_12_21, // superOETHb
+          ['6f0dcec1eda8cb66e295a41897ddd269bdb02cd241c7c5e30db58ffe31718748']: OToken_2023_12_21, // superOETHb (governanceRecover())
           ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04, // OETH
+          ['219568b0baaa5c41831401e6b696c97b537a770244bce9ed091a7991c8fb64b9']: OToken_2025_03_04, // OETH
           ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS
         }
         const OTokenClass = implementations[implementationHash]
@@ -246,6 +282,7 @@ export const createOTokenProcessor2 = (params: {
           }
           otoken = newImplementation
           producer.otoken = newImplementation
+          justUpgraded = true
         } else {
           throw new Error('Implementation hash not found.')
         }
@@ -287,6 +324,8 @@ export const createOTokenProcessor2 = (params: {
           producer.otoken = otoken
         }
       }
+
+      let justUpgraded = false
 
       // Process logs from all blocks
       for (const block of ctx.blocks) {
@@ -348,20 +387,20 @@ export const createOTokenProcessor2 = (params: {
               } else if (rebaseOptInTraceFilter.matches(trace)) {
                 // ctx.log.info(trace, 'rebaseOptIn')
                 await otoken.rebaseOptIn(sender)
-                await producer.afterRebaseOptIn(sender)
+                await producer.afterRebaseOptIn(trace, sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (rebaseOptOutTraceFilter.matches(trace)) {
                 // ctx.log.info(trace, 'rebaseOptOut')
                 await otoken.rebaseOptOut(sender)
-                await producer.afterRebaseOptOut(sender)
+                await producer.afterRebaseOptOut(trace, sender)
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (governanceRebaseOptInTraceFilter.matches(trace)) {
                 const data = otokenAbi.functions.governanceRebaseOptIn.decode(trace.action.input)
                 // ctx.log.info(trace, 'governanceRebaseOptIn')
                 await otoken.governanceRebaseOptIn(sender, data._account)
-                await producer.afterRebaseOptIn(data._account)
+                await producer.afterRebaseOptIn(trace, data._account)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._account)
                 ///////////////////////////////
@@ -432,7 +471,7 @@ export const createOTokenProcessor2 = (params: {
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'delegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
-                await producer.afterDelegateYield(data._from.toLowerCase(), data._to.toLowerCase())
+                await producer.afterDelegateYield(trace, data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
                 addressesToCheck.add(data._to)
@@ -442,7 +481,7 @@ export const createOTokenProcessor2 = (params: {
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'undelegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
-                await producer.afterUndelegateYield(sender, data._from.toLowerCase())
+                await producer.afterUndelegateYield(trace, sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
                 ///////////////////////////////
@@ -479,9 +518,19 @@ export const createOTokenProcessor2 = (params: {
                 }
               }
             }
+            await producer.afterBlock(ctx, params)
+          }
+        }
+        for (const log of block.logs) {
+          if (harvesterYieldSentFilter?.matches(log)) {
+            await producer.processHarvesterYieldSent(ctx, block, log)
           }
         }
         if (otoken) {
+          if (justUpgraded) {
+            await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))
+            justUpgraded = false
+          }
           // await checkState(ctx, block, otoken, new Set())
           // await checkState(ctx, block, otoken, addressesToCheck)
         }

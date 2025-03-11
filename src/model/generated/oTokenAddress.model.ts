@@ -33,7 +33,13 @@ export class OTokenAddress {
     credits!: bigint
 
     @BigIntColumn_({nullable: false})
-    alternativeCreditsPerToken!: bigint
+    creditsPerToken!: bigint
+
+    @BigIntColumn_({nullable: false})
+    balance!: bigint
+
+    @BigIntColumn_({nullable: false})
+    earned!: bigint
 
     @Index_()
     @ManyToOne_(() => OTokenAddress, {nullable: true})
@@ -42,12 +48,6 @@ export class OTokenAddress {
     @Index_()
     @ManyToOne_(() => OTokenAddress, {nullable: true})
     yieldFrom!: OTokenAddress | undefined | null
-
-    @BigIntColumn_({nullable: false})
-    balance!: bigint
-
-    @BigIntColumn_({nullable: false})
-    balanceEarned!: bigint
 
     @IntColumn_({nullable: false})
     blockNumber!: number

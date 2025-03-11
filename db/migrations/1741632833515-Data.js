@@ -1,7 +1,8 @@
-module.exports = class Data1741413207548 {
-    name = 'Data1741413207548'
+module.exports = class Data1741632833515 {
+    name = 'Data1741632833515'
 
     async up(db) {
+        await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "exchange_rate" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_5c5d27d2b900ef6cdeef0398472" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2b58051dcc72cf0f02aa41ff14" ON "exchange_rate" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
@@ -113,7 +114,6 @@ module.exports = class Data1741413207548 {
         await db.query(`CREATE INDEX "IDX_260344a123765d6bf9a1887c32" ON "curve_pool_booster_tokens_rescued" ("address") `)
         await db.query(`CREATE INDEX "IDX_2a323bed0afc57f70185f57291" ON "curve_pool_booster_tokens_rescued" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7d7a98e0d63faa39054f7c70b8" ON "curve_pool_booster_tokens_rescued" ("block_number") `)
-        await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "pool_booster" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "registry_address" text NOT NULL, "amm_pool_address" text NOT NULL, "factory_address" text NOT NULL, "pool_booster_type" integer NOT NULL, "active" boolean NOT NULL, CONSTRAINT "PK_85efb2983184555953408176314" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c46c14abc58edf2c6bbd1e8d09" ON "pool_booster" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_2c38cf60d95bd998304076c11c" ON "pool_booster" ("timestamp") `)
@@ -152,7 +152,7 @@ module.exports = class Data1741413207548 {
         await db.query(`CREATE INDEX "IDX_2f1457755464ec5951d1e96542" ON "o_token_history" ("address_id") `)
         await db.query(`CREATE INDEX "IDX_42142d191ea0408fb511f9f576" ON "o_token_history" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_f87d86cfca9ef211ba1b18d2bc" ON "o_token_history" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "credits" numeric NOT NULL, "alternative_credits_per_token" numeric NOT NULL, "balance" numeric NOT NULL, "balance_earned" numeric NOT NULL, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, "yield_to_id" character varying, "yield_from_id" character varying, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "rebasing_option" character varying(21) NOT NULL, "credits" numeric NOT NULL, "credits_per_token" numeric NOT NULL, "balance" numeric NOT NULL, "earned" numeric NOT NULL, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, "yield_to_id" character varying, "yield_from_id" character varying, CONSTRAINT "PK_5d5d2b6f8a94da6ed63aac85194" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7cbc465ce1e9ae06dfe3a8c625" ON "o_token_address" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5342c499e930e396bade7faeb6" ON "o_token_address" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_75c7d29bf71b393e99c4407885" ON "o_token_address" ("address") `)
@@ -801,6 +801,7 @@ module.exports = class Data1741413207548 {
     }
 
     async down(db) {
+        await db.query(`DROP TABLE "util_cache"`)
         await db.query(`DROP TABLE "exchange_rate"`)
         await db.query(`DROP INDEX "public"."IDX_2b58051dcc72cf0f02aa41ff14"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)
@@ -912,7 +913,6 @@ module.exports = class Data1741413207548 {
         await db.query(`DROP INDEX "public"."IDX_260344a123765d6bf9a1887c32"`)
         await db.query(`DROP INDEX "public"."IDX_2a323bed0afc57f70185f57291"`)
         await db.query(`DROP INDEX "public"."IDX_7d7a98e0d63faa39054f7c70b8"`)
-        await db.query(`DROP TABLE "util_cache"`)
         await db.query(`DROP TABLE "pool_booster"`)
         await db.query(`DROP INDEX "public"."IDX_c46c14abc58edf2c6bbd1e8d09"`)
         await db.query(`DROP INDEX "public"."IDX_2c38cf60d95bd998304076c11c"`)

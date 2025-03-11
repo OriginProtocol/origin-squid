@@ -49,11 +49,11 @@ type OTokenAddress @entity {
   isContract: Boolean!
   rebasingOption: RebasingOption!
   credits: BigInt!
-  alternativeCreditsPerToken: BigInt! # For non-rebasing accounts
+  creditsPerToken: BigInt!
+  balance: BigInt!
+  earned: BigInt!
   yieldTo: OTokenAddress # For delegation source
   yieldFrom: OTokenAddress # For delegation target
-  balance: BigInt!
-  balanceEarned: BigInt!
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime

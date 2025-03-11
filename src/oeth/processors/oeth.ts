@@ -5,8 +5,8 @@ import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import { Context } from '@originprotocol/squid-utils'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { createOTokenLegacyProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
-import { createOTokenProcessor2 } from '@templates/otoken/otoken'
 import {
   CURVE_ETH_OETH_POOL_ADDRESS,
   CURVE_FRXETH_OETH_POOL_ADDRESS,
@@ -29,12 +29,13 @@ import {
 } from '@utils/addresses'
 import { tokensByChain } from '@utils/tokensByChain'
 
-const otokenProcessor = createOTokenProcessor2({
+const otokenProcessor = createOTokenLegacyProcessor({
   name: 'OETH',
   symbol: 'OETH',
   // from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
   from: 17076206, // OETH contract initialize
   vaultFrom: 17084107,
+  // fee: 20n,
   otokenAddress: OETH_ADDRESS,
   wotoken: {
     address: WOETH_ADDRESS,

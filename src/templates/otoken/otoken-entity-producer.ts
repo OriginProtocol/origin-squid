@@ -3,8 +3,20 @@ import utc from 'dayjs/plugin/utc'
 import { compact } from 'lodash'
 import { LessThan } from 'typeorm'
 
-import { HistoryType, OToken, OTokenAPY, OTokenAddress, OTokenHistory, OTokenRebase, RebasingOption } from '@model'
-import { Block, Context, Trace, calculateAPY } from '@originprotocol/squid-utils'
+import * as otokenHarvester from '@abi/otoken-base-harvester'
+import {
+  HistoryType,
+  OToken,
+  OTokenAPY,
+  OTokenAddress,
+  OTokenDailyStat,
+  OTokenHarvesterYieldSent,
+  OTokenHistory,
+  OTokenRebase,
+  OTokenRebaseOption,
+  RebasingOption,
+} from '@model'
+import { Block, Context, Log, Trace, calculateAPY } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
@@ -12,23 +24,40 @@ import { isContract } from '@utils/isContract'
 
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
+import { processOTokenDailyStats } from './otoken-daily-stats'
+import { createOTokenLegacyProcessor } from './otoken-legacy'
 
 dayjs.extend(utc)
 
 export class OTokenEntityProducer {
   otoken: OToken_2023_12_21 | OToken_2025_03_04
+  public from: number
   public ctx: Context
   public block: Block
+  public fee: bigint
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
   private histories: OTokenHistory[] = []
   private apyMap: Map<string, OTokenAPY> = new Map()
   private rebaseMap: Map<string, OTokenRebase> = new Map()
+  private rebaseOptions: OTokenRebaseOption[] = []
+  private harvesterYieldSent: OTokenHarvesterYieldSent[] = []
+  private dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }> = new Map()
 
-  constructor(otoken: OToken_2023_12_21 | OToken_2025_03_04, ctx: Context, block: Block) {
+  constructor(
+    otoken: OToken_2023_12_21 | OToken_2025_03_04,
+    params: {
+      from: number
+      ctx: Context
+      block: Block
+      fee: bigint
+    },
+  ) {
     this.otoken = otoken
-    this.ctx = ctx
-    this.block = block
+    this.from = params.from
+    this.ctx = params.ctx
+    this.block = params.block
+    this.fee = params.fee
   }
 
   private async getOrCreateTokenEntity(): Promise<OToken> {
@@ -67,9 +96,9 @@ export class OTokenEntityProducer {
 
   private async getOrCreateAddress(account: string): Promise<OTokenAddress> {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${account}`
-    let address = this.addressMap.get(id)
+    let address = this.addressMap.get(account)
     if (!address) {
-      address = await this.ctx.store.get(OTokenAddress, id)
+      address = await this.ctx.store.get(OTokenAddress, account)
     }
 
     if (!address) {
@@ -82,14 +111,15 @@ export class OTokenEntityProducer {
         isContract: isContractAddress,
         rebasingOption: RebasingOption.OptIn, // Default
         credits: 0n,
-        alternativeCreditsPerToken: 0n,
+        creditsPerToken: 0n,
         balance: 0n,
-        balanceEarned: 0n,
+        earned: 0n,
         blockNumber: this.otoken.block.header.height,
         lastUpdated: new Date(this.otoken.block.header.timestamp),
         since: new Date(this.otoken.block.header.timestamp),
       })
     }
+    this.addressMap.set(account, address)
 
     const otoken = this.otoken as OToken_2025_03_04
 
@@ -99,13 +129,18 @@ export class OTokenEntityProducer {
 
     const yieldFrom = 'yieldFrom' in otoken ? otoken.yieldFrom[account] : null
     const yieldTo = 'yieldTo' in otoken ? otoken.yieldTo[account] : null
-    address.balance = balance
+    let earned = 0n
+    if (address.creditsPerToken && creditsPerToken !== address.creditsPerToken) {
+      earned = ((address.creditsPerToken - creditsPerToken) * balance) / 10n ** otoken.RESOLUTION_DECIMALS
+    }
     address.credits = credits
-    address.alternativeCreditsPerToken = creditsPerToken
+    address.creditsPerToken = creditsPerToken
+    address.balance = balance
+    address.earned = earned
     address.blockNumber = this.otoken.block.header.height
     address.lastUpdated = new Date(this.otoken.block.header.timestamp)
-    address.yieldFrom = yieldFrom ? await this.getOrCreateAddress(yieldFrom) : null
-    address.yieldTo = yieldTo ? await this.getOrCreateAddress(yieldTo) : null
+    address.yieldFrom = yieldFrom ? this.addressMap.get(yieldFrom) ?? (await this.getOrCreateAddress(yieldFrom)) : null
+    address.yieldTo = yieldTo ? this.addressMap.get(yieldTo) ?? (await this.getOrCreateAddress(yieldTo)) : null
     address.isContract = await isContract(this.ctx, this.otoken.block, account)
 
     // Update rebasing option based on token state
@@ -135,7 +170,6 @@ export class OTokenEntityProducer {
       }
     }
 
-    this.addressMap.set(id, address)
     return address
   }
 
@@ -297,7 +331,7 @@ export class OTokenEntityProducer {
     }
 
     const _yield = totalSupplyDiff
-    const _fee = (_yield * 25n) / 100n
+    const _fee = (_yield * this.fee) / (100n - this.fee) // yield already has the fee removed.
     let feeETH = 0n
     let yieldETH = 0n
     let feeUSD = 0n
@@ -382,24 +416,75 @@ export class OTokenEntityProducer {
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
   }
 
-  async afterDelegateYield(from: string, to: string): Promise<void> {
+  async createRebasingOption(trace: Trace, account: string) {
+    const traceAddress = trace.traceAddress.join('-')
+    const address = await this.getOrCreateAddress(account)
+    this.rebaseOptions.push(
+      new OTokenRebaseOption({
+        id: `${this.ctx.chain.id}-${trace.transaction!.hash}-${traceAddress}-${account}`,
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+        timestamp: new Date(this.otoken.block.header.timestamp),
+        blockNumber: this.otoken.block.header.height,
+        txHash: trace.transaction!.hash,
+        address,
+        status: address.rebasingOption,
+        delegatedTo: address.yieldTo?.address ?? null,
+      }),
+    )
+  }
+
+  async afterDelegateYield(trace: Trace, from: string, to: string): Promise<void> {
     await this.getOrCreateAddress(from)
     await this.getOrCreateAddress(to)
+    await this.createRebasingOption(trace, from)
+    await this.createRebasingOption(trace, to)
   }
 
-  async afterUndelegateYield(from: string, to: string): Promise<void> {
+  async afterUndelegateYield(trace: Trace, from: string, to: string): Promise<void> {
     await this.getOrCreateAddress(from)
     await this.getOrCreateAddress(to)
+    await this.createRebasingOption(trace, from)
+    await this.createRebasingOption(trace, to)
   }
 
-  async afterRebaseOptIn(account: string): Promise<void> {
+  async afterRebaseOptIn(trace: Trace, account: string): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.getOrCreateAddress(account)
+    await this.createRebasingOption(trace, account)
   }
 
-  async afterRebaseOptOut(account: string): Promise<void> {
+  async afterRebaseOptOut(trace: Trace, account: string): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.getOrCreateAddress(account)
+    await this.createRebasingOption(trace, account)
+  }
+
+  async afterBlock(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
+    await processOTokenDailyStats(this.ctx, {
+      ...params,
+      balances: new Map(Array.from(this.addressMap.values()).map((address) => [address.address, address.balance])),
+      otokens: Array.from(this.otokenMap.values()),
+      apies: Array.from(this.apyMap.values()),
+      rebases: Array.from(this.rebaseMap.values()),
+      dailyStats: this.dailyStats,
+    })
+  }
+
+  async processHarvesterYieldSent(ctx: Context, block: Block, log: Log) {
+    const data = otokenHarvester.events.YieldSent.decode(log)
+    this.harvesterYieldSent.push(
+      new OTokenHarvesterYieldSent({
+        id: log.id,
+        chainId: ctx.chain.id,
+        blockNumber: block.header.height,
+        timestamp: new Date(block.header.timestamp),
+        otoken: this.otoken.address,
+        txHash: log.transactionHash,
+        yield: data.yield,
+        fee: data.fee,
+      }),
+    )
   }
 
   async save(): Promise<void> {
@@ -408,11 +493,15 @@ export class OTokenEntityProducer {
     await this.ctx.store.upsert([...this.apyMap.values()])
     await this.ctx.store.insert([...this.rebaseMap.values()])
     await this.ctx.store.insert(this.histories)
+    await this.ctx.store.insert(this.rebaseOptions)
+    await this.ctx.store.insert(this.harvesterYieldSent)
 
     this.otokenMap.clear()
     this.addressMap.clear()
     this.apyMap.clear()
     this.rebaseMap.clear()
     this.histories = []
+    this.rebaseOptions = []
+    this.harvesterYieldSent = []
   }
 }

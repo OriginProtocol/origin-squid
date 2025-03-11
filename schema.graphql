@@ -1,5 +1,9 @@
 # GENERATED, DO NOT MODIFY
 
+type UtilCache @entity {
+  id: ID! @index
+  data: JSON!
+}
 """
 Any entity which has a price associated with it should have that price go in here.
 Prices can change very frequently and we don't want those changes on the same track
@@ -373,10 +377,6 @@ type CurvePoolBoosterTokensRescued @entity {
   receiver: String!
   txHash: String!
 }
-type UtilCache @entity {
-  id: ID! @index
-  data: JSON!
-}
 # Pool Booster Events
 type PoolBooster @entity {
   id: ID! @index # chainId-address
@@ -452,11 +452,11 @@ type OTokenAddress @entity {
   isContract: Boolean!
   rebasingOption: RebasingOption!
   credits: BigInt!
-  alternativeCreditsPerToken: BigInt! # For non-rebasing accounts
+  creditsPerToken: BigInt!
+  balance: BigInt!
+  earned: BigInt!
   yieldTo: OTokenAddress # For delegation source
   yieldFrom: OTokenAddress # For delegation target
-  balance: BigInt!
-  balanceEarned: BigInt!
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime
