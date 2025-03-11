@@ -20,7 +20,7 @@ import { tokensByChain } from '@utils/tokensByChain'
 export const { name, from, setup, process } = createOTokenLegacyProcessor({
   name: 'OUSD',
   symbol: 'OUSD',
-  from: 10884563, // OUSDReset
+  from: 11585978, // OUSDReset
   vaultFrom: 11596942,
   // fee: 20n,
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
