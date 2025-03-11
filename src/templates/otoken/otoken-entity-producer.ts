@@ -122,7 +122,7 @@ export class OTokenEntityProducer {
         otoken: this.otoken.address,
         address: account,
         isContract: isContractAddress,
-        rebasingOption: RebasingOption.OptIn, // Default
+        rebasingOption: isContractAddress ? RebasingOption.OptOut : RebasingOption.OptIn, // Default
         credits: 0n,
         creditsPerToken: 0n,
         balance: 0n,
