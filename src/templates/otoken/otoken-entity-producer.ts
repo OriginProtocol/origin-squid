@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { compact } from 'lodash'
 import { LessThan } from 'typeorm'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
@@ -26,7 +25,7 @@ import { isContract } from '@utils/isContract'
 import { createOTokenLegacyProcessor } from './otoken'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
-import { processOTokenDailyStats } from './otoken-daily-stats'
+import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
 import { processOTokenERC20 } from './otoken-erc20'
 
 dayjs.extend(utc)
@@ -41,7 +40,7 @@ export class OTokenEntityProducer {
   // Entity storage which should be reset after every `process`.
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
-  private histories: OTokenHistory[] = []
+  private histories: Map<string, OTokenHistory> = new Map()
   private apyMap: Map<string, OTokenAPY> = new Map()
   private rebaseMap: Map<string, OTokenRebase> = new Map()
   private rebaseOptions: OTokenRebaseOption[] = []
@@ -202,39 +201,39 @@ export class OTokenEntityProducer {
     value: bigint,
   ): Promise<OTokenHistory[]> {
     const id = `${this.ctx.chain.id}:${trace.transaction!.hash}:${trace.traceAddress.join('-')}`
-
-    const entries = compact([
-      from
-        ? new OTokenHistory({
-            id: `${id}-sent`,
-            chainId: this.ctx.chain.id,
-            otoken: this.otoken.address,
-            address: await this.getOrCreateAddress(from),
-            timestamp: new Date(this.otoken.block.header.timestamp),
-            blockNumber: this.otoken.block.header.height,
-            txHash: this.otoken.block.header.hash,
-            type: HistoryType.Sent,
-            value: value,
-            balance: this.otoken.balanceOf(from),
-          })
-        : undefined,
-      to
-        ? new OTokenHistory({
-            id: `${id}-received`,
-            chainId: this.ctx.chain.id,
-            otoken: this.otoken.address,
-            address: await this.getOrCreateAddress(to),
-            timestamp: new Date(this.otoken.block.header.timestamp),
-            blockNumber: this.otoken.block.header.height,
-            txHash: this.otoken.block.header.hash,
-            type: HistoryType.Received,
-            value: value,
-            balance: this.otoken.balanceOf(to),
-          })
-        : undefined,
-    ])
-
-    this.histories.push(...entries)
+    const entries: OTokenHistory[] = []
+    if (from) {
+      const sentEntity = new OTokenHistory({
+        id: `${id}-sent`,
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+        address: await this.getOrCreateAddress(from),
+        timestamp: new Date(this.otoken.block.header.timestamp),
+        blockNumber: this.otoken.block.header.height,
+        txHash: this.otoken.block.header.hash,
+        type: HistoryType.Sent,
+        value: value,
+        balance: this.otoken.balanceOf(from),
+      })
+      this.histories.set(sentEntity.id, sentEntity)
+      entries.push(sentEntity)
+    }
+    if (to) {
+      const receivedEntity = new OTokenHistory({
+        id: `${id}-received`,
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+        address: await this.getOrCreateAddress(to),
+        timestamp: new Date(this.otoken.block.header.timestamp),
+        blockNumber: this.otoken.block.header.height,
+        txHash: this.otoken.block.header.hash,
+        type: HistoryType.Received,
+        value: value,
+        balance: this.otoken.balanceOf(to),
+      })
+      this.histories.set(receivedEntity.id, receivedEntity)
+      entries.push(receivedEntity)
+    }
 
     return entries
   }
@@ -473,28 +472,31 @@ export class OTokenEntityProducer {
     await this.getOrCreateAPYEntity()
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
     await Promise.all(
-      Object.keys(this.otoken.creditBalances).map((account) => {
-        return (async () => {
-          let address = await this.getAddress(account)
-          const earned = address?.earned ?? 0n
-          address = await this.getOrCreateAddress(account)
-          const earnedDiff = address.earned - earned
-          this.histories.push(
-            new OTokenHistory({
-              id: `${this.ctx.chain.id}-${trace.transaction!.hash}-${trace.traceAddress.join('-')}-${account}`,
-              chainId: this.ctx.chain.id,
-              otoken: this.otoken.address,
-              address: await this.getOrCreateAddress(account),
-              timestamp: new Date(this.otoken.block.header.timestamp),
-              blockNumber: this.otoken.block.header.height,
-              txHash: this.otoken.block.header.hash,
-              type: HistoryType.Yield,
-              value: earnedDiff,
-              balance: this.otoken.balanceOf(account),
-            }),
-          )
-        })()
-      }),
+      Object.entries(this.otoken.creditBalances)
+        .filter(([_account, credits]) => credits > 0n)
+        .map(([account]) => {
+          return (async () => {
+            let address = await this.getAddress(account)
+            const earned = address?.earned ?? 0n
+            address = await this.getOrCreateAddress(account)
+            const earnedDiff = address.earned - earned
+            if (earnedDiff > 0n) {
+              const history = new OTokenHistory({
+                id: `${this.ctx.chain.id}-${trace.transaction!.hash}-${trace.traceAddress.join('-')}-${account}`,
+                chainId: this.ctx.chain.id,
+                otoken: this.otoken.address,
+                address: await this.getOrCreateAddress(account),
+                timestamp: new Date(this.otoken.block.header.timestamp),
+                blockNumber: this.otoken.block.header.height,
+                txHash: this.otoken.block.header.hash,
+                type: HistoryType.Yield,
+                value: earnedDiff,
+                balance: this.otoken.balanceOf(account),
+              })
+              this.histories.set(history.id, history)
+            }
+          })()
+        }),
     )
   }
 
@@ -542,7 +544,11 @@ export class OTokenEntityProducer {
     await this.createRebasingOption(trace, account)
   }
 
-  async afterBlock(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
+  async afterBlock() {
+    await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
+  }
+
+  async afterContext(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
     await processOTokenDailyStats(this.ctx, {
       ...params,
       balances: new Map(Array.from(this.addressMap.values()).map((address) => [address.address, address.balance])),
@@ -574,18 +580,21 @@ export class OTokenEntityProducer {
       otokenAddress: this.otoken.address,
       otokens: Array.from(this.otokenMap.values()),
       addresses: Array.from(this.addressMap.values()),
-      history: this.histories,
+      history: Array.from(this.histories.values()),
       transfers: this.transfers,
     })
 
     await this.ctx.store.upsert([...this.addressMap.values()]) // These must be saved first.
     await Promise.all([
+      // OToken Entity Saving
       this.ctx.store.insert([...this.otokenMap.values()]),
       this.ctx.store.upsert([...this.apyMap.values()]),
       this.ctx.store.insert([...this.rebaseMap.values()]),
-      this.ctx.store.insert(this.histories),
+      this.ctx.store.insert([...this.histories.values()]),
       this.ctx.store.insert(this.rebaseOptions),
       this.ctx.store.insert(this.harvesterYieldSent),
+      this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
+
       // ERC20
       this.ctx.store.insert([...erc20s.states.values()]),
       this.ctx.store.upsert([...erc20s.statesByDay.values()]),
@@ -602,7 +611,7 @@ export class OTokenEntityProducer {
     // Reset the entity storage.
     this.otokenMap = new Map()
     this.addressMap = new Map()
-    this.histories = []
+    this.histories = new Map()
     this.apyMap = new Map()
     this.rebaseMap = new Map()
     this.rebaseOptions = []

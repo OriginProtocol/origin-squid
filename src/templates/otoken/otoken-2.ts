@@ -520,7 +520,7 @@ export const createOTokenProcessor2 = (params: {
             }
           }
         }
-        await producer.afterBlock(params)
+        await producer.afterBlock()
         for (const log of block.logs) {
           if (harvesterYieldSentFilter?.matches(log)) {
             await producer.processHarvesterYieldSent(ctx, block, log)
@@ -535,6 +535,9 @@ export const createOTokenProcessor2 = (params: {
           // await checkState(ctx, block, otoken, addressesToCheck)
         }
       }
+
+      await producer.afterContext(params)
+
       if (otoken) {
         const lastBlock = ctx.blocks[ctx.blocks.length - 1]
         await ctx.store.save(
