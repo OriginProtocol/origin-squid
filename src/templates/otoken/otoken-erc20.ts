@@ -119,15 +119,11 @@ export const processOTokenERC20 = async (
     }
   }
 
-  let transaction = ''
-  let transactionTransferCount = 0
+  let transactionCounts = new Map<string, number>()
   for (const transfer of params.transfers) {
-    if (transaction !== transfer.transactionHash) {
-      transaction = transfer.transactionHash
-      transactionTransferCount = 0
-    }
-    transactionTransferCount += 1
-    const erc20Id = `${ctx.chain.id}-${transfer.transactionHash}-${transactionTransferCount}`
+    const transferCount = (transactionCounts.get(transfer.transactionHash) ?? 0) + 1
+    transactionCounts.set(transfer.transactionHash, transferCount)
+    const erc20Id = `${ctx.chain.id}-${transfer.transactionHash}-${transferCount}`
     result.transfers.push(
       new ERC20Transfer({
         id: erc20Id,
