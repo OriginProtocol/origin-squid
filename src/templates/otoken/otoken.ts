@@ -469,6 +469,7 @@ export const createOTokenLegacyProcessor = (params: {
 
       otokenObject.totalSupply = data.totalSupply
       otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
+      otokenObject.creditsPerToken = data.rebasingCreditsPerToken
 
       // Rebase events
       const rebase = createRebaseAPY(
@@ -771,6 +772,7 @@ export const createOTokenLegacyProcessor = (params: {
           timestamp: new Date(block.header.timestamp),
           blockNumber: block.header.height,
           unallocatedSupply: latest?.unallocatedSupply ?? 0n,
+          creditsPerToken: latest?.creditsPerToken ?? 0n,
           totalSupply: latest?.totalSupply ?? 0n,
           rebasingSupply: latest?.rebasingSupply ?? 0n,
           nonRebasingSupply: latest?.nonRebasingSupply ?? 0n,
