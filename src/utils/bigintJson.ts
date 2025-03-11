@@ -12,6 +12,9 @@ export const bigintJsonStringify = (value: any, indent?: number): string => {
       if (typeof value === 'bigint') {
         return value.toString() + 'n'
       }
+      if (value === '[object Object]') {
+        throw new Error(`bigintJsonStringify: ${key} ${value}`)
+      }
       return value
     },
     indent,
@@ -26,8 +29,13 @@ export const bigintJsonStringify = (value: any, indent?: number): string => {
  */
 export const bigintJsonParse = (jsonString: string): any => {
   return JSON.parse(jsonString, (key, value) => {
-    if (typeof value === 'string' && /^-?\d+n$/.test(value)) {
-      return BigInt(value.slice(0, -1))
+    try {
+      if (typeof value === 'string' && /^-?\d+n$/.test(value)) {
+        return BigInt(value.slice(0, -1))
+      }
+    } catch (e) {
+      console.error(`bigintJsonParse: ${key} ${value}`)
+      throw e
     }
     return value
   })
