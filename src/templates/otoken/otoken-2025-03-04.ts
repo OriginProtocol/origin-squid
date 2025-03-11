@@ -563,6 +563,7 @@ export class OToken_2025_03_04 {
     this.totalSupply = _newTotalSupply > this.MAX_SUPPLY ? this.MAX_SUPPLY : _newTotalSupply
 
     const rebasingSupply = this.totalSupply - this.nonRebasingSupply
+    this.rebasingSupply = rebasingSupply
     // round up in the favour of the protocol
 
     if (this.block.header.timestamp < Date.parse('2025-01-08T00:00:00Z')) {

@@ -73,7 +73,7 @@ export class OTokenEntityProducer {
     this.fee = params.fee
   }
 
-  private async getOrCreateTokenEntity(): Promise<OToken> {
+  private async getOrCreateOTokenEntity(): Promise<OToken> {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${this.block.header.height}`
     let token = this.otokenMap.get(id)
     if (!token) {
@@ -401,7 +401,7 @@ export class OTokenEntityProducer {
   }
 
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, null, to, value)
     this.transfers.push({
       block: this.block,
@@ -415,7 +415,7 @@ export class OTokenEntityProducer {
   }
 
   async afterBurn(trace: Trace, from: string, value: bigint): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, null, value)
     this.transfers.push({
       block: this.block,
@@ -429,7 +429,7 @@ export class OTokenEntityProducer {
   }
 
   async afterTransfer(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
     this.transfers.push({
       block: this.block,
@@ -443,7 +443,7 @@ export class OTokenEntityProducer {
   }
 
   async afterTransferFrom(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
     this.transfers.push({
       block: this.block,
@@ -460,7 +460,7 @@ export class OTokenEntityProducer {
   // }
 
   async afterChangeSupply(trace: Trace, newTotalSupply: bigint, totalSupplyDiff: bigint): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.getOrCreateAPYEntity()
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
     await Promise.all(
@@ -505,13 +505,13 @@ export class OTokenEntityProducer {
   }
 
   async afterRebaseOptIn(trace: Trace, account: string): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.getOrCreateAddress(account)
     await this.createRebasingOption(trace, account)
   }
 
   async afterRebaseOptOut(trace: Trace, account: string): Promise<void> {
-    await this.getOrCreateTokenEntity()
+    await this.getOrCreateOTokenEntity()
     await this.getOrCreateAddress(account)
     await this.createRebasingOption(trace, account)
   }
