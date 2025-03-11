@@ -5,6 +5,7 @@ import { LessThan } from 'typeorm'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import {
+  ERC20Holder,
   HistoryType,
   OToken,
   OTokenAPY,
@@ -25,6 +26,7 @@ import { isContract } from '@utils/isContract'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { processOTokenDailyStats } from './otoken-daily-stats'
+import { processOTokenERC20 } from './otoken-erc20'
 import { createOTokenLegacyProcessor } from './otoken-legacy'
 
 dayjs.extend(utc)
@@ -35,6 +37,8 @@ export class OTokenEntityProducer {
   public ctx: Context
   public block: Block
   public fee: bigint
+
+  // Entity storage which should be reset after every `process`.
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
   private histories: OTokenHistory[] = []
@@ -43,6 +47,15 @@ export class OTokenEntityProducer {
   private rebaseOptions: OTokenRebaseOption[] = []
   private harvesterYieldSent: OTokenHarvesterYieldSent[] = []
   private dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }> = new Map()
+  private transfers: {
+    block: Block
+    transactionHash: string
+    from: string
+    fromBalance: bigint
+    to: string
+    toBalance: bigint
+    value: bigint
+  }[] = []
 
   constructor(
     otoken: OToken_2023_12_21 | OToken_2025_03_04,
@@ -390,21 +403,57 @@ export class OTokenEntityProducer {
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.createHistory(trace, null, to, value)
+    this.transfers.push({
+      block: this.block,
+      transactionHash: trace.transaction!.hash,
+      from: '0x0000000000000000000000000000000000000000',
+      fromBalance: 0n,
+      to,
+      toBalance: this.otoken.balanceOf(to),
+      value,
+    })
   }
 
   async afterBurn(trace: Trace, from: string, value: bigint): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.createHistory(trace, from, null, value)
+    this.transfers.push({
+      block: this.block,
+      transactionHash: trace.transaction!.hash,
+      from,
+      fromBalance: this.otoken.balanceOf(from),
+      to: '0x0000000000000000000000000000000000000000',
+      toBalance: 0n,
+      value,
+    })
   }
 
   async afterTransfer(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.createHistory(trace, from, to, value)
+    this.transfers.push({
+      block: this.block,
+      transactionHash: trace.transaction!.hash,
+      from,
+      fromBalance: this.otoken.balanceOf(from),
+      to,
+      toBalance: this.otoken.balanceOf(to),
+      value,
+    })
   }
 
   async afterTransferFrom(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateTokenEntity()
     await this.createHistory(trace, from, to, value)
+    this.transfers.push({
+      block: this.block,
+      transactionHash: trace.transaction!.hash,
+      from,
+      fromBalance: this.otoken.balanceOf(from),
+      to,
+      toBalance: this.otoken.balanceOf(to),
+      value,
+    })
   }
 
   // async afterApprove(trace: Trace, owner: string, spender: string, value: bigint): Promise<void> {
@@ -414,6 +463,13 @@ export class OTokenEntityProducer {
     await this.getOrCreateTokenEntity()
     await this.getOrCreateAPYEntity()
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
+    await Promise.all(
+      Object.keys(this.otoken.creditBalances).map((account) => {
+        return (async () => {
+          await this.getOrCreateAddress(account)
+        })()
+      }),
+    )
   }
 
   async createRebasingOption(trace: Trace, account: string) {
@@ -488,20 +544,44 @@ export class OTokenEntityProducer {
   }
 
   async save(): Promise<void> {
-    await this.ctx.store.upsert([...this.otokenMap.values()])
-    await this.ctx.store.upsert([...this.addressMap.values()])
-    await this.ctx.store.upsert([...this.apyMap.values()])
-    await this.ctx.store.insert([...this.rebaseMap.values()])
-    await this.ctx.store.insert(this.histories)
-    await this.ctx.store.insert(this.rebaseOptions)
-    await this.ctx.store.insert(this.harvesterYieldSent)
+    const erc20s = await processOTokenERC20(this.ctx, {
+      otokenAddress: this.otoken.address,
+      otokens: Array.from(this.otokenMap.values()),
+      addresses: Array.from(this.addressMap.values()),
+      history: this.histories,
+      transfers: this.transfers,
+    })
 
-    this.otokenMap.clear()
-    this.addressMap.clear()
-    this.apyMap.clear()
-    this.rebaseMap.clear()
+    await this.ctx.store.upsert([...this.addressMap.values()]) // These must be saved first.
+    await Promise.all([
+      this.ctx.store.upsert([...this.otokenMap.values()]),
+      this.ctx.store.upsert([...this.apyMap.values()]),
+      this.ctx.store.insert([...this.rebaseMap.values()]),
+      this.ctx.store.insert(this.histories),
+      this.ctx.store.insert(this.rebaseOptions),
+      this.ctx.store.insert(this.harvesterYieldSent),
+      // ERC20
+      this.ctx.store.insert([...erc20s.states.values()]),
+      this.ctx.store.upsert([...erc20s.statesByDay.values()]),
+      this.ctx.store.upsert([...erc20s.holders.values()]),
+      this.ctx.store.insert([...erc20s.balances.values()]),
+      this.ctx.store.insert(erc20s.transfers),
+      this.ctx.store.remove(
+        [...erc20s.removedHolders.values()].map(
+          (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
+        ),
+      ),
+    ])
+
+    // Reset the entity storage.
+    this.otokenMap = new Map()
+    this.addressMap = new Map()
     this.histories = []
+    this.apyMap = new Map()
+    this.rebaseMap = new Map()
     this.rebaseOptions = []
     this.harvesterYieldSent = []
+    this.dailyStats = new Map()
+    this.transfers = []
   }
 }

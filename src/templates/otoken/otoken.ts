@@ -518,7 +518,7 @@ export const createOTokenProcessor2 = (params: {
                 }
               }
             }
-            await producer.afterBlock(ctx, params)
+            await producer.afterBlock(params)
           }
         }
         for (const log of block.logs) {

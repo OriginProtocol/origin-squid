@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { findLast, sortBy, uniq } from 'lodash'
 import { LessThanOrEqual } from 'typeorm'
 
@@ -10,11 +9,7 @@ import * as otokenDripper from '@abi/otoken-dripper'
 import * as wotokenAbi from '@abi/woeth'
 import {
   ERC20,
-  ERC20Balance,
   ERC20Holder,
-  ERC20State,
-  ERC20StateByDay,
-  ERC20Transfer,
   HistoryType,
   OToken,
   OTokenAPY,
@@ -40,6 +35,7 @@ import { sonicAddresses } from '@utils/addresses-sonic'
 import { DECIMALS_18 } from '@utils/constants'
 
 import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
+import { processOTokenERC20 } from './otoken-erc20'
 import { createAddress, createRebaseAPY } from './utils'
 
 export type OTokenContractAddress =
@@ -190,14 +186,6 @@ export const createOTokenLegacyProcessor = (params: {
           yield: bigint
         }
       | undefined
-    erc20: {
-      states: Map<string, ERC20State>
-      statesByDay: Map<string, ERC20StateByDay>
-      balances: Map<string, ERC20Balance>
-      transfers: Map<string, ERC20Transfer>
-      holders: Map<string, ERC20Holder>
-      removedHolders: Set<string>
-    }
   }
 
   let owners: Map<string, OTokenAddress> | undefined = undefined
@@ -274,15 +262,16 @@ export const createOTokenLegacyProcessor = (params: {
       dripperStates: [],
       harvesterYieldSent: [],
       lastYieldDistributionEvent: undefined,
-      erc20: {
-        states: new Map<string, ERC20State>(),
-        statesByDay: new Map<string, ERC20StateByDay>(),
-        balances: new Map<string, ERC20Balance>(),
-        transfers: new Map<string, ERC20Transfer>(),
-        holders: new Map<string, ERC20Holder>(),
-        removedHolders: new Set<string>(),
-      },
     }
+    const transfers: {
+      block: Block
+      transactionHash: string
+      from: string
+      fromBalance: bigint
+      to: string
+      toBalance: bigint
+      value: bigint
+    }[] = []
 
     /* Owners which have been pulled or updated in the current context. */
     let ownersChanged = new Map<string, OTokenAddress>()
@@ -458,23 +447,15 @@ export const createOTokenLegacyProcessor = (params: {
       // Update rebasing supply in all cases
       otokenObject.rebasingSupply = otokenObject.totalSupply - otokenObject.nonRebasingSupply
 
-      const erc20Id = `${ctx.chain.id}-${log.id}`
-      result.erc20.transfers.set(
-        erc20Id,
-        new ERC20Transfer({
-          id: erc20Id,
-          chainId: ctx.chain.id,
-          txHash: log.transactionHash,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          address: params.otokenAddress,
-          from: data.from,
-          fromBalance: addressSub.balance,
-          to: data.to,
-          toBalance: addressAdd.balance,
-          value: data.value,
-        }),
-      )
+      transfers.push({
+        block,
+        transactionHash: log.transactionHash,
+        from: data.from,
+        fromBalance: addressSub.balance,
+        to: data.to,
+        toBalance: addressAdd.balance,
+        value: data.value,
+      })
     }
 
     const processTotalSupplyUpdatedHighres = async (
@@ -948,85 +929,13 @@ export const createOTokenLegacyProcessor = (params: {
     })
     time('dailyStats')
 
-    // Create ERC20 entities based on OToken entities
-    for (const otoken of result.otokens) {
-      const erc20State = new ERC20State({
-        id: `${ctx.chain.id}-${otoken.blockNumber}-${otoken.otoken}`,
-        chainId: ctx.chain.id,
-        address: otoken.otoken,
-        timestamp: otoken.timestamp,
-        blockNumber: otoken.blockNumber,
-        totalSupply: otoken.totalSupply,
-        holderCount: otoken.holderCount,
-      })
-      result.erc20.states.set(erc20State.id, erc20State)
-    }
     const ownersToUpdate = [...(ownersChanged.values() ?? [])]
-    for (const owner of ownersToUpdate) {
-      if (owner.balance === 0n) {
-        result.erc20.removedHolders.add(owner.address)
-      } else {
-        const erc20Holder = new ERC20Holder({
-          id: `${ctx.chain.id}-${owner.otoken}-${owner.address}`,
-          chainId: ctx.chain.id,
-          address: owner.otoken,
-          account: owner.address,
-          since: owner.since!,
-          balance: owner.balance,
-        })
-        if (!erc20Holder.since) {
-          debugger
-        }
-        result.erc20.holders.set(erc20Holder.id, erc20Holder)
-      }
-    }
-    for (const history of result.history) {
-      const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address.address}`
-      result.erc20.balances.set(
-        id,
-        new ERC20Balance({
-          id,
-          chainId: ctx.chain.id,
-          address: history.otoken,
-          account: history.address.address,
-          timestamp: history.timestamp,
-          blockNumber: history.blockNumber,
-          balance: history.balance,
-        }),
-      )
-    }
-    // Generate ERC20StateByDay entities.
-    let lastStateByDay = await ctx.store.findOne(ERC20StateByDay, {
-      where: { chainId: ctx.chain.id, address: params.otokenAddress },
-      order: { timestamp: 'DESC' },
+    const erc20s = await processOTokenERC20(ctx, {
+      ...params,
+      ...result,
+      addresses: ownersToUpdate,
+      transfers: transfers,
     })
-
-    const states = [...result.erc20.states.values()]
-    const startDate = lastStateByDay
-      ? dayjs.utc(lastStateByDay.timestamp).endOf('day')
-      : states[0]
-      ? dayjs.utc(states[0].timestamp).endOf('day')
-      : null
-    if (startDate) {
-      const endDate = dayjs.utc(ctx.blocks[ctx.blocks.length - 1].header.timestamp).endOf('day')
-
-      // Ensure we create an entry for every day
-      for (let day = startDate; day.isBefore(endDate) || day.isSame(endDate, 'day'); day = day.add(1, 'day')) {
-        const date = day.format('YYYY-MM-DD')
-        const dayEnd = day.endOf('day')
-        const mostRecentState = findLast(
-          states,
-          (s) => dayjs.utc(s.timestamp).isBefore(dayEnd) || dayjs.utc(s.timestamp).isSame(dayEnd),
-        )
-        const stateByDay = new ERC20StateByDay({
-          ...(mostRecentState ?? lastStateByDay ?? states[0]), // Fallback to first state if no previous state exists
-          id: `${ctx.chain.id}-${date}-${params.otokenAddress}`,
-          date,
-        })
-        result.erc20.statesByDay.set(stateByDay.id, stateByDay)
-        lastStateByDay = stateByDay
-      }
-    }
     time('erc20 instances')
 
     // Save to database
@@ -1044,13 +953,13 @@ export const createOTokenLegacyProcessor = (params: {
       ctx.store.insert(result.harvesterYieldSent),
       ctx.store.upsert([...result.dailyStats.values()].map((ds) => ds.entity)),
       // ERC20
-      ctx.store.insert([...result.erc20.states.values()]),
-      ctx.store.upsert([...result.erc20.statesByDay.values()]),
-      ctx.store.upsert([...result.erc20.holders.values()]),
-      ctx.store.insert([...result.erc20.balances.values()]),
-      ctx.store.insert([...result.erc20.transfers.values()]),
+      ctx.store.insert([...erc20s.states.values()]),
+      ctx.store.upsert([...erc20s.statesByDay.values()]),
+      ctx.store.upsert([...erc20s.holders.values()]),
+      ctx.store.insert([...erc20s.balances.values()]),
+      ctx.store.insert(erc20s.transfers),
       ctx.store.remove(
-        [...result.erc20.removedHolders.values()].map(
+        [...erc20s.removedHolders.values()].map(
           (account) => new ERC20Holder({ id: `${ctx.chain.id}-${params.otokenAddress}-${account}` }),
         ),
       ),
@@ -1073,12 +982,12 @@ export const createOTokenLegacyProcessor = (params: {
       HarvesterYieldSent: ${result.harvesterYieldSent.length}
       DailyStats: ${result.dailyStats.size}
       ERC20:
-        - States: ${result.erc20.states.size}
-        - StatesByDay: ${result.erc20.statesByDay.size}
-        - Holders: ${result.erc20.holders.size}
-        - Balances: ${result.erc20.balances.size}
-        - Transfers: ${result.erc20.transfers.size}
-        - RemovedHolders: ${result.erc20.removedHolders.size}
+        - States: ${erc20s.states.size}
+        - StatesByDay: ${erc20s.statesByDay.size}
+        - Holders: ${erc20s.holders.size}
+        - Balances: ${erc20s.balances.size}
+        - Transfers: ${erc20s.transfers.length}
+        - RemovedHolders: ${erc20s.removedHolders.size}
     `)
     }
   }
