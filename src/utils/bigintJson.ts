@@ -28,15 +28,15 @@ export const bigintJsonStringify = (value: any, indent?: number): string => {
  * @returns An object with bigint values restored
  */
 export const bigintJsonParse = (jsonString: string): any => {
-  return JSON.parse(jsonString, (key, value) => {
-    try {
+  try {
+    return JSON.parse(jsonString, (key, value) => {
       if (typeof value === 'string' && /^-?\d+n$/.test(value)) {
         return BigInt(value.slice(0, -1))
       }
-    } catch (e) {
-      console.error(`bigintJsonParse: ${key} ${value}`)
-      throw e
-    }
-    return value
-  })
+      return value
+    })
+  } catch (e) {
+    console.error(`bigintJsonParse: ${jsonString}`)
+    throw e
+  }
 }
