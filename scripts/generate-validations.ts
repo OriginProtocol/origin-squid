@@ -7,6 +7,7 @@ import { ousdStrategies } from '../src/ousd/processors/strategies'
 import { IStrategyData } from '../src/templates/strategy'
 import { addresses } from '../src/utils/addresses'
 import { baseAddresses } from '../src/utils/addresses-base'
+import { sonicAddresses } from '../src/utils/addresses-sonic'
 
 const LIMIT = 1000
 
@@ -400,10 +401,12 @@ const main = async () => {
     ...oToken('oeth', addresses.oeth.address),
     ...oToken('ousd', addresses.ousd.address),
     ...oToken('superoethb', baseAddresses.superOETHb.address),
+    ...oToken('os', sonicAddresses.tokens.OS),
     erc20Balances('ogn', '0x8207c1ffc5b6804f6024322ccf34f29c3541ae26'),
     erc20Balances('ousd', '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86'),
     erc20Balances('oeth', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'),
     erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
+    erc20Balances('os', sonicAddresses.tokens.OS),
     ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
     ognDailyStats(),
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
