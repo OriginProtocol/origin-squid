@@ -123,7 +123,7 @@ export const processOTokenERC20 = async (
   for (const transfer of params.transfers) {
     const transferCount = (transactionCounts.get(transfer.transactionHash) ?? 0) + 1
     transactionCounts.set(transfer.transactionHash, transferCount)
-    const erc20Id = `${ctx.chain.id}-${transfer.transactionHash}-${transferCount}`
+    const erc20Id = `${ctx.chain.id}-${params.otokenAddress}-${transfer.transactionHash}-${transferCount}`
     result.transfers.push(
       new ERC20Transfer({
         id: erc20Id,
