@@ -210,7 +210,7 @@ export class OTokenEntityProducer {
         address: await this.getOrCreateAddress(from),
         timestamp: new Date(this.otoken.block.header.timestamp),
         blockNumber: this.otoken.block.header.height,
-        txHash: this.otoken.block.header.hash,
+        txHash: trace.transaction!.hash,
         type: HistoryType.Sent,
         value: value,
         balance: this.otoken.balanceOf(from),
@@ -226,7 +226,7 @@ export class OTokenEntityProducer {
         address: await this.getOrCreateAddress(to),
         timestamp: new Date(this.otoken.block.header.timestamp),
         blockNumber: this.otoken.block.header.height,
-        txHash: this.otoken.block.header.hash,
+        txHash: trace.transaction!.hash,
         type: HistoryType.Received,
         value: value,
         balance: this.otoken.balanceOf(to),
@@ -238,7 +238,7 @@ export class OTokenEntityProducer {
     return entries
   }
 
-  private async getOrCreateAPYEntity(): Promise<OTokenAPY> {
+  private async getOrCreateAPYEntity(trace: Trace): Promise<OTokenAPY> {
     const dateStr = new Date(this.otoken.block.header.timestamp).toISOString().split('T')[0]
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${dateStr}`
 
@@ -275,7 +275,7 @@ export class OTokenEntityProducer {
         otoken: this.otoken.address,
         timestamp: new Date(this.otoken.block.header.timestamp),
         blockNumber: this.otoken.block.header.height,
-        txHash: this.otoken.block.header.hash,
+        txHash: trace.transaction!.hash,
         date: dateStr,
         apr: 0,
         apy: 0,
@@ -290,7 +290,7 @@ export class OTokenEntityProducer {
     apy.rebasingCreditsPerToken = currentCreditsPerToken
     apy.timestamp = new Date(this.otoken.block.header.timestamp)
     apy.blockNumber = this.otoken.block.header.height
-    apy.txHash = this.otoken.block.header.hash // Not a great field considering we can have more than one rebase per day.
+    apy.txHash = trace.transaction!.hash // Not a great field considering we can have more than one rebase per day.
 
     // Calculate APY if we have previous data
     if (previousApy) {
@@ -382,7 +382,7 @@ export class OTokenEntityProducer {
         otoken: this.otoken.address,
         timestamp: new Date(this.otoken.block.header.timestamp),
         blockNumber: this.otoken.block.header.height,
-        txHash: this.otoken.block.header.hash,
+        txHash: trace.transaction!.hash,
         totalSupply: this.otoken.totalSupply,
         rebasingCredits: this.otoken.rebasingCreditsHighres(),
         rebasingCreditsPerToken: this.otoken.rebasingCreditsPerTokenHighres(),
@@ -396,13 +396,13 @@ export class OTokenEntityProducer {
     }
 
     // Update with current values
-    rebase.apy = await this.getOrCreateAPYEntity()
+    rebase.apy = await this.getOrCreateAPYEntity(trace)
     rebase.totalSupply = this.otoken.totalSupply
     rebase.rebasingCredits = this.otoken.rebasingCreditsHighres()
     rebase.rebasingCreditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
     rebase.timestamp = new Date(this.otoken.block.header.timestamp)
     rebase.blockNumber = this.otoken.block.header.height
-    rebase.txHash = this.otoken.block.header.hash
+    rebase.txHash = trace.transaction!.hash
 
     this.rebaseMap.set(id, rebase)
     return rebase
@@ -469,7 +469,7 @@ export class OTokenEntityProducer {
 
   async afterChangeSupply(trace: Trace, newTotalSupply: bigint, totalSupplyDiff: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
-    await this.getOrCreateAPYEntity()
+    await this.getOrCreateAPYEntity(trace)
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
     await Promise.all(
       Object.entries(this.otoken.creditBalances)
@@ -488,7 +488,7 @@ export class OTokenEntityProducer {
                 address: await this.getOrCreateAddress(account),
                 timestamp: new Date(this.otoken.block.header.timestamp),
                 blockNumber: this.otoken.block.header.height,
-                txHash: this.otoken.block.header.hash,
+                txHash: trace.transaction!.hash,
                 type: HistoryType.Yield,
                 value: earnedDiff,
                 balance: this.otoken.balanceOf(account),
