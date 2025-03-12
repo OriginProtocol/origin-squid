@@ -41,7 +41,7 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
 
   time += Date.now() - start
   count++
-  if (true || process.env.DEBUG_PERF === 'true') {
+  if (process.env.DEBUG_PERF === 'true') {
     ctx.log.info(`isContract ${count} ${time / count}`)
   }
   return codeAtBlock !== '0x'

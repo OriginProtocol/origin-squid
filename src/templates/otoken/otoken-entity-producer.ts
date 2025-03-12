@@ -351,8 +351,8 @@ export class OTokenEntityProducer {
       rebase = await this.ctx.store.get(OTokenRebase, id)
     }
 
-    const _yield = totalSupplyDiff
-    const _fee = (_yield * this.fee) / (100n - this.fee) // yield already has the fee removed.
+    const _fee = (totalSupplyDiff * this.fee) / (100n - this.fee) // totalSupplyDiff does not include the fee
+    const _yield = totalSupplyDiff + _fee // yes, yield here includes the fee
     let feeETH = 0n
     let yieldETH = 0n
     let feeUSD = 0n
