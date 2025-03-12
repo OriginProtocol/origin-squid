@@ -520,12 +520,12 @@ export const createOTokenProcessor2 = (params: {
             }
           }
         }
-        await producer.afterBlock()
         for (const log of block.logs) {
           if (harvesterYieldSentFilter?.matches(log)) {
             await producer.processHarvesterYieldSent(ctx, block, log)
           }
         }
+        await producer.afterBlock()
         if (otoken) {
           if (justUpgraded) {
             await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))

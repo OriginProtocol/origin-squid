@@ -545,10 +545,12 @@ export class OTokenEntityProducer {
   }
 
   async afterBlock() {
+    if (!this.otoken) return
     await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
   }
 
   async afterContext(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
+    if (!this.otoken) return
     await processOTokenDailyStats(this.ctx, {
       ...params,
       balances: new Map(Array.from(this.addressMap.values()).map((address) => [address.address, address.balance])),
