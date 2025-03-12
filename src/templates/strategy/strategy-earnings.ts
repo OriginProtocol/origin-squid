@@ -252,10 +252,6 @@ export const processStrategyEarnings = async (
           )
         }
 
-        if (earningsTransferLogs.find((l) => l.address !== WETH_ADDRESS)) {
-          debugger
-        }
-
         await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
           token: strategyData.base.address,
           amount: convertDecimals(

@@ -1,4 +1,4 @@
-type PoolBoosterCampaign @entity {
+type CurvePoolBoosterCampaign @entity {
   id: ID! @index
   chainId: Int! @index
   address: String! @index
@@ -10,7 +10,7 @@ type PoolBoosterCampaign @entity {
   closed: Boolean!
 }
 
-type PoolBoosterFeeCollected @entity {
+type CurvePoolBoosterFeeCollected @entity {
   id: ID! @index
   chainId: Int! @index
   address: String! @index
@@ -21,7 +21,7 @@ type PoolBoosterFeeCollected @entity {
   txHash: String!
 }
 
-type PoolBoosterTokensRescued @entity {
+type CurvePoolBoosterTokensRescued @entity {
   id: ID! @index
   chainId: Int! @index
   address: String! @index

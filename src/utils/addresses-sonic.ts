@@ -1,5 +1,5 @@
 const OS = {
-  initializeBlock: 3884403,
+  initializeBlock: 3884286,
   address: '0xb1e25689d55734fd3fffc939c4c3eb52dff8a794',
   dripper: '0x5b72992e9cde8c07ce7c8217eb014ec7fd281f03',
   oracleRouter: '0xe68e0c66950a7e02335fc9f44daa05d115c4e88b',

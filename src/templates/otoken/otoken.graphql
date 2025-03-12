@@ -8,7 +8,18 @@ type OToken @entity {
   totalSupply: BigInt!
   rebasingSupply: BigInt!
   nonRebasingSupply: BigInt!
+  creditsPerToken: BigInt!
   holderCount: Int!
+}
+
+type OTokenRawData @entity {
+  id: ID! @index
+  chainId: Int! @index
+  otoken: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  type: String!
+  data: JSON!
 }
 
 type WOToken @entity {
@@ -37,10 +48,12 @@ type OTokenAddress @entity {
   address: String! @index
   isContract: Boolean!
   rebasingOption: RebasingOption!
+  credits: BigInt!
+  creditsPerToken: BigInt!
   balance: BigInt!
   earned: BigInt!
-  credits: BigInt!
-  delegatedTo: String
+  yieldTo: String # For delegation source
+  yieldFrom: String # For delegation target
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime

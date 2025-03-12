@@ -10,6 +10,7 @@
     "prettier-fix": "prettier --write src",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
     "serve": "sqd serve",
+    "typegen": "sqd typegen",
     "process:arbitrum": "sqd process:arbitrum",
     "process:base": "sqd process:base",
     "process:sonic": "sqd process:sonic",
@@ -21,7 +22,9 @@
     "process": "sqd process",
     "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
     "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts",
-    "postdeploy": "sh -c 'npm run log:processing-times $1 && npm run generate:validations $1' --"
+    "postdeploy": "sh -c 'npm run log:processing-times $1 && npm run generate:validations $1' --",
+    "lint": "eslint \"src/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
     "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#main",
@@ -55,6 +58,9 @@
     "@types/node-fetch": "^2.6.9",
     "@types/uuid": "^9.0.2",
     "@types/websocket": "^1.0.10",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "eslint": "^9.21.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.3",
     "tsconfig-paths": "^4.2.0",

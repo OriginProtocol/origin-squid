@@ -21,6 +21,7 @@ export class ERC20State {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
     address!: string
 

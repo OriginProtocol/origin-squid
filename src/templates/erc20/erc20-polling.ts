@@ -1,5 +1,5 @@
 import * as abi from '@abi/erc20'
-import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20StateByDay, ERC20Transfer } from '@model'
 import { Block, Context, blockFrequencyUpdater, logFilter, multicall } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -93,6 +93,7 @@ export const createERC20PollingTracker = ({
       }
       const result = {
         states: new Map<string, ERC20State>(),
+        statesByDay: new Map<string, ERC20StateByDay>(),
         balances: new Map<string, ERC20Balance>(),
         transfers: new Map<string, ERC20Transfer>(),
         holders: new Map<string, ERC20Holder>(),
@@ -113,6 +114,15 @@ export const createERC20PollingTracker = ({
           holderCount: holders.size,
         })
         result.states.set(id, state)
+
+        const date = new Date(block.header.timestamp)
+        const dateString = date.toISOString().slice(0, 10)
+        const stateByDay = new ERC20StateByDay({
+          ...state,
+          id: `${ctx.chain.id}-${dateString}-${address}`,
+          date: dateString,
+        })
+        result.statesByDay.set(stateByDay.id, stateByDay)
       }
       const updateBalances = async (ctx: Context, block: Block, accounts: string[], doStateUpdate = false) => {
         if (accountFilterSet) {
@@ -208,6 +218,7 @@ export const createERC20PollingTracker = ({
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
+        ctx.store.upsert([...result.statesByDay.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
         ctx.store.remove(

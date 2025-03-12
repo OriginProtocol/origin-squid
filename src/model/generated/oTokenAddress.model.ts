@@ -30,16 +30,22 @@ export class OTokenAddress {
     rebasingOption!: RebasingOption
 
     @BigIntColumn_({nullable: false})
+    credits!: bigint
+
+    @BigIntColumn_({nullable: false})
+    creditsPerToken!: bigint
+
+    @BigIntColumn_({nullable: false})
     balance!: bigint
 
     @BigIntColumn_({nullable: false})
     earned!: bigint
 
-    @BigIntColumn_({nullable: false})
-    credits!: bigint
+    @StringColumn_({nullable: true})
+    yieldTo!: string | undefined | null
 
     @StringColumn_({nullable: true})
-    delegatedTo!: string | undefined | null
+    yieldFrom!: string | undefined | null
 
     @IntColumn_({nullable: false})
     blockNumber!: number

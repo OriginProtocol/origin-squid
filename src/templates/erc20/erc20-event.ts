@@ -1,5 +1,8 @@
+import dayjs from 'dayjs'
+import { findLast } from 'lodash'
+
 import * as abi from '@abi/erc20'
-import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20Transfer } from '@model'
+import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20StateByDay, ERC20Transfer } from '@model'
 import { Block, Context, logFilter } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
@@ -60,6 +63,7 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
       await initialize(ctx)
       const result = {
         states: new Map<string, ERC20State>(),
+        statesByDay: new Map<string, ERC20StateByDay>(),
         balances: new Map<string, ERC20Balance>(),
         transfers: new Map<string, ERC20Transfer>(),
         holders: new Map<string, ERC20Holder>(),
@@ -191,9 +195,43 @@ export const createERC20EventTracker = ({ from, address }: { from: number; addre
         }
       }
 
+      // Generate ERC20StateByDay entities.
+      let lastStateByDay = await ctx.store.findOne(ERC20StateByDay, {
+        where: { chainId: ctx.chain.id, address },
+        order: { timestamp: 'DESC' },
+      })
+
+      const states = [...result.states.values()]
+      const startDate = lastStateByDay
+        ? dayjs.utc(lastStateByDay.timestamp).endOf('day')
+        : states[0]
+        ? dayjs.utc(states[0].timestamp).endOf('day')
+        : null
+      if (startDate) {
+        const endDate = dayjs.utc(ctx.blocks[ctx.blocks.length - 1].header.timestamp).endOf('day')
+
+        // Ensure we create an entry for every day
+        for (let day = startDate; day.isBefore(endDate) || day.isSame(endDate, 'day'); day = day.add(1, 'day')) {
+          const date = day.format('YYYY-MM-DD')
+          const dayEnd = day.endOf('day')
+          const mostRecentState = findLast(
+            states,
+            (s) => dayjs.utc(s.timestamp).isBefore(dayEnd) || dayjs.utc(s.timestamp).isSame(dayEnd),
+          )
+          const stateByDay = new ERC20StateByDay({
+            ...(mostRecentState ?? lastStateByDay ?? states[0]), // Fallback to first state if no previous state exists
+            id: `${ctx.chain.id}-${date}-${address}`,
+            date,
+          })
+          result.statesByDay.set(stateByDay.id, stateByDay)
+          lastStateByDay = stateByDay
+        }
+      }
+
       await Promise.all([
         ctx.store.upsert([...result.holders.values()]),
         ctx.store.insert([...result.states.values()]),
+        ctx.store.upsert([...result.statesByDay.values()]),
         ctx.store.insert([...result.balances.values()]),
         ctx.store.insert([...result.transfers.values()]),
       ])

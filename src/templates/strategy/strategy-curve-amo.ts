@@ -63,11 +63,13 @@ export const getStrategyBalances = async (ctx: Context, block: { height: number 
     return getConvexEthMetaStrategyBalances(ctx, block, strategyData)
   }
   return await Promise.all(
-    strategyData.assets.map(async (asset) => {
-      const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
-      const balance = await contract.checkBalance(asset.address)
-      return { address: strategyData.address, asset: asset.address, balance }
-    }),
+    strategyData.assets
+      .filter((asset) => asset.checkBalance !== false)
+      .map(async (asset) => {
+        const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
+        const balance = await contract.checkBalance(asset.address)
+        return { address: strategyData.address, asset: asset.address, balance }
+      }),
   )
 }
 

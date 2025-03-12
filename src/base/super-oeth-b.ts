@@ -1,18 +1,22 @@
 import { parseEther } from 'viem'
 import { base } from 'viem/chains'
 
+import * as erc20Abi from '@abi/erc20'
 import { getPositions } from '@templates/aerodrome/lp'
-import { createOTokenProcessor } from '@templates/otoken'
+import { createOTokenLegacyProcessor } from '@templates/otoken'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
 import { tokensByChain } from '@utils/tokensByChain'
 
-const otokenProcessor = createOTokenProcessor({
+import { baseCurveAMO } from './strategies'
+
+const otokenProcessor = createOTokenLegacyProcessor({
   name: 'Super OETHb',
   symbol: 'superOETHb',
   from: 17819702,
   vaultFrom: 17819702,
+  // fee: 20n,
   otokenAddress: baseAddresses.tokens.superOETHb,
   wotoken: {
     address: baseAddresses.tokens.wsuperOETHb,
@@ -42,10 +46,18 @@ const otokenProcessor = createOTokenProcessor({
       ctx,
       height,
       aerodromePools['CL1-WETH/superOETHb'],
-      baseAddresses.superOETHb.strategies.amo,
+      baseAddresses.superOETHb.strategies.aerodromeAMO,
       1,
     )
-    return positions.reduce((acc, position) => acc + BigInt(position.amount1) + BigInt(position.staked1), 0n)
+    const aerodromeAMO = positions.reduce(
+      (acc, position) => acc + BigInt(position.amount1) + BigInt(position.staked1),
+      0n,
+    )
+
+    const superOETHb = new erc20Abi.Contract(ctx, { height }, baseAddresses.superOETHb.address)
+    const curveAmoBalance = await superOETHb.balanceOf(baseCurveAMO.curvePoolInfo!.poolAddress)
+
+    return aerodromeAMO + curveAmoBalance
   },
   upgrades: {
     rebaseOptEvents: false,

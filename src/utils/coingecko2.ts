@@ -14,7 +14,7 @@ export async function getCoingeckoData(
   const vsCurrency = props.vsCurrency || 'usd'
   const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=${vsCurrency}&days=365&interval=daily&precision=18`
   const coingeckoJson = await queryClient.fetchQuery({
-    queryKey: [coingeckoURL],
+    queryKey: [coingeckoURL, new Date().toISOString().slice(0, 10)],
     queryFn: async () => {
       console.log('Fetching Coingecko market data')
       const response = await fetch(coingeckoURL)
