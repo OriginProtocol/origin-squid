@@ -662,6 +662,7 @@ export class OTokenEntityProducer {
   }
 
   async save(): Promise<void> {
+    if (!this.otoken) return
     const erc20s = await processOTokenERC20(this.ctx, {
       otokenAddress: this.otoken.address,
       otokens: Array.from(this.otokenMap.values()),
