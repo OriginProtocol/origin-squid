@@ -379,7 +379,6 @@ export const createOTokenProcessor2 = (params: {
           // if (transaction.status !== 1) {
           //   continue // skip failed transactions
           // }
-          if (transaction.hash === '0x9e8f9a12aec71793c9983720d01f264e5e620f610a3f2744680546a4a020f118') debugger
           for (const trace of transaction.traces) {
             if (trace.type === 'call') {
               if (errorParent(trace)) {
@@ -596,15 +595,14 @@ export const createOTokenProcessor2 = (params: {
           }
         }
         await producer.afterBlock()
-        if (otoken) {
-          if (justUpgraded) {
-            await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))
-            justUpgraded = false
-          } else if (hasUpgraded && addressesToCheck.size > 0) {
-            await checkState(ctx, block, otoken, addressesToCheck)
-          }
-        }
-        // TODO: Testing an issue seen at 21061766
+        // if (otoken) {
+        //   if (justUpgraded) {
+        //     await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))
+        //     justUpgraded = false
+        //   } else if (hasUpgraded && addressesToCheck.size > 0) {
+        //     await checkState(ctx, block, otoken, addressesToCheck)
+        //   }
+        // }
       }
 
       await producer.afterContext(params)

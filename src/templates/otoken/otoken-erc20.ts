@@ -65,9 +65,6 @@ export const processOTokenERC20 = async (
         since: owner.since!,
         balance: owner.balance,
       })
-      if (!erc20Holder.since) {
-        debugger
-      }
       result.holders.set(erc20Holder.id, erc20Holder)
     }
   }

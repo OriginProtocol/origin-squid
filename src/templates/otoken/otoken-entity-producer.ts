@@ -495,7 +495,7 @@ export class OTokenEntityProducer {
         if (from) {
           const balance = this.otoken.balanceOf(account)
           const forwardedBalance = this.otoken.balanceOf(from)
-          const forwardedBalancePercentage = forwardedBalance / (balance + forwardedBalance)
+          const forwardedBalancePercentage = (forwardedBalance * 10n ** 18n) / (balance + forwardedBalance)
           const to = account
           // Thought is put into more than once change supply happening in the same block.
           // Also thought is put into there possibly being yield forwarded, then forwarding changing, and then yield forwarded again to somewhere else.
@@ -563,7 +563,7 @@ export class OTokenEntityProducer {
           const yieldForwardInfo = this.yieldForwardInfo.get(`${from}-${to}`)!
           const newBalance = this.otoken.balanceOf(to)
           const yieldEarned = newBalance - yieldForwardInfo.balance
-          const yieldEarnedFromForwarding = yieldEarned * yieldForwardInfo.forwardedBalancePercentage
+          const yieldEarnedFromForwarding = (yieldEarned * yieldForwardInfo.forwardedBalancePercentage) / 10n ** 18n
           yieldForwardInfo.yieldEarned += yieldEarnedFromForwarding
         }
       }
@@ -620,7 +620,7 @@ export class OTokenEntityProducer {
     for (const info of this.yieldForwardInfo.values()) {
       this.yieldForwarded.push(
         new OTokenYieldForwarded({
-          id: `${this.ctx.chain.id}-${this.otoken.address}-${info.from}-${info.to}`,
+          id: `${this.ctx.chain.id}-${this.otoken.address}-${this.otoken.block.header.height}-${info.from}-${info.to}`,
           chainId: this.ctx.chain.id,
           otoken: this.otoken.address,
           timestamp: new Date(this.otoken.block.header.timestamp),
@@ -680,6 +680,7 @@ export class OTokenEntityProducer {
       this.ctx.store.insert(this.rebaseOptions),
       this.ctx.store.insert(this.harvesterYieldSent),
       this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
+      this.ctx.store.upsert([...this.yieldForwarded.values()]),
 
       // ERC20
       this.ctx.store.insert([...erc20s.states.values()]),
@@ -703,6 +704,7 @@ export class OTokenEntityProducer {
     this.rebaseMap = new Map()
     this.rebaseOptions = []
     this.harvesterYieldSent = []
+    this.yieldForwarded = []
     this.dailyStats = new Map()
     this.transfers = []
   }
