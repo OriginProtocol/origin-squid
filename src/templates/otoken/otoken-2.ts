@@ -8,7 +8,7 @@ import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import { OTokenAsset, OTokenRawData } from '@model'
-import { Block, Context, Processor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
+import { Block, Context, defineProcessor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
@@ -52,7 +52,7 @@ export const createOTokenProcessor2 = (params: {
   }
   accountsOverThresholdMinimum: bigint
   feeOverride?: bigint // out of 100
-}): Processor => {
+}) => {
   const { otokenAddress, from } = params
 
   const frequencyUpdater = otokenFrequencyProcessor(params)
@@ -197,7 +197,7 @@ export const createOTokenProcessor2 = (params: {
   let producer: OTokenEntityProducer
   let hasUpgraded = false
 
-  return {
+  return defineProcessor({
     name: `otoken2-${otokenAddress}`,
     from,
     setup: (processor: EvmBatchProcessor) => {
@@ -620,7 +620,7 @@ export const createOTokenProcessor2 = (params: {
         ctx.store.insert(frequencyUpdateResults.dripperStates),
       ])
     },
-  }
+  })
 }
 
 const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) => {
