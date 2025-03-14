@@ -69,7 +69,7 @@ export const processOTokenERC20 = async (
     }
   }
   for (const history of params.history) {
-    const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address.address}`
+    const id = history.id
     result.balances.set(
       id,
       new ERC20Balance({

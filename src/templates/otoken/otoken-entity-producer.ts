@@ -687,7 +687,7 @@ export class OTokenEntityProducer {
       this.ctx.store.insert([...erc20s.states.values()]),
       this.ctx.store.upsert([...erc20s.statesByDay.values()]),
       this.ctx.store.upsert([...erc20s.holders.values()]),
-      this.ctx.store.insert([...erc20s.balances.values()]),
+      this.ctx.store.upsert([...erc20s.balances.values()]),
       this.ctx.store.insert(erc20s.transfers),
       this.ctx.store.remove(
         [...erc20s.removedHolders.values()].map(
