@@ -1,12 +1,14 @@
 import crypto from 'crypto'
+import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { pick } from 'lodash'
+import { getAddress } from 'viem'
 
 import * as proxyAbi from '@abi/governed-upgradeability-proxy'
 import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import { OTokenAsset, OTokenRawData } from '@model'
-import { Block, Context, Processor, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
+import { Block, Context, Processor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
@@ -193,6 +195,7 @@ export const createOTokenProcessor2 = (params: {
 
   let otoken: OToken_2025_03_04 | OToken_2023_12_21
   let producer: OTokenEntityProducer
+  let hasUpgraded = false
 
   return {
     name: `otoken2-${otokenAddress}`,
@@ -205,14 +208,41 @@ export const createOTokenProcessor2 = (params: {
 
       // Implementation Related
       // We want to receive all trace calls to the otoken contract
-      processor.addLog({
-        address: [otokenAddress],
-        transaction: true,
-        range: { from },
-      })
+      // processor.addLog({
+      //   address: [otokenAddress],
+      //   transaction: true,
+      //   range: { from },
+      // })
+
+      // Monkeypatch Hack
+      const originalAddTrace = processor.addTrace
+      function modifiedMapRequest<T extends { range?: { from: number } }>(options: T): Omit<T, 'range'> {
+        let { range, ...req } = options
+        for (let key in req) {
+          let val = (req as any)[key]
+          if (Array.isArray(val)) {
+            ;(req as any)[key] = val.map((s) => {
+              return typeof s == 'string' ? s : s
+            })
+          }
+        }
+        return req
+      }
+      processor.addTrace = function (options: Parameters<typeof originalAddTrace>[0]): EvmBatchProcessor {
+        const privateThis: any = this
+        privateThis.assertNotRunning()
+        privateThis.add(
+          {
+            traces: [modifiedMapRequest(options)],
+          },
+          options.range,
+        )
+        return this
+      }
+
       processor.addTrace({
         type: ['call'],
-        callTo: [otokenAddress],
+        callTo: [otokenAddress, getAddress(otokenAddress)],
         ...generalTraceParams,
       })
 
@@ -243,6 +273,7 @@ export const createOTokenProcessor2 = (params: {
         )
       }
     },
+
     /**
      * Process events from logs and traces to update the OToken state
      * @param ctx The context containing logs and traces
@@ -250,6 +281,19 @@ export const createOTokenProcessor2 = (params: {
     async process(ctx: Context): Promise<void> {
       await loadIsContractCache(ctx)
       const frequencyUpdatePromise = frequencyUpdater(ctx)
+
+      if (!otoken) {
+        if (process.env.BLOCK_FROM) {
+          const filePath = `data/otoken-raw-data-${otokenAddress}-${process.env.BLOCK_FROM}.json`
+          if (existsSync(filePath)) {
+            const savedData = readFileSync(filePath, 'utf8')
+            const savedDataEntity = bigintJsonParse(savedData) as OTokenRawData
+            otoken = loadOTokenRawData(ctx, ctx.blocks[0], savedDataEntity)
+          } else {
+            ctx.log.error(`Raw data file not found: ${filePath}`)
+          }
+        }
+      }
 
       if (otoken) {
         otoken.ctx = ctx
@@ -283,6 +327,7 @@ export const createOTokenProcessor2 = (params: {
           otoken = newImplementation
           producer.otoken = newImplementation
           justUpgraded = true
+          hasUpgraded = true
         } else {
           throw new Error('Implementation hash not found.')
         }
@@ -314,13 +359,7 @@ export const createOTokenProcessor2 = (params: {
       if (!otoken) {
         const entity = await ctx.store.get(OTokenRawData, `${ctx.chain.id}-${otokenAddress}`)
         if (entity) {
-          if (entity.type === 'OToken_2023_12_21') {
-            otoken = new OToken_2023_12_21(ctx, ctx.blocks[0], otokenAddress)
-            Object.assign(otoken, bigintJsonParse(JSON.stringify(entity.data)))
-          } else if (entity.type === 'OToken_2025_03_04') {
-            otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
-            Object.assign(otoken, bigintJsonParse(JSON.stringify(entity.data)))
-          }
+          otoken = loadOTokenRawData(ctx, ctx.blocks[0], bigintJsonParse(JSON.stringify(entity)))
           producer.otoken = otoken
         }
       }
@@ -332,6 +371,7 @@ export const createOTokenProcessor2 = (params: {
         if (otoken) {
           otoken.block = block
           producer.block = block
+          await producer.beforeBlock()
         }
         const addressesToCheck = new Set<string>()
         // Process traces
@@ -339,6 +379,7 @@ export const createOTokenProcessor2 = (params: {
           // if (transaction.status !== 1) {
           //   continue // skip failed transactions
           // }
+          if (transaction.hash === '0x9e8f9a12aec71793c9983720d01f264e5e620f610a3f2744680546a4a020f118') debugger
           for (const trace of transaction.traces) {
             if (trace.type === 'call') {
               if (errorParent(trace)) {
@@ -459,6 +500,7 @@ export const createOTokenProcessor2 = (params: {
                 addressesToCheck.add(sender)
                 ///////////////////////////////
               } else if (changeSupplyTraceFilter.matches(trace)) {
+                await producer.beforeChangeSupply()
                 const data = otokenAbi.functions.changeSupply.decode(trace.action.input)
                 // ctx.log.info({ data, hash: trace.transaction?.hash }, 'changeSupply')
                 const totalSupplyDiff = data._newTotalSupply - otoken.totalSupply
@@ -497,6 +539,34 @@ export const createOTokenProcessor2 = (params: {
                 // await otoken.claimGovernance()
                 addressesToCheck.add(sender)
                 ///////////////////////////////
+              } else if (trace.action.to === otokenAddress && trace.action.input.startsWith('0xc6f10ba3')) {
+                ctx.log.info('SPECIAL CASE FOR superOETHb - governanceRecover()')
+                // https://dashboard.tenderly.co/tx/0x9fadf02b9cae9a233ccd777b27cf5e8abf63507615963bbc207924d45270d8d5?trace=0.1.3.7.0.5.0.0.1.0.1
+                /*
+                 *  function governanceRecover() external onlyGovernor {
+                 *      // Bribes contract
+                 *      address _from = 0x685cE0E36Ca4B81F13B7551C76143D962568f6DD;
+                 *      // Strategist multisig
+                 *      address _to = 0x28bce2eE5775B652D92bB7c2891A89F036619703;
+                 *      // Amount to recover
+                 *      uint256 amount = 38692983174128797556;
+                 *      _executeTransfer(_from, _to, amount);
+                 *
+                 *      emit Transfer(_from, _to, amount);
+                 *  }
+                 */
+                // ---------------
+                // Bribes contract
+                const _from = '0x685ce0e36ca4b81f13b7551c76143d962568f6dd'
+                // Strategist multisig
+                const _to = '0x28bce2ee5775b652d92bb7c2891a89f036619703'
+                // Amount to recover
+                const _value = 38692983174128797556n
+                await otoken.transfer(_from, _to, _value)
+                await producer.afterTransfer(trace, _from, _to, _value)
+                addressesToCheck.add(_from)
+                addressesToCheck.add(_to)
+                ///////////////////////////////
               } else if (trace.action.to === otokenAddress) {
                 let fun
                 fun = Object.values(otokenAbi20241221.functions).find((value) =>
@@ -530,66 +600,18 @@ export const createOTokenProcessor2 = (params: {
           if (justUpgraded) {
             await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))
             justUpgraded = false
+          } else if (hasUpgraded && addressesToCheck.size > 0) {
+            await checkState(ctx, block, otoken, addressesToCheck)
           }
-          // await checkState(ctx, block, otoken, new Set())
-          // await checkState(ctx, block, otoken, addressesToCheck)
         }
+        // TODO: Testing an issue seen at 21061766
       }
 
       await producer.afterContext(params)
 
       if (otoken) {
         const lastBlock = ctx.blocks[ctx.blocks.length - 1]
-        await ctx.store.save(
-          new OTokenRawData({
-            id: `${ctx.chain.id}-${otokenAddress}`,
-            chainId: ctx.chain.id,
-            otoken: otokenAddress,
-            timestamp: new Date(lastBlock.header.timestamp),
-            blockNumber: lastBlock.header.height,
-            type: otoken.constructor.name,
-            data: JSON.parse(
-              bigintJsonStringify(
-                pick(
-                  otoken,
-                  otoken instanceof OToken_2023_12_21
-                    ? [
-                        'totalSupply',
-                        '_allowances',
-                        'vaultAddress',
-                        'creditBalances',
-                        '_rebasingCredits',
-                        '_rebasingCreditsPerToken',
-                        'nonRebasingSupply',
-                        'nonRebasingCreditsPerToken',
-                        'rebaseState',
-                        'isUpgraded',
-                        'governor',
-                      ]
-                    : [
-                        // OToken_2025_03_04
-                        'totalSupply',
-                        'allowances',
-                        'vaultAddress',
-                        'creditBalances',
-                        'rebasingCredits',
-                        'rebasingCreditsPerToken',
-                        'nonRebasingSupply',
-                        'rebasingSupply',
-                        'alternativeCreditsPerToken',
-                        'rebaseState',
-                        'yieldTo',
-                        'yieldFrom',
-                        'governor',
-                      ],
-                ),
-              ),
-            ),
-          }),
-        )
-        if (ctx.isHead) {
-          // await checkState(ctx, lastBlock, otoken, new Set([...Object.keys(otoken.creditBalances)]))
-        }
+        await saveOTokenRawData(ctx, lastBlock, otoken)
       }
       const frequencyUpdateResults = await frequencyUpdatePromise
       await Promise.all([
@@ -600,6 +622,71 @@ export const createOTokenProcessor2 = (params: {
         ctx.store.insert(frequencyUpdateResults.dripperStates),
       ])
     },
+  }
+}
+
+const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) => {
+  const otoken =
+    entity.type === 'OToken_2023_12_21'
+      ? new OToken_2023_12_21(ctx, block, entity.otoken)
+      : new OToken_2025_03_04(ctx, block, entity.otoken)
+  Object.assign(otoken, entity.data)
+  return otoken
+}
+
+const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023_12_21 | OToken_2025_03_04) => {
+  const rawDataEntity = new OTokenRawData({
+    id: `${ctx.chain.id}-${otoken.address}`,
+    chainId: ctx.chain.id,
+    otoken: otoken.address,
+    timestamp: new Date(block.header.timestamp),
+    blockNumber: block.header.height,
+    type: otoken.constructor.name,
+    data: JSON.parse(
+      bigintJsonStringify(
+        pick(
+          otoken,
+          otoken instanceof OToken_2023_12_21
+            ? [
+                'totalSupply',
+                '_allowances',
+                'vaultAddress',
+                'creditBalances',
+                '_rebasingCredits',
+                '_rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'nonRebasingCreditsPerToken',
+                'rebaseState',
+                'isUpgraded',
+                'governor',
+              ]
+            : [
+                // OToken_2025_03_04
+                'totalSupply',
+                'allowances',
+                'vaultAddress',
+                'creditBalances',
+                'rebasingCredits',
+                'rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'rebasingSupply',
+                'alternativeCreditsPerToken',
+                'rebaseState',
+                'yieldTo',
+                'yieldFrom',
+                'governor',
+              ],
+        ),
+      ),
+    ),
+  })
+  await ctx.store.save(rawDataEntity)
+
+  if (env.NODE_ENV === 'development') {
+    writeFileSync(
+      `data/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
+      bigintJsonStringify(rawDataEntity, 2),
+    )
   }
 }
 

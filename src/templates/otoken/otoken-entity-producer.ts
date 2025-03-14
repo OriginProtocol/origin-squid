@@ -14,6 +14,7 @@ import {
   OTokenHistory,
   OTokenRebase,
   OTokenRebaseOption,
+  OTokenYieldForwarded,
   RebasingOption,
 } from '@model'
 import { Block, Context, Log, Trace, calculateAPY } from '@originprotocol/squid-utils'
@@ -40,11 +41,13 @@ export class OTokenEntityProducer {
   // Entity storage which should be reset after every `process`.
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
+  private changedAddressMap: Map<string, OTokenAddress> = new Map() // Only to contain addresses whose content has changed during the context.
   private histories: Map<string, OTokenHistory> = new Map()
   private apyMap: Map<string, OTokenAPY> = new Map()
   private rebaseMap: Map<string, OTokenRebase> = new Map()
   private rebaseOptions: OTokenRebaseOption[] = []
   private harvesterYieldSent: OTokenHarvesterYieldSent[] = []
+  private yieldForwarded: OTokenYieldForwarded[] = []
   private dailyStats: Map<string, { block: Block; entity: OTokenDailyStat }> = new Map()
   private transfers: {
     block: Block
@@ -191,6 +194,7 @@ export class OTokenEntityProducer {
       }
     }
 
+    this.changedAddressMap.set(account, address)
     return address
   }
 
@@ -408,6 +412,23 @@ export class OTokenEntityProducer {
     return rebase
   }
 
+  private yieldForwardInfo: Map<
+    string,
+    {
+      from: string
+      to: string
+      balance: bigint
+      forwardedBalancePercentage: bigint
+      yieldEarned: bigint
+    }
+  > = new Map()
+
+  private accountEarningsByHour: Map<string, bigint> = new Map()
+
+  async beforeBlock() {
+    this.yieldForwardInfo = new Map()
+  }
+
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, null, to, value)
@@ -467,6 +488,31 @@ export class OTokenEntityProducer {
   // async afterApprove(trace: Trace, owner: string, spender: string, value: bigint): Promise<void> {
   // }
 
+  async beforeChangeSupply(): Promise<void> {
+    if (this.otoken instanceof OToken_2025_03_04) {
+      for (const account of Object.keys(this.otoken.creditBalances)) {
+        const from = this.otoken.yieldFrom[account]
+        if (from) {
+          const balance = this.otoken.balanceOf(account)
+          const forwardedBalance = this.otoken.balanceOf(from)
+          const forwardedBalancePercentage = forwardedBalance / (balance + forwardedBalance)
+          const to = account
+          // Thought is put into more than once change supply happening in the same block.
+          // Also thought is put into there possibly being yield forwarded, then forwarding changing, and then yield forwarded again to somewhere else.
+          // This will probably *never* happen, but I'm trying to account for it by using `from-to` as the key.
+          const yieldEarned = this.yieldForwardInfo.get(`${from}-${to}`)?.yieldEarned ?? 0n
+          this.yieldForwardInfo.set(`${from}-${to}`, {
+            from,
+            to,
+            balance,
+            forwardedBalancePercentage,
+            yieldEarned,
+          })
+        }
+      }
+    }
+  }
+
   async afterChangeSupply(trace: Trace, newTotalSupply: bigint, totalSupplyDiff: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.getOrCreateAPYEntity(trace)
@@ -476,13 +522,24 @@ export class OTokenEntityProducer {
         .filter(([_account, credits]) => credits > 0n)
         .map(([account]) => {
           return (async () => {
+            //Delete previous hour accrual
+            const previousDateHour = dayjs(this.otoken.block.header.timestamp)
+              .subtract(1, 'hour')
+              .toISOString()
+              .slice(0, 13)
+            this.accountEarningsByHour.delete(previousDateHour)
+
+            const dateHour = dayjs(this.otoken.block.header.timestamp).toISOString().slice(0, 13) // Date including hour
+            const id = `${this.ctx.chain.id}-${this.otoken.address}-${account}-${dateHour}`
             let address = await this.getAddress(account)
             const earned = address?.earned ?? 0n
             address = await this.getOrCreateAddress(account)
             const earnedDiff = address.earned - earned
+            const hourlyEarnings = (this.accountEarningsByHour.get(id) ?? 0n) + earnedDiff
+            this.accountEarningsByHour.set(id, hourlyEarnings)
             if (earnedDiff > 0n) {
               const history = new OTokenHistory({
-                id: `${this.ctx.chain.id}-${trace.transaction!.hash}-${trace.traceAddress.join('-')}-${account}`,
+                id,
                 chainId: this.ctx.chain.id,
                 otoken: this.otoken.address,
                 address: await this.getOrCreateAddress(account),
@@ -490,7 +547,7 @@ export class OTokenEntityProducer {
                 blockNumber: this.otoken.block.header.height,
                 txHash: trace.transaction!.hash,
                 type: HistoryType.Yield,
-                value: earnedDiff,
+                value: hourlyEarnings,
                 balance: this.otoken.balanceOf(account),
               })
               this.histories.set(history.id, history)
@@ -498,6 +555,19 @@ export class OTokenEntityProducer {
           })()
         }),
     )
+    // Calculate Yield Forwarded
+    if (this.otoken instanceof OToken_2025_03_04) {
+      for (const to of Object.keys(this.otoken.creditBalances)) {
+        const from = this.otoken.yieldFrom[to]
+        if (from) {
+          const yieldForwardInfo = this.yieldForwardInfo.get(`${from}-${to}`)!
+          const newBalance = this.otoken.balanceOf(to)
+          const yieldEarned = newBalance - yieldForwardInfo.balance
+          const yieldEarnedFromForwarding = yieldEarned * yieldForwardInfo.forwardedBalancePercentage
+          yieldForwardInfo.yieldEarned += yieldEarnedFromForwarding
+        }
+      }
+    }
   }
 
   async createRebasingOption(trace: Trace, account: string) {
@@ -547,6 +617,20 @@ export class OTokenEntityProducer {
   async afterBlock() {
     if (!this.otoken) return
     await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
+    for (const info of this.yieldForwardInfo.values()) {
+      this.yieldForwarded.push(
+        new OTokenYieldForwarded({
+          id: `${this.ctx.chain.id}-${this.otoken.address}-${info.from}-${info.to}`,
+          chainId: this.ctx.chain.id,
+          otoken: this.otoken.address,
+          timestamp: new Date(this.otoken.block.header.timestamp),
+          blockNumber: this.otoken.block.header.height,
+          from: info.from,
+          to: info.to,
+          amount: info.yieldEarned,
+        }),
+      )
+    }
   }
 
   async afterContext(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
@@ -581,18 +665,18 @@ export class OTokenEntityProducer {
     const erc20s = await processOTokenERC20(this.ctx, {
       otokenAddress: this.otoken.address,
       otokens: Array.from(this.otokenMap.values()),
-      addresses: Array.from(this.addressMap.values()),
+      addresses: Array.from(this.changedAddressMap.values()),
       history: Array.from(this.histories.values()),
       transfers: this.transfers,
     })
 
-    await this.ctx.store.upsert([...this.addressMap.values()]) // These must be saved first.
+    await this.ctx.store.upsert([...this.changedAddressMap.values()]) // These must be saved first.
     await Promise.all([
       // OToken Entity Saving
       this.ctx.store.insert([...this.otokenMap.values()]),
       this.ctx.store.upsert([...this.apyMap.values()]),
       this.ctx.store.insert([...this.rebaseMap.values()]),
-      this.ctx.store.insert([...this.histories.values()]),
+      this.ctx.store.upsert([...this.histories.values()]),
       this.ctx.store.insert(this.rebaseOptions),
       this.ctx.store.insert(this.harvesterYieldSent),
       this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
@@ -612,7 +696,8 @@ export class OTokenEntityProducer {
 
     // Reset the entity storage.
     this.otokenMap = new Map()
-    this.addressMap = new Map()
+    // We don't reset `this.addressMap` - keep it in memory for performance.
+    this.changedAddressMap = new Map()
     this.histories = new Map()
     this.apyMap = new Map()
     this.rebaseMap = new Map()

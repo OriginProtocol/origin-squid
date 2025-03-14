@@ -315,6 +315,10 @@ export class OToken_2025_03_04 {
       }
     }
 
+    if (this.creditBalances[_account] === 0n) {
+      delete this.creditBalances[_account]
+    }
+
     return [rebasingCreditsDiff, nonRebasingSupplyDiff]
   }
 

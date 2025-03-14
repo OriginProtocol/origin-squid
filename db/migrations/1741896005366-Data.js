@@ -1,5 +1,5 @@
-module.exports = class Data1741720109548 {
-    name = 'Data1741720109548'
+module.exports = class Data1741896005366 {
+    name = 'Data1741896005366'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -216,6 +216,11 @@ module.exports = class Data1741720109548 {
         await db.query(`CREATE INDEX "IDX_40e7c338b514e19f2319d768bd" ON "o_token_withdrawal_request" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_39091effe13b6c6e2a321c1cad" ON "o_token_withdrawal_request" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_f5baa0e3b6dcfe1940cfa02c01" ON "o_token_withdrawal_request" ("tx_hash") `)
+        await db.query(`CREATE TABLE "o_token_yield_forwarded" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_22bbb6894ff29f1cffa62fa8cca" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_c819776ce5a04915227ada2990" ON "o_token_yield_forwarded" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_74ae9edf4f308f86740b16b7cd" ON "o_token_yield_forwarded" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_b8b0b44e2b80be2fbeb211debe" ON "o_token_yield_forwarded" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_8e58218e9917d409803beb1479" ON "o_token_yield_forwarded" ("otoken") `)
         await db.query(`CREATE TABLE "arm" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "symbol" text NOT NULL, "decimals" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, CONSTRAINT "PK_711e2a749a8c4baeccf8365290c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "arm_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "total_deposits" numeric NOT NULL, "total_withdrawals" numeric NOT NULL, "total_yield" numeric NOT NULL, "total_fees" numeric NOT NULL, CONSTRAINT "PK_e58fff61dd95dfeac112204c378" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68943c1b73a665919e9377027e" ON "arm_state" ("chain_id") `)
@@ -1011,6 +1016,11 @@ module.exports = class Data1741720109548 {
         await db.query(`DROP INDEX "public"."IDX_40e7c338b514e19f2319d768bd"`)
         await db.query(`DROP INDEX "public"."IDX_39091effe13b6c6e2a321c1cad"`)
         await db.query(`DROP INDEX "public"."IDX_f5baa0e3b6dcfe1940cfa02c01"`)
+        await db.query(`DROP TABLE "o_token_yield_forwarded"`)
+        await db.query(`DROP INDEX "public"."IDX_c819776ce5a04915227ada2990"`)
+        await db.query(`DROP INDEX "public"."IDX_74ae9edf4f308f86740b16b7cd"`)
+        await db.query(`DROP INDEX "public"."IDX_b8b0b44e2b80be2fbeb211debe"`)
+        await db.query(`DROP INDEX "public"."IDX_8e58218e9917d409803beb1479"`)
         await db.query(`DROP TABLE "arm"`)
         await db.query(`DROP TABLE "arm_state"`)
         await db.query(`DROP INDEX "public"."IDX_68943c1b73a665919e9377027e"`)

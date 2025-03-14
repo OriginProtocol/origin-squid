@@ -134,7 +134,9 @@ export class OToken_2023_12_21 {
     }
     const fromBalance = this.balanceOf(caller)
     if (value > fromBalance) {
-      this.ctx.log.warn(`Transfer amount exceeds balance: requested ${value}, available ${fromBalance}`)
+      this.ctx.log.warn(
+        `Transfer amount exceeds balance: from=${caller}, to=${to}, requested ${value}, available ${fromBalance}`,
+      )
     }
 
     await this._executeTransfer(caller, to, value)
@@ -149,7 +151,9 @@ export class OToken_2023_12_21 {
       throw new Error('Transfer to zero address')
     }
     if (value > this.balanceOf(from)) {
-      this.ctx.log.warn(`Transfer greater than balance: requested ${value}, available ${this.balanceOf(from)}`)
+      this.ctx.log.warn(
+        `Transfer greater than balance: from=${from}, to=${to}, requested ${value}, available ${this.balanceOf(from)}`,
+      )
     }
 
     const allowances = this._allowances[from] || {}
@@ -176,12 +180,18 @@ export class OToken_2023_12_21 {
 
     if ((this.creditBalances[from] || 0n) < creditsDeducted) {
       this.ctx.log.warn(
-        `Transfer amount exceeds balance: requested ${creditsDeducted}, available ${this.creditBalances[from] || 0n}`,
+        `Transfer amount exceeds balance: from=${from}, to=${to}, requested ${creditsDeducted}, available ${
+          this.creditBalances[from] || 0n
+        }`,
       )
     }
 
     this.creditBalances[from] = (this.creditBalances[from] || 0n) - creditsDeducted
     this.creditBalances[to] = (this.creditBalances[to] || 0n) + creditsCredited
+
+    if (this.creditBalances[from] === 0n) {
+      delete this.creditBalances[from]
+    }
 
     if (isNonRebasingTo && !isNonRebasingFrom) {
       this.nonRebasingSupply += value
@@ -342,6 +352,9 @@ export class OToken_2023_12_21 {
       this.ctx.log.warn(
         `Remove exceeds balance: requested ${_amount}, available ${currentCredits / this._creditsPerToken(_account)}`,
       )
+      if (this.creditBalances[_account] === 0n) {
+        delete this.creditBalances[_account]
+      }
     }
 
     // Remove from the credit tallies and non-rebasing supply
