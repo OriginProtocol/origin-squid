@@ -39,34 +39,73 @@ export const processOTokenDailyStats = async (
   for (const { block, entity } of params.dailyStats.values()) {
     if (block.header.height < params.from) continue
     const blockDate = new Date(block.header.timestamp)
-    // Get the latest otokenObject for the blockDate in question. We cannot use `getLatestOTokenObject`.
-    let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
-    if (!otokenObject) {
-      otokenObject = await ctx.store.findOne(OToken, {
-        where: {
-          chainId: ctx.chain.id,
-          otoken: params.otokenAddress,
-          timestamp: LessThanOrEqual(blockDate),
-        },
-        order: { timestamp: 'desc' },
-      })
+    const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
+    const getDripperAvailableFunds = async () => {
+      if (!params.dripper || params.dripper.from > block.header.height) return 0n
+      const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
+      return dripperContract.availableFunds()
     }
-    if (!otokenObject) {
-      continue
-      // throw new Error('otokenObject not found for daily stat processing')
-    }
+    const wotokenContract =
+      params.wotoken && block.header.height >= params.wotoken.from
+        ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
+        : null
+
+    const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] =
+      await Promise.all([
+        (async () => {
+          let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
+          if (!otokenObject) {
+            otokenObject = await ctx.store.findOne(OToken, {
+              where: {
+                chainId: ctx.chain.id,
+                otoken: params.otokenAddress,
+                timestamp: LessThanOrEqual(blockDate),
+              },
+              order: { timestamp: 'desc' },
+            })
+          }
+          return otokenObject
+        })(),
+        (async () => {
+          let apy = findLast(params.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
+          if (!apy) {
+            apy = await ctx.store.findOne(OTokenAPY, {
+              order: { timestamp: 'desc' },
+              where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
+            })
+          }
+          return apy
+        })(),
+        (async () => {
+          let rebases = params.rebases.filter(
+            (rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate,
+          )
+          rebases.push(
+            ...(await ctx.store.find(OTokenRebase, {
+              order: { timestamp: 'desc' },
+              where: {
+                chainId: ctx.chain.id,
+                otoken: params.otokenAddress,
+                timestamp: Between(startOfDay, blockDate),
+              },
+            })),
+          )
+          return rebases
+        })(),
+        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
+        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
+        getDripperAvailableFunds(),
+        params.getAmoSupply(ctx, block.header.height),
+        wotokenContract ? wotokenContract.totalSupply() : 0n,
+        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
+      ])
+
+    if (!otokenObject) continue
+
     entity.totalSupply = otokenObject.totalSupply ?? 0n
     entity.nonRebasingSupply = otokenObject.nonRebasingSupply ?? 0n
     entity.rebasingSupply = otokenObject.rebasingSupply ?? 0n
 
-    const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
-    let apy = findLast(params.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
-    if (!apy) {
-      apy = await ctx.store.findOne(OTokenAPY, {
-        order: { timestamp: 'desc' },
-        where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
-      })
-    }
     if (apy) {
       entity.apr = apy.apr
       entity.apy = apy.apy
@@ -74,18 +113,7 @@ export const processOTokenDailyStats = async (
       entity.apy14 = apy.apy14DayAvg
       entity.apy30 = apy.apy30DayAvg
     }
-    // These should remain unique since any result rebases have not been stored in the database yet.
-    let rebases = params.rebases.filter((rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate)
-    rebases.push(
-      ...(await ctx.store.find(OTokenRebase, {
-        order: { timestamp: 'desc' },
-        where: {
-          chainId: ctx.chain.id,
-          otoken: params.otokenAddress,
-          timestamp: Between(startOfDay, blockDate),
-        },
-      })),
-    )
+
     entity.yield = rebases.reduce((sum, current) => sum + current.yield - current.fee, 0n)
     // There was a time when this was considered to be used, but I think we will *not* do that now.
     // Leaving it here for now...
@@ -112,26 +140,6 @@ export const processOTokenDailyStats = async (
     const last = params.dailyStats.get(lastId)?.entity ?? (await ctx.store.get(OTokenDailyStat, lastId))
     entity.cumulativeYield = (last?.cumulativeYield ?? 0n) + entity.yield
     entity.cumulativeFees = (last?.cumulativeFees ?? 0n) + entity.fees
-
-    const getDripperAvailableFunds = async () => {
-      if (!params.dripper || params.dripper.from > block.header.height) return 0n
-      const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
-      return dripperContract.availableFunds()
-    }
-
-    const wotokenContract =
-      params.wotoken && block.header.height >= params.wotoken.from
-        ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
-        : null
-
-    const [rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] = await Promise.all([
-      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
-      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
-      getDripperAvailableFunds(),
-      params.getAmoSupply(ctx, block.header.height),
-      wotokenContract ? wotokenContract.totalSupply() : 0n,
-      wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
-    ])
 
     entity.rateETH = rateETH
     entity.rateUSD = rateUSD

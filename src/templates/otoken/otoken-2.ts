@@ -13,7 +13,7 @@ import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchang
 import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
-import { loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
+import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
 import { OTokenContractAddress } from './otoken'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
@@ -333,7 +333,7 @@ export const createOTokenProcessor2 = (params: {
 
       if (!otoken) {
         if (process.env.BLOCK_FROM) {
-          const filePath = `data/otoken-raw-data-${otokenAddress}-${process.env.BLOCK_FROM}.json`
+          const filePath = `data/otoken/otoken-raw-data-${otokenAddress}-${process.env.BLOCK_FROM}.json`
           if (existsSync(filePath)) {
             const savedData = readFileSync(filePath, 'utf8')
             const savedDataEntity = bigintJsonParse(savedData) as OTokenRawData
@@ -414,6 +414,44 @@ export const createOTokenProcessor2 = (params: {
       }
 
       let justUpgraded = false
+
+      // Cache isContract results
+      const transferRelated = ctx.blocks
+        .flatMap((b) => b.transactions)
+        .flatMap((t) => t.traces)
+        .filter(
+          (trace) =>
+            (trace.type === 'call' && mintTraceFilter.matches(trace)) ||
+            burnTraceFilter.matches(trace) ||
+            transferTraceFilter.matches(trace) ||
+            transferFromTraceFilter.matches(trace),
+        )
+      await areContracts(
+        ctx,
+        ctx.blocks[0],
+        transferRelated.flatMap((trace) => {
+          if (trace.type !== 'call') return []
+          const sender = trace.action.from.toLowerCase()
+          if (mintTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.mint.decode(trace.action.input)
+            return [data._account.toLowerCase()]
+          } else if (burnTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.burn.decode(trace.action.input)
+            return [data._account.toLowerCase()]
+          } else if (transferTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.transfer.decode(trace.action.input)
+            return [data._to.toLowerCase(), sender]
+          } else if (transferFromTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
+            return [data._to.toLowerCase(), data._from.toLowerCase()]
+          }
+          return []
+        }),
+      )
+
+      if (otoken && !producer.initialized) {
+        await producer.initialize()
+      }
 
       // Process logs from all blocks
       for (const block of ctx.blocks) {
@@ -725,7 +763,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
 
   if (env.NODE_ENV === 'development') {
     writeFileSync(
-      `data/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
+      `data/otoken/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
       bigintJsonStringify(rawDataEntity, 2),
     )
   }
