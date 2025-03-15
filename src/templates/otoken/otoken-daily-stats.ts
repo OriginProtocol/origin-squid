@@ -38,6 +38,14 @@ export const processOTokenDailyStats = async (
   // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
   for (const { block, entity } of params.dailyStats.values()) {
     if (block.header.height < params.from) continue
+    // Skip processing if not head and not close to end of day
+    if (
+      !ctx.isHead &&
+      dayjs.utc(block.header.timestamp).endOf('day').diff(dayjs.utc(block.header.timestamp), 'second') >
+        5 * ctx.blockRate
+    ) {
+      continue
+    }
     const blockDate = new Date(block.header.timestamp)
     // Get the latest otokenObject for the blockDate in question. We cannot use `getLatestOTokenObject`.
     let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)

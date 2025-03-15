@@ -425,7 +425,7 @@ export class OTokenEntityProducer {
 
   private accountEarningsByHour: Map<string, bigint> = new Map()
 
-  async beforeBlock() {
+  beforeBlock() {
     this.yieldForwardInfo = new Map()
   }
 
@@ -706,7 +706,8 @@ export class OTokenEntityProducer {
     this.rebaseOptions = []
     this.harvesterYieldSent = []
     this.yieldForwarded = []
-    this.dailyStats = new Map()
+    const dayString = new Date(this.ctx.blocks.at(-1)!.header.timestamp).toISOString().substring(0, 10)
+    this.dailyStats = new Map([...this.dailyStats.entries()].filter(([_key, value]) => value.entity.date === dayString))
     this.transfers = []
   }
 }
