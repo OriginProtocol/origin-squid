@@ -178,8 +178,12 @@ export const loadIsContractCache = async (ctx: Context) => {
   }
 }
 
+// save once every ~5 minutes
+let lastSave = 0
 export const saveIsContractCache = async (ctx: Context) => {
+  if (!cache) return
   if (ctx.isHead) return // Stop saving once we get to head, we no longer want cache at head.
+  if (Date.now() - lastSave < 5 * 60 * 1000) return
   const id = `${ctx.chain.id}-isContract`
   if (process.env.NODE_ENV === 'development') {
     writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))
@@ -190,4 +194,5 @@ export const saveIsContractCache = async (ctx: Context) => {
       data: Object.fromEntries(cache),
     }),
   )
+  lastSave = Date.now()
 }
