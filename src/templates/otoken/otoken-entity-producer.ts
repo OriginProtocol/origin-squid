@@ -691,37 +691,44 @@ export class OTokenEntityProducer {
 
   async save(): Promise<void> {
     if (!this.otoken) return
-    const erc20s = await processOTokenERC20(this.ctx, {
-      otokenAddress: this.otoken.address,
-      otokens: Array.from(this.otokenMap.values()),
-      addresses: Array.from(this.changedAddressMap.values()),
-      history: Array.from(this.histories.values()),
-      transfers: this.transfers,
-    })
 
-    await this.ctx.store.upsert([...this.changedAddressMap.values()]) // These must be saved first.
     await Promise.all([
-      // OToken Entity Saving
-      this.ctx.store.insert([...this.otokenMap.values()]),
-      this.ctx.store.upsert([...this.apyMap.values()]),
-      this.ctx.store.insert([...this.rebaseMap.values()]),
-      this.ctx.store.upsert([...this.histories.values()]),
-      this.ctx.store.insert(this.rebaseOptions),
-      this.ctx.store.insert(this.harvesterYieldSent),
-      this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
-      this.ctx.store.upsert([...this.yieldForwarded.values()]),
-
       // ERC20
-      this.ctx.store.insert([...erc20s.states.values()]),
-      this.ctx.store.upsert([...erc20s.statesByDay.values()]),
-      this.ctx.store.upsert([...erc20s.holders.values()]),
-      this.ctx.store.upsert([...erc20s.balances.values()]),
-      this.ctx.store.insert(erc20s.transfers),
-      this.ctx.store.remove(
-        [...erc20s.removedHolders.values()].map(
-          (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
-        ),
+      processOTokenERC20(this.ctx, {
+        otokenAddress: this.otoken.address,
+        otokens: Array.from(this.otokenMap.values()),
+        addresses: Array.from(this.changedAddressMap.values()),
+        history: Array.from(this.histories.values()),
+        transfers: this.transfers,
+      }).then((erc20s) =>
+        Promise.all([
+          this.ctx.store.insert([...erc20s.states.values()]),
+          this.ctx.store.upsert([...erc20s.statesByDay.values()]),
+          this.ctx.store.upsert([...erc20s.holders.values()]),
+          this.ctx.store.upsert([...erc20s.balances.values()]),
+          this.ctx.store.insert(erc20s.transfers),
+          this.ctx.store.remove(
+            [...erc20s.removedHolders.values()].map(
+              (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
+            ),
+          ),
+        ]),
       ),
+      // OToken Entity Saving,
+      this.ctx.store
+        .upsert([...this.changedAddressMap.values()]) // These must be saved first.
+        .then(() =>
+          Promise.all([
+            this.ctx.store.insert([...this.otokenMap.values()]),
+            this.ctx.store.upsert([...this.apyMap.values()]),
+            this.ctx.store.insert([...this.rebaseMap.values()]),
+            this.ctx.store.upsert([...this.histories.values()]),
+            this.ctx.store.insert(this.rebaseOptions),
+            this.ctx.store.insert(this.harvesterYieldSent),
+            this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
+            this.ctx.store.upsert([...this.yieldForwarded.values()]),
+          ]),
+        ),
     ])
 
     if (process.env.DEBUG_PERF === 'true') {
