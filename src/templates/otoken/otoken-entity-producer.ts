@@ -692,7 +692,7 @@ export class OTokenEntityProducer {
   async save(): Promise<void> {
     if (!this.otoken) return
 
-    await Promise.all([
+    const [erc20s] = await Promise.all([
       // ERC20
       processOTokenERC20(this.ctx, {
         otokenAddress: this.otoken.address,
@@ -712,7 +712,7 @@ export class OTokenEntityProducer {
               (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
             ),
           ),
-        ]),
+        ]).then(() => erc20s),
       ),
       // OToken Entity Saving,
       this.ctx.store
