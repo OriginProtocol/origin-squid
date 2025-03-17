@@ -160,6 +160,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
       blockNumber
       chainId
       otoken
+      date
       totalSupply
       rebasingSupply
       nonRebasingSupply
@@ -178,6 +179,8 @@ const oTokenDailyStats = (prefix: string, address: string) => {
       rateUSD
       yield
       marketCapUSD
+      accountsOverThreshold
+      rateWrapped
     }
   `)
 }

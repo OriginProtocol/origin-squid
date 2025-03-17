@@ -12859,6 +12859,19 @@
       "balanceWeight": 1,
       "earnings": "1115245737892115814080114",
       "earningsChange": "3918597956742315192202"
+    },
+    {
+      "id": "0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x0000000000000000000000000000000000000348:2025-03-14",
+      "timestamp": "2025-03-14T23:59:59.999000Z",
+      "blockNumber": 22048553,
+      "strategy": "0x79f2188ef9350a1dc11a062cca0abe90684b0197",
+      "apr": 0.021151150309949296,
+      "apy": 0.021375795848679102,
+      "asset": "0x0000000000000000000000000000000000000348",
+      "balance": "1072829617088072546601",
+      "balanceWeight": 1,
+      "earnings": "1153699274723689383217870",
+      "earningsChange": "62126161500500669"
     }
   ],
   "strategyBalances_ousd_0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44": [
@@ -16168,6 +16181,17 @@
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
+    },
+    {
+      "id": "8453:0x80c864704dd06c3693ed5179190786ee38acf835:0x4200000000000000000000000000000000000006:27500000",
+      "blockNumber": 27500000,
+      "timestamp": "2025-03-12T14:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "13991417950890018964895",
+      "balanceETH": "13991417950890018964895",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
     }
   ],
   "strategyDailyYields_superoethb_0x80c864704dd06c3693ed5179190786ee38acf835": [
@@ -17161,6 +17185,17 @@
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
+    },
+    {
+      "id": "8453:0xf611cc500eee7e4e4763a05fe623e2363c86d2af:0x4200000000000000000000000000000000000006:27500000",
+      "blockNumber": 27500000,
+      "timestamp": "2025-03-12T14:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "113304454156458031276117",
+      "balanceETH": "113304454156458031276117",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
     }
   ],
   "strategyDailyYields_superoethb_0xf611cc500eee7e4e4763a05fe623e2363c86d2af": [
@@ -17346,6 +17381,17 @@
       "asset": "0x4200000000000000000000000000000000000006",
       "balance": "4113829352225690647067",
       "balanceETH": "4113829352225690647067",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
+    },
+    {
+      "id": "8453:0x9cfcaf81600155e01c63e4d2993a8a81a8205829:0x4200000000000000000000000000000000000006:27500000",
+      "blockNumber": 27500000,
+      "timestamp": "2025-03-12T14:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "4113846571067157109274",
+      "balanceETH": "4113846571067157109274",
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
@@ -18863,6 +18909,7 @@
       "blockNumber": 16936360,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-03-29",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -18880,7 +18927,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2023-05-18",
@@ -18888,6 +18937,7 @@
       "blockNumber": 17289856,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-05-18",
       "totalSupply": "2777777160065849525063",
       "rebasingSupply": "1958492070675104244270",
       "nonRebasingSupply": "819285089390745280793",
@@ -18905,7 +18955,9 @@
       "rateETH": "999353150969924088",
       "rateUSD": "1801930000000000000000",
       "yield": "151780619735038698",
-      "marketCapUSD": 5.005359998037456e+24
+      "marketCapUSD": 5.005359998037456e+24,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1025868888966217459"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2023-07-07",
@@ -18913,6 +18965,7 @@
       "blockNumber": 17645346,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-07-07",
       "totalSupply": "30064898534738920317163",
       "rebasingSupply": "15182687489870589733523",
       "nonRebasingSupply": "14882211044868330583640",
@@ -18930,7 +18983,9 @@
       "rateETH": "999613706468163769",
       "rateUSD": "1870023800000000000000",
       "yield": "3761187872168264659",
-      "marketCapUSD": 5.6222075804546905e+25
+      "marketCapUSD": 5.6222075804546905e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1039401576549179155"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2023-08-26",
@@ -18938,6 +18993,7 @@
       "blockNumber": 18002284,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-08-26",
       "totalSupply": "44421437284279455385238",
       "rebasingSupply": "20060426931406797157541",
       "nonRebasingSupply": "24361010352872658227697",
@@ -18955,7 +19011,9 @@
       "rateETH": "1000354937948275245",
       "rateUSD": "1646090000000000000000",
       "yield": "3955330858173394652",
-      "marketCapUSD": 7.3121683699279565e+25
+      "marketCapUSD": 7.3121683699279565e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1050339825502196559"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2023-10-15",
@@ -18963,6 +19021,7 @@
       "blockNumber": 18359212,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-10-15",
       "totalSupply": "39773473735295748812167",
       "rebasingSupply": "25268242215966637953043",
       "nonRebasingSupply": "14505231519329110859124",
@@ -18980,7 +19039,9 @@
       "rateETH": "999722578675828066",
       "rateUSD": "1557174517110000000000",
       "yield": "3441060329738544693",
-      "marketCapUSD": 6.193423975754642e+25
+      "marketCapUSD": 6.193423975754642e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1060956327282636782"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2023-12-04",
@@ -18988,6 +19049,7 @@
       "blockNumber": 18716438,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2023-12-04",
       "totalSupply": "39094408250756602613652",
       "rebasingSupply": "26062680246979661354775",
       "nonRebasingSupply": "13031728003776941258877",
@@ -19005,7 +19067,9 @@
       "rateETH": "1002336217292407326",
       "rateUSD": "2242826960000000000000",
       "yield": "3659513879697673827",
-      "marketCapUSD": 8.768199281004334e+25
+      "marketCapUSD": 8.768199281004334e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1068089521121648325"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-01-23",
@@ -19013,6 +19077,7 @@
       "blockNumber": 19072787,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-01-23",
       "totalSupply": "39590819562012832929742",
       "rebasingSupply": "32720051032445185853551",
       "nonRebasingSupply": "6870768529567647076191",
@@ -19030,7 +19095,9 @@
       "rateETH": "1000560561664259166",
       "rateUSD": "2243070000000000000000",
       "yield": "4227974836029061618",
-      "marketCapUSD": 8.880497963496412e+25
+      "marketCapUSD": 8.880497963496412e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1076402153318890805"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-03-13",
@@ -19038,6 +19105,7 @@
       "blockNumber": 19429555,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-03-13",
       "totalSupply": "44493699195000166508927",
       "rebasingSupply": "33912642221932794747745",
       "nonRebasingSupply": "10581056973067371761182",
@@ -19055,7 +19123,9 @@
       "rateETH": "1000497122046554193",
       "rateUSD": "4013360000000000000000",
       "yield": "3876838208551034016",
-      "marketCapUSD": 1.7856923260124585e+26
+      "marketCapUSD": 1.7856923260124585e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1082668966399170255"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-05-02",
@@ -19063,6 +19133,7 @@
       "blockNumber": 19785869,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-05-02",
       "totalSupply": "44694721545998421172007",
       "rebasingSupply": "28097041985313428275720",
       "nonRebasingSupply": "16597679560684992896287",
@@ -19080,7 +19151,9 @@
       "rateETH": "1003271974115651874",
       "rateUSD": "2989809272000000000000",
       "yield": "3520127547881020051",
-      "marketCapUSD": 1.3362869288768426e+26
+      "marketCapUSD": 1.3362869288768426e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1088401579648809269"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-06-21",
@@ -19088,6 +19161,7 @@
       "blockNumber": 20143530,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-06-21",
       "totalSupply": "34422847357883300275081",
       "rebasingSupply": "26385538302275477057106",
       "nonRebasingSupply": "8037309055607823217975",
@@ -19105,7 +19179,9 @@
       "rateETH": "1001164704655150263",
       "rateUSD": "3515830000000000000000",
       "yield": "1890844002877882232",
-      "marketCapUSD": 1.2102487942626684e+26
+      "marketCapUSD": 1.2102487942626684e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1094127373238032192"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-08-10",
@@ -19113,6 +19189,7 @@
       "blockNumber": 20501654,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-08-10",
       "totalSupply": "32611113467177836647965",
       "rebasingSupply": "27916138209269283255346",
       "nonRebasingSupply": "4694975257908553392619",
@@ -19130,7 +19207,9 @@
       "rateETH": "1000027477352903716",
       "rateUSD": "2607560000000000000000",
       "yield": "2634710565831564083",
-      "marketCapUSD": 8.503543503247424e+25
+      "marketCapUSD": 8.503543503247424e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1099265042142671270"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-09-29",
@@ -19138,6 +19217,7 @@
       "blockNumber": 20859740,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-09-29",
       "totalSupply": "30898232787049477765422",
       "rebasingSupply": "25897676873303192002812",
       "nonRebasingSupply": "5000555913746285762610",
@@ -19155,7 +19235,9 @@
       "rateETH": "1000003038732513647",
       "rateUSD": "2656320100000000000000",
       "yield": "3734170059110254955",
-      "marketCapUSD": 8.207559680671856e+25
+      "marketCapUSD": 8.207559680671856e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1105741965301678291"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2024-11-18",
@@ -19163,6 +19245,7 @@
       "blockNumber": 21218049,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2024-11-18",
       "totalSupply": "42363184214870485395680",
       "rebasingSupply": "38143436277043587450404",
       "nonRebasingSupply": "4219747937826897945276",
@@ -19180,7 +19263,9 @@
       "rateETH": "1000012514374210297",
       "rateUSD": "3209524109770000000000",
       "yield": "3935326003973269016",
-      "marketCapUSD": 1.3596566110425472e+26
+      "marketCapUSD": 1.3596566110425472e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1110756585369076876"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2025-01-07",
@@ -19188,6 +19273,7 @@
       "blockNumber": 21576035,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2025-01-07",
       "totalSupply": "56101476190368334301928",
       "rebasingSupply": "49843440093924628630489",
       "nonRebasingSupply": "6258036096443705671439",
@@ -19205,7 +19291,9 @@
       "rateETH": "999917392883238603",
       "rateUSD": "3385560000000000000000",
       "yield": "5181173357956497270",
-      "marketCapUSD": 1.899349137310634e+26
+      "marketCapUSD": 1.899349137310634e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1115115963499354624"
     },
     {
       "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2025-02-26",
@@ -19213,6 +19301,7 @@
       "blockNumber": 21933948,
       "chainId": 1,
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "date": "2025-02-26",
       "totalSupply": "40560911778030210944071",
       "rebasingSupply": "29944306069172377423033",
       "nonRebasingSupply": "10616605708857833521038",
@@ -19230,7 +19319,9 @@
       "rateETH": "1003970137106847275",
       "rateUSD": "2327670000000000000000",
       "yield": "3640369777712866022",
-      "marketCapUSD": 9.441241751836758e+25
+      "marketCapUSD": 9.441241751836758e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1120014255785044512"
     }
   ],
   "ousd_oTokens": [
@@ -21099,6 +21190,7 @@
       "blockNumber": 13922671,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-01-01",
       "totalSupply": "296477074831530779025161557",
       "rebasingSupply": "47240969851094908057861600",
       "nonRebasingSupply": "249236104980435870967299957",
@@ -21116,7 +21208,9 @@
       "rateETH": "265527152774509",
       "rateUSD": "1000000000000000000",
       "yield": "7053424903264990835784",
-      "marketCapUSD": 2.964770748315308e+26
+      "marketCapUSD": 2.964770748315308e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-02-20",
@@ -21124,6 +21218,7 @@
       "blockNumber": 14246087,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-02-20",
       "totalSupply": "207197238257363437965303072",
       "rebasingSupply": "85380691689686043288810386",
       "nonRebasingSupply": "121816546567677394676492686",
@@ -21141,7 +21236,9 @@
       "rateETH": "379915875251525",
       "rateUSD": "1000000000000000000",
       "yield": "9783847759642651574745",
-      "marketCapUSD": 2.0719723825736345e+26
+      "marketCapUSD": 2.0719723825736345e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-04-11",
@@ -21149,6 +21246,7 @@
       "blockNumber": 14567461,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-04-11",
       "totalSupply": "99247335769702951220610199",
       "rebasingSupply": "59215768679937747349518476",
       "nonRebasingSupply": "40031567089765203871091723",
@@ -21166,7 +21264,9 @@
       "rateETH": "335495599237358",
       "rateUSD": "1000000000000000000",
       "yield": "7520707146297125851587",
-      "marketCapUSD": 9.924733576970295e+25
+      "marketCapUSD": 9.924733576970295e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1000000000000000000"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-05-31",
@@ -21174,6 +21274,7 @@
       "blockNumber": 14881676,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-05-31",
       "totalSupply": "63605444362627255590365864",
       "rebasingSupply": "35721669308346431369090619",
       "nonRebasingSupply": "27883775054280824221275245",
@@ -21191,7 +21292,9 @@
       "rateETH": "513392787134531",
       "rateUSD": "1000000000000000000",
       "yield": "3309361873638847566043",
-      "marketCapUSD": 6.360544436262726e+25
+      "marketCapUSD": 6.360544436262726e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1009168229652502887"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-07-20",
@@ -21199,6 +21302,7 @@
       "blockNumber": 15182613,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-07-20",
       "totalSupply": "66231988492905320680499902",
       "rebasingSupply": "34532980209994354855237589",
       "nonRebasingSupply": "31699008282910965825262313",
@@ -21216,7 +21320,9 @@
       "rateETH": "657544992532306",
       "rateUSD": "1000000000000000000",
       "yield": "1886234553843826996975",
-      "marketCapUSD": 6.623198849290532e+25
+      "marketCapUSD": 6.623198849290532e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1013169213733850081"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-09-08",
@@ -21224,6 +21330,7 @@
       "blockNumber": 15499581,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-09-08",
       "totalSupply": "48559067029173577629369425",
       "rebasingSupply": "32627991995932540128662971",
       "nonRebasingSupply": "15931075033241037500706454",
@@ -21241,7 +21348,9 @@
       "rateETH": "611365842620366",
       "rateUSD": "1000000000000000000",
       "yield": "984097451091656983509",
-      "marketCapUSD": 4.855906702917357e+25
+      "marketCapUSD": 4.855906702917357e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1016590195356831574"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-10-28",
@@ -21249,6 +21358,7 @@
       "blockNumber": 15850000,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-10-28",
       "totalSupply": "48502494494266730565400830",
       "rebasingSupply": "22338521459617633782352629",
       "nonRebasingSupply": "26163973034649096783048201",
@@ -21266,7 +21376,9 @@
       "rateETH": "642542606788618",
       "rateUSD": "1000000000000000000",
       "yield": "2260549648168303246099",
-      "marketCapUSD": 4.850249449426673e+25
+      "marketCapUSD": 4.850249449426673e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1019839150950027744"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2022-12-17",
@@ -21274,6 +21386,7 @@
       "blockNumber": 16207856,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2022-12-17",
       "totalSupply": "51058999238009371694328719",
       "rebasingSupply": "19053056552221469048428912",
       "nonRebasingSupply": "32005942685787902645899807",
@@ -21291,7 +21404,9 @@
       "rateETH": "841623323065528",
       "rateUSD": "1000000000000000000",
       "yield": "1871789213664193043304",
-      "marketCapUSD": 5.105899923800937e+25
+      "marketCapUSD": 5.105899923800937e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1029485305546350182"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-02-05",
@@ -21299,6 +21414,7 @@
       "blockNumber": 16566022,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-02-05",
       "totalSupply": "49619418994155571287822867",
       "rebasingSupply": "18949728794473844677758778",
       "nonRebasingSupply": "30669690199681726610064089",
@@ -21316,7 +21432,9 @@
       "rateETH": "612707554684149",
       "rateUSD": "1000000000000000000",
       "yield": "2617279861622214211135",
-      "marketCapUSD": 4.961941899415557e+25
+      "marketCapUSD": 4.961941899415557e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1035696315768259003"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-03-27",
@@ -21324,6 +21442,7 @@
       "blockNumber": 16922136,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-03-27",
       "totalSupply": "34869719487662865056464589",
       "rebasingSupply": "17474673322097881228274227",
       "nonRebasingSupply": "17395046165564983828190362",
@@ -21341,7 +21460,9 @@
       "rateETH": "582719429333819",
       "rateUSD": "1000000000000000000",
       "yield": "2108630642939901079583",
-      "marketCapUSD": 3.4869719487662865e+25
+      "marketCapUSD": 3.4869719487662865e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1049955349655462722"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-05-16",
@@ -21349,6 +21470,7 @@
       "blockNumber": 17275671,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-05-16",
       "totalSupply": "38794235958943144388486042",
       "rebasingSupply": "16015613559353381304997777",
       "nonRebasingSupply": "22778622399589763083488265",
@@ -21366,7 +21488,9 @@
       "rateETH": "548305735277991",
       "rateUSD": "1000000000000000000",
       "yield": "1752107670475434008465",
-      "marketCapUSD": 3.879423595894314e+25
+      "marketCapUSD": 3.879423595894314e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1057605151173700451"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-07-05",
@@ -21374,6 +21498,7 @@
       "blockNumber": 17631107,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-07-05",
       "totalSupply": "20395843415309665201801237",
       "rebasingSupply": "13038749723399127543101230",
       "nonRebasingSupply": "7357093691910537658700007",
@@ -21391,7 +21516,9 @@
       "rateETH": "523374603252610",
       "rateUSD": "1000000000000000000",
       "yield": "2207933029738795788079",
-      "marketCapUSD": 2.0395843415309665e+25
+      "marketCapUSD": 2.0395843415309665e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1064890792431505134"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-08-24",
@@ -21399,6 +21526,7 @@
       "blockNumber": 17987994,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-08-24",
       "totalSupply": "18109577086143442299191583",
       "rebasingSupply": "10934282808130219817410167",
       "nonRebasingSupply": "7175294278013222481781416",
@@ -21416,7 +21544,9 @@
       "rateETH": "602691082909353",
       "rateUSD": "1000000000000000000",
       "yield": "2016436782137197627862",
-      "marketCapUSD": 1.8109577086143442e+25
+      "marketCapUSD": 1.8109577086143442e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1071599858638233033"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-10-13",
@@ -21424,6 +21554,7 @@
       "blockNumber": 18344906,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-10-13",
       "totalSupply": "15229237606739962083813286",
       "rebasingSupply": "9260449136908305963302208",
       "nonRebasingSupply": "5968788469831656120511078",
@@ -21441,7 +21572,9 @@
       "rateETH": "643489613822448",
       "rateUSD": "998116740000000000",
       "yield": "806921067725538722700",
-      "marketCapUSD": 1.5200556992724692e+25
+      "marketCapUSD": 1.5200556992724692e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1080913807592065936"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2023-12-02",
@@ -21449,6 +21582,7 @@
       "blockNumber": 18702158,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2023-12-02",
       "totalSupply": "14739255003057431289536952",
       "rebasingSupply": "13615873687053176496412186",
       "nonRebasingSupply": "1123381316004254793124766",
@@ -21466,7 +21600,9 @@
       "rateETH": "461437038712342",
       "rateUSD": "999317260000000000",
       "yield": "2394378598051128865414",
-      "marketCapUSD": 1.4729191924096644e+25
+      "marketCapUSD": 1.4729191924096644e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1088845085253530923"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2024-01-21",
@@ -21474,6 +21610,7 @@
       "blockNumber": 19058586,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2024-01-21",
       "totalSupply": "14399813073446212697747641",
       "rebasingSupply": "13763494442688505639098242",
       "nonRebasingSupply": "636318630757707058649399",
@@ -21491,7 +21628,9 @@
       "rateETH": "407219968416707",
       "rateUSD": "998826380000000000",
       "yield": "2100185035678154576645",
-      "marketCapUSD": 1.4382913164826955e+25
+      "marketCapUSD": 1.4382913164826955e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1098981624218870446"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2024-03-11",
@@ -21499,6 +21638,7 @@
       "blockNumber": 19415285,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2024-03-11",
       "totalSupply": "12007829537597009677310832",
       "rebasingSupply": "11242358546427550591517127",
       "nonRebasingSupply": "765470991169459085793705",
@@ -21516,7 +21656,9 @@
       "rateETH": "245821674041297",
       "rateUSD": "1000002570000000000",
       "yield": "3027561261157317716383",
-      "marketCapUSD": 1.2007860397718922e+25
+      "marketCapUSD": 1.2007860397718922e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1109505354608113874"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2024-04-30",
@@ -21524,6 +21666,7 @@
       "blockNumber": 19771559,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2024-04-30",
       "totalSupply": "8240747234596085416759818",
       "rebasingSupply": "6756062004767319985396228",
       "nonRebasingSupply": "1484685229828765431363590",
@@ -21541,7 +21684,9 @@
       "rateETH": "330539377106171",
       "rateUSD": "997550730000000000",
       "yield": "2459627234089151917882",
-      "marketCapUSD": 8.220563419616806e+24
+      "marketCapUSD": 8.220563419616806e+24,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1126697017249054463"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2024-06-19",
@@ -21549,6 +21694,7 @@
       "blockNumber": 20129224,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2024-06-19",
       "totalSupply": "7988993608621341257950175",
       "rebasingSupply": "6560272873061925318649614",
       "nonRebasingSupply": "1428720735559415939300561",
@@ -21566,7 +21712,9 @@
       "rateETH": "280565692055124",
       "rateUSD": "997511590000000000",
       "yield": "1427703370058788958988",
-      "marketCapUSD": 7.969113717035712e+24
+      "marketCapUSD": 7.969113717035712e+24,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1138673594684522419"
     },
     {
       "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-2024-08-08",
@@ -21574,6 +21722,7 @@
       "blockNumber": 20487316,
       "chainId": 1,
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "date": "2024-08-08",
       "totalSupply": "7062387067547612460080618",
       "rebasingSupply": "5507993703208394411823209",
       "nonRebasingSupply": "1554393364339218048257409",
@@ -21591,7 +21740,9 @@
       "rateETH": "371608612989000",
       "rateUSD": "997352930000000000",
       "yield": "578270941795506443613",
-      "marketCapUSD": 7.04369243461272e+24
+      "marketCapUSD": 7.04369243461272e+24,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1150209475067624687"
     }
   ],
   "superoethb_oTokens": [
@@ -21856,6 +22007,21 @@
       "date": "2025-01-22",
       "rebasingCreditsPerToken": "959388451895100832523271079",
       "txHash": "0xf5dc61fbfa63399fc799289815a392daf5b797a0f57735eb59a8bfc3594ef943"
+    },
+    {
+      "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2025-03-13",
+      "timestamp": "2025-03-13T21:25:29.000000Z",
+      "blockNumber": 27555891,
+      "chainId": 8453,
+      "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "apr": 0.058325361584956215,
+      "apy": 0.060054906327667856,
+      "apy14DayAvg": 0.06546408280849174,
+      "apy30DayAvg": 0.06408016793909785,
+      "apy7DayAvg": 0.06531316614568043,
+      "date": "2025-03-13",
+      "rebasingCreditsPerToken": "951819049481251600307662530",
+      "txHash": "0xd6296d84ac7f4b803fda5655088018d0a09e74650f68b739c5bd0a9703510f9a"
     }
   ],
   "superoethb_oTokenHistories": [
@@ -23346,6 +23512,15 @@
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
       "address": "0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
       "totalValue": "131494148494883500417296"
+    },
+    {
+      "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-27500000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "timestamp": "2025-03-12T14:22:27.000000Z",
+      "blockNumber": 27500000,
+      "chainId": 8453,
+      "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "address": "0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "totalValue": "131807328579290050100874"
     }
   ],
   "superoethb_oTokenDailyStats": [
@@ -23355,6 +23530,7 @@
       "blockNumber": 3234220,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2023-08-28",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23372,7 +23548,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2023-10-17",
@@ -23380,6 +23558,7 @@
       "blockNumber": 5398615,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2023-10-17",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23397,7 +23576,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2023-12-06",
@@ -23405,6 +23586,7 @@
       "blockNumber": 7556288,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2023-12-06",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23422,7 +23604,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-01-25",
@@ -23430,6 +23614,7 @@
       "blockNumber": 9708337,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-01-25",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23447,7 +23632,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-03-15",
@@ -23455,6 +23642,7 @@
       "blockNumber": 11875279,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-03-15",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23472,7 +23660,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-05-04",
@@ -23480,6 +23670,7 @@
       "blockNumber": 14036671,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-05-04",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23497,7 +23688,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-06-23",
@@ -23505,6 +23698,7 @@
       "blockNumber": 16198926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-06-23",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -23522,7 +23716,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-08-12",
@@ -23530,6 +23726,7 @@
       "blockNumber": 18358926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-08-12",
       "totalSupply": "42000000000000000",
       "rebasingSupply": "22000000000000000",
       "nonRebasingSupply": "20000000000000000",
@@ -23547,7 +23744,9 @@
       "rateETH": "1000000000000000000",
       "rateUSD": "2722660000000000000000",
       "yield": "0",
-      "marketCapUSD": 114351720000000000000
+      "marketCapUSD": 114351720000000000000,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-10-01",
@@ -23555,6 +23754,7 @@
       "blockNumber": 20518926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-10-01",
       "totalSupply": "136238731064936149341828",
       "rebasingSupply": "20067038124685790866710",
       "nonRebasingSupply": "116171692940250358475118",
@@ -23572,7 +23772,9 @@
       "rateETH": "1000014710692044086",
       "rateUSD": "2448906326810000000000",
       "yield": "5771660247467213490",
-      "marketCapUSD": 3.336358904614882e+26
+      "marketCapUSD": 3.336358904614882e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1013562435155352945"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2024-11-20",
@@ -23580,6 +23782,7 @@
       "blockNumber": 22678926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2024-11-20",
       "totalSupply": "165875611199590612817553",
       "rebasingSupply": "41159255136662616371831",
       "nonRebasingSupply": "124716356062927996445722",
@@ -23597,7 +23800,9 @@
       "rateETH": "1000017689355759479",
       "rateUSD": "3070985023000000000000",
       "yield": "8945796632375630637",
-      "marketCapUSD": 5.0940151767491386e+26
+      "marketCapUSD": 5.0940151767491386e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1028498627527150530"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2025-01-09",
@@ -23605,6 +23810,7 @@
       "blockNumber": 24838926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2025-01-09",
       "totalSupply": "125351956706747282264223",
       "rebasingSupply": "36507216715930539353109",
       "nonRebasingSupply": "88844739990816742911114",
@@ -23622,7 +23828,9 @@
       "rateETH": "1000006465535511363",
       "rateUSD": "3217309252270000000000",
       "yield": "7215131794904400426",
-      "marketCapUSD": 4.032960101027665e+26
+      "marketCapUSD": 4.032960101027665e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1039878677506542002"
     },
     {
       "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-2025-02-28",
@@ -23630,6 +23838,7 @@
       "blockNumber": 26998926,
       "chainId": 8453,
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "date": "2025-02-28",
       "totalSupply": "161212514298161282483226",
       "rebasingSupply": "19321322150680452533203",
       "nonRebasingSupply": "141891192147480829950023",
@@ -23647,7 +23856,9 @@
       "rateETH": "1000000710620775340",
       "rateUSD": "2236996036540000000000",
       "yield": "2374658290955903271",
-      "marketCapUSD": 3.606317555256349e+26
+      "marketCapUSD": 3.606317555256349e+26,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1048236788006215225"
     }
   ],
   "os_oTokens": [
@@ -23867,6 +24078,21 @@
       "date": "2025-01-22",
       "rebasingCreditsPerToken": "999793118139340126342631938",
       "txHash": "0x148f3742d54c57fe40fd0efb08f4ba9103d8b1759cb6fe7c198074fe63e6b6a5"
+    },
+    {
+      "id": "146:0xb1e25689d55734fd3fffc939c4c3eb52dff8a794:2025-03-13",
+      "timestamp": "2025-03-13T23:50:28.000000Z",
+      "blockNumber": 13559997,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "apr": 0.05163882476076531,
+      "apy": 0.052991514560084774,
+      "apy14DayAvg": 0.0702176783235425,
+      "apy30DayAvg": 0.09224417045893878,
+      "apy7DayAvg": 0.05491873284781896,
+      "date": "2025-03-13",
+      "rebasingCreditsPerToken": "984096671854517859436975309",
+      "txHash": "0xc817ed8feedd4a7bfcb9b2e63bebaddcc86585baa7fc5237a31f9ba14301b16c"
     }
   ],
   "os_oTokenHistories": [
@@ -25312,6 +25538,42 @@
       "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
       "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
       "totalValue": "57316980749750645675600044"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-13000000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-03-11T07:07:12.000000Z",
+      "blockNumber": 13000000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "57257191202134702815660960"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-13100000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-03-11T18:26:26.000000Z",
+      "blockNumber": 13100000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "57282348967506647680904560"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-13200000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-03-12T07:11:58.000000Z",
+      "blockNumber": 13200000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "57430476572743191583432288"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-13300000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-03-12T18:28:43.000000Z",
+      "blockNumber": 13300000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "57749417833351974718066911"
     }
   ],
   "os_oTokenDailyStats": [
@@ -25321,6 +25583,7 @@
       "blockNumber": 3932347,
       "chainId": 146,
       "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "date": "2025-01-14",
       "totalSupply": "0",
       "rebasingSupply": "0",
       "nonRebasingSupply": "0",
@@ -25338,7 +25601,9 @@
       "rateETH": "0",
       "rateUSD": "0",
       "yield": "0",
-      "marketCapUSD": 0
+      "marketCapUSD": 0,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "0"
     },
     {
       "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-2025-03-05",
@@ -25346,6 +25611,7 @@
       "blockNumber": 11934736,
       "chainId": 146,
       "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "date": "2025-03-05",
       "totalSupply": "57118066794750340401480926",
       "rebasingSupply": "45351248195058503499616167",
       "nonRebasingSupply": "11767092511913669089864985",
@@ -25363,7 +25629,9 @@
       "rateETH": "263920385937416",
       "rateUSD": "592754630000000000",
       "yield": "7214448576187187565235",
-      "marketCapUSD": 3.3856998549237524e+25
+      "marketCapUSD": 3.3856998549237524e+25,
+      "accountsOverThreshold": 0,
+      "rateWrapped": "1014954912997309550"
     }
   ],
   "ogn_erc20Balances": [

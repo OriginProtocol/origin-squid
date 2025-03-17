@@ -1,16 +1,21 @@
-import { sonicErc20s } from 'sonic/erc20'
-import { OS } from 'sonic/os'
-import { sonicStrategies } from 'sonic/strategies'
-import 'tsconfig-paths/register'
-import { sonic } from 'viem/chains'
+import { sonicErc20s } from 'sonic/erc20';
+import { OS } from 'sonic/os';
+import { sonicStrategies } from 'sonic/strategies';
+import 'tsconfig-paths/register';
+import { sonic } from 'viem/chains';
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
-import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
-import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
-import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
-import { processStatus } from '@templates/processor-status'
 
-import * as validate from './sonic/validate'
+
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils';
+import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates';
+import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster';
+import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster';
+import { processStatus } from '@templates/processor-status';
+
+
+
+import * as validate from './sonic/validate';
+
 
 export const processor = defineSquidProcessor({
   chainId: sonic.id,
@@ -20,7 +25,7 @@ export const processor = defineSquidProcessor({
     ...sonicErc20s,
     sonicStrategies,
     createCurvePoolBoosterProcessor({ from: 7436660 }),
-    createPoolBoosterProcessor({ registryAddress: '0x246594d0276ffaeb0442c3edcdfb026e6924b3b3', from: 9219718 }),
+    createPoolBoosterProcessor({ registryAddress: '0x7c5cb7db176b188af729d8b3b00ef222dd4ca4a7', from: 9219718 }),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
   validators: [validate],

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { LessThan } from 'typeorm'
+import { parseUnits } from 'viem'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import {
@@ -33,11 +34,16 @@ dayjs.extend(utc)
 
 export class OTokenEntityProducer {
   otoken: OToken_2023_12_21 | OToken_2025_03_04
+  public name: string
+  public symbol: string
   public from: number
   public ctx: Context
   public block: Block
   public fee: bigint
   public initialized = false
+
+  // For balances under this threshold, we won't update the balance after rebases.
+  public rebaseBalanceUpdateThreshold = parseUnits('.0001', 18)
 
   // Entity storage which should be reset after every `process`.
   private otokenMap: Map<string, OToken> = new Map()
@@ -63,6 +69,8 @@ export class OTokenEntityProducer {
   constructor(
     otoken: OToken_2023_12_21 | OToken_2025_03_04,
     params: {
+      name: string
+      symbol: string
       from: number
       ctx: Context
       block: Block
@@ -70,6 +78,8 @@ export class OTokenEntityProducer {
     },
   ) {
     this.otoken = otoken
+    this.name = params.name
+    this.symbol = params.symbol
     this.from = params.from
     this.ctx = params.ctx
     this.block = params.block
@@ -543,15 +553,11 @@ export class OTokenEntityProducer {
     await this.getOrCreateAPYEntity(trace)
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
     // Trying not to have any async calls within this loop.
-    for (const [account, credits] of Object.entries(this.otoken.creditBalances)) {
-      if (credits > 0n) {
-        //Delete previous hour accrual
-        const previousDateHour = dayjs(this.otoken.block.header.timestamp)
-          .subtract(1, 'hour')
-          .toISOString()
-          .slice(0, 13)
-        this.accountEarningsByHour.delete(previousDateHour)
-
+    for (const account of Object.keys(this.otoken.creditBalances)) {
+      //Delete previous hour accrual
+      const previousDateHour = dayjs(this.otoken.block.header.timestamp).subtract(1, 'hour').toISOString().slice(0, 13)
+      this.accountEarningsByHour.delete(previousDateHour)
+      if (this.otoken.balanceOf(account) > this.rebaseBalanceUpdateThreshold) {
         const dateHour = dayjs(this.otoken.block.header.timestamp).toISOString().slice(0, 13) // Date including hour
         const id = `${this.ctx.chain.id}-${this.otoken.address}-${account}-${dateHour}`
 
@@ -695,6 +701,8 @@ export class OTokenEntityProducer {
     const [erc20s] = await Promise.all([
       // ERC20
       processOTokenERC20(this.ctx, {
+        name: this.name,
+        symbol: this.symbol,
         otokenAddress: this.otoken.address,
         otokens: Array.from(this.otokenMap.values()),
         addresses: Array.from(this.changedAddressMap.values()),

@@ -149,7 +149,7 @@ export const processOTokenDailyStats = async (
     entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
     entity.wrappedSupply = wrappedSupply
     entity.rateWrapped = wrappedRate
-    entity.accountsOverThreshold = Object.keys(params.balances ?? {}).filter(
+    entity.accountsOverThreshold = [...params.balances.keys()].filter(
       (a) => params.balances.get(a)! >= params.accountsOverThresholdMinimum,
     ).length
     ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)

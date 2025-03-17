@@ -348,7 +348,14 @@ export const createOTokenProcessor2 = (params: {
         otoken.ctx = ctx
       }
       if (!producer) {
-        producer = new OTokenEntityProducer(otoken, { ctx, block: ctx.blocks[0], fee: params.fee, from: params.from })
+        producer = new OTokenEntityProducer(otoken, {
+          ctx,
+          block: ctx.blocks[0],
+          fee: params.fee,
+          from: params.from,
+          name: params.name,
+          symbol: params.symbol,
+        })
       }
       producer.ctx = ctx
 
