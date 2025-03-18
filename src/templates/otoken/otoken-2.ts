@@ -8,17 +8,66 @@ import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import { OTokenAsset, OTokenRawData } from '@model'
-import { Block, Context, Processor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
+import { Block, Context, defineProcessor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
-import { loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
+import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
 import { OTokenContractAddress } from './otoken'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { OTokenEntityProducer } from './otoken-entity-producer'
 import { otokenFrequencyProcessor } from './otoken-frequency'
+
+const DEBUG_PERF = process.env.DEBUG_PERF === 'true'
+
+// Performance tracking
+interface PerformanceStats {
+  totalTime: number
+  calls: number
+  lastStart?: number
+}
+
+const performanceStats = new Map<string, PerformanceStats>()
+
+// TODO: Remove later
+const startSection = (section: string) => {
+  if (!DEBUG_PERF) return
+  const stats = performanceStats.get(section) || { totalTime: 0, calls: 0 }
+  stats.lastStart = performance.now()
+  performanceStats.set(section, stats)
+}
+
+const endSection = (section: string) => {
+  if (!DEBUG_PERF) return
+  const stats = performanceStats.get(section)
+  if (!stats || typeof stats.lastStart !== 'number') return
+
+  const duration = performance.now() - stats.lastStart
+  stats.totalTime += duration
+  stats.calls += 1
+  delete stats.lastStart
+}
+
+const logPerformanceStats = () => {
+  if (!DEBUG_PERF) return
+  let totalTime = 0
+  for (const [_, stats] of performanceStats) {
+    totalTime += stats.totalTime
+  }
+
+  console.log('\nPerformance Statistics:')
+  console.log('=======================')
+  const sortedStats = [...performanceStats.entries()].sort((a, b) => b[1].totalTime - a[1].totalTime)
+
+  for (const [section, stats] of sortedStats) {
+    const percentage = ((stats.totalTime / totalTime) * 100).toFixed(2)
+    const avgTime = (stats.totalTime / stats.calls).toFixed(2)
+    console.log(`${section}: ${stats.totalTime.toFixed(2)}ms (${percentage}%) ${stats.calls}x ${avgTime}ms avg`)
+  }
+  console.log('=======================\n')
+}
 
 export const createOTokenProcessor2 = (params: {
   name: string
@@ -52,7 +101,7 @@ export const createOTokenProcessor2 = (params: {
   }
   accountsOverThresholdMinimum: bigint
   feeOverride?: bigint // out of 100
-}): Processor => {
+}) => {
   const { otokenAddress, from } = params
 
   const frequencyUpdater = otokenFrequencyProcessor(params)
@@ -197,7 +246,7 @@ export const createOTokenProcessor2 = (params: {
   let producer: OTokenEntityProducer
   let hasUpgraded = false
 
-  return {
+  return defineProcessor({
     name: `otoken2-${otokenAddress}`,
     from,
     setup: (processor: EvmBatchProcessor) => {
@@ -284,7 +333,7 @@ export const createOTokenProcessor2 = (params: {
 
       if (!otoken) {
         if (process.env.BLOCK_FROM) {
-          const filePath = `data/otoken-raw-data-${otokenAddress}-${process.env.BLOCK_FROM}.json`
+          const filePath = `data/otoken/otoken-raw-data-${otokenAddress}-${process.env.BLOCK_FROM}.json`
           if (existsSync(filePath)) {
             const savedData = readFileSync(filePath, 'utf8')
             const savedDataEntity = bigintJsonParse(savedData) as OTokenRawData
@@ -299,7 +348,14 @@ export const createOTokenProcessor2 = (params: {
         otoken.ctx = ctx
       }
       if (!producer) {
-        producer = new OTokenEntityProducer(otoken, { ctx, block: ctx.blocks[0], fee: params.fee, from: params.from })
+        producer = new OTokenEntityProducer(otoken, {
+          ctx,
+          block: ctx.blocks[0],
+          fee: params.fee,
+          from: params.from,
+          name: params.name,
+          symbol: params.symbol,
+        })
       }
       producer.ctx = ctx
 
@@ -366,28 +422,66 @@ export const createOTokenProcessor2 = (params: {
 
       let justUpgraded = false
 
+      // Cache isContract results
+      const transferRelated = ctx.blocks
+        .flatMap((b) => b.transactions)
+        .flatMap((t) => t.traces)
+        .filter(
+          (trace) =>
+            (trace.type === 'call' && mintTraceFilter.matches(trace)) ||
+            burnTraceFilter.matches(trace) ||
+            transferTraceFilter.matches(trace) ||
+            transferFromTraceFilter.matches(trace),
+        )
+      await areContracts(
+        ctx,
+        ctx.blocks[0],
+        transferRelated.flatMap((trace) => {
+          if (trace.type !== 'call') return []
+          const sender = trace.action.from.toLowerCase()
+          if (mintTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.mint.decode(trace.action.input)
+            return [data._account.toLowerCase()]
+          } else if (burnTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.burn.decode(trace.action.input)
+            return [data._account.toLowerCase()]
+          } else if (transferTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.transfer.decode(trace.action.input)
+            return [data._to.toLowerCase(), sender]
+          } else if (transferFromTraceFilter.matches(trace)) {
+            const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
+            return [data._to.toLowerCase(), data._from.toLowerCase()]
+          }
+          return []
+        }),
+      )
+
+      if (otoken && !producer.initialized) {
+        await producer.initialize()
+      }
+
       // Process logs from all blocks
       for (const block of ctx.blocks) {
         if (otoken) {
           otoken.block = block
           producer.block = block
-          await producer.beforeBlock()
+          producer.beforeBlock()
         }
+
         const addressesToCheck = new Set<string>()
+
         // Process traces
         for (const transaction of block.transactions) {
-          // if (transaction.status !== 1) {
-          //   continue // skip failed transactions
-          // }
           for (const trace of transaction.traces) {
             if (trace.type === 'call') {
               if (errorParent(trace)) {
-                // ctx.log.info({ block: block.header.height, hash: trace.transaction?.hash }, 'errorLineage')
                 continue // skip traces with error parents
               }
+
               const sender = trace.action.from.toLowerCase()
 
               if (proxyInitializeTraceFilter.matches(trace)) {
+                startSection('trace_proxyInitialize')
                 const data = proxyAbi.functions.initialize.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyInitialize')
                 const hash = await hashImplementation(block, data._logic.toLowerCase())
@@ -401,172 +495,158 @@ export const createOTokenProcessor2 = (params: {
                     otoken.initialize(sender, initializeTrace._vaultAddress, initializeTrace._initialCreditsPerToken)
                   }
                 }
-                ///////////////////////////////
+                endSection('trace_proxyInitialize')
               } else if (proxyUpgradeToTraceFilter.matches(trace)) {
+                startSection('trace_proxyUpgradeTo')
                 const data = proxyAbi.functions.upgradeTo.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyUpgradeTo')
                 const hash = await hashImplementation(block, data.newImplementation.toLowerCase())
                 updateOToken(block, hash)
-                ///////////////////////////////
+                endSection('trace_proxyUpgradeTo')
               } else if (proxyUpgradeToAndCallTraceFilter.matches(trace)) {
+                startSection('trace_proxyUpgradeToAndCall')
                 const data = proxyAbi.functions.upgradeToAndCall.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyUpgradeToAndCall')
                 const hash = await hashImplementation(block, data.newImplementation.toLowerCase())
                 updateOToken(block, hash)
-                ///////////////////////////////
+                endSection('trace_proxyUpgradeToAndCall')
               } else if (initializeTraceFilter.matches(trace)) {
+                startSection('trace_initialize')
                 ctx.log.info(trace, 'initialize')
                 const data = otokenAbi.functions.initialize.decode(trace.action.input)
                 otoken.initialize(sender, data._vaultAddress, data._initialCreditsPerToken)
-                ///////////////////////////////
+                endSection('trace_initialize')
               } else if (initialize20241221TraceFilter.matches(trace)) {
+                startSection('trace_initialize20241221')
                 ctx.log.info(trace, 'initialize20241221')
                 const data = otokenAbi20241221.functions.initialize.decode(trace.action.input)
                 otoken.initialize(sender, data._vaultAddress, data._initialCreditsPerToken)
-                ///////////////////////////////
+                endSection('trace_initialize20241221')
               } else if (rebaseOptInTraceFilter.matches(trace)) {
-                // ctx.log.info(trace, 'rebaseOptIn')
+                startSection('trace_rebaseOptIn')
                 await otoken.rebaseOptIn(sender)
                 await producer.afterRebaseOptIn(trace, sender)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_rebaseOptIn')
               } else if (rebaseOptOutTraceFilter.matches(trace)) {
-                // ctx.log.info(trace, 'rebaseOptOut')
+                startSection('trace_rebaseOptOut')
                 await otoken.rebaseOptOut(sender)
                 await producer.afterRebaseOptOut(trace, sender)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_rebaseOptOut')
               } else if (governanceRebaseOptInTraceFilter.matches(trace)) {
+                startSection('trace_governanceRebaseOptIn')
                 const data = otokenAbi.functions.governanceRebaseOptIn.decode(trace.action.input)
-                // ctx.log.info(trace, 'governanceRebaseOptIn')
                 await otoken.governanceRebaseOptIn(sender, data._account)
                 await producer.afterRebaseOptIn(trace, data._account)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._account)
-                ///////////////////////////////
+                endSection('trace_governanceRebaseOptIn')
               } else if (mintTraceFilter.matches(trace)) {
+                startSection('trace_mint')
                 const data = otokenAbi.functions.mint.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'mint')
                 await otoken.mint(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
                 await producer.afterMint(trace, data._account, data._amount)
                 addressesToCheck.add(data._account)
-                ///////////////////////////////
+                endSection('trace_mint')
               } else if (burnTraceFilter.matches(trace)) {
+                startSection('trace_burn')
                 const data = otokenAbi.functions.burn.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'burn')
                 await otoken.burn(otoken.vaultAddress, data._account.toLowerCase(), data._amount)
                 await producer.afterBurn(trace, data._account, data._amount)
                 addressesToCheck.add(data._account)
-                ///////////////////////////////
+                endSection('trace_burn')
               } else if (transferTraceFilter.matches(trace)) {
+                startSection('trace_transfer')
                 const data = otokenAbi.functions.transfer.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transfer')
                 await otoken.transfer(sender, data._to.toLowerCase(), data._value)
                 await producer.afterTransfer(trace, sender, data._to.toLowerCase(), data._value)
                 addressesToCheck.add(data._to)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_transfer')
               } else if (transferFromTraceFilter.matches(trace)) {
+                startSection('trace_transferFrom')
                 const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferFrom')
                 await otoken.transferFrom(sender, data._from.toLowerCase(), data._to.toLowerCase(), data._value)
                 await producer.afterTransferFrom(trace, data._from.toLowerCase(), data._to.toLowerCase(), data._value)
                 addressesToCheck.add(data._from)
                 addressesToCheck.add(data._to)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_transferFrom')
               } else if (approveTraceFilter.matches(trace)) {
+                startSection('trace_approve')
                 const data = otokenAbi.functions.approve.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'approve')
                 otoken.approve(sender, data._spender.toLowerCase(), data._value)
                 addressesToCheck.add(data._spender)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_approve')
               } else if (increaseAllowanceTraceFilter.matches(trace)) {
+                startSection('trace_increaseAllowance')
                 const data = otokenAbi20241221.functions.increaseAllowance.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'increaseAllowance')
                 const otoken20231221 = otoken as OToken_2023_12_21
                 otoken20231221.increaseAllowance(sender, data._spender.toLowerCase(), data._addedValue)
                 addressesToCheck.add(data._spender)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_increaseAllowance')
               } else if (decreaseAllowanceTraceFilter.matches(trace)) {
+                startSection('trace_decreaseAllowance')
                 const data = otokenAbi20241221.functions.decreaseAllowance.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'decreaseAllowance')
                 const otoken20231221 = otoken as OToken_2023_12_21
                 otoken20231221.decreaseAllowance(sender, data._spender.toLowerCase(), data._subtractedValue)
                 addressesToCheck.add(data._spender)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_decreaseAllowance')
               } else if (changeSupplyTraceFilter.matches(trace)) {
+                startSection('trace_changeSupply')
                 await producer.beforeChangeSupply()
                 const data = otokenAbi.functions.changeSupply.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'changeSupply')
                 const totalSupplyDiff = data._newTotalSupply - otoken.totalSupply
                 otoken.changeSupply(sender, data._newTotalSupply)
                 await producer.afterChangeSupply(trace, data._newTotalSupply, totalSupplyDiff)
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_changeSupply')
               } else if (delegateYieldTraceFilter.matches(trace)) {
+                startSection('trace_delegateYield')
                 const data = otokenAbi.functions.delegateYield.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'delegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
                 await producer.afterDelegateYield(trace, data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
                 addressesToCheck.add(data._to)
-                ///////////////////////////////
+                endSection('trace_delegateYield')
               } else if (undelegateYieldTraceFilter.matches(trace)) {
+                startSection('trace_undelegateYield')
                 const data = otokenAbi.functions.undelegateYield.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'undelegateYield')
                 if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
                 await producer.afterUndelegateYield(trace, sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._from)
-                ///////////////////////////////
+                endSection('trace_undelegateYield')
               } else if (transferGovernanceTraceFilter.matches(trace)) {
+                startSection('trace_transferGovernance')
                 const data = otokenAbi.functions.transferGovernance.decode(trace.action.input)
-                // ctx.log.info({ data, hash: trace.transaction?.hash }, 'transferGovernance')
-                // otoken.transferGovernance(sender, data._newGovernor)
                 addressesToCheck.add(sender)
                 addressesToCheck.add(data._newGovernor)
-                ///////////////////////////////
+                endSection('trace_transferGovernance')
               } else if (claimGovernanceTraceFilter.matches(trace)) {
-                // ctx.log.info(trace, 'claimGovernance')
-                // await otoken.claimGovernance()
+                startSection('trace_claimGovernance')
                 addressesToCheck.add(sender)
-                ///////////////////////////////
+                endSection('trace_claimGovernance')
               } else if (trace.action.to === otokenAddress && trace.action.input.startsWith('0xc6f10ba3')) {
+                startSection('trace_governanceRecover')
                 ctx.log.info('SPECIAL CASE FOR superOETHb - governanceRecover()')
-                // https://dashboard.tenderly.co/tx/0x9fadf02b9cae9a233ccd777b27cf5e8abf63507615963bbc207924d45270d8d5?trace=0.1.3.7.0.5.0.0.1.0.1
-                /*
-                 *  function governanceRecover() external onlyGovernor {
-                 *      // Bribes contract
-                 *      address _from = 0x685cE0E36Ca4B81F13B7551C76143D962568f6DD;
-                 *      // Strategist multisig
-                 *      address _to = 0x28bce2eE5775B652D92bB7c2891A89F036619703;
-                 *      // Amount to recover
-                 *      uint256 amount = 38692983174128797556;
-                 *      _executeTransfer(_from, _to, amount);
-                 *
-                 *      emit Transfer(_from, _to, amount);
-                 *  }
-                 */
-                // ---------------
-                // Bribes contract
                 const _from = '0x685ce0e36ca4b81f13b7551c76143d962568f6dd'
-                // Strategist multisig
                 const _to = '0x28bce2ee5775b652d92bb7c2891a89f036619703'
-                // Amount to recover
                 const _value = 38692983174128797556n
                 await otoken.transfer(_from, _to, _value)
                 await producer.afterTransfer(trace, _from, _to, _value)
                 addressesToCheck.add(_from)
                 addressesToCheck.add(_to)
-                ///////////////////////////////
+                endSection('trace_governanceRecover')
               } else if (trace.action.to === otokenAddress) {
+                startSection('trace_unknown')
                 let fun
                 fun = Object.values(otokenAbi20241221.functions).find((value) =>
                   trace.action.input.startsWith(value.selector),
@@ -585,33 +665,37 @@ export const createOTokenProcessor2 = (params: {
                     'write function not being processed',
                   )
                 }
+                endSection('trace_unknown')
               }
             }
           }
         }
+
         for (const log of block.logs) {
           if (harvesterYieldSentFilter?.matches(log)) {
             await producer.processHarvesterYieldSent(ctx, block, log)
           }
         }
+
+        startSection('afterBlock')
         await producer.afterBlock()
-        // if (otoken) {
-        //   if (justUpgraded) {
-        //     await checkState(ctx, block, otoken, new Set([...Object.keys(otoken.creditBalances)]))
-        //     justUpgraded = false
-        //   } else if (hasUpgraded && addressesToCheck.size > 0) {
-        //     await checkState(ctx, block, otoken, addressesToCheck)
-        //   }
-        // }
+        endSection('afterBlock')
       }
 
+      startSection('afterContext')
       await producer.afterContext(params)
+      endSection('afterContext')
 
       if (otoken) {
+        startSection('saveOTokenRawData')
         const lastBlock = ctx.blocks[ctx.blocks.length - 1]
         await saveOTokenRawData(ctx, lastBlock, otoken)
+        endSection('saveOTokenRawData')
       }
+
       const frequencyUpdateResults = await frequencyUpdatePromise
+
+      startSection('finalSave')
       await Promise.all([
         saveIsContractCache(ctx),
         producer.save(),
@@ -619,8 +703,12 @@ export const createOTokenProcessor2 = (params: {
         ctx.store.insert(frequencyUpdateResults.wotokens),
         ctx.store.insert(frequencyUpdateResults.dripperStates),
       ])
+      endSection('finalSave')
+
+      // Log performance stats at the end of context processing
+      logPerformanceStats()
     },
-  }
+  })
 }
 
 const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) => {
@@ -682,7 +770,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
 
   if (env.NODE_ENV === 'development') {
     writeFileSync(
-      `data/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
+      `data/otoken/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
       bigintJsonStringify(rawDataEntity, 2),
     )
   }

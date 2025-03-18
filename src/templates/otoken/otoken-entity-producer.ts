@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { LessThan } from 'typeorm'
+import { parseUnits } from 'viem'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import {
@@ -33,10 +34,16 @@ dayjs.extend(utc)
 
 export class OTokenEntityProducer {
   otoken: OToken_2023_12_21 | OToken_2025_03_04
+  public name: string
+  public symbol: string
   public from: number
   public ctx: Context
   public block: Block
   public fee: bigint
+  public initialized = false
+
+  // For balances under this threshold, we won't update the balance after rebases.
+  public rebaseBalanceUpdateThreshold = parseUnits('.0001', 18)
 
   // Entity storage which should be reset after every `process`.
   private otokenMap: Map<string, OToken> = new Map()
@@ -62,6 +69,8 @@ export class OTokenEntityProducer {
   constructor(
     otoken: OToken_2023_12_21 | OToken_2025_03_04,
     params: {
+      name: string
+      symbol: string
       from: number
       ctx: Context
       block: Block
@@ -69,18 +78,35 @@ export class OTokenEntityProducer {
     },
   ) {
     this.otoken = otoken
+    this.name = params.name
+    this.symbol = params.symbol
     this.from = params.from
     this.ctx = params.ctx
     this.block = params.block
     this.fee = params.fee
   }
 
+  public async initialize() {
+    // Load all addresses for this otoken into the addressMap
+    const addresses = await this.ctx.store.find(OTokenAddress, {
+      where: {
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+      },
+    })
+
+    // Populate the addressMap with all retrieved addresses
+    for (const address of addresses) {
+      this.addressMap.set(address.address, address)
+    }
+
+    this.initialized = true
+  }
+
   private async getOrCreateOTokenEntity(): Promise<OToken> {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${this.block.header.height}`
     let token = this.otokenMap.get(id)
-    if (!token) {
-      token = await this.ctx.store.get(OToken, id)
-    }
+    // We don't try to retrieve from database because this is unique per block.
     if (!token) {
       token = new OToken({
         id,
@@ -144,6 +170,17 @@ export class OTokenEntityProducer {
       })
     }
     this.addressMap.set(account, address)
+    address.isContract = await isContract(this.ctx, this.otoken.block, account)
+    this.updateAddress(account)
+    return address
+  }
+
+  /**
+   * An update path which is not async.
+   */
+  private updateAddress(account: string): OTokenAddress {
+    const address = this.addressMap.get(account)
+    if (!address) throw new Error('All addresses should exist here: ' + account)
 
     const otoken = this.otoken as OToken_2025_03_04
 
@@ -165,7 +202,6 @@ export class OTokenEntityProducer {
     address.lastUpdated = new Date(this.otoken.block.header.timestamp)
     address.yieldFrom = yieldFrom ?? null
     address.yieldTo = yieldTo ?? null
-    address.isContract = await isContract(this.ctx, this.otoken.block, account)
 
     // Update rebasing option based on token state
     if ('rebaseState' in this.otoken) {
@@ -351,9 +387,7 @@ export class OTokenEntityProducer {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${this.block.header.height}-${trace.traceAddress.join('-')}`
 
     let rebase = this.rebaseMap.get(id)
-    if (!rebase) {
-      rebase = await this.ctx.store.get(OTokenRebase, id)
-    }
+    // We don't try to retrieve from database because this is unique per block & trace.
 
     const _fee = (totalSupplyDiff * this.fee) / (100n - this.fee) // totalSupplyDiff does not include the fee
     const _yield = totalSupplyDiff + _fee // yes, yield here includes the fee
@@ -425,7 +459,7 @@ export class OTokenEntityProducer {
 
   private accountEarningsByHour: Map<string, bigint> = new Map()
 
-  async beforeBlock() {
+  beforeBlock() {
     this.yieldForwardInfo = new Map()
   }
 
@@ -514,47 +548,47 @@ export class OTokenEntityProducer {
   }
 
   async afterChangeSupply(trace: Trace, newTotalSupply: bigint, totalSupplyDiff: bigint): Promise<void> {
+    if (totalSupplyDiff === 0n) return // Skip if there was no change in supply.
     await this.getOrCreateOTokenEntity()
     await this.getOrCreateAPYEntity(trace)
     await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
-    await Promise.all(
-      Object.entries(this.otoken.creditBalances)
-        .filter(([_account, credits]) => credits > 0n)
-        .map(([account]) => {
-          return (async () => {
-            //Delete previous hour accrual
-            const previousDateHour = dayjs(this.otoken.block.header.timestamp)
-              .subtract(1, 'hour')
-              .toISOString()
-              .slice(0, 13)
-            this.accountEarningsByHour.delete(previousDateHour)
+    // Trying not to have any async calls within this loop.
+    for (const account of Object.keys(this.otoken.creditBalances)) {
+      //Delete previous hour accrual
+      const previousDateHour = dayjs(this.otoken.block.header.timestamp).subtract(1, 'hour').toISOString().slice(0, 13)
+      this.accountEarningsByHour.delete(previousDateHour)
+      if (this.otoken.balanceOf(account) > this.rebaseBalanceUpdateThreshold) {
+        const dateHour = dayjs(this.otoken.block.header.timestamp).toISOString().slice(0, 13) // Date including hour
+        const id = `${this.ctx.chain.id}-${this.otoken.address}-${account}-${dateHour}`
 
-            const dateHour = dayjs(this.otoken.block.header.timestamp).toISOString().slice(0, 13) // Date including hour
-            const id = `${this.ctx.chain.id}-${this.otoken.address}-${account}-${dateHour}`
-            let address = await this.getAddress(account)
-            const earned = address?.earned ?? 0n
-            address = await this.getOrCreateAddress(account)
-            const earnedDiff = address.earned - earned
-            const hourlyEarnings = (this.accountEarningsByHour.get(id) ?? 0n) + earnedDiff
-            this.accountEarningsByHour.set(id, hourlyEarnings)
-            if (earnedDiff > 0n) {
-              const history = new OTokenHistory({
-                id,
-                chainId: this.ctx.chain.id,
-                otoken: this.otoken.address,
-                address: await this.getOrCreateAddress(account),
-                timestamp: new Date(this.otoken.block.header.timestamp),
-                blockNumber: this.otoken.block.header.height,
-                txHash: trace.transaction!.hash,
-                type: HistoryType.Yield,
-                value: hourlyEarnings,
-                balance: this.otoken.balanceOf(account),
-              })
-              this.histories.set(history.id, history)
-            }
-          })()
-        }),
-    )
+        // Get the address first so we can see it's earnings prior to being updated.
+        let address = this.addressMap.get(account)!
+        if (!address) throw new Error('Address should be cached: ' + account)
+        const earned = address.earned
+
+        // Update the address state and check new earnings.
+        address = this.updateAddress(account)
+        const earnedDiff = address.earned - earned
+
+        if (earnedDiff > 0n) {
+          const hourlyEarnings = (this.accountEarningsByHour.get(id) ?? 0n) + earnedDiff
+          this.accountEarningsByHour.set(id, hourlyEarnings)
+          const history = new OTokenHistory({
+            id,
+            chainId: this.ctx.chain.id,
+            otoken: this.otoken.address,
+            address,
+            timestamp: new Date(this.otoken.block.header.timestamp),
+            blockNumber: this.otoken.block.header.height,
+            txHash: trace.transaction!.hash,
+            type: HistoryType.Yield,
+            value: hourlyEarnings,
+            balance: this.otoken.balanceOf(account),
+          })
+          this.histories.set(history.id, history)
+        }
+      }
+    }
     // Calculate Yield Forwarded
     if (this.otoken instanceof OToken_2025_03_04) {
       for (const to of Object.keys(this.otoken.creditBalances)) {
@@ -662,38 +696,90 @@ export class OTokenEntityProducer {
   }
 
   async save(): Promise<void> {
-    const erc20s = await processOTokenERC20(this.ctx, {
-      otokenAddress: this.otoken.address,
-      otokens: Array.from(this.otokenMap.values()),
-      addresses: Array.from(this.changedAddressMap.values()),
-      history: Array.from(this.histories.values()),
-      transfers: this.transfers,
-    })
+    if (!this.otoken) return
 
-    await this.ctx.store.upsert([...this.changedAddressMap.values()]) // These must be saved first.
-    await Promise.all([
-      // OToken Entity Saving
-      this.ctx.store.insert([...this.otokenMap.values()]),
-      this.ctx.store.upsert([...this.apyMap.values()]),
-      this.ctx.store.insert([...this.rebaseMap.values()]),
-      this.ctx.store.upsert([...this.histories.values()]),
-      this.ctx.store.insert(this.rebaseOptions),
-      this.ctx.store.insert(this.harvesterYieldSent),
-      this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
-      this.ctx.store.upsert([...this.yieldForwarded.values()]),
-
+    const [erc20s] = await Promise.all([
       // ERC20
-      this.ctx.store.insert([...erc20s.states.values()]),
-      this.ctx.store.upsert([...erc20s.statesByDay.values()]),
-      this.ctx.store.upsert([...erc20s.holders.values()]),
-      this.ctx.store.insert([...erc20s.balances.values()]),
-      this.ctx.store.insert(erc20s.transfers),
-      this.ctx.store.remove(
-        [...erc20s.removedHolders.values()].map(
-          (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
-        ),
+      processOTokenERC20(this.ctx, {
+        name: this.name,
+        symbol: this.symbol,
+        otokenAddress: this.otoken.address,
+        otokens: Array.from(this.otokenMap.values()),
+        addresses: Array.from(this.changedAddressMap.values()),
+        history: Array.from(this.histories.values()),
+        transfers: this.transfers,
+      }).then((erc20s) =>
+        Promise.all([
+          this.ctx.store.insert([...erc20s.states.values()]),
+          this.ctx.store.upsert([...erc20s.statesByDay.values()]),
+          this.ctx.store.upsert([...erc20s.holders.values()]),
+          this.ctx.store.upsert([...erc20s.balances.values()]),
+          this.ctx.store.insert(erc20s.transfers),
+          this.ctx.store.remove(
+            [...erc20s.removedHolders.values()].map(
+              (account) => new ERC20Holder({ id: `${this.ctx.chain.id}-${this.otoken.address}-${account}` }),
+            ),
+          ),
+        ]).then(() => erc20s),
       ),
+      // OToken Entity Saving,
+      this.ctx.store
+        .upsert([...this.changedAddressMap.values()]) // These must be saved first.
+        .then(() =>
+          Promise.all([
+            this.ctx.store.insert([...this.otokenMap.values()]),
+            this.ctx.store.upsert([...this.apyMap.values()]),
+            this.ctx.store.insert([...this.rebaseMap.values()]),
+            this.ctx.store.upsert([...this.histories.values()]),
+            this.ctx.store.insert(this.rebaseOptions),
+            this.ctx.store.insert(this.harvesterYieldSent),
+            this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
+            this.ctx.store.upsert([...this.yieldForwarded.values()]),
+          ]),
+        ),
     ])
+
+    if (process.env.DEBUG_PERF === 'true') {
+      // Log the quantity of items saved
+      const totalItemsSaved =
+        this.changedAddressMap.size +
+        this.otokenMap.size +
+        this.apyMap.size +
+        this.rebaseMap.size +
+        this.histories.size +
+        this.rebaseOptions.length +
+        this.harvesterYieldSent.length +
+        [...this.dailyStats.values()].length +
+        this.yieldForwarded.length +
+        erc20s.states.size +
+        erc20s.statesByDay.size +
+        erc20s.holders.size +
+        erc20s.balances.size +
+        erc20s.transfers.length +
+        erc20s.removedHolders.size
+
+      this.ctx.log.info(
+        {
+          addresses: this.changedAddressMap.size,
+          otokens: this.otokenMap.size,
+          apy: this.apyMap.size,
+          rebases: this.rebaseMap.size,
+          histories: this.histories.size,
+          rebaseOptions: this.rebaseOptions.length,
+          harvesterYieldSent: this.harvesterYieldSent.length,
+          dailyStats: [...this.dailyStats.values()].length,
+          yieldForwarded: this.yieldForwarded.length,
+          erc20States: erc20s.states.size,
+          erc20StatesByDay: erc20s.statesByDay.size,
+          erc20Holders: erc20s.holders.size,
+          erc20Balances: erc20s.balances.size,
+          erc20Transfers: erc20s.transfers.length,
+          erc20RemovedHolders: erc20s.removedHolders.size,
+          totalItemsSaved: totalItemsSaved,
+        },
+        'OToken entity producer saved items',
+      )
+    }
 
     // Reset the entity storage.
     this.otokenMap = new Map()
@@ -705,7 +791,8 @@ export class OTokenEntityProducer {
     this.rebaseOptions = []
     this.harvesterYieldSent = []
     this.yieldForwarded = []
-    this.dailyStats = new Map()
+    const dayString = new Date(this.ctx.blocks.at(-1)!.header.timestamp).toISOString().substring(0, 10)
+    this.dailyStats = new Map([...this.dailyStats.entries()].filter(([_key, value]) => value.entity.date === dayString))
     this.transfers = []
   }
 }

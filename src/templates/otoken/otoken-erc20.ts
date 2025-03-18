@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { findLast } from 'lodash'
 
 import {
+  ERC20,
   ERC20Balance,
   ERC20Holder,
   ERC20State,
@@ -13,9 +14,13 @@ import {
 } from '@model'
 import { Block, Context } from '@originprotocol/squid-utils'
 
+let initialized: Record<string, boolean> = {}
+
 export const processOTokenERC20 = async (
   ctx: Context,
   params: {
+    name: string
+    symbol: string
     otokenAddress: string
     otokens: OToken[]
     addresses: OTokenAddress[]
@@ -31,6 +36,19 @@ export const processOTokenERC20 = async (
     }[]
   },
 ) => {
+  if (!initialized[params.otokenAddress]) {
+    initialized[params.otokenAddress] = true
+    await ctx.store.upsert(
+      new ERC20({
+        id: `${ctx.chain.id}-${params.otokenAddress}`,
+        chainId: ctx.chain.id,
+        address: params.otokenAddress,
+        name: params.name,
+        symbol: params.symbol,
+        decimals: 18,
+      }),
+    )
+  }
   const result = {
     states: new Map<string, ERC20State>(),
     statesByDay: new Map<string, ERC20StateByDay>(),
@@ -69,7 +87,7 @@ export const processOTokenERC20 = async (
     }
   }
   for (const history of params.history) {
-    const id = `${ctx.chain.id}-${history.blockNumber}-${history.otoken}-${history.address.address}`
+    const id = history.id
     result.balances.set(
       id,
       new ERC20Balance({

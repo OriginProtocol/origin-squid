@@ -4,7 +4,6 @@ import { mainnet } from 'viem/chains'
 import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import { Context } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import {
@@ -101,9 +100,9 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 })
 
 export const name = 'otoken'
-export const from = Math.min(otokenProcessor.from, otokenActivityProcessor.from)
-export const setup = (processor: EvmBatchProcessor) => {
-  otokenProcessor.setup(processor)
+export const from = Math.min(otokenProcessor.from ?? Number.MAX_SAFE_INTEGER, otokenActivityProcessor.from)
+export const setup = (processor: ReturnType<typeof createEvmBatchProcessor>) => {
+  otokenProcessor.setup?.(processor)
   otokenActivityProcessor.setup(processor)
 }
 export const process = async (ctx: Context) => {
