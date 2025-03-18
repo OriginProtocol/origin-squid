@@ -58,9 +58,9 @@ export const createOTokenLegacyProcessor = (params: {
   dripper?: {
     address: string
     from: number
+    to?: number
     token: string
-    perSecondStartingBlock?: number
-  }
+  }[]
   harvester?: {
     address: string
     from: number
@@ -910,28 +910,33 @@ export const createOTokenLegacyProcessor = (params: {
         )
       }
 
-      if (params.dripper && params.dripper.from <= block.header.height) {
-        const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
-        const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
-          dripperContract.dripDuration(),
-          dripperContract.drip(),
-          dripperContract.availableFunds(),
-          new erc20.Contract(ctx, block.header, params.dripper.token).balanceOf(params.dripper.address),
-        ])
-        result.dripperStates.push(
-          new OTokenDripperState({
-            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-            chainId: ctx.chain.id,
-            blockNumber: block.header.height,
-            timestamp: new Date(block.header.timestamp),
-            otoken: params.otokenAddress,
-            dripDuration,
-            lastCollect,
-            perSecond,
-            availableFunds,
-            wethBalance,
-          }),
+      if (params.dripper) {
+        const dripper = params.dripper.find(
+          (d) => d.from <= block.header.height && (!d.to || d.to >= block.header.height),
         )
+        if (dripper) {
+          const dripperContract = new otokenDripper.Contract(ctx, block.header, dripper.address)
+          const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
+            dripperContract.dripDuration(),
+            dripperContract.drip(),
+            dripperContract.availableFunds(),
+            new erc20.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
+          ])
+          result.dripperStates.push(
+            new OTokenDripperState({
+              id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+              chainId: ctx.chain.id,
+              blockNumber: block.header.height,
+              timestamp: new Date(block.header.timestamp),
+              otoken: params.otokenAddress,
+              dripDuration,
+              lastCollect,
+              perSecond,
+              availableFunds,
+              wethBalance,
+            }),
+          )
+        }
       }
     })
     time('frequencyUpdate')

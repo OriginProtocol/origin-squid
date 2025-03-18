@@ -22,11 +22,13 @@ const otokenProcessor = createOTokenProcessor2({
     address: baseAddresses.tokens.wsuperOETHb,
     from: 18760018,
   },
-  dripper: {
-    address: baseAddresses.superOETHb.dripper,
-    token: tokensByChain[base.id].WETH,
-    from: 18215706,
-  },
+  dripper: [
+    {
+      address: baseAddresses.superOETHb.dripper,
+      token: tokensByChain[base.id].WETH,
+      from: 18215706,
+    },
+  ],
   harvester: {
     address: baseAddresses.superOETHb.harvester,
     from: 20464482,

@@ -84,9 +84,9 @@ export const createOTokenProcessor2 = (params: {
   dripper?: {
     address: string
     from: number
+    to?: number
     token: string
-    perSecondStartingBlock?: number
-  }
+  }[]
   harvester?: {
     address: string
     from: number

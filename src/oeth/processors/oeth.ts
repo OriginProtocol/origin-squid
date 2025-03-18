@@ -14,6 +14,7 @@ import {
   OETH_ADDRESS,
   OETH_CURVE_REWARD_LP_ADDRESS,
   OETH_DRIPPER_ADDRESS,
+  OETH_DRIPPER_ADDRESS_OLD,
   OETH_VAULT_ADDRESS,
   OETH_ZAPPER_ADDRESS,
   RETH_ADDRESS,
@@ -40,11 +41,19 @@ const otokenProcessor = createOTokenProcessor2({
     address: WOETH_ADDRESS,
     from: 17080507,
   },
-  dripper: {
-    address: OETH_DRIPPER_ADDRESS,
-    token: tokensByChain[mainnet.id].WETH,
-    from: 17067707,
-  },
+  dripper: [
+    {
+      address: OETH_DRIPPER_ADDRESS_OLD,
+      token: tokensByChain[mainnet.id].WETH,
+      from: 17067707,
+      to: 21624133,
+    },
+    {
+      address: OETH_DRIPPER_ADDRESS,
+      token: tokensByChain[mainnet.id].WETH,
+      from: 21624134,
+    },
+  ],
   otokenVaultAddress: OETH_VAULT_ADDRESS,
   redemptionAsset: { asset: WETH_ADDRESS, symbol: 'WETH' },
   oTokenAssets: [

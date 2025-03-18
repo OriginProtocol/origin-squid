@@ -27,9 +27,9 @@ export const processOTokenDailyStats = async (
     dripper?: {
       address: string
       from: number
+      to?: number
       token: string
-      perSecondStartingBlock?: number
-    }
+    }[]
     getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
     accountsOverThresholdMinimum: bigint
   },
@@ -41,9 +41,15 @@ export const processOTokenDailyStats = async (
     const blockDate = new Date(block.header.timestamp)
     const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
     const getDripperAvailableFunds = async () => {
-      if (!params.dripper || params.dripper.from > block.header.height) return 0n
-      const dripperContract = new otokenDripper.Contract(ctx, block.header, params.dripper.address)
-      return dripperContract.availableFunds()
+      if (!params.dripper) return 0n
+      const dripper = params.dripper.find(
+        (d) => d.from <= block.header.height && (!d.to || d.to >= block.header.height),
+      )
+      if (dripper) {
+        const dripperContract = new otokenDripper.Contract(ctx, block.header, dripper.address)
+        return await dripperContract.availableFunds()
+      }
+      return 0n
     }
     const wotokenContract =
       params.wotoken && block.header.height >= params.wotoken.from

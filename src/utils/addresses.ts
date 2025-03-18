@@ -60,8 +60,10 @@ export const OETH_ADDRESS = '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'
 export const OETH_VAULT_ADDRESS = '0x39254033945aa2e4809cc2977e7087bee48bd7ab'
 export const OETH_HARVESTER_ADDRESS = `0x0d017afa83eace9f10a8ec5b6e13941664a6785c`
 export const OETH_HARVESTER_SIMPLE_ADDRESS = '0x399b69bf06ccec7a53befea14771059d39a3617a'
+export const OETH_HARVESTER_SIMPLE_ADDRESS_2 = '0x6d416e576eecbb9f897856a7c86007905274ed04'
 export const OETH_ZAPPER_ADDRESS = '0x9858e47bcbbe6fbac040519b02d7cd4b2c470c66'
-export const OETH_DRIPPER_ADDRESS = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
+export const OETH_DRIPPER_ADDRESS_OLD = '0xc0f42f73b8f01849a2dd99753524d4ba14317eb3'
+export const OETH_DRIPPER_ADDRESS = '0xe3b3b4fc77505ecfaacf6dd21619a8cc12fcc501'
 export const WOETH_ADDRESS = '0xdcee70654261af21c44c093c300ed3bb97b78192'
 export const WOETH_ARBITRUM_ADDRESS = '0xd8724322f44e5c58d7a815f542036fb17dbbf839'
 export const OETH_CONVEX_ADDRESS = '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63'
@@ -163,7 +165,7 @@ export const ousdStrategyArray = Object.values(strategies.ousd)
 export const oeth = {
   address: OETH_ADDRESS,
   vault: OETH_VAULT_ADDRESS,
-  dripper: OETH_DRIPPER_ADDRESS,
+  dripper: OETH_DRIPPER_ADDRESS_OLD,
   zapper: OETH_ZAPPER_ADDRESS,
   harvester: OETH_HARVESTER_ADDRESS,
   vaultTokens: OETH_VAULT_ERC20_ADDRESSES,

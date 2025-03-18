@@ -13,8 +13,10 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,
+  OETH_DRIPPER_ADDRESS_OLD,
   OETH_HARVESTER_ADDRESS,
   OETH_HARVESTER_SIMPLE_ADDRESS,
+  OETH_HARVESTER_SIMPLE_ADDRESS_2,
   OUSD_ADDRESS,
   OUSD_DRIPPER_ADDRESS,
   OUSD_HARVESTER_ADDRESS,
@@ -82,8 +84,8 @@ const oTokenValues = {
     rewardConversionToken: [WETH_ADDRESS, tokens.CRV, tokens.CVX],
     rewardConversionTokenDecimals: 18,
     saveAsAsset: WETH_ADDRESS,
-    harvester: [OETH_HARVESTER_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS],
-    harvesterTargets: [OETH_DRIPPER_ADDRESS, addresses.multisig['multichain-guardian']],
+    harvester: [OETH_HARVESTER_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS_2],
+    harvesterTargets: [OETH_DRIPPER_ADDRESS, OETH_DRIPPER_ADDRESS_OLD, addresses.multisig['multichain-guardian']],
   },
   [baseAddresses.superOETHb.address]: {
     rewardConversionToken: [baseAddresses.tokens.WETH],

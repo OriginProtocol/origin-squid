@@ -17,11 +17,13 @@ const otokenProcessor = createOTokenProcessor2({
     address: sonicAddresses.OS.wrapped,
     from: 4025393,
   },
-  dripper: {
-    address: sonicAddresses.OS.dripper,
-    token: sonicAddresses.tokens.wS,
-    from: 3884406,
-  },
+  dripper: [
+    {
+      address: sonicAddresses.OS.dripper,
+      token: sonicAddresses.tokens.wS,
+      from: 3884406,
+    },
+  ],
   harvester: {
     address: sonicAddresses.OS.harvester,
     from: sonicAddresses.OS.initializeBlock,
