@@ -178,7 +178,7 @@ export class OTokenEntityProducer {
   /**
    * An update path which is not async.
    */
-  private updateAddress(account: string): OTokenAddress {
+  private updateAddress(account: string, calculateEarnings = false): OTokenAddress {
     const address = this.addressMap.get(account)
     if (!address) throw new Error('All addresses should exist here: ' + account)
 
@@ -190,14 +190,13 @@ export class OTokenEntityProducer {
 
     const yieldFrom = 'yieldFrom' in otoken ? otoken.yieldFrom[account] : null
     const yieldTo = 'yieldTo' in otoken ? otoken.yieldTo[account] : null
-    let earned = 0n
-    if (address.creditsPerToken && creditsPerToken !== address.creditsPerToken) {
-      earned = ((address.creditsPerToken - creditsPerToken) * balance) / 10n ** otoken.RESOLUTION_DECIMALS
+    if (calculateEarnings) {
+      const earned = balance - address.balance
+      address.earned += earned
     }
     address.credits = credits
     address.creditsPerToken = creditsPerToken
     address.balance = balance
-    address.earned += earned
     address.blockNumber = this.otoken.block.header.height
     address.lastUpdated = new Date(this.otoken.block.header.timestamp)
     address.yieldFrom = yieldFrom ?? null
@@ -567,7 +566,7 @@ export class OTokenEntityProducer {
         const earned = address.earned
 
         // Update the address state and check new earnings.
-        address = this.updateAddress(account)
+        address = this.updateAddress(account, true)
         const earnedDiff = address.earned - earned
 
         if (earnedDiff > 0n) {
