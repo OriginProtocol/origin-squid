@@ -4,6 +4,7 @@ import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import * as mainnetAddresses from '@utils/addresses'
+import { USDS_ADDRESS } from '@utils/addresses'
 
 import { aaveStrategy } from './aave-strategy'
 import { USDC, USDT } from './const'
@@ -15,6 +16,18 @@ import { morphoAave } from './morpho-aave'
 import { morphoCompound } from './morpho-compound'
 
 export const ousdStrategies: readonly IStrategyData[] = [
+  {
+    chainId: 1,
+    from: 22090164,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Sky Savings Rate',
+    contractName: 'Generalized4626Strategy',
+    address: mainnetAddresses.strategies.ousd.SkySavingsRateStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [{ address: USDS_ADDRESS, decimals: 18 }],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
   convexMetaStrategy,
   aaveStrategy,
   morphoCompound,

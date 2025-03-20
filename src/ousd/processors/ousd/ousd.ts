@@ -8,6 +8,7 @@ import {
   OUSD_DRIPPER_ADDRESS,
   OUSD_VAULT_ADDRESS,
   USDC_ADDRESS,
+  USDS_ADDRESS,
   USDT_ADDRESS,
   WOUSD_ADDRESS,
 } from '@utils/addresses'
@@ -41,6 +42,7 @@ export const { name, from, setup, process } = createOTokenLegacyProcessor({
     { asset: USDC_ADDRESS, symbol: 'USDC' },
     { asset: USDT_ADDRESS, symbol: 'USDT' },
     { asset: DAI_ADDRESS, symbol: 'DAI' },
+    { asset: USDS_ADDRESS, symbol: 'USDS' },
   ],
   getAmoSupply: async () => 0n,
   accountsOverThresholdMinimum: parseEther('100'),

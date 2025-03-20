@@ -12,6 +12,7 @@ export const mainnetCurrencies = {
   DAI: '0x6b175474e89094c44da98b954eedeac495271d0f',
   USDT: '0xdac17f958d2ee523a2206206994597c13d831ec7',
   USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  USDS: '0xdc035d45d973e3ec169d2276ddab16f1e407384f',
   ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // Chainlink Denominations.ETH
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
   OUSD: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',

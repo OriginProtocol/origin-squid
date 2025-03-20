@@ -201,6 +201,8 @@ export const priceMap: Partial<
   ...twoWay('DAI', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'DAI', 'USD'), 8),
   ...twoWay('USDC', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'USD'), 8),
   ...twoWay('USDT', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'USD'), 8),
+  ...twoWay('USDS', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDS', 'USD'), 8),
+  ...twoWay('ETH', 'USDS', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USDS'), 8),
   ...derived(
     'DAI',
     'ETH',
