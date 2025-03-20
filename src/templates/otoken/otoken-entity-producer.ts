@@ -451,6 +451,7 @@ export class OTokenEntityProducer {
       from: string
       to: string
       balance: bigint
+      forwardedBalance: bigint
       forwardedBalancePercentage: bigint
       yieldEarned: bigint
     }
@@ -538,6 +539,7 @@ export class OTokenEntityProducer {
             from,
             to,
             balance,
+            forwardedBalance,
             forwardedBalancePercentage,
             yieldEarned,
           })
@@ -660,6 +662,7 @@ export class OTokenEntityProducer {
           blockNumber: this.otoken.block.header.height,
           from: info.from,
           to: info.to,
+          fromBalance: info.forwardedBalance,
           amount: info.yieldEarned,
         }),
       )

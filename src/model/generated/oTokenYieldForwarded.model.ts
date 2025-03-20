@@ -32,5 +32,8 @@ export class OTokenYieldForwarded {
     to!: string
 
     @BigIntColumn_({nullable: false})
+    fromBalance!: bigint
+
+    @BigIntColumn_({nullable: false})
     amount!: bigint
 }

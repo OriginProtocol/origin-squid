@@ -254,6 +254,7 @@ type OTokenYieldForwarded @entity {
   otoken: String! @index
   from: String!
   to: String!
+  fromBalance: BigInt!
   amount: BigInt!
 }
 

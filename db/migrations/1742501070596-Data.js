@@ -1,5 +1,5 @@
-module.exports = class Data1741896005366 {
-    name = 'Data1741896005366'
+module.exports = class Data1742501070596 {
+    name = 'Data1742501070596'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -216,7 +216,7 @@ module.exports = class Data1741896005366 {
         await db.query(`CREATE INDEX "IDX_40e7c338b514e19f2319d768bd" ON "o_token_withdrawal_request" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_39091effe13b6c6e2a321c1cad" ON "o_token_withdrawal_request" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_f5baa0e3b6dcfe1940cfa02c01" ON "o_token_withdrawal_request" ("tx_hash") `)
-        await db.query(`CREATE TABLE "o_token_yield_forwarded" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_22bbb6894ff29f1cffa62fa8cca" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_yield_forwarded" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "from" text NOT NULL, "to" text NOT NULL, "from_balance" numeric NOT NULL, "amount" numeric NOT NULL, CONSTRAINT "PK_22bbb6894ff29f1cffa62fa8cca" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_c819776ce5a04915227ada2990" ON "o_token_yield_forwarded" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_74ae9edf4f308f86740b16b7cd" ON "o_token_yield_forwarded" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b8b0b44e2b80be2fbeb211debe" ON "o_token_yield_forwarded" ("timestamp") `)
