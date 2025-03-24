@@ -36,17 +36,29 @@ export const process = async (ctx: Context) => {
     coinId: 'origin-protocol',
     vsCurrency: 'usd',
   })
+
   for (const date of dates) {
     const newDailyStat = await createDailyStat(ctx, date)
     if (newDailyStat) {
       const day = coingeckoData[newDailyStat.id]
-      newDailyStat.priceUSD = day?.prices || 0
-      newDailyStat.marketCapUSD = day?.market_caps || 0
-      newDailyStat.tradingVolumeUSD = day?.total_volumes || 0
-      newDailyStat.totalSupplyUSD = Number(formatEther(newDailyStat.totalSupply)) * newDailyStat.priceUSD
-      ognDailyStats.push(newDailyStat)
+
+      if (!day?.prices || day.prices <= 0) {
+        console.log(`Skipping ${newDailyStat.id} - no valid price data`)
+        continue
+      }
+
+      if (day.market_caps !== null && day.total_volumes !== null) {
+        newDailyStat.priceUSD = day.prices
+        newDailyStat.marketCapUSD = day.market_caps
+        newDailyStat.tradingVolumeUSD = day.total_volumes
+        newDailyStat.totalSupplyUSD = Number(formatEther(newDailyStat.totalSupply)) * day.prices
+        ognDailyStats.push(newDailyStat)
+      } else {
+        console.log(`Skipping ${newDailyStat.id} - missing market data`)
+      }
     }
   }
+
   await ctx.store.upsert(ognDailyStats)
 }
 
@@ -90,7 +102,6 @@ async function createDailyStat(ctx: Context, date: Date) {
     id,
     blockNumber: mostRecentEntity?.blockNumber,
     timestamp: mostRecentEntity?.timestamp,
-
     totalSupply: totalSupply?.totalSupply || 0n,
     totalStaked: stakedBalance?.balance || 0n,
     totalSupplyUSD: 0,
