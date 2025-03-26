@@ -144,8 +144,8 @@ export const baseAddresses = {
     slipstreamNft: '0x827922686190790b37229fd06084350e74485b72',
     pools: aerodromePools,
     poolFactory: {
-      amm: '0x420DD381b31aEf6683db6B902084cB0FFECe40Da',
-      cl: '0x5e7BB104d84c7CB9B682AaC2F3d509f5F406809A',
+      amm: '0x420dd381b31aef6683db6b902084cb0ffece40da',
+      cl: '0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a',
     },
   },
 } as const

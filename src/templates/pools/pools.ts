@@ -1,6 +1,8 @@
 import { compact } from 'lodash'
 import { base, mainnet, sonic } from 'viem/chains'
 
+import * as aerodromeCLPoolFactoryAbi from '@abi/aerodrome-cl-pool-factory'
+import * as aerodromePoolFactoryAbi from '@abi/aerodrome-pool-factory'
 import * as algebraFactoryAbi from '@abi/algebra-v4-factory'
 import * as algebraPoolAbi from '@abi/algebra-v4-pool'
 import * as stableSwapFactoryAbi from '@abi/curve-stable-swap-factory-ng'
@@ -112,9 +114,59 @@ export const createPoolsProcessor = (chainId: number) => {
   if (!chainParams[chainId]) {
     throw new Error(`No params found for chainId: ${chainId}`)
   }
+  let initialized = false
   return joinProcessors(
     'pools',
     compact([
+      mainnet.id === chainId
+        ? defineProcessor({
+            name: 'default-pools',
+            from: 17371439,
+            process: async (ctx: Context) => {
+              if (initialized) return
+              initialized = true
+              if ((await ctx.store.count(Pool)) === 0) return
+              await ctx.store.insert([
+                new Pool({
+                  id: '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
+                  chainId: 1,
+                  address: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
+                  name: 'Curve.fi Factory Pool: OETH',
+                  symbol: 'OETHCRV-f',
+                  createdAtBlock: 17130232,
+                  createdAt: new Date('Apr-26-2023 11:54:47 AM UTC'),
+                  tokens: ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
+                  exchange: 'curve',
+                  type: 'stable',
+                }),
+                new Pool({
+                  id: '1:0xfa0bbb0a5815f6648241c9221027b70914dd8949',
+                  chainId: 1,
+                  address: '0xfa0bbb0a5815f6648241c9221027b70914dd8949',
+                  name: 'Curve.fi Factory Plain Pool: frxETH/OETH',
+                  symbol: 'frxETHOETH-f',
+                  createdAtBlock: 18123489,
+                  createdAt: new Date('Sep-12-2023 11:21:47 PM UTC'),
+                  tokens: ['0x5e8422345238f34275888049021821e8e08caa1f', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
+                  exchange: 'curve',
+                  type: 'stable',
+                }),
+                new Pool({
+                  id: '1:0x87650d7bbfc3a9f10587d7778206671719d9910d',
+                  chainId: 1,
+                  address: '0x87650d7bbfc3a9f10587d7778206671719d9910d',
+                  name: 'Curve.fi Factory USD Metapool: Origin Dollar',
+                  symbol: 'OUSD3CRV-f',
+                  createdAtBlock: 12860905,
+                  createdAt: new Date('Jul-20-2021 02:59:14 AM UTC'),
+                  tokens: ['0x2a8e1e676ec238d8a992307b495b45b3feaa5e86', '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+                  exchange: 'curve',
+                  type: 'stable',
+                }),
+              ])
+            },
+          })
+        : undefined,
       createCurveStableProcessor(chainParams[chainId].stableSwapFactory),
       createCurveTwoCryptoProcessor(chainParams[chainId].twoCryptoFactory),
       createCurveTriCryptoProcessor(chainParams[chainId].triCryptoFactory),
@@ -124,6 +176,7 @@ export const createPoolsProcessor = (chainId: number) => {
       chainParams[chainId].swapxAlgebraFactory
         ? createAlgebraProcessor(chainParams[chainId].swapxAlgebraFactory!)
         : undefined,
+      createAeroProcessor(),
     ]),
   )
 }
@@ -389,168 +442,75 @@ export const createAlgebraProcessor = (params: { address: string; from: number }
   })
 }
 
-// export const createCurveMetaPoolFactoryProcessor = (params: { from: number; address: string }) => {
-//   const metaPoolDeployedFilter = logFilter({
-//     address: [params.address],
-//     topic0: [curveMetaPoolFactoryAbi.events.MetaPoolDeployed.topic],
-//     range: { from: params.from },
-//   })
-//   return defineProcessor({
-//     name: 'curve-meta-pool-factory',
-//     from: params.from,
-//     setup: (processor: EvmBatchProcessor) => {
-//       processor.addLog(metaPoolDeployedFilter.value)
-//     },
-//     process: async (ctx: Context) => {
-//       const pools = new Map<string, Pool>()
-
-//       for (const block of ctx.blocksWithContent) {
-//         for (const log of block.logs) {
-//           if (metaPoolDeployedFilter.matches(log)) {
-//             const data = curveMetaPoolFactoryAbi.events.MetaPoolDeployed.decode(log)
-//             const poolContract = new curveLpTokenAbi.Contract(ctx, block.header, data.deployer)
-//             const handleError = (error: Error) => {
-//               if (error.toString().includes('execution reverted')) {
-//                 return null
-//               }
-//               throw error
-//             }
-//             try {
-//               const [A, name, symbol, coin0, coin1, coin2, coin3] = await Promise.all([
-//                 poolContract.A(),
-//                 poolContract.name(),
-//                 poolContract.symbol(),
-//                 poolContract.coins(0).catch(handleError),
-//                 poolContract.coins(1).catch(handleError),
-//                 poolContract.coins(2).catch(handleError),
-//                 poolContract.coins(3).catch(handleError),
-//               ])
-//               const tokens = compact([coin0, coin1, coin2, coin3].map((token) => token?.toLowerCase()))
-//               if (tokens.some((token) => TRACKED_TOKENS.includes(token))) {
-//                 const pool = new Pool({
-//                   id: `${ctx.chain.id}:${data.pool}`,
-//                   chainId: ctx.chain.id,
-//                   address: log.address,
-//                   createdAtBlock: block.header.height,
-//                   createdAt: new Date(block.header.timestamp),
-//                   name,
-//                   symbol,
-//                   tokens,
-//                   exchange: 'curve',
-//                   isActive: true,
-//                   txHash: log.transactionHash,
-//                   type: `standard-${A}`,
-//                 })
-//                 pools.set(pool.id, pool)
-//                 console.log('Pool added:', data.pool)
-//                 debugger
-//               } else {
-//                 console.log('Pool not added:', data.pool)
-//               }
-//             } catch (error: any) {
-//               if (error.toString().includes('execution reverted')) {
-//                 console.log('Pool could not be processed:', data.pool)
-//               } else {
-//                 throw error
-//               }
-//             }
-//           } else if (poolRemovedFilter.matches(log)) {
-//             const data = curveRegistryAbi.events.PoolRemoved.decode(log)
-//             const id = `${ctx.chain.id}:${data.pool}`
-//             const pool = await ctx.store.get(Pool, id)
-//             if (pool) {
-//               pool.isActive = false
-//               pools.set(pool.id, pool)
-//             }
-//           }
-//         }
-//       }
-//     },
-//   })
-// }
-
-// export const createCurveRegistryProcessor = (params: { from: number; address: string }) => {
-//   const poolAddedFilter = logFilter({
-//     address: [params.address],
-//     topic0: [curveRegistryAbi.events.PoolAdded.topic],
-//     range: { from: params.from },
-//   })
-//   const poolRemovedFilter = logFilter({
-//     address: [params.address],
-//     topic0: [curveRegistryAbi.events.PoolRemoved.topic],
-//     range: { from: params.from },
-//   })
-//   return defineProcessor({
-//     name: 'curve-registry',
-//     from: params.from,
-//     setup: (processor: EvmBatchProcessor) => {
-//       processor.addLog(poolAddedFilter.value)
-//       processor.addLog(poolRemovedFilter.value)
-//     },
-//     process: async (ctx: Context) => {
-//       const pools = new Map<string, Pool>()
-
-//       for (const block of ctx.blocksWithContent) {
-//         for (const log of block.logs) {
-//           if (poolAddedFilter.matches(log)) {
-//             const data = curveRegistryAbi.events.PoolAdded.decode(log)
-//             const poolContract = new curveLpTokenAbi.Contract(ctx, block.header, data.pool)
-//             const handleError = (error: Error) => {
-//               if (error.toString().includes('execution reverted')) {
-//                 return null
-//               }
-//               throw error
-//             }
-//             try {
-//               const [A, name, symbol, coin0, coin1, coin2, coin3] = await Promise.all([
-//                 poolContract.A(),
-//                 poolContract.name(),
-//                 poolContract.symbol(),
-//                 poolContract.coins(0).catch(handleError),
-//                 poolContract.coins(1).catch(handleError),
-//                 poolContract.coins(2).catch(handleError),
-//                 poolContract.coins(3).catch(handleError),
-//               ])
-//               const tokens = compact([coin0, coin1, coin2, coin3].map((token) => token?.toLowerCase()))
-//               if (tokens.some((token) => TRACKED_TOKENS.includes(token))) {
-//                 const pool = new Pool({
-//                   id: `${ctx.chain.id}:${data.pool}`,
-//                   chainId: ctx.chain.id,
-//                   address: log.address,
-//                   createdAtBlock: block.header.height,
-//                   createdAt: new Date(block.header.timestamp),
-//                   name,
-//                   symbol,
-//                   tokens,
-//                   exchange: 'curve',
-//                   isActive: true,
-//                   txHash: log.transactionHash,
-//                   type: `standard-${A}`,
-//                 })
-//                 pools.set(pool.id, pool)
-//                 console.log('Pool added:', data.pool)
-//                 debugger
-//               } else {
-//                 console.log('Pool not added:', data.pool)
-//               }
-//             } catch (error: any) {
-//               if (error.toString().includes('execution reverted')) {
-//                 console.log('Pool could not be processed:', data.pool)
-//               } else {
-//                 throw error
-//               }
-//             }
-//           } else if (poolRemovedFilter.matches(log)) {
-//             const data = curveRegistryAbi.events.PoolRemoved.decode(log)
-//             const id = `${ctx.chain.id}:${data.pool}`
-//             const pool = await ctx.store.get(Pool, id)
-//             if (pool) {
-//               pool.isActive = false
-//               pools.set(pool.id, pool)
-//             }
-//           }
-//         }
-//       }
-//     },
-//   })
-// }
+export const createAeroProcessor = () => {
+  const aeroPoolDeployedFilter = logFilter({
+    address: [baseAddresses.aerodrome.poolFactory.amm],
+    topic0: [aerodromePoolFactoryAbi.events.PoolCreated.topic],
+    range: { from: 3200559 },
+  })
+  const aeroCLPoolDeployedFilter = logFilter({
+    address: [baseAddresses.aerodrome.poolFactory.cl],
+    topic0: [aerodromeCLPoolFactoryAbi.events.PoolCreated.topic],
+    range: { from: 13843704 },
+  })
+  return defineProcessor({
+    name: 'aerodrome-pool-factories',
+    from: 3200559,
+    setup: (processor: EvmBatchProcessor) => {
+      processor.addLog(aeroPoolDeployedFilter.value)
+      processor.addLog(aeroCLPoolDeployedFilter.value)
+    },
+    process: async (ctx: Context) => {
+      const pools = new Map<string, Pool>()
+      for (const block of ctx.blocksWithContent) {
+        for (const log of block.logs) {
+          if (aeroPoolDeployedFilter.matches(log)) {
+            const data = aerodromePoolFactoryAbi.events.PoolCreated.decode(log)
+            const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
+            const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
+            const [symbol0, symbol1] = await Promise.all([token0Contract.symbol(), token1Contract.symbol()])
+            const type = data.stable ? 'sAMM' : 'vAMM'
+            const pool = new Pool({
+              id: `${ctx.chain.id}:${data.pool}`,
+              chainId: ctx.chain.id,
+              address: data.pool,
+              name: `Aerodrome ${type} ${symbol0}/${symbol1}`,
+              symbol: `${type}-${symbol0}/${symbol1}`,
+              createdAtBlock: block.header.height,
+              createdAt: new Date(block.header.timestamp),
+              tokens: [data.token0.toLowerCase(), data.token1.toLowerCase()],
+              exchange: 'aerodrome',
+              type,
+            })
+            pools.set(pool.id, pool)
+          } else if (aeroCLPoolDeployedFilter.matches(log)) {
+            const data = aerodromeCLPoolFactoryAbi.events.PoolCreated.decode(log)
+            const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
+            const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
+            const poolContract = new algebraPoolAbi.Contract(ctx, block.header, data.pool)
+            const [symbol0, symbol1, tickSpacing] = await Promise.all([
+              token0Contract.symbol(),
+              token1Contract.symbol(),
+              poolContract.tickSpacing(),
+            ])
+            const type = `CL${data.tickSpacing}`
+            const pool = new Pool({
+              id: `${ctx.chain.id}:${data.pool}`,
+              chainId: ctx.chain.id,
+              address: data.pool,
+              name: `Aerodrome ${type} ${symbol0}/${symbol1}`,
+              symbol: `${type}-${symbol0}/${symbol1}`,
+              createdAtBlock: block.header.height,
+              createdAt: new Date(block.header.timestamp),
+              tokens: [data.token0.toLowerCase(), data.token1.toLowerCase()],
+              exchange: 'aerodrome',
+              type,
+            })
+            pools.set(pool.id, pool)
+          }
+        }
+      }
+      await ctx.store.insert([...pools.values()])
+    },
+  })
+}
