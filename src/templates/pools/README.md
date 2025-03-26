@@ -4,11 +4,11 @@ The goal here is to track what pools exist so we can dynamically understand our 
 
 AMMs to Process:
 
-- Curve
-- SwapX
-- Metropolis
-- Shadow
-- Aerodrome
+- [x] Curve
+- [x] SwapX
+- [x] Metropolis
+- [ ] Shadow
+- [x] Aerodrome
 
 ## Curve
 
