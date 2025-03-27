@@ -183,6 +183,7 @@ export const createPoolsProcessor = (chainId: number) => {
         : undefined,
       chainId === base.id ? createAeroProcessor() : undefined,
       chainId === sonic.id ? createMetropolisProcessor() : undefined,
+      chainId === sonic.id ? createShadowProcessor() : undefined,
     ]),
   )
 }
@@ -588,17 +589,18 @@ export const createShadowProcessor = () => {
   const shadowV2PairCreatedFilter = logFilter({
     address: ['0x2da25e7446a70d7be65fd4c053948becaa6374c8'],
     topic0: [shadowPairFactoryAbi.events.PairCreated.topic],
-    range: { from: 3200559 },
+    range: { from: 4028276 },
   })
   const shadowV3PoolCreatedFilter = logFilter({
     address: ['0xcd2d0637c94fe77c2896bbcbb174ceffb08de6d7'],
     topic0: [shadowV3FactoryAbi.events.PoolCreated.topic],
-    range: { from: 3200559 },
+    range: { from: 1705781 },
   })
   return defineProcessor({
     name: 'shadow-pool-factories',
-    from: 3200559,
+    from: 1705781,
     setup: (processor: EvmBatchProcessor) => {
+      processor.addLog(shadowV2PairCreatedFilter.value)
       processor.addLog(shadowV3PoolCreatedFilter.value)
     },
     process: async (ctx: Context) => {
