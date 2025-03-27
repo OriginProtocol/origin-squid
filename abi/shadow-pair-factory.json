@@ -1,0 +1,284 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_voter", "type": "address" },
+      { "internalType": "address", "name": "_treasury", "type": "address" },
+      { "internalType": "address", "name": "_accessHub", "type": "address" },
+      { "internalType": "address", "name": "_feeRecipientFactory", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "FEE_TOO_HIGH", "type": "error" },
+  { "inputs": [], "name": "IA", "type": "error" },
+  { "inputs": [], "name": "INVALID_FEE_SPLIT", "type": "error" },
+  { "inputs": [], "name": "NOT_AUTHORIZED", "type": "error" },
+  { "inputs": [], "name": "PE", "type": "error" },
+  { "inputs": [], "name": "ZA", "type": "error" },
+  { "inputs": [], "name": "ZERO_FEE", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "_caller", "type": "address" },
+      { "indexed": true, "internalType": "bool", "name": "_status", "type": "bool" }
+    ],
+    "name": "FeeSplitWhenNoGauge",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "_caller", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "_newTreasury", "type": "address" }
+    ],
+    "name": "NewTreasury",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "token0", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "token1", "type": "address" },
+      { "indexed": false, "internalType": "address", "name": "pair", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "PairCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "uint256", "name": "fee", "type": "uint256" }],
+    "name": "SetFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "pair", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "feeRecipient", "type": "address" }
+    ],
+    "name": "SetFeeRecipient",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "uint256", "name": "_feeSplit", "type": "uint256" }],
+    "name": "SetFeeSplit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "pair", "type": "address" },
+      { "indexed": true, "internalType": "uint256", "name": "fee", "type": "uint256" }
+    ],
+    "name": "SetPairFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "pair", "type": "address" },
+      { "indexed": true, "internalType": "uint256", "name": "_feeSplit", "type": "uint256" }
+    ],
+    "name": "SetPairFeeSplit",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "_pair", "type": "address" },
+      { "indexed": true, "internalType": "bool", "name": "_status", "type": "bool" }
+    ],
+    "name": "SkimStatus",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_FEE",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "accessHub",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "allPairs",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "allPairsLength",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "tokenA", "type": "address" },
+      { "internalType": "address", "name": "tokenB", "type": "address" },
+      { "internalType": "bool", "name": "stable", "type": "bool" }
+    ],
+    "name": "createPair",
+    "outputs": [{ "internalType": "address", "name": "pair", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fee",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeRecipientFactory",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeSplit",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "feeSplitWhenNoGauge",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token0", "type": "address" },
+      { "internalType": "address", "name": "token1", "type": "address" },
+      { "internalType": "bool", "name": "stable", "type": "bool" }
+    ],
+    "name": "getPair",
+    "outputs": [{ "internalType": "address", "name": "pair", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "pair", "type": "address" }],
+    "name": "isPair",
+    "outputs": [{ "internalType": "bool", "name": "isPair", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pairCodeHash",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_pair", "type": "address" }],
+    "name": "pairFee",
+    "outputs": [{ "internalType": "uint256", "name": "feeForPair", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_fee", "type": "uint256" }],
+    "name": "setFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_pair", "type": "address" },
+      { "internalType": "address", "name": "_feeRecipient", "type": "address" }
+    ],
+    "name": "setFeeRecipient",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_feeSplit", "type": "uint256" }],
+    "name": "setFeeSplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bool", "name": "status", "type": "bool" }],
+    "name": "setFeeSplitWhenNoGauge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_pair", "type": "address" },
+      { "internalType": "uint256", "name": "_fee", "type": "uint256" }
+    ],
+    "name": "setPairFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_pair", "type": "address" },
+      { "internalType": "uint256", "name": "_feeSplit", "type": "uint256" }
+    ],
+    "name": "setPairFeeSplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_pair", "type": "address" },
+      { "internalType": "bool", "name": "_status", "type": "bool" }
+    ],
+    "name": "setSkimEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_treasury", "type": "address" }],
+    "name": "setTreasury",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "pair", "type": "address" }],
+    "name": "skimEnabled",
+    "outputs": [{ "internalType": "bool", "name": "skimEnabled", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "voter",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
