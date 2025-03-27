@@ -244,12 +244,20 @@ export const createCurveStableProcessor = (params: { address: string; from: numb
                 poolContract.symbol(),
                 factory.get_coins(poolAddress),
               ])
-              const [symbols, decimals] = (await Promise.all(
-                coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return Promise.all([tokenContract.symbol(), tokenContract.decimals()])
-                }),
-              )) as [string[], number[]]
+              const [symbols, decimals] = await Promise.all([
+                Promise.all(
+                  coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.symbol()
+                  }),
+                ),
+                Promise.all(
+                  coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.decimals()
+                  }),
+                ),
+              ])
 
               const pool = new Pool({
                 id: `${ctx.chain.id}:${poolAddress}`,
@@ -274,12 +282,20 @@ export const createCurveStableProcessor = (params: { address: string; from: numb
                 poolContract.symbol(),
                 factory.get_coins(poolAddress),
               ])
-              const [symbols, decimals] = (await Promise.all(
-                coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return Promise.all([tokenContract.symbol(), tokenContract.decimals()])
-                }),
-              )) as [string[], number[]]
+              const [symbols, decimals] = await Promise.all([
+                Promise.all(
+                  coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.symbol()
+                  }),
+                ),
+                Promise.all(
+                  coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.decimals()
+                  }),
+                ),
+              ])
 
               const pool = new Pool({
                 id: `${ctx.chain.id}:${poolAddress}`,
@@ -323,12 +339,20 @@ export const createCurveTwoCryptoProcessor = (params: { address: string; from: n
         for (const log of block.logs) {
           if (twocryptoPoolDeployedFilter.matches(log)) {
             const data = twocryptoFactoryAbi.events.TwocryptoPoolDeployed.decode(log)
-            const [symbols, decimals] = (await Promise.all(
-              data.coins.map(async (coin) => {
-                const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                return Promise.all([tokenContract.symbol(), tokenContract.decimals()])
-              }),
-            )) as [string[], number[]]
+            const [symbols, decimals] = await Promise.all([
+              Promise.all(
+                data.coins.map(async (coin) => {
+                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                  return tokenContract.symbol()
+                }),
+              ),
+              Promise.all(
+                data.coins.map(async (coin) => {
+                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                  return tokenContract.decimals()
+                }),
+              ),
+            ])
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
@@ -370,12 +394,20 @@ export const createCurveTriCryptoProcessor = (params: { address: string; from: n
         for (const log of block.logs) {
           if (twocryptoPoolDeployedFilter.matches(log)) {
             const data = triCryptoFactoryAbi.events.TricryptoPoolDeployed.decode(log)
-            const [symbols, decimals] = (await Promise.all(
-              data.coins.map(async (coin) => {
-                const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                return Promise.all([tokenContract.symbol(), tokenContract.decimals()])
-              }),
-            )) as [string[], number[]]
+            const [symbols, decimals] = await Promise.all([
+              Promise.all(
+                data.coins.map(async (coin) => {
+                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                  return tokenContract.symbol()
+                }),
+              ),
+              Promise.all(
+                data.coins.map(async (coin) => {
+                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                  return tokenContract.decimals()
+                }),
+              ),
+            ])
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
@@ -417,14 +449,17 @@ export const createSwapxPairProcessor = (params: { address: string; from: number
         for (const log of block.logs) {
           if (swapxPairDeployedFilter.matches(log)) {
             const data = swapxPairFactoryAbi.events.PairCreated.decode(log)
+            const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
+            const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const poolContract = new erc20Abi.Contract(ctx, block.header, data.pair)
-            const [name, symbol] = await Promise.all([poolContract.name(), poolContract.symbol()])
-            const [symbols, decimals] = (await Promise.all(
-              [data.token0, data.token1].map(async (coin) => {
-                const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                return Promise.all([tokenContract.symbol(), tokenContract.decimals()])
-              }),
-            )) as [string[], number[]]
+            const [name, symbol, symbol0, symbol1, decimals0, decimals1] = await Promise.all([
+              poolContract.name(),
+              poolContract.symbol(),
+              token0Contract.symbol(),
+              token1Contract.symbol(),
+              token0Contract.decimals(),
+              token1Contract.decimals(),
+            ])
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pair}`,
               chainId: ctx.chain.id,
@@ -434,8 +469,8 @@ export const createSwapxPairProcessor = (params: { address: string; from: number
               createdAtBlock: block.header.height,
               createdAt: new Date(block.header.timestamp),
               tokens: [data.token0.toLowerCase(), data.token1.toLowerCase()],
-              symbols,
-              decimals,
+              symbols: [symbol0, symbol1],
+              decimals: [decimals0, decimals1],
               exchange: 'swapx',
               type: data.stable ? 'stable' : 'volatile',
             })
