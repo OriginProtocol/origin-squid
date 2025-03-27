@@ -1,5 +1,5 @@
-module.exports = class Data1742952301754 {
-    name = 'Data1742952301754'
+module.exports = class Data1743110935957 {
+    name = 'Data1743110935957'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -100,7 +100,7 @@ module.exports = class Data1742952301754 {
         await db.query(`CREATE INDEX "IDX_1ada02a88b8355495e0917b49b" ON "transaction_details" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_81a859fb3a14a34f194e1d8606" ON "transaction_details" ("from") `)
         await db.query(`CREATE INDEX "IDX_ae3e0f0414a1deb6e4840e2e44" ON "transaction_details" ("to") `)
-        await db.query(`CREATE TABLE "pool" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "exchange" text NOT NULL, "name" text, "symbol" text, "tokens" text array NOT NULL, "type" text NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_db1bfe411e1516c01120b85f8fe" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "pool" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "exchange" text NOT NULL, "name" text, "symbol" text, "tokens" text array NOT NULL, "symbols" text array NOT NULL, "decimals" integer array NOT NULL, "type" text NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_db1bfe411e1516c01120b85f8fe" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_ca7b22bed322c7c1c817d7fefc" ON "pool" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_0764827295d4ed49e259aa398f" ON "pool" ("address") `)
         await db.query(`CREATE INDEX "IDX_9a38a7d17d1fff09327de45882" ON "pool" ("exchange") `)

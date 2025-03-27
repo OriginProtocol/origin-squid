@@ -6,6 +6,8 @@ type Pool @entity {
   name: String
   symbol: String
   tokens: [String!]!
+  symbols: [String!]!
+  decimals: [Int!]!
   type: String!
   createdAtBlock: Int!
   createdAt: DateTime!

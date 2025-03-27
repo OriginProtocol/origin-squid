@@ -30,6 +30,12 @@ export class Pool {
     @StringColumn_({array: true, nullable: false})
     tokens!: (string)[]
 
+    @StringColumn_({array: true, nullable: false})
+    symbols!: (string)[]
+
+    @IntColumn_({array: true, nullable: false})
+    decimals!: (number)[]
+
     @StringColumn_({nullable: false})
     type!: string
 
