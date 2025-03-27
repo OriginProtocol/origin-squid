@@ -1,5 +1,5 @@
-module.exports = class Data1742501070596 {
-    name = 'Data1742501070596'
+module.exports = class Data1742952301754 {
+    name = 'Data1742952301754'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -100,6 +100,10 @@ module.exports = class Data1742501070596 {
         await db.query(`CREATE INDEX "IDX_1ada02a88b8355495e0917b49b" ON "transaction_details" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_81a859fb3a14a34f194e1d8606" ON "transaction_details" ("from") `)
         await db.query(`CREATE INDEX "IDX_ae3e0f0414a1deb6e4840e2e44" ON "transaction_details" ("to") `)
+        await db.query(`CREATE TABLE "pool" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "exchange" text NOT NULL, "name" text, "symbol" text, "tokens" text array NOT NULL, "type" text NOT NULL, "created_at_block" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_db1bfe411e1516c01120b85f8fe" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_ca7b22bed322c7c1c817d7fefc" ON "pool" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_0764827295d4ed49e259aa398f" ON "pool" ("address") `)
+        await db.query(`CREATE INDEX "IDX_9a38a7d17d1fff09327de45882" ON "pool" ("exchange") `)
         await db.query(`CREATE TABLE "curve_pool_booster_campaign" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "gauge" text NOT NULL, "campaign_id" numeric, "reward_token" text NOT NULL, "max_reward_per_vote" numeric NOT NULL, "total_reward_amount" numeric NOT NULL, "closed" boolean NOT NULL, CONSTRAINT "PK_87fbe895d9766f209af471d152b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_8817bf2c1e0879334c58b84f5c" ON "curve_pool_booster_campaign" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_c15ec6167b28e7f4dff4d73efb" ON "curve_pool_booster_campaign" ("address") `)
@@ -900,6 +904,10 @@ module.exports = class Data1742501070596 {
         await db.query(`DROP INDEX "public"."IDX_1ada02a88b8355495e0917b49b"`)
         await db.query(`DROP INDEX "public"."IDX_81a859fb3a14a34f194e1d8606"`)
         await db.query(`DROP INDEX "public"."IDX_ae3e0f0414a1deb6e4840e2e44"`)
+        await db.query(`DROP TABLE "pool"`)
+        await db.query(`DROP INDEX "public"."IDX_ca7b22bed322c7c1c817d7fefc"`)
+        await db.query(`DROP INDEX "public"."IDX_0764827295d4ed49e259aa398f"`)
+        await db.query(`DROP INDEX "public"."IDX_9a38a7d17d1fff09327de45882"`)
         await db.query(`DROP TABLE "curve_pool_booster_campaign"`)
         await db.query(`DROP INDEX "public"."IDX_8817bf2c1e0879334c58b84f5c"`)
         await db.query(`DROP INDEX "public"."IDX_c15ec6167b28e7f4dff4d73efb"`)

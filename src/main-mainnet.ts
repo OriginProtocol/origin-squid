@@ -2,6 +2,7 @@ import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { originArmProcessors } from 'mainnet/processors/origin-arm'
 import { protocolProcessor } from 'mainnet/processors/protocol'
 import 'tsconfig-paths/register'
+import { mainnet } from 'viem/chains'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
@@ -9,6 +10,7 @@ import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
 import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
+import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
 import { createTransactionProcessor } from '@templates/transactions'
 import {
@@ -50,6 +52,7 @@ export const processor = defineSquidProcessor({
     // Defender Relayer for Lido ARM
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
     createCurvePoolBoosterProcessor({ from: 21000000 }),
+    createPoolsProcessor(mainnet.id),
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolProcessor],
   validators: [validate],

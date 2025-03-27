@@ -343,6 +343,18 @@ type TransactionDetails @entity {
   effectiveGasPrice: BigInt!
   transactionFee: BigInt!
 }
+type Pool @entity {
+  id: ID!
+  chainId: Int! @index
+  address: String! @index
+  exchange: String! @index
+  name: String
+  symbol: String
+  tokens: [String!]!
+  type: String!
+  createdAtBlock: Int!
+  createdAt: DateTime!
+}
 type CurvePoolBoosterCampaign @entity {
   id: ID! @index
   chainId: Int! @index
