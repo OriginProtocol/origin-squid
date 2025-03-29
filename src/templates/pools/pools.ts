@@ -130,7 +130,7 @@ export const createPoolsProcessor = (chainId: number) => {
             process: async (ctx: Context) => {
               if (initialized) return
               initialized = true
-              if ((await ctx.store.count(Pool)) === 0) return
+              if (await ctx.store.get(Pool, '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7')) return
               await ctx.store.insert([
                 new Pool({
                   id: '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
