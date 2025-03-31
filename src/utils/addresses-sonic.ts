@@ -9,7 +9,10 @@ const OS = {
   vaultValueChecker: '0x06f172e6852085eca886b7f9fd8f7b21db3d2c40',
   wrapped: '0x9f0df7799f6fdad409300080cff680f5a23df4b1',
   zapper: '0xe25a2b256ffb3ad73678d5e80de8d2f6022fab21',
-  strategies: [] as { from: number; address: string }[],
+  strategies: [{ from: 4927920, address: '0x596b0401479f6dfe1caf8c12838311fee742b95c' }] as {
+    from: number
+    address: string
+  }[],
 } as const
 
 export const sonicTokens = {

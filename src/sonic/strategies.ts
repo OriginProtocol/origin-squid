@@ -15,8 +15,8 @@ export const oethStrategies: readonly IStrategyData[] = [
       ({
         chainId: sonic.id,
         from: strategy.from,
-        name: `OS Native Staking ${index + 1}`,
-        contractName: '<fill me in>',
+        name: `Sonic Staking ${index + 1}`,
+        contractName: 'SonicStakingStrategy',
         address: strategy.address,
         oTokenAddress: sonicAddresses.OS.address,
         kind: 'NativeStaking',
