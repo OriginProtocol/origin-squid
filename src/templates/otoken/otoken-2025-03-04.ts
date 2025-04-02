@@ -46,7 +46,6 @@ export class OToken_2025_03_04 {
   public rebasingCredits: bigint = 0n
   public rebasingCreditsPerToken: bigint = 0n
   public nonRebasingSupply: bigint = 0n
-  public rebasingSupply: bigint = 0n
   public alternativeCreditsPerToken: Record<string, bigint> = {}
   public rebaseState: Record<string, RebaseOptions> = {}
   public yieldTo: Record<string, string | undefined> = {}
@@ -62,7 +61,6 @@ export class OToken_2025_03_04 {
     this.rebasingCreditsPerToken = other._rebasingCreditsPerToken
     this.nonRebasingSupply = other.nonRebasingSupply
     this.alternativeCreditsPerToken = other.nonRebasingCreditsPerToken
-    this.rebasingSupply = other.totalSupply - other.nonRebasingSupply
     this.rebaseState = other.rebaseState
     this.governor = other.governor
   }
@@ -117,6 +115,13 @@ export class OToken_2025_03_04 {
    */
   decimals(): number {
     return 18
+  }
+
+  /**
+   * Returns the rebasing supply of the token
+   */
+  public get rebasingSupply(): bigint {
+    return this.totalSupply - this.nonRebasingSupply
   }
 
   /**
@@ -566,16 +571,13 @@ export class OToken_2025_03_04 {
 
     this.totalSupply = _newTotalSupply > this.MAX_SUPPLY ? this.MAX_SUPPLY : _newTotalSupply
 
-    const rebasingSupply = this.totalSupply - this.nonRebasingSupply
-    this.rebasingSupply = rebasingSupply
-    // round up in the favour of the protocol
-
     if (this.block.header.timestamp < Date.parse('2025-01-08T00:00:00Z')) {
-      this.rebasingCreditsPerToken = (this.rebasingCredits * 10n ** 18n) / rebasingSupply
+      this.rebasingCreditsPerToken = (this.rebasingCredits * 10n ** 18n) / this.rebasingSupply
       // Validate total supply calculation
       this.totalSupply = (this.rebasingCredits * 10n ** 18n) / this.rebasingCreditsPerToken + this.nonRebasingSupply
     } else {
-      this.rebasingCreditsPerToken = (this.rebasingCredits * 10n ** 18n + rebasingSupply - 1n) / rebasingSupply
+      this.rebasingCreditsPerToken =
+        (this.rebasingCredits * 10n ** 18n + this.rebasingSupply - 1n) / this.rebasingSupply
     }
 
     if (this.rebasingCreditsPerToken <= 0n) {
