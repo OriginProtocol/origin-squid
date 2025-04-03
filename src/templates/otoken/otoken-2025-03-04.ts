@@ -54,7 +54,7 @@ export class OToken_2025_03_04 {
 
   copyState(other: OToken_2023_12_21): void {
     this.totalSupply = other.totalSupply
-    this.allowances = other._allowances
+    this.allowances = other.allowances
     this.vaultAddress = other.vaultAddress
     this.creditBalances = other.creditBalances
     this.rebasingCredits = other._rebasingCredits
@@ -86,13 +86,13 @@ export class OToken_2025_03_04 {
    */
   private onlyGovernor(caller: string): void {
     if (caller !== this.governor) {
-      this.ctx.log.warn('Caller is not the Governor')
+      // this.ctx.log.warn('Caller is not the Governor')
     }
   }
 
   private onlyVault(caller: string): void {
     if (caller !== this.vaultAddress) {
-      this.ctx.log.warn('Caller is not the Vault')
+      // this.ctx.log.warn('Caller is not the Vault')
     }
   }
 
@@ -239,7 +239,7 @@ export class OToken_2025_03_04 {
 
     const userAllowance = this.allowances[_from]?.[caller] || 0n
     if (_value > userAllowance) {
-      throw new Error('Allowance exceeded')
+      this.ctx.log.error('Allowance exceeded')
     }
 
     // Update allowance

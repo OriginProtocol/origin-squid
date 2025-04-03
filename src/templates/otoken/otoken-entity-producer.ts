@@ -25,15 +25,15 @@ import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { isContract } from '@utils/isContract'
 
 import { createOTokenLegacyProcessor } from './otoken'
-import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
 import { processOTokenERC20 } from './otoken-erc20'
+import { OTokenClass } from './types'
 
 dayjs.extend(utc)
 
 export class OTokenEntityProducer {
-  otoken: OToken_2023_12_21 | OToken_2025_03_04
+  otoken: OTokenClass
   public name: string
   public symbol: string
   public from: number
@@ -67,7 +67,7 @@ export class OTokenEntityProducer {
   }[] = []
 
   constructor(
-    otoken: OToken_2023_12_21 | OToken_2025_03_04,
+    otoken: OTokenClass,
     params: {
       name: string
       symbol: string
@@ -301,7 +301,7 @@ export class OTokenEntityProducer {
         order: { date: 'DESC' },
       })
       if (previousApy) {
-        this.apyMap.set(previousId, previousApy)
+        this.apyMap.set(previousApy.id, previousApy)
       }
     }
 
@@ -725,20 +725,21 @@ export class OTokenEntityProducer {
         ]).then(() => erc20s),
       ),
       // OToken Entity Saving,
-      this.ctx.store
-        .upsert([...this.changedAddressMap.values()]) // These must be saved first.
-        .then(() =>
-          Promise.all([
-            this.ctx.store.insert([...this.otokenMap.values()]),
-            this.ctx.store.upsert([...this.apyMap.values()]),
-            this.ctx.store.insert([...this.rebaseMap.values()]),
-            this.ctx.store.upsert([...this.histories.values()]),
-            this.ctx.store.insert(this.rebaseOptions),
-            this.ctx.store.insert(this.harvesterYieldSent),
-            this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
-            this.ctx.store.upsert([...this.yieldForwarded.values()]),
-          ]),
-        ),
+      Promise.all([
+        // These must be saved first.
+        this.ctx.store.upsert([...this.apyMap.values()]),
+        this.ctx.store.upsert([...this.changedAddressMap.values()]),
+      ]).then(() =>
+        Promise.all([
+          this.ctx.store.insert([...this.otokenMap.values()]),
+          this.ctx.store.upsert([...this.rebaseMap.values()]),
+          this.ctx.store.upsert([...this.histories.values()]),
+          this.ctx.store.insert(this.rebaseOptions),
+          this.ctx.store.insert(this.harvesterYieldSent),
+          this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
+          this.ctx.store.upsert([...this.yieldForwarded.values()]),
+        ]),
+      ),
     ])
 
     if (process.env.DEBUG_PERF === 'true') {

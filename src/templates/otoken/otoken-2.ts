@@ -7,6 +7,7 @@ import * as proxyAbi from '@abi/governed-upgradeability-proxy'
 import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
+import * as otokenUpgradeAccountsAbi from '@abi/otoken-upgradeAccounts'
 import { OTokenAsset, OTokenRawData } from '@model'
 import { Block, Context, defineProcessor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
@@ -15,10 +16,15 @@ import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
 import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
 import { OTokenContractAddress } from './otoken'
+import { OToken_2021_01_02 } from './otoken-2021-01-02'
+import { OToken_2021_01_08 } from './otoken-2021-01-08'
+import { OToken_2021_01_25 } from './otoken-2021-01-25'
+import { OToken_2021_06_06 } from './otoken-2021-06-06'
 import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { OTokenEntityProducer } from './otoken-entity-producer'
 import { otokenFrequencyProcessor } from './otoken-frequency'
+import { OTokenClass } from './types'
 
 const DEBUG_PERF = process.env.DEBUG_PERF === 'true'
 
@@ -242,7 +248,7 @@ export const createOTokenProcessor2 = (params: {
       })
     : undefined
 
-  let otoken: OToken_2025_03_04 | OToken_2023_12_21
+  let otoken: OTokenClass
   let producer: OTokenEntityProducer
   let hasUpgraded = false
 
@@ -360,26 +366,33 @@ export const createOTokenProcessor2 = (params: {
       producer.ctx = ctx
 
       const updateOToken = (block: Block, implementationHash: string) => {
-        const implementations: Record<string, typeof OToken_2023_12_21 | typeof OToken_2025_03_04 | undefined> = {
+        const implementations = {
+          ['496e21711abcc5a5e71f44a6df876be356b8d2a744dbfd3ca9178b7c3541b709']: OToken_2021_01_02, // OUSDReset
+          ['a8637a9454638edbb3bcc829dce87a34347c79ea7d770c5c0bf5454084493068']: OToken_2021_01_02, // OUSD
+          ['d6b4e5430521fd995b6f2b22ded687920ba3366e0d9a26a4a1945d4294c6c87a']: OToken_2021_01_08, // OUSD
+          ['59dbb5d85bc23b4f3ba03b666968b047cdf37510ffebb0d73be488a6cc4caf6b']: OToken_2021_01_25, // OUSD
+          ['2c732025acc57af56e91280585f618ab82c490c622d020cd9e1392e16ad8f002']: OToken_2021_06_06, // OUSD
+          ['a72adccfd144de224327c1e996846581ea558e09c5d4550be805f476c2c95693']: OToken_2021_06_06, // OUSD (Oct 10 Solidity Version Upgrade)
+          ['fb0d375a21da4cd166daa272599ba63cc6a5b33297911f4d5d0d59704d8441f0']: OToken_2023_12_21, // OUSD
+          ['7d8c23bd4b030988bfce3157db9b64fb5b56e0b3e84dc6c46ad6518d62f91123']: OToken_2023_12_21, // OUSD
+          ['8f4279035f7015d760105710a9dd0492b01ce31a5005ad107af1227d5c0c6889']: OToken_2025_03_04, // OUSD (Yield Forwarding)
           ['9ad3a9e43e4bdd6a974ef5db2c3fe9da590cbc6ad6709000f524896422abd5b8']: OToken_2023_12_21, // OETH
           ['eb5e67df57270fd5381abb6733ed1d61fc4afd08e1de9993f2f5b4ca95118f59']: OToken_2023_12_21, // OETH & superOETHb
           ['a6222a94f4fa7e48bb9acd1f7c484bc6f07d8a29269a34d0d9cd29af9d3fca28']: OToken_2023_12_21, // superOETHb
           ['6f0dcec1eda8cb66e295a41897ddd269bdb02cd241c7c5e30db58ffe31718748']: OToken_2023_12_21, // superOETHb (governanceRecover())
-          ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04, // OETH
-          ['219568b0baaa5c41831401e6b696c97b537a770244bce9ed091a7991c8fb64b9']: OToken_2025_03_04, // OETH
-          ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS
-        }
-        const OTokenClass = implementations[implementationHash]
-        if (OTokenClass) {
-          if (otoken instanceof OTokenClass) {
+          ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04, // OETH (Yield Forwarding)
+          ['219568b0baaa5c41831401e6b696c97b537a770244bce9ed091a7991c8fb64b9']: OToken_2025_03_04, // OETH (Yield Forwarding)
+          ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS (Yield Forwarding)
+        } as const
+        const ImplementationOTokenClass = implementations[implementationHash as keyof typeof implementations]
+        if (ImplementationOTokenClass) {
+          if (otoken instanceof ImplementationOTokenClass) {
             ctx.log.info('New implementation processed by same class.')
             return
           }
-          const newImplementation = new OTokenClass(ctx, block, otokenAddress)
+          const newImplementation = new ImplementationOTokenClass(ctx, block, otokenAddress)
           ctx.log.info('Instantiated new implementation now copying state: ' + newImplementation.constructor.name)
-          if (otoken instanceof OToken_2023_12_21 && newImplementation instanceof OToken_2025_03_04) {
-            newImplementation.copyState(otoken)
-          }
+          copyData(otoken, newImplementation)
           otoken = newImplementation
           producer.otoken = newImplementation
           justUpgraded = true
@@ -634,6 +647,32 @@ export const createOTokenProcessor2 = (params: {
                 startSection('trace_claimGovernance')
                 addressesToCheck.add(sender)
                 endSection('trace_claimGovernance')
+              } else if (trace.action.to === otokenAddress && trace.action.input.startsWith('0x51cfd6fe')) {
+                startSection('trace_upgradeGlobals')
+                if (otoken instanceof OToken_2023_12_21) {
+                  otoken.isUpgraded['0x0000000000000000000000000000000000000000'] = 1n
+                  otoken._rebasingCredits = otoken._rebasingCredits * 10n ** 9n
+                  otoken._rebasingCreditsPerToken = otoken._rebasingCreditsPerToken * 10n ** 9n
+                }
+                endSection('trace_upgradeGlobals')
+              } else if (trace.action.to === otokenAddress && trace.action.input.startsWith('0xeec037f6')) {
+                startSection('trace_upgradeAccounts')
+                const data = otokenUpgradeAccountsAbi.functions.upgradeAccounts.decode(trace.action.input)
+                if (otoken instanceof OToken_2023_12_21) {
+                  for (const account of data.accounts) {
+                    otoken.isUpgraded[account] = 1n
+
+                    // Handle special for non-rebasing accounts
+                    const nrc = otoken.nonRebasingCreditsPerToken[account]
+                    if (nrc > 0n) {
+                      otoken.nonRebasingCreditsPerToken[account] = nrc * 10n ** 9n
+                    }
+                    // Upgrade balance
+                    const balance = otoken.creditBalances[account]
+                    otoken.creditBalances[account] = balance * 10n ** 9n
+                  }
+                }
+                endSection('trace_upgradeAccounts')
               } else if (trace.action.to === otokenAddress && trace.action.input.startsWith('0xc6f10ba3')) {
                 startSection('trace_governanceRecover')
                 ctx.log.info('SPECIAL CASE FOR superOETHb - governanceRecover()')
@@ -691,6 +730,7 @@ export const createOTokenProcessor2 = (params: {
         const lastBlock = ctx.blocks[ctx.blocks.length - 1]
         await saveOTokenRawData(ctx, lastBlock, otoken)
         endSection('saveOTokenRawData')
+        // await checkState(ctx, lastBlock, otoken, new Set([...Object.keys(otoken.creditBalances)]))
       }
 
       const frequencyUpdateResults = await frequencyUpdatePromise
@@ -711,16 +751,40 @@ export const createOTokenProcessor2 = (params: {
   })
 }
 
+const copyData = (otoken: OTokenClass, newImplementation: OTokenClass) => {
+  if (otoken instanceof OToken_2021_01_02 && newImplementation instanceof OToken_2021_01_08) {
+    newImplementation.copyState(otoken)
+  } else if (otoken instanceof OToken_2021_01_08 && newImplementation instanceof OToken_2021_01_25) {
+    newImplementation.copyState(otoken)
+  } else if (otoken instanceof OToken_2021_01_25 && newImplementation instanceof OToken_2021_06_06) {
+    newImplementation.copyState(otoken)
+  } else if (otoken instanceof OToken_2021_06_06 && newImplementation instanceof OToken_2023_12_21) {
+    newImplementation.copyState(otoken)
+  } else if (otoken instanceof OToken_2023_12_21 && newImplementation instanceof OToken_2025_03_04) {
+    newImplementation.copyState(otoken)
+  } else if (otoken) {
+    throw new Error('Invalid copyData')
+  }
+}
+
 const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) => {
   const otoken =
-    entity.type === 'OToken_2023_12_21'
+    entity.type === 'OToken_2021_01_02'
+      ? new OToken_2021_01_02(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2021_01_08'
+      ? new OToken_2021_01_08(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2021_01_25'
+      ? new OToken_2021_01_25(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2021_06_06'
+      ? new OToken_2021_06_06(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2023_12_21'
       ? new OToken_2023_12_21(ctx, block, entity.otoken)
       : new OToken_2025_03_04(ctx, block, entity.otoken)
   Object.assign(otoken, entity.data)
   return otoken
 }
 
-const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023_12_21 | OToken_2025_03_04) => {
+const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass) => {
   const rawDataEntity = new OTokenRawData({
     id: `${ctx.chain.id}-${otoken.address}`,
     chainId: ctx.chain.id,
@@ -732,10 +796,25 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
       bigintJsonStringify(
         pick(
           otoken,
-          otoken instanceof OToken_2023_12_21
+          otoken instanceof OToken_2021_01_02 ||
+            otoken instanceof OToken_2021_01_08 ||
+            otoken instanceof OToken_2021_01_25 ||
+            otoken instanceof OToken_2021_06_06
             ? [
                 'totalSupply',
-                '_allowances',
+                'allowances',
+                'vaultAddress',
+                'creditBalances',
+                'rebasingCredits',
+                'rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'nonRebasingCreditsPerToken',
+                'rebaseState',
+              ]
+            : otoken instanceof OToken_2023_12_21
+            ? [
+                'totalSupply',
+                'allowances',
                 'vaultAddress',
                 'creditBalances',
                 '_rebasingCredits',
@@ -755,7 +834,6 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
                 'rebasingCredits',
                 'rebasingCreditsPerToken',
                 'nonRebasingSupply',
-                'rebasingSupply',
                 'alternativeCreditsPerToken',
                 'rebaseState',
                 'yieldTo',
@@ -768,7 +846,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
   })
   await ctx.store.save(rawDataEntity)
 
-  if (env.NODE_ENV === 'development') {
+  if (false && env.NODE_ENV === 'development') {
     writeFileSync(
       `data/otoken/otoken-raw-data-${otoken.address}-${block.header.height}.json`,
       bigintJsonStringify(rawDataEntity, 2),
@@ -776,12 +854,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OToken_2023
   }
 }
 
-const checkState = async (
-  ctx: Context,
-  block: Block,
-  otoken: OToken_2023_12_21 | OToken_2025_03_04,
-  addressesToCheck: Set<string>,
-) => {
+const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addressesToCheck: Set<string>) => {
   ctx.log.info(`checking state at height ${block.header.height}`)
   let wrongCount = 0
   let totalCount = 0

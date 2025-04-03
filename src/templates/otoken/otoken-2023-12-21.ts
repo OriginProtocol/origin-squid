@@ -1,6 +1,8 @@
 import { Block, Context } from '@originprotocol/squid-utils'
 import { isContract } from '@utils/isContract'
 
+import { OToken_2021_06_06 } from './otoken-2021-06-06'
+
 /**
  * @title OUSD Token Contract
  * @dev TypeScript implementation of OUSD token with elastic supply
@@ -16,7 +18,7 @@ enum RebaseOptions {
 export class OToken_2023_12_21 {
   public readonly MAX_SUPPLY = 2n ** 128n - 1n // (2^128) - 1
   public totalSupply: bigint = 0n
-  public _allowances: Record<string, Record<string, bigint>> = {}
+  public allowances: Record<string, Record<string, bigint>> = {}
   public vaultAddress: string = '0x0000000000000000000000000000000000000000'
   public creditBalances: Record<string, bigint> = {}
   public _rebasingCredits: bigint = 0n
@@ -39,6 +41,18 @@ export class OToken_2023_12_21 {
     this.address = address
   }
 
+  copyState(other: OToken_2021_06_06): void {
+    this.totalSupply = other.totalSupply
+    this.allowances = other.allowances
+    this.vaultAddress = other.vaultAddress
+    this.creditBalances = other.creditBalances
+    this._rebasingCredits = other.rebasingCredits
+    this._rebasingCreditsPerToken = other.rebasingCreditsPerToken
+    this.nonRebasingSupply = other.nonRebasingSupply
+    this.nonRebasingCreditsPerToken = other.nonRebasingCreditsPerToken
+    this.rebaseState = other.rebaseState
+  }
+
   /**
    * @dev Initialize the contract with initial parameters
    */
@@ -57,13 +71,13 @@ export class OToken_2023_12_21 {
 
   private onlyVault(caller: string): void {
     if (caller !== this.vaultAddress) {
-      this.ctx.log.warn('Caller is not the Vault')
+      // this.ctx.log.warn('Caller is not the Vault')
     }
   }
 
   private onlyGovernor(caller: string): void {
     if (caller !== this.governor) {
-      this.ctx.log.warn('Caller is not the Governor')
+      // this.ctx.log.warn('Caller is not the Governor')
     }
   }
 
@@ -156,10 +170,10 @@ export class OToken_2023_12_21 {
       )
     }
 
-    const allowances = this._allowances[from] || {}
+    const allowances = this.allowances[from] || {}
     const allowance = allowances[caller] || 0n
     allowances[caller] = allowance - value
-    this._allowances[from] = allowances
+    this.allowances[from] = allowances
 
     await this._executeTransfer(from, to, value)
 
@@ -210,7 +224,7 @@ export class OToken_2023_12_21 {
    * @return The number of tokens still available for the _spender.
    */
   public allowance(_owner: string, _spender: string): bigint {
-    return this._allowances[_owner]?.[_spender] || 0n
+    return this.allowances[_owner]?.[_spender] || 0n
   }
 
   /**
@@ -226,12 +240,14 @@ export class OToken_2023_12_21 {
    * @param _spender The address which will spend the funds.
    * @param _value The amount of tokens to be spent.
    */
-  public approve(caller: string, _spender: string, _value: bigint): boolean {
-    if (!this._allowances[caller]) {
-      this._allowances[caller] = {}
-    }
-    this._allowances[caller][_spender] = _value
-    // this.emitApproval(caller, _spender, _value)
+  approve(caller: string, _spender: string, _value: bigint): boolean {
+    const callerAllowances = this.allowances[caller] || {}
+    callerAllowances[_spender] = _value
+    this.allowances[caller] = callerAllowances
+
+    // Emit event (would be handled by event system in actual implementation)
+    // emit Approval(caller, _spender, _value)
+
     return true
   }
 

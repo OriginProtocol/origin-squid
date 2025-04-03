@@ -3,11 +3,14 @@ import { formatUnits } from 'viem'
 
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
-import { Context, run } from '@originprotocol/squid-utils'
+import * as erc20Abi from '@abi/erc20'
+import * as otokenAbi from '@abi/otoken'
+import { Context, defineProcessor, logFilter, multicall, run } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { priceMap } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
 import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { getCoingeckoData } from '@utils/coingecko2'
 
@@ -176,18 +179,65 @@ const testMixedQuoter = {
   },
 }
 
+const ousdTransferFilter = logFilter({
+  address: [OUSD_ADDRESS],
+  topic0: [erc20Abi.events.Transfer.topic],
+  range: { from: 10884563 },
+})
+
+const addressSet = new Set<string>()
+
+const getOUSDAddresses = defineProcessor({
+  name: 'get-ousd-addresses',
+  from: 10884563,
+  setup: (p: EvmBatchProcessor) => {
+    p.addLog(ousdTransferFilter.value)
+    p.includeAllBlocks({ from: 11585978 })
+  },
+  process: async (ctx: Context) => {
+    for (const block of ctx.blocks) {
+      for (const log of block.logs) {
+        const data = erc20Abi.events.Transfer.decode(log)
+        if (data.from && data.from !== '0x0000000000000000000000000000000000000000') {
+          addressSet.add(data.from)
+        }
+        if (data.to && data.to !== '0x0000000000000000000000000000000000000000') {
+          addressSet.add(data.to)
+        }
+      }
+      const addressList = Array.from(addressSet.values())
+      if (block.header.height === 11585978) {
+        const balances = await multicall(
+          ctx,
+          block.header,
+          otokenAbi.functions.creditsBalanceOf,
+          OUSD_ADDRESS,
+          addressList.map((a) => ({ _account: a })),
+        )
+        const balanceMap = new Map(balances.map((b, i) => [addressList[i], b]))
+        console.log(balanceMap)
+        debugger
+      }
+    }
+  },
+})
+
 if (require.main === module) {
   console.log('process:test running')
   run({
-    chainId: 8453,
+    chainId: 1,
     stateSchema: 'test-processor',
     processors: [
       // testRate,
       // testCoingecko,
       // testAerodromeSugar,
-      testMixedQuoter,
+      // testMixedQuoter,
+      getOUSDAddresses,
     ],
     postProcessors: [],
     validators: [],
+  }).catch((e) => {
+    console.error(e)
+    process.exit(1)
   })
 }
