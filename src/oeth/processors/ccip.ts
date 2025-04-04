@@ -72,6 +72,7 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
     address: [onRampAddress],
     topic0: [ccipOnRampAbi.events.CCIPSendRequested.topic],
     transaction: true,
+    transactionTraces: true,
   })
 
   const executionStateChanged = logFilter({
@@ -92,7 +93,6 @@ export const ccip = (params: { chainId: 1 | 42161 }) => {
     processor.addLog(executionStateChanged.value)
     processor.addLog(transfersToLockReleasePool.value)
     processor.addLog(ccipSendRequested.value)
-    processor.addTrace(ccipSendFunction.value)
   }
 
   const process = async (ctx: Context) => {
