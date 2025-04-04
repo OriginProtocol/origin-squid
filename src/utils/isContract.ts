@@ -14,7 +14,7 @@ let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number }>
  */
 export const isContract = async (ctx: Context, block: Block, account: string): Promise<boolean> => {
   if (account === '0x0000000000000000000000000000000000000000') return false
-  if (!ctx.isHead && cache.has(account)) {
+  if (cache.has(account)) {
     const entry = cache.get(account)!
     if (entry.expiresAt > block.header.timestamp && entry.validFrom <= block.header.timestamp) {
       return entry.value
@@ -25,28 +25,24 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
   let codeAtBlock
   let codeAtLatest
 
-  if (ctx.isHead) {
-    codeAtBlock = await ctx._chain.client.call('eth_getCode', [account, `0x${block.header.height.toString(16)}`])
-  } else {
-    const batchResult = await ctx._chain.client.batchCall([
-      {
-        method: 'eth_getCode',
-        params: [account, `latest`],
-      },
-      {
-        method: 'eth_getCode',
-        params: [account, `0x${block.header.height.toString(16)}`],
-      },
-    ])
-    codeAtLatest = batchResult[0]
-    codeAtBlock = batchResult[1]
-    if (codeAtBlock === codeAtLatest) {
-      cache.set(account, {
-        value: codeAtLatest !== '0x',
-        expiresAt: Date.now(),
-        validFrom: block.header.timestamp,
-      })
-    }
+  const batchResult = await ctx._chain.client.batchCall([
+    {
+      method: 'eth_getCode',
+      params: [account, `latest`],
+    },
+    {
+      method: 'eth_getCode',
+      params: [account, `0x${block.header.height.toString(16)}`],
+    },
+  ])
+  codeAtLatest = batchResult[0]
+  codeAtBlock = batchResult[1]
+  if (codeAtBlock === codeAtLatest) {
+    cache.set(account, {
+      value: codeAtLatest !== '0x',
+      expiresAt: Date.now(),
+      validFrom: block.header.timestamp,
+    })
   }
 
   time += Date.now() - start
@@ -77,7 +73,7 @@ export const areContracts = async (ctx: Context, block: Block, accounts: string[
       continue
     }
 
-    if (!ctx.isHead && cache.has(account)) {
+    if (cache.has(account)) {
       const entry = cache.get(account)!
       if (entry.expiresAt > block.header.timestamp && entry.validFrom <= block.header.timestamp) {
         result.set(account, entry.value)
@@ -92,50 +88,35 @@ export const areContracts = async (ctx: Context, block: Block, accounts: string[
 
   const start = Date.now()
 
-  if (ctx.isHead) {
-    // For head blocks, we can only check the current block
-    const batchCalls = accountsToCheck.map((account) => ({
+  // For historical blocks, we can check both latest and at block
+  const batchCalls = accountsToCheck.flatMap((account) => [
+    {
+      method: 'eth_getCode',
+      params: [account, 'latest'],
+    },
+    {
       method: 'eth_getCode',
       params: [account, `0x${block.header.height.toString(16)}`],
-    }))
+    },
+  ])
 
-    const batchResults = await ctx._chain.client.batchCall(batchCalls)
+  const batchResults = await ctx._chain.client.batchCall(batchCalls)
 
-    accountsToCheck.forEach((account, index) => {
-      const codeAtBlock = batchResults[index]
-      result.set(account, codeAtBlock !== '0x')
-    })
-  } else {
-    // For historical blocks, we can check both latest and at block
-    const batchCalls = accountsToCheck.flatMap((account) => [
-      {
-        method: 'eth_getCode',
-        params: [account, 'latest'],
-      },
-      {
-        method: 'eth_getCode',
-        params: [account, `0x${block.header.height.toString(16)}`],
-      },
-    ])
+  for (let i = 0; i < accountsToCheck.length; i++) {
+    const account = accountsToCheck[i]
+    const codeAtLatest = batchResults[i * 2]
+    const codeAtBlock = batchResults[i * 2 + 1]
 
-    const batchResults = await ctx._chain.client.batchCall(batchCalls)
+    const isContractValue = codeAtBlock !== '0x'
+    result.set(account, isContractValue)
 
-    for (let i = 0; i < accountsToCheck.length; i++) {
-      const account = accountsToCheck[i]
-      const codeAtLatest = batchResults[i * 2]
-      const codeAtBlock = batchResults[i * 2 + 1]
-
-      const isContractValue = codeAtBlock !== '0x'
-      result.set(account, isContractValue)
-
-      // Update cache if the code is the same at latest and at block
-      if (codeAtBlock === codeAtLatest) {
-        cache.set(account, {
-          value: isContractValue,
-          expiresAt: Date.now(),
-          validFrom: block.header.timestamp,
-        })
-      }
+    // Update cache if the code is the same at latest and at block
+    if (codeAtBlock === codeAtLatest) {
+      cache.set(account, {
+        value: isContractValue,
+        expiresAt: Date.now(),
+        validFrom: block.header.timestamp,
+      })
     }
   }
 
@@ -161,6 +142,7 @@ export const loadIsContractCache = async (ctx: Context) => {
         return [key, { ...value, validFrom: value.validFrom ?? 0 }]
       }),
     )
+    ctx.log.info('Loaded isContract cache from database: ' + cache.size + ' entries')
   } else if (existsSync(`${localStoragePath}/${id}.json`)) {
     try {
       const fileData = JSON.parse(readFileSync(`${localStoragePath}/${id}.json`, 'utf8'))
@@ -169,6 +151,7 @@ export const loadIsContractCache = async (ctx: Context) => {
           return [key, { ...value, validFrom: value.validFrom ?? 0 }]
         }),
       )
+      ctx.log.info('Loaded isContract cache from file: ' + cache.size + ' entries')
     } catch (e) {
       console.error('Error loading isContract cache from file:', e)
       cache = new Map()
@@ -182,7 +165,6 @@ export const loadIsContractCache = async (ctx: Context) => {
 let lastSave = 0
 export const saveIsContractCache = async (ctx: Context) => {
   if (!cache) return
-  if (ctx.isHead) return // Stop saving once we get to head, we no longer want cache at head.
   if (Date.now() - lastSave < 5 * 60 * 1000) return
   const id = `${ctx.chain.id}-isContract`
   if (process.env.NODE_ENV === 'development') {
