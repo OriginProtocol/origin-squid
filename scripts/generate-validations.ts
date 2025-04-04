@@ -395,6 +395,46 @@ const strategy = (prefix: string, strategies: string) => {
   ]
 }
 
+const bridging = () => {
+  return [
+    gql(`
+    bridgeTransfers(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+    ) {
+      amountIn
+      amountOut
+      bridge
+      blockNumber
+      chainIn
+      chainOut
+      id
+      messageId
+      receiver
+      sender
+      state
+      timestamp
+      tokenIn
+      tokenOut
+      transactor
+      txHashIn
+      txHashOut
+      }
+    `),
+    gql(`
+      bridgeTransferStates: bridgeTransferStates(
+        limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      ) {  
+        blockNumber
+        id
+        state
+        timestamp
+        txHash
+      }
+    `),
+  ]
+}
 const main = async () => {
   console.log(`Generating validations for: ${process.argv[2]}`)
   const queries: string[] = [
@@ -414,6 +454,7 @@ const main = async () => {
     ognDailyStats(),
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
+    ...bridging(),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
