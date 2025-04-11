@@ -56,9 +56,7 @@ export const processOTokenDailyStats = async (
         ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
         : null
 
-    if (process.env.DEBUG_PERF === 'true') {
-      console.time('getOTokenDailyStat async calls')
-    }
+    const asyncStartTime = Date.now()
     const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] =
       await Promise.all([
         (async () => {
@@ -109,7 +107,7 @@ export const processOTokenDailyStats = async (
         wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
       ])
     if (process.env.DEBUG_PERF === 'true') {
-      console.timeEnd('getOTokenDailyStat async calls')
+      ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
     }
 
     if (!otokenObject) continue
