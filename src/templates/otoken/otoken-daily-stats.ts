@@ -56,6 +56,9 @@ export const processOTokenDailyStats = async (
         ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
         : null
 
+    if (process.env.DEBUG_PERF === 'true') {
+      console.time('getOTokenDailyStat async calls')
+    }
     const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] =
       await Promise.all([
         (async () => {
@@ -105,6 +108,9 @@ export const processOTokenDailyStats = async (
         wotokenContract ? wotokenContract.totalSupply() : 0n,
         wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
       ])
+    if (process.env.DEBUG_PERF === 'true') {
+      console.timeEnd('getOTokenDailyStat async calls')
+    }
 
     if (!otokenObject) continue
 
@@ -155,8 +161,8 @@ export const processOTokenDailyStats = async (
     entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
     entity.wrappedSupply = wrappedSupply
     entity.rateWrapped = wrappedRate
-    entity.accountsOverThreshold = [...params.balances.keys()].filter(
-      (a) => params.balances.get(a)! >= params.accountsOverThresholdMinimum,
+    entity.accountsOverThreshold = Array.from(params.balances.values()).filter(
+      (balance) => balance >= params.accountsOverThresholdMinimum,
     ).length
     ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
   }
