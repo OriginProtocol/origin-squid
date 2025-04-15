@@ -13,6 +13,14 @@ const OS = {
     from: number
     address: string
   }[],
+  amoSwapX: {
+    pool: '0xcfe67b6c7b65c8d038e666b3241a161888b7f2b0',
+    gauge: '0x083d761b2a3e1fb5914fa61c6bf11a93dcb60709',
+    strategy: {
+      address: '0xbe19cc5654e30daf04ad3b5e06213d70f4e882ee',
+      from: 17414053,
+    },
+  },
 } as const
 
 export const sonicTokens = {

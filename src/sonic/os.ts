@@ -1,5 +1,6 @@
 import { parseEther } from 'viem'
 
+import * as initializableAbstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
@@ -41,7 +42,15 @@ const otokenProcessor = createOTokenProcessor2({
     rebaseOptEvents: false,
   },
   accountsOverThresholdMinimum: parseEther('.01'),
-  getAmoSupply: async () => 0n,
+  getAmoSupply: async (ctx, height) => {
+    if (height < sonicAddresses.OS.amoSwapX.strategy.from) return 0n
+    const contract = new initializableAbstractStrategyAbi.Contract(
+      ctx,
+      { height },
+      sonicAddresses.OS.amoSwapX.strategy.address,
+    )
+    return contract.checkBalance(sonicAddresses.tokens.wS)
+  },
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
