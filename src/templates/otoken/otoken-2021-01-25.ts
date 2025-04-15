@@ -63,7 +63,7 @@ export class OToken_2021_01_25 {
   /**
    * @dev Verifies that the caller is the Savings Manager contract
    */
-  private onlyVault(caller: string): void {
+  private onlyVault(_caller: string): void {
     // if (caller !== this.vaultAddress) {
     //   throw new Error('Caller is not the Vault')
     // }
@@ -433,7 +433,7 @@ export class OToken_2021_01_25 {
 
   /* compat for object fit */
 
-  public async governanceRebaseOptIn(caller: string, account: string): Promise<void> {
+  public async governanceRebaseOptIn(_caller: string, _account: string): Promise<void> {
     return
   }
 }

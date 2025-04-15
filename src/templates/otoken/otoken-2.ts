@@ -9,9 +9,18 @@ import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenUpgradeAccountsAbi from '@abi/otoken-upgradeAccounts'
 import { OTokenAsset, OTokenRawData } from '@model'
-import { Block, Context, defineProcessor, env, logFilter, multicall, traceFilter } from '@originprotocol/squid-utils'
+import {
+  Block,
+  Context,
+  EvmBatchProcessor,
+  defineProcessor,
+  env,
+  logFilter,
+  multicall,
+  traceFilter,
+} from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor, Trace } from '@subsquid/evm-processor'
+import { Trace } from '@subsquid/evm-processor'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
 import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
@@ -59,7 +68,7 @@ const endSection = (section: string) => {
 const logPerformanceStats = () => {
   if (!DEBUG_PERF) return
   let totalTime = 0
-  for (const [_, stats] of performanceStats) {
+  for (const stats of performanceStats.values()) {
     totalTime += stats.totalTime
   }
 
@@ -250,7 +259,7 @@ export const createOTokenProcessor2 = (params: {
 
   let otoken: OTokenClass
   let producer: OTokenEntityProducer
-  let hasUpgraded = false
+  // let hasUpgraded = false
 
   return defineProcessor({
     name: `otoken2-${otokenAddress}`,
@@ -270,8 +279,10 @@ export const createOTokenProcessor2 = (params: {
       // })
 
       // Monkeypatch Hack
+      // eslint-disable-next-line
       const originalAddTrace = processor.addTrace
       function modifiedMapRequest<T extends { range?: { from: number } }>(options: T): Omit<T, 'range'> {
+        // eslint-disable-next-line
         let { range, ...req } = options
         for (let key in req) {
           let val = (req as any)[key]
@@ -395,8 +406,8 @@ export const createOTokenProcessor2 = (params: {
           copyData(otoken, newImplementation)
           otoken = newImplementation
           producer.otoken = newImplementation
-          justUpgraded = true
-          hasUpgraded = true
+          // justUpgraded = true
+          // hasUpgraded = true
         } else {
           throw new Error('Implementation hash not found.')
         }
@@ -433,7 +444,7 @@ export const createOTokenProcessor2 = (params: {
         }
       }
 
-      let justUpgraded = false
+      // let justUpgraded = false
 
       // Cache isContract results
       const transferRelated = ctx.blocks
@@ -854,6 +865,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addressesToCheck: Set<string>) => {
   ctx.log.info(`checking state at height ${block.header.height}`)
   let wrongCount = 0

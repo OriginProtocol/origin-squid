@@ -1,3 +1,4 @@
+/* eslint-disable */
 import 'tsconfig-paths/register'
 import { formatUnits } from 'viem'
 

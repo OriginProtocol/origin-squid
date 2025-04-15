@@ -29,7 +29,7 @@ export const validateBlocks = async (
 }
 
 // If there is nothing to validate, we don't return a promise. (for performance)
-export const validateExpectations = <
+export const validateExpectations = async <
   T extends Entity & {
     timestamp: string
     blockNumber: number
@@ -40,28 +40,21 @@ export const validateExpectations = <
   Class: EntityClass<any>,
   firstBlock: boolean,
   expectations?: T[],
-): Promise<void> | undefined => {
+) => {
   if (!expectations) return
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (firstBlock) {
-        while (expectations[0]?.blockNumber < block.header.height) {
-          const entity = expectations.shift()!
-          await validateExpectation(ctx, block, Class, entity)
-        }
-      }
-      if (expectations.length && expectations[0]?.blockNumber < block.header.height) {
-        throw new Error(`Something is missing: ${expectations[0].id}`)
-      }
-      while (expectations[0]?.blockNumber === block.header.height) {
-        const entity = expectations.shift()!
-        await validateExpectation(ctx, block, Class, entity)
-      }
-      resolve()
-    } catch (e) {
-      reject(e)
+  if (firstBlock) {
+    while (expectations[0]?.blockNumber < block.header.height) {
+      const entity = expectations.shift()!
+      await validateExpectation(ctx, block, Class, entity)
     }
-  })
+  }
+  if (expectations.length && expectations[0]?.blockNumber < block.header.height) {
+    throw new Error(`Something is missing: ${expectations[0].id}`)
+  }
+  while (expectations[0]?.blockNumber === block.header.height) {
+    const entity = expectations.shift()!
+    await validateExpectation(ctx, block, Class, entity)
+  }
 }
 
 const validateExpectation = async <

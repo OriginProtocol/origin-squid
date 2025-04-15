@@ -2,8 +2,8 @@ import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createBalancerInitializer, createBalancerProcessor, createBalancerSetup } from '@templates/balancer'
 
-const ousdResetFrom = 11585978
-const oethDeployFrom = 16933090
+// const ousdResetFrom = 11585978
+// const oethDeployFrom = 16933090
 
 const pools: {
   name: string

@@ -20,6 +20,7 @@ export const compare = (expectation: any, actual: any) => {
   try {
     assert(Object.keys(diff.updated).length === 0 && Object.keys(diff.deleted).length === 0)
   } catch (err) {
+    console.error(err)
     console.log('Validation failed for:', expectation.id)
     console.log('actual', JSON.stringify(actual, null, 2))
     console.log('expectation', JSON.stringify(expectation, null, 2))

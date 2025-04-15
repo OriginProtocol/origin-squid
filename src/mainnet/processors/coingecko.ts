@@ -9,7 +9,7 @@ const from = 20933088
 export const coingeckoProcessor = defineProcessor({
   from, // This is irrelevant
   name: 'coingecko',
-  setup: async (processor) => {
+  setup: (processor) => {
     processor.includeAllBlocks({ from })
   },
   process: async (ctx) => {

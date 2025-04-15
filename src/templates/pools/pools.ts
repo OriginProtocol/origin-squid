@@ -18,16 +18,7 @@ import * as shadowV3FactoryAbi from '@abi/shadow-v3-factory'
 import * as swapxPairFactoryAbi from '@abi/swapx-pair-factory'
 import { Pool } from '@model'
 import { Context, EvmBatchProcessor, defineProcessor, joinProcessors, logFilter } from '@originprotocol/squid-utils'
-import { OETH_ADDRESS, OGN_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-
-const TRACKED_TOKENS = [
-  OETH_ADDRESS,
-  OUSD_ADDRESS,
-  OGN_ADDRESS,
-  baseAddresses.tokens.OGN,
-  baseAddresses.superOETHb.address,
-].filter(Boolean)
 
 /**
  * For curve data refer to the AddressProvider:

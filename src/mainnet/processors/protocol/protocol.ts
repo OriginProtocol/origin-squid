@@ -110,16 +110,6 @@ export const protocolProcessor = defineProcessor({
   },
 })
 
-const getLatestProtocolDailyStat = async (ctx: Context) => {
-  const latestProtocolDailyStat = await ctx.store.findOne(ProtocolDailyStat, {
-    order: {
-      date: 'desc',
-    },
-  })
-  if (latestProtocolDailyStat) {
-    return latestProtocolDailyStat
-  }
-}
 const getLatestProtocolDailyStatDetail = async (ctx: Context, product: string) => {
   const latestProtocolDailyStatDetail = await ctx.store.findOne(ProtocolDailyStatDetail, {
     order: {

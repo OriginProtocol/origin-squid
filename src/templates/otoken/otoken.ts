@@ -589,13 +589,13 @@ export const createOTokenLegacyProcessor = (params: {
       address,
       hash,
       option,
-      delegate,
+      _delegate,
     }: {
       block: Context['blocks']['0']
       address: string
       hash: string
       option: RebasingOption
-      delegate?: string
+      _delegate?: string
     }) => {
       if (rebaseOptsHandled.has(`${hash}-${address}-${option}`)) return
       rebaseOptsHandled.add(`${hash}-${address}-${option}`)
@@ -753,7 +753,7 @@ export const createOTokenLegacyProcessor = (params: {
     }
 
     // Update the unallocatedSupply of OToken.
-    const processWithdrawalRelated = async (block: Block, log: Log) => {
+    const processWithdrawalRelated = async (block: Block, _log: Log) => {
       if (!params.redemptionAsset) return
       const vault = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
       const redeemingAsset = new erc20.Contract(ctx, block.header, params.redemptionAsset.asset)

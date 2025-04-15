@@ -223,7 +223,7 @@ export const createGovernanceProcessor = ({ from, address }: { from: number; add
 
   const _processProposalEvents = async (ctx: Context, result: IProcessResult, block: Block, log: Log) => {
     // ctx.log.info('_processProposalEvents')
-    const { decode, status, event } = eventMapper[log.topics[0]]!
+    const { decode, event } = eventMapper[log.topics[0]]!
 
     const { proposalId } = decode(log)
     const blockTimestamp = new Date(block.header.timestamp)

@@ -71,7 +71,7 @@ export class StrategyResolver {
     @Arg('timestamp', () => String, { nullable: true }) timestamp: string | null,
     @Arg('chainId', () => Number, { nullable: true }) chainId: number | null,
     @Arg('otoken', () => String, { nullable: true }) otoken: string | null,
-    @Info() info: GraphQLResolveInfo,
+    @Info() _info: GraphQLResolveInfo,
   ): Promise<Strategy[]> {
     const manager = await this.tx()
 

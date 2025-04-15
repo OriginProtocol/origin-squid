@@ -61,7 +61,7 @@ export const process = async (ctx: Context) => {
     }
   }
 
-  await ctx.store.upsert(Array.from(result.addresses.values()).sort((a, b) => (a.delegatee?.id ? 1 : -1)))
+  await ctx.store.upsert(Array.from(result.addresses.values()).sort((a) => (a.delegatee?.id ? 1 : -1)))
   await ctx.store.upsert(Array.from(result.lockups.values()))
   await ctx.store.upsert(result.lockupEvents)
 }

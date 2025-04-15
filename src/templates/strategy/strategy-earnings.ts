@@ -355,7 +355,7 @@ const processDepositWithdrawal = async (
     MainnetCurrency,
     MainnetCurrency,
   ][]
-  const rates = await ensureExchangeRates(ctx, block, desiredRates)
+  await ensureExchangeRates(ctx, block, desiredRates)
   let previousBalance = 0n
   for (let index = 0; index < assets.length; index++) {
     const a = assets[index]

@@ -89,7 +89,7 @@ const getChainlinkPrice = async (ctx: Context, height: number, base: MainnetCurr
   }
 }
 
-const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
+// const oethOracleCurrencies = new Set(['WETH', 'stETH', 'frxETH'])
 const oethOracleAddress = '0xbE19cC5654e30dAF04AD3B5E06213D70F4e882eE'
 const getOethOraclePrice = async (ctx: Context, height: number, quote: MainnetCurrency) => {
   if (height < 18032300) return 0n

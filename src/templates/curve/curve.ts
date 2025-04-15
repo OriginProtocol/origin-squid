@@ -51,6 +51,7 @@ export const createCurveProcessor = ({
   tokens: string[]
   ratesToPull?: { i: bigint; j: bigint; dx: bigint }[] | undefined
 }) => {
+  console.log('createCurveProcessor', name)
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
     const result: ProcessResult = {

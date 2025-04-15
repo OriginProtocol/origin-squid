@@ -22,13 +22,9 @@ const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Prom
 }
 
 const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height: number) => {
-  if (baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb'].from > height) return 0n
-  const pool = new aerodromePoolAbi.Contract(
-    ctx,
-    { height },
-    baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb'].address,
-  )
-  return await pool.getReserves().then((r) => (r._reserve1 * ONE_ETH) / r._reserve0)
+  if (pool.from > height) return 0n
+  const poolContract = new aerodromePoolAbi.Contract(ctx, { height }, pool.address)
+  return await poolContract.getReserves().then((r) => (r._reserve1 * ONE_ETH) / r._reserve0)
 }
 
 const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {

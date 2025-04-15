@@ -22,5 +22,6 @@ module.exports = [
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
     },
+    ignores: ['**/abi/**', '**/src/abi/**', '**/src/model/**'],
   },
 ]

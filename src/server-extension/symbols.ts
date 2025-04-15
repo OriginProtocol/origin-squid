@@ -23,7 +23,7 @@ export class SymbolResolver {
   constructor(private tx: () => Promise<EntityManager>) {}
 
   @Query(() => [Symbol])
-  async symbols(@Info() info: GraphQLResolveInfo): Promise<Symbol[]> {
+  async symbols(@Info() _info: GraphQLResolveInfo): Promise<Symbol[]> {
     return symbols.map((symbol) => new Symbol(symbol))
   }
 }

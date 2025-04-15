@@ -48,6 +48,7 @@ export const createMaverickProcessor = ({
   from: number
   tokens: [string, string]
 }) => {
+  console.log('createMaverickProcessor', name, tokens)
   const update = blockFrequencyUpdater({ from })
   return async (ctx: Context) => {
     const result: ProcessResult = {

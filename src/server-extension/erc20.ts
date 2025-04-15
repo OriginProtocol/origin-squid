@@ -33,7 +33,7 @@ export class ERC20Resolver {
     @Arg('address', () => String, { nullable: false }) address: string,
     @Arg('from', () => String, { nullable: false }) from: string,
     @Arg('to', () => String, { nullable: true }) to: string | null,
-    @Info() info: GraphQLResolveInfo,
+    @Info() _info: GraphQLResolveInfo,
   ): Promise<ERC20StateByDayR[]> {
     const manager = await this.tx()
     const repository = manager.getRepository(ERC20StateByDay)
