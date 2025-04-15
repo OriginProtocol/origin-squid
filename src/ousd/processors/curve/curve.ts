@@ -1,5 +1,4 @@
-import { Context } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { createCurveInitializer, createCurveProcessor, createCurveSetup } from '@templates/curve'
 import { tokens } from '@utils/addresses'
 

@@ -2,11 +2,10 @@ import * as balancerMetaStablePoolStrategyAbi from '@abi/balancer-meta-pool-stra
 import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import { StrategyBalance } from '@model'
-import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { convertRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { getBalancePoolRateProviders } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, BALANCER_VAULT, ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { addressToSymbol } from '@utils/symbols'
 

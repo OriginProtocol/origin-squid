@@ -5,8 +5,7 @@ import {
   FRRSRewardsTargetChange,
   FRRSStrategistUpdated,
 } from '@model'
-import { Block, Context, Log, LogFilter, logFilter } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Block, Context, EvmBatchProcessor, Log, LogFilter, logFilter } from '@originprotocol/squid-utils'
 
 interface State {
   // Event Entities

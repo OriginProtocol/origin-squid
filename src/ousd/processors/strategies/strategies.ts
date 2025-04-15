@@ -1,6 +1,5 @@
-import { Context } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import * as mainnetAddresses from '@utils/addresses'

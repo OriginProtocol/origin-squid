@@ -1,8 +1,7 @@
 import * as poolBoosterAbi from '@abi/pool-booster'
 import * as poolBoosterCentralRegistryAbi from '@abi/pool-booster-central-registry'
 import { PoolBooster, PoolBoosterBribeExecuted } from '@model'
-import { Context, defineProcessor, logFilter } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor, defineProcessor, logFilter } from '@originprotocol/squid-utils'
 
 export const createPoolBoosterProcessor = (params: { registryAddress: string; from: number }) => {
   const poolBoosterCreatedFilter = logFilter({

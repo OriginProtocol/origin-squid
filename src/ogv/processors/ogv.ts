@@ -1,8 +1,7 @@
 import * as erc20Abi from '@abi/erc20'
 import * as veogvAbi from '@abi/veogv'
 import { OGVAddress, OGVLockup, OGVLockupEventType, OGVLockupTxLog } from '@model'
-import { Block, Context, Log } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Block, Context, EvmBatchProcessor, Log } from '@originprotocol/squid-utils'
 import { ADDRESS_ZERO, OGV_ADDRESS, VEOGV_ADDRESS } from '@utils/addresses'
 
 export const from = 14439231 // https://etherscan.io/tx/0x9295cac246169f06a3d4ec33fdbd87fced7a9e19ea61177cae75034e45ae66f4

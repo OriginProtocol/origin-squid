@@ -1,9 +1,8 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
-import { Block, Context, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
 import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { addressToSymbol } from '@utils/symbols'
 
 import { IStrategyData } from './index'

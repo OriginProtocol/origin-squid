@@ -1,6 +1,5 @@
 import { TransactionDetails } from '@model'
-import { defineProcessor } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { EvmBatchProcessor, defineProcessor } from '@originprotocol/squid-utils'
 
 export const createTransactionProcessor = (params: { from: number; address: string[] }) => {
   const addressSet = new Set(params.address)

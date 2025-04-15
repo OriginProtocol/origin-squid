@@ -3,9 +3,8 @@ import { findLast } from 'lodash'
 
 import * as abi from '@abi/erc20'
 import { ERC20, ERC20Balance, ERC20Holder, ERC20State, ERC20StateByDay, ERC20Transfer } from '@model'
-import { Block, Context, logFilter } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, logFilter } from '@originprotocol/squid-utils'
 import { publishERC20State } from '@shared/erc20'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO } from '@utils/addresses'
 import { TokenAddress } from '@utils/symbols'
 

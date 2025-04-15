@@ -25,10 +25,17 @@ import {
   RebasingOption,
   WOToken,
 } from '@model'
-import { Block, Context, Log, blockFrequencyUpdater, logFilter, multicall } from '@originprotocol/squid-utils'
+import {
+  Block,
+  Context,
+  EvmBatchProcessor,
+  Log,
+  blockFrequencyUpdater,
+  logFilter,
+  multicall,
+} from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS, OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { sonicAddresses } from '@utils/addresses-sonic'

@@ -62,5 +62,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  run(processor)
+  run(processor).catch((error) => {
+    throw error
+  })
 }

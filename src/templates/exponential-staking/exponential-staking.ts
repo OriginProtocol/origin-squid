@@ -15,9 +15,17 @@ import {
   ESYield,
   FRRSRewardsPerSecondChanged,
 } from '@model'
-import { Block, Context, Log, LogFilter, calculateAPY2, convertApyToApr, logFilter } from '@originprotocol/squid-utils'
+import {
+  Block,
+  Context,
+  EvmBatchProcessor,
+  Log,
+  LogFilter,
+  calculateAPY2,
+  convertApyToApr,
+  logFilter,
+} from '@originprotocol/squid-utils'
 import { waitForERC20State } from '@shared/erc20'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { TokenAddress } from '@utils/symbols'
 
 interface State {

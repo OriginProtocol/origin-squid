@@ -7,9 +7,16 @@ import * as erc20Abi from '@abi/erc20'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
-import { Block, Context, Processor, blockFrequencyTracker, calculateAPY, logFilter } from '@originprotocol/squid-utils'
+import {
+  Block,
+  Context,
+  EvmBatchProcessor,
+  Processor,
+  blockFrequencyTracker,
+  calculateAPY,
+  logFilter,
+} from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { traceFilter } from '@utils/traceFilter'

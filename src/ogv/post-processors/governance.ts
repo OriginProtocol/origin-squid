@@ -8,8 +8,7 @@ import {
   OGVProposalVote,
   OGVVoteType,
 } from '@model'
-import { Block, Context, Log } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Block, Context, EvmBatchProcessor, Log } from '@originprotocol/squid-utils'
 import { OGV_GOVERNANCE_ADDRESS } from '@utils/addresses'
 import { env } from '@utils/env'
 

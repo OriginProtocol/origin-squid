@@ -1,6 +1,5 @@
-import { Context } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 export const name = 'exchange-rates-base'
 

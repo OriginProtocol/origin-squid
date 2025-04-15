@@ -5,11 +5,10 @@ import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
 import * as erc20Abi from '@abi/erc20'
 import * as otokenAbi from '@abi/otoken'
-import { Context, defineProcessor, logFilter, multicall, run } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor, logFilter, multicall, run } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { priceMap } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { getCoingeckoData } from '@utils/coingecko2'
@@ -236,8 +235,7 @@ if (require.main === module) {
     ],
     postProcessors: [],
     validators: [],
-  }).catch((e) => {
-    console.error(e)
-    process.exit(1)
+  }).catch((error) => {
+    throw error
   })
 }

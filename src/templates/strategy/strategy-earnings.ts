@@ -6,10 +6,9 @@ import * as baseRewardPool from '@abi/base-reward-pool'
 import * as erc20 from '@abi/erc20'
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyYield } from '@model'
-import { Block, Context, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
 import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, MainnetCurrency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import {
   OETH_ADDRESS,
   OETH_DRIPPER_ADDRESS,

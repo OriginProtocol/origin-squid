@@ -1,7 +1,6 @@
 import * as curvePoolBoosterAbi from '@abi/otoken-curve-pool-booster'
 import { CurvePoolBoosterCampaign, CurvePoolBoosterFeeCollected, CurvePoolBoosterTokensRescued } from '@model'
-import { Context, defineProcessor, logFilter } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor, defineProcessor, logFilter } from '@originprotocol/squid-utils'
 
 export const createCurvePoolBoosterProcessor = (params: { from: number }) => {
   const feeCollectedFilter = logFilter({

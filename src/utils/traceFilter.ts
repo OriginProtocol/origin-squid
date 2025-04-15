@@ -1,5 +1,4 @@
-import { Trace } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { EvmBatchProcessor, Trace } from '@originprotocol/squid-utils'
 
 const lower = (hex: string) => hex.toLowerCase()
 

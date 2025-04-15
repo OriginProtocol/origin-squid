@@ -1,7 +1,6 @@
 import * as legacyStakingAbi from '@abi/legacy-staking'
 import { LegacyStaker } from '@model'
-import { Context } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { LEGACY_OGN_STAKING } from '@utils/addresses'
 
 export const from = 11469389 // https://etherscan.io/tx/0xe6aebd9182872d2a360b281dd60dbd991548da71f8660028526363cac2c80bde

@@ -1,6 +1,5 @@
-import { Context } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 import { createBalancerInitializer, createBalancerProcessor, createBalancerSetup } from '@templates/balancer'
 
 const ousdResetFrom = 11585978

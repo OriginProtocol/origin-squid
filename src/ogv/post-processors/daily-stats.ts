@@ -3,8 +3,7 @@ import utc from 'dayjs/plugin/utc'
 import { FindOptionsOrderValue, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
 
 import { OGV, OGVAddress, OGVDailyStat } from '@model'
-import { Context } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { applyCoingeckoData } from '@utils/coingecko'
 
 dayjs.extend(utc)

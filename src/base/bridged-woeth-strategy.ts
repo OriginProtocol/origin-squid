@@ -1,7 +1,6 @@
 import * as bridgedWOETHStrategyABI from '@abi/strategy-bridged-woeth'
 import { EventWOETHPriceUpdated } from '@model'
-import { Context, logFilter } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor, logFilter } from '@originprotocol/squid-utils'
 import { baseAddresses } from '@utils/addresses-base'
 
 const filter = logFilter({

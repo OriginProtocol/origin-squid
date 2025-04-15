@@ -1,6 +1,5 @@
-import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
 
 export const from = 13000000
 

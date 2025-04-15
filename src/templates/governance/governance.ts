@@ -9,8 +9,7 @@ import {
   GovernanceProposalVote,
   GovernanceVoteType,
 } from '@model'
-import { Block, Context, Log } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Block, Context, EvmBatchProcessor, Log } from '@originprotocol/squid-utils'
 import { env } from '@utils/env'
 
 interface IProcessResult {

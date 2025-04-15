@@ -1,7 +1,6 @@
 import * as maverickPool from '@abi/maverick-pool'
 import { MaverickPool, MaverickPoolBalance } from '@model'
-import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import { Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 
 // Maverick Pool Reference: https://docs.mav.xyz/guides/technical-reference/pool
 

@@ -1,8 +1,13 @@
 import { minBy } from 'lodash'
 
 import { NativeBalance } from '@model'
-import { Context, blockFrequencyUpdater, defineProcessor, getNativeBalances } from '@originprotocol/squid-utils'
-import { EvmBatchProcessor } from '@subsquid/evm-processor'
+import {
+  Context,
+  EvmBatchProcessor,
+  blockFrequencyUpdater,
+  defineProcessor,
+  getNativeBalances,
+} from '@originprotocol/squid-utils'
 import { OETH_VAULT_ADDRESS, OUSD_VAULT_ADDRESS, oethStrategyArray, ousdStrategyArray } from '@utils/addresses'
 
 /**
