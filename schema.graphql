@@ -173,6 +173,13 @@ type CoinGeckoCoinData @entity {
   marketCap: Float!
   tradingVolume: Float!
 }
+type WalletLabels @entity {
+  id: ID! @index
+  address: String!
+  description: String!
+  labels: [String!]!
+  lastUpdated: DateTime!
+}
 type OGNDailyStat @entity {
   id: ID!
   blockNumber: Int! @index

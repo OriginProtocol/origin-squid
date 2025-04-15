@@ -1,0 +1,7 @@
+type WalletLabels @entity {
+  id: ID! @index
+  address: String!
+  description: String!
+  labels: [String!]!
+  lastUpdated: DateTime!
+}

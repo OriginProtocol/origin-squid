@@ -1,4 +1,5 @@
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
+import { notionProcessor } from 'mainnet/processors/notion'
 import { originArmProcessors } from 'mainnet/processors/origin-arm'
 import { protocolProcessor } from 'mainnet/processors/protocol'
 import 'tsconfig-paths/register'
@@ -53,6 +54,7 @@ export const processor = defineSquidProcessor({
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
     createCurvePoolBoosterProcessor({ from: 21000000 }),
     createPoolsProcessor(mainnet.id),
+    notionProcessor,
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolProcessor],
   validators: [validate],

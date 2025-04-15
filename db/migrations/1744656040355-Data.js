@@ -1,5 +1,5 @@
-module.exports = class Data1743110935957 {
-    name = 'Data1743110935957'
+module.exports = class Data1744656040355 {
+    name = 'Data1744656040355'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -57,6 +57,7 @@ module.exports = class Data1743110935957 {
         await db.query(`CREATE TABLE "coin_gecko_coin_data" ("id" character varying NOT NULL, "product" text NOT NULL, "date" text NOT NULL, "vs_currency" text NOT NULL, "price" numeric NOT NULL, "market_cap" numeric NOT NULL, "trading_volume" numeric NOT NULL, CONSTRAINT "PK_abb8340f8d830c27b3288a1083c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_55f8b56cad28caa22a995dfb83" ON "coin_gecko_coin_data" ("product") `)
         await db.query(`CREATE INDEX "IDX_821542437abc5d0d6aa7959131" ON "coin_gecko_coin_data" ("date") `)
+        await db.query(`CREATE TABLE "wallet_labels" ("id" character varying NOT NULL, "address" text NOT NULL, "description" text NOT NULL, "labels" text array NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_59edf57a7c32b43605aec86b9e0" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_cb4297ef85375ee13a3446b240" ON "ogn_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b96b9849e1e479d743ffb547c9" ON "ogn_daily_stat" ("timestamp") `)
@@ -861,6 +862,7 @@ module.exports = class Data1743110935957 {
         await db.query(`DROP TABLE "coin_gecko_coin_data"`)
         await db.query(`DROP INDEX "public"."IDX_55f8b56cad28caa22a995dfb83"`)
         await db.query(`DROP INDEX "public"."IDX_821542437abc5d0d6aa7959131"`)
+        await db.query(`DROP TABLE "wallet_labels"`)
         await db.query(`DROP TABLE "ogn_daily_stat"`)
         await db.query(`DROP INDEX "public"."IDX_cb4297ef85375ee13a3446b240"`)
         await db.query(`DROP INDEX "public"."IDX_b96b9849e1e479d743ffb547c9"`)
