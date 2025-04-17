@@ -10,7 +10,7 @@ export const notionProcessor = defineProcessor({
     p.includeAllBlocks()
   },
   process: async (ctx) => {
-    const now = new Date().toJSON().slice(0, 7)
+    const now = new Date().toJSON().slice(0, 13)
     if (now !== lastUpdate) {
       lastUpdate = now
 
