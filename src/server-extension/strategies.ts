@@ -1,6 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { compact } from 'lodash'
 import { ousdStrategies } from 'ousd/processors/strategies'
+import { plumeStrategies } from 'plume/strategies'
+import { sonicStrategies } from 'sonic/strategies'
 import { Arg, Field, Info, Int, ObjectType, Query, Resolver } from 'type-graphql'
 import { EntityManager, LessThanOrEqual } from 'typeorm'
 
@@ -8,6 +10,8 @@ import { StrategyBalance } from '@model'
 import { IStrategyData } from '@templates/strategy'
 import { addresses } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
+import { plumeAddresses } from '@utils/addresses-plume'
+import { sonicAddresses } from '@utils/addresses-sonic'
 
 import { strategies } from '../base/strategies'
 import { oethStrategies } from '../oeth/processors/strategies'
@@ -60,6 +64,8 @@ const otokens: Record<string, readonly IStrategyData[]> = {
   [addresses.oeth.address]: oethStrategies,
   [addresses.ousd.address]: ousdStrategies,
   [baseAddresses.superOETHb.address]: strategies,
+  [sonicAddresses.OS.address]: sonicStrategies,
+  [plumeAddresses.superOETHp.address]: plumeStrategies,
 }
 
 @Resolver()
