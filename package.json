@@ -17,6 +17,7 @@
     "process:oeth": "sqd process:oeth",
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
+    "process:plume": "sqd process:plume",
     "process:mainnet": "sqd process:mainnet",
     "process:test": "sqd process:test",
     "process": "sqd process",

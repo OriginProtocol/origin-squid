@@ -8,8 +8,8 @@ import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@te
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
-export const oethStrategies: readonly IStrategyData[] = [
-  ...sonicAddresses.OS.strategies.map(
+export const sonicStrategies: readonly IStrategyData[] = [
+  ...sonicAddresses.OS.nativeStrategies.map(
     (strategy, index) =>
       ({
         chainId: sonic.id,
@@ -24,12 +24,24 @@ export const oethStrategies: readonly IStrategyData[] = [
         earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
       }) as const,
   ),
+  {
+    chainId: sonic.id,
+    from: sonicAddresses.OS.amoSwapX.strategy.from,
+    name: 'Sonic SwapX AMO Strategy',
+    contractName: 'SonicSwapXAMOStrategy',
+    address: sonicAddresses.OS.amoSwapX.strategy.address,
+    oTokenAddress: sonicAddresses.OS.address,
+    kind: 'Generic',
+    base: { address: sonicAddresses.tokens.wS, decimals: 18 },
+    assets: [{ address: sonicAddresses.tokens.wS, decimals: 18 }],
+    earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
+  },
 ]
 
-const strategies = oethStrategies
+const strategies = sonicStrategies
 
 const eventProcessors = [
-  ...sonicAddresses.OS.strategies.map((strategy) =>
+  ...sonicAddresses.OS.nativeStrategies.map((strategy) =>
     createEventProcessor({
       address: strategy.address,
       event: nativeStakingAbi.events.AccountingConsensusRewards,
@@ -65,7 +77,7 @@ export const process = async (ctx: Context) => {
   await Promise.all([...processors.map((p) => p(ctx)), ...eventProcessors.map((p) => p.process(ctx))])
 }
 
-export const sonicStrategies = defineProcessor({
+export const sonicStrategiesProcessor = defineProcessor({
   name,
   from,
   setup,

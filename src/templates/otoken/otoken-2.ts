@@ -394,6 +394,7 @@ export const createOTokenProcessor2 = (params: {
           ['337166fcadcf7a10878d5e055b0af8a2cd4129e039ad4b9b73c1adf3483c0908']: OToken_2025_03_04, // OETH (Yield Forwarding)
           ['219568b0baaa5c41831401e6b696c97b537a770244bce9ed091a7991c8fb64b9']: OToken_2025_03_04, // OETH (Yield Forwarding)
           ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS (Yield Forwarding)
+          ['9458e80af8187b3f621118b0610274094566075cddc2eeaf05f70eeb00e582a9']: OToken_2025_03_04, // superOETHp (Yield Forwarding)
         } as const
         const ImplementationOTokenClass = implementations[implementationHash as keyof typeof implementations]
         if (ImplementationOTokenClass) {
@@ -783,14 +784,14 @@ const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) =>
     entity.type === 'OToken_2021_01_02'
       ? new OToken_2021_01_02(ctx, block, entity.otoken)
       : entity.type === 'OToken_2021_01_08'
-      ? new OToken_2021_01_08(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2021_01_25'
-      ? new OToken_2021_01_25(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2021_06_06'
-      ? new OToken_2021_06_06(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2023_12_21'
-      ? new OToken_2023_12_21(ctx, block, entity.otoken)
-      : new OToken_2025_03_04(ctx, block, entity.otoken)
+        ? new OToken_2021_01_08(ctx, block, entity.otoken)
+        : entity.type === 'OToken_2021_01_25'
+          ? new OToken_2021_01_25(ctx, block, entity.otoken)
+          : entity.type === 'OToken_2021_06_06'
+            ? new OToken_2021_06_06(ctx, block, entity.otoken)
+            : entity.type === 'OToken_2023_12_21'
+              ? new OToken_2023_12_21(ctx, block, entity.otoken)
+              : new OToken_2025_03_04(ctx, block, entity.otoken)
   Object.assign(otoken, entity.data)
   return otoken
 }
@@ -823,34 +824,34 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
                 'rebaseState',
               ]
             : otoken instanceof OToken_2023_12_21
-            ? [
-                'totalSupply',
-                'allowances',
-                'vaultAddress',
-                'creditBalances',
-                '_rebasingCredits',
-                '_rebasingCreditsPerToken',
-                'nonRebasingSupply',
-                'nonRebasingCreditsPerToken',
-                'rebaseState',
-                'isUpgraded',
-                'governor',
-              ]
-            : [
-                // OToken_2025_03_04
-                'totalSupply',
-                'allowances',
-                'vaultAddress',
-                'creditBalances',
-                'rebasingCredits',
-                'rebasingCreditsPerToken',
-                'nonRebasingSupply',
-                'alternativeCreditsPerToken',
-                'rebaseState',
-                'yieldTo',
-                'yieldFrom',
-                'governor',
-              ],
+              ? [
+                  'totalSupply',
+                  'allowances',
+                  'vaultAddress',
+                  'creditBalances',
+                  '_rebasingCredits',
+                  '_rebasingCreditsPerToken',
+                  'nonRebasingSupply',
+                  'nonRebasingCreditsPerToken',
+                  'rebaseState',
+                  'isUpgraded',
+                  'governor',
+                ]
+              : [
+                  // OToken_2025_03_04
+                  'totalSupply',
+                  'allowances',
+                  'vaultAddress',
+                  'creditBalances',
+                  'rebasingCredits',
+                  'rebasingCreditsPerToken',
+                  'nonRebasingSupply',
+                  'alternativeCreditsPerToken',
+                  'rebaseState',
+                  'yieldTo',
+                  'yieldFrom',
+                  'governor',
+                ],
         ),
       ),
     ),
