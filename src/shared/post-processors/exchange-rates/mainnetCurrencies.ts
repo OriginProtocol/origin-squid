@@ -5,6 +5,7 @@ import {
   baseCurrenciesByAddress,
 } from '@shared/post-processors/exchange-rates/price-routing-base'
 
+import { PlumeCurrencyAddress, PlumeCurrencySymbol } from './price-routing-plume'
 import { SonicCurrencyAddress, SonicCurrencySymbol } from './price-routing-sonic'
 
 export const mainnetCurrencies = {
@@ -40,7 +41,7 @@ export type MainnetCurrencyAddress = (typeof mainnetCurrencies)[keyof typeof mai
 
 export type MainnetCurrency = MainnetCurrencySymbol | MainnetCurrencyAddress
 
-export type CurrencySymbol = MainnetCurrencySymbol | BaseCurrencySymbol | SonicCurrencySymbol
-export type CurrencyAddress = MainnetCurrencyAddress | BaseCurrencyAddress | SonicCurrencyAddress
+export type CurrencySymbol = MainnetCurrencySymbol | BaseCurrencySymbol | SonicCurrencySymbol | PlumeCurrencySymbol
+export type CurrencyAddress = MainnetCurrencyAddress | BaseCurrencyAddress | SonicCurrencyAddress | PlumeCurrencyAddress
 
 export type Currency = CurrencySymbol | CurrencyAddress

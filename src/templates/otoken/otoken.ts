@@ -38,6 +38,7 @@ import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { ADDRESS_ZERO, OETH_ADDRESS, OUSD_ADDRESS, OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
+import { plumeAddresses } from '@utils/addresses-plume'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { DECIMALS_18 } from '@utils/constants'
 
@@ -50,6 +51,7 @@ export type OTokenContractAddress =
   | typeof OETH_ADDRESS
   | typeof baseAddresses.superOETHb.address
   | typeof sonicAddresses.tokens.OS
+  | typeof plumeAddresses.tokens.superOETHp
 
 export const createOTokenLegacyProcessor = (params: {
   name: string
