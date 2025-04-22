@@ -12,7 +12,7 @@ import { CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCu
 import { priceMap } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
 import { OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { getCoingeckoData } from '@utils/coingecko2'
 
 const testRate = {
@@ -237,11 +237,7 @@ if (require.main === module) {
     ],
     postProcessors: [],
     validators: [],
-    fields: {
-      transaction: {
-        ...EXCLUDE_TX_RECEIPT_FIELDS,
-      },
-    },
+    fields: DEFAULT_FIELDS,
   }).catch((error) => {
     throw error
   })
