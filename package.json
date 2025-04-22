@@ -28,7 +28,7 @@
     "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
-    "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#test2",
+    "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#main",
     "@subsquid/evm-processor": "^1.27.0",
     "@subsquid/graphql-server": "^4.9.0",
     "@subsquid/typeorm-migration": "^1.3.0",
