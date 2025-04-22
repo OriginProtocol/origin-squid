@@ -4,10 +4,9 @@ import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 import { addresses } from '@utils/addresses'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import * as oeth from './oeth/processors'
-import { ccip } from './oeth/processors/ccip'
+import { DEFAULT_FIELDS, ccip } from './oeth/processors/ccip'
 import * as exchangeRates from './oeth/processors/exchange-rates'
 import * as strategies from './oeth/processors/strategies'
 import * as validateOeth from './oeth/validators/validate-oeth'
@@ -28,11 +27,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('oeth')],
   validators: [validateOeth],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 export default processor
 

@@ -5,7 +5,7 @@ import { plumeMainnet } from 'viem/chains'
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import * as validate from './sonic/validate'
 
@@ -19,11 +19,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('plume')],
   validators: [validate],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 
 export default processor

@@ -6,7 +6,7 @@ import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-ra
 import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import { baseERC20s, baseStrategies, bridgedWoethStrategy, superOETHb } from './base'
 import { aerodromeProcessors } from './base/aerodrome'
@@ -28,11 +28,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('base')],
   validators: [validate],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 
 export default processor
