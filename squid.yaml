@@ -22,6 +22,8 @@ deploy:
     - RPC_ARBITRUM_ENV
     - RPC_SONIC_ENDPOINT
     - RPC_SONIC_ENV
+    - RPC_PLUME_ENDPOINT
+    - RPC_PLUME_ENV
     - NOTION_SECRET
   processor:
     ########## MAIN NETWORK ##########
