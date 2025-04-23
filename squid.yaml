@@ -113,18 +113,18 @@ deploy:
       #   ### Time Travel Fix
       #   # BLOCK_FROM: 20919091
     ########## PLUME NETWORK ##########
-    # - name: plume-processor
-    #   cmd: ['sqd', 'process:plume:prod']
-    #   # env:
-    #   #   ### Fork Setup Stage 1
-    #   #   ARCHIVE_ONLY: 'true'
-    #   #   BLOCK_TO: 21527081
-    #   #   ### Fork Setup Stage 2
-    #   #   # DISABLE_ARCHIVE: 'true'
-    #   #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
-    #   #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
-    #   #   ### Time Travel Fix
-    #   #   # BLOCK_FROM: 20919091
+    - name: plume-processor
+      cmd: ['sqd', 'process:plume:prod']
+      # env:
+      #   ### Fork Setup Stage 1
+      #   ARCHIVE_ONLY: 'true'
+      #   BLOCK_TO: 21527081
+      #   ### Fork Setup Stage 2
+      #   # DISABLE_ARCHIVE: 'true'
+      #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
+      #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
+      #   ### Time Travel Fix
+      #   # BLOCK_FROM: 20919091
   api:
     cmd:
       - npx
