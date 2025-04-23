@@ -2,7 +2,7 @@ import 'tsconfig-paths/register'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import { processStatus } from '@templates/processor-status'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import * as dailyStats from './ogv/post-processors/daily-stats'
 import * as governance from './ogv/post-processors/governance'
@@ -14,11 +14,7 @@ export const processor = defineSquidProcessor({
   processors: [ogvSupply, ogv],
   postProcessors: [governance, dailyStats, processStatus('ogv')],
   validators: [],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 export default processor
 

@@ -21,6 +21,7 @@ import {
   OGV_GOVERNANCE_ADDRESS,
   XOGN_ADDRESS,
 } from '@utils/addresses'
+import { FIELDS_WITH_RECEIPTS_INFO } from '@utils/batch-proccesor-fields'
 
 import * as dailyStats from './mainnet/post-processors/ogn-daily-stats'
 import * as curve from './mainnet/processors/curve'
@@ -58,6 +59,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolProcessor],
   validators: [validate],
+  fields: FIELDS_WITH_RECEIPTS_INFO,
 })
 export default processor
 

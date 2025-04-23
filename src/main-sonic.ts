@@ -10,7 +10,7 @@ import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-bo
 import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import * as validate from './sonic/validate'
 
@@ -27,11 +27,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
   validators: [validate],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 
 export default processor

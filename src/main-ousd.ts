@@ -3,7 +3,7 @@ import 'tsconfig-paths/register'
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
-import { EXCLUDE_TX_RECEIPT_FIELDS } from '@utils/batch-proccesor-fields'
+import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 import * as curve from './ousd/processors/curve'
 import { erc20s } from './ousd/processors/erc20s'
@@ -17,11 +17,7 @@ export const processor = defineSquidProcessor({
   processors: [ousd, strategies, curve, morphoMarketStatesProcessor, ...erc20s()],
   postProcessors: [exchangeRatesPostProcessor, processStatus('ousd')],
   validators: [validateOusd],
-  fields: {
-    transaction: {
-      ...EXCLUDE_TX_RECEIPT_FIELDS,
-    },
-  },
+  fields: DEFAULT_FIELDS,
 })
 export default processor
 
