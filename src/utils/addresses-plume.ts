@@ -1,7 +1,7 @@
 const superOETHp = {
   address: '0xfcbe50dbe43bf7e5c88c6f6fb9ef432d4165406e',
   wrapped: '0x2de8a403f7a5c6c5161d4a129918ec9f0b653918',
-  vault: '0xf1d0bb43c194371b04717ee8029a467a218c69b4',
+  vault: '0xc8c8f8bea5631a8af26440af32a55002138cb76a',
   oracleRouter: '0xa6c76fc1ac0ac86f19cd874524726b456905ea81',
   dripper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
   strategies: {},
