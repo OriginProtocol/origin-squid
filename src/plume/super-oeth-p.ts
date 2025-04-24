@@ -9,7 +9,7 @@ const otokenProcessor = createOTokenProcessor2({
   name: 'Super OETHp',
   symbol: 'superOETHp',
   from: 535166,
-  vaultFrom: 99999999_535190,
+  vaultFrom: 878332,
   fee: 20n,
   otokenAddress: plumeAddresses.superOETHp.address,
   wotoken: {
@@ -52,7 +52,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   oTokenAddress: plumeAddresses.superOETHp.address,
   oTokenVaultAddress: plumeAddresses.superOETHp.vault,
-  from: 99999999_535166,
+  from: 878332,
 })
 
 export const superOETHp = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor]
