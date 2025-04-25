@@ -1,6 +1,7 @@
 import { parseEther } from 'viem'
 import { mainnet } from 'viem/chains'
 
+import * as strategyAbi from '@abi/initializable-abstract-strategy'
 import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
 import {
   DAI_ADDRESS,
@@ -11,6 +12,7 @@ import {
   USDS_ADDRESS,
   USDT_ADDRESS,
   WOUSD_ADDRESS,
+  strategies,
 } from '@utils/addresses'
 import { tokensByChain } from '@utils/tokensByChain'
 
@@ -44,6 +46,9 @@ export const { name, from, setup, process } = createOTokenProcessor2({
     { asset: DAI_ADDRESS, symbol: 'DAI' },
     { asset: USDS_ADDRESS, symbol: 'USDS' },
   ],
-  getAmoSupply: async () => 0n,
+  getAmoSupply: async (ctx, height) => {
+    const contract = new strategyAbi.Contract(ctx, { height }, strategies.ousd.OUSDCurveAMOStrategy)
+    return contract.checkBalance(USDC_ADDRESS)
+  },
   accountsOverThresholdMinimum: parseEther('100'),
 })

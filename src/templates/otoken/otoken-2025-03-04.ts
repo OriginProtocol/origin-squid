@@ -580,7 +580,7 @@ export class OToken_2025_03_04 {
         (this.rebasingCredits * 10n ** 18n + this.rebasingSupply - 1n) / this.rebasingSupply
     }
 
-    if (this.rebasingCreditsPerToken <= 0n) {
+    if (this.rebasingCreditsPerToken <= 0n && !process.env.BLOCK_FROM) {
       throw new Error('Invalid change in supply')
     }
 

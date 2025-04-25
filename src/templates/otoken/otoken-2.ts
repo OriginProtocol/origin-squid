@@ -356,7 +356,9 @@ export const createOTokenProcessor2 = (params: {
             const savedDataEntity = bigintJsonParse(savedData) as OTokenRawData
             otoken = loadOTokenRawData(ctx, ctx.blocks[0], savedDataEntity)
           } else {
-            ctx.log.error(`Raw data file not found: ${filePath}`)
+            otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
+            otoken.initialize('governor', 'vault', 10n ** 18n)
+            ctx.log.error(`Raw data file not found: ${filePath} (creating blank instance)`)
           }
         }
       }
@@ -784,14 +786,14 @@ const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) =>
     entity.type === 'OToken_2021_01_02'
       ? new OToken_2021_01_02(ctx, block, entity.otoken)
       : entity.type === 'OToken_2021_01_08'
-        ? new OToken_2021_01_08(ctx, block, entity.otoken)
-        : entity.type === 'OToken_2021_01_25'
-          ? new OToken_2021_01_25(ctx, block, entity.otoken)
-          : entity.type === 'OToken_2021_06_06'
-            ? new OToken_2021_06_06(ctx, block, entity.otoken)
-            : entity.type === 'OToken_2023_12_21'
-              ? new OToken_2023_12_21(ctx, block, entity.otoken)
-              : new OToken_2025_03_04(ctx, block, entity.otoken)
+      ? new OToken_2021_01_08(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2021_01_25'
+      ? new OToken_2021_01_25(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2021_06_06'
+      ? new OToken_2021_06_06(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2023_12_21'
+      ? new OToken_2023_12_21(ctx, block, entity.otoken)
+      : new OToken_2025_03_04(ctx, block, entity.otoken)
   Object.assign(otoken, entity.data)
   return otoken
 }
@@ -824,34 +826,34 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
                 'rebaseState',
               ]
             : otoken instanceof OToken_2023_12_21
-              ? [
-                  'totalSupply',
-                  'allowances',
-                  'vaultAddress',
-                  'creditBalances',
-                  '_rebasingCredits',
-                  '_rebasingCreditsPerToken',
-                  'nonRebasingSupply',
-                  'nonRebasingCreditsPerToken',
-                  'rebaseState',
-                  'isUpgraded',
-                  'governor',
-                ]
-              : [
-                  // OToken_2025_03_04
-                  'totalSupply',
-                  'allowances',
-                  'vaultAddress',
-                  'creditBalances',
-                  'rebasingCredits',
-                  'rebasingCreditsPerToken',
-                  'nonRebasingSupply',
-                  'alternativeCreditsPerToken',
-                  'rebaseState',
-                  'yieldTo',
-                  'yieldFrom',
-                  'governor',
-                ],
+            ? [
+                'totalSupply',
+                'allowances',
+                'vaultAddress',
+                'creditBalances',
+                '_rebasingCredits',
+                '_rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'nonRebasingCreditsPerToken',
+                'rebaseState',
+                'isUpgraded',
+                'governor',
+              ]
+            : [
+                // OToken_2025_03_04
+                'totalSupply',
+                'allowances',
+                'vaultAddress',
+                'creditBalances',
+                'rebasingCredits',
+                'rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'alternativeCreditsPerToken',
+                'rebaseState',
+                'yieldTo',
+                'yieldFrom',
+                'governor',
+              ],
         ),
       ),
     ),

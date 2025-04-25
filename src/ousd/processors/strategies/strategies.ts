@@ -58,6 +58,18 @@ export const ousdStrategies: readonly IStrategyData[] = [
     assets: [USDT],
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
+  {
+    chainId: 1,
+    from: 22224255,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Curve AMO',
+    contractName: 'CurveAMOStrategy',
+    address: mainnetAddresses.strategies.ousd.OUSDCurveAMOStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDC],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
   // Deprecated
   // {
   //   from: 13369299,
@@ -77,7 +89,7 @@ export const ousdStrategies: readonly IStrategyData[] = [
 ]
 
 const strategies = ousdStrategies
-export const name = 'OUSD Strategies'
+export const name = 'strategies'
 export const from = Math.min(...strategies.map((s) => s.from))
 
 export const setup = (processor: EvmBatchProcessor) => {
