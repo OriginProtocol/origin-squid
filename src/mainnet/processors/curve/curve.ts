@@ -1,6 +1,6 @@
 import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 import { createCurveInitializer, createCurveProcessor, createCurveSetup } from '@templates/curve'
-import { tokens } from '@utils/addresses'
+import { mainnetTokens } from '@utils/addresses'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090
@@ -13,7 +13,7 @@ const pools: (Parameters<typeof createCurveInitializer>['0'] & Parameters<typeof
     name: 'factory-v2-298: ETH/OETH',
     address: '0x94B17476A93b3262d87B9a326965D1E91f9c13E7'.toLowerCase(),
     from: Math.max(17130500, oethDeployFrom),
-    tokens: [tokens.ETH, tokens.OETH],
+    tokens: [mainnetTokens.ETH, mainnetTokens.OETH],
     ratesToPull: [{ i: 1n, j: 0n, dx: 1000000000000000000n }],
   },
   // {

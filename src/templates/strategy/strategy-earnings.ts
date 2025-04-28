@@ -23,7 +23,7 @@ import {
   USDT_ADDRESS,
   WETH_ADDRESS,
   addresses,
-  tokens,
+  mainnetTokens,
 } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { plumeAddresses } from '@utils/addresses-plume'
@@ -82,7 +82,7 @@ const oTokenValues = {
     harvesterTargets: [OUSD_DRIPPER_ADDRESS, addresses.multisig['multichain-guardian']],
   },
   [OETH_ADDRESS]: {
-    rewardConversionToken: [WETH_ADDRESS, tokens.CRV, tokens.CVX],
+    rewardConversionToken: [WETH_ADDRESS, mainnetTokens.CRV, mainnetTokens.CVX],
     rewardConversionTokenDecimals: 18,
     saveAsAsset: WETH_ADDRESS,
     harvester: [OETH_HARVESTER_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS, OETH_HARVESTER_SIMPLE_ADDRESS_2],

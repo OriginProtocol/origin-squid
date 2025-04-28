@@ -6,8 +6,8 @@ import {
   OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
   WOETH_ADDRESS,
+  mainnetTokens,
   oethStrategyArray,
-  tokens,
 } from '@utils/addresses'
 import { TokenSymbol } from '@utils/symbols'
 
@@ -20,23 +20,23 @@ const simpleTracks: Record<string, Parameters<typeof createERC20EventTracker>[0]
   // Origin Specific
   OGN: {
     from: 6436154,
-    address: tokens.OGN,
+    address: mainnetTokens.OGN,
   },
   xOGN: {
     from: 19919745,
-    address: tokens.xOGN,
+    address: mainnetTokens.xOGN,
   },
   OGV: {
     from: 14439231,
-    address: tokens.OGV,
+    address: mainnetTokens.OGV,
   },
   veOGV: {
     from: 15089596,
-    address: tokens.veOGV,
+    address: mainnetTokens.veOGV,
   },
   primeETH: {
     from: 19138973,
-    address: tokens.primeETH,
+    address: mainnetTokens.primeETH,
   },
 }
 
@@ -48,7 +48,7 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
   // OETH Related
   WETH: {
     from: 16933090, // oeth deploy date
-    address: tokens.WETH,
+    address: mainnetTokens.WETH,
     accountFilter: [
       ...oethStrategyArray,
       OETH_VAULT_ADDRESS,
