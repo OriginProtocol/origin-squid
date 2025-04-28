@@ -1,12 +1,12 @@
 import { createERC20PollingTracker } from '@templates/erc20'
-import { OUSD_VAULT_ADDRESS, ousdStrategyArray, tokens } from '@utils/addresses'
+import { OUSD_VAULT_ADDRESS, mainnetTokens, ousdStrategyArray } from '@utils/addresses'
 
 const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = {
   // OUSD Related
   USDT: {
     // from: 11362821,
     from: 16933090, // oeth deploy date
-    address: tokens.USDT,
+    address: mainnetTokens.USDT,
     accountFilter: [
       ...ousdStrategyArray,
       OUSD_VAULT_ADDRESS,
@@ -18,7 +18,7 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
   USDC: {
     // from: 11367200,
     from: 16933090, // oeth deploy date
-    address: tokens.USDC,
+    address: mainnetTokens.USDC,
     accountFilter: [
       ...ousdStrategyArray,
       OUSD_VAULT_ADDRESS,
@@ -30,7 +30,7 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
   DAI: {
     // from: 11367184,
     from: 16933090, // oeth deploy date
-    address: tokens.DAI,
+    address: mainnetTokens.DAI,
     accountFilter: [
       ...ousdStrategyArray,
       OUSD_VAULT_ADDRESS,

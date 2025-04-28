@@ -94,7 +94,7 @@ export const OGV_GOVERNANCE_ADDRESS = '0x3cdd07c16614059e66344a7b579dab4f9516c0b
 
 // TODO: this needs better multichain organization
 // Token Helper Objects & Types
-export const tokens = {
+export const mainnetTokens = {
   // Origin ERC20 Tokens
   OGN: OGN_ADDRESS,
   OGN_base: OGN_BASE_ADDRESS,
@@ -202,7 +202,7 @@ export const multisig = {
 
 export const addresses = {
   multisig,
-  tokens,
+  tokens: mainnetTokens,
   strategies,
   oeth,
   ousd,

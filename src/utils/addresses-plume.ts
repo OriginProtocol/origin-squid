@@ -4,13 +4,15 @@ const superOETHp = {
   vault: '0xc8c8f8bea5631a8af26440af32a55002138cb76a',
   oracleRouter: '0xa6c76fc1ac0ac86f19cd874524726b456905ea81',
   dripper: '0x3b56c09543d3068f8488ed34e6f383c3854d2bc1',
-  strategies: {},
+  strategies: {
+    bridgedWOETH: '0x1e3edd5e019207d6355ea77f724b1f1bf639b569',
+  },
   zapper: undefined,
   harvester: undefined,
   vaultTokens: ['0xca59ca09e5602fae8b629dee83ffa819741f14be'],
 } as const
 
-export const tokens = {
+export const plumeTokens = {
   superOETHp: superOETHp.address,
   WOETH: '0xd8724322f44e5c58d7a815f542036fb17dbbf839',
   WETH: '0xca59ca09e5602fae8b629dee83ffa819741f14be',
@@ -24,5 +26,5 @@ export const plumeAddresses = {
   },
   timelock: '0x6c6f8f839a7648949873d3d2beea936fc2932e5c',
   superOETHp,
-  tokens,
+  tokens: plumeTokens,
 } as const

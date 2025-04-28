@@ -1,9 +1,9 @@
 import { WOETH_ARBITRUM_ADDRESS } from './addresses'
 
-export const tokens = {
+export const arbitrumTokens = {
   wOETH: WOETH_ARBITRUM_ADDRESS,
 }
 
 export const arbitrumAddresses = {
-  tokens,
+  tokens: arbitrumTokens,
 }

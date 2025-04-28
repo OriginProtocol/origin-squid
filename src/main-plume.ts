@@ -1,3 +1,4 @@
+import { plumeStrategyProcessors } from 'plume/strategies'
 import { superOETHp } from 'plume/super-oeth-p'
 import 'tsconfig-paths/register'
 import { plumeMainnet } from 'viem/chains'
@@ -14,6 +15,7 @@ export const processor = defineSquidProcessor({
   stateSchema: 'plume-processor',
   processors: [
     ...superOETHp,
+    ...plumeStrategyProcessors,
     // createPoolBoosterProcessor({ registryAddress: '0x4f3b656aa5fb5e708bf7b63d6ff71623eb4a218a', from: 9219718 }),
     // createPoolsProcessor(plumeMainnet.id),
   ],

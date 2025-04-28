@@ -16,7 +16,7 @@ const superOETHb = {
   vaultTokens: ['0x4200000000000000000000000000000000000006'],
 } as const
 
-export const tokens = {
+export const baseTokens = {
   USDC: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
   ETH: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
   WETH: '0x4200000000000000000000000000000000000006',
@@ -123,7 +123,7 @@ export const baseAddresses = {
     reservoir: '0xb6d85ce798660076152d6fd3a484129668839c95',
   },
   baseHotWallet: '0x3c112e20141b65041c252a68a611ef145f58b7bc',
-  tokens,
+  tokens: baseTokens,
   superOETHb,
   origin: compact(
     uniq(
