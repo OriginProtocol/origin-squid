@@ -1,5 +1,5 @@
-module.exports = class Data1744656040355 {
-    name = 'Data1744656040355'
+module.exports = class Data1745966160707 {
+    name = 'Data1745966160707'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -782,6 +782,11 @@ module.exports = class Data1744656040355 {
         await db.query(`CREATE INDEX "IDX_df364fb6e82d1feeed2a5dfffa" ON "strategy_daily_yield" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_095c7036449ae511b4ef2a01df" ON "strategy_daily_yield" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_c6a366374690d7e37b070e5788" ON "strategy_daily_yield" ("strategy") `)
+        await db.query(`CREATE TABLE "sfc_withdrawal" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL, "created_at_block" integer NOT NULL, "delegator" text NOT NULL, "to_validator_id" text NOT NULL, "wr_id" text NOT NULL, "amount" numeric NOT NULL, "penalty" numeric, "withdrawn_at" TIMESTAMP WITH TIME ZONE, "withdrawn_at_block" integer, CONSTRAINT "PK_ddb6248f9bf2b19ba24e1de1aae" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_098bb05eb0e21825d9f97d7238" ON "sfc_withdrawal" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_c1767bd417033cf6be2fc0dfed" ON "sfc_withdrawal" ("delegator") `)
+        await db.query(`CREATE INDEX "IDX_7afdeeed7b96e60407ed2cee72" ON "sfc_withdrawal" ("to_validator_id") `)
+        await db.query(`CREATE INDEX "IDX_8e76d028b9d21884b48a6cfb34" ON "sfc_withdrawal" ("wr_id") `)
         await db.query(`CREATE TABLE "morpho_market_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "market_id" text NOT NULL, "total_supply_assets" numeric NOT NULL, "total_supply_shares" numeric NOT NULL, "total_borrow_assets" numeric NOT NULL, "total_borrow_shares" numeric NOT NULL, "last_update" numeric NOT NULL, "fee" numeric NOT NULL, CONSTRAINT "PK_69eee8c1777f06d9de8b4cab68d" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "event_woeth_price_updated" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "old_value" numeric NOT NULL, "new_value" numeric NOT NULL, CONSTRAINT "PK_1c828c028380b7600d024778689" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_cfeca5e039fb3f137b5922a60a" ON "event_woeth_price_updated" ("chain_id") `)
@@ -1587,6 +1592,11 @@ module.exports = class Data1744656040355 {
         await db.query(`DROP INDEX "public"."IDX_df364fb6e82d1feeed2a5dfffa"`)
         await db.query(`DROP INDEX "public"."IDX_095c7036449ae511b4ef2a01df"`)
         await db.query(`DROP INDEX "public"."IDX_c6a366374690d7e37b070e5788"`)
+        await db.query(`DROP TABLE "sfc_withdrawal"`)
+        await db.query(`DROP INDEX "public"."IDX_098bb05eb0e21825d9f97d7238"`)
+        await db.query(`DROP INDEX "public"."IDX_c1767bd417033cf6be2fc0dfed"`)
+        await db.query(`DROP INDEX "public"."IDX_7afdeeed7b96e60407ed2cee72"`)
+        await db.query(`DROP INDEX "public"."IDX_8e76d028b9d21884b48a6cfb34"`)
         await db.query(`DROP TABLE "morpho_market_state"`)
         await db.query(`DROP TABLE "event_woeth_price_updated"`)
         await db.query(`DROP INDEX "public"."IDX_cfeca5e039fb3f137b5922a60a"`)

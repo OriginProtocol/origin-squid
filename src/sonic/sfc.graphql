@@ -1,0 +1,13 @@
+type SFCWithdrawal @entity {
+  id: ID!
+  chainId: Int! @index
+  createdAt: DateTime!
+  createdAtBlock: Int!
+  delegator: String! @index
+  toValidatorID: String! @index
+  wrID: String! @index
+  amount: BigInt!
+  penalty: BigInt
+  withdrawnAt: DateTime
+  withdrawnAtBlock: Int
+}

@@ -1951,6 +1951,19 @@ type StrategyDailyYield @entity {
   apr: Float!
   apy: Float!
 }
+type SFCWithdrawal @entity {
+  id: ID!
+  chainId: Int! @index
+  createdAt: DateTime!
+  createdAtBlock: Int!
+  delegator: String! @index
+  toValidatorID: String! @index
+  wrID: String! @index
+  amount: BigInt!
+  penalty: BigInt
+  withdrawnAt: DateTime
+  withdrawnAtBlock: Int
+}
 type MorphoMarketState @entity {
   id: ID!
   chainId: Int!
