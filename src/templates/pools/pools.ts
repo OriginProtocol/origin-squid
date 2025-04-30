@@ -1,5 +1,5 @@
 import { compact } from 'lodash'
-import { base, mainnet, sonic } from 'viem/chains'
+import { base, mainnet, plumeMainnet, sonic } from 'viem/chains'
 
 import * as aerodromeCLPoolFactoryAbi from '@abi/aerodrome-cl-pool-factory'
 import * as aerodromePoolFactoryAbi from '@abi/aerodrome-pool-factory'
@@ -11,6 +11,7 @@ import * as stableSwapNgAbi from '@abi/curve-stable-swap-ng'
 import * as triCryptoFactoryAbi from '@abi/curve-tricrypto-factory'
 import * as twocryptoFactoryAbi from '@abi/curve-twocrypto-factory'
 import * as erc20Abi from '@abi/erc20'
+import * as maverickV2FactoryAbi from '@abi/maverick-v2-factory'
 import * as metropolisLbFactoryAbi from '@abi/metropolis-lb-factory'
 import * as metropolisV2FactoryAbi from '@abi/metropolis-v2-factory'
 import * as shadowPairFactoryAbi from '@abi/shadow-pair-factory'
@@ -31,15 +32,15 @@ import { baseAddresses } from '@utils/addresses-base'
 const chainParams: Record<
   number,
   {
-    stableSwapFactory: {
+    stableSwapFactory?: {
       address: string
       from: number
     }
-    twoCryptoFactory: {
+    twoCryptoFactory?: {
       address: string
       from: number
     }
-    triCryptoFactory: {
+    triCryptoFactory?: {
       address: string
       from: number
     }
@@ -103,6 +104,7 @@ const chainParams: Record<
       from: 1440914,
     },
   },
+  [plumeMainnet.id]: {},
 }
 
 export const createPoolsProcessor = (chainId: number) => {
@@ -113,73 +115,74 @@ export const createPoolsProcessor = (chainId: number) => {
   return joinProcessors(
     'pools',
     compact([
-      mainnet.id === chainId
-        ? defineProcessor({
-            name: 'default-pools',
-            from: 17371439,
-            process: async (ctx: Context) => {
-              if (initialized) return
-              initialized = true
-              if (await ctx.store.get(Pool, '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7')) return
-              await ctx.store.insert([
-                new Pool({
-                  id: '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
-                  chainId: 1,
-                  address: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
-                  name: 'Curve.fi Factory Pool: OETH',
-                  symbol: 'OETHCRV-f',
-                  createdAtBlock: 17130232,
-                  createdAt: new Date('Apr-26-2023 11:54:47 AM UTC'),
-                  tokens: ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
-                  symbols: ['ETH', 'OETH'],
-                  decimals: [18, 18],
-                  exchange: 'curve',
-                  type: 'stable',
-                }),
-                new Pool({
-                  id: '1:0xfa0bbb0a5815f6648241c9221027b70914dd8949',
-                  chainId: 1,
-                  address: '0xfa0bbb0a5815f6648241c9221027b70914dd8949',
-                  name: 'Curve.fi Factory Plain Pool: frxETH/OETH',
-                  symbol: 'frxETHOETH-f',
-                  createdAtBlock: 18123489,
-                  createdAt: new Date('Sep-12-2023 11:21:47 PM UTC'),
-                  tokens: ['0x5e8422345238f34275888049021821e8e08caa1f', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
-                  symbols: ['frxETH', 'OETH'],
-                  decimals: [18, 18],
-                  exchange: 'curve',
-                  type: 'stable',
-                }),
-                new Pool({
-                  id: '1:0x87650d7bbfc3a9f10587d7778206671719d9910d',
-                  chainId: 1,
-                  address: '0x87650d7bbfc3a9f10587d7778206671719d9910d',
-                  name: 'Curve.fi Factory USD Metapool: Origin Dollar',
-                  symbol: 'OUSD3CRV-f',
-                  createdAtBlock: 12860905,
-                  createdAt: new Date('Jul-20-2021 02:59:14 AM UTC'),
-                  tokens: ['0x2a8e1e676ec238d8a992307b495b45b3feaa5e86', '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
-                  symbols: ['OUSD', '3Crv'],
-                  decimals: [18, 18],
-                  exchange: 'curve',
-                  type: 'stable',
-                }),
-              ])
-            },
-          })
-        : undefined,
-      createCurveStableProcessor(chainParams[chainId].stableSwapFactory),
-      createCurveTwoCryptoProcessor(chainParams[chainId].twoCryptoFactory),
-      createCurveTriCryptoProcessor(chainParams[chainId].triCryptoFactory),
-      chainParams[chainId].swapxPairFactory
-        ? createSwapxPairProcessor(chainParams[chainId].swapxPairFactory!)
-        : undefined,
-      chainParams[chainId].swapxAlgebraFactory
-        ? createAlgebraProcessor(chainParams[chainId].swapxAlgebraFactory!)
-        : undefined,
-      chainId === base.id ? createAeroProcessor() : undefined,
-      chainId === sonic.id ? createMetropolisProcessor() : undefined,
-      chainId === sonic.id ? createShadowProcessor() : undefined,
+      mainnet.id === chainId &&
+        defineProcessor({
+          name: 'default-pools',
+          from: 17371439,
+          process: async (ctx: Context) => {
+            if (initialized) return
+            initialized = true
+            if (await ctx.store.get(Pool, '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7')) return
+            await ctx.store.insert([
+              new Pool({
+                id: '1:0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
+                chainId: 1,
+                address: '0x94b17476a93b3262d87b9a326965d1e91f9c13e7',
+                name: 'Curve.fi Factory Pool: OETH',
+                symbol: 'OETHCRV-f',
+                createdAtBlock: 17130232,
+                createdAt: new Date('Apr-26-2023 11:54:47 AM UTC'),
+                tokens: ['0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
+                symbols: ['ETH', 'OETH'],
+                decimals: [18, 18],
+                exchange: 'curve',
+                type: 'stable',
+              }),
+              new Pool({
+                id: '1:0xfa0bbb0a5815f6648241c9221027b70914dd8949',
+                chainId: 1,
+                address: '0xfa0bbb0a5815f6648241c9221027b70914dd8949',
+                name: 'Curve.fi Factory Plain Pool: frxETH/OETH',
+                symbol: 'frxETHOETH-f',
+                createdAtBlock: 18123489,
+                createdAt: new Date('Sep-12-2023 11:21:47 PM UTC'),
+                tokens: ['0x5e8422345238f34275888049021821e8e08caa1f', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'],
+                symbols: ['frxETH', 'OETH'],
+                decimals: [18, 18],
+                exchange: 'curve',
+                type: 'stable',
+              }),
+              new Pool({
+                id: '1:0x87650d7bbfc3a9f10587d7778206671719d9910d',
+                chainId: 1,
+                address: '0x87650d7bbfc3a9f10587d7778206671719d9910d',
+                name: 'Curve.fi Factory USD Metapool: Origin Dollar',
+                symbol: 'OUSD3CRV-f',
+                createdAtBlock: 12860905,
+                createdAt: new Date('Jul-20-2021 02:59:14 AM UTC'),
+                tokens: ['0x2a8e1e676ec238d8a992307b495b45b3feaa5e86', '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'],
+                symbols: ['OUSD', '3Crv'],
+                decimals: [18, 18],
+                exchange: 'curve',
+                type: 'stable',
+              }),
+            ])
+          },
+        }),
+      chainParams[chainId].stableSwapFactory && createCurveStableProcessor(chainParams[chainId].stableSwapFactory!),
+      chainParams[chainId].twoCryptoFactory && createCurveTwoCryptoProcessor(chainParams[chainId].twoCryptoFactory!),
+      chainParams[chainId].triCryptoFactory && createCurveTriCryptoProcessor(chainParams[chainId].triCryptoFactory!),
+      chainParams[chainId].swapxPairFactory && createSwapxPairProcessor(chainParams[chainId].swapxPairFactory!),
+      chainParams[chainId].swapxAlgebraFactory && createAlgebraProcessor(chainParams[chainId].swapxAlgebraFactory!),
+      chainId === base.id && createAeroProcessor(),
+      chainId === sonic.id && createMetropolisProcessor(),
+      chainId === sonic.id && createShadowProcessor(),
+      chainId === plumeMainnet.id &&
+        createMaverickV2Processor({
+          address: '0x056a588afdc0cdaa4cab50d8a4d2940c5d04172e',
+          from: 12119,
+          exchange: 'rooster',
+        }),
     ]),
   )
 }
@@ -757,6 +760,55 @@ export const createShadowProcessor = () => {
               symbols: [symbol0, symbol1],
               decimals: [decimals0, decimals1],
               exchange: 'shadow',
+              type: `CL${data.tickSpacing}`,
+            })
+            pools.set(pool.id, pool)
+          }
+        }
+      }
+      await ctx.store.insert([...pools.values()])
+    },
+  })
+}
+
+export const createMaverickV2Processor = (params: { address: string; from: number; exchange: string }) => {
+  const maverickV2PoolCreatedFilter = logFilter({
+    address: [params.address],
+    topic0: [maverickV2FactoryAbi.events.PoolCreated.topic],
+    range: { from: params.from },
+  })
+  return defineProcessor({
+    name: `maverick-v2-${params.exchange}-factory`,
+    from: params.from,
+    setup: (processor: EvmBatchProcessor) => {
+      processor.addLog(maverickV2PoolCreatedFilter.value)
+    },
+    process: async (ctx: Context) => {
+      const pools = new Map<string, Pool>()
+      for (const block of ctx.blocksWithContent) {
+        for (const log of block.logs) {
+          if (maverickV2PoolCreatedFilter.matches(log)) {
+            const data = maverickV2FactoryAbi.events.PoolCreated.decode(log)
+            const token0Contract = new erc20Abi.Contract(ctx, block.header, data.tokenA)
+            const token1Contract = new erc20Abi.Contract(ctx, block.header, data.tokenB)
+            const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
+              token0Contract.symbol(),
+              token1Contract.symbol(),
+              token0Contract.decimals(),
+              token1Contract.decimals(),
+            ])
+            const pool = new Pool({
+              id: `${ctx.chain.id}:${data.poolAddress}`,
+              chainId: ctx.chain.id,
+              address: data.poolAddress,
+              name: `Maverick V2 CL${data.tickSpacing} ${symbol0}/${symbol1}`,
+              symbol: `CL${data.tickSpacing}-${symbol0}/${symbol1}`,
+              createdAtBlock: block.header.height,
+              createdAt: new Date(block.header.timestamp),
+              tokens: [data.tokenA.toLowerCase(), data.tokenB.toLowerCase()],
+              symbols: [symbol0, symbol1],
+              decimals: [decimals0, decimals1],
+              exchange: params.exchange,
               type: `CL${data.tickSpacing}`,
             })
             pools.set(pool.id, pool)

@@ -5,6 +5,7 @@ import { plumeMainnet } from 'viem/chains'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createPoolsProcessor } from '@templates/pools'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
@@ -17,7 +18,7 @@ export const processor = defineSquidProcessor({
     ...superOETHp,
     ...plumeStrategyProcessors,
     // createPoolBoosterProcessor({ registryAddress: '0x4f3b656aa5fb5e708bf7b63d6ff71623eb4a218a', from: 9219718 }),
-    // createPoolsProcessor(plumeMainnet.id),
+    createPoolsProcessor(plumeMainnet.id),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('plume')],
   validators: [validate],

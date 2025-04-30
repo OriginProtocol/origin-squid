@@ -1,0 +1,75 @@
+[
+  {
+    "type": "event",
+    "name": "PoolCreated",
+    "inputs": [
+      {
+        "name": "poolAddress",
+        "type": "address",
+        "indexed": false,
+        "internalType": "contract IMaverickV2Pool"
+      },
+      {
+        "name": "protocolFeeRatio",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "feeAIn",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "feeBIn",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "tickSpacing",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "lookback",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "activeTick",
+        "type": "int32",
+        "indexed": false,
+        "internalType": "int32"
+      },
+      {
+        "name": "tokenA",
+        "type": "address",
+        "indexed": false,
+        "internalType": "contract IERC20"
+      },
+      {
+        "name": "tokenB",
+        "type": "address",
+        "indexed": false,
+        "internalType": "contract IERC20"
+      },
+      {
+        "name": "kinds",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "accessor",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  }
+]
