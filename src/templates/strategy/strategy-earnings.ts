@@ -241,7 +241,18 @@ export const processStrategyEarnings = async (
         didUpdate = true
         txIgnore.add(log.transactionHash)
 
-        // Example for OETH: Pull all WETH transfers from harvester to the dripper.
+        // Simple flow
+        // Native staking strategies use this flow.
+        if (strategyData.earnings?.rewardTokenCollectedSimple) {
+          const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
+          await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
+            token: strategyData.base.address,
+            amount: data.amount,
+          })
+          return
+        }
+
+        // Complex flow
         const earningsTransferLogs = block.logs.filter(
           (l) =>
             l.transactionHash === log.transactionHash && rewardTokenCollectedTransfersFilter(strategyData).matches(l),

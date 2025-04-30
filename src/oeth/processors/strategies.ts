@@ -150,7 +150,11 @@ export const oethStrategies: readonly IStrategyData[] = [
         kind: 'NativeStaking',
         base: { address: WETH_ADDRESS, decimals: 18 },
         assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
-        earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+        earnings: {
+          passiveByDepositWithdrawal: true,
+          rewardTokenCollected: true,
+          rewardTokenCollectedSimple: true,
+        },
       }) as const,
   ),
 ]

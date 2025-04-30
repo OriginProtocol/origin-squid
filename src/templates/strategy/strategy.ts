@@ -53,6 +53,7 @@ export type IStrategyData = {
   curvePoolInfo?: ICurveAMOInfo
   earnings?: {
     rewardTokenCollected?: boolean
+    rewardTokenCollectedSimple?: boolean
     passiveByDepositWithdrawal?: boolean
     passiveByDepositWithdrawalByTrace?: boolean
   }
