@@ -47,6 +47,7 @@ export const { name, from, setup, process } = createOTokenProcessor2({
     { asset: USDS_ADDRESS, symbol: 'USDS' },
   ],
   getAmoSupply: async (ctx, height) => {
+    if (height <= 22224255) return 0n
     const contract = new strategyAbi.Contract(ctx, { height }, strategies.ousd.OUSDCurveAMOStrategy)
     return contract.checkBalance(USDC_ADDRESS)
   },
