@@ -1,11 +1,16 @@
+import * as aerodromeCLGaugeAbi from '@abi/aerodrome-cl-gauge'
 import * as aerodromeCLPoolFactoryAbi from '@abi/aerodrome-cl-pool-factory'
 import * as aerodromeGaugeAbi from '@abi/aerodrome-gauge'
 import * as aerodromePoolFactoryAbi from '@abi/aerodrome-pool-factory'
 import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
-import { AeroCLPoolCreated, AeroGaugeNotifyReward, AeroPoolCreated, AeroVoterGaugeCreated } from '@model'
+import {
+  AeroCLGaugeNotifyReward,
+  AeroCLPoolCreated,
+  AeroGaugeNotifyReward,
+  AeroPoolCreated,
+  AeroVoterGaugeCreated,
+} from '@model'
 import { Processor } from '@originprotocol/squid-utils'
-import { aerodromeCLGauge } from '@templates/aerodrome/cl-gauge'
-import { aerodromeGauge } from '@templates/aerodrome/gauge'
 import { aerodromeLP } from '@templates/aerodrome/lp'
 import { aerodromePool } from '@templates/aerodrome/pool'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
@@ -25,12 +30,44 @@ export const aerodromeProcessors = pools
     if (pool.type == 'amm') {
       processors.push(aerodromePool(pool))
       if (pool.gauge) {
-        processors.push(aerodromeGauge(pool.gauge))
+        processors.push(
+          createEventProcessor({
+            event: aerodromeGaugeAbi.events.NotifyReward,
+            address: pool.gauge.address,
+            from: pool.gauge.from,
+            mapEntity: (ctx, block, log, decoded) => {
+              return new AeroGaugeNotifyReward({
+                id: `${ctx.chain.id}:${log.id}`,
+                chainId: ctx.chain.id,
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                address: log.address,
+                ...decoded,
+              })
+            },
+          }),
+        )
       }
     }
     if (pool.type == 'cl') {
       if (pool.gauge) {
-        processors.push(aerodromeCLGauge(pool.gauge))
+        processors.push(
+          createEventProcessor({
+            event: aerodromeCLGaugeAbi.events.NotifyReward,
+            address: pool.gauge.address,
+            from: pool.gauge.from,
+            mapEntity: (ctx, block, log, decoded) => {
+              return new AeroCLGaugeNotifyReward({
+                id: `${ctx.chain.id}:${log.id}`,
+                chainId: ctx.chain.id,
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                address: log.address,
+                ...decoded,
+              })
+            },
+          }),
+        )
       }
     }
     if (pool.lps?.length > 0) {
@@ -40,20 +77,6 @@ export const aerodromeProcessors = pools
     return processors
   })
   .concat([
-    createEventProcessor({
-      event: aerodromeGaugeAbi.events.NotifyReward,
-      from: 3200584,
-      mapEntity: (ctx, block, log, decoded) => {
-        return new AeroGaugeNotifyReward({
-          id: `${ctx.chain.id}:${log.id}`,
-          chainId: ctx.chain.id,
-          timestamp: new Date(block.header.timestamp),
-          blockNumber: block.header.height,
-          address: log.address,
-          ...decoded,
-        })
-      },
-    }),
     createEventProcessor({
       address: baseAddresses.aerodrome.voter,
       event: aerodromeVoterAbi.events.GaugeCreated,
