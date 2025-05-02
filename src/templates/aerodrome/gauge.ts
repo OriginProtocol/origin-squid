@@ -35,9 +35,8 @@ export const aerodromeGauge = (gauge: NonNullable<PoolDefinition['gauge']>): Pro
           )
         }
       }
-      if (entities.length > 0) {
-        await ctx.store.insert(entities)
-      }
+
+      await ctx.store.insert(entities)
     },
   }
 }
