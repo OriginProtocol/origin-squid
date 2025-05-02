@@ -132,38 +132,6 @@ type ExecutionRewardsCollected @entity {
   strategy: String! @index
   amount: BigInt!
 }
-type BalancerPool @entity {
-  id: ID!
-  address: String! @index
-  name: String!
-  tokenCount: Int!
-  token0: String!
-  token1: String!
-  token2: String
-  token3: String
-}
-
-type BalancerPoolBalance @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  address: String!
-  balance0: BigInt!
-  balance1: BigInt!
-  balance2: BigInt!
-  balance3: BigInt!
-}
-
-type BalancerPoolRate @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  address: String!
-  rate0: BigInt!
-  rate1: BigInt!
-  rate2: BigInt!
-  rate3: BigInt!
-}
 type CoinGeckoCoinData @entity {
   id: ID!
   product: String! @index

@@ -1,5 +1,5 @@
-module.exports = class Data1746144669005 {
-    name = 'Data1746144669005'
+module.exports = class Data1746146259288 {
+    name = 'Data1746146259288'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -46,14 +46,6 @@ module.exports = class Data1746144669005 {
         await db.query(`CREATE INDEX "IDX_b883d5666bb2f8b5b1f7d9633a" ON "execution_rewards_collected" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_adcff42ecde1a20daeb870b3c4" ON "execution_rewards_collected" ("address") `)
         await db.query(`CREATE INDEX "IDX_41665fa5e546780642bacf96c7" ON "execution_rewards_collected" ("strategy") `)
-        await db.query(`CREATE TABLE "balancer_pool" ("id" character varying NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "token_count" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, "token2" text, "token3" text, CONSTRAINT "PK_d7d096bf445ae226ec938f8bb6a" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_0c5b4cc12b9d8b80ac5d983848" ON "balancer_pool" ("address") `)
-        await db.query(`CREATE TABLE "balancer_pool_balance" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "balance0" numeric NOT NULL, "balance1" numeric NOT NULL, "balance2" numeric NOT NULL, "balance3" numeric NOT NULL, CONSTRAINT "PK_441c7de293266414608c8e9de4c" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_642115282f1c3026edbc4bc2a7" ON "balancer_pool_balance" ("timestamp") `)
-        await db.query(`CREATE INDEX "IDX_eecdc2d6132041e3806d77c7b4" ON "balancer_pool_balance" ("block_number") `)
-        await db.query(`CREATE TABLE "balancer_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "rate0" numeric NOT NULL, "rate1" numeric NOT NULL, "rate2" numeric NOT NULL, "rate3" numeric NOT NULL, CONSTRAINT "PK_3ca9825db8d15c7850b715d9121" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_b1656f8d048f72b38bb637ea24" ON "balancer_pool_rate" ("timestamp") `)
-        await db.query(`CREATE INDEX "IDX_c55345ef048232dfe36e60e4c5" ON "balancer_pool_rate" ("block_number") `)
         await db.query(`CREATE TABLE "coin_gecko_coin_data" ("id" character varying NOT NULL, "product" text NOT NULL, "date" text NOT NULL, "vs_currency" text NOT NULL, "price" numeric NOT NULL, "market_cap" numeric NOT NULL, "trading_volume" numeric NOT NULL, CONSTRAINT "PK_abb8340f8d830c27b3288a1083c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_55f8b56cad28caa22a995dfb83" ON "coin_gecko_coin_data" ("product") `)
         await db.query(`CREATE INDEX "IDX_821542437abc5d0d6aa7959131" ON "coin_gecko_coin_data" ("date") `)
@@ -548,14 +540,6 @@ module.exports = class Data1746144669005 {
         await db.query(`DROP INDEX "public"."IDX_b883d5666bb2f8b5b1f7d9633a"`)
         await db.query(`DROP INDEX "public"."IDX_adcff42ecde1a20daeb870b3c4"`)
         await db.query(`DROP INDEX "public"."IDX_41665fa5e546780642bacf96c7"`)
-        await db.query(`DROP TABLE "balancer_pool"`)
-        await db.query(`DROP INDEX "public"."IDX_0c5b4cc12b9d8b80ac5d983848"`)
-        await db.query(`DROP TABLE "balancer_pool_balance"`)
-        await db.query(`DROP INDEX "public"."IDX_642115282f1c3026edbc4bc2a7"`)
-        await db.query(`DROP INDEX "public"."IDX_eecdc2d6132041e3806d77c7b4"`)
-        await db.query(`DROP TABLE "balancer_pool_rate"`)
-        await db.query(`DROP INDEX "public"."IDX_b1656f8d048f72b38bb637ea24"`)
-        await db.query(`DROP INDEX "public"."IDX_c55345ef048232dfe36e60e4c5"`)
         await db.query(`DROP TABLE "coin_gecko_coin_data"`)
         await db.query(`DROP INDEX "public"."IDX_55f8b56cad28caa22a995dfb83"`)
         await db.query(`DROP INDEX "public"."IDX_821542437abc5d0d6aa7959131"`)
