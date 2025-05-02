@@ -1,64 +1,43 @@
 import * as aerodromeGaugeAbi from '@abi/aerodrome-gauge'
-import * as models from '@model'
-import { Block, Context, Log, Processor, logFilter } from '@originprotocol/squid-utils'
+import { AeroGaugeNotifyReward } from '@model'
+import { Processor, logFilter } from '@originprotocol/squid-utils'
 import { PoolDefinition } from '@utils/addresses-base'
 
 export const aerodromeGauge = (gauge: NonNullable<PoolDefinition['gauge']>): Processor => {
-  const eventProcessors = Object.entries(aerodromeGaugeAbi.events).map(([eventName, event]) => {
-    const filter = logFilter({
-      address: [gauge.address],
-      topic0: [event.topic],
-      range: { from: gauge.from },
-    })
-    return {
-      name: eventName,
-      filter,
-      process: (ctx: Context, block: Block, log: Log) => {
-        if (!filter.matches(log)) return null
-        const Model = models[`AeroGauge${eventName as keyof typeof aerodromeGaugeAbi.events}`]
-        const data = event.decode(log) as any
-        for (const key of Object.keys(data)) {
-          if (typeof data[key] === 'string') {
-            data[key] = data[key].toLowerCase()
-          }
-        }
-        return new Model({
-          ...data,
-          id: `${ctx.chain.id}-${log.id}`,
-          chainId: ctx.chain.id,
-          blockNumber: block.header.height,
-          timestamp: new Date(block.header.timestamp),
-          address: log.address,
-        })
-      },
-    }
+  const notifyRewardFilter = logFilter({
+    address: [gauge.address],
+    topic0: [aerodromeGaugeAbi.events.NotifyReward.topic],
+    range: { from: gauge.from },
   })
+
   return {
     from: gauge.from,
     name: `Aerodrome Gauge ${gauge.address}`,
     setup: (processor) => {
-      for (const { filter } of eventProcessors) {
-        processor.addLog(filter.value)
-      }
+      processor.addLog(notifyRewardFilter.value)
     },
     process: async (ctx) => {
-      const entities = new Map<string, NonNullable<ReturnType<(typeof eventProcessors)[number]['process']>>[]>()
+      const entities: AeroGaugeNotifyReward[] = []
       for (const block of ctx.blocksWithContent) {
         for (const log of block.logs) {
-          for (const { name, process } of eventProcessors) {
-            const entity = process(ctx, block, log)
-            if (entity) {
-              let entitiesArray = entities.get(name)
-              if (!entitiesArray) {
-                entitiesArray = []
-                entities.set(name, entitiesArray)
-              }
-              entitiesArray.push(entity)
-            }
-          }
+          if (!notifyRewardFilter.matches(log)) continue
+          const data = aerodromeGaugeAbi.events.NotifyReward.decode(log)
+          entities.push(
+            new AeroGaugeNotifyReward({
+              id: `${ctx.chain.id}:${log.id}`,
+              chainId: ctx.chain.id,
+              blockNumber: block.header.height,
+              timestamp: new Date(block.header.timestamp),
+              address: log.address,
+              from: data.from.toLowerCase(),
+              amount: data.amount,
+            }),
+          )
         }
       }
-      await Promise.all([...entities.values()].map(async (entity) => ctx.store.insert(entity)))
+      if (entities.length > 0) {
+        await ctx.store.insert(entities)
+      }
     },
   }
 }

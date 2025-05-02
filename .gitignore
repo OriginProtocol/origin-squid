@@ -3,6 +3,8 @@
 /builds
 /dump
 /data
+/cache
+/out
 
 /**Versions.json
 

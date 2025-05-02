@@ -5,11 +5,9 @@ import * as aerodromeVoterAbi from '@abi/aerodrome-voter'
 import { AeroCLPoolCreated, AeroGaugeNotifyReward, AeroPoolCreated, AeroVoterGaugeCreated } from '@model'
 import { Processor } from '@originprotocol/squid-utils'
 import { aerodromeCLGauge } from '@templates/aerodrome/cl-gauge'
-import { aerodromeCLPool } from '@templates/aerodrome/cl-pool'
 import { aerodromeGauge } from '@templates/aerodrome/gauge'
 import { aerodromeLP } from '@templates/aerodrome/lp'
 import { aerodromePool } from '@templates/aerodrome/pool'
-import { aerodromeVoter } from '@templates/aerodrome/voter'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { PoolDefinition, aerodromePools, baseAddresses } from '@utils/addresses-base'
 
@@ -31,7 +29,6 @@ export const aerodromeProcessors = pools
       }
     }
     if (pool.type == 'cl') {
-      processors.push(aerodromeCLPool(pool))
       if (pool.gauge) {
         processors.push(aerodromeCLGauge(pool.gauge))
       }
@@ -43,16 +40,6 @@ export const aerodromeProcessors = pools
     return processors
   })
   .concat([
-    aerodromeVoter({
-      address: baseAddresses.aerodrome.voter,
-      pools: pools.map((p) => p.address),
-      from: Math.min(...pools.map((p) => p.from)), // Should be the pools' lowest `from`
-    }),
-    // TODO: I don't think we need this one...
-    // aerodromeVoterEscrow({
-    //   address: '0xeBf418Fe2512e7E6bd9b87a8F0f294aCDC67e6B4',
-    //   from: 3200584,
-    // }),
     createEventProcessor({
       event: aerodromeGaugeAbi.events.NotifyReward,
       from: 3200584,
