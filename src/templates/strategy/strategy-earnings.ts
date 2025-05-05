@@ -292,7 +292,24 @@ export const processStrategyEarnings = async (
       ) {
         await balanceTrackingUpdate()
       } else if (rewardTokenCollectedFilter(strategyData).matches(log) && !txIgnore.has(log.transactionHash)) {
-        await rewardTokenCollectedUpdate()
+        if (strategyData.kind === 'CurveAMO') {
+          const values = oTokenValues[strategyData.oTokenAddress]
+          const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
+          const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
+          await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
+            token: strategyData.base.address,
+            amount: await convertRate(
+              ctx,
+              block,
+              data.rewardToken as CurrencyAddress,
+              saveAsAsset ?? (log.address as CurrencyAddress),
+              data.amount,
+            ),
+          })
+        } else {
+          // NOTE: This method has been found to be buggy when a harvest TX harvests for multiple strategies at the same time.
+          await rewardTokenCollectedUpdate()
+        }
       }
     }
 
