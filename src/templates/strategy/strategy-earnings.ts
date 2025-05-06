@@ -292,7 +292,7 @@ export const processStrategyEarnings = async (
       ) {
         await balanceTrackingUpdate()
       } else if (rewardTokenCollectedFilter(strategyData).matches(log) && !txIgnore.has(log.transactionHash)) {
-        if (strategyData.kind === 'CurveAMO') {
+        if (strategyData.kind === 'CurveAMO' && strategyData.oTokenAddress === OETH_ADDRESS) {
           const values = oTokenValues[strategyData.oTokenAddress]
           const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
           const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
