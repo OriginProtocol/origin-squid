@@ -11,6 +11,7 @@ import {
   AeroVoterGaugeCreated,
 } from '@model'
 import { Processor } from '@originprotocol/squid-utils'
+import { aerodromeCLPool } from '@templates/aerodrome/cl-pool'
 import { aerodromeLP } from '@templates/aerodrome/lp'
 import { aerodromePool } from '@templates/aerodrome/pool'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
@@ -50,6 +51,7 @@ export const aerodromeProcessors = pools
       }
     }
     if (pool.type == 'cl') {
+      processors.push(aerodromeCLPool(pool))
       if (pool.gauge) {
         processors.push(
           createEventProcessor({
