@@ -7,7 +7,6 @@ import { sonic } from 'viem/chains'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
-import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
 import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
@@ -23,7 +22,6 @@ export const processor = defineSquidProcessor({
     ...sonicErc20s,
     sonicStrategiesProcessor,
     sfcProcessor,
-    createCurvePoolBoosterProcessor({ from: 7436660 }),
     createPoolBoosterProcessor({ registryAddress: '0x4f3b656aa5fb5e708bf7b63d6ff71623eb4a218a', from: 9219718 }),
     createPoolsProcessor(sonic.id),
   ],

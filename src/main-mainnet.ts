@@ -10,7 +10,6 @@ import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
-import { createCurvePoolBoosterProcessor } from '@templates/otoken/curve-pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
 import { createTransactionProcessor } from '@templates/transactions'
@@ -53,7 +52,6 @@ export const processor = defineSquidProcessor({
     ...originArmProcessors,
     // Defender Relayer for Lido ARM
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
-    createCurvePoolBoosterProcessor({ from: 21000000 }),
     createPoolsProcessor(mainnet.id),
     notionProcessor,
   ],
