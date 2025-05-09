@@ -435,6 +435,30 @@ const bridging = () => {
     `),
   ]
 }
+
+const aeroPoolEpochStates = () => {
+  return gql(`
+      aeroPoolEpochStates(where: {address_eq: "0x6446021f4e396da3df4235c62537431372195d38"}, limit: 50, orderBy: blockNumber_ASC) {
+        address
+        blockNumber
+        bribes {
+          amount
+          token
+        }
+        chainId
+        emissions
+        epoch
+        fees {
+          amount
+          token
+        }
+        id
+        timestamp
+        votes
+      }
+  `)
+}
+
 const main = async () => {
   console.log(`Generating validations for: ${process.argv[2]}`)
   const queries: string[] = [
@@ -455,6 +479,7 @@ const main = async () => {
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
     ...bridging(),
+    aeroPoolEpochStates(),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
