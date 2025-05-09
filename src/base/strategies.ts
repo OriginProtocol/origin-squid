@@ -13,6 +13,7 @@ export const baseCurveAMO: IStrategyData = {
   kind: 'CurveAMO',
   curvePoolInfo: {
     poolAddress: '0x302a94e3c28c290eaf2a4605fc52e11eb915f378',
+    gaugeAddress: '0x9da8420dbeebdfc4902b356017610259ef7eedd8',
     rewardsPoolAddress: '0x9da8420dbeebdfc4902b356017610259ef7eedd8',
   },
   base: { address: baseAddresses.tokens.WETH, decimals: 18 },

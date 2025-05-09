@@ -44,6 +44,8 @@ const otokenProcessor = createOTokenProcessor2({
     },
   ],
   getAmoSupply: async (ctx, height) => {
+    // Aerodrome Calculation
+    // =================
     const positions = await getPositions(
       ctx,
       height,
@@ -55,9 +57,32 @@ const otokenProcessor = createOTokenProcessor2({
       (acc, position) => acc + BigInt(position.amount1) + BigInt(position.staked1),
       0n,
     )
+    // =================
 
+    // Curve Calculation
+    // =================
+    // Our OETHb AMO balance = Pool OETHb balance * Gauge Pool Ownership * AMO Gauge Ownership
+    // Pool OETHb Balance
     const superOETHb = new erc20Abi.Contract(ctx, { height }, baseAddresses.superOETHb.address)
-    const curveAmoBalance = await superOETHb.balanceOf(baseCurveAMO.curvePoolInfo!.poolAddress)
+    const poolOETHbBalance = await superOETHb.balanceOf(baseCurveAMO.curvePoolInfo!.poolAddress)
+
+    // Gauge Pool Ownership
+    const curvePool = new erc20Abi.Contract(ctx, { height }, baseCurveAMO.curvePoolInfo!.poolAddress)
+    const curvePoolSupply = await curvePool.totalSupply()
+    const curveGauge = new erc20Abi.Contract(ctx, { height }, baseCurveAMO.curvePoolInfo!.gaugeAddress!)
+    const curveGaugeSupply = await curveGauge.totalSupply()
+    const gaugePoolOwnership = (curveGaugeSupply * 10n ** 18n) / curvePoolSupply
+
+    // AMO Gauge Ownership
+    const amoGaugeBalance = await curveGauge.balanceOf(baseCurveAMO.address)
+    const amoGaugeOwnership = (amoGaugeBalance * 10n ** 18n) / curveGaugeSupply
+
+    // AMO Ownership
+    const amoOwnership = (gaugePoolOwnership * amoGaugeOwnership) / 10n ** 18n
+
+    // AMO OETHb Balance
+    const curveAmoBalance = (poolOETHbBalance * amoOwnership) / 10n ** 18n
+    // =================
 
     return aerodromeAMO + curveAmoBalance
   },
