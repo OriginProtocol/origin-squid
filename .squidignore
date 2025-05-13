@@ -2,6 +2,7 @@
 /node_modules
 /lib
 /dump
+/dumps
 /*Versions.json
 npm-debug.log
 
