@@ -42,7 +42,7 @@ async function dumpDatabase(processorName: string) {
     }
 
     // Get block height for the processor
-    const blockHeight = 30148800 // await getBlockHeight(processorName)
+    const blockHeight = await getBlockHeight(processorName)
     console.log(`Found block height ${blockHeight} for processor ${processorName}`)
 
     // Create dumps directory if it doesn't exist
