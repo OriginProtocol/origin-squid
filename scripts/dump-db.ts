@@ -11,7 +11,7 @@ const DB_HOST = process.env.DB_HOST || 'localhost'
 const DB_PORT = process.env.DB_PORT || '23798'
 const DB_NAME = process.env.DB_NAME || 'squid'
 const DB_USER = process.env.DB_USER || 'postgres'
-const DB_PASSWORD = process.env.DB_PASSWORD || 'postgres'
+const DB_PASS = process.env.DB_PASS || 'postgres'
 
 async function getBlockHeight(processorName: string): Promise<number> {
   const pool = new Pool({
@@ -19,7 +19,7 @@ async function getBlockHeight(processorName: string): Promise<number> {
     port: parseInt(DB_PORT),
     database: DB_NAME,
     user: DB_USER,
-    password: DB_PASSWORD,
+    password: DB_PASS,
   })
 
   try {
@@ -37,8 +37,8 @@ async function getBlockHeight(processorName: string): Promise<number> {
 
 async function dumpDatabase(processorName: string) {
   try {
-    if (!DB_PASSWORD) {
-      throw new Error('DB_PASSWORD environment variable is required')
+    if (!DB_PASS) {
+      throw new Error('DB_PASS environment variable is required')
     }
 
     // Get block height for the processor
@@ -55,7 +55,7 @@ async function dumpDatabase(processorName: string) {
     const dumpFile = path.join(dumpsDir, `dump_${processorName}_${blockHeight}.dump`)
 
     // Construct the pg_dump command with custom format, data-only, and public schema only
-    const dumpCommand = `PGPASSWORD=${DB_PASSWORD} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -F c -n public --exclude-table-data=migrations -f ${dumpFile}`
+    const dumpCommand = `PGPASSWORD=${DB_PASS} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -F c -n public --exclude-table-data=migrations -f ${dumpFile}`
 
     console.log('Starting database data dump...')
     const { stdout, stderr } = await execAsync(dumpCommand)
