@@ -37,14 +37,12 @@ async function getBlockHeight(processorName: string): Promise<number> {
 
 async function dumpDatabase(processorName: string) {
   try {
-    // Get database connection details from environment variables
-
     if (!DB_PASSWORD) {
       throw new Error('DB_PASSWORD environment variable is required')
     }
 
     // Get block height for the processor
-    const blockHeight = await getBlockHeight(processorName)
+    const blockHeight = 30148800 // await getBlockHeight(processorName)
     console.log(`Found block height ${blockHeight} for processor ${processorName}`)
 
     // Create dumps directory if it doesn't exist
@@ -54,10 +52,10 @@ async function dumpDatabase(processorName: string) {
     }
 
     // Generate filename with processor name and block height
-    const dumpFile = path.join(dumpsDir, `dump_${processorName}_${blockHeight}.sql`)
+    const dumpFile = path.join(dumpsDir, `dump_${processorName}_${blockHeight}.dump`)
 
-    // Construct the pg_dump command with --data-only flag
-    const dumpCommand = `PGPASSWORD=${DB_PASSWORD} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -F p -f ${dumpFile}`
+    // Construct the pg_dump command with custom format, data-only, and public schema only
+    const dumpCommand = `PGPASSWORD=${DB_PASSWORD} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -F c -n public --exclude-table-data=migrations -f ${dumpFile}`
 
     console.log('Starting database data dump...')
     const { stdout, stderr } = await execAsync(dumpCommand)
@@ -67,6 +65,8 @@ async function dumpDatabase(processorName: string) {
     }
 
     console.log(`Database data dump completed successfully. File saved to: ${dumpFile}`)
+    console.log('\nTo upload to S3, use the AWS CLI:')
+    console.log(`aws s3 cp ${dumpFile} s3://origin-squid/dumps/`)
   } catch (error) {
     console.error('Error dumping database:', error)
     process.exit(1)

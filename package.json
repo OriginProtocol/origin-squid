@@ -29,6 +29,7 @@
     "lint:fix": "eslint \"src/**/*.ts\" --fix"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.808.0",
     "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#main",
     "@subsquid/evm-processor": "^1.27.0",
     "@subsquid/graphql-server": "^4.9.0",
