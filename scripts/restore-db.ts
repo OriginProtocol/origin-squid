@@ -11,10 +11,10 @@ async function restoreDatabase(dumpFile: string) {
     const DB_PORT = process.env.DB_PORT || '5432'
     const DB_NAME = process.env.DB_NAME || 'origin_squid'
     const DB_USER = process.env.DB_USER || 'postgres'
-    const DB_PASSWORD = process.env.DB_PASSWORD
+    const DB_PASS = process.env.DB_PASS
 
-    if (!DB_PASSWORD) {
-      throw new Error('DB_PASSWORD environment variable is required')
+    if (!DB_PASS) {
+      throw new Error('DB_PASS environment variable is required')
     }
 
     // Validate dump file exists
@@ -23,7 +23,7 @@ async function restoreDatabase(dumpFile: string) {
     }
 
     // Construct the psql restore command
-    const restoreCommand = `PGPASSWORD=${DB_PASSWORD} psql -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} -f ${dumpFile}`
+    const restoreCommand = `PGPASSWORD=${DB_PASS} psql -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} -f ${dumpFile}`
 
     console.log('Starting database data restore...')
     const { stdout, stderr } = await execAsync(restoreCommand)

@@ -18,7 +18,7 @@ export class DBDumpManager {
 
   constructor() {
     // Validate required environment variables
-    const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']
+    const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASS']
 
     const missingVars = requiredEnvVars.filter((varName) => !process.env[varName])
     if (missingVars.length > 0) {
@@ -30,7 +30,7 @@ export class DBDumpManager {
       port: parseInt(process.env.DB_PORT!),
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+      password: process.env.DB_PASS,
     })
 
     this.s3Client = new S3Client({
@@ -148,7 +148,7 @@ export class DBDumpManager {
       stdio: 'inherit',
       env: {
         ...process.env,
-        PGPASSWORD: process.env.DB_PASSWORD,
+        PGPASSWORD: process.env.DB_PASS,
       },
     })
 
