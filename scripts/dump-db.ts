@@ -52,10 +52,10 @@ async function dumpDatabase(processorName: string) {
     }
 
     // Generate filename with processor name and block height
-    const dumpFile = path.join(dumpsDir, `dump_${processorName}_${blockHeight}.dump`)
+    const dumpFile = path.join(dumpsDir, `dump_${processorName}_${blockHeight}.sql.gz`)
 
-    // Construct the pg_dump command with custom format, data-only, and public schema only
-    const dumpCommand = `PGPASSWORD=${DB_PASS} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -F c -n public --exclude-table-data=migrations -f ${dumpFile}`
+    // Construct the pg_dump command with plain SQL format and gzip compression
+    const dumpCommand = `PGPASSWORD=${DB_PASS} pg_dump -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER} -d ${DB_NAME} --data-only -n public --exclude-table-data=migrations | gzip > ${dumpFile}`
 
     console.log('Starting database data dump...')
     const { stdout, stderr } = await execAsync(dumpCommand)

@@ -1,8 +1,11 @@
-import { spawn } from 'child_process'
+import { exec } from 'child_process'
 import 'dotenv/config'
 import { Pool } from 'pg'
+import { promisify } from 'util'
 
 import { GetObjectCommand, GetObjectCommandOutput, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
+
+const execAsync = promisify(exec)
 
 interface DumpInfo {
   processorName: string
@@ -61,8 +64,8 @@ export class DBDumpManager {
       for (const object of response.Contents || []) {
         if (!object.Key) continue
 
-        // Parse dump info from filename (format: dumps/dump_processor-name_block-height.dump)
-        const match = object.Key.match(/dumps\/dump_([^_]+)_(\d+)\.dump/)
+        // Parse dump info from filename (format: dumps/dump_processor-name_block-height.sql.gz)
+        const match = object.Key.match(/dumps\/dump_([^_]+)_(\d+)\.sql.gz/)
         if (match) {
           dumps.push({
             processorName: match[1],
@@ -137,37 +140,51 @@ export class DBDumpManager {
       stream.pipe(writeStream).on('error', reject).on('finish', resolve)
     })
 
-    // Construct the pg_restore command
-    const restoreCommand = `pg_restore -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} -d ${process.env.DB_NAME} --data-only --no-owner --no-privileges -n public ${tempFile}`
+    try {
+      // Check if the file is compressed (gzip)
+      const isCompressed = await this.isGzipped(tempFile)
+      let sqlFile = tempFile
 
-    console.log(`Starting database restore: ${JSON.stringify(dumpInfo)}`)
+      if (isCompressed) {
+        console.log('Decompressing dump file...')
+        sqlFile = tempFile.replace('.sql.gz', '.sql')
+        await execAsync(`gunzip -c ${tempFile} > ${sqlFile}`)
+      }
 
-    // Use spawn with promise handling
-    const [cmd, ...args] = restoreCommand.split(' ')
-    const child = spawn(cmd, args, {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        PGPASSWORD: process.env.DB_PASS,
-      },
-    })
+      // Execute the SQL file
+      console.log('Executing SQL file...')
+      const restoreCommand = `PGPASSWORD=${process.env.DB_PASS} psql -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} -d ${process.env.DB_NAME} -f ${sqlFile}`
 
-    await new Promise<void>((resolve, reject) => {
-      child.on('close', (code) => {
-        if (code === 0) {
-          resolve()
-        } else {
-          reject(new Error(`pg_restore failed with exit code ${code}`))
-        }
-      })
-      child.on('error', reject)
-    })
+      console.log('Starting database data restore...')
+      const { stdout, stderr } = await execAsync(restoreCommand)
 
-    // Clean up the temporary file
-    require('fs').unlinkSync(tempFile)
+      if (stderr) {
+        console.error('Warning:', stderr)
+      }
 
-    // Mark as restored with block height
-    await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
+      // Clean up the temporary files
+      fs.unlinkSync(tempFile)
+      if (isCompressed) {
+        fs.unlinkSync(sqlFile)
+      }
+
+      // Mark as restored with block height
+      await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
+    } catch (error) {
+      // Clean up the temporary file in case of error
+      fs.unlinkSync(tempFile)
+      throw error
+    }
+  }
+
+  private async isGzipped(filePath: string): Promise<boolean> {
+    try {
+      const { stdout } = await execAsync(`file ${filePath}`)
+      return stdout.includes('gzip compressed data')
+    } catch (error) {
+      console.error('Error checking file type:', error)
+      return false
+    }
   }
 
   async close(): Promise<void> {
