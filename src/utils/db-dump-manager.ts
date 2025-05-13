@@ -34,8 +34,15 @@ export class DBDumpManager {
     })
 
     this.s3Client = new S3Client({
-      profile: 'origin',
       region: 'us-east-1',
+      ...(process.env.AWS_ACCESS_KEY_ID
+        ? {
+            credentials: {
+              accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+            },
+          }
+        : { profile: 'origin' }),
     })
 
     this.BUCKET_NAME = 'origin-squid'

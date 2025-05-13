@@ -25,6 +25,8 @@ deploy:
     - RPC_PLUME_ENDPOINT
     - RPC_PLUME_ENV
     - NOTION_SECRET
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
   processor:
     ########## MAIN NETWORK ##########
     - name: mainnet-processor
