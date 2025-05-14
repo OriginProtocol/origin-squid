@@ -1,16 +1,12 @@
-import { exec } from 'child_process'
 import 'dotenv/config'
 import { createReadStream, createWriteStream, unlinkSync } from 'fs'
 import { Pool, PoolClient } from 'pg'
 import { from as copyFrom } from 'pg-copy-streams'
 import { Readable, Transform } from 'stream'
 import { pipeline } from 'stream/promises'
-import { promisify } from 'util'
 import { createGunzip } from 'zlib'
 
 import { GetObjectCommand, GetObjectCommandOutput, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
-
-const execAsync = promisify(exec)
 
 interface DumpInfo {
   processorName: string
@@ -154,6 +150,7 @@ export class DBDumpManager {
       let copyCommand: string | null = null
       let copyCommandData: string[] = []
       let partial: string | null = null
+      let entityCount = 0
 
       const processLines = new Transform({
         objectMode: true,
@@ -177,27 +174,32 @@ export class DBDumpManager {
             let action = async () => {
               for (const line of lines) {
                 if (line.startsWith('COPY ')) {
-                  console.log(line)
                   copyCommand = line
                   copyCommandData = []
                 } else if (line === '\\.') {
                   if (copyCommandData.length > 0) {
+                    console.log(copyCommand)
                     const stream = client.query(copyFrom(copyCommand!))
                     const readable = Readable.from(copyCommandData)
-
-                    // // Write readable to a file using streams to handle large data
-                    // const writeStream = createWriteStream('copy-command.txt')
-                    // const readableForFile = Readable.from(copyCommandData)
-                    // await pipeline(readableForFile, writeStream)
-
                     await pipeline(readable, stream)
                     stream.end()
+                    entityCount += copyCommandData.length
                   }
                   copyCommand = null
                   copyCommandData = []
                 } else if (copyCommand && line.length > 0) {
                   copyCommandData.push(line + '\n')
                 }
+              }
+
+              if (copyCommandData.length > 10000) {
+                console.log(copyCommand)
+                const stream = client.query(copyFrom(copyCommand!))
+                const readable = Readable.from(copyCommandData)
+                await pipeline(readable, stream)
+                stream.end()
+                entityCount += copyCommandData.length
+                copyCommandData = []
               }
             }
 
@@ -223,6 +225,7 @@ export class DBDumpManager {
       // Mark as restored with block height
       await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
       console.log('Database dump restored successfully')
+      console.log(`Inserted ${entityCount} entities`)
     } catch (error) {
       // Clean up the temporary file in case of error
       try {
@@ -234,16 +237,6 @@ export class DBDumpManager {
       throw error
     } finally {
       client.release()
-    }
-  }
-
-  private async isGzipped(filePath: string): Promise<boolean> {
-    try {
-      const { stdout } = await execAsync(`file ${filePath}`)
-      return stdout.includes('gzip compressed data')
-    } catch (error) {
-      console.error('Error checking file type:', error)
-      return false
     }
   }
 
