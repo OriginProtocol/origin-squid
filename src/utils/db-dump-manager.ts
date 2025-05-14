@@ -1,9 +1,14 @@
 import { exec } from 'child_process'
 import 'dotenv/config'
-import { Pool } from 'pg'
+import { createReadStream, createWriteStream, unlinkSync } from 'fs'
+import { Pool, PoolClient } from 'pg'
+import { from as copyFrom } from 'pg-copy-streams'
+import { Readable, Transform } from 'stream'
+import { pipeline } from 'stream/promises'
 import { promisify } from 'util'
+import { createGunzip } from 'zlib'
 
-import { GetObjectCommand, GetObjectCommandOutput, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
+import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
 
 const execAsync = promisify(exec)
 
@@ -124,56 +129,111 @@ export class DBDumpManager {
 
     console.log(`Downloading database dump: ${JSON.stringify(dumpInfo)}`)
 
-    const response: GetObjectCommandOutput = await this.s3Client.send(command)
-    if (!response.Body) {
-      throw new Error('No body in S3 response')
-    }
+    // const response: GetObjectCommandOutput = await this.s3Client.send(command)
+    // if (!response.Body) {
+    //   throw new Error('No body in S3 response')
+    // }
 
     // Create a temporary file to store the dump
     const tempFile = `/tmp/${dumpInfo.key.split('/').pop()}`
-    const fs = require('fs')
+    const client: PoolClient = await this.pool.connect()
 
-    // Create a write stream and pipe the S3 response body directly to it
-    const writeStream = fs.createWriteStream(tempFile)
-    await new Promise((resolve, reject) => {
-      const stream = response.Body as any
-      stream.pipe(writeStream).on('error', reject).on('finish', resolve)
-    })
+    // Start a transaction to ensure data consistency during restore
+    await client.query('BEGIN')
 
     try {
-      // Check if the file is compressed (gzip)
-      const isCompressed = await this.isGzipped(tempFile)
-      let sqlFile = tempFile
+      // Write the compressed file
+      const writeStream = createWriteStream(tempFile)
+      await new Promise((resolve, reject) => {
+        // const stream = response.Body as any
+        const stream = createReadStream('dumps/dump_oethb-processor_30148800.sql.gz')
+        stream.pipe(writeStream).on('error', reject).on('finish', resolve)
+      })
 
-      if (isCompressed) {
-        console.log('Decompressing dump file...')
-        sqlFile = tempFile.replace('.sql.gz', '.sql')
-        await execAsync(`gunzip -c ${tempFile} > ${sqlFile}`)
-      }
+      // Create a transform stream to execute COPY commands
+      let copyCommand: string | null = null
+      let copyCommandData: string[] = []
+      let partial: string | null = null
 
-      // Execute the SQL file
-      console.log('Executing SQL file...')
-      const restoreCommand = `PGPASSWORD=${process.env.DB_PASS} psql -h ${process.env.DB_HOST} -p ${process.env.DB_PORT} -U ${process.env.DB_USER} -d ${process.env.DB_NAME} -f ${sqlFile}`
+      const processLines = new Transform({
+        objectMode: true,
+        transform: function (
+          this: DBDumpManager,
+          chunk: Uint8Array,
+          encoding: string,
+          callback: (error?: Error | null) => void,
+        ) {
+          try {
+            // Convert chunk to string for processing
+            const chunkStr = Buffer.from(chunk).toString('utf8')
 
+            // If we have a partial line from the previous chunk, prepend it
+            const fullChunk = partial ? partial + chunkStr : chunkStr
+            const lines = fullChunk.split('\n')
+
+            // Keep the last line as partial if it doesn't end with a newline
+            partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
+
+            let action = async () => {
+              for (const line of lines) {
+                if (line.startsWith('COPY ')) {
+                  console.log(line)
+                  copyCommand = line
+                  copyCommandData = []
+                } else if (line === '\\.') {
+                  if (copyCommandData.length > 0) {
+                    const stream = client.query(copyFrom(copyCommand!))
+                    const readable = Readable.from(copyCommandData)
+
+                    // // Write readable to a file using streams to handle large data
+                    // const writeStream = createWriteStream('copy-command.txt')
+                    // const readableForFile = Readable.from(copyCommandData)
+                    // await pipeline(readableForFile, writeStream)
+
+                    await pipeline(readable, stream)
+                    stream.end()
+                  }
+                  copyCommand = null
+                  copyCommandData = []
+                } else if (copyCommand && line.length > 0) {
+                  copyCommandData.push(line + '\n')
+                }
+              }
+            }
+
+            action()
+              .then(() => callback())
+              .catch(callback)
+          } catch (error) {
+            console.error('Error processing chunk:', error)
+            callback(error as Error)
+          }
+        }.bind(this),
+      })
+
+      // Stream the file through decompression and SQL execution
       console.log('Starting database data restore...')
-      const { stdout, stderr } = await execAsync(restoreCommand)
+      await pipeline(createReadStream(tempFile), createGunzip(), processLines)
 
-      if (stderr) {
-        console.error('Warning:', stderr)
-      }
+      await client.query('COMMIT')
 
-      // Clean up the temporary files
-      fs.unlinkSync(tempFile)
-      if (isCompressed) {
-        fs.unlinkSync(sqlFile)
-      }
+      // Clean up the temporary file
+      unlinkSync(tempFile)
 
       // Mark as restored with block height
       await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
+      console.log('Database dump restored successfully')
     } catch (error) {
       // Clean up the temporary file in case of error
-      fs.unlinkSync(tempFile)
+      try {
+        unlinkSync(tempFile)
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+      console.error('Error restoring database dump:', error)
       throw error
+    } finally {
+      client.release()
     }
   }
 
