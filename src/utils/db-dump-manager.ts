@@ -118,7 +118,7 @@ export class DBDumpManager {
 
   async updateProcessingStatus(processorName: string, startTime: Date): Promise<void> {
     await this.pool.query('UPDATE "processing_status" SET "startTimestamp" = $2 WHERE name = $1', [
-      processorName,
+      processorName.split('-')[0],
       startTime.toISOString(),
     ])
   }
