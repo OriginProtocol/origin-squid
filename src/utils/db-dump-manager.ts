@@ -116,7 +116,17 @@ export class DBDumpManager {
     )
   }
 
+  async updateProcessingStatus(processorName: string, startTime: Date): Promise<void> {
+    await this.pool.query('UPDATE "processing_status" SET "startTimestamp" = $2 WHERE name = $1', [
+      processorName,
+      startTime.toISOString(),
+    ])
+  }
+
   async restoreDump(dumpInfo: DumpInfo): Promise<void> {
+    // Log the time at which we started the restore process
+    const restoreStartTime = new Date()
+
     // Download the dump file from S3
     const command = new GetObjectCommand({
       Bucket: this.BUCKET_NAME,
@@ -176,14 +186,17 @@ export class DBDumpManager {
                 if (line.startsWith('COPY ')) {
                   copyCommand = line
                   copyCommandData = []
+                  entityCount = 0
                 } else if (line === '\\.') {
                   if (copyCommandData.length > 0) {
-                    console.log(copyCommand)
                     const stream = client.query(copyFrom(copyCommand!))
                     const readable = Readable.from(copyCommandData)
                     await pipeline(readable, stream)
                     stream.end()
                     entityCount += copyCommandData.length
+                  }
+                  if (entityCount > 0) {
+                    console.log(copyCommand, `(${entityCount} entities)`)
                   }
                   copyCommand = null
                   copyCommandData = []
@@ -192,8 +205,7 @@ export class DBDumpManager {
                 }
               }
 
-              if (copyCommandData.length > 10000) {
-                console.log(copyCommand)
+              if (copyCommandData.length > 50000) {
                 const stream = client.query(copyFrom(copyCommand!))
                 const readable = Readable.from(copyCommandData)
                 await pipeline(readable, stream)
@@ -224,6 +236,10 @@ export class DBDumpManager {
 
       // Mark as restored with block height
       await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
+
+      // Update the processing status table with the start time
+      await this.updateProcessingStatus(dumpInfo.processorName, restoreStartTime)
+
       console.log('Database dump restored successfully')
       console.log(`Inserted ${entityCount} entities`)
     } catch (error) {
