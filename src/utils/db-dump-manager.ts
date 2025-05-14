@@ -8,7 +8,7 @@ import { pipeline } from 'stream/promises'
 import { promisify } from 'util'
 import { createGunzip } from 'zlib'
 
-import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
+import { GetObjectCommand, GetObjectCommandOutput, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
 
 const execAsync = promisify(exec)
 
@@ -129,10 +129,10 @@ export class DBDumpManager {
 
     console.log(`Downloading database dump: ${JSON.stringify(dumpInfo)}`)
 
-    // const response: GetObjectCommandOutput = await this.s3Client.send(command)
-    // if (!response.Body) {
-    //   throw new Error('No body in S3 response')
-    // }
+    const response: GetObjectCommandOutput = await this.s3Client.send(command)
+    if (!response.Body) {
+      throw new Error('No body in S3 response')
+    }
 
     // Create a temporary file to store the dump
     const tempFile = `/tmp/${dumpInfo.key.split('/').pop()}`
@@ -145,8 +145,8 @@ export class DBDumpManager {
       // Write the compressed file
       const writeStream = createWriteStream(tempFile)
       await new Promise((resolve, reject) => {
-        // const stream = response.Body as any
-        const stream = createReadStream('dumps/dump_oethb-processor_30148800.sql.gz')
+        const stream = response.Body as any
+        // const stream = createReadStream('dumps/dump_oethb-processor_30148800.sql.gz')
         stream.pipe(writeStream).on('error', reject).on('finish', resolve)
       })
 
