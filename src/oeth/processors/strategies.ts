@@ -40,6 +40,31 @@ export const oethStrategies: readonly IStrategyData[] = [
   },
   {
     chainId: 1,
+    from: 22423606,
+    name: 'OETH Convex OETH+WETH (AMO)',
+    contractName: 'ConvexEthMetaStrategy',
+    address: '0xba0e352ab5c13861c26e4e773e7a833c3a223fe6',
+    oTokenAddress: OETH_ADDRESS,
+    kind: 'CurveAMO',
+    curvePoolInfo: {
+      poolAddress: '0xcc7d5785ad5755b6164e21495e07adb0ff11c2a8',
+      rewardsPoolAddress: '0xac15fffdca77fc86770beaba20cbc1bc2d00494c',
+    },
+    base: { address: mainnetCurrencies.WETH, decimals: 18 },
+    assets: [
+      {
+        address: WETH_ADDRESS,
+        decimals: 18,
+      },
+    ],
+    earnings: {
+      passiveByDepositWithdrawal: true,
+      rewardTokenCollected: true,
+      rewardTokenCollectedSimple: true,
+    },
+  },
+  {
+    chainId: 1,
     from: 17067232,
     name: 'OETH Frax Staking',
     contractName: 'FraxETHStrategy',
