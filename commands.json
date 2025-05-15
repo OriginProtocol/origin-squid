@@ -81,6 +81,11 @@
       "deps": ["build"],
       "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-oeth.js"]
     },
+    "process:oethb": {
+      "description": "Load .env and start the squid processor",
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-oethb.js"]
+    },
     "process:ousd": {
       "description": "Load .env and start the squid processor",
       "deps": ["build"],
@@ -129,6 +134,12 @@
       "description": "Start the squid processor",
       "deps": ["migration:apply"],
       "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-oeth.js"],
+      "hidden": true
+    },
+    "process:oethb:prod": {
+      "description": "Start the squid processor",
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-oethb.js"],
       "hidden": true
     },
     "process:ousd:prod": {

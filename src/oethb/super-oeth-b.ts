@@ -9,7 +9,7 @@ import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { aerodromePools, baseAddresses } from '@utils/addresses-base'
 import { tokensByChain } from '@utils/tokensByChain'
 
-import { baseCurveAMO } from './strategies'
+import { baseCurveAMO } from '../base/strategies'
 
 const otokenProcessor = createOTokenProcessor2({
   name: 'Super OETHb',
@@ -59,6 +59,10 @@ const otokenProcessor = createOTokenProcessor2({
     )
     // =================
 
+    if (height < baseCurveAMO.from) {
+      return aerodromeAMO
+    }
+
     // Curve Calculation
     // =================
     // Our OETHb AMO balance = Pool OETHb balance * Gauge Pool Ownership * AMO Gauge Ownership
@@ -71,11 +75,11 @@ const otokenProcessor = createOTokenProcessor2({
     const curvePoolSupply = await curvePool.totalSupply()
     const curveGauge = new erc20Abi.Contract(ctx, { height }, baseCurveAMO.curvePoolInfo!.gaugeAddress!)
     const curveGaugeSupply = await curveGauge.totalSupply()
-    const gaugePoolOwnership = (curveGaugeSupply * 10n ** 18n) / curvePoolSupply
+    const gaugePoolOwnership = curvePoolSupply === 0n ? 0n : (curveGaugeSupply * 10n ** 18n) / curvePoolSupply
 
     // AMO Gauge Ownership
     const amoGaugeBalance = await curveGauge.balanceOf(baseCurveAMO.address)
-    const amoGaugeOwnership = (amoGaugeBalance * 10n ** 18n) / curveGaugeSupply
+    const amoGaugeOwnership = curveGaugeSupply === 0n ? 0n : (amoGaugeBalance * 10n ** 18n) / curveGaugeSupply
 
     // AMO Ownership
     const amoOwnership = (gaugePoolOwnership * amoGaugeOwnership) / 10n ** 18n
