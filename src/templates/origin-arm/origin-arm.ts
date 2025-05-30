@@ -4,6 +4,7 @@ import { LessThan } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
+import * as originArmAbi from '@abi/origin-arm'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
@@ -26,11 +27,13 @@ export const createOriginARMProcessors = ({
   from,
   armAddress,
   capManagerAddress,
+  lidoArm,
 }: {
   name: string
   from: number
   armAddress: string
   capManagerAddress: string
+  lidoArm: boolean
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
@@ -98,7 +101,7 @@ export const createOriginARMProcessors = ({
     if (entity) {
       armEntity = entity
     } else {
-      const armContract = new originLidoArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
+      const armContract = new originArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
       const [name, symbol, decimals, token0, token1] = await Promise.all([
         armContract.name(),
         armContract.symbol(),
@@ -172,13 +175,14 @@ export const createOriginARMProcessors = ({
             return armStateEntity
           }
           const previousState = await getPreviousState()
-          const armContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
+          const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
+          const armContract = new originArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
           const [assets0, assets1, outstandingAssets1, totalAssets, totalAssetsCap, totalSupply, assetsPerShare] =
             await Promise.all([
               new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
               new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
-              armContract.lidoWithdrawalQueueAmount(),
+              lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.withdrawsQueued(),
               armContract.totalAssets(),
               controllerContract.totalAssetsCap(),
               armContract.totalSupply(),

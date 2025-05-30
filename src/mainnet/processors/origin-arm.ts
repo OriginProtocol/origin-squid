@@ -6,4 +6,5 @@ export const originArmProcessors = createOriginARMProcessors({
   from: 20987226,
   armAddress: addresses.arm.address,
   capManagerAddress: addresses.arm.capManager,
+  lidoArm: true,
 })

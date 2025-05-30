@@ -1,4 +1,5 @@
 import { sonicErc20s } from 'sonic/erc20'
+import { sonicArmProcessors } from 'sonic/origin-sonic-arm'
 import { OS } from 'sonic/os'
 import { sfcProcessor } from 'sonic/sfc'
 import { sonicStrategiesProcessor } from 'sonic/strategies'
@@ -24,6 +25,7 @@ export const processor = defineSquidProcessor({
     sfcProcessor,
     createPoolBoosterProcessor({ registryAddress: '0x4f3b656aa5fb5e708bf7b63d6ff71623eb4a218a', from: 9219718 }),
     createPoolsProcessor(sonic.id),
+    ...sonicArmProcessors,
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
   validators: [validate],

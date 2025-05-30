@@ -35,6 +35,11 @@ export const sonicOrigin = {
   timelock: '0x31a91336414d3b955e494e7d485a6b06b55fc8fb',
 } as const
 
+export const sonicArmOS = {
+  address: '0x2f872623d1e1af5835b08b0e49aad2d81d649d30',
+  capManager: '0x38b654d7859dab79935c9cf99267392c06d254cf',
+}
+
 export const sonicMultisig = {
   'multichain-guardian': '0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971',
 } as const
@@ -48,6 +53,7 @@ export const sonicAddresses = {
   multisig: sonicMultisig,
   tokens: sonicTokens,
   origin: sonicOrigin,
+  armOS: sonicArmOS,
   contracts: sonicContracts,
   OS,
 } as const
