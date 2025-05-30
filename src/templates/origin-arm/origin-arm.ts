@@ -182,7 +182,7 @@ export const createOriginARMProcessors = ({
             await Promise.all([
               new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
               new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
-              lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.withdrawsQueued(),
+              lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.vaultWithdrawalAmount(),
               armContract.totalAssets(),
               controllerContract.totalAssetsCap(),
               armContract.totalSupply(),
