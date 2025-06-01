@@ -164,3 +164,5 @@ scale:
     postgres:
       storage: 60G
       profile: xlarge
+  processor:
+    profile: medium
