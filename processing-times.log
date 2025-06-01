@@ -1,14 +1,14 @@
 Processing Times
 ==============================
-Version: v96
-Date: 2025-05-15T18:58:50.158Z
+Version: v97
+Date: 2025-06-01T17:42:47.512Z
 ==============================
-arbitrum: 73.29 minutes
-base: 73.14 minutes
-mainnet: 50.63 minutes
-oeth: 89.39 minutes
-oethb: 5639.15 minutes (bug in v96 related to updating processing status after restore)
-ogv: 28.16 minutes
-ousd: 92.72 minutes
-plume: 4.01 minutes
-sonic: 75.55 minutes
+arbitrum: 74.18 minutes
+base: 76.30 minutes
+mainnet: 52.67 minutes
+oeth: 91.83 minutes
+oethb: 22.47 minutes
+ogv: 28.71 minutes
+ousd: 93.53 minutes
+plume: 5.41 minutes
+sonic: 91.07 minutes
