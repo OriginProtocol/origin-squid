@@ -18,6 +18,8 @@ deploy:
   secrets:
     - RPC_ENDPOINT
     - RPC_ENV
+    - RPC_BASE_ENDPOINT
+    - RPC_BASE_ENV
     - RPC_ARBITRUM_ENDPOINT
     - RPC_ARBITRUM_ENV
     - RPC_SONIC_ENDPOINT
