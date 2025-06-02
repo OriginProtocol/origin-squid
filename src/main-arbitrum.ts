@@ -1,9 +1,10 @@
 import 'tsconfig-paths/register'
 import { arbitrum } from 'viem/chains'
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
+import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import { processStatus } from '@templates/processor-status/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
+import { initProcessorFromDump } from '@utils/dumps'
 
 import { arbitrumERC20s } from './arbitrum'
 import { ccip } from './oeth/processors/ccip'
@@ -19,7 +20,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  run(processor).catch((error) => {
+  initProcessorFromDump(processor).catch((error) => {
     throw error
   })
 }
