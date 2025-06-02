@@ -1,7 +1,7 @@
 import * as metaMorpho from '@abi/meta-morpho'
 import * as morpho from '@abi/morpho'
 import { MorphoMarketState } from '@model'
-import { Context, EvmBatchProcessor, multicall, range } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor, multicall, range } from '@originprotocol/squid-utils'
 import { META_MORPHO_ADDRESS, MORPHO_ADDRESS } from '@utils/addresses'
 
 const from = 20685100
@@ -55,9 +55,9 @@ const process = async (ctx: Context) => {
   await ctx.store.insert(states)
 }
 
-export const morphoMarketStatesProcessor = {
+export const morphoMarketStatesProcessor = defineProcessor({
   name: 'Morpho Market States',
   from,
   setup,
   process,
-}
+})

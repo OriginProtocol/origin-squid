@@ -7,7 +7,7 @@ import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
-import { baseERC20s, baseStrategies, bridgedWoethStrategy } from './base'
+import { baseERC20s, baseStrategiesProcessors, bridgedWoethStrategy } from './base'
 import { aerodromeProcessors } from './base/aerodrome'
 import * as exchangeRatesProcessor from './base/exchange-rates'
 import * as validate from './base/validate'
@@ -17,7 +17,7 @@ export const processor = defineSquidProcessor({
   stateSchema: 'base-processor',
   processors: [
     ...baseERC20s,
-    ...baseStrategies,
+    ...baseStrategiesProcessors,
     ...aerodromeProcessors,
     bridgedWoethStrategy,
     exchangeRatesProcessor,

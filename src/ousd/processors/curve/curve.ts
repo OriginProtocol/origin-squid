@@ -1,11 +1,9 @@
-import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor } from '@originprotocol/squid-utils'
 import { createCurveInitializer, createCurveProcessor, createCurveSetup } from '@templates/curve'
 import { mainnetTokens } from '@utils/addresses'
 
 const ousdResetFrom = 11585978
 const oethDeployFrom = 16933090
-
-export const from = Math.min(ousdResetFrom, oethDeployFrom)
 
 const pools: (Parameters<typeof createCurveInitializer>['0'] & Parameters<typeof createCurveProcessor>['0'])[] = [
   // Curve (OUSD)
@@ -29,20 +27,21 @@ const pools: (Parameters<typeof createCurveInitializer>['0'] & Parameters<typeof
   },
 ]
 
-export const setup = (processor: EvmBatchProcessor) => {
-  for (const pool of pools) {
-    createCurveSetup(pool.from, processor)
-  }
-}
-
 const initializers = pools.map((pool) => createCurveInitializer(pool))
-
-export const initialize = async (ctx: Context) => {
-  await Promise.all(initializers.map((p) => p(ctx)))
-}
-
 const processors = pools.map((pool) => createCurveProcessor(pool))
 
-export const process = async (ctx: Context) => {
-  await Promise.all(processors.map((p) => p(ctx)))
-}
+export const ousdCurveProcessor = defineProcessor({
+  name: 'curve',
+  from: Math.min(ousdResetFrom, oethDeployFrom),
+  setup: (processor: EvmBatchProcessor) => {
+    for (const pool of pools) {
+      createCurveSetup(pool.from, processor)
+    }
+  },
+  initialize: async (ctx: Context) => {
+    await Promise.all(initializers.map((p) => p(ctx)))
+  },
+  process: async (ctx: Context) => {
+    await Promise.all(processors.map((p) => p(ctx)))
+  },
+})

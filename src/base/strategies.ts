@@ -24,7 +24,7 @@ export const baseCurveAMO: IStrategyData = {
   earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
 }
 
-export const strategies: readonly IStrategyData[] = [
+export const baseStrategies: readonly IStrategyData[] = [
   {
     chainId: 8453,
     from: 18689563,
@@ -52,8 +52,8 @@ export const strategies: readonly IStrategyData[] = [
   baseCurveAMO,
 ]
 
-export const baseStrategies = [
-  ...strategies.map((s) => {
+export const baseStrategiesProcessors = [
+  ...baseStrategies.map((s) => {
     return defineProcessor({
       name: s.name,
       from: s.from,
@@ -61,7 +61,7 @@ export const baseStrategies = [
       process: createStrategyProcessor(s),
     })
   }),
-  ...strategies
+  ...baseStrategies
     .filter((s) => s.kind !== 'Vault')
     .map((s) => {
       return defineProcessor({

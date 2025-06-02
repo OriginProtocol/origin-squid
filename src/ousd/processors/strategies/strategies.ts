@@ -1,4 +1,4 @@
-import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
@@ -89,19 +89,20 @@ export const ousdStrategies: readonly IStrategyData[] = [
 ]
 
 const strategies = ousdStrategies
-export const name = 'strategies'
-export const from = Math.min(...strategies.map((s) => s.from))
-
-export const setup = (processor: EvmBatchProcessor) => {
-  strategies.forEach((s) => createStrategySetup(s)(processor))
-  strategies.forEach((s) => createStrategyRewardSetup(s)(processor))
-}
 
 const processors = [
   ...strategies.map(createStrategyProcessor),
   ...strategies.map((strategy) => createStrategyRewardProcessor(strategy)),
 ]
 
-export const process = async (ctx: Context) => {
-  await Promise.all(processors.map((p) => p(ctx)))
-}
+export const ousdStrategiesProcessor = defineProcessor({
+  name: 'strategies',
+  from: Math.min(...strategies.map((s) => s.from)),
+  setup: (processor: EvmBatchProcessor) => {
+    strategies.forEach((s) => createStrategySetup(s)(processor))
+    strategies.forEach((s) => createStrategyRewardSetup(s)(processor))
+  },
+  process: async (ctx: Context) => {
+    await Promise.all(processors.map((p) => p(ctx)))
+  },
+})

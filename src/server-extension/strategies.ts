@@ -1,3 +1,4 @@
+import { baseStrategies } from 'base/strategies'
 import { GraphQLResolveInfo } from 'graphql'
 import { compact } from 'lodash'
 import { ousdStrategies } from 'ousd/processors/strategies'
@@ -13,7 +14,6 @@ import { baseAddresses } from '@utils/addresses-base'
 import { plumeAddresses } from '@utils/addresses-plume'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
-import { strategies } from '../base/strategies'
 import { oethStrategies } from '../oeth/processors/strategies'
 
 /**
@@ -63,7 +63,7 @@ export class Balance {
 const otokens: Record<string, readonly IStrategyData[]> = {
   [addresses.oeth.address]: oethStrategies,
   [addresses.ousd.address]: ousdStrategies,
-  [baseAddresses.superOETHb.address]: strategies,
+  [baseAddresses.superOETHb.address]: baseStrategies,
   [sonicAddresses.OS.address]: sonicStrategies,
   [plumeAddresses.superOETHp.address]: plumeStrategies,
 }
