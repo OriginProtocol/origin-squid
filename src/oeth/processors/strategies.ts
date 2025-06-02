@@ -1,7 +1,7 @@
 import * as feeAccumulatorAbi from '@abi/fee-accumulator'
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
-import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
@@ -220,20 +220,20 @@ const eventProcessors = [
   }),
 ]
 
-export const name = 'oeth-strategies'
-export const from = Math.min(...strategies.map((s) => s.from))
-
-export const setup = (processor: EvmBatchProcessor) => {
-  strategies.forEach((s) => createStrategySetup(s)(processor))
-  strategies.filter((s) => s.kind !== 'Vault').forEach((s) => createStrategyRewardSetup(s)(processor))
-  eventProcessors.forEach((p) => p.setup(processor))
-}
-
 const processors = [
   ...strategies.map(createStrategyProcessor),
   ...strategies.filter((s) => s.kind !== 'Vault').map((strategy) => createStrategyRewardProcessor(strategy)),
 ]
 
-export const process = async (ctx: Context) => {
-  await Promise.all([...processors.map((p) => p(ctx)), ...eventProcessors.map((p) => p.process(ctx))])
-}
+export const oethStrategiesProcessor = defineProcessor({
+  name: 'oeth-strategies',
+  from: Math.min(...strategies.map((s) => s.from)),
+  setup: (processor: EvmBatchProcessor) => {
+    strategies.forEach((s) => createStrategySetup(s)(processor))
+    strategies.filter((s) => s.kind !== 'Vault').forEach((s) => createStrategyRewardSetup(s)(processor))
+    eventProcessors.forEach((p) => p.setup(processor))
+  },
+  process: async (ctx: Context) => {
+    await Promise.all([...processors.map((p) => p(ctx)), ...eventProcessors.map((p) => p.process(ctx))])
+  },
+})
