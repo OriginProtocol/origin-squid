@@ -170,6 +170,11 @@ export const saveIsContractCache = async (ctx: Context) => {
   if (process.env.NODE_ENV === 'development') {
     writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))
   }
+  for (const [key, value] of cache) {
+    if (value.expiresAt < Date.now()) {
+      cache.delete(key)
+    }
+  }
   await ctx.store.save(
     new UtilCache({
       id,
