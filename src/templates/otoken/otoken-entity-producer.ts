@@ -24,7 +24,7 @@ import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetC
 import { OUSD_STABLE_OTOKENS } from '@utils/addresses'
 import { isContract } from '@utils/isContract'
 
-import { createOTokenLegacyProcessor } from './otoken'
+import { createOTokenProcessor2 } from './otoken-2'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
 import { processOTokenERC20 } from './otoken-erc20'
@@ -669,7 +669,7 @@ export class OTokenEntityProducer {
     }
   }
 
-  async afterContext(params: Parameters<typeof createOTokenLegacyProcessor>[0]) {
+  async afterContext(params: Parameters<typeof createOTokenProcessor2>[0]) {
     if (!this.otoken) return
     await processOTokenDailyStats(this.ctx, {
       ...params,

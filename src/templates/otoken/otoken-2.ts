@@ -21,10 +21,13 @@ import {
 } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { Trace } from '@subsquid/evm-processor'
+import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
+import { baseAddresses } from '@utils/addresses-base'
+import { plumeAddresses } from '@utils/addresses-plume'
+import { sonicAddresses } from '@utils/addresses-sonic'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
 import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
-import { OTokenContractAddress } from './otoken'
 import { OToken_2021_01_02 } from './otoken-2021-01-02'
 import { OToken_2021_01_08 } from './otoken-2021-01-08'
 import { OToken_2021_01_25 } from './otoken-2021-01-25'
@@ -36,6 +39,13 @@ import { otokenFrequencyProcessor } from './otoken-frequency'
 import { OTokenClass } from './types'
 
 const DEBUG_PERF = process.env.DEBUG_PERF === 'true'
+
+export type OTokenContractAddress =
+  | typeof OUSD_ADDRESS
+  | typeof OETH_ADDRESS
+  | typeof baseAddresses.superOETHb.address
+  | typeof sonicAddresses.tokens.OS
+  | typeof plumeAddresses.tokens.superOETHp
 
 // Performance tracking
 interface PerformanceStats {
