@@ -7,6 +7,7 @@ import { mainnet } from 'viem/chains'
 
 import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
+import { ccip } from '@templates/ccip'
 import { createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
@@ -37,6 +38,7 @@ export const processor = defineSquidProcessor({
     nativeStaking,
     legacyStaking,
     curve,
+    ccip({ chainId: 1 }),
     ...erc20s(),
     createGovernanceProcessor({ from: 15491391, address: OGV_GOVERNANCE_ADDRESS }),
     createGovernanceProcessor({ from: 20117923, address: OGN_GOVERNANCE_ADDRESS }),

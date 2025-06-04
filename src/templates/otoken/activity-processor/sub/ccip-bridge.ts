@@ -4,7 +4,7 @@ import { ActivityProcessor } from '@templates/otoken/activity-processor/types'
 import { createActivity } from '@templates/otoken/activity-processor/utils'
 import { BridgeActivity } from '@templates/otoken/activity-types'
 
-import { CCIPProcessorResult } from '../../../../oeth/processors/ccip'
+import { CCIPProcessorResult } from '../../../ccip'
 
 export const ccipBridgeActivityProcessor = (params: {
   otokenAddress: string

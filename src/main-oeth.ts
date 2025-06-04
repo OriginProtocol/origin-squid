@@ -8,7 +8,6 @@ import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
 
 import { oethProcessor } from './oeth/processors'
-import { ccip } from './oeth/processors/ccip'
 import { oethExchangeRatesProcessor } from './oeth/processors/exchange-rates'
 import { oethStrategiesProcessor } from './oeth/processors/strategies'
 import * as validateOeth from './oeth/validators/validate-oeth'
@@ -17,7 +16,6 @@ import { createOTokenWithdrawalsProcessor } from './templates/withdrawals'
 export const processor = defineSquidProcessor({
   stateSchema: 'oeth-processor',
   processors: [
-    ccip({ chainId: 1 }),
     oethProcessor,
     oethStrategiesProcessor,
     oethExchangeRatesProcessor,
