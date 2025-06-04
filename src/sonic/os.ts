@@ -23,6 +23,14 @@ const otokenProcessor = createOTokenProcessor2({
       address: sonicAddresses.OS.dripper,
       token: sonicAddresses.tokens.wS,
       from: 3884406,
+      to: 20754935,
+      vaultDripper: false,
+    },
+    {
+      address: sonicAddresses.OS.vault,
+      token: sonicAddresses.tokens.wS,
+      from: 20754935,
+      vaultDripper: true,
     },
   ],
   harvester: {

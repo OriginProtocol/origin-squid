@@ -2,10 +2,10 @@ import { findLast, sortBy, uniq } from 'lodash'
 import { LessThanOrEqual } from 'typeorm'
 
 import * as erc20 from '@abi/erc20'
-import * as otokenVault from '@abi/oeth-vault'
 import * as otoken from '@abi/otoken'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenDripper from '@abi/otoken-dripper'
+import * as otokenVault from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
 import {
   ERC20,
@@ -65,6 +65,7 @@ export const createOTokenLegacyProcessor = (params: {
     from: number
   }
   dripper?: {
+    vaultDripper: boolean
     address: string
     from: number
     to?: number

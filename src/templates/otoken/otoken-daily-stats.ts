@@ -3,7 +3,9 @@ import { findLast } from 'lodash'
 import { Between, LessThanOrEqual } from 'typeorm'
 import { formatUnits } from 'viem'
 
+import * as otokenAbi from '@abi/otoken'
 import * as otokenDripper from '@abi/otoken-dripper'
+import * as otokenVault from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
 import { OToken, OTokenAPY, OTokenDailyStat, OTokenRebase } from '@model'
 import { Block, Context } from '@originprotocol/squid-utils'
@@ -25,6 +27,7 @@ export const processOTokenDailyStats = async (
       from: number
     }
     dripper?: {
+      vaultDripper: boolean
       address: string
       from: number
       to?: number
@@ -46,8 +49,18 @@ export const processOTokenDailyStats = async (
         (d) => d.from <= block.header.height && (!d.to || d.to >= block.header.height),
       )
       if (dripper) {
-        const dripperContract = new otokenDripper.Contract(ctx, block.header, dripper.address)
-        return await dripperContract.availableFunds()
+        if (dripper.vaultDripper) {
+          const vaultContract = new otokenVault.Contract(ctx, block.header, dripper.address)
+          const otokenContract = new otokenAbi.Contract(ctx, block.header, params.otokenAddress)
+          const [totalValue, totalSupply] = await Promise.all([
+            vaultContract.totalValue(),
+            otokenContract.totalSupply(),
+          ])
+          return totalValue - totalSupply
+        } else {
+          const dripperContract = new otokenDripper.Contract(ctx, block.header, dripper.address)
+          return await dripperContract.availableFunds()
+        }
       }
       return 0n
     }

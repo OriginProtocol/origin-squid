@@ -1,4 +1,5 @@
 import * as erc20Abi from '@abi/erc20'
+import * as otokenAbi from '@abi/otoken'
 import * as dripperAbi from '@abi/otoken-dripper'
 import * as otokenVault from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
@@ -14,6 +15,7 @@ export const otokenFrequencyProcessor = (params: {
     from: number
   }
   dripper?: {
+    vaultDripper: boolean
     address: string
     token: string
     from: number
@@ -76,27 +78,55 @@ export const otokenFrequencyProcessor = (params: {
           (d) => d.from <= block.header.height && (!d.to || d.to >= block.header.height),
         )
         if (dripper) {
-          const dripperContract = new dripperAbi.Contract(ctx, block.header, dripper.address)
-          const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
-            dripperContract.dripDuration(),
-            dripperContract.drip(),
-            dripperContract.availableFunds(),
-            new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
-          ])
-          dripperStates.push(
-            new OTokenDripperState({
-              id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-              chainId: ctx.chain.id,
-              blockNumber: block.header.height,
-              timestamp: new Date(block.header.timestamp),
-              otoken: params.otokenAddress,
-              dripDuration,
-              lastCollect,
-              perSecond,
-              availableFunds,
-              wethBalance,
-            }),
-          )
+          if (dripper.vaultDripper) {
+            const vaultContract = new otokenVault.Contract(ctx, block.header, dripper.address)
+            const otokenContract = new otokenAbi.Contract(ctx, block.header, params.otokenAddress)
+            const [dripDuration, lastCollect, perSecond, totalValue, totalSupply, wethBalance] = await Promise.all([
+              vaultContract.dripDuration(),
+              vaultContract.lastRebase(),
+              vaultContract.rebasePerSecondTarget(),
+              vaultContract.totalValue(),
+              otokenContract.totalSupply(),
+              new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
+            ])
+            const availableFunds = totalValue - totalSupply
+            dripperStates.push(
+              new OTokenDripperState({
+                id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+                chainId: ctx.chain.id,
+                blockNumber: block.header.height,
+                timestamp: new Date(block.header.timestamp),
+                otoken: params.otokenAddress,
+                dripDuration,
+                lastCollect,
+                perSecond,
+                availableFunds,
+                wethBalance,
+              }),
+            )
+          } else {
+            const dripperContract = new dripperAbi.Contract(ctx, block.header, dripper.address)
+            const [dripDuration, { lastCollect, perSecond }, availableFunds, wethBalance] = await Promise.all([
+              dripperContract.dripDuration(),
+              dripperContract.drip(),
+              dripperContract.availableFunds(),
+              new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
+            ])
+            dripperStates.push(
+              new OTokenDripperState({
+                id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
+                chainId: ctx.chain.id,
+                blockNumber: block.header.height,
+                timestamp: new Date(block.header.timestamp),
+                otoken: params.otokenAddress,
+                dripDuration,
+                lastCollect,
+                perSecond,
+                availableFunds,
+                wethBalance,
+              }),
+            )
+          }
         }
       }
     })

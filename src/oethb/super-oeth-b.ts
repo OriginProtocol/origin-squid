@@ -27,6 +27,14 @@ const otokenProcessor = createOTokenProcessor2({
       address: baseAddresses.superOETHb.dripper,
       token: tokensByChain[base.id].WETH,
       from: 18215706,
+      to: 29358238,
+      vaultDripper: false,
+    },
+    {
+      address: baseAddresses.superOETHb.vault,
+      token: tokensByChain[base.id].WETH,
+      from: 29358238,
+      vaultDripper: true,
     },
   ],
   harvester: {

@@ -1,4 +1,4 @@
-import * as oethVault from '@abi/oeth-vault'
+import * as oethVault from '@abi/otoken-vault'
 import { OTokenWithdrawalRequest } from '@model'
 import { Context, EvmBatchProcessor, logFilter } from '@originprotocol/squid-utils'
 

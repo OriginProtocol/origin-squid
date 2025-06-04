@@ -97,6 +97,7 @@ export const createOTokenProcessor2 = (params: {
     from: number
   }
   dripper?: {
+    vaultDripper: boolean
     address: string
     from: number
     to?: number
