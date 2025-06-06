@@ -12,7 +12,12 @@ import { getMainnetPrice, translateMainnetSymbol } from '@shared/post-processors
 import { PlumeCurrency, getPlumePrice, translatePlumeSymbol } from './price-routing-plume'
 import { SonicCurrency, getSonicPrice, translateSonicSymbol } from './price-routing-sonic'
 
-export const getPrice = async (ctx: Context, height: number, base: Currency, quote: Currency) => {
+export const getPrice = async (
+  ctx: Context,
+  height: number,
+  base: Currency,
+  quote: Currency,
+): Promise<readonly [bigint, number] | undefined> => {
   if (ctx.chain.id === mainnet.id) {
     return getMainnetPrice(ctx, height, base as MainnetCurrency, quote as MainnetCurrency)
   }

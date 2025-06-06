@@ -42,7 +42,8 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
       pair,
       base,
       quote,
-      rate: price,
+      rate: price[0],
+      decimals: price[1],
     })
     exchangeRates.set(id, exchangeRate)
   }

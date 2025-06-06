@@ -21,6 +21,7 @@ type ExchangeRate @entity {
   base: String!
   quote: String!
   rate: BigInt!
+  decimals: Int!
 }
 type NativeBalance @entity {
   """
@@ -278,33 +279,6 @@ type OGVDailyStat @entity {
   marketCapUSD: Float!
   priceUSD: Float!
   holdersOverThreshold: Int!
-}
-type BridgeTransfer @entity {
-  id: ID! # chain + log id
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHashIn: String!
-  txHashOut: String # Initially null
-  messageId: String! @index
-  bridge: String! @index
-  transactor: String! @index
-  sender: String! @index
-  receiver: String! @index
-  chainIn: Int! @index
-  chainOut: Int!
-  tokenIn: String!
-  tokenOut: String!
-  amountIn: BigInt!
-  amountOut: BigInt!
-  state: Int!
-}
-
-type BridgeTransferState @entity {
-  id: ID!
-  timestamp: DateTime! @index
-  blockNumber: Int! @index
-  txHash: String! @index
-  state: Int!
 }
 type TransactionDetails @entity {
   id: ID!
@@ -1038,7 +1012,34 @@ type GovernanceProposalVote @entity {
   type: GovernanceVoteType!
   txHash: String!
   timestamp: DateTime!
-}type FRRSRewardCollected @entity {
+}type BridgeTransfer @entity {
+  id: ID! # chain + log id
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHashIn: String!
+  txHashOut: String # Initially null
+  messageId: String! @index
+  bridge: String! @index
+  transactor: String! @index
+  sender: String! @index
+  receiver: String! @index
+  chainIn: Int! @index
+  chainOut: Int!
+  tokenIn: String!
+  tokenOut: String!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  state: Int!
+}
+
+type BridgeTransferState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
+  state: Int!
+}
+type FRRSRewardCollected @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index

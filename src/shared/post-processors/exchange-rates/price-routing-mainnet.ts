@@ -27,8 +27,8 @@ export const getMainnetPrice = async (ctx: Context, height: number, base: Mainne
 
   const priceEntry = priceMap[`${base}_${quote}`]
   if (priceEntry) {
-    const [getPrice] = priceEntry
-    return getPrice(ctx, height)
+    const [getPrice, decimals] = priceEntry
+    return [await getPrice(ctx, height), decimals] as const
   }
   throw new Error(`No price for ${base}_${quote}`)
 }
@@ -161,7 +161,7 @@ export const derived = <Base extends MainnetCurrencySymbol, Quote extends Mainne
     async (ctx: Context, height: number) => {
       const baseExponent = 10n ** BigInt(decimals)
       const rates = await Promise.all(connections.map(({ base, quote }) => getMainnetPrice(ctx, height, base, quote)))
-      return rates.reduce((acc, rate) => (acc * rate) / baseExponent, baseExponent)
+      return rates.reduce((acc, [rate]) => (acc * rate) / baseExponent, baseExponent)
     },
     decimals,
   )

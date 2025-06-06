@@ -15,4 +15,5 @@ type ExchangeRate @entity {
   base: String!
   quote: String!
   rate: BigInt!
+  decimals: Int!
 }

@@ -360,7 +360,7 @@ export const createOriginARMProcessors = ({
               apy: armDayApy.apy,
               fees: state.totalFees - (yesterdayState?.totalFees ?? 0n),
               yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
-              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, 8),
+              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }

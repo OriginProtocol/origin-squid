@@ -40,4 +40,7 @@ export class ExchangeRate {
 
     @BigIntColumn_({nullable: false})
     rate!: bigint
+
+    @IntColumn_({nullable: false})
+    decimals!: number
 }

@@ -39,10 +39,10 @@ export const getSonicPrice = async (ctx: Context, height: number, base: SonicCur
   try {
     base = translateSonicSymbol(base)
     quote = translateSonicSymbol(quote)
-    if (base === quote) return 1_000_000_000_000_000_000n
+    if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
     if (feed) {
-      return feed(ctx, height)
+      return [await feed(ctx, height), 18] as const
     }
     return undefined
   } catch (err) {

@@ -71,14 +71,14 @@ export const getBasePrice = async (ctx: Context, height: number, base: BaseCurre
   try {
     base = translateBaseSymbol(base)
     quote = translateBaseSymbol(quote)
-    if (base === quote) return 1_000_000_000_000_000_000n
+    if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
     if (feed) {
-      return feed(ctx, height)
+      return [await feed(ctx, height), 18] as const
     }
     const alternateFeed = alternativePriceFeeds[`${base}_${quote}`]
     if (alternateFeed) {
-      return alternateFeed(ctx, height)
+      return [await alternateFeed(ctx, height), 18] as const
     }
     return undefined
   } catch (err) {
