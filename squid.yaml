@@ -166,3 +166,5 @@ scale:
       profile: xlarge
   processor:
     profile: medium
+  api:
+    profile: medium
