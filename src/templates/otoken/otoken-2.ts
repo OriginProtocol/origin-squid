@@ -879,8 +879,8 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addressesToCheck: Set<string>) => {
+  if (block.header.timestamp < Date.parse('2022-01-01')) return
   ctx.log.info(`checking state at height ${block.header.height}`)
   let wrongCount = 0
   let totalCount = 0
@@ -888,8 +888,17 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
   // Check contract-level state variables
   const contract = new otokenAbi20241221.Contract(ctx, block.header, otoken.address)
 
+  const [contractTotalSupply, contractNonRebasingSupply, contractRebasingCredits, contractRebasingCreditsPerToken] =
+    await Promise.all([
+      contract.totalSupply(),
+      contract.nonRebasingSupply(),
+      contract.rebasingCreditsHighres(),
+      contract.rebasingCreditsPerTokenHighres(),
+    ])
+
+  let highlevelMismatch = false
+
   // Check totalSupply
-  const contractTotalSupply = await contract.totalSupply()
   const localTotalSupply = otoken.totalSupply
 
   if (contractTotalSupply !== localTotalSupply) {
@@ -898,12 +907,24 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
         contractTotalSupply - localTotalSupply
       }`,
     )
+    highlevelMismatch = true
+    debugger
+  }
+
+  // Check nonRebasingSupply
+  const localNonRebasingSupply = otoken.nonRebasingSupply
+
+  if (contractNonRebasingSupply !== localNonRebasingSupply) {
+    console.log(
+      `Non-rebasing supply mismatch: contract=${contractNonRebasingSupply}, local=${localNonRebasingSupply}, diff=${
+        contractNonRebasingSupply - localNonRebasingSupply
+      }`,
+    )
+    highlevelMismatch = true
+    debugger
   }
 
   // Check rebasingCredits and rebasingCreditsPerToken
-  const contractRebasingCredits = await contract.rebasingCreditsHighres()
-  const contractRebasingCreditsPerToken = await contract.rebasingCreditsPerTokenHighres()
-
   if (
     contractRebasingCredits !==
     (typeof otoken.rebasingCreditsHighres === 'function'
@@ -917,6 +938,8 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
           : otoken.rebasingCreditsHighres
       }`,
     )
+    highlevelMismatch = true
+    debugger
   }
 
   if (
@@ -932,43 +955,47 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
           : otoken.rebasingCreditsPerTokenHighres
       }`,
     )
+    highlevelMismatch = true
+    debugger
   }
 
   if (addressesToCheck.size === 0) return
   const accounts = [...addressesToCheck]
 
-  // Check Balances
-  const balanceMap = await multicall(
-    ctx,
-    block.header,
-    otokenAbi.functions.balanceOf,
-    otoken.address,
-    accounts.map((address) => ({ _account: address })),
-  ).then((balances) => {
-    return new Map(balances.map((balance, index) => [accounts[index], balance]))
-  })
+  if (highlevelMismatch) {
+    // Check Balances
+    const balanceMap = await multicall(
+      ctx,
+      block.header,
+      otokenAbi.functions.balanceOf,
+      otoken.address,
+      accounts.map((address) => ({ _account: address })),
+    ).then((balances) => {
+      return new Map(balances.map((balance, index) => [accounts[index], balance]))
+    })
 
-  for (const account of accounts) {
-    const contractBalance = balanceMap.get(account)!
-    const localBalance = otoken.balanceOf(account)
-    if (contractBalance !== localBalance) {
-      wrongCount++
-      const difference =
-        contractBalance > localBalance ? contractBalance - localBalance : localBalance - contractBalance
-      const percentOff = Number((difference * 10000n) / (contractBalance === 0n ? 1n : contractBalance)) / 100
-      console.log(
-        `${account} ${
-          otoken instanceof OToken_2025_03_04
-            ? otoken.alternativeCreditsPerToken[account] > 0n
-            : otoken.nonRebasingCreditsPerToken[account] > 0n
-        } has ${contractBalance} contract balance and ${localBalance} local balance (${percentOff.toFixed(2)}% off)`,
-      )
+    for (const account of accounts) {
+      const contractBalance = balanceMap.get(account)!
+      const localBalance = otoken.balanceOf(account)
+      if (contractBalance !== localBalance) {
+        wrongCount++
+        const difference =
+          contractBalance > localBalance ? contractBalance - localBalance : localBalance - contractBalance
+        const percentOff = Number((difference * 10000n) / (contractBalance === 0n ? 1n : contractBalance)) / 100
+        console.log(
+          `${account} ${
+            otoken instanceof OToken_2025_03_04
+              ? otoken.alternativeCreditsPerToken[account] > 0n
+              : otoken.nonRebasingCreditsPerToken[account] > 0n
+          } has ${contractBalance} contract balance and ${localBalance} local balance (${percentOff.toFixed(2)}% off)`,
+        )
+      }
+      totalCount++
     }
-    totalCount++
-  }
 
-  const wrongPercentage = totalCount > 0 ? (wrongCount / totalCount) * 100 : 0
-  console.log(`${wrongCount} out of ${totalCount} addresses (${wrongPercentage.toFixed(2)}%) have incorrect balances`)
+    const wrongPercentage = totalCount > 0 ? (wrongCount / totalCount) * 100 : 0
+    console.log(`${wrongCount} out of ${totalCount} addresses (${wrongPercentage.toFixed(2)}%) have incorrect balances`)
+  }
 }
 
 const errorParent = (trace: Trace): boolean => {
