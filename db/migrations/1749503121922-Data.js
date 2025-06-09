@@ -1,5 +1,5 @@
-module.exports = class Data1749236737272 {
-    name = 'Data1749236737272'
+module.exports = class Data1749503121922 {
+    name = 'Data1749503121922'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -165,7 +165,7 @@ module.exports = class Data1749236737272 {
         await db.query(`CREATE INDEX "IDX_41df5fb0657b57079c5e011578" ON "o_token_daily_stat" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_7581835374b0582ec62df30f28" ON "o_token_daily_stat" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_448a0a2ffd35d4dda520f1a98f" ON "o_token_daily_stat" ("date") `)
-        await db.query(`CREATE TABLE "o_token_dripper_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "weth_balance" numeric NOT NULL, "available_funds" numeric NOT NULL, "last_collect" numeric NOT NULL, "per_second" numeric NOT NULL, "drip_duration" numeric NOT NULL, CONSTRAINT "PK_8fd326f8158125b5a2be7e86803" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_dripper_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "weth_balance" numeric NOT NULL, "available_funds" numeric NOT NULL, "last_collect" numeric NOT NULL, "per_second" numeric NOT NULL, "per_second_max" numeric, "drip_duration" numeric NOT NULL, CONSTRAINT "PK_8fd326f8158125b5a2be7e86803" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_7671125bf3c842a221e9ada6da" ON "o_token_dripper_state" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_bd00c38c8ddaf6a21f00d71c7a" ON "o_token_dripper_state" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_7db5954d3839261e98ef3f7a9a" ON "o_token_dripper_state" ("timestamp") `)

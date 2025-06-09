@@ -81,14 +81,16 @@ export const otokenFrequencyProcessor = (params: {
           if (dripper.vaultDripper) {
             const vaultContract = new otokenVault.Contract(ctx, block.header, dripper.address)
             const otokenContract = new otokenAbi.Contract(ctx, block.header, params.otokenAddress)
-            const [dripDuration, lastCollect, perSecond, totalValue, totalSupply, wethBalance] = await Promise.all([
-              vaultContract.dripDuration(),
-              vaultContract.lastRebase(),
-              vaultContract.rebasePerSecondTarget(),
-              vaultContract.totalValue(),
-              otokenContract.totalSupply(),
-              new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
-            ])
+            const [dripDuration, lastCollect, perSecond, perSecondMax, totalValue, totalSupply, wethBalance] =
+              await Promise.all([
+                vaultContract.dripDuration(),
+                vaultContract.lastRebase(),
+                vaultContract.previewYield(),
+                vaultContract.rebasePerSecondMax(),
+                vaultContract.totalValue(),
+                otokenContract.totalSupply(),
+                new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
+              ])
             const availableFunds = totalValue - totalSupply
             dripperStates.push(
               new OTokenDripperState({
@@ -100,6 +102,7 @@ export const otokenFrequencyProcessor = (params: {
                 dripDuration,
                 lastCollect,
                 perSecond,
+                perSecondMax,
                 availableFunds,
                 wethBalance,
               }),

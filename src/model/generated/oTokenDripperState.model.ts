@@ -37,6 +37,9 @@ export class OTokenDripperState {
     @BigIntColumn_({nullable: false})
     perSecond!: bigint
 
+    @BigIntColumn_({nullable: true})
+    perSecondMax!: bigint | undefined | null
+
     @BigIntColumn_({nullable: false})
     dripDuration!: bigint
 }
