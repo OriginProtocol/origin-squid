@@ -101,7 +101,7 @@ export const otokenFrequencyProcessor = (params: {
                 otoken: params.otokenAddress,
                 dripDuration,
                 lastCollect,
-                perSecond,
+                perSecond: perSecond / (BigInt(block.header.timestamp) - lastCollect),
                 perSecondMax,
                 availableFunds,
                 wethBalance,
