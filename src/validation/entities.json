@@ -1355,11 +1355,11 @@
       "timestamp": "2025-04-12T23:59:59.999000Z",
       "blockNumber": 22256323,
       "strategy": "0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63",
-      "apr": 0.15243127993830208,
-      "apy": 0.16462538969654616,
+      "apr": 0.1524525954883854,
+      "apy": 0.16465020423515808,
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "12743726346181632310301",
-      "balanceWeight": 0.4740679644693993,
+      "balanceWeight": 0.47400168144287474,
       "earnings": "1377648566918670841032",
       "earningsChange": "2521279062193380072"
     },
@@ -1390,67 +1390,67 @@
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22531920",
-      "blockNumber": 22531920,
-      "timestamp": "2025-05-21T14:40:11.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22534070",
+      "blockNumber": 22534070,
+      "timestamp": "2025-05-21T21:53:35.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "524998337718140407784",
-      "balanceETH": "524998337718140407784",
+      "balance": "525000109916185174379",
+      "balanceETH": "525000109916185174379",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22620468",
-      "blockNumber": 22620468,
-      "timestamp": "2025-06-03T00:10:47.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22621356",
+      "blockNumber": 22621356,
+      "timestamp": "2025-06-03T03:09:47.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "525012844700432502729",
-      "balanceETH": "525012844700432502729",
+      "balance": "525012865367078412022",
+      "balanceETH": "525012865367078412022",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22627885",
-      "blockNumber": 22627885,
-      "timestamp": "2025-06-04T01:04:35.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22628779",
+      "blockNumber": 22628779,
+      "timestamp": "2025-06-04T04:04:47.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "525012899865004780433",
-      "balanceETH": "525012899865004780433",
+      "balance": "525012910950527735224",
+      "balanceETH": "525012910950527735224",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22635416",
-      "blockNumber": 22635416,
-      "timestamp": "2025-06-05T02:23:23.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22636304",
+      "blockNumber": 22636304,
+      "timestamp": "2025-06-05T05:21:59.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "525014011494900075051",
-      "balanceETH": "525014011494900075051",
+      "balance": "525014358772823111206",
+      "balanceETH": "525014358772823111206",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22642816",
-      "blockNumber": 22642816,
-      "timestamp": "2025-06-06T03:16:35.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22643704",
+      "blockNumber": 22643704,
+      "timestamp": "2025-06-06T06:15:23.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "2525015367568889942851",
-      "balanceETH": "2525015367568889942851",
+      "balance": "2525015476392424187289",
+      "balanceETH": "2525015476392424187289",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22650235",
-      "blockNumber": 22650235,
-      "timestamp": "2025-06-07T04:11:11.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22651129",
+      "blockNumber": 22651129,
+      "timestamp": "2025-06-07T07:10:35.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "2525017992946539630915",
-      "balanceETH": "2525017992946539630915",
+      "balance": "2525018007596492316954",
+      "balanceETH": "2525018007596492316954",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
@@ -4136,7 +4136,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "4724993843969664181671",
       "balanceWeight": 1,
-      "earnings": "156886949815752672584",
+      "earnings": "158244755729449367279",
       "earningsChange": "997171385494539300"
     },
     {
@@ -4147,9 +4147,9 @@
       "apr": 0.02707986934871709,
       "apy": 0.027448829873971903,
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-      "balance": "4731010331545192237503",
+      "balance": "4730999801431273430239",
       "balanceWeight": 1,
-      "earnings": "187669010750230559409",
+      "earnings": "189026816663927254104",
       "earningsChange": "350760141453170177"
     },
     {
@@ -4162,7 +4162,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4175,7 +4175,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4188,7 +4188,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4201,7 +4201,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4214,7 +4214,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4227,7 +4227,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     },
     {
@@ -4240,7 +4240,7 @@
       "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "206244196927277702909",
+      "earnings": "207602002840974397604",
       "earningsChange": "0"
     }
   ],
@@ -8990,6 +8990,39 @@
       "chainId": 1,
       "symbol": "USDT",
       "strategy": "0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90"
+    },
+    {
+      "id": "1:0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90:0x6b175474e89094c44da98b954eedeac495271d0f:21500000",
+      "blockNumber": 21500000,
+      "timestamp": "2024-12-28T09:14:47.000000Z",
+      "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "DAI",
+      "strategy": "0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90"
+    },
+    {
+      "id": "1:0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:21500000",
+      "blockNumber": 21500000,
+      "timestamp": "2024-12-28T09:14:47.000000Z",
+      "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "USDC",
+      "strategy": "0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90"
+    },
+    {
+      "id": "1:0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90:0xdac17f958d2ee523a2206206994597c13d831ec7:21500000",
+      "blockNumber": 21500000,
+      "timestamp": "2024-12-28T09:14:47.000000Z",
+      "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "USDT",
+      "strategy": "0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90"
     }
   ],
   "strategyDailyYields_ousd_0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90": [
@@ -9016,7 +9049,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "29793967735194087461519852",
       "balanceWeight": 1,
-      "earnings": "55486191901890952941936",
+      "earnings": "55470422242806064952430",
       "earningsChange": "58814726573542068968"
     },
     {
@@ -9029,7 +9062,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "30587188001964544235227899",
       "balanceWeight": 1,
-      "earnings": "120986811386998615954091",
+      "earnings": "120971041727913727964585",
       "earningsChange": "2070480448398811734611"
     },
     {
@@ -9042,7 +9075,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "9524105150946200085125519",
       "balanceWeight": 1,
-      "earnings": "206098373743448195019386",
+      "earnings": "205717521294890618202761",
       "earningsChange": "45355998114482095579"
     },
     {
@@ -9055,7 +9088,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "4000034082369343662203746",
       "balanceWeight": 1,
-      "earnings": "251712874955560067260443",
+      "earnings": "251327169493925310934831",
       "earningsChange": "286596868269404099329"
     },
     {
@@ -9068,7 +9101,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "24113455470049428204810",
       "balanceWeight": 1,
-      "earnings": "261997943344290577203522",
+      "earnings": "261612237882655820877910",
       "earningsChange": "72521435408949972"
     },
     {
@@ -9081,7 +9114,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9094,7 +9127,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9107,7 +9140,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9120,7 +9153,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9133,7 +9166,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9146,7 +9179,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9159,7 +9192,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9172,7 +9205,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9185,7 +9218,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9198,7 +9231,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9211,7 +9244,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9224,7 +9257,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     },
     {
@@ -9237,7 +9270,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "267814880019532704093731",
+      "earnings": "267446831553915692430446",
       "earningsChange": "0"
     }
   ],
@@ -10785,7 +10818,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "36714758719726014279607321",
       "balanceWeight": 1,
-      "earnings": "132940866909885952842843",
+      "earnings": "130796788942818872114015",
       "earningsChange": "2054888564543869647528"
     },
     {
@@ -10798,7 +10831,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "38952394392849521152753190",
       "balanceWeight": 1,
-      "earnings": "360443845707676797305555",
+      "earnings": "347672097091556218165185",
       "earningsChange": "2622992583449936573621"
     },
     {
@@ -10811,7 +10844,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "386369430671983564586978",
+      "earnings": "373004370643870700848346",
       "earningsChange": "0"
     },
     {
@@ -10824,7 +10857,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "28768328795418507078088516",
       "balanceWeight": 1,
-      "earnings": "387925019577122028230651",
+      "earnings": "374559959549009164492019",
       "earningsChange": "649077504823187085784"
     },
     {
@@ -10837,7 +10870,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "409588141033584653233900",
+      "earnings": "396136581096788948722117",
       "earningsChange": "0"
     },
     {
@@ -10850,7 +10883,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "3391020709902404424513991",
       "balanceWeight": 1,
-      "earnings": "419596632464981622224892",
+      "earnings": "405630382324551233590492",
       "earningsChange": "198489253239339277730"
     },
     {
@@ -10863,7 +10896,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "293566169020294190614521",
       "balanceWeight": 1,
-      "earnings": "439020960142871334786134",
+      "earnings": "425054710002440946151734",
       "earningsChange": "20579285539433299077"
     },
     {
@@ -10876,7 +10909,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "324442834275000000000000",
       "balanceWeight": 1,
-      "earnings": "441109317504460977551578",
+      "earnings": "427137403287251942933805",
       "earningsChange": "25296788000000000000"
     },
     {
@@ -10889,7 +10922,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "74701629209000000000000",
       "balanceWeight": 1,
-      "earnings": "441369501962460977551578",
+      "earnings": "427397587745251942933805",
       "earningsChange": "4487625000000000000"
     },
     {
@@ -10902,7 +10935,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "516525469886987637777929",
       "balanceWeight": 1,
-      "earnings": "450136364068962488803712",
+      "earnings": "436143553098109806083253",
       "earningsChange": "37421054652198959220"
     },
     {
@@ -10915,7 +10948,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10928,7 +10961,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10941,7 +10974,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10954,7 +10987,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10967,7 +11000,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10980,7 +11013,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -10993,7 +11026,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "450762968422673877964690",
+      "earnings": "436769004743126232833740",
       "earningsChange": "0"
     },
     {
@@ -11006,7 +11039,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "104041221404000000000000",
       "balanceWeight": 1,
-      "earnings": "450811745500673877964690",
+      "earnings": "436817781821126232833740",
       "earningsChange": "6816149000000000000"
     },
     {
@@ -11019,7 +11052,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "99547536492000000000000",
       "balanceWeight": 1,
-      "earnings": "451266344077673877964690",
+      "earnings": "437274999321126232833740",
       "earningsChange": "13808122000000000000"
     }
   ],
@@ -12798,7 +12831,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "13659453944000411230456534",
       "balanceWeight": 1,
-      "earnings": "21021859343253819097113",
+      "earnings": "20141522238180503092159",
       "earningsChange": "540534314691294966960"
     },
     {
@@ -12811,7 +12844,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "7252474839870567737070834",
       "balanceWeight": 1,
-      "earnings": "50112186738283030642923",
+      "earnings": "49890391300225026575286",
       "earningsChange": "398062940963917760948"
     },
     {
@@ -12824,7 +12857,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "11142464466797197684763983",
       "balanceWeight": 1,
-      "earnings": "74068428457803257821546",
+      "earnings": "73539422214087138359531",
       "earningsChange": "445210526135876247897"
     },
     {
@@ -12837,7 +12870,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "77317524207877403378218",
+      "earnings": "76663813893088136319147",
       "earningsChange": "0"
     },
     {
@@ -12850,7 +12883,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "1671554828122518274170740",
       "balanceWeight": 1,
-      "earnings": "83550707794395765323671",
+      "earnings": "82896997479606498264600",
       "earningsChange": "114144083051634072615"
     },
     {
@@ -12863,7 +12896,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "5267701926426283583128945",
       "balanceWeight": 1,
-      "earnings": "107734039961096132786746",
+      "earnings": "107724289166033644272469",
       "earningsChange": "484705266809785367201"
     },
     {
@@ -12876,7 +12909,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "5296931341652136892477221",
       "balanceWeight": 1,
-      "earnings": "136963455186949442135022",
+      "earnings": "136953704391886953620745",
       "earningsChange": "499289660249140619067"
     },
     {
@@ -12889,7 +12922,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "4946955871500674489159144",
       "balanceWeight": 1,
-      "earnings": "173895520914457401358123",
+      "earnings": "173885770119394912843846",
       "earningsChange": "1167842790019422093672"
     },
     {
@@ -12902,7 +12935,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "20024950819296190341",
       "balanceWeight": 1,
-      "earnings": "211043949784491007589874",
+      "earnings": "211034198989428519075597",
       "earningsChange": "3275713967129043"
     },
     {
@@ -12915,7 +12948,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "20338162571909471731",
       "balanceWeight": 1,
-      "earnings": "211044262996243620871264",
+      "earnings": "211034512201181132356987",
       "earningsChange": "8483302674141133"
     },
     {
@@ -12928,7 +12961,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -12941,7 +12974,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -12954,7 +12987,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -12967,7 +13000,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -12980,7 +13013,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -12993,7 +13026,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -13006,7 +13039,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     },
     {
@@ -13019,7 +13052,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "211044319919842573667142",
+      "earnings": "211034569124780085152865",
       "earningsChange": "0"
     }
   ],
@@ -14442,6 +14475,17 @@
       "chainId": 1,
       "symbol": "USDT",
       "strategy": "0x79f2188ef9350a1dc11a062cca0abe90684b0197"
+    },
+    {
+      "id": "1:0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x6b175474e89094c44da98b954eedeac495271d0f:20700000",
+      "blockNumber": 20700000,
+      "timestamp": "2024-09-07T16:44:35.000000Z",
+      "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "balance": "9290004358755896108",
+      "balanceETH": "405322",
+      "chainId": 1,
+      "symbol": "DAI",
+      "strategy": "0x79f2188ef9350a1dc11a062cca0abe90684b0197"
     }
   ],
   "strategyDailyYields_ousd_0x79f2188ef9350a1dc11a062cca0abe90684b0197": [
@@ -14481,7 +14525,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "10626006030144000337001523",
       "balanceWeight": 1,
-      "earnings": "137612537385090034887649",
+      "earnings": "137187834089037631285061",
       "earningsChange": "1324706227898862331949"
     },
     {
@@ -14494,7 +14538,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "229984506837583002517068",
+      "earnings": "229373123704863353286448",
       "earningsChange": "0"
     },
     {
@@ -14507,7 +14551,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "16109772950943000000000000",
       "balanceWeight": 1,
-      "earnings": "299455222559583002517068",
+      "earnings": "298413020052863353286448",
       "earningsChange": "1510680670000000000000"
     },
     {
@@ -14520,7 +14564,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "8629779580223094708864360",
       "balanceWeight": 1,
-      "earnings": "353061117207368777082112",
+      "earnings": "351933776091953212640572",
       "earningsChange": "829636450159856488829"
     },
     {
@@ -14533,7 +14577,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "6052591950571378927447009",
       "balanceWeight": 1,
-      "earnings": "403095105702208997475209",
+      "earnings": "402141550585310200900858",
       "earningsChange": "674188714058946864456"
     },
     {
@@ -14541,12 +14585,12 @@
       "timestamp": "2023-12-20T23:59:59.999000Z",
       "blockNumber": 18830533,
       "strategy": "0x79f2188ef9350a1dc11a062cca0abe90684b0197",
-      "apr": 0.09643414631914193,
-      "apy": 0.10122304162916862,
+      "apr": 0.09644263252095586,
+      "apy": 0.10123238440297522,
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "5935866756699779548587564",
       "balanceWeight": 1,
-      "earnings": "470483436867526731364577",
+      "earnings": "469529881750627934790226",
       "earningsChange": "1598863246765887398419"
     },
     {
@@ -14559,7 +14603,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "10105974838611207429129408",
       "balanceWeight": 1,
-      "earnings": "551804379542707048950949",
+      "earnings": "551346535728376094352561",
       "earningsChange": "1470957509100052257584"
     },
     {
@@ -14567,13 +14611,13 @@
       "timestamp": "2024-03-29T23:59:59.999000Z",
       "blockNumber": 19543073,
       "strategy": "0x79f2188ef9350a1dc11a062cca0abe90684b0197",
-      "apr": 0.18815058206822188,
-      "apy": 0.2069567850458507,
+      "apr": 0.16402618839571875,
+      "apy": 0.17820178961169564,
       "asset": "0x0000000000000000000000000000000000000348",
-      "balance": "8092112539222746715785175",
+      "balance": "8092657010875739362899323",
       "balanceWeight": 1,
-      "earnings": "703115924840631079659246",
-      "earningsChange": "4246434535134896464783"
+      "earnings": "703438758557850723282154",
+      "earningsChange": "3701962882142249350635"
     },
     {
       "id": "0x79f2188ef9350a1dc11a062cca0abe90684b0197:0x0000000000000000000000000000000000000348:2024-05-18",
@@ -14585,7 +14629,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "6147644152616330832751299",
       "balanceWeight": 1,
-      "earnings": "790276203377331596638305",
+      "earnings": "792608092481077422638136",
       "earningsChange": "860032828826744580392"
     },
     {
@@ -14598,7 +14642,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "5633097203738167445342749",
       "balanceWeight": 1,
-      "earnings": "856176977623401886700218",
+      "earnings": "858892903111824623678508",
       "earningsChange": "578436427848500122941"
     },
     {
@@ -14611,7 +14655,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "4533380146797240380970317",
       "balanceWeight": 1,
-      "earnings": "910639301363335482708274",
+      "earnings": "913355226851758219686564",
       "earningsChange": "1194842335327728120086"
     },
     {
@@ -14624,7 +14668,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "4364659265485799112818339",
       "balanceWeight": 1,
-      "earnings": "952834221315654009099924",
+      "earnings": "955550146804076746078214",
       "earningsChange": "1172615486192909389100"
     },
     {
@@ -14637,7 +14681,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "1953600969564659457830013",
       "balanceWeight": 1,
-      "earnings": "1024775674105461746679628",
+      "earnings": "1027491599593884483657918",
       "earningsChange": "1419555235251739633963"
     },
     {
@@ -14650,7 +14694,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "2046495704923170256856462",
       "balanceWeight": 1,
-      "earnings": "1117670409463972545706077",
+      "earnings": "1120386334952395282684367",
       "earningsChange": "3918597956742315192202"
     },
     {
@@ -14663,7 +14707,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "1072829617088072546601",
       "balanceWeight": 1,
-      "earnings": "1156123946295546114843833",
+      "earnings": "1158839871783968851822123",
       "earningsChange": "62126161500500669"
     },
     {
@@ -14676,7 +14720,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "0",
       "balanceWeight": 1,
-      "earnings": "1156124143029767772451923",
+      "earnings": "1158840123576716841728983",
       "earningsChange": "0"
     }
   ],
@@ -15994,6 +16038,39 @@
       "id": "1:0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44:0xdac17f958d2ee523a2206206994597c13d831ec7:21800000",
       "blockNumber": 21800000,
       "timestamp": "2025-02-08T06:27:11.000000Z",
+      "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "USDT",
+      "strategy": "0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44"
+    },
+    {
+      "id": "1:0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44:0x6b175474e89094c44da98b954eedeac495271d0f:21900000",
+      "blockNumber": 21900000,
+      "timestamp": "2025-02-22T06:11:11.000000Z",
+      "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "DAI",
+      "strategy": "0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44"
+    },
+    {
+      "id": "1:0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:21900000",
+      "blockNumber": 21900000,
+      "timestamp": "2025-02-22T06:11:11.000000Z",
+      "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "USDC",
+      "strategy": "0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44"
+    },
+    {
+      "id": "1:0x76bf500b6305dc4ea851384d3d5502f1c7a0ed44:0xdac17f958d2ee523a2206206994597c13d831ec7:21900000",
+      "blockNumber": 21900000,
+      "timestamp": "2025-02-22T06:11:11.000000Z",
       "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
       "balance": "0",
       "balanceETH": "0",
@@ -17556,10 +17633,10 @@
       "timestamp": "2025-03-28T23:59:59.999000Z",
       "blockNumber": 22148848,
       "strategy": "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26",
-      "apr": 0.028186457439066892,
-      "apy": 0.028586335713146394,
+      "apr": 0.028186617829782434,
+      "apy": 0.02858650067612789,
       "asset": "0x0000000000000000000000000000000000000348",
-      "balance": "1900729867394000000000000",
+      "balance": "1900719051645000000000000",
       "balanceWeight": 1,
       "earnings": "4448148444000000000000",
       "earningsChange": "146679922000000000000"
@@ -17591,78 +17668,78 @@
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22471728",
-      "blockNumber": 22471728,
-      "timestamp": "2025-05-13T03:47:59.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22478600",
+      "blockNumber": 22478600,
+      "timestamp": "2025-05-14T02:59:23.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900135858124",
-      "balanceETH": "776726154",
+      "balance": "1900138064051",
+      "balanceETH": "714529211",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22561902",
-      "blockNumber": 22561902,
-      "timestamp": "2025-05-25T19:24:59.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22567051",
+      "blockNumber": 22567051,
+      "timestamp": "2025-05-26T12:45:35.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900279361850",
-      "balanceETH": "760656240",
+      "balance": "1900280249036",
+      "balanceETH": "737837225",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22622540",
-      "blockNumber": 22622540,
-      "timestamp": "2025-06-03T07:07:35.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22623872",
+      "blockNumber": 22623872,
+      "timestamp": "2025-06-03T11:36:59.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900331600447",
-      "balanceETH": "729441709",
+      "balance": "1900331695548",
+      "balanceETH": "729441746",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22630088",
-      "blockNumber": 22630088,
-      "timestamp": "2025-06-04T08:29:11.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22631420",
+      "blockNumber": 22631420,
+      "timestamp": "2025-06-04T12:58:11.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900332569702",
-      "balanceETH": "722066458",
+      "balance": "1900333032007",
+      "balanceETH": "722066633",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22637488",
-      "blockNumber": 22637488,
-      "timestamp": "2025-06-05T09:21:47.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22638820",
+      "blockNumber": 22638820,
+      "timestamp": "2025-06-05T13:51:23.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900334787674",
-      "balanceETH": "728660750",
+      "balance": "1900335562647",
+      "balanceETH": "728521599",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22644888",
-      "blockNumber": 22644888,
-      "timestamp": "2025-06-06T10:13:47.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22646220",
+      "blockNumber": 22646220,
+      "timestamp": "2025-06-06T14:44:11.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900337577336",
-      "balanceETH": "772109000",
+      "balance": "1900337988128",
+      "balanceETH": "756591288",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
     },
     {
-      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22652321",
-      "blockNumber": 22652321,
-      "timestamp": "2025-06-07T11:09:59.000000Z",
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:22653662",
+      "blockNumber": 22653662,
+      "timestamp": "2025-06-07T15:40:23.000000Z",
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-      "balance": "1900344122707",
-      "balanceETH": "764279753",
+      "balance": "1900344234742",
+      "balanceETH": "756621601",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
@@ -17692,7 +17769,7 @@
       "asset": "0x0000000000000000000000000000000000000348",
       "balance": "1900286575431000000000000",
       "balanceWeight": 1,
-      "earnings": "196714977000000000000",
+      "earnings": "197236506000000000000",
       "earningsChange": "998895000000000000"
     }
   ],
@@ -22837,7 +22914,7 @@
       "rateUSD": "1871370000000000000000",
       "yield": "4083910370761068749",
       "marketCapUSD": 8.503649447795058e+25,
-      "accountsOverThreshold": 283,
+      "accountsOverThreshold": 282,
       "rateWrapped": "1043712280264547403"
     },
     {
@@ -22977,7 +23054,7 @@
       "rateUSD": "3505232760000000000000",
       "yield": "2447711957784992624",
       "marketCapUSD": 1.5630014240402882e+26,
-      "accountsOverThreshold": 219,
+      "accountsOverThreshold": 221,
       "rateWrapped": "1085171157408856796"
     },
     {
@@ -23005,7 +23082,7 @@
       "rateUSD": "3791100000000000000000",
       "yield": "1601664708012462191",
       "marketCapUSD": 1.3008874430725188e+26,
-      "accountsOverThreshold": 207,
+      "accountsOverThreshold": 206,
       "rateWrapped": "1090557212338453611"
     },
     {
@@ -23061,7 +23138,7 @@
       "rateUSD": "2526805032180000000000",
       "yield": "1564214124295399627",
       "marketCapUSD": 8.638142914129745e+25,
-      "accountsOverThreshold": 206,
+      "accountsOverThreshold": 207,
       "rateWrapped": "1101762153117825827"
     },
     {
@@ -23117,7 +23194,7 @@
       "rateUSD": "4006208915000000000000",
       "yield": "2449030289348545920",
       "marketCapUSD": 1.684388717560699e+26,
-      "accountsOverThreshold": 182,
+      "accountsOverThreshold": 181,
       "rateWrapped": "1112343557605210689"
     },
     {
@@ -23173,7 +23250,7 @@
       "rateUSD": "1927064421580000000000",
       "yield": "3203062699047138037",
       "marketCapUSD": 7.562820750640373e+25,
-      "accountsOverThreshold": 182,
+      "accountsOverThreshold": 181,
       "rateWrapped": "1122436398009474159"
     },
     {
@@ -25144,7 +25221,7 @@
       "rateUSD": "1000000000000000000",
       "yield": "7053424903264990835784",
       "marketCapUSD": 2.964770748315308e+26,
-      "accountsOverThreshold": 764,
+      "accountsOverThreshold": 762,
       "rateWrapped": "0"
     },
     {
@@ -25172,7 +25249,7 @@
       "rateUSD": "1000000000000000000",
       "yield": "9783847759642651574745",
       "marketCapUSD": 2.0719723825736345e+26,
-      "accountsOverThreshold": 923,
+      "accountsOverThreshold": 924,
       "rateWrapped": "0"
     },
     {
@@ -25200,7 +25277,7 @@
       "rateUSD": "1000000000000000000",
       "yield": "7520707146297125851587",
       "marketCapUSD": 9.924733576970295e+25,
-      "accountsOverThreshold": 862,
+      "accountsOverThreshold": 863,
       "rateWrapped": "1000000000000000000"
     },
     {
@@ -31460,6 +31537,15 @@
       "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
       "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
       "totalValue": "35773024994822421902108749"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-32600000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-06-08T03:01:14.000000Z",
+      "blockNumber": 32600000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "35774600235943664946074670"
     }
   ],
   "os_oTokenDailyStats": [
@@ -31516,7 +31602,7 @@
       "rateUSD": "561933230000000000",
       "yield": "6760441509642214115837",
       "marketCapUSD": 2.9950337067274702e+25,
-      "accountsOverThreshold": 1716,
+      "accountsOverThreshold": 1711,
       "rateWrapped": "1014786369183059281"
     },
     {
@@ -32490,7 +32576,7 @@
       "totalAssets": "1588089208451602605387",
       "totalAssetsCap": "5000000000000000000000",
       "totalDeposits": "1585855813260185772698",
-      "totalFees": "680973424087221932",
+      "totalFees": "652099498950381171",
       "totalSupply": "1583137891848463035553",
       "totalWithdrawals": "435004286157975980",
       "totalYield": "2668399477574808669"
@@ -32526,7 +32612,7 @@
       "totalAssets": "2833317339261288424687",
       "totalAssetsCap": "5000000000000000000000",
       "totalDeposits": "2862052681279092747716",
-      "totalFees": "3369243398673471535",
+      "totalFees": "3467874809656453756",
       "totalSupply": "2810848375803185338167",
       "totalWithdrawals": "42275318158677624567",
       "totalYield": "13539976140873301538"
@@ -32615,11 +32701,11 @@
       "outstandingAssets1": "5911413168322378114489",
       "totalAssets": "5911619280423652659685",
       "totalAssetsCap": "10000000000000000000000",
-      "totalDeposits": "7752972991101788308756",
+      "totalDeposits": "7752955491101788308756",
       "totalFees": "19198274041053748173",
       "totalSupply": "5767145522904288040735",
       "totalWithdrawals": "1828829380993122555960",
-      "totalYield": "-12524329685013093111"
+      "totalYield": "-12506829685013093111"
     },
     {
       "id": "1:21900000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -32634,10 +32720,10 @@
       "totalAssets": "7404703162800594409741",
       "totalAssetsCap": "10000000000000000000000",
       "totalDeposits": "10399120116099129163859",
-      "totalFees": "21906115861563967218",
+      "totalFees": "21405816944007986123",
       "totalSupply": "7212398944256125679720",
-      "totalWithdrawals": "3632433306535140637209",
-      "totalYield": "638016353236605883091"
+      "totalWithdrawals": "3082002781736966064332",
+      "totalYield": "87585828438431310214"
     },
     {
       "id": "1:22000000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -32669,11 +32755,11 @@
       "outstandingAssets1": "1722159302556265002166",
       "totalAssets": "7649048360890005911050",
       "totalAssetsCap": "10000000000000000000000",
-      "totalDeposits": "11843226402399492960630",
-      "totalFees": "29757164978373638977",
+      "totalDeposits": "12229428137294842840038",
+      "totalFees": "29812803224724747145",
       "totalSupply": "7419558979294112660588",
-      "totalWithdrawals": "4313406866812236211991",
-      "totalYield": "119228825302749162411"
+      "totalWithdrawals": "4324257845968188046024",
+      "totalYield": "-256121930436648882964"
     },
     {
       "id": "1:22200000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -32706,7 +32792,7 @@
       "totalAssets": "6769294761648035765663",
       "totalAssetsCap": "10000000000000000000000",
       "totalDeposits": "12371057383714410520497",
-      "totalFees": "35335651809305036762",
+      "totalFees": "35745427916288386649",
       "totalSupply": "6543087228940488743951",
       "totalWithdrawals": "5744504548152103139762",
       "totalYield": "142741926085728384928"
@@ -32844,52 +32930,52 @@
   ],
   "ognDailyStats": [
     {
-      "id": "2024-06-10",
-      "blockNumber": 20064782,
-      "timestamp": "2024-06-10T23:42:59.000000Z",
-      "totalStaked": "213788087204895469226124214"
+      "id": "2024-06-11",
+      "blockNumber": 20072019,
+      "timestamp": "2024-06-11T23:58:11.000000Z",
+      "totalStaked": "314636610951425753824931024"
     },
     {
-      "id": "2024-07-30",
-      "blockNumber": 20422688,
-      "timestamp": "2024-07-30T23:35:47.000000Z",
+      "id": "2024-07-31",
+      "blockNumber": 20429669,
+      "timestamp": "2024-07-31T22:59:11.000000Z",
       "totalStaked": "327884671735192909704419263"
     },
     {
-      "id": "2024-09-18",
-      "blockNumber": 20780842,
-      "timestamp": "2024-09-18T23:45:11.000000Z",
-      "totalStaked": "449798459804615506935732186"
+      "id": "2024-09-19",
+      "blockNumber": 20788039,
+      "timestamp": "2024-09-19T23:50:59.000000Z",
+      "totalStaked": "449890173160856350041830266"
     },
     {
-      "id": "2024-11-07",
-      "blockNumber": 21139068,
-      "timestamp": "2024-11-07T23:31:47.000000Z",
-      "totalStaked": "471336105318505341518320941"
+      "id": "2024-11-08",
+      "blockNumber": 21146131,
+      "timestamp": "2024-11-08T23:12:35.000000Z",
+      "totalStaked": "471402094342189018601634316"
     },
     {
-      "id": "2024-12-27",
-      "blockNumber": 21497229,
-      "timestamp": "2024-12-27T23:58:35.000000Z",
-      "totalStaked": "474074031874371997718767487"
+      "id": "2024-12-28",
+      "blockNumber": 21504394,
+      "timestamp": "2024-12-28T23:58:35.000000Z",
+      "totalStaked": "474361317000839402851058951"
     },
     {
-      "id": "2025-02-15",
-      "blockNumber": 21855105,
-      "timestamp": "2025-02-15T23:30:35.000000Z",
-      "totalStaked": "475630117128830234126546986"
+      "id": "2025-02-16",
+      "blockNumber": 21862362,
+      "timestamp": "2025-02-16T23:53:47.000000Z",
+      "totalStaked": "475749018007563848744091101"
     },
     {
-      "id": "2025-04-06",
-      "blockNumber": 22213097,
-      "timestamp": "2025-04-06T23:18:11.000000Z",
-      "totalStaked": "482569510416245898560740839"
+      "id": "2025-04-07",
+      "blockNumber": 22220345,
+      "timestamp": "2025-04-07T23:37:59.000000Z",
+      "totalStaked": "482482558145056894772013656"
     },
     {
-      "id": "2025-05-26",
-      "blockNumber": 22570338,
-      "timestamp": "2025-05-26T23:46:47.000000Z",
-      "totalStaked": "483019470736268570964176617"
+      "id": "2025-05-27",
+      "blockNumber": 22577541,
+      "timestamp": "2025-05-27T23:55:59.000000Z",
+      "totalStaked": "484508486686078563437365717"
     }
   ],
   "beaconDepositEvents": [
