@@ -206,6 +206,7 @@ type OTokenDripperState @entity {
   availableFunds: BigInt!
   lastCollect: BigInt!
   perSecond: BigInt!
+  perSecondTarget: BigInt
   perSecondMax: BigInt
   dripDuration: BigInt!
 }

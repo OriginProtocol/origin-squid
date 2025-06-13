@@ -38,6 +38,9 @@ export class OTokenDripperState {
     perSecond!: bigint
 
     @BigIntColumn_({nullable: true})
+    perSecondTarget!: bigint | undefined | null
+
+    @BigIntColumn_({nullable: true})
     perSecondMax!: bigint | undefined | null
 
     @BigIntColumn_({nullable: false})
