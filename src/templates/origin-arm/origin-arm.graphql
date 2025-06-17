@@ -61,6 +61,7 @@ type ArmDailyStat @entity {
   yield: BigInt!
   fees: BigInt!
   rateUSD: Float!
+  rateETH: Float!
 }
 
 type ArmWithdrawalRequest @entity {

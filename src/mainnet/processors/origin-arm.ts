@@ -5,6 +5,7 @@ export const originArmProcessors = createOriginARMProcessors({
   name: 'origin-arm',
   from: 20987226,
   armAddress: addresses.arm.address,
+  underlyingToken: 'WETH',
   capManagerAddress: addresses.arm.capManager,
   lidoArm: true,
 })

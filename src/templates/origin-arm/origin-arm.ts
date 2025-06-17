@@ -18,6 +18,7 @@ import {
   logFilter,
 } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { traceFilter } from '@utils/traceFilter'
@@ -26,12 +27,14 @@ export const createOriginARMProcessors = ({
   name,
   from,
   armAddress,
+  underlyingToken,
   capManagerAddress,
   lidoArm,
 }: {
   name: string
   from: number
   armAddress: string
+  underlyingToken: Currency
   capManagerAddress: string
   lidoArm: boolean
 }): Processor[] => {
@@ -319,10 +322,11 @@ export const createOriginARMProcessors = ({
         for (const block of ctx.blocks) {
           if (tracker(ctx, block) || (block.header.height > from && ctx.latestBlockOfDay(block))) {
             // ArmState
-            const [state, yesterdayState, rateUSD] = await Promise.all([
+            const [state, yesterdayState, rateUSD, rateETH] = await Promise.all([
               getCurrentState(block),
               getYesterdayState(block),
-              ensureExchangeRate(ctx, block, 'ETH', 'USD'),
+              ensureExchangeRate(ctx, block, underlyingToken, 'USD'),
+              ensureExchangeRate(ctx, block, underlyingToken, 'ETH'),
             ])
 
             // ArmDailyStat
@@ -361,6 +365,7 @@ export const createOriginARMProcessors = ({
               fees: state.totalFees - (yesterdayState?.totalFees ?? 0n),
               yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
+              rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }

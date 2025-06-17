@@ -64,4 +64,7 @@ export class ArmDailyStat {
 
     @FloatColumn_({nullable: false})
     rateUSD!: number
+
+    @FloatColumn_({nullable: false})
+    rateETH!: number
 }
