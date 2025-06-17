@@ -1,5 +1,6 @@
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { notionProcessor } from 'mainnet/processors/notion'
+import { ognBuybacks } from 'mainnet/processors/ogn-buybacks'
 import { originArmProcessors } from 'mainnet/processors/origin-arm'
 import { protocolProcessor } from 'mainnet/processors/protocol'
 import 'tsconfig-paths/register'
@@ -35,6 +36,7 @@ export const processor = defineSquidProcessor({
   stateSchema: 'mainnet-processor',
   processors: [
     mainnetExchangeRates,
+    ognBuybacks,
     nativeStaking,
     legacyStaking,
     curve,

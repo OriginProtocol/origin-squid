@@ -1,0 +1,9 @@
+type OGNBuyback @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  operator: String! @index
+  tokenSold: String!
+  amountSold: BigInt!
+  ognBought: BigInt!
+}

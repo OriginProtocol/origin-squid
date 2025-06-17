@@ -142,6 +142,15 @@ type CoinGeckoCoinData @entity {
   marketCap: Float!
   tradingVolume: Float!
 }
+type OGNBuyback @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  operator: String! @index
+  tokenSold: String!
+  amountSold: BigInt!
+  ognBought: BigInt!
+}
 type WalletLabels @entity {
   id: ID! @index
   address: String!
