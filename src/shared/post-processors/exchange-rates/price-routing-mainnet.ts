@@ -198,6 +198,7 @@ export const priceMap: Partial<
   ...twoWay('ETH', 'stETH', (ctx, height) => getOethOraclePrice(ctx, height, 'stETH')),
   ...twoWay('OETH', 'USD', getPrice_OETH_USD),
   ...twoWay('ETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'), 8),
+  ...twoWay('WETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'), 8),
   ...twoWay('DAI', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'DAI', 'USD'), 8),
   ...twoWay('USDC', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'USD'), 8),
   ...twoWay('USDT', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'USD'), 8),
