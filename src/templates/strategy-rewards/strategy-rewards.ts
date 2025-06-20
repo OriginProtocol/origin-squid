@@ -2,13 +2,13 @@ import * as iat from '@abi/initializable-abstract-strategy'
 import { OTokenRewardTokenCollected } from '@model'
 import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
 
-export const createStrategyRewardSetup = ({ address, from }: { address: string; from: number }) => {
+export const createStrategyRewardSetup = ({ address, from, to }: { address: string; from: number; to?: number }) => {
   return (processor: EvmBatchProcessor) => {
     processor.addLog({
       address: [address],
       topic0: [iat.events.RewardTokenCollected.topic],
       transaction: false,
-      range: { from },
+      range: { from, to },
     })
   }
 }

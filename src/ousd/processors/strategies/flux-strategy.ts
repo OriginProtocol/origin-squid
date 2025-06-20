@@ -7,6 +7,7 @@ import { DAI, USDC, USDT } from './const'
 export const fluxStrategy: IStrategyData = {
   chainId: 1,
   from: 17877308,
+  to: 20647021,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
   name: 'OUSD Flux',

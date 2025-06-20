@@ -7,6 +7,7 @@ import { DAI, USDC, USDT } from './const'
 export const morphoAave: IStrategyData = {
   chainId: 1,
   from: 16331911,
+  to: 22110751,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
   name: 'OUSD Morpho Aave',

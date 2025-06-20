@@ -66,6 +66,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     chainId: 1,
     from: 17067232,
+    to: 18363599,
     name: 'OETH Frax Staking',
     contractName: 'FraxETHStrategy',
     address: addresses.strategies.oeth.FraxETHStrategy,
@@ -78,6 +79,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     chainId: 1,
     from: 17367105,
+    to: 21264028,
     name: 'OETH Morpho Aave V2',
     contractName: 'MorphoAaveStrategy',
     address: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
@@ -90,6 +92,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     chainId: 1,
     from: 18156225,
+    to: 20136072,
     name: 'OETH Aura rETH/WETH',
     contractName: 'BalancerMetaPoolStrategy',
     address: addresses.strategies.oeth.BalancerMetaPoolStrategy,
@@ -123,6 +126,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     chainId: 1,
     from: 17141121,
+    to: 20136072,
     name: 'OETH Vault (rETH)',
     contractName: 'VaultCore',
     address: OETH_VAULT_ADDRESS,
@@ -141,6 +145,7 @@ export const oethStrategies: readonly IStrategyData[] = [
   {
     chainId: 1,
     from: 17067232,
+    to: 20136072,
     name: 'OETH Vault (stETH)',
     contractName: 'VaultCore',
     address: OETH_VAULT_ADDRESS,

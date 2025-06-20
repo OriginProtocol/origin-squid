@@ -26,6 +26,7 @@ export type ICurveAMOInfo = {
 export type IStrategyData = {
   chainId: number
   from: number
+  to?: number
   oTokenAddress: OTokenContractAddress
   name: string
   contractName: string

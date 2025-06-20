@@ -11,6 +11,7 @@ import { DAI, USDT } from './const'
 export const aaveStrategy: IStrategyData = {
   chainId: 1,
   from: 14206832, // 13369326, Initial Deploy
+  to: 21965572,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
   name: 'OUSD Aave',

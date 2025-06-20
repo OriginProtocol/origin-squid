@@ -7,6 +7,7 @@ import { DAI } from './const'
 export const makerDsrStrategy: IStrategyData = {
   chainId: 1,
   from: 17883037,
+  to: 22123275,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
   name: 'OUSD Maker DSR',

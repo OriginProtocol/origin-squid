@@ -13,12 +13,12 @@ const getFilter = (strategyData: IStrategyData) => {
     depositFilter: logFilter({
       address: [strategyData.address],
       topic0: [abstractStrategyAbi.events.Deposit.topic],
-      range: { from: strategyData.from },
+      range: { from: strategyData.from, to: strategyData.to },
     }),
     withdrawFilter: logFilter({
       address: [strategyData.address],
       topic0: [abstractStrategyAbi.events.Withdrawal.topic],
-      range: { from: strategyData.from },
+      range: { from: strategyData.from, to: strategyData.to },
     }),
   }
 }

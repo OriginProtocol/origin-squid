@@ -11,6 +11,7 @@ const from = 15896478
 export const convexMetaStrategy: IStrategyData = {
   chainId: 1,
   from,
+  to: 21764191,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'CurveAMO',
   name: 'OUSD Convex OUSD+3Crv (AMO)',
