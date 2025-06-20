@@ -101,6 +101,7 @@ export const otokenFrequencyProcessor = (params: {
               new erc20Abi.Contract(ctx, block.header, dripper.token).balanceOf(dripper.address),
             ])
             const availableFunds = totalValue - totalSupply
+            const secondsSinceLastCollect = BigInt(block.header.timestamp / 1000) - lastCollect
             dripperStates.push(
               new OTokenDripperState({
                 id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
@@ -110,7 +111,7 @@ export const otokenFrequencyProcessor = (params: {
                 otoken: params.otokenAddress,
                 dripDuration,
                 lastCollect,
-                perSecond: perSecond / (BigInt(block.header.timestamp / 1000) - lastCollect),
+                perSecond: secondsSinceLastCollect > 0 ? perSecond / secondsSinceLastCollect : 0n,
                 perSecondTarget,
                 perSecondMax,
                 availableFunds,
