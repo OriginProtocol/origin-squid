@@ -19,6 +19,7 @@ export async function checkAndRestoreDump(processorName: string) {
     const processorDumps = dumps.filter((d) => d.processorName === processorName)
 
     if (processorDumps.length === 0) {
+      await dumpManager.markDumpAsRestored(processorName, 0)
       console.log(`No database dumps found for ${processorName}`)
       return null
     }
