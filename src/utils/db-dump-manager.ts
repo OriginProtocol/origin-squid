@@ -205,7 +205,7 @@ export class DBDumpManager {
                 }
               }
 
-              if (copyCommandData.length > 50000) {
+              if (copyCommandData.length > 10000) {
                 const stream = client.query(copyFrom(copyCommand!))
                 const readable = Readable.from(copyCommandData)
                 await pipeline(readable, stream)
