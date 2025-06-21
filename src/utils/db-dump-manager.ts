@@ -102,22 +102,19 @@ export class DBDumpManager {
     return result.rows[0].data.blockHeight
   }
 
-  async markDumpAsRestored(processorName: string, blockHeight: number): Promise<void> {
-    await this.pool.query(
-      'INSERT INTO "util_cache" (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = $2',
-      [
-        `dump_restored_${processorName}`,
-        {
-          restored: true,
-          timestamp: new Date().toISOString(),
-          blockHeight,
-        },
-      ],
-    )
+  async markDumpAsRestored(client: PoolClient, processorName: string, blockHeight: number): Promise<void> {
+    await client.query('INSERT INTO "util_cache" (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = $2', [
+      `dump_restored_${processorName}`,
+      {
+        restored: true,
+        timestamp: new Date().toISOString(),
+        blockHeight,
+      },
+    ])
   }
 
-  async updateProcessingStatus(processorName: string, startTime: Date): Promise<void> {
-    await this.pool.query('UPDATE "processing_status" SET "start_timestamp" = $2 WHERE id = $1', [
+  async updateProcessingStatus(client: PoolClient, processorName: string, startTime: Date): Promise<void> {
+    await client.query('UPDATE "processing_status" SET "start_timestamp" = $2 WHERE id = $1', [
       processorName.split('-')[0],
       startTime.toISOString(),
     ])
@@ -232,16 +229,16 @@ export class DBDumpManager {
       console.log('Starting database data restore...')
       await pipeline(createReadStream(tempFile), createGunzip(), processLines)
 
-      await client.query('COMMIT')
-
       // Clean up the temporary file
       unlinkSync(tempFile)
 
       // Mark as restored with block height
-      await this.markDumpAsRestored(dumpInfo.processorName, dumpInfo.blockHeight)
+      await this.markDumpAsRestored(client, dumpInfo.processorName, dumpInfo.blockHeight)
 
       // Update the processing status table with the start time
-      await this.updateProcessingStatus(dumpInfo.processorName, restoreStartTime)
+      await this.updateProcessingStatus(client, dumpInfo.processorName, restoreStartTime)
+
+      await client.query('COMMIT')
 
       console.log('Database dump restored successfully')
       console.log(`Inserted ${entityCount} entities`)
