@@ -6,12 +6,13 @@ import { sonicStrategiesProcessor } from 'sonic/strategies'
 import 'tsconfig-paths/register'
 import { sonic } from 'viem/chains'
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
+import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
+import { initProcessorFromDump } from '@utils/dumps'
 
 import * as validate from './sonic/validate'
 
@@ -35,7 +36,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  run(processor).catch((error) => {
+  initProcessorFromDump(processor).catch((error) => {
     throw error
   })
 }
