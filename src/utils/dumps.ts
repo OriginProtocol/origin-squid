@@ -45,7 +45,7 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
     // Update processor configuration to start from the restored block height
     processor.processors.forEach((p) => {
       if ('from' in p) {
-        p.from = blockHeight
+        p.from = blockHeight + 1
       }
     })
   }
