@@ -162,6 +162,8 @@ export class DBDumpManager {
       let partial: string | null = null
       let entityCount = 0
 
+      let entitiesToIgnore = ['util_cache']
+
       const processLines = new Transform({
         objectMode: true,
         transform: function (
@@ -183,7 +185,8 @@ export class DBDumpManager {
 
             let action = async () => {
               for (const line of lines) {
-                if (line.startsWith('COPY ')) {
+                const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
+                if (line.startsWith('COPY ') && !shouldIgnore) {
                   copyCommand = line
                   copyCommandData = []
                   entityCount = 0
