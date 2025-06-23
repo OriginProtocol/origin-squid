@@ -102,15 +102,26 @@ export class DBDumpManager {
     return result.rows[0].data.blockHeight
   }
 
-  async markDumpAsRestored(client: PoolClient, processorName: string, blockHeight: number): Promise<void> {
-    await client.query('INSERT INTO "util_cache" (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = $2', [
-      `dump_restored_${processorName}`,
-      {
-        restored: true,
-        timestamp: new Date().toISOString(),
-        blockHeight,
-      },
-    ])
+  async markDumpAsRestored({
+    client,
+    processorName,
+    blockHeight,
+  }: {
+    client?: PoolClient
+    processorName: string
+    blockHeight: number
+  }): Promise<void> {
+    await (client || this.pool).query(
+      'INSERT INTO "util_cache" (id, data) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET data = $2',
+      [
+        `dump_restored_${processorName}`,
+        {
+          restored: true,
+          timestamp: new Date().toISOString(),
+          blockHeight,
+        },
+      ],
+    )
   }
 
   async updateProcessingStatus(client: PoolClient, processorName: string, startTime: Date): Promise<void> {
@@ -233,7 +244,11 @@ export class DBDumpManager {
       unlinkSync(tempFile)
 
       // Mark as restored with block height
-      await this.markDumpAsRestored(client, dumpInfo.processorName, dumpInfo.blockHeight)
+      await this.markDumpAsRestored({
+        client,
+        processorName: dumpInfo.processorName,
+        blockHeight: dumpInfo.blockHeight,
+      })
 
       // Update the processing status table with the start time
       await this.updateProcessingStatus(client, dumpInfo.processorName, restoreStartTime)
