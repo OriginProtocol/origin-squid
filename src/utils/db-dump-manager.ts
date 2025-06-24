@@ -15,10 +15,18 @@ interface DumpInfo {
   key: string
 }
 
+interface RestoreLock {
+  processorName: string
+  timestamp: string
+  processId: string
+}
+
 export class DBDumpManager {
   private pool: Pool
   private s3Client: S3Client
   private readonly BUCKET_NAME: string
+  private readonly LOCK_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
+  private readonly LOCK_KEY = 'db_restore_lock'
 
   constructor() {
     // Validate required environment variables
@@ -131,143 +139,250 @@ export class DBDumpManager {
     ])
   }
 
-  async restoreDump(dumpInfo: DumpInfo): Promise<void> {
-    // Log the time at which we started the restore process
-    const restoreStartTime = new Date()
-
-    // Download the dump file from S3
-    const command = new GetObjectCommand({
-      Bucket: this.BUCKET_NAME,
-      Key: dumpInfo.key,
-    })
-
-    console.log(`Downloading database dump: ${JSON.stringify(dumpInfo)}`)
-
-    const response: GetObjectCommandOutput = await this.s3Client.send(command)
-    if (!response.Body) {
-      throw new Error('No body in S3 response')
-    }
-
-    // Create a temporary file to store the dump
-    const tempFile = `/tmp/${dumpInfo.key.split('/').pop()}`
-    const client: PoolClient = await this.pool.connect()
-
-    // Start a transaction to ensure data consistency during restore
-    await client.query('BEGIN')
+  async acquireRestoreLock(processorName: string): Promise<boolean> {
+    const client = await this.pool.connect()
 
     try {
-      // Write the compressed file
-      const writeStream = createWriteStream(tempFile)
-      await new Promise((resolve, reject) => {
-        const stream = response.Body as any
-        // const stream = createReadStream('dumps/dump_oethb-processor_30148800.sql.gz')
-        stream.pipe(writeStream).on('error', reject).on('finish', resolve)
+      await client.query('BEGIN')
+
+      // Check if there's an existing lock
+      const existingLock = await client.query('SELECT data FROM "util_cache" WHERE id = $1', [this.LOCK_KEY])
+
+      if (existingLock.rows.length > 0) {
+        const lockData: RestoreLock = existingLock.rows[0].data
+        const lockTimestamp = new Date(lockData.timestamp)
+        const now = new Date()
+
+        // Check if the lock has expired
+        if (now.getTime() - lockTimestamp.getTime() > this.LOCK_TIMEOUT_MS) {
+          console.log(`Removing expired restore lock for processor: ${lockData.processorName}`)
+          await client.query('DELETE FROM "util_cache" WHERE id = $1', [this.LOCK_KEY])
+        } else {
+          // Lock is still valid
+          await client.query('ROLLBACK')
+          console.log(`Restore operation already in progress for processor: ${lockData.processorName}`)
+          return false
+        }
+      }
+
+      // Acquire the lock
+      const lockData: RestoreLock = {
+        processorName,
+        timestamp: new Date().toISOString(),
+        processId: process.pid.toString(),
+      }
+
+      await client.query('INSERT INTO "util_cache" (id, data) VALUES ($1, $2)', [this.LOCK_KEY, lockData])
+
+      await client.query('COMMIT')
+      console.log(`Acquired restore lock for processor: ${processorName}`)
+      return true
+    } catch (error) {
+      await client.query('ROLLBACK')
+      console.error('Error acquiring restore lock:', error)
+      return false
+    } finally {
+      client.release()
+    }
+  }
+
+  async releaseRestoreLock(processorName: string): Promise<void> {
+    const client = await this.pool.connect()
+
+    try {
+      await client.query('BEGIN')
+
+      // Check if we own the lock
+      const existingLock = await client.query('SELECT data FROM "util_cache" WHERE id = $1', [this.LOCK_KEY])
+
+      if (existingLock.rows.length > 0) {
+        const lockData: RestoreLock = existingLock.rows[0].data
+
+        if (lockData.processorName === processorName && lockData.processId === process.pid.toString()) {
+          await client.query('DELETE FROM "util_cache" WHERE id = $1', [this.LOCK_KEY])
+          console.log(`Released restore lock for processor: ${processorName}`)
+        } else {
+          console.warn(`Cannot release lock: owned by ${lockData.processorName} (PID: ${lockData.processId})`)
+        }
+      }
+
+      await client.query('COMMIT')
+    } catch (error) {
+      await client.query('ROLLBACK')
+      console.error('Error releasing restore lock:', error)
+    } finally {
+      client.release()
+    }
+  }
+
+  async waitForRestoreLock(processorName: string, maxWaitMs: number = 60 * 60 * 1000): Promise<boolean> {
+    const startTime = Date.now()
+    const checkInterval = 30000 // Check every 30 seconds
+
+    while (Date.now() - startTime < maxWaitMs) {
+      if (await this.acquireRestoreLock(processorName)) {
+        return true
+      }
+
+      console.log(
+        `Waiting for restore lock to be available... (${Math.round((Date.now() - startTime) / 1000)}s elapsed)`,
+      )
+      await new Promise((resolve) => setTimeout(resolve, checkInterval))
+    }
+
+    console.error(`Timeout waiting for restore lock after ${maxWaitMs / 1000} seconds`)
+    return false
+  }
+
+  async restoreDump(dumpInfo: DumpInfo): Promise<void> {
+    // Acquire restore lock to ensure serial execution
+    const lockAcquired = await this.acquireRestoreLock(dumpInfo.processorName)
+    if (!lockAcquired && !(await this.waitForRestoreLock(dumpInfo.processorName))) {
+      throw new Error(`Cannot start restore: another restore operation is already in progress`)
+    }
+
+    try {
+      // Log the time at which we started the restore process
+      const restoreStartTime = new Date()
+
+      // Download the dump file from S3
+      const command = new GetObjectCommand({
+        Bucket: this.BUCKET_NAME,
+        Key: dumpInfo.key,
       })
 
-      // Create a transform stream to execute COPY commands
-      let copyCommand: string | null = null
-      let copyCommandData: string[] = []
-      let partial: string | null = null
-      let entityCount = 0
+      console.log(`Downloading database dump: ${JSON.stringify(dumpInfo)}`)
 
-      let entitiesToIgnore = ['util_cache']
+      const response: GetObjectCommandOutput = await this.s3Client.send(command)
+      if (!response.Body) {
+        throw new Error('No body in S3 response')
+      }
 
-      const processLines = new Transform({
-        objectMode: true,
-        transform: function (
-          this: DBDumpManager,
-          chunk: Uint8Array,
-          encoding: string,
-          callback: (error?: Error | null) => void,
-        ) {
-          try {
-            // Convert chunk to string for processing
-            const chunkStr = Buffer.from(chunk).toString('utf8')
+      // Create a temporary file to store the dump
+      const tempFile = `/tmp/${dumpInfo.key.split('/').pop()}`
+      const client: PoolClient = await this.pool.connect()
 
-            // If we have a partial line from the previous chunk, prepend it
-            const fullChunk = partial ? partial + chunkStr : chunkStr
-            const lines = fullChunk.split('\n')
+      // Start a transaction to ensure data consistency during restore
+      await client.query('BEGIN')
 
-            // Keep the last line as partial if it doesn't end with a newline
-            partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
+      try {
+        // Write the compressed file
+        const writeStream = createWriteStream(tempFile)
+        await new Promise((resolve, reject) => {
+          const stream = response.Body as any
+          // const stream = createReadStream('dumps/dump_oethb-processor_30148800.sql.gz')
+          stream.pipe(writeStream).on('error', reject).on('finish', resolve)
+        })
 
-            let action = async () => {
-              for (const line of lines) {
-                const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
-                if (line.startsWith('COPY ') && !shouldIgnore) {
-                  copyCommand = line
-                  copyCommandData = []
-                  entityCount = 0
-                } else if (line === '\\.') {
-                  if (copyCommandData.length > 0) {
-                    const stream = client.query(copyFrom(copyCommand!))
-                    const readable = Readable.from(copyCommandData)
-                    await pipeline(readable, stream)
-                    stream.end()
-                    entityCount += copyCommandData.length
+        // Create a transform stream to execute COPY commands
+        let copyCommand: string | null = null
+        let copyCommandData: string[] = []
+        let partial: string | null = null
+        let entityCount = 0
+
+        let entitiesToIgnore = ['util_cache']
+
+        const processLines = new Transform({
+          objectMode: true,
+          transform: function (
+            this: DBDumpManager,
+            chunk: Uint8Array,
+            encoding: string,
+            callback: (error?: Error | null) => void,
+          ) {
+            try {
+              // Convert chunk to string for processing
+              const chunkStr = Buffer.from(chunk).toString('utf8')
+
+              // If we have a partial line from the previous chunk, prepend it
+              const fullChunk = partial ? partial + chunkStr : chunkStr
+              const lines = fullChunk.split('\n')
+
+              // Keep the last line as partial if it doesn't end with a newline
+              partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
+
+              let action = async () => {
+                for (const line of lines) {
+                  const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
+                  if (line.startsWith('COPY ') && !shouldIgnore) {
+                    copyCommand = line
+                    copyCommandData = []
+                    entityCount = 0
+                  } else if (line === '\\.') {
+                    if (copyCommandData.length > 0) {
+                      const stream = client.query(copyFrom(copyCommand!))
+                      const readable = Readable.from(copyCommandData)
+                      await pipeline(readable, stream)
+                      stream.end()
+                      entityCount += copyCommandData.length
+                    }
+                    if (entityCount > 0) {
+                      console.log(copyCommand, `(${entityCount} entities)`)
+                    }
+                    copyCommand = null
+                    copyCommandData = []
+                  } else if (copyCommand && line.length > 0) {
+                    copyCommandData.push(line + '\n')
                   }
-                  if (entityCount > 0) {
-                    console.log(copyCommand, `(${entityCount} entities)`)
-                  }
-                  copyCommand = null
+                }
+
+                if (copyCommandData.length > 10000) {
+                  const stream = client.query(copyFrom(copyCommand!))
+                  const readable = Readable.from(copyCommandData)
+                  await pipeline(readable, stream)
+                  stream.end()
+                  entityCount += copyCommandData.length
                   copyCommandData = []
-                } else if (copyCommand && line.length > 0) {
-                  copyCommandData.push(line + '\n')
                 }
               }
 
-              if (copyCommandData.length > 10000) {
-                const stream = client.query(copyFrom(copyCommand!))
-                const readable = Readable.from(copyCommandData)
-                await pipeline(readable, stream)
-                stream.end()
-                entityCount += copyCommandData.length
-                copyCommandData = []
-              }
+              action()
+                .then(() => callback())
+                .catch(callback)
+            } catch (error) {
+              console.error('Error processing chunk:', error)
+              callback(error as Error)
             }
+          }.bind(this),
+        })
 
-            action()
-              .then(() => callback())
-              .catch(callback)
-          } catch (error) {
-            console.error('Error processing chunk:', error)
-            callback(error as Error)
-          }
-        }.bind(this),
-      })
+        // Stream the file through decompression and SQL execution
+        console.log('Starting database data restore...')
+        await pipeline(createReadStream(tempFile), createGunzip(), processLines)
 
-      // Stream the file through decompression and SQL execution
-      console.log('Starting database data restore...')
-      await pipeline(createReadStream(tempFile), createGunzip(), processLines)
-
-      // Clean up the temporary file
-      unlinkSync(tempFile)
-
-      // Mark as restored with block height
-      await this.markDumpAsRestored({
-        client,
-        processorName: dumpInfo.processorName,
-        blockHeight: dumpInfo.blockHeight,
-      })
-
-      // Update the processing status table with the start time
-      await this.updateProcessingStatus(client, dumpInfo.processorName, restoreStartTime)
-
-      await client.query('COMMIT')
-
-      console.log('Database dump restored successfully')
-      console.log(`Inserted ${entityCount} entities`)
-    } catch (error) {
-      // Clean up the temporary file in case of error
-      try {
+        // Clean up the temporary file
         unlinkSync(tempFile)
-      } catch (e) {
-        // Ignore cleanup errors
+
+        // Mark as restored with block height
+        await this.markDumpAsRestored({
+          client,
+          processorName: dumpInfo.processorName,
+          blockHeight: dumpInfo.blockHeight,
+        })
+
+        // Update the processing status table with the start time
+        await this.updateProcessingStatus(client, dumpInfo.processorName, restoreStartTime)
+
+        await client.query('COMMIT')
+
+        console.log('Database dump restored successfully')
+        console.log(`Inserted ${entityCount} entities`)
+      } catch (error) {
+        await client.query('ROLLBACK')
+        // Clean up the temporary file in case of error
+        try {
+          unlinkSync(tempFile)
+        } catch (e) {
+          // Ignore cleanup errors
+        }
+        console.error('Error restoring database dump:', error)
+        throw error
+      } finally {
+        client.release()
       }
-      console.error('Error restoring database dump:', error)
-      throw error
     } finally {
-      client.release()
+      // Always release the lock, even if an error occurred
+      await this.releaseRestoreLock(dumpInfo.processorName)
     }
   }
 
