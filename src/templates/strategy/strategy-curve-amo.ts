@@ -58,9 +58,6 @@ const getCurveAMOStrategyHoldings = async (
 }
 
 export const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {
-  if (strategyData.address === '0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63') {
-    return getConvexEthMetaStrategyBalances(ctx, block, strategyData)
-  }
   return await Promise.all(
     strategyData.assets
       .filter((asset) => asset.checkBalance !== false)

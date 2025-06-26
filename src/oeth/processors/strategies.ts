@@ -32,10 +32,12 @@ export const oethStrategies: readonly IStrategyData[] = [
       rewardsPoolAddress: '0x24b65dc1cf053a8d96872c323d29e86ec43eb33a',
     },
     base: { address: mainnetCurrencies.ETH, decimals: 18 },
-    assets: [ETH_ADDRESS, OETH_ADDRESS].map((address) => ({
-      address,
-      decimals: 18,
-    })),
+    assets: [
+      {
+        address: WETH_ADDRESS,
+        decimals: 18,
+      },
+    ],
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
   },
   {

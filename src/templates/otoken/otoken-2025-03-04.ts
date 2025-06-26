@@ -168,7 +168,7 @@ export class OToken_2025_03_04 {
 
     const creditsPerToken = this._creditsPerToken(_account)
     const creditBalance = this.creditBalances[_account] || 0n
-    const baseBalance = (creditBalance * 10n ** 18n) / creditsPerToken
+    const baseBalance = creditsPerToken > 0n ? (creditBalance * 10n ** 18n) / creditsPerToken : 0n
 
     if (state === RebaseOptions.YieldDelegationTarget) {
       // creditBalances of yieldFrom accounts equals token balances

@@ -65,7 +65,7 @@ export const ousdStrategies: readonly IStrategyData[] = [
     kind: 'Generic',
     name: 'OUSD Curve AMO',
     contractName: 'CurveAMOStrategy',
-    address: mainnetAddresses.strategies.ousd.OUSDCurveAMOStrategy,
+    address: mainnetAddresses.strategies.ousd.CurveUSDCAMOStrategy,
     base: { address: mainnetCurrencies.USD, decimals: 18 },
     assets: [USDC],
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
