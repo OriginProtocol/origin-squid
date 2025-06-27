@@ -13,11 +13,9 @@ export class ERC20State {
     @IntColumn_({nullable: false})
     chainId!: number
 
-    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
-    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 

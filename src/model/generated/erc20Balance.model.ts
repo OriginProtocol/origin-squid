@@ -13,11 +13,9 @@ export class ERC20Balance {
     @IntColumn_({nullable: false})
     chainId!: number
 
-    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
-    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 
@@ -25,7 +23,6 @@ export class ERC20Balance {
     @StringColumn_({nullable: false})
     address!: string
 
-    @Index_()
     @StringColumn_({nullable: false})
     account!: string
 

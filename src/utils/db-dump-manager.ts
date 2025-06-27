@@ -43,6 +43,10 @@ export class DBDumpManager {
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
+      connectionTimeoutMillis: 60000, // 60 seconds to establish connection
+      idleTimeoutMillis: 600000, // 10 minutes before closing idle connections
+      query_timeout: 1800000, // 30 minutes for long-running queries
+      statement_timeout: 1800000, // 30 minutes server-side statement timeout
     })
 
     this.s3Client = new S3Client({
@@ -274,8 +278,9 @@ export class DBDumpManager {
           stream.pipe(writeStream).on('error', reject).on('finish', resolve)
         })
 
-        // Create a transform stream to execute COPY commands
+        // Create a transform stream to execute COPY commands with staging tables
         let copyCommand: string | null = null
+        let tableName: string | null = null
         let copyCommandData: string[] = []
         let partial: string | null = null
         let entityCount = 0
@@ -301,31 +306,72 @@ export class DBDumpManager {
               // Keep the last line as partial if it doesn't end with a newline
               partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
 
+              const tablesWithConflicts = ['exchange_rate']
+
               let action = async () => {
                 for (const line of lines) {
                   const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
                   if (line.startsWith('COPY ') && !shouldIgnore) {
-                    copyCommand = line
-                    copyCommandData = []
-                    entityCount = 0
+                    // Extract table name from COPY command
+                    const match = line.match(/COPY (?:"?(?:\w+\.)?(\w+)"?)/)
+                    if (match) {
+                      tableName = match[1] // Just the table name, ignoring schema
+
+                      // Only use staging table for exchange_rate table
+                      if (tablesWithConflicts.includes(tableName)) {
+                        const stagingTableName = `restore_${tableName}`
+
+                        // Create staging table
+                        await client.query(`CREATE TEMP TABLE ${stagingTableName} (LIKE ${tableName} INCLUDING ALL)`)
+
+                        // Modify COPY command to use staging table
+                        copyCommand = line.replace(tableName, stagingTableName).replace('public.', '')
+                      } else {
+                        // Use direct COPY for all other tables
+                        copyCommand = line
+                      }
+
+                      copyCommandData = []
+                      entityCount = 0
+                    }
                   } else if (line === '\\.') {
-                    if (copyCommandData.length > 0) {
+                    if (copyCommandData.length > 0 && tableName) {
+                      // Copy data to target
                       const stream = client.query(copyFrom(copyCommand!))
                       const readable = Readable.from(copyCommandData)
                       await pipeline(readable, stream)
                       stream.end()
                       entityCount += copyCommandData.length
+
+                      // Handle staging table approach for exchange_rate
+                      if (tablesWithConflicts.includes(tableName)) {
+                        const stagingTableName = `restore_${tableName}`
+
+                        // Transfer data from staging to target table with conflict resolution
+                        const insertResult = await client.query(`
+                          INSERT INTO ${tableName}
+                          SELECT * FROM ${stagingTableName}
+                          ON CONFLICT (id) DO NOTHING
+                        `)
+
+                        console.log(`${tableName}: ${entityCount} entities, ${insertResult.rowCount} inserted (staged)`)
+
+                        // Clean up staging table
+                        await client.query(`DROP TABLE ${stagingTableName}`)
+                      } else {
+                        console.log(`${tableName}: ${entityCount} entities (direct)`)
+                      }
                     }
-                    if (entityCount > 0) {
-                      console.log(copyCommand, `(${entityCount} entities)`)
-                    }
+
                     copyCommand = null
+                    tableName = null
                     copyCommandData = []
                   } else if (copyCommand && line.length > 0) {
                     copyCommandData.push(line + '\n')
                   }
                 }
 
+                // Handle large batches by periodically flushing to staging table
                 if (copyCommandData.length > 10000) {
                   const stream = client.query(copyFrom(copyCommand!))
                   const readable = Readable.from(copyCommandData)
