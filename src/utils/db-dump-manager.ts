@@ -306,6 +306,8 @@ export class DBDumpManager {
               // Keep the last line as partial if it doesn't end with a newline
               partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
 
+              const tablesWithConflicts = ['exchange_rate']
+
               let action = async () => {
                 for (const line of lines) {
                   const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
@@ -314,38 +316,51 @@ export class DBDumpManager {
                     const match = line.match(/COPY (?:"?(?:\w+\.)?(\w+)"?)/)
                     if (match) {
                       tableName = match[1] // Just the table name, ignoring schema
-                      const stagingTableName = `restore_${tableName}`
 
-                      // Create staging table
-                      await client.query(`CREATE TEMP TABLE ${stagingTableName} (LIKE ${tableName} INCLUDING ALL)`)
+                      // Only use staging table for exchange_rate table
+                      if (tablesWithConflicts.includes(tableName)) {
+                        const stagingTableName = `restore_${tableName}`
 
-                      // Modify COPY command to use staging table
-                      copyCommand = line.replace(tableName, stagingTableName).replace('public.', '')
+                        // Create staging table
+                        await client.query(`CREATE TEMP TABLE ${stagingTableName} (LIKE ${tableName} INCLUDING ALL)`)
+
+                        // Modify COPY command to use staging table
+                        copyCommand = line.replace(tableName, stagingTableName).replace('public.', '')
+                      } else {
+                        // Use direct COPY for all other tables
+                        copyCommand = line
+                      }
+
                       copyCommandData = []
                       entityCount = 0
                     }
                   } else if (line === '\\.') {
                     if (copyCommandData.length > 0 && tableName) {
-                      const stagingTableName = `restore_${tableName}`
-
-                      // Copy data to staging table
+                      // Copy data to target
                       const stream = client.query(copyFrom(copyCommand!))
                       const readable = Readable.from(copyCommandData)
                       await pipeline(readable, stream)
                       stream.end()
                       entityCount += copyCommandData.length
 
-                      // Transfer data from staging to target table with conflict resolution
-                      const insertResult = await client.query(`
-                        INSERT INTO ${tableName}
-                        SELECT * FROM ${stagingTableName}
-                        ON CONFLICT (id) DO NOTHING
-                      `)
+                      // Handle staging table approach for exchange_rate
+                      if (tablesWithConflicts.includes(tableName)) {
+                        const stagingTableName = `restore_${tableName}`
 
-                      console.log(`${copyCommand} (${entityCount} entities, ${insertResult.rowCount} inserted)`)
+                        // Transfer data from staging to target table with conflict resolution
+                        const insertResult = await client.query(`
+                          INSERT INTO ${tableName}
+                          SELECT * FROM ${stagingTableName}
+                          ON CONFLICT (id) DO NOTHING
+                        `)
 
-                      // Clean up staging table
-                      await client.query(`DROP TABLE ${stagingTableName}`)
+                        console.log(`${tableName}: ${entityCount} entities, ${insertResult.rowCount} inserted (staged)`)
+
+                        // Clean up staging table
+                        await client.query(`DROP TABLE ${stagingTableName}`)
+                      } else {
+                        console.log(`${tableName}: ${entityCount} entities (direct)`)
+                      }
                     }
 
                     copyCommand = null
