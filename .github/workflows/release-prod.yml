@@ -34,3 +34,8 @@ jobs:
 
           # Update prod tag
           sqd tags add prod --name origin-squid -s $VERSION --allow-tag-reassign
+
+      - name: update grafana datasource
+        env:
+          GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
+        run: node scripts/update-grafana-ds.js
