@@ -274,8 +274,9 @@ export class DBDumpManager {
           stream.pipe(writeStream).on('error', reject).on('finish', resolve)
         })
 
-        // Create a transform stream to execute COPY commands
+        // Create a transform stream to execute COPY commands with staging tables
         let copyCommand: string | null = null
+        let tableName: string | null = null
         let copyCommandData: string[] = []
         let partial: string | null = null
         let entityCount = 0
@@ -305,28 +306,54 @@ export class DBDumpManager {
                 for (const line of lines) {
                   const shouldIgnore = entitiesToIgnore.some((entity) => line.includes(entity))
                   if (line.startsWith('COPY ') && !shouldIgnore) {
-                    copyCommand = line
-                    copyCommandData = []
-                    entityCount = 0
+                    // Extract table name from COPY command
+                    const match = line.match(/COPY (?:"?(?:\w+\.)?(\w+)"?)/)
+                    if (match) {
+                      tableName = match[1] // Just the table name, ignoring schema
+                      const stagingTableName = `restore_${tableName}`
+
+                      // Create staging table
+                      await client.query(`CREATE TEMP TABLE ${stagingTableName} (LIKE ${tableName} INCLUDING ALL)`)
+
+                      // Modify COPY command to use staging table
+                      copyCommand = line.replace(tableName, stagingTableName).replace('public.', '')
+                      copyCommandData = []
+                      entityCount = 0
+                    }
                   } else if (line === '\\.') {
-                    if (copyCommandData.length > 0) {
+                    if (copyCommandData.length > 0 && tableName) {
+                      const stagingTableName = `restore_${tableName}`
+
+                      // Copy data to staging table
                       const stream = client.query(copyFrom(copyCommand!))
                       const readable = Readable.from(copyCommandData)
                       await pipeline(readable, stream)
                       stream.end()
                       entityCount += copyCommandData.length
+
+                      // Transfer data from staging to target table with conflict resolution
+                      const insertResult = await client.query(`
+                        INSERT INTO ${tableName}
+                        SELECT * FROM ${stagingTableName}
+                        ON CONFLICT (id) DO NOTHING
+                      `)
+
+                      console.log(`${copyCommand} (${entityCount} entities, ${insertResult.rowCount} inserted)`)
+
+                      // Clean up staging table
+                      await client.query(`DROP TABLE ${stagingTableName}`)
                     }
-                    if (entityCount > 0) {
-                      console.log(copyCommand, `(${entityCount} entities)`)
-                    }
+
                     copyCommand = null
+                    tableName = null
                     copyCommandData = []
                   } else if (copyCommand && line.length > 0) {
                     copyCommandData.push(line + '\n')
                   }
                 }
 
-                if (copyCommandData.length > 10000) {
+                // Handle large batches by periodically flushing to staging table
+                if (copyCommandData.length > 100000) {
                   const stream = client.query(copyFrom(copyCommand!))
                   const readable = Readable.from(copyCommandData)
                   await pipeline(readable, stream)
