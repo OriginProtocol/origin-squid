@@ -32,11 +32,9 @@ export class OTokenHistory {
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
-    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 
-    @Index_()
     @StringColumn_({nullable: false})
     txHash!: string
 

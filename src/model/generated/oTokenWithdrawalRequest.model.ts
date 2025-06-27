@@ -13,11 +13,9 @@ export class OTokenWithdrawalRequest {
     @IntColumn_({nullable: false})
     chainId!: number
 
-    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 
-    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
@@ -40,7 +38,6 @@ export class OTokenWithdrawalRequest {
     @BooleanColumn_({nullable: false})
     claimed!: boolean
 
-    @Index_()
     @StringColumn_({nullable: false})
     txHash!: string
 }

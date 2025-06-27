@@ -26,14 +26,12 @@ export class ERC20Transfer {
     @StringColumn_({nullable: false})
     address!: string
 
-    @Index_()
     @StringColumn_({nullable: false})
     from!: string
 
     @BigIntColumn_({nullable: false})
     fromBalance!: bigint
 
-    @Index_()
     @StringColumn_({nullable: false})
     to!: string
 

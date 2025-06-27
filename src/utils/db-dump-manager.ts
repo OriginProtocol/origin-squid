@@ -43,6 +43,10 @@ export class DBDumpManager {
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
+      connectionTimeoutMillis: 60000, // 60 seconds to establish connection
+      idleTimeoutMillis: 600000, // 10 minutes before closing idle connections
+      query_timeout: 1800000, // 30 minutes for long-running queries
+      statement_timeout: 1800000, // 30 minutes server-side statement timeout
     })
 
     this.s3Client = new S3Client({
