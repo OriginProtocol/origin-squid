@@ -18,9 +18,8 @@ import {
   sumBigIntBy,
 } from '@originprotocol/squid-utils'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
-import { OETH_ADDRESS, OUSD_ADDRESS, arm } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-import { sonicAddresses } from '@utils/addresses-sonic'
+import { armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
 
@@ -30,15 +29,6 @@ export const protocolProcessor = defineProcessor({
     processor.includeAllBlocks({ from: 15000000 })
   },
   process: async (ctx: Context) => {
-    const otokenProducts = [
-      { product: 'OUSD', processorId: 'ousd', otokenAddress: OUSD_ADDRESS },
-      { product: 'OETH', processorId: 'oeth', otokenAddress: OETH_ADDRESS },
-      { product: 'superOETHb', processorId: 'base', otokenAddress: baseAddresses.superOETHb.address },
-      { product: 'OS', processorId: 'sonic', otokenAddress: sonicAddresses.OS.address },
-    ]
-
-    const armProducts = [{ product: 'ARM-WETH-stETH', processorId: 'mainnet', armAddress: arm.address }]
-
     // Generate all product details
     let details = await Promise.all([
       ...otokenProducts.map((p) => getOTokenDetails(ctx, p)),
