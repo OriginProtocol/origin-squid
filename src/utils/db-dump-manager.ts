@@ -353,7 +353,7 @@ export class DBDumpManager {
                 }
 
                 // Handle large batches by periodically flushing to staging table
-                if (copyCommandData.length > 100000) {
+                if (copyCommandData.length > 10000) {
                   const stream = client.query(copyFrom(copyCommand!))
                   const readable = Readable.from(copyCommandData)
                   await pipeline(readable, stream)
