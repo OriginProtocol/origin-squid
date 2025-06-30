@@ -11,7 +11,7 @@ type ERC20Holder @entity {
   id: ID!
   chainId: Int! @index
   address: String! @index
-  account: String!
+  account: String! @index
   since: DateTime! @index
   balance: BigInt!
 }
@@ -19,8 +19,8 @@ type ERC20Holder @entity {
 type ERC20State @entity {
   id: ID!
   chainId: Int! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   address: String! @index
   totalSupply: BigInt!
   holderCount: Int!
@@ -29,8 +29,8 @@ type ERC20State @entity {
 type ERC20StateByDay @entity {
   id: ID!
   chainId: Int! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   date: String! @index
   address: String! @index
   totalSupply: BigInt!
@@ -40,10 +40,10 @@ type ERC20StateByDay @entity {
 type ERC20Balance @entity {
   id: ID!
   chainId: Int! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   address: String! @index
-  account: String!
+  account: String! @index
   balance: BigInt!
 }
 
@@ -54,9 +54,9 @@ type ERC20Transfer @entity {
   blockNumber: Int!
   timestamp: DateTime!
   address: String! @index
-  from: String!
+  from: String! @index
   fromBalance: BigInt!
-  to: String!
+  to: String! @index
   toBalance: BigInt!
   value: BigInt!
 }

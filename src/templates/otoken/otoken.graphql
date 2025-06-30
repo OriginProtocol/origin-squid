@@ -2,8 +2,8 @@ type OToken @entity {
   id: ID! @index
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   unallocatedSupply: BigInt!
   totalSupply: BigInt!
   rebasingSupply: BigInt!
@@ -16,8 +16,8 @@ type OTokenRawData @entity {
   id: ID! @index
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   type: String!
   data: JSON!
 }
@@ -26,8 +26,8 @@ type WOToken @entity {
   id: ID! @index
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   totalAssets: BigInt!
   totalSupply: BigInt!
   assetsPerShare: BigInt!
@@ -68,8 +68,8 @@ type OTokenHistory @entity {
   value: BigInt!
   balance: BigInt!
   timestamp: DateTime!
-  blockNumber: Int!
-  txHash: String!
+  blockNumber: Int! @index
+  txHash: String! @index
   type: HistoryType!
 }
 
@@ -77,9 +77,9 @@ type OTokenRebase @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
-  txHash: String!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
   totalSupply: BigInt!
   rebasingCredits: BigInt!
   rebasingCreditsPerToken: BigInt!
@@ -96,9 +96,9 @@ type OTokenRebaseOption @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
-  txHash: String!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
   address: OTokenAddress!
   status: RebasingOption!
   delegatedTo: String
@@ -108,9 +108,9 @@ type OTokenAPY @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
-  txHash: String!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
   date: String! @index
   apr: Float!
   apy: Float!
@@ -124,8 +124,8 @@ type OTokenVault @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
   address: String! @index
   vaultBuffer: BigInt!
   totalValue: BigInt!
@@ -135,9 +135,9 @@ type OTokenActivity @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
-  timestamp: DateTime!
-  blockNumber: Int!
-  txHash: String!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  txHash: String! @index
   type: OTokenActivityType
   data: JSON
 }
@@ -164,8 +164,8 @@ enum OTokenActivityType {
 type OTokenDailyStat @entity {
   id: ID! # chain-otokenAddress-YYYY-MM-DD
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   date: String! @index
 
@@ -199,8 +199,8 @@ type OTokenDailyStat @entity {
 type OTokenDripperState @entity {
   id: ID! # chain-otokenAddress-blockNumber
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   wethBalance: BigInt!
   availableFunds: BigInt!
@@ -214,8 +214,8 @@ type OTokenDripperState @entity {
 type OTokenHarvesterYieldSent @entity {
   id: ID! # log.id
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   txHash: String!
   yield: BigInt!
@@ -225,8 +225,8 @@ type OTokenHarvesterYieldSent @entity {
 type OTokenRewardTokenCollected @entity {
   id: ID!
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   strategy: String!
   recipient: String!
@@ -237,22 +237,22 @@ type OTokenRewardTokenCollected @entity {
 type OTokenWithdrawalRequest @entity {
   id: ID!
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   requestId: BigInt!
   withdrawer: String!
   amount: BigInt!
   queued: BigInt!
   claimed: Boolean!
-  txHash: String!
+  txHash: String! @index
 }
 
 type OTokenYieldForwarded @entity {
   id: ID!
   chainId: Int! @index
-  blockNumber: Int!
-  timestamp: DateTime!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
   otoken: String! @index
   from: String!
   to: String!
