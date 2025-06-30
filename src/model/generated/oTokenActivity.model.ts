@@ -18,12 +18,15 @@ export class OTokenActivity {
     @StringColumn_({nullable: false})
     otoken!: string
 
+    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
+    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @StringColumn_({nullable: false})
     txHash!: string
 

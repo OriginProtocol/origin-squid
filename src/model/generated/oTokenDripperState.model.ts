@@ -13,9 +13,11 @@ export class OTokenDripperState {
     @IntColumn_({nullable: false})
     chainId!: number
 
+    @Index_()
     @IntColumn_({nullable: false})
     blockNumber!: number
 
+    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 

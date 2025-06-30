@@ -17,6 +17,7 @@ export class ERC20Holder {
     @StringColumn_({nullable: false})
     address!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
     account!: string
 
