@@ -81,13 +81,35 @@ const otokenProcessor = createOTokenProcessor2({
   getAmoSupply: async (ctx, height) => {
     if (height < 17297479) return 0n
     const oethContract = new erc20.Contract(ctx, { height }, OETH_ADDRESS)
-    const rewardPoolContract = new baseRewardPool.Contract(ctx, { height }, OETH_CURVE_REWARD_LP_ADDRESS)
-    const [poolBalance, rewardBalance, rewardTotal] = await Promise.all([
+    const amo1_rewardPoolContract = new baseRewardPool.Contract(ctx, { height }, OETH_CURVE_REWARD_LP_ADDRESS)
+
+    const [amo1_poolBalance, amo1_rewardBalance, amo1_rewardTotal] = await Promise.all([
       oethContract.balanceOf(CURVE_ETH_OETH_POOL_ADDRESS),
-      rewardPoolContract.balanceOf(strategies.oeth.ConvexEthMetaStrategy),
-      rewardPoolContract.totalSupply(),
+      amo1_rewardPoolContract.balanceOf(strategies.oeth.ConvexEthMetaStrategy),
+      amo1_rewardPoolContract.totalSupply(),
     ])
-    return (poolBalance * rewardBalance) / rewardTotal
+    const amo1Supply = (amo1_poolBalance * amo1_rewardBalance) / amo1_rewardTotal
+
+    if (height < 22423606) return amo1Supply
+
+    const amo2_gaugeContract = new erc20.Contract(ctx, { height }, '0x36cc1d791704445a5b6b9c36a667e511d4702f3f')
+    const amo2_rewardPoolContract = new baseRewardPool.Contract(
+      ctx,
+      { height },
+      '0xac15fffdca77fc86770beaba20cbc1bc2d00494c',
+    )
+    const [amo2_poolBalance, amo2_gaugeBalance, amo2_gaugeTotal, amo2_rewardBalance, amo2_rewardTotal] =
+      await Promise.all([
+        oethContract.balanceOf('0xcc7d5785ad5755b6164e21495e07adb0ff11c2a8'), // Balance of Pool
+        amo2_gaugeContract.balanceOf('0xba0e352ab5c13861c26e4e773e7a833c3a223fe6'),
+        amo2_gaugeContract.totalSupply(),
+        amo2_rewardPoolContract.balanceOf('0xba0e352ab5c13861c26e4e773e7a833c3a223fe6'), // Balance of Reward Pool
+        amo2_rewardPoolContract.totalSupply(), // Supply of Reward Pool
+      ])
+    const amo2SupplyByGauge = amo2_gaugeTotal > 0 ? (amo2_poolBalance * amo2_gaugeBalance) / amo2_gaugeTotal : 0n
+    const amo2Supply = amo2_rewardTotal > 0 ? (amo2_poolBalance * amo2_rewardBalance) / amo2_rewardTotal : 0n
+
+    return amo1Supply + amo2Supply + amo2SupplyByGauge
   },
   accountsOverThresholdMinimum: parseEther('.1'),
 })

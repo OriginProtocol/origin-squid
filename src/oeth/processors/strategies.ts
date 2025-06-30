@@ -51,6 +51,7 @@ export const oethStrategies: readonly IStrategyData[] = [
     curvePoolInfo: {
       poolAddress: '0xcc7d5785ad5755b6164e21495e07adb0ff11c2a8',
       rewardsPoolAddress: '0xac15fffdca77fc86770beaba20cbc1bc2d00494c',
+      gaugeAddress: '0x36cc1d791704445a5b6b9c36a667e511d4702f3f',
     },
     base: { address: mainnetCurrencies.WETH, decimals: 18 },
     assets: [
