@@ -150,6 +150,7 @@ type OGNBuyback @entity {
   tokenSold: String!
   amountSold: BigInt!
   ognBought: BigInt!
+  ognBoughtUSD: Float!
 }
 type WalletLabels @entity {
   id: ID! @index

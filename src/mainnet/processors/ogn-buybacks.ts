@@ -1,8 +1,11 @@
 import { compact } from 'lodash'
+import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
 import { OGNBuyback } from '@model'
 import { defineProcessor, logFilter } from '@originprotocol/squid-utils'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OGN_ADDRESS, OGN_REWARDS_SOURCE_ADDRESS, XOGN_ADDRESS, addresses } from '@utils/addresses'
 
 const buybackOperators = [
@@ -51,6 +54,8 @@ export const ognBuybacks = defineProcessor({
           if (!transferFrom) return
 
           const tokenOut = transferFrom.log.address
+          const tokenRate = await ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD')
+
           const { from, value } = erc20Abi.events.Transfer.decode(log)
           if (from !== XOGN_ADDRESS) {
             const buyback = new OGNBuyback({
@@ -61,6 +66,12 @@ export const ognBuybacks = defineProcessor({
               tokenSold: tokenOut,
               amountSold: transferFrom.data.value,
               ognBought: value,
+              ognBoughtUSD: Number(
+                formatUnits(
+                  (transferFrom.data.value * (tokenRate?.rate ?? 0n)) / 10n ** BigInt(tokenRate?.decimals ?? 18),
+                  18,
+                ),
+              ),
             })
             buybacks.push(buyback)
           }

@@ -6,4 +6,5 @@ type OGNBuyback @entity {
   tokenSold: String!
   amountSold: BigInt!
   ognBought: BigInt!
+  ognBoughtUSD: Float!
 }
