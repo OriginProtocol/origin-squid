@@ -651,7 +651,10 @@ export class OTokenEntityProducer {
 
   async afterBlock() {
     if (!this.otoken) return
-    await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
+    const secondsNearDailyCrossover = Math.abs(dayjs.utc().endOf('day').diff(dayjs.utc(), 'seconds'))
+    if (this.ctx.blocksWithContent.length > 0 || secondsNearDailyCrossover < 60) {
+      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
+    }
     for (const info of this.yieldForwardInfo.values()) {
       this.yieldForwarded.push(
         new OTokenYieldForwarded({
