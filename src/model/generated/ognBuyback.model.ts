@@ -32,4 +32,7 @@ export class OGNBuyback {
 
     @FloatColumn_({nullable: false})
     ognBoughtUSD!: number
+
+    @StringColumn_({nullable: false})
+    txHash!: string
 }

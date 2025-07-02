@@ -1,5 +1,5 @@
-module.exports = class Data1751398417838 {
-    name = 'Data1751398417838'
+module.exports = class Data1751485188915 {
+    name = 'Data1751485188915'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -49,7 +49,7 @@ module.exports = class Data1751398417838 {
         await db.query(`CREATE TABLE "coin_gecko_coin_data" ("id" character varying NOT NULL, "product" text NOT NULL, "date" text NOT NULL, "vs_currency" text NOT NULL, "price" numeric NOT NULL, "market_cap" numeric NOT NULL, "trading_volume" numeric NOT NULL, CONSTRAINT "PK_abb8340f8d830c27b3288a1083c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_55f8b56cad28caa22a995dfb83" ON "coin_gecko_coin_data" ("product") `)
         await db.query(`CREATE INDEX "IDX_821542437abc5d0d6aa7959131" ON "coin_gecko_coin_data" ("date") `)
-        await db.query(`CREATE TABLE "ogn_buyback" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "operator" text NOT NULL, "token_sold" text NOT NULL, "amount_sold" numeric NOT NULL, "ogn_bought" numeric NOT NULL, "ogn_bought_usd" numeric NOT NULL, CONSTRAINT "PK_7a3b8c1f6b0f5d5c9ae759744d6" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ogn_buyback" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "operator" text NOT NULL, "token_sold" text NOT NULL, "amount_sold" numeric NOT NULL, "ogn_bought" numeric NOT NULL, "ogn_bought_usd" numeric NOT NULL, "tx_hash" text NOT NULL, CONSTRAINT "PK_7a3b8c1f6b0f5d5c9ae759744d6" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_daa406e4bd0f1313c9e54aab97" ON "ogn_buyback" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_854fb3714182df4d2ba943417a" ON "ogn_buyback" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_30396766a2f98c53fc916657e6" ON "ogn_buyback" ("operator") `)

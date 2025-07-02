@@ -9,8 +9,6 @@ import { createPoolsProcessor } from '@templates/pools'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
-import * as validate from './sonic/validate'
-
 export const processor = defineSquidProcessor({
   chainId: plumeMainnet.id,
   stateSchema: 'plume-processor',
@@ -21,7 +19,7 @@ export const processor = defineSquidProcessor({
     createPoolsProcessor(plumeMainnet.id),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('plume')],
-  validators: [validate],
+  validators: [],
   fields: DEFAULT_FIELDS,
 })
 

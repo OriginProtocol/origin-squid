@@ -72,6 +72,7 @@ export const ognBuybacks = defineProcessor({
                   18,
                 ),
               ),
+              txHash: log.transactionHash,
             })
             buybacks.push(buyback)
           }
