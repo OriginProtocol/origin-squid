@@ -54,7 +54,10 @@ export const ognBuybacks = defineProcessor({
           if (!transferFrom) return
 
           const tokenOut = transferFrom.log.address
-          const tokenRate = await ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD')
+          const [tokenOutDecimals, tokenRate] = await Promise.all([
+            new erc20Abi.Contract(ctx, block.header, tokenOut).decimals(),
+            ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD'),
+          ])
 
           const { from, value } = erc20Abi.events.Transfer.decode(log)
           if (from !== XOGN_ADDRESS) {
@@ -69,7 +72,7 @@ export const ognBuybacks = defineProcessor({
               ognBoughtUSD: Number(
                 formatUnits(
                   (transferFrom.data.value * (tokenRate?.rate ?? 0n)) / 10n ** BigInt(tokenRate?.decimals ?? 18),
-                  18,
+                  tokenOutDecimals,
                 ),
               ),
               txHash: log.transactionHash,
