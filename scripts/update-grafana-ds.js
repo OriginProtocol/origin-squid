@@ -31,7 +31,7 @@ async function main() {
   // Step 3: Update credentials
   ds.user = params.user
   ds.database = params.database
-  ds.secureJsonData = { password: params.password }
+  ds.password = params.password
   ds.version += 1
 
   // Step 4: PUT updated datasource
