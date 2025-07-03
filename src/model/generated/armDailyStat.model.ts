@@ -50,6 +50,15 @@ export class ArmDailyStat {
     @BigIntColumn_({nullable: false})
     assetsPerShare!: bigint
 
+    @BigIntColumn_({nullable: false})
+    totalDeposits!: bigint
+
+    @BigIntColumn_({nullable: false})
+    totalWithdrawals!: bigint
+
+    @BigIntColumn_({nullable: false})
+    totalWithdrawalsClaimed!: bigint
+
     @FloatColumn_({nullable: false})
     apr!: number
 

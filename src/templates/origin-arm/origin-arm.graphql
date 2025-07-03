@@ -38,6 +38,7 @@ type ArmState @entity {
   assetsPerShare: BigInt!
   totalDeposits: BigInt!
   totalWithdrawals: BigInt!
+  totalWithdrawalsClaimed: BigInt!
   totalYield: BigInt!
   totalFees: BigInt!
 }
@@ -56,6 +57,9 @@ type ArmDailyStat @entity {
   totalAssetsCap: BigInt!
   totalSupply: BigInt!
   assetsPerShare: BigInt!
+  totalDeposits: BigInt!
+  totalWithdrawals: BigInt!
+  totalWithdrawalsClaimed: BigInt!
   apr: Float!
   apy: Float!
   yield: BigInt!

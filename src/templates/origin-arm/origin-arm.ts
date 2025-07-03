@@ -258,6 +258,10 @@ export const createOriginARMProcessors = ({
               const state = await getCurrentState(block)
               state.totalWithdrawals += event.assets
               state.totalYield = calculateTotalYield(state)
+            } else if (redeemClaimedFilter.matches(log)) {
+              const event = originLidoArmAbi.events.RedeemClaimed.decode(log)
+              const state = await getCurrentState(block)
+              state.totalWithdrawalsClaimed += event.assets
             }
             if (feeCollectedFilter.matches(log)) {
               const event = originLidoArmAbi.events.FeeCollected.decode(log)
@@ -360,6 +364,9 @@ export const createOriginARMProcessors = ({
               totalAssetsCap: state.totalAssetsCap,
               totalSupply: state.totalSupply,
               assetsPerShare: state.assetsPerShare,
+              totalDeposits: state.totalDeposits,
+              totalWithdrawals: state.totalWithdrawals,
+              totalWithdrawalsClaimed: state.totalWithdrawalsClaimed,
               apr: armDayApy.apr,
               apy: armDayApy.apy,
               fees: state.totalFees - (yesterdayState?.totalFees ?? 0n),

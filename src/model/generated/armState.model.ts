@@ -53,6 +53,9 @@ export class ArmState {
     totalWithdrawals!: bigint
 
     @BigIntColumn_({nullable: false})
+    totalWithdrawalsClaimed!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalYield!: bigint
 
     @BigIntColumn_({nullable: false})
