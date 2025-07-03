@@ -207,6 +207,7 @@ export const createOriginARMProcessors = ({
             assetsPerShare,
             totalDeposits: previousState?.totalDeposits ?? 0n,
             totalWithdrawals: previousState?.totalWithdrawals ?? 0n,
+            totalWithdrawalsClaimed: previousState?.totalWithdrawalsClaimed ?? 0n,
             totalFees: previousState?.totalFees ?? 0n,
             totalYield: 0n,
           })
