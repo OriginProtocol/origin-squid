@@ -29,6 +29,7 @@ export const createOriginARMProcessors = ({
   armAddress,
   underlyingToken,
   capManagerAddress,
+  marketFrom,
   lidoArm,
 }: {
   name: string
@@ -36,6 +37,7 @@ export const createOriginARMProcessors = ({
   armAddress: string
   underlyingToken: Currency
   capManagerAddress: string
+  marketFrom?: number
   lidoArm: boolean
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
@@ -198,7 +200,7 @@ export const createOriginARMProcessors = ({
             controllerContract.totalAssetsCap(),
             armContract.totalSupply(),
             armContract.previewRedeem(10n ** 18n),
-            !lidoArm ? armContract.activeMarket() : Promise.resolve(undefined),
+            marketFrom && block.header.height >= marketFrom ? armContract.activeMarket() : Promise.resolve(undefined),
           ])
           const marketBalanceOf = activeMarket
             ? await new erc20Abi.Contract(ctx, block.header, activeMarket).balanceOf(armAddress)

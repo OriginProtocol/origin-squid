@@ -7,5 +7,6 @@ export const sonicArmProcessors = createOriginARMProcessors({
   armAddress: sonicAddresses.armOS.address,
   underlyingToken: 'S',
   capManagerAddress: sonicAddresses.armOS.capManager,
+  marketFrom: 37481525,
   lidoArm: false,
 })
