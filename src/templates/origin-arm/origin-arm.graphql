@@ -32,6 +32,7 @@ type ArmState @entity {
   assets0: BigInt!
   assets1: BigInt!
   outstandingAssets1: BigInt!
+  marketAssets: BigInt!
   totalAssets: BigInt!
   totalAssetsCap: BigInt!
   totalSupply: BigInt!
@@ -53,6 +54,7 @@ type ArmDailyStat @entity {
   assets0: BigInt!
   assets1: BigInt!
   outstandingAssets1: BigInt!
+  marketAssets: BigInt!
   totalAssets: BigInt!
   totalAssetsCap: BigInt!
   totalSupply: BigInt!

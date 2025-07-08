@@ -181,16 +181,32 @@ export const createOriginARMProcessors = ({
           const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
           const armContract = new originArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
-          const [assets0, assets1, outstandingAssets1, totalAssets, totalAssetsCap, totalSupply, assetsPerShare] =
-            await Promise.all([
-              new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
-              new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
-              lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.vaultWithdrawalAmount(),
-              armContract.totalAssets(),
-              controllerContract.totalAssetsCap(),
-              armContract.totalSupply(),
-              armContract.previewRedeem(10n ** 18n),
-            ])
+          const [
+            assets0,
+            assets1,
+            outstandingAssets1,
+            totalAssets,
+            totalAssetsCap,
+            totalSupply,
+            assetsPerShare,
+            activeMarket,
+          ] = await Promise.all([
+            new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
+            new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
+            lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.vaultWithdrawalAmount(),
+            armContract.totalAssets(),
+            controllerContract.totalAssetsCap(),
+            armContract.totalSupply(),
+            armContract.previewRedeem(10n ** 18n),
+            !lidoArm ? armContract.activeMarket() : Promise.resolve(undefined),
+          ])
+          const marketBalanceOf = activeMarket
+            ? await new erc20Abi.Contract(ctx, block.header, activeMarket).balanceOf(armAddress)
+            : 0n
+          const marketAssets =
+            activeMarket && marketBalanceOf > 0n
+              ? await new originArmAbi.Contract(ctx, block.header, activeMarket).previewRedeem(marketBalanceOf)
+              : 0n
           const date = new Date(block.header.timestamp)
           armStateEntity = new ArmState({
             id: stateId,
@@ -201,6 +217,7 @@ export const createOriginARMProcessors = ({
             assets0,
             assets1,
             outstandingAssets1,
+            marketAssets,
             totalAssets,
             totalAssetsCap,
             totalSupply,
@@ -361,6 +378,7 @@ export const createOriginARMProcessors = ({
               assets0: state.assets0,
               assets1: state.assets1,
               outstandingAssets1: state.outstandingAssets1,
+              marketAssets: state.marketAssets,
               totalAssets: state.totalAssets,
               totalAssetsCap: state.totalAssetsCap,
               totalSupply: state.totalSupply,
@@ -379,11 +397,13 @@ export const createOriginARMProcessors = ({
           }
         }
 
-        await ctx.store.insert(states)
-        await ctx.store.upsert([...dailyStatsMap.values()])
-        await ctx.store.upsert([...redemptionMap.values()])
-        await ctx.store.insert(swaps)
-        await tradeRateProcessor.process(ctx)
+        await Promise.all([
+          ctx.store.insert(states),
+          ctx.store.upsert([...dailyStatsMap.values()]),
+          ctx.store.upsert([...redemptionMap.values()]),
+          ctx.store.insert(swaps),
+          tradeRateProcessor.process(ctx),
+        ])
       },
     },
     // The ARM is an ERC20, so we can use the ERC20SimpleTracker to track holder balances
