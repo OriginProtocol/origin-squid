@@ -37,9 +37,14 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
   ])
   codeAtLatest = batchResult[0]
   codeAtBlock = batchResult[1]
+
+  // EIP-7702: https://eips.ethereum.org/EIPS/eip-7702
+  // Check if code length is 23 bytes and starts with 0xef0100
+  const eip7702 = codeAtBlock.length === 23 * 2 + 2 && codeAtBlock.startsWith('0xef0100')
+  const isEOA = codeAtBlock === '0x' || eip7702
   if (codeAtBlock === codeAtLatest) {
     cache.set(account, {
-      value: codeAtLatest !== '0x',
+      value: !isEOA,
       expiresAt: Date.now(),
       validFrom: block.header.timestamp,
     })
@@ -50,7 +55,7 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
   if (process.env.DEBUG_PERF === 'true') {
     ctx.log.info(`isContract ${count} ${time / count}`)
   }
-  return codeAtBlock !== '0x'
+  return !isEOA
 }
 
 /**
