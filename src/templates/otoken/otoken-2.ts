@@ -408,7 +408,9 @@ export const createOTokenProcessor2 = (params: {
           ['219568b0baaa5c41831401e6b696c97b537a770244bce9ed091a7991c8fb64b9']: OToken_2025_03_04, // OETH (Yield Forwarding)
           ['ecd02b3be735b1e4f5fadf1bf46627cb6f79fdda5cd36de813ceaa9dd712a4e8']: OToken_2025_03_04, // OS (Yield Forwarding)
           ['9458e80af8187b3f621118b0610274094566075cddc2eeaf05f70eeb00e582a9']: OToken_2025_03_04, // superOETHp (Yield Forwarding)
-          ['1cde8861b9a1320fbcdcfb5a008f9739a867e867aa89b8273b673ea2d263745b']: OToken_2025_03_04, // superOETHb (Unknown)
+          ['1cde8861b9a1320fbcdcfb5a008f9739a867e867aa89b8273b673ea2d263745b']: OToken_2025_03_04, // superOETHb (EIP7702)
+          ['d9ecfc9311872162e7364a6339b49461f61ed12d283e2a2e711492a10985fba0']: OToken_2025_03_04, // OETH (EIP7702)
+          ['54e613f760dfd74b6ca1ba5f071aba3645b8ba32fa5b2879fa2a0a0c627c55d1']: OToken_2025_03_04, // OUSD (EIP7702)
         } as const
         const ImplementationOTokenClass = implementations[implementationHash as keyof typeof implementations]
         if (ImplementationOTokenClass) {
