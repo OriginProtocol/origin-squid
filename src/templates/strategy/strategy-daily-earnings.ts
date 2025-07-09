@@ -87,7 +87,7 @@ export const processStrategyDailyEarnings = async (ctx: Context, blocks: Block[]
     current.earningsChange = earningsChange
 
     if (current.earnings < (latest?.earnings ?? 0n)) {
-      ctx.log.info('earnings went down :(')
+      // ctx.log.info('earnings went down :(')
       // throw new Error('how!??!?!')
     }
 

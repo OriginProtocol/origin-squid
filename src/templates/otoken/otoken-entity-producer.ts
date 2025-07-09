@@ -651,10 +651,6 @@ export class OTokenEntityProducer {
 
   async afterBlock() {
     if (!this.otoken) return
-    const secondsNearHourlyCrossover = Math.abs(dayjs.utc().endOf('hour').diff(dayjs.utc(), 'seconds'))
-    if (this.ctx.blocksWithContent.length > 0 || secondsNearHourlyCrossover < 20) {
-      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
-    }
     for (const info of this.yieldForwardInfo.values()) {
       this.yieldForwarded.push(
         new OTokenYieldForwarded({
@@ -669,6 +665,10 @@ export class OTokenEntityProducer {
           amount: info.yieldEarned,
         }),
       )
+    }
+    const secondsNearHourlyCrossover = Math.abs(dayjs.utc().endOf('hour').diff(dayjs.utc(), 'seconds'))
+    if (this.haveChanges() || secondsNearHourlyCrossover < 20) {
+      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
     }
   }
 
@@ -800,5 +800,19 @@ export class OTokenEntityProducer {
     const dayString = new Date(this.ctx.blocks.at(-1)!.header.timestamp).toISOString().substring(0, 10)
     this.dailyStats = new Map([...this.dailyStats.entries()].filter(([_key, value]) => value.entity.date === dayString))
     this.transfers = []
+  }
+
+  haveChanges() {
+    return (
+      this.otokenMap.size > 0 ||
+      this.changedAddressMap.size > 0 ||
+      this.histories.size > 0 ||
+      this.apyMap.size > 0 ||
+      this.rebaseMap.size > 0 ||
+      this.rebaseOptions.length > 0 ||
+      this.harvesterYieldSent.length > 0 ||
+      this.yieldForwarded.length > 0 ||
+      this.transfers.length > 0
+    )
   }
 }
