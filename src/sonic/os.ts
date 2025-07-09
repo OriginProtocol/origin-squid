@@ -12,7 +12,7 @@ const otokenProcessor = createOTokenProcessor2({
   from: sonicAddresses.OS.initializeBlock,
   otokenVaultAddress: sonicAddresses.OS.vault,
   vaultFrom: 3884318,
-  fee: 10n,
+  feeStructure: [{ fee: 10n, from: 3884286 }],
   otokenAddress: sonicAddresses.OS.address,
   wotoken: {
     address: sonicAddresses.OS.wrapped,

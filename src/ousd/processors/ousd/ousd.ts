@@ -25,7 +25,7 @@ export const ousdProcessor = createOTokenProcessor2({
   symbol: 'OUSD',
   from: 11590995, // OUSDReset~
   vaultFrom: 11596942,
-  fee: 20n,
+  feeStructure: [],
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
   otokenAddress: OUSD_ADDRESS,
   wotoken: {

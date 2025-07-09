@@ -4,6 +4,7 @@ import { LessThan } from 'typeorm'
 import { parseUnits } from 'viem'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
+import * as otokenVault from '@abi/otoken-vault'
 import {
   ERC20Holder,
   HistoryType,
@@ -39,7 +40,9 @@ export class OTokenEntityProducer {
   public from: number
   public ctx: Context
   public block: Block
-  public fee: bigint
+  /** The OToken processor will use YieldDistribution events to
+   *  calculate fees unless a feeStructure is replacing a time-period. */
+  public feeStructure: { fee: bigint; from?: number; to?: number }[]
   public initialized = false
 
   // For balances under this threshold, we won't update the balance after rebases.
@@ -74,7 +77,9 @@ export class OTokenEntityProducer {
       from: number
       ctx: Context
       block: Block
-      fee: bigint
+      /** The OToken processor will use YieldDistribution events to
+       *  calculate fees unless a feeStructure is replacing a time-period. */
+      feeStructure: { fee: bigint; from?: number; to?: number }[]
     },
   ) {
     this.otoken = otoken
@@ -83,7 +88,7 @@ export class OTokenEntityProducer {
     this.from = params.from
     this.ctx = params.ctx
     this.block = params.block
-    this.fee = params.fee
+    this.feeStructure = params.feeStructure
   }
 
   public async initialize() {
@@ -382,14 +387,17 @@ export class OTokenEntityProducer {
     currentApy.apy30DayAvg = apy30Days.reduce((sum, val) => sum + val, 0) / apy30Days.length
   }
 
-  private async getOrCreateRebaseEntity(trace: Trace, totalSupplyDiff: bigint): Promise<OTokenRebase> {
+  /**
+   * @param trace The trace causing the rebase.
+   * @param _yield The yield distributed to the OToken.
+   * @param _fee The fee paid to the OToken.
+   */
+  private async getOrCreateRebaseEntity(trace: Trace, _yield: bigint, _fee: bigint): Promise<OTokenRebase> {
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${this.block.header.height}-${trace.traceAddress.join('-')}`
 
     let rebase = this.rebaseMap.get(id)
     // We don't try to retrieve from database because this is unique per block & trace.
 
-    const _fee = (totalSupplyDiff * this.fee) / (100n - this.fee) // totalSupplyDiff does not include the fee
-    const _yield = totalSupplyDiff + _fee // yes, yield here includes the fee
     let feeETH = 0n
     let yieldETH = 0n
     let feeUSD = 0n
@@ -552,7 +560,31 @@ export class OTokenEntityProducer {
     if (totalSupplyDiff === 0n) return // Skip if there was no change in supply.
     await this.getOrCreateOTokenEntity()
     await this.getOrCreateAPYEntity(trace)
-    await this.getOrCreateRebaseEntity(trace, totalSupplyDiff)
+
+    // Fee Logic
+    let _yield = 0n
+    let _fee = 0n
+    const feeDirective = this.feeStructure.find(
+      (f) => (!f.from || f.from <= this.block.header.height) && (!f.to || f.to >= this.block.header.height),
+    )
+    if (feeDirective) {
+      _fee = (totalSupplyDiff * feeDirective.fee) / (100n - feeDirective.fee) // Total supply diff does not include the fee.
+      _yield = totalSupplyDiff + _fee // The yield shown here should represent all yield generated, including the fee.
+      // This yield is different from daily stat yield which does *not* include the fee.
+    } else {
+      const yieldDistributionEvent = trace.transaction!.logs.find(
+        (l) => otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.address,
+      )
+      const yieldDistributionEventData =
+        yieldDistributionEvent && otokenVault.events.YieldDistribution.decode(yieldDistributionEvent)
+
+      _yield = yieldDistributionEventData?._yield ?? 0n
+      _fee = yieldDistributionEventData?._fee ?? 0n
+    }
+
+    // Create Rebase Entity
+    await this.getOrCreateRebaseEntity(trace, _yield, _fee)
+
     // Trying not to have any async calls within this loop.
     for (const account of Object.keys(this.otoken.creditBalances)) {
       //Delete previous hour accrual

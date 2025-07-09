@@ -99,7 +99,9 @@ export const createOTokenProcessor2 = (params: {
   symbol: string
   from: number
   vaultFrom: number
-  fee: bigint // out of 100
+  /** The OToken processor will use YieldDistribution events to
+   *  calculate fees unless a feeStructure is replacing a time-period. */
+  feeStructure: { fee: bigint; from?: number; to?: number }[]
   Upgrade_CreditsBalanceOfHighRes?: number
   otokenAddress: OTokenContractAddress
   wotoken?: {
@@ -126,7 +128,6 @@ export const createOTokenProcessor2 = (params: {
     rebaseOptEvents: number | false
   }
   accountsOverThresholdMinimum: bigint
-  feeOverride?: bigint // out of 100
 }) => {
   const { otokenAddress, from } = params
 
@@ -235,6 +236,7 @@ export const createOTokenProcessor2 = (params: {
     callTo: [otokenAddress],
     callSighash: [otokenAbi.functions.changeSupply.selector],
     ...generalTraceParams,
+    transactionLogs: true,
   })
   const delegateYieldTraceFilter = traceFilter({
     type: ['call'],
@@ -381,7 +383,7 @@ export const createOTokenProcessor2 = (params: {
         producer = new OTokenEntityProducer(otoken, {
           ctx,
           block: ctx.blocks[0],
-          fee: params.fee,
+          feeStructure: params.feeStructure,
           from: params.from,
           name: params.name,
           symbol: params.symbol,

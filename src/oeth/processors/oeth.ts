@@ -35,7 +35,7 @@ const otokenProcessor = createOTokenProcessor2({
   // from: 16933090, // https://etherscan.io/tx/0x3b4ece4f5fef04bf7ceaec4f6c6edf700540d7597589f8da0e3a8c94264a3b50
   from: 17076206, // OETH contract initialize
   vaultFrom: 17084107,
-  fee: 20n,
+  feeStructure: [],
   otokenAddress: OETH_ADDRESS,
   wotoken: {
     address: WOETH_ADDRESS,

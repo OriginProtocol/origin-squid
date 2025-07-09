@@ -16,7 +16,7 @@ const otokenProcessor = createOTokenProcessor2({
   symbol: 'superOETHb',
   from: 17819702,
   vaultFrom: 17819702,
-  fee: 20n,
+  feeStructure: [{ fee: 20n, from: 17819702, to: 32657316 }],
   otokenAddress: baseAddresses.tokens.superOETHb,
   wotoken: {
     address: baseAddresses.tokens.wsuperOETHb,
@@ -102,7 +102,6 @@ const otokenProcessor = createOTokenProcessor2({
     rebaseOptEvents: false,
   },
   accountsOverThresholdMinimum: parseEther('.1'),
-  feeOverride: 20n,
 })
 
 const otokenActivityProcessor = createOTokenActivityProcessor({
