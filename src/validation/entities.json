@@ -862,31 +862,20 @@
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22804152",
-      "blockNumber": 22804152,
-      "timestamp": "2025-06-28T16:32:59.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22803648",
+      "blockNumber": 22803648,
+      "timestamp": "2025-06-28T14:51:35.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "12435279549061070996071",
-      "balanceETH": "12435279549061070996071",
+      "balance": "12435279287136080396921",
+      "balanceETH": "12435279287136080396921",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22832313",
-      "blockNumber": 22832313,
-      "timestamp": "2025-07-02T15:04:35.000000Z",
-      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "8213619113853631603995",
-      "balanceETH": "8213619113853631603995",
-      "chainId": 1,
-      "symbol": "WETH",
-      "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
-    },
-    {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22839804",
-      "blockNumber": 22839804,
-      "timestamp": "2025-07-03T16:11:23.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22840544",
+      "blockNumber": 22840544,
+      "timestamp": "2025-07-03T18:40:47.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
       "balance": "8213622178335631274216",
       "balanceETH": "8213622178335631274216",
@@ -895,34 +884,45 @@
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22847213",
-      "blockNumber": 22847213,
-      "timestamp": "2025-07-04T17:01:47.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22847958",
+      "blockNumber": 22847958,
+      "timestamp": "2025-07-04T19:31:11.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "8213625224949502089309",
-      "balanceETH": "8213625224949502089309",
+      "balance": "8213625260530141640065",
+      "balanceETH": "8213625260530141640065",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22854604",
-      "blockNumber": 22854604,
-      "timestamp": "2025-07-05T17:48:11.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22855344",
+      "blockNumber": 22855344,
+      "timestamp": "2025-07-05T20:17:59.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "8213626696649424455582",
-      "balanceETH": "8213626696649424455582",
+      "balance": "8213626749030916980554",
+      "balanceETH": "8213626749030916980554",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
     },
     {
-      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22862004",
-      "blockNumber": 22862004,
-      "timestamp": "2025-07-06T18:39:23.000000Z",
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22862858",
+      "blockNumber": 22862858,
+      "timestamp": "2025-07-06T21:31:11.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-      "balance": "8213629618614127245982",
-      "balanceETH": "8213629618614127245982",
+      "balance": "8213629678970770681015",
+      "balanceETH": "8213629678970770681015",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
+    },
+    {
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:22870144",
+      "blockNumber": 22870144,
+      "timestamp": "2025-07-07T21:57:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "8213644129180881868026",
+      "balanceETH": "8213644129180881868026",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
@@ -22278,6 +22278,21 @@
       "date": "2025-05-18",
       "rebasingCreditsPerToken": "886184530784876860428609727",
       "txHash": "0x20cd1a26cbc141c7020a9ab575ab6f1a62e8c764e209332c373ccb2b8429dc6d"
+    },
+    {
+      "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:2025-07-07",
+      "timestamp": "2025-07-07T23:50:35.000000Z",
+      "blockNumber": 22870707,
+      "chainId": 1,
+      "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "apr": 0.036451873471739886,
+      "apy": 0.03712250327577249,
+      "apy14DayAvg": 0.028287253197388434,
+      "apy30DayAvg": 0.02562133099554282,
+      "apy7DayAvg": 0.03361510285775128,
+      "date": "2025-07-07",
+      "rebasingCreditsPerToken": "882810468560533032269962281",
+      "txHash": "0x9b426bcbe1936cae26c2169d36adc53aaff192b3c7e36e5677e9ff6c1d3956a0"
     }
   ],
   "oeth_oTokenHistories": [
@@ -23894,15 +23909,15 @@
       "apy14": 0.023538110544923305,
       "apy30": 0.026709894267785285,
       "apy7": 0.022530819161317543,
-      "cumulativeFees": "651598451673055948151",
-      "cumulativeYield": "2606393806692223795616",
+      "cumulativeFees": "648403348190165133203",
+      "cumulativeYield": "2593613392760660535756",
       "dripperWETH": "26296345028842468283",
-      "fees": "641010427870527358",
+      "fees": "0",
       "rateETH": "999696471638243997",
       "rateUSD": "2416400000000000000000",
-      "yield": "2564041711482109444",
+      "yield": "0",
       "marketCapUSD": 1.35228928914355e+26,
-      "accountsOverThreshold": 183,
+      "accountsOverThreshold": 184,
       "rateWrapped": "1131678921266468558"
     }
   ],
@@ -32677,6 +32692,15 @@
       "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
       "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
       "totalValue": "34123811589457153447920097"
+    },
+    {
+      "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-37500000-0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "timestamp": "2025-07-07T16:22:35.000000Z",
+      "blockNumber": 37500000,
+      "chainId": 146,
+      "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+      "address": "0xa3c0eca00d2b76b4d1f170b0ab3fdea16c180186",
+      "totalValue": "34127750027954069992015957"
     }
   ],
   "os_oTokenDailyStats": [
@@ -33735,7 +33759,7 @@
       "totalAssets": "1588089208451602605387",
       "totalAssetsCap": "5000000000000000000000",
       "totalDeposits": "1585855813260185772698",
-      "totalFees": "652099498950381171",
+      "totalFees": "680973424087221932",
       "totalSupply": "1583137891848463035553",
       "totalWithdrawals": "435004286157975980",
       "totalYield": "2668399477574808669"
@@ -33825,7 +33849,7 @@
       "totalAssets": "3271674252820250734874",
       "totalAssetsCap": "5000000000000000000000",
       "totalDeposits": "3288009605727489428796",
-      "totalFees": "9245056972835886594",
+      "totalFees": "9526654652531409995",
       "totalSupply": "3219210207194140827240",
       "totalWithdrawals": "54040749527987112934",
       "totalYield": "37705396620748419012"
@@ -33860,11 +33884,11 @@
       "outstandingAssets1": "5911413168322378114489",
       "totalAssets": "5911619280423652659685",
       "totalAssetsCap": "10000000000000000000000",
-      "totalDeposits": "7752972991101788308756",
-      "totalFees": "19198274041053748173",
+      "totalDeposits": "7343955491101788308756",
+      "totalFees": "18937874673587101339",
       "totalSupply": "5767145522904288040735",
-      "totalWithdrawals": "1828829380993122555960",
-      "totalYield": "-12524329685013093111"
+      "totalWithdrawals": "1509829380993122556250",
+      "totalYield": "77493170314986907179"
     },
     {
       "id": "1:21900000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -33879,10 +33903,10 @@
       "totalAssets": "7404703162800594409741",
       "totalAssetsCap": "10000000000000000000000",
       "totalDeposits": "10399120116099129163859",
-      "totalFees": "21906115861563967218",
+      "totalFees": "21405816944007986123",
       "totalSupply": "7212398944256125679720",
-      "totalWithdrawals": "3632433306535140637209",
-      "totalYield": "638016353236605883091"
+      "totalWithdrawals": "3082002781736966064332",
+      "totalYield": "87585828438431310214"
     },
     {
       "id": "1:22000000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -33897,10 +33921,10 @@
       "totalAssets": "8139501651569687269226",
       "totalAssetsCap": "10000000000000000000000",
       "totalDeposits": "11831726402399492960631",
-      "totalFees": "26434599353250484352",
+      "totalFees": "26690161311762394465",
       "totalSupply": "7908236068512128211664",
-      "totalWithdrawals": "3798337575329091441072",
-      "totalYield": "106112824499285749667"
+      "totalWithdrawals": "3808433244775528192797",
+      "totalYield": "116208493945722501392"
     },
     {
       "id": "1:22100000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -34053,7 +34077,7 @@
       "assets1": "13806354630639333885",
       "assetsPerShare": "1030574847155826626",
       "date": "2025-03-16",
-      "fees": "0",
+      "fees": "575710403678940739",
       "outstandingAssets1": "4054057472058109203690",
       "rateUSD": 1881.87282561,
       "totalAssets": "7950297420668058592733",
@@ -34073,7 +34097,7 @@
       "assets1": "52172215332531514045",
       "assetsPerShare": "1036232239065818879",
       "date": "2025-05-05",
-      "fees": "85098783456665062",
+      "fees": "84305057472581454",
       "outstandingAssets1": "6141261918510961609897",
       "rateUSD": 1822.36938227,
       "totalAssets": "6789889796366769506618",
@@ -34104,52 +34128,52 @@
   ],
   "ognDailyStats": [
     {
-      "id": "2024-07-09",
-      "blockNumber": 20272351,
-      "timestamp": "2024-07-09T23:55:23.000000Z",
-      "totalStaked": "327104581858504546293835880"
+      "id": "2024-07-11",
+      "blockNumber": 20286657,
+      "timestamp": "2024-07-11T23:50:11.000000Z",
+      "totalStaked": "327485567145680973652476437"
     },
     {
-      "id": "2024-08-28",
-      "blockNumber": 20630502,
-      "timestamp": "2024-08-28T23:55:11.000000Z",
-      "totalStaked": "328670317246482868955531140"
+      "id": "2024-08-30",
+      "blockNumber": 20644768,
+      "timestamp": "2024-08-30T23:47:11.000000Z",
+      "totalStaked": "328783160454482868955531140"
     },
     {
-      "id": "2024-10-17",
-      "blockNumber": 20988619,
-      "timestamp": "2024-10-17T23:38:59.000000Z",
-      "totalStaked": "449922851936563391880048184"
+      "id": "2024-10-19",
+      "blockNumber": 21002921,
+      "timestamp": "2024-10-19T23:31:35.000000Z",
+      "totalStaked": "449963358416563391880048184"
     },
     {
-      "id": "2024-12-06",
-      "blockNumber": 21346854,
-      "timestamp": "2024-12-06T23:51:59.000000Z",
-      "totalStaked": "472884132933729764093517655"
+      "id": "2024-12-08",
+      "blockNumber": 21361132,
+      "timestamp": "2024-12-08T23:42:59.000000Z",
+      "totalStaked": "472979937522177276497989897"
     },
     {
-      "id": "2025-01-25",
-      "blockNumber": 21704741,
-      "timestamp": "2025-01-25T23:14:59.000000Z",
-      "totalStaked": "478131012938926922708654162"
+      "id": "2025-01-27",
+      "blockNumber": 21719254,
+      "timestamp": "2025-01-27T23:50:11.000000Z",
+      "totalStaked": "478173716252648428603410202"
     },
     {
-      "id": "2025-03-16",
-      "blockNumber": 22062372,
-      "timestamp": "2025-03-16T22:17:11.000000Z",
-      "totalStaked": "480942123854544143633034636"
+      "id": "2025-03-18",
+      "blockNumber": 22077131,
+      "timestamp": "2025-03-18T23:46:35.000000Z",
+      "totalStaked": "481061536185941574338042473"
     },
     {
-      "id": "2025-05-05",
-      "blockNumber": 22420878,
-      "timestamp": "2025-05-05T23:42:11.000000Z",
-      "totalStaked": "480244716872724776449866936"
+      "id": "2025-05-07",
+      "blockNumber": 22434982,
+      "timestamp": "2025-05-07T23:30:11.000000Z",
+      "totalStaked": "480410778979369637342786869"
     },
     {
-      "id": "2025-06-24",
-      "blockNumber": 22776677,
-      "timestamp": "2025-06-24T20:28:47.000000Z",
-      "totalStaked": "492765769411066201142000647"
+      "id": "2025-06-26",
+      "blockNumber": 22791901,
+      "timestamp": "2025-06-26T23:28:59.000000Z",
+      "totalStaked": "495294354075090360655058947"
     }
   ],
   "beaconDepositEvents": [
