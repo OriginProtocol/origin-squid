@@ -12,6 +12,9 @@ import { Block, Context } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 
+/**
+ * For sake of efficiency, we only want to update the daily stats if the block is within 20 seconds of the hourly crossover or if there has been recent activity on the OToken.
+ */
 export const processOTokenDailyStats = async (
   ctx: Context,
   params: {
@@ -35,6 +38,7 @@ export const processOTokenDailyStats = async (
     }[]
     getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
     accountsOverThresholdMinimum: bigint
+    forceUpdate: boolean
   },
 ) => {
   // Daily Stats
@@ -43,10 +47,9 @@ export const processOTokenDailyStats = async (
     if (block.header.height < params.from) continue
     const blockDate = new Date(block.header.timestamp)
 
-    const secondsNearHourlyCrossover = Math.abs(
-      dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds'),
-    )
-    if (secondsNearHourlyCrossover >= 20) continue
+    // Only update if we're within 20 seconds of the end of the hour (or force update is enabled)
+    const secondsUntilHourEnd = dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds')
+    if (!params.forceUpdate && secondsUntilHourEnd >= 20) continue
 
     const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
     const getDripperAvailableFunds = async () => {

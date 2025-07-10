@@ -684,13 +684,7 @@ export class OTokenEntityProducer {
   async afterBlock() {
     if (!this.otoken) return
 
-    const blockDate = new Date(this.block.header.timestamp)
-    const secondsNearHourlyCrossover = Math.abs(
-      dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds'),
-    )
-    if (this.haveChanges() || secondsNearHourlyCrossover < 20) {
-      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
-    }
+    await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
 
     for (const info of this.yieldForwardInfo.values()) {
       this.yieldForwarded.push(
@@ -718,6 +712,7 @@ export class OTokenEntityProducer {
       apies: Array.from(this.apyMap.values()),
       rebases: Array.from(this.rebaseMap.values()),
       dailyStats: this.dailyStats,
+      forceUpdate: this.hasChanges(),
     })
   }
 
@@ -839,7 +834,7 @@ export class OTokenEntityProducer {
     this.transfers = []
   }
 
-  haveChanges() {
+  hasChanges() {
     return (
       this.otokenMap.size > 0 ||
       this.changedAddressMap.size > 0 ||
