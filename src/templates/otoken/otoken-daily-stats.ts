@@ -42,6 +42,12 @@ export const processOTokenDailyStats = async (
   for (const { block, entity } of params.dailyStats.values()) {
     if (block.header.height < params.from) continue
     const blockDate = new Date(block.header.timestamp)
+
+    const secondsNearHourlyCrossover = Math.abs(
+      dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds'),
+    )
+    if (secondsNearHourlyCrossover >= 20) continue
+
     const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
     const getDripperAvailableFunds = async () => {
       if (!params.dripper) return 0n

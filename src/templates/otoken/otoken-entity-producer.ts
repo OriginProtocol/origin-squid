@@ -683,6 +683,15 @@ export class OTokenEntityProducer {
 
   async afterBlock() {
     if (!this.otoken) return
+
+    const blockDate = new Date(this.block.header.timestamp)
+    const secondsNearHourlyCrossover = Math.abs(
+      dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds'),
+    )
+    if (this.haveChanges() || secondsNearHourlyCrossover < 20) {
+      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
+    }
+
     for (const info of this.yieldForwardInfo.values()) {
       this.yieldForwarded.push(
         new OTokenYieldForwarded({
@@ -697,10 +706,6 @@ export class OTokenEntityProducer {
           amount: info.yieldEarned,
         }),
       )
-    }
-    const secondsNearHourlyCrossover = Math.abs(dayjs.utc().endOf('hour').diff(dayjs.utc(), 'seconds'))
-    if (this.haveChanges() || secondsNearHourlyCrossover < 20) {
-      await getOTokenDailyStat(this.ctx, this.block, this.otoken.address, this.dailyStats)
     }
   }
 
