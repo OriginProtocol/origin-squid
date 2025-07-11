@@ -420,6 +420,7 @@ export const createOTokenProcessor2 = (params: {
           ['1cde8861b9a1320fbcdcfb5a008f9739a867e867aa89b8273b673ea2d263745b']: OToken_2025_03_04, // superOETHb (EIP7702)
           ['d9ecfc9311872162e7364a6339b49461f61ed12d283e2a2e711492a10985fba0']: OToken_2025_03_04, // OETH (EIP7702)
           ['54e613f760dfd74b6ca1ba5f071aba3645b8ba32fa5b2879fa2a0a0c627c55d1']: OToken_2025_03_04, // OUSD (EIP7702)
+          ['2e3b558cd70b1ffd05b039aa8d412dda14dbbd94af318edc66c7160c856d0643']: OToken_2025_03_04, // OS   (EIP7702)
         } as const
         const ImplementationOTokenClass = implementations[implementationHash as keyof typeof implementations]
         if (ImplementationOTokenClass) {
