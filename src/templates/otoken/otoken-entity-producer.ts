@@ -577,8 +577,8 @@ export class OTokenEntityProducer {
     } else {
       const yieldDistributionEvent = trace.transaction!.logs.find(
         (l) =>
-          (otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.vaultAddress) ||
-          l.address === this.otokenVaultAddress,
+          otokenVault.events.YieldDistribution.topic === l.topics[0] &&
+          (l.address === this.otoken.vaultAddress || l.address === this.otokenVaultAddress),
       )
       const yieldDistributionEventData =
         yieldDistributionEvent && otokenVault.events.YieldDistribution.decode(yieldDistributionEvent)
