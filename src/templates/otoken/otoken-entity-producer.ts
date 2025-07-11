@@ -573,7 +573,7 @@ export class OTokenEntityProducer {
       // This yield is different from daily stat yield which does *not* include the fee.
     } else {
       const yieldDistributionEvent = trace.transaction!.logs.find(
-        (l) => otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.address,
+        (l) => otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.vaultAddress,
       )
       const yieldDistributionEventData =
         yieldDistributionEvent && otokenVault.events.YieldDistribution.decode(yieldDistributionEvent)

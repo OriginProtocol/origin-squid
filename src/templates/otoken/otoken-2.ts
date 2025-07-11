@@ -8,6 +8,7 @@ import * as otokenAbi from '@abi/otoken'
 import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenUpgradeAccountsAbi from '@abi/otoken-upgradeAccounts'
+import * as otokenVaultAbi from '@abi/otoken-vault'
 import { OTokenAsset, OTokenRawData } from '@model'
 import {
   Block,
@@ -129,7 +130,7 @@ export const createOTokenProcessor2 = (params: {
   }
   accountsOverThresholdMinimum: bigint
 }) => {
-  const { otokenAddress, from } = params
+  const { otokenAddress, from, otokenVaultAddress } = params
 
   const frequencyUpdater = otokenFrequencyProcessor(params)
 
@@ -236,7 +237,11 @@ export const createOTokenProcessor2 = (params: {
     callTo: [otokenAddress],
     callSighash: [otokenAbi.functions.changeSupply.selector],
     ...generalTraceParams,
-    transactionLogs: true,
+  })
+  const yieldDistributionLogFilter = logFilter({
+    address: [otokenVaultAddress],
+    topic0: [otokenVaultAbi.events.YieldDistribution.topic],
+    ...generalTraceParams,
   })
   const delegateYieldTraceFilter = traceFilter({
     type: ['call'],
@@ -282,6 +287,7 @@ export const createOTokenProcessor2 = (params: {
       processor.addTrace(proxyInitializeTraceFilter.value)
       processor.addTrace(proxyUpgradeToTraceFilter.value)
       processor.addTrace(proxyUpgradeToAndCallTraceFilter.value)
+      processor.addLog(yieldDistributionLogFilter.value)
 
       // Implementation Related
       // We want to receive all trace calls to the otoken contract
