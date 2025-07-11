@@ -376,7 +376,7 @@ export const createOTokenProcessor2 = (params: {
             otoken = loadOTokenRawData(ctx, ctx.blocks[0], savedDataEntity)
           } else {
             otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
-            otoken.initialize('governor', 'vault', 10n ** 18n)
+            otoken.initialize('governor', params.otokenVaultAddress, 10n ** 18n)
             ctx.log.error(`Raw data file not found: ${filePath} (creating blank instance)`)
           }
         }
@@ -393,6 +393,7 @@ export const createOTokenProcessor2 = (params: {
           from: params.from,
           name: params.name,
           symbol: params.symbol,
+          otokenVaultAddress: params.otokenVaultAddress,
         })
       }
       producer.ctx = ctx

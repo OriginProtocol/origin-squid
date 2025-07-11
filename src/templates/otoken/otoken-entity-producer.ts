@@ -43,6 +43,7 @@ export class OTokenEntityProducer {
   /** The OToken processor will use YieldDistribution events to
    *  calculate fees unless a feeStructure is replacing a time-period. */
   public feeStructure: { fee: bigint; from?: number; to?: number }[]
+  public otokenVaultAddress: string
   public initialized = false
 
   // For balances under this threshold, we won't update the balance after rebases.
@@ -80,6 +81,7 @@ export class OTokenEntityProducer {
       /** The OToken processor will use YieldDistribution events to
        *  calculate fees unless a feeStructure is replacing a time-period. */
       feeStructure: { fee: bigint; from?: number; to?: number }[]
+      otokenVaultAddress: string
     },
   ) {
     this.otoken = otoken
@@ -89,6 +91,7 @@ export class OTokenEntityProducer {
     this.ctx = params.ctx
     this.block = params.block
     this.feeStructure = params.feeStructure
+    this.otokenVaultAddress = params.otokenVaultAddress
   }
 
   public async initialize() {
@@ -573,7 +576,9 @@ export class OTokenEntityProducer {
       // This yield is different from daily stat yield which does *not* include the fee.
     } else {
       const yieldDistributionEvent = trace.transaction!.logs.find(
-        (l) => otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.vaultAddress,
+        (l) =>
+          (otokenVault.events.YieldDistribution.topic === l.topics[0] && l.address === this.otoken.vaultAddress) ||
+          l.address === this.otokenVaultAddress,
       )
       const yieldDistributionEventData =
         yieldDistributionEvent && otokenVault.events.YieldDistribution.decode(yieldDistributionEvent)
