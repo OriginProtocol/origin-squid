@@ -10,7 +10,7 @@ const otokenProcessor = createOTokenProcessor2({
   symbol: 'superOETHp',
   from: 535166,
   vaultFrom: 878332,
-  feeStructure: [{ fee: 0n, from: 535166 }],
+  feeStructure: [{ fee: 0n, from: 535166, to: 11738269 }],
   otokenAddress: plumeAddresses.superOETHp.address,
   wotoken: {
     address: plumeAddresses.superOETHp.wrapped,
