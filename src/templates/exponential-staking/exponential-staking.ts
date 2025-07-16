@@ -370,7 +370,7 @@ export const createESTracker = ({
         const assetBalance = await assetContract.balanceOf(address) // Could optimize to not use RPC but saving time here.
         // Get the latest rewards per second - consider that it might be on this block.
         const rpsLog = block.logs.find((l) => fixedRewardsChangeFilter.matches(l))
-        const rpsFromBlock = rpsLog && fixedRewardsAbi.events.RewardsPerSecondChanged.decode(log).newRPS
+        const rpsFromBlock = rpsLog && fixedRewardsAbi.events.RewardsPerSecondChanged.decode(rpsLog).newRPS
         const rpsFromState =
           state.rewardsPerSecond.length > 0 && state.rewardsPerSecond[state.rewardsPerSecond.length - 1]
         const rewardsPerSecond =
