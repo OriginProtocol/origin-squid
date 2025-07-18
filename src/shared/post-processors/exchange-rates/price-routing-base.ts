@@ -59,6 +59,18 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
     const rate2 = await chainlinkPriceFeeds['superOETHb_USD'](ctx, height)
     return (rate1 * rate2) / ONE_ETH
   },
+  AERO_ETH: async (ctx: Context, height: number) => {
+    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'](ctx, height)
+    const ethUsd = await chainlinkPriceFeeds['ETH_USD'](ctx, height)
+    if (ethUsd === 0n) return 0n
+    return (aeroUsd * ONE_ETH) / ethUsd
+  },
+  AERO_WETH: async (ctx: Context, height: number) => {
+    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'](ctx, height)
+    const ethUsd = await chainlinkPriceFeeds['ETH_USD'](ctx, height)
+    if (ethUsd === 0n) return 0n
+    return (aeroUsd * ONE_ETH) / ethUsd
+  },
 }
 
 export const baseCurrenciesByAddress = invertMap(baseAddresses.tokens)

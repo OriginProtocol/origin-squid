@@ -236,52 +236,6 @@ export const processStrategyEarnings = async (
     }
 
     for (const log of block.logs) {
-      const rewardTokenCollectedUpdate = async () => {
-        // ctx.log.info(`rewardTokenCollectedUpdate`)
-        didUpdate = true
-        txIgnore.add(log.transactionHash)
-
-        // Simple flow
-        // Native staking strategies use this flow.
-        if (strategyData.earnings?.rewardTokenCollectedSimple) {
-          const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
-          await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
-            token: strategyData.base.address,
-            amount: data.amount,
-          })
-          return
-        }
-
-        // Complex flow
-        const earningsTransferLogs = block.logs.filter(
-          (l) =>
-            l.transactionHash === log.transactionHash && rewardTokenCollectedTransfersFilter(strategyData).matches(l),
-        )
-
-        const values = oTokenValues[strategyData.oTokenAddress]
-        const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
-        let amount = 0n
-        for (const log of earningsTransferLogs) {
-          const data = erc20.events.Transfer.decode(log)
-          amount += await convertRate(
-            ctx,
-            block,
-            log.address as CurrencyAddress,
-            saveAsAsset ?? (log.address as CurrencyAddress),
-            data.value,
-          )
-        }
-
-        await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
-          token: strategyData.base.address,
-          amount: convertDecimals(
-            oTokenValues[strategyData.oTokenAddress].rewardConversionTokenDecimals,
-            strategyData.base.decimals,
-            amount,
-          ),
-        })
-      }
-
       if (strategyData.kind === 'BalancerMetaStablePool' && balancerPoolFilter(strategyData).matches(log)) {
         await balanceTrackingUpdate()
       } else if (strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))) {
@@ -292,24 +246,19 @@ export const processStrategyEarnings = async (
       ) {
         await balanceTrackingUpdate()
       } else if (rewardTokenCollectedFilter(strategyData).matches(log) && !txIgnore.has(log.transactionHash)) {
-        if (strategyData.kind === 'CurveAMO' && strategyData.oTokenAddress === OETH_ADDRESS) {
-          const values = oTokenValues[strategyData.oTokenAddress]
-          const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
-          const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
-          await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
-            token: strategyData.base.address,
-            amount: await convertRate(
-              ctx,
-              block,
-              data.rewardToken as CurrencyAddress,
-              saveAsAsset ?? (log.address as CurrencyAddress),
-              data.amount,
-            ),
-          })
-        } else {
-          // NOTE: This method has been found to be buggy when a harvest TX harvests for multiple strategies at the same time.
-          await rewardTokenCollectedUpdate()
-        }
+        const values = oTokenValues[strategyData.oTokenAddress]
+        const saveAsAsset = 'saveAsAsset' in values ? values.saveAsAsset : null
+        const data = abstractStrategyAbi.events.RewardTokenCollected.decode(log)
+        await processRewardTokenCollected(ctx, strategyData, block, strategyYields, {
+          token: strategyData.base.address,
+          amount: await convertRate(
+            ctx,
+            block,
+            data.rewardToken as CurrencyAddress,
+            saveAsAsset ?? (strategyData.assets[0].address as CurrencyAddress),
+            data.amount,
+          ),
+        })
       }
     }
 
