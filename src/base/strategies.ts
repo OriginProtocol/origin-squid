@@ -1,4 +1,5 @@
-import { defineProcessor } from '@originprotocol/squid-utils'
+import * as aerodromeStrategyAbi from '@abi/aerodrome-amo-strategy'
+import { defineProcessor, logFilter } from '@originprotocol/squid-utils'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
 import { createStrategyRewardProcessor, createStrategyRewardSetup } from '@templates/strategy-rewards'
 import { baseAddresses } from '@utils/addresses-base'
@@ -48,6 +49,12 @@ export const baseStrategies: readonly IStrategyData[] = [
     base: { address: baseAddresses.tokens.WETH, decimals: 18 },
     assets: [{ address: baseAddresses.tokens.WETH, decimals: 18 }],
     earnings: { rewardTokenCollected: true, passiveByDepositWithdrawal: true },
+    balanceUpdateLogFilters: [
+      logFilter({
+        address: [baseAddresses.superOETHb.strategies.aerodromeAMO],
+        topic0: [aerodromeStrategyAbi.events.LiquidityAdded.topic, aerodromeStrategyAbi.events.LiquidityRemoved.topic],
+      }),
+    ],
   },
   baseCurveAMO,
 ]
