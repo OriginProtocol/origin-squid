@@ -5,6 +5,7 @@ import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as chainlinkFeedRegistry from '@abi/chainlink-feed-registry'
 import * as curveLpToken from '@abi/curve-lp-token'
 import * as diaOracleAbi from '@abi/dia-oracle'
+import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
 import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
@@ -21,9 +22,29 @@ import {
   mainnetCurrenciesByAddress,
 } from './mainnetCurrencies'
 
+const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
+  return async (ctx: Context, height: number) => {
+    const feedContract = new eacAggregatorProxy.Contract(ctx, { height }, address)
+    const result = await feedContract.latestAnswer()
+    return result * 10n ** (18n - decimals)
+  }
+}
+
+// 0xCd627aA160A6fA45Eb793D19Ef54f5062F20f33f
+
+const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
+  CRV_USD: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
+  CRV_USDC: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
+}
+
 export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
   base = translateMainnetSymbol(base)
   quote = translateMainnetSymbol(quote)
+
+  const feed = chainlinkPriceFeeds[`${base}_${quote}`]
+  if (feed) {
+    return [await feed(ctx, height), 18] as const
+  }
 
   const priceEntry = priceMap[`${base}_${quote}`]
   if (priceEntry) {
