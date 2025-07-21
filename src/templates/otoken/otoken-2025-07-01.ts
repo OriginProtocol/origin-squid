@@ -62,6 +62,8 @@ export class OToken_2025_07_01 {
     this.nonRebasingSupply = other.nonRebasingSupply
     this.alternativeCreditsPerToken = other.alternativeCreditsPerToken
     this.rebaseState = other.rebaseState
+    this.yieldTo = other.yieldTo
+    this.yieldFrom = other.yieldFrom
     this.governor = other.governor
   }
 

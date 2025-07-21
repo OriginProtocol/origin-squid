@@ -30,6 +30,7 @@ import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { getOTokenDailyStat, processOTokenDailyStats } from './otoken-daily-stats'
 import { processOTokenERC20 } from './otoken-erc20'
 import { OTokenClass } from './types'
+import { isYieldDelegationContract } from './utils'
 
 dayjs.extend(utc)
 
@@ -537,12 +538,13 @@ export class OTokenEntityProducer {
   // }
 
   async beforeChangeSupply(): Promise<void> {
-    if (this.otoken instanceof OToken_2025_03_04) {
-      for (const account of Object.keys(this.otoken.creditBalances)) {
-        const from = this.otoken.yieldFrom[account]
+    if (isYieldDelegationContract(this.otoken)) {
+      const otoken = this.otoken as OToken_2025_03_04 // We need a type which has yield delegation properties on it.
+      for (const account of Object.keys(otoken.creditBalances)) {
+        const from = otoken.yieldFrom[account]
         if (from) {
-          const balance = this.otoken.balanceOf(account)
-          const forwardedBalance = this.otoken.balanceOf(from)
+          const balance = otoken.balanceOf(account)
+          const forwardedBalance = otoken.balanceOf(from)
           const forwardedBalancePercentage = (forwardedBalance * 10n ** 18n) / (balance + forwardedBalance)
           const to = account
           // Thought is put into more than once change supply happening in the same block.
@@ -631,12 +633,13 @@ export class OTokenEntityProducer {
       }
     }
     // Calculate Yield Forwarded
-    if (this.otoken instanceof OToken_2025_03_04) {
-      for (const to of Object.keys(this.otoken.creditBalances)) {
-        const from = this.otoken.yieldFrom[to]
+    if (isYieldDelegationContract(this.otoken)) {
+      const otoken = this.otoken as OToken_2025_03_04 // We need a type which has yield delegation properties on it.
+      for (const to of Object.keys(otoken.creditBalances)) {
+        const from = otoken.yieldFrom[to]
         if (from) {
           const yieldForwardInfo = this.yieldForwardInfo.get(`${from}-${to}`)!
-          const newBalance = this.otoken.balanceOf(to)
+          const newBalance = otoken.balanceOf(to)
           const yieldEarned = newBalance - yieldForwardInfo.balance
           const yieldEarnedFromForwarding = (yieldEarned * yieldForwardInfo.forwardedBalancePercentage) / 10n ** 18n
           yieldForwardInfo.yieldEarned += yieldEarnedFromForwarding

@@ -39,6 +39,7 @@ import { OToken_2025_07_01 } from './otoken-2025-07-01'
 import { OTokenEntityProducer } from './otoken-entity-producer'
 import { otokenFrequencyProcessor } from './otoken-frequency'
 import { OTokenClass } from './types'
+import { isYieldDelegationContract } from './utils'
 
 const DEBUG_PERF = process.env.DEBUG_PERF === 'true'
 
@@ -539,7 +540,7 @@ export const createOTokenProcessor2 = (params: {
                 const hash = await hashImplementation(block, data._logic.toLowerCase())
                 updateOToken(block, hash)
                 if (data._data) {
-                  if (otoken instanceof OToken_2025_03_04) {
+                  if (isYieldDelegationContract(otoken)) {
                     const initializeTrace = otokenAbi.functions.initialize.decode(data._data)
                     otoken.initialize(sender, initializeTrace._vaultAddress, initializeTrace._initialCreditsPerToken)
                   } else if (otoken instanceof OToken_2023_12_21) {
@@ -660,7 +661,7 @@ export const createOTokenProcessor2 = (params: {
               } else if (delegateYieldTraceFilter.matches(trace)) {
                 startSection('trace_delegateYield')
                 const data = otokenAbi.functions.delegateYield.decode(trace.action.input)
-                if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
+                if (!isYieldDelegationContract(otoken)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
                 await producer.afterDelegateYield(trace, data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
@@ -670,7 +671,7 @@ export const createOTokenProcessor2 = (params: {
               } else if (undelegateYieldTraceFilter.matches(trace)) {
                 startSection('trace_undelegateYield')
                 const data = otokenAbi.functions.undelegateYield.decode(trace.action.input)
-                if (!(otoken instanceof OToken_2025_03_04)) throw new Error('Invalid contract version')
+                if (!isYieldDelegationContract(otoken)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
                 await producer.afterUndelegateYield(trace, sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
@@ -1000,7 +1001,7 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
         const percentOff = Number((difference * 10000n) / (contractBalance === 0n ? 1n : contractBalance)) / 100
         console.log(
           `${account} ${
-            otoken instanceof OToken_2025_03_04 || otoken instanceof OToken_2025_07_01
+            isYieldDelegationContract(otoken)
               ? otoken.alternativeCreditsPerToken[account] > 0n
               : otoken.nonRebasingCreditsPerToken[account] > 0n
           } has ${contractBalance} contract balance and ${localBalance} local balance (${percentOff.toFixed(2)}% off)`,
