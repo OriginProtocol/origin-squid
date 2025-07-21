@@ -538,13 +538,12 @@ export class OTokenEntityProducer {
   // }
 
   async beforeChangeSupply(): Promise<void> {
-    if (isYieldDelegationContract(this.otoken)) {
-      const otoken = this.otoken as OToken_2025_03_04 // We need a type which has yield delegation properties on it.
-      for (const account of Object.keys(otoken.creditBalances)) {
-        const from = otoken.yieldFrom[account]
+    if ('yieldFrom' in this.otoken) {
+      for (const account of Object.keys(this.otoken.creditBalances)) {
+        const from = this.otoken.yieldFrom[account]
         if (from) {
-          const balance = otoken.balanceOf(account)
-          const forwardedBalance = otoken.balanceOf(from)
+          const balance = this.otoken.balanceOf(account)
+          const forwardedBalance = this.otoken.balanceOf(from)
           const forwardedBalancePercentage = (forwardedBalance * 10n ** 18n) / (balance + forwardedBalance)
           const to = account
           // Thought is put into more than once change supply happening in the same block.

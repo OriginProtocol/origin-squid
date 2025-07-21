@@ -190,7 +190,7 @@ const testEIP7702 = {
   },
   process: async (ctx: Context) => {
     await loadIsContractCache(ctx)
-    const result = await isContract(ctx, ctx.blocks[0], '0xEf058bf0C10A2D62879e9aCc21833Ec158DCa191', true)
+    const result = await isContract(ctx, ctx.blocks[0], '0x6e4141d33021b52c91c28608403db4a0ffb50ec6', true)
     console.log(result)
     process.exit(0)
   },

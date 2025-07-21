@@ -5,7 +5,7 @@
  * @author Origin Protocol Inc
  */
 import { Block, Context } from '@originprotocol/squid-utils'
-import { isContract } from '@utils/isContract'
+import { isContract, resetCacheForAccounts } from '@utils/isContract'
 
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 
@@ -37,6 +37,7 @@ export class OToken_2025_07_01 {
   private readonly MAX_SUPPLY: bigint = BigInt('340282366920938463463374607431768211455') // uint128 max
   private readonly RESOLUTION_INCREASE: bigint = BigInt('1000000000') // 1e9
   public readonly RESOLUTION_DECIMALS: bigint = 27n
+  public readonly supportsEIP7702: boolean = true
 
   // State variables
   public totalSupply: bigint = 0n
@@ -65,6 +66,9 @@ export class OToken_2025_07_01 {
     this.yieldTo = other.yieldTo
     this.yieldFrom = other.yieldFrom
     this.governor = other.governor
+
+    // We want to reset the cache for all accounts on this contract due to the change in `isContract` logic for EIP-7702.
+    resetCacheForAccounts(Object.keys(this.creditBalances))
   }
 
   /**

@@ -7,7 +7,13 @@ let time = 0
 let count = 0
 
 const localStoragePath = './data'
-let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number }>
+let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number; blockNumber?: number }>
+
+export const resetCacheForAccounts = (accounts: string[]) => {
+  for (const account of accounts) {
+    cache.delete(account)
+  }
+}
 
 /**
  * I've found we cannot cache this because it may change.
@@ -70,7 +76,12 @@ export const isContract = async (
  * @param accounts Array of account addresses to check
  * @returns Map of account addresses to boolean indicating if they are contracts
  */
-export const areContracts = async (ctx: Context, block: Block, accounts: string[]): Promise<Map<string, boolean>> => {
+export const areContracts = async (
+  ctx: Context,
+  block: Block,
+  accounts: string[],
+  eip7702Check: boolean = false,
+): Promise<Map<string, boolean>> => {
   if (!accounts.length) return new Map()
 
   const result = new Map<string, boolean>()
@@ -117,13 +128,16 @@ export const areContracts = async (ctx: Context, block: Block, accounts: string[
     const codeAtLatest = batchResults[i * 2]
     const codeAtBlock = batchResults[i * 2 + 1]
 
-    const isContractValue = codeAtBlock !== '0x'
-    result.set(account, isContractValue)
+    // EIP-7702: https://eips.ethereum.org/EIPS/eip-7702
+    // Check if code length is 23 bytes and starts with 0xef0100
+    const eip7702 = eip7702Check && codeAtBlock.length === 23 * 2 + 2 && codeAtBlock.startsWith('0xef0100')
+    const isEOA = codeAtBlock === '0x' || eip7702
+    result.set(account, !isEOA)
 
     // Update cache if the code is the same at latest and at block
     if (codeAtBlock === codeAtLatest) {
       cache.set(account, {
-        value: isContractValue,
+        value: !isEOA,
         expiresAt: Date.now(),
         validFrom: block.header.timestamp,
       })

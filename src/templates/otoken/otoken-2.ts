@@ -377,7 +377,7 @@ export const createOTokenProcessor2 = (params: {
             const savedDataEntity = bigintJsonParse(savedData) as OTokenRawData
             otoken = loadOTokenRawData(ctx, ctx.blocks[0], savedDataEntity)
           } else {
-            otoken = new OToken_2025_03_04(ctx, ctx.blocks[0], otokenAddress)
+            otoken = new OToken_2025_07_01(ctx, ctx.blocks[0], otokenAddress)
             otoken.initialize('governor', params.otokenVaultAddress, 10n ** 18n)
             ctx.log.error(`Raw data file not found: ${filePath} (creating blank instance)`)
           }
@@ -488,7 +488,7 @@ export const createOTokenProcessor2 = (params: {
         )
       await areContracts(
         ctx,
-        ctx.blocks[0],
+        ctx.blocks.at(-1)!,
         transferRelated.flatMap((trace) => {
           if (trace.type !== 'call') return []
           const sender = trace.action.from.toLowerCase()
@@ -507,6 +507,7 @@ export const createOTokenProcessor2 = (params: {
           }
           return []
         }),
+        otoken && 'supportsEIP7702' in otoken ? otoken.supportsEIP7702 : false,
       )
 
       if (otoken && !producer.initialized) {
@@ -661,7 +662,7 @@ export const createOTokenProcessor2 = (params: {
               } else if (delegateYieldTraceFilter.matches(trace)) {
                 startSection('trace_delegateYield')
                 const data = otokenAbi.functions.delegateYield.decode(trace.action.input)
-                if (!isYieldDelegationContract(otoken)) throw new Error('Invalid contract version')
+                if (!('delegateYield' in otoken)) throw new Error('Invalid contract version')
                 otoken.delegateYield(sender, data._from.toLowerCase(), data._to.toLowerCase())
                 await producer.afterDelegateYield(trace, data._from.toLowerCase(), data._to.toLowerCase())
                 addressesToCheck.add(sender)
@@ -671,7 +672,7 @@ export const createOTokenProcessor2 = (params: {
               } else if (undelegateYieldTraceFilter.matches(trace)) {
                 startSection('trace_undelegateYield')
                 const data = otokenAbi.functions.undelegateYield.decode(trace.action.input)
-                if (!isYieldDelegationContract(otoken)) throw new Error('Invalid contract version')
+                if (!('undelegateYield' in otoken)) throw new Error('Invalid contract version')
                 otoken.undelegateYield(sender, data._from.toLowerCase())
                 await producer.afterUndelegateYield(trace, sender, data._from.toLowerCase())
                 addressesToCheck.add(sender)
@@ -1001,7 +1002,7 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
         const percentOff = Number((difference * 10000n) / (contractBalance === 0n ? 1n : contractBalance)) / 100
         console.log(
           `${account} ${
-            isYieldDelegationContract(otoken)
+            'alternativeCreditsPerToken' in otoken
               ? otoken.alternativeCreditsPerToken[account] > 0n
               : otoken.nonRebasingCreditsPerToken[account] > 0n
           } has ${contractBalance} contract balance and ${localBalance} local balance (${percentOff.toFixed(2)}% off)`,
