@@ -9,8 +9,10 @@ import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
 import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
 import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
+import * as uniswapV3 from '@abi/uniswap-v3'
 import * as woethAbi from '@abi/woeth'
 import { Context } from '@originprotocol/squid-utils'
+import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
 import {
@@ -160,6 +162,11 @@ const getPrice_OUSD_ETH = async (ctx: Context, height: number) => {
   return (ousdusd * 10n ** 8n) / ethusd
 }
 
+const getMorphoEthPrice = async (ctx: Context, height: number) => {
+  const morpho = new uniswapV3.Contract(ctx, { height }, '0xc8219b876753a85025156b22176c2edea17aac53')
+  return morpho.slot0().then((slot0) => getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96))
+}
+
 const getPrice_OETH_USD = async (ctx: Context, height: number) => {
   const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
   return ethusd * 10n ** 10n
@@ -210,6 +217,7 @@ export const priceMap: Partial<
   ETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
   ETH_OETH: [getETHOETHPrice, 18],
   OETH_ETH: [getOETHETHPrice, 18],
+  ...twoWay('MORPHO', 'ETH', getMorphoEthPrice, 18),
   ...twoWay('ETH', 'sfrxETH', getStakedFraxPrice),
   ...twoWay('ETH', 'rETH', getRETHPrice),
   ...twoWay('ETH', 'frxETH', getFrxEthPrice),
@@ -233,6 +241,24 @@ export const priceMap: Partial<
       { base: 'USD', quote: 'ETH' },
     ],
     8,
+  ),
+  ...derived(
+    'MORPHO',
+    'USDC',
+    [
+      { base: 'MORPHO', quote: 'ETH' },
+      { base: 'ETH', quote: 'USDC' },
+    ],
+    18,
+  ),
+  ...derived(
+    'MORPHO',
+    'USDT',
+    [
+      { base: 'MORPHO', quote: 'ETH' },
+      { base: 'ETH', quote: 'USDT' },
+    ],
+    18,
   ),
   ...twoWay('USDC', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'ETH')),
   ...twoWay('USDT', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'ETH')),
