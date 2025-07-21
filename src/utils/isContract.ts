@@ -12,7 +12,12 @@ let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number }>
 /**
  * I've found we cannot cache this because it may change.
  */
-export const isContract = async (ctx: Context, block: Block, account: string): Promise<boolean> => {
+export const isContract = async (
+  ctx: Context,
+  block: Block,
+  account: string,
+  eip7702Check: boolean = false,
+): Promise<boolean> => {
   if (account === '0x0000000000000000000000000000000000000000') return false
   if (cache.has(account)) {
     const entry = cache.get(account)!
@@ -40,7 +45,7 @@ export const isContract = async (ctx: Context, block: Block, account: string): P
 
   // EIP-7702: https://eips.ethereum.org/EIPS/eip-7702
   // Check if code length is 23 bytes and starts with 0xef0100
-  const eip7702 = codeAtBlock.length === 23 * 2 + 2 && codeAtBlock.startsWith('0xef0100')
+  const eip7702 = eip7702Check && codeAtBlock.length === 23 * 2 + 2 && codeAtBlock.startsWith('0xef0100')
   const isEOA = codeAtBlock === '0x' || eip7702
   if (codeAtBlock === codeAtLatest) {
     cache.set(account, {

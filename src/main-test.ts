@@ -1,6 +1,7 @@
 /* eslint-disable */
 import 'tsconfig-paths/register'
 import { formatUnits } from 'viem'
+import { base } from 'viem/chains'
 
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
 import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
@@ -14,6 +15,7 @@ import { OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { getCoingeckoData } from '@utils/coingecko2'
+import { isContract, loadIsContractCache } from '@utils/isContract'
 
 const testRate = {
   name: 'test',
@@ -180,6 +182,20 @@ const testMixedQuoter = {
   },
 }
 
+const testEIP7702 = {
+  name: 'test-eip7702',
+  from: 33168070,
+  setup: (p: EvmBatchProcessor) => {
+    p.includeAllBlocks({ from: 33168070 })
+  },
+  process: async (ctx: Context) => {
+    await loadIsContractCache(ctx)
+    const result = await isContract(ctx, ctx.blocks[0], '0xEf058bf0C10A2D62879e9aCc21833Ec158DCa191', true)
+    console.log(result)
+    process.exit(0)
+  },
+}
+
 const ousdTransferFilter = logFilter({
   address: [OUSD_ADDRESS],
   topic0: [erc20Abi.events.Transfer.topic],
@@ -226,14 +242,15 @@ const getOUSDAddresses = defineProcessor({
 if (require.main === module) {
   console.log('process:test running')
   run({
-    chainId: 1,
+    chainId: base.id,
     stateSchema: 'test-processor',
     processors: [
       // testRate,
       // testCoingecko,
       // testAerodromeSugar,
       // testMixedQuoter,
-      getOUSDAddresses,
+      // getOUSDAddresses,
+      testEIP7702,
     ],
     postProcessors: [],
     validators: [],

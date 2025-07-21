@@ -159,8 +159,11 @@ export class OTokenEntityProducer {
       address = await this.ctx.store.get(OTokenAddress, account)
     }
 
+    const isContractAddress =
+      'isContract' in this.otoken
+        ? await this.otoken.isContract(account) // Use logic from class if available (e.g. EIP7702 in OToken_2025_07_01)
+        : await isContract(this.ctx, this.otoken.block, account, false)
     if (!address) {
-      const isContractAddress = await isContract(this.ctx, this.otoken.block, account)
       address = new OTokenAddress({
         id,
         chainId: this.ctx.chain.id,
@@ -178,7 +181,7 @@ export class OTokenEntityProducer {
       })
     }
     this.addressMap.set(account, address)
-    address.isContract = await isContract(this.ctx, this.otoken.block, account)
+    address.isContract = isContractAddress
     this.updateAddress(account)
     return address
   }
