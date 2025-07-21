@@ -998,7 +998,7 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
         const percentOff = Number((difference * 10000n) / (contractBalance === 0n ? 1n : contractBalance)) / 100
         console.log(
           `${account} ${
-            otoken instanceof OToken_2025_03_04
+            otoken instanceof OToken_2025_03_04 || otoken instanceof OToken_2025_07_01
               ? otoken.alternativeCreditsPerToken[account] > 0n
               : otoken.nonRebasingCreditsPerToken[account] > 0n
           } has ${contractBalance} contract balance and ${localBalance} local balance (${percentOff.toFixed(2)}% off)`,
