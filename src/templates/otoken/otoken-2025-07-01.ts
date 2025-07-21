@@ -7,7 +7,7 @@
 import { Block, Context } from '@originprotocol/squid-utils'
 import { isContract } from '@utils/isContract'
 
-import { OToken_2023_12_21 } from './otoken-2023-12-21'
+import { OToken_2025_03_04 } from './otoken-2025-03-04'
 
 /**
  * Enum for rebasing options
@@ -52,15 +52,15 @@ export class OToken_2025_07_01 {
   public yieldFrom: Record<string, string | undefined> = {}
   public governor: string = ''
 
-  copyState(other: OToken_2023_12_21): void {
+  copyState(other: OToken_2025_03_04): void {
     this.totalSupply = other.totalSupply
     this.allowances = other.allowances
     this.vaultAddress = other.vaultAddress
     this.creditBalances = other.creditBalances
-    this.rebasingCredits = other._rebasingCredits
-    this.rebasingCreditsPerToken = other._rebasingCreditsPerToken
+    this.rebasingCredits = other.rebasingCredits
+    this.rebasingCreditsPerToken = other.rebasingCreditsPerToken
     this.nonRebasingSupply = other.nonRebasingSupply
-    this.alternativeCreditsPerToken = other.nonRebasingCreditsPerToken
+    this.alternativeCreditsPerToken = other.alternativeCreditsPerToken
     this.rebaseState = other.rebaseState
     this.governor = other.governor
   }

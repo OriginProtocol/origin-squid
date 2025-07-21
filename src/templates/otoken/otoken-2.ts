@@ -801,6 +801,8 @@ const copyData = (otoken: OTokenClass, newImplementation: OTokenClass) => {
     newImplementation.copyState(otoken)
   } else if (otoken instanceof OToken_2023_12_21 && newImplementation instanceof OToken_2025_03_04) {
     newImplementation.copyState(otoken)
+  } else if (otoken instanceof OToken_2025_03_04 && newImplementation instanceof OToken_2025_07_01) {
+    newImplementation.copyState(otoken)
   } else if (otoken) {
     throw new Error('Invalid copyData')
   }
