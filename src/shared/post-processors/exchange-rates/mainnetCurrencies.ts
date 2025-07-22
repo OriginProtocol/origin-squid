@@ -28,6 +28,7 @@ export const mainnetCurrencies = {
   CVX: '0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b',
   BAL: '0xba100000625a3754423978a60c9317c58a424e3d',
   MORPHO: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
+  MORPHO_LEGACY: '0x9994e35db50125e0df82e4c2dde62496ce330999',
 } as const
 
 export const mainnetCurrenciesByAddress = invertMap(mainnetCurrencies)
