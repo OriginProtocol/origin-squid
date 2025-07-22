@@ -1,14 +1,14 @@
 Processing Times
 ==============================
-Version: v112
-Date: 2025-07-21T18:20:52.829Z
+Version: v113
+Date: 2025-07-22T02:58:07.235Z
 ==============================
-arbitrum: 77.40 minutes
-base: 87.78 minutes
-mainnet: 86.04 minutes
-oeth: 8.17 minutes
-oethb: 26.95 minutes
-ogv: 27.22 minutes
-ousd: 4010.09 minutes
-plume: 13.55 minutes
-sonic: 20.96 minutes
+arbitrum: 77.17 minutes
+base: 100.51 minutes
+mainnet: 89.12 minutes
+oeth: 13.41 minutes
+oethb: 35.16 minutes
+ogv: 28.14 minutes
+ousd: 21.24 minutes
+plume: 24.43 minutes
+sonic: 35.69 minutes
