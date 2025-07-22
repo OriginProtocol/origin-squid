@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readFileSync } from 'fs'
 
 import { UtilCache } from '@model'
 import { Block, Context } from '@originprotocol/squid-utils'
@@ -191,9 +191,9 @@ export const saveIsContractCache = async (ctx: Context) => {
   if (!cache) return
   if (Date.now() - lastSave < 5 * 60 * 1000) return
   const id = `${ctx.chain.id}-isContract`
-  if (process.env.NODE_ENV === 'development') {
-    writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))
-  }
+  // if (process.env.NODE_ENV === 'development') {
+  //   writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))
+  // }
   for (const [key, value] of cache) {
     if (value.expiresAt < Date.now()) {
       cache.delete(key)
