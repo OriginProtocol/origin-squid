@@ -218,6 +218,7 @@ export const priceMap: Partial<
   ETH_OETH: [getETHOETHPrice, 18],
   OETH_ETH: [getOETHETHPrice, 18],
   ...twoWay('MORPHO', 'ETH', getMorphoEthPrice, 18),
+  ...twoWay('MORPHO_LEGACY', 'ETH', getMorphoEthPrice, 18),
   ...twoWay('ETH', 'sfrxETH', getStakedFraxPrice),
   ...twoWay('ETH', 'rETH', getRETHPrice),
   ...twoWay('ETH', 'frxETH', getFrxEthPrice),
@@ -253,6 +254,24 @@ export const priceMap: Partial<
   ),
   ...derived(
     'MORPHO',
+    'USDT',
+    [
+      { base: 'MORPHO', quote: 'ETH' },
+      { base: 'ETH', quote: 'USDT' },
+    ],
+    18,
+  ),
+  ...derived(
+    'MORPHO_LEGACY',
+    'USDC',
+    [
+      { base: 'MORPHO', quote: 'ETH' },
+      { base: 'ETH', quote: 'USDC' },
+    ],
+    18,
+  ),
+  ...derived(
+    'MORPHO_LEGACY',
     'USDT',
     [
       { base: 'MORPHO', quote: 'ETH' },
