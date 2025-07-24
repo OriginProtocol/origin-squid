@@ -38,6 +38,9 @@ export class ArmState {
     marketAssets!: bigint
 
     @BigIntColumn_({nullable: false})
+    feesAccrued!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalAssets!: bigint
 
     @BigIntColumn_({nullable: false})

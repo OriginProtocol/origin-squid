@@ -42,6 +42,9 @@ export class ArmDailyStat {
     marketAssets!: bigint
 
     @BigIntColumn_({nullable: false})
+    feesAccrued!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalAssets!: bigint
 
     @BigIntColumn_({nullable: false})
