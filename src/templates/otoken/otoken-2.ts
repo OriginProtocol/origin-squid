@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { pick } from 'lodash'
+import { pick, uniq } from 'lodash'
 import { getAddress } from 'viem'
 
 import * as proxyAbi from '@abi/governed-upgradeability-proxy'
@@ -400,7 +400,7 @@ export const createOTokenProcessor2 = (params: {
       }
       producer.ctx = ctx
 
-      const updateOToken = (block: Block, implementationHash: string) => {
+      const updateOToken = async (block: Block, implementationHash: string) => {
         const implementations = {
           ['496e21711abcc5a5e71f44a6df876be356b8d2a744dbfd3ca9178b7c3541b709']: OToken_2021_01_02, // OUSDReset
           ['a8637a9454638edbb3bcc829dce87a34347c79ea7d770c5c0bf5454084493068']: OToken_2021_01_02, // OUSD
@@ -432,7 +432,7 @@ export const createOTokenProcessor2 = (params: {
           }
           const newImplementation = new ImplementationOTokenClass(ctx, block, otokenAddress)
           ctx.log.info('Instantiated new implementation now copying state: ' + newImplementation.constructor.name)
-          copyData(otoken, newImplementation)
+          await copyData(otoken, newImplementation)
           otoken = newImplementation
           producer.otoken = newImplementation
           // justUpgraded = true
@@ -486,27 +486,28 @@ export const createOTokenProcessor2 = (params: {
             transferTraceFilter.matches(trace) ||
             transferFromTraceFilter.matches(trace),
         )
+      const areContractsAccounts = transferRelated.flatMap((trace) => {
+        if (trace.type !== 'call') return []
+        const sender = trace.action.from.toLowerCase()
+        if (mintTraceFilter.matches(trace)) {
+          const data = otokenAbi.functions.mint.decode(trace.action.input)
+          return [data._account.toLowerCase()]
+        } else if (burnTraceFilter.matches(trace)) {
+          const data = otokenAbi.functions.burn.decode(trace.action.input)
+          return [data._account.toLowerCase()]
+        } else if (transferTraceFilter.matches(trace)) {
+          const data = otokenAbi.functions.transfer.decode(trace.action.input)
+          return [data._to.toLowerCase(), sender]
+        } else if (transferFromTraceFilter.matches(trace)) {
+          const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
+          return [data._to.toLowerCase(), data._from.toLowerCase()]
+        }
+        return []
+      })
       await areContracts(
         ctx,
-        ctx.blocks.at(-1)!,
-        transferRelated.flatMap((trace) => {
-          if (trace.type !== 'call') return []
-          const sender = trace.action.from.toLowerCase()
-          if (mintTraceFilter.matches(trace)) {
-            const data = otokenAbi.functions.mint.decode(trace.action.input)
-            return [data._account.toLowerCase()]
-          } else if (burnTraceFilter.matches(trace)) {
-            const data = otokenAbi.functions.burn.decode(trace.action.input)
-            return [data._account.toLowerCase()]
-          } else if (transferTraceFilter.matches(trace)) {
-            const data = otokenAbi.functions.transfer.decode(trace.action.input)
-            return [data._to.toLowerCase(), sender]
-          } else if (transferFromTraceFilter.matches(trace)) {
-            const data = otokenAbi.functions.transferFrom.decode(trace.action.input)
-            return [data._to.toLowerCase(), data._from.toLowerCase()]
-          }
-          return []
-        }),
+        ctx.blocks[0],
+        areContractsAccounts,
         otoken && 'supportsEIP7702' in otoken ? otoken.supportsEIP7702 : false,
       )
 
@@ -526,6 +527,7 @@ export const createOTokenProcessor2 = (params: {
 
         // Process traces
         for (const transaction of block.transactions) {
+          if (transaction.status === 0) continue
           for (const trace of transaction.traces) {
             if (trace.type === 'call') {
               if (errorParent(trace)) {
@@ -539,7 +541,7 @@ export const createOTokenProcessor2 = (params: {
                 const data = proxyAbi.functions.initialize.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyInitialize')
                 const hash = await hashImplementation(block, data._logic.toLowerCase())
-                updateOToken(block, hash)
+                await updateOToken(block, hash)
                 if (data._data) {
                   if (isYieldDelegationContract(otoken)) {
                     const initializeTrace = otokenAbi.functions.initialize.decode(data._data)
@@ -555,14 +557,14 @@ export const createOTokenProcessor2 = (params: {
                 const data = proxyAbi.functions.upgradeTo.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyUpgradeTo')
                 const hash = await hashImplementation(block, data.newImplementation.toLowerCase())
-                updateOToken(block, hash)
+                await updateOToken(block, hash)
                 endSection('trace_proxyUpgradeTo')
               } else if (proxyUpgradeToAndCallTraceFilter.matches(trace)) {
                 startSection('trace_proxyUpgradeToAndCall')
                 const data = proxyAbi.functions.upgradeToAndCall.decode(trace.action.input)
                 ctx.log.info({ data, hash: trace.transaction?.hash }, 'proxyUpgradeToAndCall')
                 const hash = await hashImplementation(block, data.newImplementation.toLowerCase())
-                updateOToken(block, hash)
+                await updateOToken(block, hash)
                 endSection('trace_proxyUpgradeToAndCall')
               } else if (initializeTraceFilter.matches(trace)) {
                 startSection('trace_initialize')
@@ -771,7 +773,13 @@ export const createOTokenProcessor2 = (params: {
         const lastBlock = ctx.blocks[ctx.blocks.length - 1]
         await saveOTokenRawData(ctx, lastBlock, otoken)
         endSection('saveOTokenRawData')
-        // await checkState(ctx, lastBlock, otoken, new Set([...Object.keys(otoken.creditBalances)]))
+        // await checkState(
+        //   ctx,
+        //   lastBlock,
+        //   otoken,
+        //   // new Set([...Object.keys(otoken.creditBalances)]),
+        //   new Set(areContractsAccounts),
+        // )
       }
 
       const frequencyUpdateResults = await frequencyUpdatePromise
@@ -792,7 +800,7 @@ export const createOTokenProcessor2 = (params: {
   })
 }
 
-const copyData = (otoken: OTokenClass, newImplementation: OTokenClass) => {
+const copyData = async (otoken: OTokenClass, newImplementation: OTokenClass) => {
   if (otoken instanceof OToken_2021_01_02 && newImplementation instanceof OToken_2021_01_08) {
     newImplementation.copyState(otoken)
   } else if (otoken instanceof OToken_2021_01_08 && newImplementation instanceof OToken_2021_01_25) {
@@ -804,7 +812,7 @@ const copyData = (otoken: OTokenClass, newImplementation: OTokenClass) => {
   } else if (otoken instanceof OToken_2023_12_21 && newImplementation instanceof OToken_2025_03_04) {
     newImplementation.copyState(otoken)
   } else if (otoken instanceof OToken_2025_03_04 && newImplementation instanceof OToken_2025_07_01) {
-    newImplementation.copyState(otoken)
+    await newImplementation.copyState(otoken)
   } else if (otoken) {
     throw new Error('Invalid copyData')
   }
@@ -822,12 +830,82 @@ const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) =>
       ? new OToken_2021_06_06(ctx, block, entity.otoken)
       : entity.type === 'OToken_2023_12_21'
       ? new OToken_2023_12_21(ctx, block, entity.otoken)
-      : new OToken_2025_03_04(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2025_03_04'
+      ? new OToken_2025_03_04(ctx, block, entity.otoken)
+      : entity.type === 'OToken_2025_07_01'
+      ? new OToken_2025_07_01(ctx, block, entity.otoken)
+      : undefined
+  if (!otoken) throw new Error('Class type not set up for loadOTokenRawData')
+
   Object.assign(otoken, entity.data)
   return otoken
 }
 
 const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass) => {
+  const keys =
+    otoken instanceof OToken_2021_01_02 ||
+    otoken instanceof OToken_2021_01_08 ||
+    otoken instanceof OToken_2021_01_25 ||
+    otoken instanceof OToken_2021_06_06
+      ? [
+          'totalSupply',
+          'allowances',
+          'vaultAddress',
+          'creditBalances',
+          'rebasingCredits',
+          'rebasingCreditsPerToken',
+          'nonRebasingSupply',
+          'nonRebasingCreditsPerToken',
+          'rebaseState',
+        ]
+      : otoken instanceof OToken_2023_12_21
+      ? [
+          'totalSupply',
+          'allowances',
+          'vaultAddress',
+          'creditBalances',
+          '_rebasingCredits',
+          '_rebasingCreditsPerToken',
+          'nonRebasingSupply',
+          'nonRebasingCreditsPerToken',
+          'rebaseState',
+          'isUpgraded',
+          'governor',
+        ]
+      : otoken instanceof OToken_2025_03_04
+      ? [
+          'totalSupply',
+          'allowances',
+          'vaultAddress',
+          'creditBalances',
+          'rebasingCredits',
+          'rebasingCreditsPerToken',
+          'nonRebasingSupply',
+          'alternativeCreditsPerToken',
+          'rebaseState',
+          'yieldTo',
+          'yieldFrom',
+          'governor',
+        ]
+      : otoken instanceof OToken_2025_07_01
+      ? [
+          'totalSupply',
+          'allowances',
+          'vaultAddress',
+          'creditBalances',
+          'rebasingCredits',
+          'rebasingCreditsPerToken',
+          'nonRebasingSupply',
+          'alternativeCreditsPerToken',
+          'rebaseState',
+          'yieldTo',
+          'yieldFrom',
+          'governor',
+        ]
+      : undefined
+
+  if (!keys) throw new Error('Keys not set up for saveOTokenRawData')
+
   const rawDataEntity = new OTokenRawData({
     id: `${ctx.chain.id}-${otoken.address}`,
     chainId: ctx.chain.id,
@@ -835,57 +913,7 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
     timestamp: new Date(block.header.timestamp),
     blockNumber: block.header.height,
     type: otoken.constructor.name,
-    data: JSON.parse(
-      bigintJsonStringify(
-        pick(
-          otoken,
-          otoken instanceof OToken_2021_01_02 ||
-            otoken instanceof OToken_2021_01_08 ||
-            otoken instanceof OToken_2021_01_25 ||
-            otoken instanceof OToken_2021_06_06
-            ? [
-                'totalSupply',
-                'allowances',
-                'vaultAddress',
-                'creditBalances',
-                'rebasingCredits',
-                'rebasingCreditsPerToken',
-                'nonRebasingSupply',
-                'nonRebasingCreditsPerToken',
-                'rebaseState',
-              ]
-            : otoken instanceof OToken_2023_12_21
-            ? [
-                'totalSupply',
-                'allowances',
-                'vaultAddress',
-                'creditBalances',
-                '_rebasingCredits',
-                '_rebasingCreditsPerToken',
-                'nonRebasingSupply',
-                'nonRebasingCreditsPerToken',
-                'rebaseState',
-                'isUpgraded',
-                'governor',
-              ]
-            : [
-                // OToken_2025_03_04
-                'totalSupply',
-                'allowances',
-                'vaultAddress',
-                'creditBalances',
-                'rebasingCredits',
-                'rebasingCreditsPerToken',
-                'nonRebasingSupply',
-                'alternativeCreditsPerToken',
-                'rebaseState',
-                'yieldTo',
-                'yieldFrom',
-                'governor',
-              ],
-        ),
-      ),
-    ),
+    data: JSON.parse(bigintJsonStringify(pick(otoken, keys))),
   })
   await ctx.store.save(rawDataEntity)
 
@@ -901,6 +929,7 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
   if (block.header.timestamp < Date.parse('2022-01-01')) return
   ctx.log.info(`checking state at height ${block.header.height}`)
   let wrongCount = 0
+  let rebaseMismatchCount = 0
   let totalCount = 0
 
   // Check contract-level state variables
@@ -926,7 +955,6 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
       }`,
     )
     highlevelMismatch = true
-    debugger
   }
 
   // Check nonRebasingSupply
@@ -939,7 +967,6 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
       }`,
     )
     highlevelMismatch = true
-    debugger
   }
 
   // Check rebasingCredits and rebasingCreditsPerToken
@@ -957,7 +984,6 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
       }`,
     )
     highlevelMismatch = true
-    debugger
   }
 
   if (
@@ -974,13 +1000,15 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
       }`,
     )
     highlevelMismatch = true
-    debugger
   }
 
-  if (addressesToCheck.size === 0) return
+  if (addressesToCheck.size === 0) {
+    if (highlevelMismatch) process.exit(1)
+    return
+  }
   const accounts = [...addressesToCheck]
 
-  if (highlevelMismatch) {
+  if (true) {
     // Check Balances
     const balanceMap = await multicall(
       ctx,
@@ -1013,7 +1041,43 @@ const checkState = async (ctx: Context, block: Block, otoken: OTokenClass, addre
 
     const wrongPercentage = totalCount > 0 ? (wrongCount / totalCount) * 100 : 0
     console.log(`${wrongCount} out of ${totalCount} addresses (${wrongPercentage.toFixed(2)}%) have incorrect balances`)
+
+    // Check rebase states for each address using multicall
+    if ('rebaseState' in otoken) {
+      // Prepare multicall for rebaseState(address) for all accounts
+      const rebaseStateResults = await multicall(
+        ctx,
+        block.header,
+        otokenAbi.functions.rebaseState,
+        otoken.address,
+        uniq([...accounts, ...Object.keys(otoken.rebaseState)]).map((address) => ({ _0: address })),
+      ).then((states) => {
+        return new Map(accounts.map((address, idx) => [address, states[idx]]))
+      })
+
+      for (const account of accounts) {
+        const contractRebaseState = rebaseStateResults.get(account)
+        const localRebaseState = otoken.rebaseState[account] ?? 0
+        // Compare contract and local rebase state
+        if (contractRebaseState !== localRebaseState) {
+          rebaseMismatchCount++
+          console.log(
+            `${account} has contract rebaseState=${contractRebaseState} and local rebaseState=${localRebaseState}`,
+          )
+        }
+      }
+      const rebaseWrongPercentage = accounts.length > 0 ? (rebaseMismatchCount / accounts.length) * 100 : 0
+      console.log(
+        `${rebaseMismatchCount} out of ${accounts.length} addresses (${rebaseWrongPercentage.toFixed(
+          2,
+        )}%) have incorrect rebase states`,
+      )
+    }
   }
+
+  if (highlevelMismatch) process.exit(1)
+  if (wrongCount > 0) process.exit(1)
+  if (rebaseMismatchCount > 0) process.exit(1)
 }
 
 const errorParent = (trace: Trace): boolean => {

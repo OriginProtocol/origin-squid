@@ -9,6 +9,7 @@ export const DEFAULT_FIELDS = {
     value: true,
     sighash: true,
     input: true,
+    status: true,
   },
   log: {
     transactionHash: true,

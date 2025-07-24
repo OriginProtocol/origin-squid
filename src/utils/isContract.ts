@@ -9,10 +9,9 @@ let count = 0
 const localStoragePath = './data'
 let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number; blockNumber?: number }>
 
-export const resetCacheForAccounts = (accounts: string[]) => {
-  for (const account of accounts) {
-    cache.delete(account)
-  }
+export const resetContractCache = async (ctx: Context) => {
+  cache = new Map()
+  await saveIsContractCache(ctx, true)
 }
 
 /**
@@ -187,9 +186,9 @@ export const loadIsContractCache = async (ctx: Context) => {
 
 // save once every ~5 minutes
 let lastSave = 0
-export const saveIsContractCache = async (ctx: Context) => {
+export const saveIsContractCache = async (ctx: Context, force: boolean = false) => {
   if (!cache) return
-  if (Date.now() - lastSave < 5 * 60 * 1000) return
+  if (Date.now() - lastSave < 5 * 60 * 1000 && !force) return
   const id = `${ctx.chain.id}-isContract`
   // if (process.env.NODE_ENV === 'development') {
   //   writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))

@@ -5,7 +5,7 @@
  * @author Origin Protocol Inc
  */
 import { Block, Context } from '@originprotocol/squid-utils'
-import { isContract, resetCacheForAccounts } from '@utils/isContract'
+import { isContract, resetContractCache } from '@utils/isContract'
 
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 
@@ -53,7 +53,7 @@ export class OToken_2025_07_01 {
   public yieldFrom: Record<string, string | undefined> = {}
   public governor: string = ''
 
-  copyState(other: OToken_2025_03_04): void {
+  async copyState(other: OToken_2025_03_04): Promise<void> {
     this.totalSupply = other.totalSupply
     this.allowances = other.allowances
     this.vaultAddress = other.vaultAddress
@@ -68,7 +68,7 @@ export class OToken_2025_07_01 {
     this.governor = other.governor
 
     // We want to reset the cache for all accounts on this contract due to the change in `isContract` logic for EIP-7702.
-    resetCacheForAccounts(Object.keys(this.creditBalances))
+    await resetContractCache(this.ctx)
   }
 
   /**
