@@ -138,6 +138,8 @@ function splitTokensInEvenly(gainLoss: {
 
 const buybackOperators = [
   addresses.multisig['multichain-guardian'],
+  '0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab', // Legacy OUSD Buyback
+  '0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2', // Legacy OETH Buyback
   '0xbb077e716a5f1f1b63ed5244ebff5214e50fec8c', // Current Operator
 ]
 
@@ -250,7 +252,7 @@ export const ognBuybacks = defineProcessor({
           )
           if (!transferFrom) {
             // console.log('no transferFrom', log.transactionHash)
-            return
+            continue
           }
 
           const tokenOut = transferFrom.log.address
@@ -262,7 +264,7 @@ export const ognBuybacks = defineProcessor({
           const { from, value } = erc20Abi.events.Transfer.decode(log)
           if (from !== XOGN_ADDRESS) {
             const buyback = new OGNBuyback({
-              id: log.id,
+              id: `${ctx.chain.id}-${log.transactionHash}-${tokenOut}`,
               blockNumber: block.header.height,
               timestamp: new Date(block.header.timestamp),
               operator: transferFrom.data.from.toLowerCase(),
@@ -277,11 +279,14 @@ export const ognBuybacks = defineProcessor({
               ),
               txHash: log.transactionHash,
             })
+            if (buybacks.find((b) => b.id === buyback.id)) {
+              throw new Error('duplicate buyback ' + buyback.id)
+            }
             buybacks.push(buyback)
           }
         }
       }
     }
-    await ctx.store.save(buybacks)
+    await ctx.store.insert(buybacks)
   },
 })
