@@ -33,6 +33,8 @@ deploy:
     ########## MAIN NETWORK ##########
     - name: mainnet-processor
       cmd: ['sqd', 'process:mainnet:prod']
+      env:
+        PROCESSOR: 'ogn-buybacks'
       # env:
       #   ### Fork Setup Stage 1
       #   # ARCHIVE_ONLY: 'true'
@@ -43,107 +45,107 @@ deploy:
       #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
       #   ### Time Travel Fix
       #   # BLOCK_FROM: 20919091
-    - name: oeth-processor
-      cmd: ['sqd', 'process:oeth:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   # ARCHIVE_ONLY: 'true'
-      #   # BLOCK_TO: 20933071
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_ENV: RPC_ENDPOINT
-      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    - name: ogv-processor
-      cmd: ['sqd', 'process:ogv:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   # ARCHIVE_ONLY: 'true'
-      #   # BLOCK_TO: 20933071
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_ENV: RPC_ENDPOINT
-      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    - name: ousd-processor
-      cmd: ['sqd', 'process:ousd:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   # ARCHIVE_ONLY: 'true'
-      #   # BLOCK_TO: 20933071
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_ENV: RPC_ENDPOINT
-      #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    ########## ARBITRUM NETWORK ##########
-    - name: arbitrum-processor
-      cmd: ['sqd', 'process:arbitrum:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   # ARCHIVE_ONLY: 'true'
-      #   # BLOCK_TO: 20919091
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_ARBITRUM_ENV: RPC_ARBITRUM_ENDPOINT
-      #   # RPC_ARBITRUM_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/4fc58260-a74c-4d0f-bdca-77e1bbb1e86c
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    ########## BASE NETWORK ##########
-    - name: base-processor
-      cmd: ['sqd', 'process:base:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   ARCHIVE_ONLY: 'true'
-      #   BLOCK_TO: 21527081
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_BASE_ENV: RPC_BASE_ENDPOINT
-      #   # RPC_BASE_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    ########## Super OETHb - BASE NETWORK ##########
-    - name: oethb-processor
-      cmd: ['sqd', 'process:oethb:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   ARCHIVE_ONLY: 'true'
-      #   BLOCK_TO: 21527081
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_BASE_ENV: RPC_BASE_ENDPOINT
-      #   # RPC_BASE_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    ########## SONIC NETWORK ##########
-    - name: sonic-processor
-      cmd: ['sqd', 'process:sonic:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   ARCHIVE_ONLY: 'true'
-      #   BLOCK_TO: 21527081
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
-      #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
-    ########## PLUME NETWORK ##########
-    - name: plume-processor
-      cmd: ['sqd', 'process:plume:prod']
-      # env:
-      #   ### Fork Setup Stage 1
-      #   ARCHIVE_ONLY: 'true'
-      #   BLOCK_TO: 21527081
-      #   ### Fork Setup Stage 2
-      #   # DISABLE_ARCHIVE: 'true'
-      #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
-      #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
-      #   ### Time Travel Fix
-      #   # BLOCK_FROM: 20919091
+    # - name: oeth-processor
+    #   cmd: ['sqd', 'process:oeth:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   # ARCHIVE_ONLY: 'true'
+    #   #   # BLOCK_TO: 20933071
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_ENV: RPC_ENDPOINT
+    #   #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # - name: ogv-processor
+    #   cmd: ['sqd', 'process:ogv:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   # ARCHIVE_ONLY: 'true'
+    #   #   # BLOCK_TO: 20933071
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_ENV: RPC_ENDPOINT
+    #   #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # - name: ousd-processor
+    #   cmd: ['sqd', 'process:ousd:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   # ARCHIVE_ONLY: 'true'
+    #   #   # BLOCK_TO: 20933071
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_ENV: RPC_ENDPOINT
+    #   #   # RPC_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/b943b56f-ef60-434a-9d70-4d8011fd1baa
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # ########## ARBITRUM NETWORK ##########
+    # - name: arbitrum-processor
+    #   cmd: ['sqd', 'process:arbitrum:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   # ARCHIVE_ONLY: 'true'
+    #   #   # BLOCK_TO: 20919091
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_ARBITRUM_ENV: RPC_ARBITRUM_ENDPOINT
+    #   #   # RPC_ARBITRUM_ENDPOINT: https://virtual.mainnet.rpc.tenderly.co/4fc58260-a74c-4d0f-bdca-77e1bbb1e86c
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # ########## BASE NETWORK ##########
+    # - name: base-processor
+    #   cmd: ['sqd', 'process:base:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   ARCHIVE_ONLY: 'true'
+    #   #   BLOCK_TO: 21527081
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_BASE_ENV: RPC_BASE_ENDPOINT
+    #   #   # RPC_BASE_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # ########## Super OETHb - BASE NETWORK ##########
+    # - name: oethb-processor
+    #   cmd: ['sqd', 'process:oethb:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   ARCHIVE_ONLY: 'true'
+    #   #   BLOCK_TO: 21527081
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_BASE_ENV: RPC_BASE_ENDPOINT
+    #   #   # RPC_BASE_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # ########## SONIC NETWORK ##########
+    # - name: sonic-processor
+    #   cmd: ['sqd', 'process:sonic:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   ARCHIVE_ONLY: 'true'
+    #   #   BLOCK_TO: 21527081
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
+    #   #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
+    # ########## PLUME NETWORK ##########
+    # - name: plume-processor
+    #   cmd: ['sqd', 'process:plume:prod']
+    #   # env:
+    #   #   ### Fork Setup Stage 1
+    #   #   ARCHIVE_ONLY: 'true'
+    #   #   BLOCK_TO: 21527081
+    #   #   ### Fork Setup Stage 2
+    #   #   # DISABLE_ARCHIVE: 'true'
+    #   #   # RPC_SONIC_ENV: RPC_SONIC_ENDPOINT
+    #   #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
+    #   #   ### Time Travel Fix
+    #   #   # BLOCK_FROM: 20919091
   api:
     cmd:
       - npx
