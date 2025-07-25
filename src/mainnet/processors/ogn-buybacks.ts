@@ -80,6 +80,62 @@ function calculateNetGainLoss(
   }
 }
 
+/**
+ * Split tokensIn evenly across multiple tokensOut when there's only one token in but multiple tokens out.
+ * Returns an array of gain/loss objects with the same structure as calculateNetGainLoss.
+ * When splitting is not needed, returns the original gain/loss object in an array.
+ */
+function splitTokensInEvenly(gainLoss: {
+  operators: string[]
+  tokensIn: Record<string, bigint>
+  tokensOut: Record<string, bigint>
+}): Array<{
+  operators: string[]
+  tokensIn: Record<string, bigint>
+  tokensOut: Record<string, bigint>
+}> {
+  const tokensInKeys = Object.keys(gainLoss.tokensIn)
+  const tokensOutKeys = Object.keys(gainLoss.tokensOut)
+
+  // Only process if there's exactly one token in and multiple tokens out
+  if (tokensInKeys.length !== 1 || tokensOutKeys.length <= 1) {
+    return [gainLoss]
+  }
+
+  const tokenIn = tokensInKeys[0]
+  const totalAmountIn = gainLoss.tokensIn[tokenIn]
+  const numTokensOut = tokensOutKeys.length
+
+  // Split the total amount evenly across all tokens out
+  const splitAmount = totalAmountIn / BigInt(numTokensOut)
+  const remainder = totalAmountIn % BigInt(numTokensOut)
+
+  const buybackEntries = []
+  let distributedAmount = 0n
+
+  for (let i = 0; i < tokensOutKeys.length; i++) {
+    const tokenOut = tokensOutKeys[i]
+    const amountOut = gainLoss.tokensOut[tokenOut]
+
+    // Add remainder to the first token to handle uneven division
+    const amountIn = splitAmount + (i === 0 ? remainder : 0n)
+    distributedAmount += amountIn
+
+    buybackEntries.push({
+      operators: gainLoss.operators,
+      tokensIn: { [tokenIn]: amountIn },
+      tokensOut: { [tokenOut]: amountOut },
+    })
+  }
+
+  // Verify the total distributed amount matches the original
+  if (distributedAmount !== totalAmountIn) {
+    throw new Error(`Amount distribution mismatch: distributed ${distributedAmount}, original ${totalAmountIn}`)
+  }
+
+  return buybackEntries
+}
+
 const buybackOperators = [
   addresses.multisig['multichain-guardian'],
   '0xbb077e716a5f1f1b63ed5244ebff5214e50fec8c', // Current Operator
@@ -131,43 +187,46 @@ export const ognBuybacks = defineProcessor({
       for (const transaction of block.transactions) {
         if (transaction.logs.some((l) => oldBuybackFilter.matches(l))) {
           const buybackOperatorsGainLoss = calculateNetGainLoss(transaction, oldBuybackAddresses)
-          const tokensIn = Object.keys(buybackOperatorsGainLoss.tokensIn)
-          const tokensOut = Object.keys(buybackOperatorsGainLoss.tokensOut)
-          if (Object.keys(buybackOperatorsGainLoss.tokensOut).length > 1) throw new Error('multiple tokens out')
-          const tokenOut = tokensOut[0]
-          const tokenIn = tokensIn[0]
-          if (!tokenOut) {
-            // console.log('no token out ' + transaction.hash)
-            continue
-          }
-          if (Object.keys(buybackOperatorsGainLoss.tokensIn).length > 1) throw new Error('multiple tokens in')
-          if (tokenIn === OGN_ADDRESS || tokenIn === OGV_ADDRESS) {
-            const [tokenOutDecimals, tokenRate] = await Promise.all([
-              new erc20Abi.Contract(ctx, block.header, tokenOut).decimals(),
-              ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD'),
-            ])
-            const tokenOutAmount = buybackOperatorsGainLoss.tokensOut[tokenOut]
-            let tokenInAmount = buybackOperatorsGainLoss.tokensIn[tokenIn]
-            if (tokenIn === OGV_ADDRESS) {
-              tokenInAmount = (tokenInAmount * parseEther('0.09137')) / 10n ** 18n
+          const splitEntries = splitTokensInEvenly(buybackOperatorsGainLoss)
+          for (const entry of splitEntries) {
+            const tokensIn = Object.keys(entry.tokensIn)
+            const tokensOut = Object.keys(entry.tokensOut)
+            if (Object.keys(entry.tokensOut).length > 1) throw new Error('multiple tokens out')
+            const tokenOut = tokensOut[0]
+            const tokenIn = tokensIn[0]
+            if (!tokenOut) {
+              // console.log('no token out ' + transaction.hash)
+              continue
             }
-            const buyback = new OGNBuyback({
-              id: `${ctx.chain.id}-${transaction.hash}`,
-              blockNumber: block.header.height,
-              timestamp: new Date(block.header.timestamp),
-              operator: buybackOperatorsGainLoss.operators[0],
-              tokenSold: tokenOut,
-              amountSold: tokenOutAmount,
-              ognBought: tokenInAmount,
-              ognBoughtUSD: Number(
-                formatUnits(
-                  (tokenOutAmount * (tokenRate?.rate ?? 0n)) / 10n ** BigInt(tokenRate?.decimals ?? 18),
-                  tokenOutDecimals,
+            if (Object.keys(entry.tokensIn).length > 1) throw new Error('multiple tokens in')
+            if (tokenIn === OGN_ADDRESS || tokenIn === OGV_ADDRESS) {
+              const [tokenOutDecimals, tokenRate] = await Promise.all([
+                new erc20Abi.Contract(ctx, block.header, tokenOut).decimals(),
+                ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD'),
+              ])
+              const tokenOutAmount = entry.tokensOut[tokenOut]
+              let tokenInAmount = entry.tokensIn[tokenIn]
+              if (tokenIn === OGV_ADDRESS) {
+                tokenInAmount = (tokenInAmount * parseEther('0.09137')) / 10n ** 18n
+              }
+              const buyback = new OGNBuyback({
+                id: `${ctx.chain.id}-${transaction.hash}`,
+                blockNumber: block.header.height,
+                timestamp: new Date(block.header.timestamp),
+                operator: entry.operators[0],
+                tokenSold: tokenOut,
+                amountSold: tokenOutAmount,
+                ognBought: tokenInAmount,
+                ognBoughtUSD: Number(
+                  formatUnits(
+                    (tokenOutAmount * (tokenRate?.rate ?? 0n)) / 10n ** BigInt(tokenRate?.decimals ?? 18),
+                    tokenOutDecimals,
+                  ),
                 ),
-              ),
-              txHash: transaction.hash,
-            })
-            buybacks.push(buyback)
+                txHash: transaction.hash,
+              })
+              buybacks.push(buyback)
+            }
           }
         }
       }
