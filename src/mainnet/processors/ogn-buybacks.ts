@@ -210,7 +210,7 @@ export const ognBuybacks = defineProcessor({
                 tokenInAmount = (tokenInAmount * parseEther('0.09137')) / 10n ** 18n
               }
               const buyback = new OGNBuyback({
-                id: `${ctx.chain.id}-${transaction.hash}`,
+                id: `${ctx.chain.id}-${transaction.hash}-${tokenOut}`,
                 blockNumber: block.header.height,
                 timestamp: new Date(block.header.timestamp),
                 operator: entry.operators[0],
