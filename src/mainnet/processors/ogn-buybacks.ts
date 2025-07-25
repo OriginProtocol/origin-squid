@@ -196,10 +196,14 @@ export const ognBuybacks = defineProcessor({
             if (Object.keys(entry.tokensOut).length > 1) throw new Error('multiple tokens out')
             const tokenOut = tokensOut[0]
             const tokenIn = tokensIn[0]
+
+            // Don't process if theres no observed token out or the token out is OGN.
             if (!tokenOut) {
               // console.log('no token out ' + transaction.hash)
               continue
             }
+            if (tokenOut === OGN_ADDRESS) continue
+
             if (Object.keys(entry.tokensIn).length > 1) throw new Error('multiple tokens in')
             if (tokenIn === OGN_ADDRESS || tokenIn === OGV_ADDRESS) {
               const [tokenOutDecimals, tokenRate] = await Promise.all([
@@ -256,6 +260,10 @@ export const ognBuybacks = defineProcessor({
           }
 
           const tokenOut = transferFrom.log.address
+
+          // Don't process if the token out is OGN.
+          if (tokenOut === OGN_ADDRESS) continue
+
           const [tokenOutDecimals, tokenRate] = await Promise.all([
             new erc20Abi.Contract(ctx, block.header, tokenOut).decimals(),
             ensureExchangeRate(ctx, block, tokenOut as CurrencyAddress, 'USD'),
