@@ -93,7 +93,12 @@ export async function applyCoingeckoData(
     const vsCurrency = props.vsCurrency || 'usd'
     console.log(`Found ${statsWithNoPrice.length} stats with no price`)
     // console.log(JSON.stringify(statsWithNoPrice.map((s) => s.id)))
-    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${props.coinId}/market_chart?vs_currency=${vsCurrency}&days=365&interval=daily&precision=18`
+    let conversionRate = props.coinId === 'origin-dollar-governance' ? 0.09173 : 1
+    let urlCoinId = props.coinId
+    if (props.coinId === 'origin-dollar-governance') {
+      urlCoinId = 'origin-protocol'
+    }
+    const coingeckoURL = `https://api.coingecko.com/api/v3/coins/${urlCoinId}/market_chart?vs_currency=${vsCurrency}&days=365&interval=daily&precision=18`
     const coingeckoJson = await queryClient.fetchQuery({
       queryKey: [coingeckoURL],
       queryFn: async () => {
@@ -120,11 +125,16 @@ export async function applyCoingeckoData(
         const day = coingeckData[dayId]
 
         if (stat && day.prices) {
-          stat.tradingVolumeUSD = day.total_volumes || 0
-          stat.marketCapUSD = day.market_caps || 0
+          if (props.coinId === 'origin-dollar-governance') {
+            stat.tradingVolumeUSD = 0
+            stat.marketCapUSD = 0
+          } else {
+            stat.tradingVolumeUSD = day.total_volumes || 0
+            stat.marketCapUSD = day.market_caps || 0
+          }
           console.log('stat', stat)
           console.log('price data', day)
-          stat.priceUSD = day.prices
+          stat.priceUSD = day.prices * conversionRate
           updatedStats.push(stat)
         }
       }
