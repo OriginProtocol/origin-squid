@@ -1,3 +1,4 @@
+import { plumeErc20s } from 'plume/erc20'
 import { plumeStrategyProcessors } from 'plume/strategies'
 import { superOETHp } from 'plume/super-oeth-p'
 import 'tsconfig-paths/register'
@@ -13,6 +14,7 @@ export const processor = defineSquidProcessor({
   chainId: plumeMainnet.id,
   stateSchema: 'plume-processor',
   processors: [
+    ...plumeErc20s,
     ...superOETHp,
     ...plumeStrategyProcessors,
     // createPoolBoosterProcessor({ registryAddress: '0x4f3b656aa5fb5e708bf7b63d6ff71623eb4a218a', from: 9219718 }),
