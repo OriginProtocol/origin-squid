@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { findLast, last } from 'lodash'
+import { findLast } from 'lodash'
 import { LessThan } from 'typeorm'
 import { formatUnits } from 'viem'
 
@@ -154,12 +154,12 @@ export const createOriginARMProcessors = ({
         const redemptionMap = new Map<string, ArmWithdrawalRequest>()
         const swaps: ArmSwap[] = []
         const getStateId = (block: Block) => `${ctx.chain.id}:${block.header.height}:${armAddress}`
-        const getPreviousState = async () => {
+        const getPreviousState = async (block: Block) => {
           return (
-            last(states) ??
+            findLast(states, (state) => state.blockNumber < block.header.height) ??
             (await ctx.store.findOne(ArmState, {
               order: { timestamp: 'DESC' },
-              where: { chainId: ctx.chain.id, address: armAddress },
+              where: { chainId: ctx.chain.id, address: armAddress, blockNumber: LessThan(block.header.height) },
             }))
           )
         }
@@ -179,7 +179,7 @@ export const createOriginARMProcessors = ({
           if (armStateEntity) {
             return armStateEntity
           }
-          const previousState = await getPreviousState()
+          const previousState = await getPreviousState(block)
           const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
           const armContract = new originArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
@@ -235,6 +235,7 @@ export const createOriginARMProcessors = ({
           })
           armStateEntity.totalYield = calculateTotalYield(armStateEntity)
           states.push(armStateEntity)
+          states.sort((a, b) => a.blockNumber - b.blockNumber) // sort ascending
           return armStateEntity
         }
         const calculateTotalYield = (state: ArmState) =>
