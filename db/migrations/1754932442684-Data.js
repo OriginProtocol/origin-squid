@@ -1,5 +1,5 @@
-module.exports = class Data1753829758019 {
-    name = 'Data1753829758019'
+module.exports = class Data1754932442684 {
+    name = 'Data1754932442684'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -184,7 +184,7 @@ module.exports = class Data1753829758019 {
         await db.query(`CREATE INDEX "IDX_f4ab790e094a77b93887966876" ON "o_token_reward_token_collected" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_21d1addd6f0b96b016c802141f" ON "o_token_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_12a95d40144492a85dc15b9e57" ON "o_token_reward_token_collected" ("otoken") `)
-        await db.query(`CREATE TABLE "o_token_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "request_id" numeric NOT NULL, "withdrawer" text NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "tx_hash" text NOT NULL, CONSTRAINT "PK_44db9244683cb58e12a51cf3c8b" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "request_id" numeric NOT NULL, "withdrawer" text NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, "tx_hash" text NOT NULL, CONSTRAINT "PK_44db9244683cb58e12a51cf3c8b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d9844c17dce47a89f23917de31" ON "o_token_withdrawal_request" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_326e6366033bf085a34371d559" ON "o_token_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_40e7c338b514e19f2319d768bd" ON "o_token_withdrawal_request" ("timestamp") `)
@@ -207,7 +207,7 @@ module.exports = class Data1753829758019 {
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8da1e323ff87677d898da36c4c" ON "arm_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
-        await db.query(`CREATE TABLE "arm_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, CONSTRAINT "PK_13dc23b0e4ee7f803645e930896" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_13dc23b0e4ee7f803645e930896" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_330af8826e0e9369301bebc3e7" ON "arm_withdrawal_request" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_501cc246901cfad5d624da98d6" ON "arm_withdrawal_request" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_f0634f8590f80c00f646b82867" ON "arm_withdrawal_request" ("timestamp") `)

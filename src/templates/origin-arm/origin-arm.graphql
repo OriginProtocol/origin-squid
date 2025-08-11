@@ -84,6 +84,7 @@ type ArmWithdrawalRequest @entity {
   amount: BigInt!
   queued: BigInt!
   claimed: Boolean!
+  claimedAt: DateTime
 }
 
 type ArmSwap @entity {

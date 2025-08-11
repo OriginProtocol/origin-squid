@@ -91,6 +91,7 @@ export const createOTokenWithdrawalsProcessor = ({
     }
     if (updated) {
       updated.claimed = true
+      updated.claimedAt = new Date(block.header.timestamp)
       result.withdrawalRequests.set(id, updated)
     }
   }

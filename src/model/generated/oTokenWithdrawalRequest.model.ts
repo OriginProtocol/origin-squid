@@ -40,6 +40,9 @@ export class OTokenWithdrawalRequest {
     @BooleanColumn_({nullable: false})
     claimed!: boolean
 
+    @DateTimeColumn_({nullable: true})
+    claimedAt!: Date | undefined | null
+
     @Index_()
     @StringColumn_({nullable: false})
     txHash!: string

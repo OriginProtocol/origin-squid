@@ -588,6 +588,7 @@ type OTokenWithdrawalRequest @entity {
   amount: BigInt!
   queued: BigInt!
   claimed: Boolean!
+  claimedAt: DateTime
   txHash: String! @index
 }
 
@@ -701,6 +702,7 @@ type ArmWithdrawalRequest @entity {
   amount: BigInt!
   queued: BigInt!
   claimed: Boolean!
+  claimedAt: DateTime
 }
 
 type ArmSwap @entity {

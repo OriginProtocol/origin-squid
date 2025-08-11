@@ -268,6 +268,7 @@ export const createOriginARMProcessors = ({
                 redemptionMap.get(eventId) ?? (await ctx.store.get(ArmWithdrawalRequest, eventId))
               if (redemptionEntity) {
                 redemptionEntity.claimed = true
+                redemptionEntity.claimedAt = new Date(block.header.timestamp)
                 redemptionMap.set(eventId, redemptionEntity)
               }
             }
