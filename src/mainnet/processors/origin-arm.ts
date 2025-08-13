@@ -8,5 +8,4 @@ export const originArmProcessors = createOriginARMProcessors({
   underlyingToken: 'WETH',
   capManagerAddress: addresses.arm.capManager,
   lidoArm: true,
-  marketFrom: 23075746,
 })
