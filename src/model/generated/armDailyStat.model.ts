@@ -77,6 +77,12 @@ export class ArmDailyStat {
     @BigIntColumn_({nullable: false})
     fees!: bigint
 
+    @BigIntColumn_({nullable: false})
+    cumulativeYield!: bigint
+
+    @BigIntColumn_({nullable: false})
+    cumulativeFees!: bigint
+
     @FloatColumn_({nullable: false})
     rateUSD!: number
 

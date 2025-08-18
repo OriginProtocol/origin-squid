@@ -68,6 +68,8 @@ type ArmDailyStat @entity {
   apy: Float!
   yield: BigInt!
   fees: BigInt!
+  cumulativeYield: BigInt!
+  cumulativeFees: BigInt!
   rateUSD: Float!
   rateETH: Float!
 }

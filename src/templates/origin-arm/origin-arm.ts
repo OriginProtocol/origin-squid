@@ -398,6 +398,8 @@ export const createOriginARMProcessors = ({
               apy: armDayApy.apy,
               fees: state.totalFees - (yesterdayState?.totalFees ?? 0n),
               yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
+              cumulativeFees: state.totalFees,
+              cumulativeYield: state.totalYield,
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
               rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
             })
