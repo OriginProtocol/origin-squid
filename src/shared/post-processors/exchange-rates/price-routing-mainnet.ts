@@ -37,6 +37,7 @@ const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
 const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
   CRV_USD: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
   CRV_USDC: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
+  CVX_USD: createChainlinkPriceFeed('0xd962fC30A72A84cE50161031391756Bf2876Af5D', 8n),
 }
 
 export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
@@ -285,4 +286,5 @@ export const priceMap: Partial<
   ...twoWay('CVX', 'WETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
   ...twoWay('CRV', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'ETH')),
   ...twoWay('CVX', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
+  ...twoWay('CVX', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
 }
