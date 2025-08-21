@@ -257,7 +257,14 @@ export const processStrategyEarnings = async (
             data.rewardToken as CurrencyAddress,
             saveAsAsset ?? (strategyData.assets[0].address as CurrencyAddress),
             data.amount,
-          ),
+          ).catch((e) => {
+            // Ignore earnings errors for OETH which happened before the LST switch.
+            // Why?
+            // - We've changed some processing which picks up more earnings from the past but they do not matter anymore.
+            // - Avoid having to hook up all the rates.
+            if (strategyData.oTokenAddress === OETH_ADDRESS && block.header.height < 21175501) return 0n
+            throw e
+          }),
         })
       }
     }

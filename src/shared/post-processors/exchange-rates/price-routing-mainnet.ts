@@ -34,32 +34,44 @@ const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
 
 // 0xCd627aA160A6fA45Eb793D19Ef54f5062F20f33f
 
-const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
-  CRV_USD: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
-  CRV_USDC: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n),
+const chainlinkPriceFeeds: Record<
+  string,
+  undefined | { height: number; get: (ctx: Context, height: number) => Promise<bigint> }
+> = {
+  CRV_USD: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
+  CRV_USDC: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
+  OETH_ETH: { height: 19384550, get: createChainlinkPriceFeed('0x703118c4cbcccbf2ab31913e0f8075fbbb15f563', 18n) },
 }
 
-export const getMainnetPrice = async (ctx: Context, height: number, base: MainnetCurrency, quote: MainnetCurrency) => {
+export const getMainnetPrice = async (
+  ctx: Context,
+  height: number,
+  base: MainnetCurrency,
+  quote: MainnetCurrency,
+): Promise<[bigint, number]> => {
   base = translateMainnetSymbol(base)
   quote = translateMainnetSymbol(quote)
 
   const feed = chainlinkPriceFeeds[`${base}_${quote}`]
-  if (feed) {
-    return [await feed(ctx, height), 18] as const
+  if (feed && feed.height <= height) {
+    return [await feed.get(ctx, height), 18]
   }
 
   const priceEntry = priceMap[`${base}_${quote}`]
   if (priceEntry) {
     const [getPrice, decimals] = priceEntry
-    return [await getPrice(ctx, height), decimals] as const
+    return [await getPrice(ctx, height), decimals]
   }
   throw new Error(`No price for ${base}_${quote}`)
 }
 
 const getOETHETHPrice = async (ctx: Context, height: number) => {
   if (height < 17230232) return 10n ** 18n
-  const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
-  return await contract.get_dy(0n, 1n, 1000000000000000000n)
+  if (height < 19384550) {
+    const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
+    return await contract.get_dy(0n, 1n, 1000000000000000000n)
+  }
+  return chainlinkPriceFeeds['OETH_ETH']!.get(ctx, height)
 }
 
 const getETHOETHPrice = async (ctx: Context, height: number) => {
@@ -234,6 +246,16 @@ export const priceMap: Partial<
   ...twoWay('USDT', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'USD'), 8),
   ...twoWay('USDS', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDS', 'USD'), 8),
   ...twoWay('ETH', 'USDS', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USDS'), 8),
+  ...twoWay('BAL', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'BAL', 'USD'), 8),
+  ...derived(
+    'BAL',
+    'WETH',
+    [
+      { base: 'BAL', quote: 'USD' },
+      { base: 'USD', quote: 'ETH' },
+    ],
+    18,
+  ),
   ...derived(
     'DAI',
     'ETH',
