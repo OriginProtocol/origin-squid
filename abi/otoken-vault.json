@@ -1,5 +1,10 @@
 [
   {
+    "inputs": [{ "internalType": "address", "name": "_weth", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "uint256", "name": "_threshold", "type": "uint256" }],
     "name": "AllocateThresholdUpdated",
@@ -266,6 +271,13 @@
   },
   {
     "inputs": [],
+    "name": "addWithdrawalQueueLiquidity",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "adminImplPosition",
     "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
     "stateMutability": "view",
@@ -287,12 +299,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
     "name": "burnForStrategy",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
+  { "inputs": [], "name": "cacheWETHAssetIndex", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
     "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
     "name": "calculateRedeemOutputs",
@@ -315,6 +328,23 @@
     "type": "function"
   },
   { "inputs": [], "name": "claimGovernance", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_requestId", "type": "uint256" }],
+    "name": "claimWithdrawal",
+    "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256[]", "name": "_requestIds", "type": "uint256[]" }],
+    "name": "claimWithdrawals",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" },
+      { "internalType": "uint256", "name": "totalAmount", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
   {
     "inputs": [],
     "name": "dripDuration",
@@ -440,7 +470,7 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
     "name": "mintForStrategy",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -549,6 +579,16 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
+    "name": "requestWithdrawal",
+    "outputs": [
+      { "internalType": "uint256", "name": "requestId", "type": "uint256" },
+      { "internalType": "uint256", "name": "queued", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [{ "internalType": "address", "name": "newImpl", "type": "address" }],
     "name": "setAdminImpl",
     "outputs": [],
@@ -603,6 +643,20 @@
   {
     "inputs": [],
     "name": "vaultBuffer",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "weth",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wethAssetIndex",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"

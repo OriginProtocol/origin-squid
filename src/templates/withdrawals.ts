@@ -59,6 +59,14 @@ export const createOTokenWithdrawalsProcessor = ({
   ) => {
     const data = oethVault.events.WithdrawalRequested.decode(log)
     const id = `${ctx.chain.id}:${oTokenAddress}:${data._withdrawer.toLowerCase()}:${data._requestId}`
+    const input = log.transaction?.input
+    let queueWait: bigint | null = null
+    if (input?.startsWith(oethVault.functions.requestWithdrawal.sighash)) {
+      const extraBytes = input.slice(74)
+      if (extraBytes.length > 0) {
+        queueWait = BigInt('0x' + extraBytes)
+      }
+    }
     const withdrawalRequest = new OTokenWithdrawalRequest({
       id,
       chainId: ctx.chain.id,
@@ -71,6 +79,7 @@ export const createOTokenWithdrawalsProcessor = ({
       queued: data._queued,
       withdrawer: data._withdrawer.toLowerCase(),
       txHash: log.transactionHash,
+      queueWait,
     })
     result.withdrawalRequests.set(withdrawalRequest.id, withdrawalRequest)
   }

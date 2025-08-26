@@ -46,15 +46,19 @@ export const events = {
 
 export const functions = {
     ADMIN_IMPLEMENTATION: viewFun("0xcc2fe94b", "ADMIN_IMPLEMENTATION()", {}, p.address),
+    addWithdrawalQueueLiquidity: fun("0xb9b17f9f", "addWithdrawalQueueLiquidity()", {}, ),
     adminImplPosition: viewFun("0xef08edc2", "adminImplPosition()", {}, p.bytes32),
     allocate: fun("0xabaa9916", "allocate()", {}, ),
     assetDefaultStrategies: viewFun("0xa403e4d5", "assetDefaultStrategies(address)", {"_0": p.address}, p.address),
     autoAllocateThreshold: viewFun("0x9fa1826e", "autoAllocateThreshold()", {}, p.uint256),
-    burnForStrategy: fun("0x6217f3ea", "burnForStrategy(uint256)", {"_amount": p.uint256}, ),
+    burnForStrategy: fun("0x6217f3ea", "burnForStrategy(uint256)", {"amount": p.uint256}, ),
+    cacheWETHAssetIndex: fun("0x44c54707", "cacheWETHAssetIndex()", {}, ),
     calculateRedeemOutputs: viewFun("0x67bd7ba3", "calculateRedeemOutputs(uint256)", {"_amount": p.uint256}, p.array(p.uint256)),
     capitalPaused: viewFun("0xe6cc5432", "capitalPaused()", {}, p.bool),
     checkBalance: viewFun("0x5f515226", "checkBalance(address)", {"_asset": p.address}, p.uint256),
     claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
+    claimWithdrawal: fun("0xf8444436", "claimWithdrawal(uint256)", {"_requestId": p.uint256}, p.uint256),
+    claimWithdrawals: fun("0x48e30f54", "claimWithdrawals(uint256[])", {"_requestIds": p.array(p.uint256)}, {"amounts": p.array(p.uint256), "totalAmount": p.uint256}),
     dripDuration: viewFun("0xbb7a632e", "dripDuration()", {}, p.uint64),
     dripper: viewFun("0x603ea03b", "dripper()", {}, p.address),
     getAllAssets: viewFun("0x2acada4d", "getAllAssets()", {}, p.array(p.address)),
@@ -70,7 +74,7 @@ export const functions = {
     lastRebase: viewFun("0x78f353a1", "lastRebase()", {}, p.uint64),
     maxSupplyDiff: viewFun("0x8e510b52", "maxSupplyDiff()", {}, p.uint256),
     mint: fun("0x156e29f6", "mint(address,uint256,uint256)", {"_asset": p.address, "_amount": p.uint256, "_minimumOusdAmount": p.uint256}, ),
-    mintForStrategy: fun("0xab80dafb", "mintForStrategy(uint256)", {"_amount": p.uint256}, ),
+    mintForStrategy: fun("0xab80dafb", "mintForStrategy(uint256)", {"amount": p.uint256}, ),
     netOusdMintForStrategyThreshold: viewFun("0x7a2202f3", "netOusdMintForStrategyThreshold()", {}, p.uint256),
     netOusdMintedForStrategy: viewFun("0xe45cc9f0", "netOusdMintedForStrategy()", {}, p.int256),
     oUSD: viewFun("0x5802a172", "oUSD()", {}, p.address),
@@ -86,6 +90,7 @@ export const functions = {
     rebaseThreshold: viewFun("0x52d38e5d", "rebaseThreshold()", {}, p.uint256),
     redeem: fun("0x7cbc2373", "redeem(uint256,uint256)", {"_amount": p.uint256, "_minimumUnitAmount": p.uint256}, ),
     redeemFeeBps: viewFun("0x09f6442c", "redeemFeeBps()", {}, p.uint256),
+    requestWithdrawal: fun("0x9ee679e8", "requestWithdrawal(uint256)", {"_amount": p.uint256}, {"requestId": p.uint256, "queued": p.uint256}),
     setAdminImpl: fun("0xfc0cfeee", "setAdminImpl(address)", {"newImpl": p.address}, ),
     strategies: viewFun("0x39ebf823", "strategies(address)", {"_0": p.address}, {"isSupported": p.bool, "_deprecated": p.uint256}),
     strategistAddr: viewFun("0x570d8e1d", "strategistAddr()", {}, p.address),
@@ -94,6 +99,8 @@ export const functions = {
     trusteeAddress: viewFun("0x49c1d54d", "trusteeAddress()", {}, p.address),
     trusteeFeeBps: viewFun("0x207134b0", "trusteeFeeBps()", {}, p.uint256),
     vaultBuffer: viewFun("0x1edfe3da", "vaultBuffer()", {}, p.uint256),
+    weth: viewFun("0x3fc8cef3", "weth()", {}, p.address),
+    wethAssetIndex: viewFun("0x54c6d858", "wethAssetIndex()", {}, p.uint256),
     withdrawalClaimDelay: viewFun("0x45e4213b", "withdrawalClaimDelay()", {}, p.uint256),
     withdrawalQueueMetadata: viewFun("0x362bd1a3", "withdrawalQueueMetadata()", {}, {"queued": p.uint128, "claimable": p.uint128, "claimed": p.uint128, "nextWithdrawalIndex": p.uint128}),
     withdrawalRequests: viewFun("0x937b2581", "withdrawalRequests(uint256)", {"_0": p.uint256}, {"withdrawer": p.address, "claimed": p.bool, "timestamp": p.uint40, "amount": p.uint128, "queued": p.uint128}),
@@ -257,6 +264,14 @@ export class Contract extends ContractBase {
         return this.eth_call(functions.vaultBuffer, {})
     }
 
+    weth() {
+        return this.eth_call(functions.weth, {})
+    }
+
+    wethAssetIndex() {
+        return this.eth_call(functions.wethAssetIndex, {})
+    }
+
     withdrawalClaimDelay() {
         return this.eth_call(functions.withdrawalClaimDelay, {})
     }
@@ -315,6 +330,9 @@ export type YieldDistributionEventArgs = EParams<typeof events.YieldDistribution
 export type ADMIN_IMPLEMENTATIONParams = FunctionArguments<typeof functions.ADMIN_IMPLEMENTATION>
 export type ADMIN_IMPLEMENTATIONReturn = FunctionReturn<typeof functions.ADMIN_IMPLEMENTATION>
 
+export type AddWithdrawalQueueLiquidityParams = FunctionArguments<typeof functions.addWithdrawalQueueLiquidity>
+export type AddWithdrawalQueueLiquidityReturn = FunctionReturn<typeof functions.addWithdrawalQueueLiquidity>
+
 export type AdminImplPositionParams = FunctionArguments<typeof functions.adminImplPosition>
 export type AdminImplPositionReturn = FunctionReturn<typeof functions.adminImplPosition>
 
@@ -330,6 +348,9 @@ export type AutoAllocateThresholdReturn = FunctionReturn<typeof functions.autoAl
 export type BurnForStrategyParams = FunctionArguments<typeof functions.burnForStrategy>
 export type BurnForStrategyReturn = FunctionReturn<typeof functions.burnForStrategy>
 
+export type CacheWETHAssetIndexParams = FunctionArguments<typeof functions.cacheWETHAssetIndex>
+export type CacheWETHAssetIndexReturn = FunctionReturn<typeof functions.cacheWETHAssetIndex>
+
 export type CalculateRedeemOutputsParams = FunctionArguments<typeof functions.calculateRedeemOutputs>
 export type CalculateRedeemOutputsReturn = FunctionReturn<typeof functions.calculateRedeemOutputs>
 
@@ -341,6 +362,12 @@ export type CheckBalanceReturn = FunctionReturn<typeof functions.checkBalance>
 
 export type ClaimGovernanceParams = FunctionArguments<typeof functions.claimGovernance>
 export type ClaimGovernanceReturn = FunctionReturn<typeof functions.claimGovernance>
+
+export type ClaimWithdrawalParams = FunctionArguments<typeof functions.claimWithdrawal>
+export type ClaimWithdrawalReturn = FunctionReturn<typeof functions.claimWithdrawal>
+
+export type ClaimWithdrawalsParams = FunctionArguments<typeof functions.claimWithdrawals>
+export type ClaimWithdrawalsReturn = FunctionReturn<typeof functions.claimWithdrawals>
 
 export type DripDurationParams = FunctionArguments<typeof functions.dripDuration>
 export type DripDurationReturn = FunctionReturn<typeof functions.dripDuration>
@@ -435,6 +462,9 @@ export type RedeemReturn = FunctionReturn<typeof functions.redeem>
 export type RedeemFeeBpsParams = FunctionArguments<typeof functions.redeemFeeBps>
 export type RedeemFeeBpsReturn = FunctionReturn<typeof functions.redeemFeeBps>
 
+export type RequestWithdrawalParams = FunctionArguments<typeof functions.requestWithdrawal>
+export type RequestWithdrawalReturn = FunctionReturn<typeof functions.requestWithdrawal>
+
 export type SetAdminImplParams = FunctionArguments<typeof functions.setAdminImpl>
 export type SetAdminImplReturn = FunctionReturn<typeof functions.setAdminImpl>
 
@@ -458,6 +488,12 @@ export type TrusteeFeeBpsReturn = FunctionReturn<typeof functions.trusteeFeeBps>
 
 export type VaultBufferParams = FunctionArguments<typeof functions.vaultBuffer>
 export type VaultBufferReturn = FunctionReturn<typeof functions.vaultBuffer>
+
+export type WethParams = FunctionArguments<typeof functions.weth>
+export type WethReturn = FunctionReturn<typeof functions.weth>
+
+export type WethAssetIndexParams = FunctionArguments<typeof functions.wethAssetIndex>
+export type WethAssetIndexReturn = FunctionReturn<typeof functions.wethAssetIndex>
 
 export type WithdrawalClaimDelayParams = FunctionArguments<typeof functions.withdrawalClaimDelay>
 export type WithdrawalClaimDelayReturn = FunctionReturn<typeof functions.withdrawalClaimDelay>

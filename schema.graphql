@@ -589,6 +589,7 @@ type OTokenWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
   claimedAt: DateTime
+  queueWait: BigInt
   txHash: String! @index
 }
 

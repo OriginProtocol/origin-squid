@@ -43,6 +43,9 @@ export class OTokenWithdrawalRequest {
     @DateTimeColumn_({nullable: true})
     claimedAt!: Date | undefined | null
 
+    @BigIntColumn_({nullable: true})
+    queueWait!: bigint | undefined | null
+
     @Index_()
     @StringColumn_({nullable: false})
     txHash!: string

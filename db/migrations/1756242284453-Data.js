@@ -1,5 +1,5 @@
-module.exports = class Data1755553679357 {
-    name = 'Data1755553679357'
+module.exports = class Data1756242284453 {
+    name = 'Data1756242284453'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -184,7 +184,7 @@ module.exports = class Data1755553679357 {
         await db.query(`CREATE INDEX "IDX_f4ab790e094a77b93887966876" ON "o_token_reward_token_collected" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_21d1addd6f0b96b016c802141f" ON "o_token_reward_token_collected" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_12a95d40144492a85dc15b9e57" ON "o_token_reward_token_collected" ("otoken") `)
-        await db.query(`CREATE TABLE "o_token_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "request_id" numeric NOT NULL, "withdrawer" text NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, "tx_hash" text NOT NULL, CONSTRAINT "PK_44db9244683cb58e12a51cf3c8b" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "otoken" text NOT NULL, "request_id" numeric NOT NULL, "withdrawer" text NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, "queue_wait" numeric, "tx_hash" text NOT NULL, CONSTRAINT "PK_44db9244683cb58e12a51cf3c8b" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_d9844c17dce47a89f23917de31" ON "o_token_withdrawal_request" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_326e6366033bf085a34371d559" ON "o_token_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_40e7c338b514e19f2319d768bd" ON "o_token_withdrawal_request" ("timestamp") `)
