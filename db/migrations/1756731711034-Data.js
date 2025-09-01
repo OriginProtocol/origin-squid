@@ -1,5 +1,5 @@
-module.exports = class Data1756729531489 {
-    name = 'Data1756729531489'
+module.exports = class Data1756731711034 {
+    name = 'Data1756731711034'
 
     async up(db) {
         await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
