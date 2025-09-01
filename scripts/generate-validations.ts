@@ -177,6 +177,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
       fees
       rateETH
       rateUSD
+      rateNative
       yield
       marketCapUSD
       accountsOverThreshold
@@ -281,6 +282,7 @@ const arm = (prefix: string, armAddress: string) => {
         totalAssetsCap
         totalSupply
         yield
+        rateNative
       }
     `),
   ]

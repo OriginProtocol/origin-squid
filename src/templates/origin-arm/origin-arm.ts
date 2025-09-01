@@ -351,11 +351,12 @@ export const createOriginARMProcessors = ({
         for (const block of ctx.blocks) {
           if (tracker(ctx, block) || (block.header.height > from && ctx.latestBlockOfDay(block))) {
             // ArmState
-            const [state, yesterdayState, rateUSD, rateETH] = await Promise.all([
+            const [state, yesterdayState, rateUSD, rateETH, rateNative] = await Promise.all([
               getCurrentState(block),
               getYesterdayState(block),
               ensureExchangeRate(ctx, block, underlyingToken, 'USD'),
               ensureExchangeRate(ctx, block, underlyingToken, 'ETH'),
+              ensureExchangeRate(ctx, block, underlyingToken, ctx.chain.nativeCurrency.symbol as Currency),
             ])
 
             // ArmDailyStat
@@ -402,6 +403,7 @@ export const createOriginARMProcessors = ({
               cumulativeYield: state.totalYield,
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
               rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
+              rateNative: +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }

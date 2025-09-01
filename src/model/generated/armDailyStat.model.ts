@@ -88,4 +88,7 @@ export class ArmDailyStat {
 
     @FloatColumn_({nullable: false})
     rateETH!: number
+
+    @FloatColumn_({nullable: false})
+    rateNative!: number
 }

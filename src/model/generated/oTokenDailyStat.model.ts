@@ -51,6 +51,9 @@ export class OTokenDailyStat {
     rateETH!: bigint
 
     @BigIntColumn_({nullable: false})
+    rateNative!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalSupply!: bigint
 
     @BigIntColumn_({nullable: false})

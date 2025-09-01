@@ -10,7 +10,7 @@ import * as wotokenAbi from '@abi/woeth'
 import { OToken, OTokenAPY, OTokenDailyStat, OTokenRebase } from '@model'
 import { Block, Context } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { Currency, CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 
 /**
  * For sake of efficiency, we only want to update the daily stats if the block is within 20 seconds of the hourly crossover or if there has been recent activity on the OToken.
@@ -79,7 +79,7 @@ export const processOTokenDailyStats = async (
         : null
 
     const asyncStartTime = Date.now()
-    const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate] =
+    const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate, rateNative] =
       await Promise.all([
         (async () => {
           let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
@@ -127,6 +127,9 @@ export const processOTokenDailyStats = async (
         params.getAmoSupply(ctx, block.header.height),
         wotokenContract ? wotokenContract.totalSupply() : 0n,
         wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
+        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, ctx.chain.nativeCurrency.symbol as Currency).then(
+          (a) => a?.rate ?? 0n,
+        ),
       ])
     if (process.env.DEBUG_PERF === 'true') {
       ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
@@ -175,6 +178,7 @@ export const processOTokenDailyStats = async (
 
     entity.rateETH = rateETH
     entity.rateUSD = rateUSD
+    entity.rateNative = rateNative
     entity.amoSupply = amoSupply
 
     entity.dripperWETH = dripperWETH
@@ -217,6 +221,7 @@ export const getOTokenDailyStat = async (
 
       rateUSD: 0n,
       rateETH: 0n,
+      rateNative: 0n,
 
       totalSupply: 0n,
       rebasingSupply: 0n,
