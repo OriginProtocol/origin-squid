@@ -309,4 +309,5 @@ export const priceMap: Partial<
   ...twoWay('CRV', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'ETH')),
   ...twoWay('CVX', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
   ...twoWay('CVX', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
+  ...twoWay('CVX', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
 }
