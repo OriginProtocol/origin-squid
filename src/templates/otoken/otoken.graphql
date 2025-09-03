@@ -177,6 +177,7 @@ type OTokenDailyStat @entity {
 
   rateUSD: BigInt!
   rateETH: BigInt!
+  rateNative: BigInt!
 
   totalSupply: BigInt!
   rebasingSupply: BigInt!

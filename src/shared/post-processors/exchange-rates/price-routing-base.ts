@@ -18,6 +18,7 @@ const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
 const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
   ETH_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
   superOETHb_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
+  superOETHb_ETH: createChainlinkPriceFeed('0x39C6E14CdE46D4FFD9F04Ff159e7ce8eC20E10B4', 18n),
   AERO_USD: createChainlinkPriceFeed('0x4EC5970fC728C5f65ba413992CD5fF6FD70fcfF0', 8n),
 }
 
