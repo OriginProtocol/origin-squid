@@ -15,12 +15,19 @@ const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
   }
 }
 
-const chainlinkPriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
-  ETH_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
-  superOETHb_USD: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
-  superOETHb_ETH: createChainlinkPriceFeed('0x39C6E14CdE46D4FFD9F04Ff159e7ce8eC20E10B4', 18n),
-  AERO_USD: createChainlinkPriceFeed('0x4EC5970fC728C5f65ba413992CD5fF6FD70fcfF0', 8n),
-}
+const chainlinkPriceFeeds: Record<string, { height: number; get: (ctx: Context, height: number) => Promise<bigint> }> =
+  {
+    ETH_USD: { height: 2092862, get: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n) },
+    superOETHb_USD: {
+      height: 2092862,
+      get: createChainlinkPriceFeed('0x71041dddad3595f9ced3dccfbe3d1f4b0a16bb70', 8n),
+    },
+    superOETHb_ETH: {
+      height: 27814188,
+      get: createChainlinkPriceFeed('0x39C6E14CdE46D4FFD9F04Ff159e7ce8eC20E10B4', 18n),
+    },
+    AERO_USD: { height: 12730314, get: createChainlinkPriceFeed('0x4EC5970fC728C5f65ba413992CD5fF6FD70fcfF0', 8n) },
+  }
 
 const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height: number) => {
   if (pool.from > height) return 0n
@@ -57,18 +64,18 @@ const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Pr
   OGN_superOETHb: createAMMPriceFeed(baseAddresses.aerodrome.pools['vAMM-OGN/superOETHb']),
   OGN_USD: async (ctx: Context, height: number) => {
     const rate1 = await alternativePriceFeeds['OGN_superOETHb'](ctx, height)
-    const rate2 = await chainlinkPriceFeeds['superOETHb_USD'](ctx, height)
+    const rate2 = await chainlinkPriceFeeds['superOETHb_USD'].get(ctx, height)
     return (rate1 * rate2) / ONE_ETH
   },
   AERO_ETH: async (ctx: Context, height: number) => {
-    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'](ctx, height)
-    const ethUsd = await chainlinkPriceFeeds['ETH_USD'](ctx, height)
+    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'].get(ctx, height)
+    const ethUsd = await chainlinkPriceFeeds['ETH_USD'].get(ctx, height)
     if (ethUsd === 0n) return 0n
     return (aeroUsd * ONE_ETH) / ethUsd
   },
   AERO_WETH: async (ctx: Context, height: number) => {
-    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'](ctx, height)
-    const ethUsd = await chainlinkPriceFeeds['ETH_USD'](ctx, height)
+    const aeroUsd = await chainlinkPriceFeeds['AERO_USD'].get(ctx, height)
+    const ethUsd = await chainlinkPriceFeeds['ETH_USD'].get(ctx, height)
     if (ethUsd === 0n) return 0n
     return (aeroUsd * ONE_ETH) / ethUsd
   },
@@ -86,8 +93,8 @@ export const getBasePrice = async (ctx: Context, height: number, base: BaseCurre
     quote = translateBaseSymbol(quote)
     if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
-    if (feed) {
-      return [await feed(ctx, height), 18] as const
+    if (feed && feed.height <= height) {
+      return [await feed.get(ctx, height), 18] as const
     }
     const alternateFeed = alternativePriceFeeds[`${base}_${quote}`]
     if (alternateFeed) {
