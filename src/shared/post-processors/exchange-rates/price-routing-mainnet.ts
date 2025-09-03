@@ -40,8 +40,10 @@ const chainlinkPriceFeeds: Record<
 > = {
   CRV_USD: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
   CRV_USDC: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
-  CVX_USD: { height: 13960589, get: createChainlinkPriceFeed('0xd962fC30A72A84cE50161031391756Bf2876Af5D', 8n) },
+  CVX_USD: { height: 13960589, get: createChainlinkPriceFeed('0xd962fc30a72a84ce50161031391756bf2876af5d', 8n) },
   OETH_ETH: { height: 19384550, get: createChainlinkPriceFeed('0x703118c4cbcccbf2ab31913e0f8075fbbb15f563', 18n) },
+  COMP_USD: { height: 10730672, get: createChainlinkPriceFeed('0xdbd020caef83efd542f4de03e3cf0c28a4428bd5', 8n) },
+  COMP_ETH: { height: 10679326, get: createChainlinkPriceFeed('0x1b39ee86ec5979ba5c322b826b3ecb8c79991699', 18n) },
 }
 
 export const getMainnetPrice = async (
@@ -310,4 +312,6 @@ export const priceMap: Partial<
   ...twoWay('CVX', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
   ...twoWay('CVX', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
   ...twoWay('CVX', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
+  ...twoWay('CRV', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'USD')),
+  ...twoWay('COMP', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'COMP', 'USD')),
 }

@@ -11,6 +11,7 @@
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
     "serve": "sqd serve",
     "typegen": "sqd typegen",
+    "migration:apply": "sqd migration:apply",
     "process:arbitrum": "sqd process:arbitrum",
     "process:base": "sqd process:base",
     "process:sonic": "sqd process:sonic",
