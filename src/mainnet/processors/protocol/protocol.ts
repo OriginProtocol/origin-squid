@@ -147,15 +147,15 @@ const getOTokenDetails = async (
   //  our product's details until our dependencies are all caught up.
   const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
   const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
-  const lastDates = [last?.date, lastSuperOETHb?.date, lastSuperOETHp?.date].filter(Boolean) as string[]
-  const oldestDate = lastDates.length > 0 ? lastDates.reduce((min, d) => (d < min ? d : min), lastDates[0]) : undefined
+  const lastDates = [last?.date ?? startDate, lastSuperOETHb?.date, lastSuperOETHp?.date].filter(Boolean) as string[]
+  const oldestDate = lastDates.reduce((min, d) => (d < min ? d : min), lastDates[0])
 
   const status = await ctx.store.findOne(ProcessingStatus, { where: { id: processorId } })
   if (!status) return []
 
   const details: ProtocolDailyStatDetail[] = []
 
-  const dates = getDatesBetween(oldestDate ?? startDate, getDateForTimestamp(status.timestamp.valueOf()))
+  const dates = getDatesBetween(oldestDate, getDateForTimestamp(status.timestamp.valueOf()))
   const dailyStats = await ctx.store.find(OTokenDailyStat, { where: { date: In(dates), otoken: otokenAddress } })
   for (const date of dates) {
     const otokenDailyStat = dailyStats.find((d) => d.date === date)
