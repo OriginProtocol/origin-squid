@@ -1,5 +1,5 @@
-module.exports = class Data1756936231004 {
-    name = 'Data1756936231004'
+module.exports = class Data1757021309606 {
+    name = 'Data1757021309606'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -22,7 +22,7 @@ module.exports = class Data1756936231004 {
         await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "meta" jsonb NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f196efecb1b717f74494c4416b" ON "protocol_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_a5af597a96fb8752dc00093192" ON "protocol_daily_stat" ("timestamp") `)
-        await db.query(`CREATE TABLE "protocol_daily_stat_detail" ("id" character varying NOT NULL, "date" text NOT NULL, "product" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "inherited_tvl" numeric NOT NULL, "inherited_yield" numeric NOT NULL, "inherited_revenue" numeric NOT NULL, "bridged_tvl" numeric NOT NULL, CONSTRAINT "PK_279e9e0ad3c5c1b9f34fd93684a" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "protocol_daily_stat_detail" ("id" character varying NOT NULL, "date" text NOT NULL, "product" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "supply" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "inherited_tvl" numeric NOT NULL, "inherited_yield" numeric NOT NULL, "inherited_revenue" numeric NOT NULL, "bridged_tvl" numeric NOT NULL, CONSTRAINT "PK_279e9e0ad3c5c1b9f34fd93684a" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_25e652f34770b8661d5ea7139e" ON "protocol_daily_stat_detail" ("date") `)
         await db.query(`CREATE INDEX "IDX_c0025cac7d806e2a33cd61c0c9" ON "protocol_daily_stat_detail" ("product") `)
         await db.query(`CREATE INDEX "IDX_8f2fcc9fbd33954d90f69c280f" ON "protocol_daily_stat_detail" ("timestamp") `)

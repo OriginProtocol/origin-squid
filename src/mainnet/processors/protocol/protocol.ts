@@ -167,7 +167,8 @@ const getOTokenDetails = async (
     const eth = (value: bigint) => (value * otokenDailyStat.rateETH) / BigInt(10 ** 18)
     detail.rateUSD = otokenDailyStat.rateUSD
     detail.earningTvl = eth(otokenDailyStat.rebasingSupply)
-    detail.tvl = eth(otokenDailyStat.totalSupply)
+    detail.tvl = eth(otokenDailyStat.totalSupply - (otokenDailyStat.amoSupply ?? 0n))
+    detail.supply = eth(otokenDailyStat.totalSupply)
     detail.yield = eth(otokenDailyStat.yield + otokenDailyStat.fees)
     detail.revenue = eth(otokenDailyStat.fees)
     detail.apy = otokenDailyStat.apy
@@ -253,8 +254,9 @@ const getArmDetails = async (
     }
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
     detail.rateUSD = BigInt(Math.round(armDailyStat.rateUSD * 1e18))
-    detail.earningTvl = armDailyStat.totalSupply
-    detail.tvl = armDailyStat.totalSupply
+    detail.earningTvl = armDailyStat.totalAssets
+    detail.tvl = armDailyStat.totalAssets
+    detail.supply = armDailyStat.totalSupply
     detail.yield = armDailyStat.yield + armDailyStat.fees
     detail.revenue = armDailyStat.fees
     detail.apy = armDailyStat.apy
