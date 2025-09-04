@@ -125,6 +125,7 @@ const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: s
     inheritedTvl: 0n,
     inheritedYield: 0n,
     inheritedRevenue: 0n,
+    bridgedTvl: 0n,
   })
 }
 
