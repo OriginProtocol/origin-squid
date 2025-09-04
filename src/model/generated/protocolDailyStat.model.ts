@@ -21,10 +21,13 @@ export class ProtocolDailyStat {
     rateUSD!: bigint
 
     @BigIntColumn_({nullable: false})
-    earningTVL!: bigint
+    earningTvl!: bigint
 
     @BigIntColumn_({nullable: false})
     tvl!: bigint
+
+    @BigIntColumn_({nullable: false})
+    yield!: bigint
 
     @BigIntColumn_({nullable: false})
     revenue!: bigint

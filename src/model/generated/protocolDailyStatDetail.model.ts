@@ -25,14 +25,29 @@ export class ProtocolDailyStatDetail {
     rateUSD!: bigint
 
     @BigIntColumn_({nullable: false})
-    earningTVL!: bigint
+    earningTvl!: bigint
 
     @BigIntColumn_({nullable: false})
     tvl!: bigint
+
+    @BigIntColumn_({nullable: false})
+    yield!: bigint
 
     @BigIntColumn_({nullable: false})
     revenue!: bigint
 
     @FloatColumn_({nullable: false})
     apy!: number
+
+    @BigIntColumn_({nullable: false})
+    inheritedTvl!: bigint
+
+    @BigIntColumn_({nullable: false})
+    inheritedYield!: bigint
+
+    @BigIntColumn_({nullable: false})
+    inheritedRevenue!: bigint
+
+    @BigIntColumn_({nullable: false})
+    bridgedTvl!: bigint
 }

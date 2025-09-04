@@ -19,7 +19,8 @@ import {
 } from '@originprotocol/squid-utils'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { baseAddresses } from '@utils/addresses-base'
-import { armProducts, otokenProducts } from '@utils/products'
+import { plumeAddresses } from '@utils/addresses-plume'
+import { ProductName, armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
 
@@ -54,45 +55,13 @@ export const protocolProcessor = defineProcessor({
       dailyStat.rateUSD = await getLatestExchangeRateForDate(ctx, 'ETH_USD', dailyStat.timestamp).then(
         (rate) => (rate?.rate ?? 0n) * 10n ** 10n,
       )
-      dailyStat.earningTVL = sumBigIntBy(dateDetails, 'earningTVL')
-      dailyStat.tvl = sumBigIntBy(dateDetails, 'tvl')
+      dailyStat.earningTvl = sumBigIntBy(dateDetails, 'earningTvl')
+      dailyStat.tvl = sumBigIntBy(dateDetails, 'tvl') - sumBigIntBy(dateDetails, 'inheritedTvl')
       dailyStat.revenue = sumBigIntBy(dateDetails, 'revenue')
+      dailyStat.yield = sumBigIntBy(dateDetails, 'yield') + dailyStat.revenue
 
-      // Find overlapping TVL
-      const superOETHbWrappedOETH = await ctx.store.findOne(StrategyBalance, {
-        where: {
-          strategy: baseAddresses.superOETHb.strategies.bridgedWOETH,
-          timestamp: LessThanOrEqual(dayjs.utc(date).endOf('day').toDate()),
-        },
-        order: {
-          timestamp: 'desc',
-        },
-      })
-      const superOETHbWrappedOethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
-
-      // Adjust TVL for overlapping strategy balance.
-      dailyStat.tvl -= superOETHbWrappedOethBalance
-      dailyStat.apy =
-        dailyStat.tvl === 0n
-          ? 0
-          : dateDetails.reduce((acc, detail) => {
-              // We lessen the OETH TVL for APY calculation since that APY is also included in Super OETHb.
-              const tvl = detail.id === 'OETH' ? detail.tvl - superOETHbWrappedOethBalance : detail.tvl
-              return acc + detail.apy * Number(tvl)
-            }, 0) / Number(dailyStat.tvl)
-
-      dailyStat.meta = {
-        tvlAdjustments: superOETHbWrappedOETH
-          ? [
-              {
-                name: 'Super OETHb Wrapped OETH Strategy',
-                blockNumber: superOETHbWrappedOETH.blockNumber,
-                timestamp: superOETHbWrappedOETH.timestamp,
-                balanceETH: superOETHbWrappedOETH.balanceETH.toString(),
-              },
-            ]
-          : [],
-      }
+      const apyYield = dailyStat.yield - dailyStat.revenue
+      dailyStat.apy = dailyStat.earningTvl !== 0n ? (Number(apyYield) / Number(dailyStat.earningTvl)) * 365 : 0
 
       dailyStats.push(dailyStat)
     }
@@ -100,7 +69,7 @@ export const protocolProcessor = defineProcessor({
   },
 })
 
-const getLatestProtocolDailyStatDetail = async (ctx: Context, product: string) => {
+const getLatestProtocolDailyStatDetail = async (ctx: Context, product: ProductName) => {
   const latestProtocolDailyStatDetail = await ctx.store.findOne(ProtocolDailyStatDetail, {
     order: {
       date: 'desc',
@@ -126,10 +95,12 @@ const getProtocolDailyStat = async (ctx: Context, date: string) => {
     date,
     timestamp: dayjs.utc(date).endOf('day').toDate(),
     rateUSD: 0n,
-    earningTVL: 0n,
+    earningTvl: 0n,
     tvl: 0n,
+    yield: 0n,
     revenue: 0n,
     apy: 0,
+    meta: {},
   })
 }
 const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: string) => {
@@ -146,10 +117,14 @@ const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: s
     product,
     timestamp: dayjs.utc(date).endOf('day').toDate(),
     rateUSD: 0n,
-    earningTVL: 0n,
+    earningTvl: 0n,
     tvl: 0n,
+    yield: 0n,
     revenue: 0n,
     apy: 0,
+    inheritedTvl: 0n,
+    inheritedYield: 0n,
+    inheritedRevenue: 0n,
   })
 }
 
@@ -161,16 +136,25 @@ const getOTokenDetails = async (
     otokenAddress,
   }: {
     processorId: string
-    product: string
+    product: ProductName
     otokenAddress: string
   },
 ) => {
   const last = await getLatestProtocolDailyStatDetail(ctx, product)
+
+  // Since we depend on superOETHb and superOETHp, we need to continue updating
+  //  our product's details until our dependencies are all caught up.
+  const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
+  const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
+  const lastDates = [last?.date, lastSuperOETHb?.date, lastSuperOETHp?.date].filter(Boolean) as string[]
+  const oldestDate = lastDates.length > 0 ? lastDates.reduce((min, d) => (d < min ? d : min), lastDates[0]) : undefined
+
   const status = await ctx.store.findOne(ProcessingStatus, { where: { id: processorId } })
   if (!status) return []
 
   const details: ProtocolDailyStatDetail[] = []
-  const dates = getDatesBetween(last?.date ?? startDate, getDateForTimestamp(status.timestamp.valueOf()))
+
+  const dates = getDatesBetween(oldestDate ?? startDate, getDateForTimestamp(status.timestamp.valueOf()))
   const dailyStats = await ctx.store.find(OTokenDailyStat, { where: { date: In(dates), otoken: otokenAddress } })
   for (const date of dates) {
     const otokenDailyStat = dailyStats.find((d) => d.date === date)
@@ -179,11 +163,64 @@ const getOTokenDetails = async (
       return details
     }
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
+    const eth = (value: bigint) => (value * otokenDailyStat.rateETH) / BigInt(10 ** 18)
     detail.rateUSD = otokenDailyStat.rateUSD
-    detail.earningTVL = (otokenDailyStat.rebasingSupply * otokenDailyStat.rateETH) / BigInt(10 ** 18)
-    detail.tvl = (otokenDailyStat.totalSupply * otokenDailyStat.rateETH) / BigInt(10 ** 18)
-    detail.revenue = (otokenDailyStat.fees * otokenDailyStat.rateETH) / BigInt(10 ** 18)
+    detail.earningTvl = eth(otokenDailyStat.rebasingSupply)
+    detail.tvl = eth(otokenDailyStat.totalSupply)
+    detail.yield = eth(otokenDailyStat.yield + otokenDailyStat.fees)
+    detail.revenue = eth(otokenDailyStat.fees)
     detail.apy = otokenDailyStat.apy
+    detail.inheritedTvl = 0n
+    detail.inheritedYield = 0n
+    detail.inheritedRevenue = 0n
+    detail.bridgedTvl = 0n
+
+    const getLatestStrategyBalance = async (ctx: Context, strategy: string, date: string) => {
+      return await ctx.store.findOne(StrategyBalance, {
+        where: {
+          strategy,
+          timestamp: LessThanOrEqual(dayjs.utc(date).endOf('day').toDate()),
+        },
+        order: {
+          timestamp: 'desc',
+        },
+      })
+    }
+
+    if (detail.product === 'OETH') {
+      // Pull superOETHp and superOETHb overlapping details.
+      const superOETHbWrappedOETH = await getLatestStrategyBalance(
+        ctx,
+        baseAddresses.superOETHb.strategies.bridgedWOETH,
+        date,
+      )
+      const superOETHpWrappedOETH = await getLatestStrategyBalance(
+        ctx,
+        plumeAddresses.superOETHp.strategies.bridgedWOETH,
+        date,
+      )
+
+      detail.inheritedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
+      detail.inheritedYield = detail.earningTvl !== 0n ? (detail.yield * detail.inheritedTvl) / detail.earningTvl : 0n
+      detail.inheritedRevenue =
+        detail.earningTvl !== 0n ? (detail.revenue * detail.inheritedTvl) / detail.earningTvl : 0n
+      detail.bridgedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
+    } else if (detail.product === 'superOETHb') {
+      const superOETHbWrappedOETH = await getLatestStrategyBalance(
+        ctx,
+        baseAddresses.superOETHb.strategies.bridgedWOETH,
+        date,
+      )
+      detail.bridgedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
+    } else if (detail.product === 'superOETHp') {
+      const superOETHpWrappedOETH = await getLatestStrategyBalance(
+        ctx,
+        plumeAddresses.superOETHp.strategies.bridgedWOETH,
+        date,
+      )
+      detail.bridgedTvl = superOETHpWrappedOETH?.balanceETH ?? 0n
+    }
+
     details.push(detail)
   }
   return details
@@ -196,7 +233,7 @@ const getArmDetails = async (
     armAddress,
   }: {
     processorId: string
-    product: string
+    product: ProductName
     armAddress: string
   },
 ) => {
@@ -215,10 +252,14 @@ const getArmDetails = async (
     }
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
     detail.rateUSD = BigInt(Math.round(armDailyStat.rateUSD * 1e18))
-    detail.earningTVL = armDailyStat.totalSupply
+    detail.earningTvl = armDailyStat.totalSupply
     detail.tvl = armDailyStat.totalSupply
+    detail.yield = armDailyStat.yield + armDailyStat.fees
     detail.revenue = armDailyStat.fees
     detail.apy = armDailyStat.apy
+    detail.inheritedTvl = 0n
+    detail.inheritedYield = 0n
+    detail.inheritedRevenue = 0n
     details.push(detail)
   }
   return details
