@@ -42,16 +42,22 @@ const chainlinkPriceFeeds: Record<string, { height: number; get: (ctx: Context, 
       get: createChainlinkPriceFeed('0x30caC44b395eB969C9CA0d44dF39e6E0aE8f8D94', 18n, 4189824),
     },
     OS_ETH: {
-      height: 21623950,
+      height: 4189824,
       get: async (ctx, height) => {
+        if (height < 21623950 && height >= chainlinkPriceFeeds.S_ETH.height) {
+          return chainlinkPriceFeeds.S_ETH.get(ctx, height)
+        }
         const osS = await chainlinkPriceFeeds.OS_S.get(ctx, height)
         const sEth = await chainlinkPriceFeeds.S_ETH.get(ctx, height)
         return (osS * sEth) / PRECISION
       },
     },
     OS_USD: {
-      height: 21623950,
+      height: 4189824,
       get: async (ctx, height) => {
+        if (height < 21623950 && height >= chainlinkPriceFeeds.S_USD.height) {
+          return chainlinkPriceFeeds.S_USD.get(ctx, height)
+        }
         const osS = await chainlinkPriceFeeds.OS_S.get(ctx, height)
         const sEth = await chainlinkPriceFeeds.S_ETH.get(ctx, height)
         const ethUsd = await chainlinkPriceFeeds.ETH_USD.get(ctx, height)
