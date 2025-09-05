@@ -218,7 +218,9 @@ const getOTokenDetails = async (
       )
       const woethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
       detail.bridgedTvl = woethBalance
-      detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      if (detail.tvl !== 0n) {
+        detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      }
     } else if (detail.product === 'superOETHp') {
       const detailOETH = await getProtocolDailyStatDetail(ctx, date, 'OETH')
       const superOETHpWrappedOETH = await getLatestStrategyBalance(
@@ -228,7 +230,9 @@ const getOTokenDetails = async (
       )
       const woethBalance = superOETHpWrappedOETH?.balanceETH ?? 0n
       detail.bridgedTvl = woethBalance
-      detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      if (detail.tvl !== 0n) {
+        detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      }
     }
 
     details.push(detail)
