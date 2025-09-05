@@ -735,6 +735,7 @@ type TraderateChanged @entity {
   id: ID!
   chainId: Int! @index
   txHash: String! @index
+  txFee: BigInt!
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index

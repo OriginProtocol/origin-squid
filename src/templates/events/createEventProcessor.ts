@@ -10,11 +10,7 @@ export const createEventProcessor = <T extends Struct, EventEntity extends Entit
   address?: string
   from: number
   mapEntity: (ctx: Context, block: Block, log: Log, decoded: DecodedStruct<IndexedCodecs<T>>) => EventEntity
-  extraFilterArgs?: {
-    topic1?: string[]
-    topic2?: string[]
-    topic3?: string[]
-  }
+  extraFilterArgs?: Parameters<typeof logFilter>[0]
 }) => {
   const filter = logFilter({
     address: params.address ? [params.address] : undefined,

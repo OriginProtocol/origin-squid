@@ -83,11 +83,15 @@ export const createOriginARMProcessors = ({
     event: originLidoArmAbi.events.TraderateChanged,
     address: armAddress,
     from,
+    extraFilterArgs: {
+      transaction: true,
+    },
     mapEntity: (ctx, block, log, decoded) => {
       return new TraderateChanged({
         id: `${ctx.chain.id}:${log.id}`,
         chainId: ctx.chain.id,
         txHash: log.transactionHash,
+        txFee: (log.transaction?.gasUsed ?? 0n) * (log.transaction?.effectiveGasPrice ?? 0n),
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
         address: armAddress,

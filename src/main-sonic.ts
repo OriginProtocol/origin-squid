@@ -10,7 +10,7 @@ import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-ra
 import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
-import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
+import { FIELDS_WITH_RECEIPTS_INFO } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
 
 import * as validate from './sonic/validate'
@@ -28,7 +28,7 @@ export const processor = defineSquidProcessor({
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
   validators: [validate],
-  fields: DEFAULT_FIELDS,
+  fields: FIELDS_WITH_RECEIPTS_INFO, // Extra fields for gas info used by arm processor
 })
 
 export default processor

@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class TraderateChanged {
@@ -16,6 +16,9 @@ export class TraderateChanged {
     @Index_()
     @StringColumn_({nullable: false})
     txHash!: string
+
+    @BigIntColumn_({nullable: false})
+    txFee!: bigint
 
     @Index_()
     @DateTimeColumn_({nullable: false})
