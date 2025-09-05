@@ -296,7 +296,9 @@ async function main() {
       ...baseEnv,
       BLOCK_TO: String(blockTo),
     }
-    await runCmd('npm run migration:apply', { env: procEnv })
+    if (!continueRun) {
+      await runCmd('npm run migration:apply', { env: procEnv })
+    }
     await runWithRetries(`npm run process:${alias}`, { env: procEnv, retries: 5, delayMs: 30000 })
 
     // Dump DB using existing script to get the AWS command
