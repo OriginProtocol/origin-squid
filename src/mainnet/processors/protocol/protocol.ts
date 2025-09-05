@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { uniq } from 'lodash'
+import { compact, uniq } from 'lodash'
 import { In, LessThanOrEqual } from 'typeorm'
 
 import {
@@ -145,9 +145,11 @@ const getOTokenDetails = async (
 
   // Since we depend on superOETHb and superOETHp, we need to continue updating
   //  our product's details until our dependencies are all caught up.
+  const lastOETH = await getLatestProtocolDailyStatDetail(ctx, 'OETH')
   const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
   const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
-  const lastDates = [last?.date ?? startDate, lastSuperOETHb?.date, lastSuperOETHp?.date].filter(Boolean) as string[]
+  const lastDates = compact([last?.date ?? startDate, lastOETH?.date, lastSuperOETHb?.date, lastSuperOETHp?.date])
+
   const oldestDate = lastDates.reduce((min, d) => (d < min ? d : min), lastDates[0])
 
   const status = await ctx.store.findOne(ProcessingStatus, { where: { id: processorId } })
@@ -208,19 +210,25 @@ const getOTokenDetails = async (
         detail.earningTvl !== 0n ? (detail.revenue * detail.inheritedTvl) / detail.earningTvl : 0n
       detail.bridgedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
     } else if (detail.product === 'superOETHb') {
+      const detailOETH = await getProtocolDailyStatDetail(ctx, date, 'OETH')
       const superOETHbWrappedOETH = await getLatestStrategyBalance(
         ctx,
         baseAddresses.superOETHb.strategies.bridgedWOETH,
         date,
       )
-      detail.bridgedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
+      const woethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
+      detail.bridgedTvl = woethBalance
+      detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
     } else if (detail.product === 'superOETHp') {
+      const detailOETH = await getProtocolDailyStatDetail(ctx, date, 'OETH')
       const superOETHpWrappedOETH = await getLatestStrategyBalance(
         ctx,
         plumeAddresses.superOETHp.strategies.bridgedWOETH,
         date,
       )
-      detail.bridgedTvl = superOETHpWrappedOETH?.balanceETH ?? 0n
+      const woethBalance = superOETHpWrappedOETH?.balanceETH ?? 0n
+      detail.bridgedTvl = woethBalance
+      detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
     }
 
     details.push(detail)
@@ -253,16 +261,14 @@ const getArmDetails = async (
       return details
     }
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
+    const eth = (value: bigint) => (value * BigInt(Math.round(armDailyStat.rateETH * 1e18))) / BigInt(10 ** 18)
     detail.rateUSD = BigInt(Math.round(armDailyStat.rateUSD * 1e18))
-    detail.earningTvl = armDailyStat.totalAssets
-    detail.tvl = armDailyStat.totalAssets
-    detail.supply = armDailyStat.totalSupply
-    detail.yield = armDailyStat.yield + armDailyStat.fees
-    detail.revenue = armDailyStat.fees
+    detail.earningTvl = eth(armDailyStat.totalAssets)
+    detail.tvl = eth(armDailyStat.totalAssets)
+    detail.supply = eth(armDailyStat.totalSupply)
+    detail.yield = eth(armDailyStat.yield + armDailyStat.fees)
+    detail.revenue = eth(armDailyStat.fees)
     detail.apy = armDailyStat.apy
-    detail.inheritedTvl = 0n
-    detail.inheritedYield = 0n
-    detail.inheritedRevenue = 0n
     details.push(detail)
   }
   return details
