@@ -15,6 +15,7 @@
     "process:arbitrum": "sqd process:arbitrum",
     "process:base": "sqd process:base",
     "process:sonic": "sqd process:sonic",
+    "process:os": "sqd process:os",
     "process:oeth": "sqd process:oeth",
     "process:oethb": "sqd process:oethb",
     "process:ousd": "sqd process:ousd",

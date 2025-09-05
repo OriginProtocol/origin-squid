@@ -1,6 +1,5 @@
 import { sonicErc20s } from 'sonic/erc20'
 import { sonicArmProcessors } from 'sonic/origin-sonic-arm'
-import { OS } from 'sonic/os'
 import { sfcProcessor } from 'sonic/sfc'
 import { sonicStrategiesProcessor } from 'sonic/strategies'
 import 'tsconfig-paths/register'
@@ -20,7 +19,6 @@ export const processor = defineSquidProcessor({
   chainId: sonic.id,
   stateSchema: 'sonic-processor',
   processors: [
-    ...OS,
     ...sonicErc20s,
     sonicStrategiesProcessor,
     sfcProcessor,

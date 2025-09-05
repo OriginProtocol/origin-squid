@@ -71,6 +71,11 @@
       "deps": ["build"],
       "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-sonic.js"]
     },
+    "process:os": {
+      "description": "Load .env and start the squid processor",
+      "deps": ["build"],
+      "cmd": ["node", "--require=dotenv/config", "--require=tsconfig-paths/register", "lib/main-os.js"]
+    },
     "process:plume": {
       "description": "Load .env and start the squid processor",
       "deps": ["build"],
@@ -122,6 +127,12 @@
       "description": "Start the squid processor",
       "deps": ["migration:apply"],
       "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-sonic.js"],
+      "hidden": true
+    },
+    "process:os:prod": {
+      "description": "Start the squid processor",
+      "deps": ["migration:apply"],
+      "cmd": ["node", "--require=tsconfig-paths/register", "lib/main-os.js"],
       "hidden": true
     },
     "process:plume:prod": {
