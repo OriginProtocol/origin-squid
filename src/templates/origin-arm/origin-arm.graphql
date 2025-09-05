@@ -94,6 +94,8 @@ type ArmSwap @entity {
   id: ID!
   chainId: Int! @index
   txHash: String! @index
+  txFrom: String!
+  txTo: String!
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index

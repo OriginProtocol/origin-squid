@@ -336,6 +336,8 @@ export const createOriginARMProcessors = ({
                     id: `${ctx.chain.id}::${transactionHash}:${trace.traceAddress.join(':')}`,
                     chainId: ctx.chain.id,
                     txHash: transactionHash,
+                    txFrom: trace.transaction?.from ?? '',
+                    txTo: trace.transaction?.to ?? '',
                     timestamp: new Date(block.header.timestamp),
                     blockNumber: block.header.height,
                     address: armAddress,

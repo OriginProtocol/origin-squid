@@ -17,6 +17,12 @@ export class ArmSwap {
     @StringColumn_({nullable: false})
     txHash!: string
 
+    @StringColumn_({nullable: false})
+    txFrom!: string
+
+    @StringColumn_({nullable: false})
+    txTo!: string
+
     @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date

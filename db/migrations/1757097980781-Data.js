@@ -1,5 +1,5 @@
-module.exports = class Data1757021309606 {
-    name = 'Data1757021309606'
+module.exports = class Data1757097980781 {
+    name = 'Data1757097980781'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -214,7 +214,7 @@ module.exports = class Data1757021309606 {
         await db.query(`CREATE INDEX "IDX_f19a1f1ecd4b69d3def526cf6d" ON "arm_withdrawal_request" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_a66956c5f52400d8800132b21f" ON "arm_withdrawal_request" ("address") `)
         await db.query(`CREATE INDEX "IDX_87f6fbcd7e96024c7d413e0496" ON "arm_withdrawal_request" ("account") `)
-        await db.query(`CREATE TABLE "arm_swap" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, CONSTRAINT "PK_e598ac0f753595d846714dec664" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_swap" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "tx_from" text NOT NULL, "tx_to" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "from" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, CONSTRAINT "PK_e598ac0f753595d846714dec664" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_00432fd8b1a0b810192cb5a3c7" ON "arm_swap" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_a3664c1263a7551c8283b7f799" ON "arm_swap" ("tx_hash") `)
         await db.query(`CREATE INDEX "IDX_10f61e220f24b8f06c3eb447a9" ON "arm_swap" ("timestamp") `)
