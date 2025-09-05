@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { compact, uniq } from 'lodash'
+import { uniq } from 'lodash'
 import { In, LessThanOrEqual } from 'typeorm'
 
 import {
@@ -30,11 +30,18 @@ export const protocolProcessor = defineProcessor({
     processor.includeAllBlocks({ from: 15000000 })
   },
   process: async (ctx: Context) => {
-    // Generate all product details
-    let details = await Promise.all([
-      ...otokenProducts.map((p) => getOTokenDetails(ctx, p)),
-      ...armProducts.map((p) => getArmDetails(ctx, p)),
-    ]).then((details) => details.flat())
+    const oethProduct = otokenProducts.find((p) => p.product === 'OETH')!
+    const oethDetails = await getOTokenDetails(ctx, oethProduct)
+    const oethCacheByDate: Record<string, ProtocolDailyStatDetail> = {}
+    for (const d of oethDetails) {
+      oethCacheByDate[d.date] = d
+    }
+    const otherOTokenProducts = otokenProducts.filter((p) => p.product !== 'OETH')
+    const otherOTokenDetailsArrays = await Promise.all(
+      otherOTokenProducts.map((p) => getOTokenDetails(ctx, p, { oethCacheByDate })),
+    )
+    const armDetailsArrays = await Promise.all(armProducts.map((p) => getArmDetails(ctx, p)))
+    let details = [oethDetails, ...otherOTokenDetailsArrays, ...armDetailsArrays].flat()
 
     // Save product details
     await ctx.store.upsert(details)
@@ -140,15 +147,19 @@ const getOTokenDetails = async (
     product: ProductName
     otokenAddress: string
   },
+  opts?: { oethCacheByDate?: Record<string, ProtocolDailyStatDetail> },
 ) => {
   const last = await getLatestProtocolDailyStatDetail(ctx, product)
 
-  // Since we depend on superOETHb and superOETHp, we need to continue updating
-  //  our product's details until our dependencies are all caught up.
-  const lastOETH = await getLatestProtocolDailyStatDetail(ctx, 'OETH')
-  const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
-  const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
-  const lastDates = compact([last?.date ?? startDate, lastOETH?.date, lastSuperOETHb?.date, lastSuperOETHp?.date])
+  const lastDates = [last?.date ?? startDate]
+  if (product === 'OETH' || product === 'superOETHb' || product === 'superOETHp') {
+    const lastOETH = await getLatestProtocolDailyStatDetail(ctx, 'OETH')
+    const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
+    const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
+    lastDates.push(lastOETH?.date ?? startDate)
+    lastDates.push(lastSuperOETHb?.date ?? startDate)
+    lastDates.push(lastSuperOETHp?.date ?? startDate)
+  }
 
   const oldestDate = lastDates.reduce((min, d) => (d < min ? d : min), lastDates[0])
 
@@ -210,7 +221,8 @@ const getOTokenDetails = async (
         detail.earningTvl !== 0n ? (detail.revenue * detail.inheritedTvl) / detail.earningTvl : 0n
       detail.bridgedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
     } else if (detail.product === 'superOETHb') {
-      const detailOETH = await getProtocolDailyStatDetail(ctx, date, 'OETH')
+      // Prefer in-memory OETH data computed earlier in this run to avoid races
+      const detailOETH = opts?.oethCacheByDate?.[date] ?? (await getProtocolDailyStatDetail(ctx, date, 'OETH'))
       const superOETHbWrappedOETH = await getLatestStrategyBalance(
         ctx,
         baseAddresses.superOETHb.strategies.bridgedWOETH,
@@ -218,11 +230,14 @@ const getOTokenDetails = async (
       )
       const woethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
       detail.bridgedTvl = woethBalance
-      if (detail.tvl !== 0n) {
-        detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      const oethTvl = detailOETH?.tvl ?? 0n
+      const oethRevenue = detailOETH?.revenue ?? 0n
+      if (oethTvl !== 0n) {
+        detail.revenue += (oethRevenue * woethBalance) / oethTvl
       }
     } else if (detail.product === 'superOETHp') {
-      const detailOETH = await getProtocolDailyStatDetail(ctx, date, 'OETH')
+      // Prefer in-memory OETH data computed earlier in this run to avoid races
+      const detailOETH = opts?.oethCacheByDate?.[date] ?? (await getProtocolDailyStatDetail(ctx, date, 'OETH'))
       const superOETHpWrappedOETH = await getLatestStrategyBalance(
         ctx,
         plumeAddresses.superOETHp.strategies.bridgedWOETH,
@@ -230,8 +245,10 @@ const getOTokenDetails = async (
       )
       const woethBalance = superOETHpWrappedOETH?.balanceETH ?? 0n
       detail.bridgedTvl = woethBalance
-      if (detail.tvl !== 0n) {
-        detail.revenue += ((detailOETH?.revenue ?? 0n) * woethBalance) / detail.tvl
+      const oethTvl = detailOETH?.tvl ?? 0n
+      const oethRevenue = detailOETH?.revenue ?? 0n
+      if (oethTvl !== 0n) {
+        detail.revenue += (oethRevenue * woethBalance) / oethTvl
       }
     }
 
