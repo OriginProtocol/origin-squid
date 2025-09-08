@@ -2,7 +2,7 @@ import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { notionProcessor } from 'mainnet/processors/notion'
 import { ognBuybacks } from 'mainnet/processors/ogn-buybacks'
 import { originArmProcessors } from 'mainnet/processors/origin-arm'
-import { protocolProcessor } from 'mainnet/processors/protocol'
+import { protocolSqlSimpleProcessor } from 'mainnet/processors/protocol/protocol-sql-simple'
 import 'tsconfig-paths/register'
 import { mainnet } from 'viem/chains'
 
@@ -59,7 +59,7 @@ export const processor = defineSquidProcessor({
     createPoolsProcessor(mainnet.id),
     notionProcessor,
   ],
-  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolProcessor],
+  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolSqlSimpleProcessor],
   validators: [validate],
   fields: FIELDS_WITH_RECEIPTS_INFO,
 })
