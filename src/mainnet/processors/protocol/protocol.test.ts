@@ -128,6 +128,7 @@ describe('Protocol Processor', () => {
         otokenDailyStats: [oethDailyStat],
         processingStatuses: [processingStatus],
         strategyBalances: [superOETHbBalance, superOETHpBalance],
+        protocolDailyStatDetails: [], // No previous records - clean start
       })
 
       await protocolProcessor.process(ctx)
@@ -141,11 +142,11 @@ describe('Protocol Processor', () => {
       expect(oethDetail.inheritedTvl).to.equal(BigInt(8000 * 10 ** 18))
       expect(oethDetail.bridgedTvl).to.equal(BigInt(8000 * 10 ** 18))
       
-      // Expected inherited yield = (1000 * 8000) / 90000 ≈ 88.89 ETH
-      const expectedInheritedYield = (BigInt(1000 * 10 ** 18) * BigInt(8000 * 10 ** 18)) / BigInt(90000 * 10 ** 18)
+      // Expected inherited yield = (yield + fees) * inheritedTvl / earningTvl = (1100 * 8000) / 90000 ≈ 97.78 ETH
+      const expectedInheritedYield = (BigInt(1100 * 10 ** 18) * BigInt(8000 * 10 ** 18)) / BigInt(90000 * 10 ** 18)
       expect(oethDetail.inheritedYield).to.equal(expectedInheritedYield)
       
-      // Expected inherited revenue = (100 * 8000) / 90000 ≈ 8.89 ETH  
+      // Expected inherited revenue = (fees * inheritedTvl) / earningTvl = (100 * 8000) / 90000 ≈ 8.89 ETH  
       const expectedInheritedRevenue = (BigInt(100 * 10 ** 18) * BigInt(8000 * 10 ** 18)) / BigInt(90000 * 10 ** 18)
       expect(oethDetail.inheritedRevenue).to.equal(expectedInheritedRevenue)
     })

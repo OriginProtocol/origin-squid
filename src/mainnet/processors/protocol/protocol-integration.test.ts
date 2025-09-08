@@ -11,7 +11,7 @@ import {
   createMockProtocolDailyStatDetail,
   createMockProcessingStatus,
   createMockStrategyBalance,
-  setupMockStore,
+  type MockStore,
 } from '@test-utils/context-helper'
 import {
   ProtocolDailyStat,
@@ -44,8 +44,10 @@ describe('Protocol Processor - Integration Tests', () => {
     // Mock store upsert to capture all upserted data
     const mockStore = ctx.store as any
     mockStore.upsert.callsFake(async (entities: any[]) => {
+      console.log('Mock upsert called with', entities.length, 'entities:', entities.map(e => e.constructor.name || 'unknown'))
       for (const entity of entities) {
         if (entity.constructor.name === 'ProtocolDailyStatDetail' || entity.product) {
+          console.log('Upserting ProtocolDailyStatDetail:', entity.product, entity.date, entity.id)
           // Remove existing detail for same date/product and add new one
           upsertedDetails = upsertedDetails.filter(d => !(d.date === entity.date && d.product === entity.product))
           upsertedDetails.push({ ...entity })
@@ -53,6 +55,7 @@ describe('Protocol Processor - Integration Tests', () => {
           existingDetails.push({ ...entity })
         }
         if (entity.constructor.name === 'ProtocolDailyStat' || entity.earningTvl !== undefined) {
+          console.log('Upserting ProtocolDailyStat:', entity.date)
           // Remove existing daily stat for same date and add new one
           upsertedDailyStats = upsertedDailyStats.filter(s => s.date !== entity.date)
           upsertedDailyStats.push({ ...entity })
@@ -64,6 +67,104 @@ describe('Protocol Processor - Integration Tests', () => {
   afterEach(() => {
     sinon.restore()
   })
+
+  // Custom setup function that doesn't override the upsert mock
+  const setupIntegrationMockStore = (ctx: Context, data: {
+    otokenDailyStats?: any[]
+    strategyBalances?: any[]
+    protocolDailyStatDetails?: any[]
+    processingStatuses?: any[]
+  }) => {
+    const mockStore = ctx.store as unknown as MockStore
+    
+    // Setup findOne responses
+    mockStore.findOne.callsFake((entity: any, options: any) => {
+      if (entity.name === 'OTokenDailyStat' || entity === require('@model').OTokenDailyStat) {
+        return data.otokenDailyStats?.find(stat => 
+          stat.date === options.where?.date && stat.otoken === options.where?.otoken
+        ) || null
+      }
+      
+      if (entity.name === 'StrategyBalance' || entity === require('@model').StrategyBalance) {
+        if (options.where?.timestamp && typeof options.where.timestamp === 'object') {
+          return data.strategyBalances?.find(balance => 
+            balance.strategy === options.where.strategy &&
+            balance.timestamp <= options.where.timestamp.value
+          ) || null
+        }
+        return data.strategyBalances?.find(balance => 
+          balance.strategy === options.where?.strategy
+        ) || null
+      }
+      
+      if (entity.name === 'ProtocolDailyStatDetail' || entity === require('@model').ProtocolDailyStatDetail) {
+        if (options.where?.date && options.where?.product) {
+          return data.protocolDailyStatDetails?.find(detail => 
+            detail.date === options.where.date && detail.product === options.where.product
+          ) || null
+        } else if (options.where?.product && options.order?.date === 'desc') {
+          const matches = data.protocolDailyStatDetails?.filter(detail => 
+            detail.product === options.where.product
+          ) || []
+          return matches.sort((a, b) => b.date.localeCompare(a.date))[0] || null
+        }
+        return null
+      }
+      
+      if (entity.name === 'ProcessingStatus' || entity === require('@model').ProcessingStatus) {
+        return data.processingStatuses?.find(status => 
+          status.id === options.where?.id
+        ) || null
+      }
+      
+      if (entity.name === 'ProtocolDailyStat' || entity === require('@model').ProtocolDailyStat) {
+        return data.protocolDailyStatDetails?.find(stat => 
+          stat.date === options.where?.date
+        ) || null
+      }
+      
+      return null
+    })
+    
+    // Setup find responses  
+    mockStore.find.callsFake((entity: any, options: any) => {
+      if (entity.name === 'OTokenDailyStat' || entity === require('@model').OTokenDailyStat) {
+        if (options.where?.date?._type === 'in') {
+          const dates = options.where.date._value
+          return data.otokenDailyStats?.filter(stat => 
+            dates.includes(stat.date) && stat.otoken === options.where.otoken
+          ) || []
+        }
+      }
+      
+      if (entity.name === 'ProtocolDailyStatDetail' || entity === require('@model').ProtocolDailyStatDetail) {
+        if (options.where?.date?.constructor.name === 'In') {
+          const dates = options.where.date.value
+          return data.protocolDailyStatDetails?.filter(detail => 
+            dates.includes(detail.date)
+          ) || []
+        }
+      }
+      
+      return []
+    })
+    
+    // Setup findBy responses
+    mockStore.findBy.callsFake((entity: any, options: any) => {
+      if (entity.name === 'ProtocolDailyStatDetail' || entity === require('@model').ProtocolDailyStatDetail) {
+        if (options.date?.constructor.name === 'In') {
+          const dates = options.date.value
+          return data.protocolDailyStatDetails?.filter(detail => 
+            dates.includes(detail.date)
+          ) || []
+        }
+      }
+      
+      return []
+    })
+
+    // Don't override upsert - let the custom tracking handle it
+  }
 
   describe('Phased Processing: Simulating Real Async Data Flow', () => {
     it('should handle complete async data evolution across 4 phases', async () => {
@@ -84,14 +185,19 @@ describe('Protocol Processor - Integration Tests', () => {
         rateETH: BigInt(10 ** 18),
       })
 
-      const oethProcessingStatus = createMockProcessingStatus({
-        id: 'oeth',
-        timestamp: new Date(`${testDate}T23:59:59Z`),
-      })
+      // Need all processor statuses to prevent early exits
+      const allProcessingStatuses = [
+        createMockProcessingStatus({ id: 'oeth', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'ousd', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'sonic', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'oethb', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'plume', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'mainnet', timestamp: new Date(`${testDate}T23:59:59Z`) }),
+      ]
 
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [oethDailyStat],
-        processingStatuses: [oethProcessingStatus],
+        processingStatuses: allProcessingStatuses,
         strategyBalances: [], // No strategy balances yet
         protocolDailyStatDetails: existingDetails,
       })
@@ -99,6 +205,7 @@ describe('Protocol Processor - Integration Tests', () => {
       await protocolProcessor.process(ctx)
 
       // Validate Phase 1 results
+      console.log('Phase 1 upserted details:', upsertedDetails.map(d => ({ product: d.product, date: d.date, id: d.id })))
       const phase1OethDetail = upsertedDetails.find(d => d.product === 'OETH' && d.date === testDate)!
       expect(phase1OethDetail).to.not.be.undefined
       expect(phase1OethDetail.inheritedTvl).to.equal(BigInt(0)) // No super token balances yet
@@ -127,14 +234,9 @@ describe('Protocol Processor - Integration Tests', () => {
         rateETH: BigInt(10 ** 18),
       })
 
-      const superOETHbProcessingStatus = createMockProcessingStatus({
-        id: 'oethb',
-        timestamp: new Date(`${testDate}T23:59:59Z`),
-      })
-
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [oethDailyStat, superOETHbDailyStat],
-        processingStatuses: [oethProcessingStatus, superOETHbProcessingStatus],
+        processingStatuses: allProcessingStatuses, // Use same complete list
         strategyBalances: [], // Still no strategy balances
         protocolDailyStatDetails: existingDetails,
       })
@@ -172,9 +274,9 @@ describe('Protocol Processor - Integration Tests', () => {
         timestamp: new Date(`${testDate}T18:00:00Z`),
       })
 
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [oethDailyStat, superOETHbDailyStat],
-        processingStatuses: [oethProcessingStatus, superOETHbProcessingStatus],
+        processingStatuses: allProcessingStatuses, // Use same complete list
         strategyBalances: [superOETHbStrategyBalance, superOETHpStrategyBalance],
         protocolDailyStatDetails: existingDetails,
       })
@@ -218,14 +320,9 @@ describe('Protocol Processor - Integration Tests', () => {
         rateETH: BigInt(10 ** 18),
       })
 
-      const superOETHpProcessingStatus = createMockProcessingStatus({
-        id: 'plume',
-        timestamp: new Date(`${testDate}T23:59:59Z`),
-      })
-
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [oethDailyStat, superOETHbDailyStat, superOETHpDailyStat],
-        processingStatuses: [oethProcessingStatus, superOETHbProcessingStatus, superOETHpProcessingStatus],
+        processingStatuses: allProcessingStatuses, // Use same complete list
         strategyBalances: [superOETHbStrategyBalance, superOETHpStrategyBalance],
         protocolDailyStatDetails: existingDetails,
       })
@@ -308,14 +405,18 @@ describe('Protocol Processor - Integration Tests', () => {
         rateETH: BigInt(10 ** 18),
       })
 
-      const processingStatuses = [
+      const earlyProcessingStatuses = [
         createMockProcessingStatus({ id: 'oeth', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'ousd', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'sonic', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
         createMockProcessingStatus({ id: 'oethb', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'plume', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'mainnet', timestamp: new Date(`${earlyDate}T23:59:59Z`) }),
       ]
 
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [earlyOethStat, earlySuperOETHbStat],
-        processingStatuses,
+        processingStatuses: earlyProcessingStatuses,
         strategyBalances: [], // No strategy balances initially
         protocolDailyStatDetails: existingDetails,
       })
@@ -356,14 +457,18 @@ describe('Protocol Processor - Integration Tests', () => {
         timestamp: new Date(`${lateDate}T18:00:00Z`),
       })
 
-      const updatedProcessingStatuses = [
+      const lateProcessingStatuses = [
         createMockProcessingStatus({ id: 'oeth', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'ousd', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'sonic', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
         createMockProcessingStatus({ id: 'oethb', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'plume', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
+        createMockProcessingStatus({ id: 'mainnet', timestamp: new Date(`${lateDate}T23:59:59Z`) }),
       ]
 
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [earlyOethStat, earlySuperOETHbStat, lateOethStat, lateSuperOETHbStat],
-        processingStatuses: updatedProcessingStatuses,
+        processingStatuses: lateProcessingStatuses,
         strategyBalances: [lateStrategyBalance],
         protocolDailyStatDetails: existingDetails,
       })
@@ -387,7 +492,7 @@ describe('Protocol Processor - Integration Tests', () => {
     it('should handle missing processing status gracefully', async () => {
       const testDate = '2023-10-01'
       
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [],
         processingStatuses: [], // No processing status
         strategyBalances: [],
@@ -409,7 +514,7 @@ describe('Protocol Processor - Integration Tests', () => {
         timestamp: new Date(`${testDate}T23:59:59Z`),
       })
 
-      setupMockStore(ctx, {
+      setupIntegrationMockStore(ctx, {
         otokenDailyStats: [], // No daily stats
         processingStatuses: [processingStatus],
         strategyBalances: [],
