@@ -17,6 +17,7 @@ type ProcessorName =
   | 'base-processor'
   | 'oethb-processor'
   | 'sonic-processor'
+  | 'os-processor'
   | 'plume-processor'
 
 function parseArgs() {
@@ -58,6 +59,7 @@ function getRpcEndpointEnvName(processorName: ProcessorName): string {
     case 'arbitrum-processor':
       return process.env['RPC_ARBITRUM_ENV']!
     case 'sonic-processor':
+    case 'os-processor':
       return process.env['RPC_SONIC_ENV']!
     case 'plume-processor':
       return process.env['RPC_PLUME_ENV']!
@@ -281,6 +283,7 @@ async function main() {
   if (!continueRun || startedCompose) {
     if (!startedCompose) {
       console.log(`Starting dockerized Postgres at port ${DB_PORT} (project ${composeProject})...`)
+      await runCmd(`docker-compose -p ${composeProject} down`, { env: { ...baseEnv } })
       await runCmd(`docker-compose -p ${composeProject} up -d`, { env: { ...baseEnv } })
       startedCompose = true
     }
