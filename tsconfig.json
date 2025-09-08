@@ -19,7 +19,15 @@
       "@shared/*": ["shared/*"],
       "@templates/*": ["templates/*"],
       "@utils/*": ["utils/*"],
+      "@test-utils/*": ["test-utils/*"],
       "@validation/*": ["validation/*"]
+    }
+  },
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "module": "commonjs"
     }
   },
   "include": ["src"],
