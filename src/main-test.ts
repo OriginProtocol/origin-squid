@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { protocolSqlSimpleProcessor } from 'mainnet/processors/protocol/protocol-sql-simple'
 import 'tsconfig-paths/register'
 import { formatUnits } from 'viem'
 import { base } from 'viem/chains'
@@ -250,7 +251,8 @@ if (require.main === module) {
       // testAerodromeSugar,
       // testMixedQuoter,
       // getOUSDAddresses,
-      testEIP7702,
+      // testEIP7702,
+      protocolSqlSimpleProcessor,
     ],
     postProcessors: [],
     validators: [],

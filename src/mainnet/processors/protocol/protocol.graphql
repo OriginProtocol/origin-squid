@@ -3,6 +3,7 @@ type ProtocolDailyStat @entity {
   date: String! @index
   timestamp: DateTime! @index
   rateUSD: BigInt!
+  supply: BigInt!
   earningTvl: BigInt! # TVL of the product, including fees.
   tvl: BigInt!
   yield: BigInt! # Yield generated, including fees.

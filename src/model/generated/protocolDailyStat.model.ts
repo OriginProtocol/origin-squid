@@ -21,6 +21,9 @@ export class ProtocolDailyStat {
     rateUSD!: bigint
 
     @BigIntColumn_({nullable: false})
+    supply!: bigint
+
+    @BigIntColumn_({nullable: false})
     earningTvl!: bigint
 
     @BigIntColumn_({nullable: false})

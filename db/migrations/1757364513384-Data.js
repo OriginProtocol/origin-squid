@@ -1,5 +1,5 @@
-module.exports = class Data1757101908744 {
-    name = 'Data1757101908744'
+module.exports = class Data1757364513384 {
+    name = 'Data1757364513384'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -19,7 +19,7 @@ module.exports = class Data1757101908744 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "meta" jsonb NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "supply" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "meta" jsonb NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f196efecb1b717f74494c4416b" ON "protocol_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_a5af597a96fb8752dc00093192" ON "protocol_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "protocol_daily_stat_detail" ("id" character varying NOT NULL, "date" text NOT NULL, "product" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "supply" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "inherited_tvl" numeric NOT NULL, "inherited_yield" numeric NOT NULL, "inherited_revenue" numeric NOT NULL, "bridged_tvl" numeric NOT NULL, CONSTRAINT "PK_279e9e0ad3c5c1b9f34fd93684a" PRIMARY KEY ("id"))`)
