@@ -175,18 +175,14 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
   await runner.query(`
     UPDATE protocol_daily_stat_detail 
     SET 
-      inherited_yield = COALESCE((
-        SELECT SUM(p2.yield) 
-        FROM protocol_daily_stat_detail p2 
-        WHERE p2.product IN ('superOETHb', 'superOETHp') 
-        AND p2.date = protocol_daily_stat_detail.date
-      ), 0),
-      inherited_revenue = COALESCE((
-        SELECT SUM(p2.revenue) 
-        FROM protocol_daily_stat_detail p2 
-        WHERE p2.product IN ('superOETHb', 'superOETHp') 
-        AND p2.date = protocol_daily_stat_detail.date
-      ), 0)
+      inherited_yield = CASE WHEN tvl > 0 THEN 
+        (yield * inherited_tvl / tvl)
+      ELSE 0 
+      END,
+      inherited_revenue = CASE WHEN tvl > 0 THEN 
+        (revenue * inherited_tvl / tvl)
+      ELSE 0 
+      END
     WHERE product = 'OETH' AND date >= '${fromDate}';
   `)
 }
