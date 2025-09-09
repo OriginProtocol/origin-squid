@@ -472,6 +472,7 @@ const protocolDailyStats = () => {
       date
       timestamp
       rateUSD
+      supply
       earningTvl
       tvl
       yield
@@ -494,6 +495,7 @@ const protocolDailyStatDetails = () => {
       product
       timestamp
       rateUSD
+      supply
       earningTvl
       tvl
       yield
