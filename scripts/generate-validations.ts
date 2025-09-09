@@ -461,6 +461,52 @@ const aeroPoolEpochStates = () => {
   `)
 }
 
+const protocolDailyStats = () => {
+  return gql(`
+    protocolDailyStats: protocolDailyStats(
+      limit: ${LIMIT},
+      orderBy: [timestamp_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      date
+      timestamp
+      rateUSD
+      earningTvl
+      tvl
+      yield
+      revenue
+      apy
+      meta
+    }
+  `)
+}
+
+const protocolDailyStatDetails = () => {
+  return gql(`
+    protocolDailyStatDetails: protocolDailyStatDetails(
+      limit: ${LIMIT},
+      orderBy: [timestamp_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      date
+      product
+      timestamp
+      rateUSD
+      earningTvl
+      tvl
+      yield
+      revenue
+      apy
+      inheritedTvl
+      inheritedYield
+      inheritedRevenue
+      bridgedTvl
+    }
+  `)
+}
+
 const main = async () => {
   console.log(`Generating validations for: ${process.argv[2]}`)
   const queries: string[] = [
@@ -482,6 +528,8 @@ const main = async () => {
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
     ...bridging(),
     aeroPoolEpochStates(),
+    protocolDailyStatDetails(),
+    protocolDailyStats(),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)

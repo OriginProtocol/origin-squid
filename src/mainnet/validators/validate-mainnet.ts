@@ -5,6 +5,8 @@ import {
   BeaconDepositEvent,
   ERC20Balance,
   OGNDailyStat,
+  ProtocolDailyStat,
+  ProtocolDailyStatDetail,
   TransactionDetails,
 } from '@model'
 import { Context } from '@originprotocol/squid-utils'
@@ -22,6 +24,8 @@ const expectationSets = [
   { entity: TransactionDetails, expectations: entities.lidoarm_transactionDetails },
   { entity: OGNDailyStat, expectations: entities.ognDailyStats },
   { entity: BeaconDepositEvent, expectations: entities.beaconDepositEvents },
+  { entity: ProtocolDailyStatDetail, expectations: entities.protocolDailyStatDetails },
+  { entity: ProtocolDailyStat, expectations: entities.protocolDailyStats },
 ]
 
 export const process = async (ctx: Context) => {
