@@ -5,6 +5,7 @@ type OGNDailyStat @entity {
 
   totalSupply: BigInt!
   totalSupplyUSD: Float!
+  circulatingSupply: Float!
   totalStaked: BigInt!
   tradingVolumeUSD: Float!
   marketCapUSD: Float!

@@ -1,5 +1,5 @@
-module.exports = class Data1757364513384 {
-    name = 'Data1757364513384'
+module.exports = class Data1757378220510 {
+    name = 'Data1757378220510'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -54,7 +54,7 @@ module.exports = class Data1757364513384 {
         await db.query(`CREATE INDEX "IDX_854fb3714182df4d2ba943417a" ON "ogn_buyback" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_30396766a2f98c53fc916657e6" ON "ogn_buyback" ("operator") `)
         await db.query(`CREATE TABLE "wallet_labels" ("id" character varying NOT NULL, "address" text NOT NULL, "description" text NOT NULL, "labels" text array NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_59edf57a7c32b43605aec86b9e0" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "ogn_daily_stat" ("id" character varying NOT NULL, "block_number" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "total_supply" numeric NOT NULL, "total_supply_usd" numeric NOT NULL, "circulating_supply" numeric NOT NULL, "total_staked" numeric NOT NULL, "trading_volume_usd" numeric NOT NULL, "market_cap_usd" numeric NOT NULL, "price_usd" numeric NOT NULL, "holders_over_threshold" integer NOT NULL, CONSTRAINT "PK_c87054f4663051254b7b2afa536" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_cb4297ef85375ee13a3446b240" ON "ogn_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b96b9849e1e479d743ffb547c9" ON "ogn_daily_stat" ("timestamp") `)
         await db.query(`CREATE TABLE "ogv" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "circulating" numeric NOT NULL, "staked" numeric NOT NULL, "total" numeric NOT NULL, CONSTRAINT "PK_f16038abf451ce82bd03ea54ee7" PRIMARY KEY ("id"))`)

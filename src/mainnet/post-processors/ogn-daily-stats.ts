@@ -5,6 +5,7 @@ import { formatEther } from 'viem'
 
 import { ERC20Balance, ERC20Holder, ERC20State, OGNDailyStat } from '@model'
 import { Context, EvmBatchProcessor } from '@originprotocol/squid-utils'
+import { getOGNCirculatingSupply } from '@utils/circulating-supply'
 import { getCoingeckoData } from '@utils/coingecko2'
 
 dayjs.extend(utc)
@@ -51,6 +52,8 @@ export const process = async (ctx: Context) => {
         newDailyStat.marketCapUSD = day.market_caps
         newDailyStat.tradingVolumeUSD = day.total_volumes
         newDailyStat.totalSupplyUSD = Number(formatEther(newDailyStat.totalSupply)) * day.prices
+        newDailyStat.circulatingSupply = await getOGNCirculatingSupply(newDailyStat.blockNumber) // NOTE: Async inside of this loop may be slow.
+
         ognDailyStats.push(newDailyStat)
       } else {
         console.log(`Skipping ${newDailyStat.id} - missing market data`)
@@ -104,6 +107,7 @@ async function createDailyStat(ctx: Context, date: Date) {
     totalSupply: totalSupply?.totalSupply || 0n,
     totalStaked: stakedBalance?.balance || 0n,
     totalSupplyUSD: 0,
+    circulatingSupply: 0,
     tradingVolumeUSD: 0,
     marketCapUSD: 0,
     priceUSD: 0,

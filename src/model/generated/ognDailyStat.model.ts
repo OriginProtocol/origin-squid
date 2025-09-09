@@ -23,6 +23,9 @@ export class OGNDailyStat {
     @FloatColumn_({nullable: false})
     totalSupplyUSD!: number
 
+    @FloatColumn_({nullable: false})
+    circulatingSupply!: number
+
     @BigIntColumn_({nullable: false})
     totalStaked!: bigint
 
