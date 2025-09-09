@@ -1,4 +1,6 @@
 /.git
+/.idea
+/builds
 /node_modules
 /lib
 /dump
