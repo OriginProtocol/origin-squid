@@ -205,7 +205,7 @@ const upsertProtocolDailyStats = async (ctx: Context, fromDate: string) => {
       COALESCE((
         SELECT rate
         FROM exchange_rate 
-        WHERE pair = 'ETH_USD'
+        WHERE pair = 'OETH_USD' -- use OETH/USD which is same as ETH/USD but has end-of-day resolution
         AND chain_id = 1
         AND timestamp <= (date::date + interval '1 day')::timestamp
         ORDER BY timestamp DESC 
