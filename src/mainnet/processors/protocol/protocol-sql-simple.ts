@@ -213,10 +213,10 @@ const upsertProtocolDailyStats = async (ctx: Context, fromDate: string) => {
       ), 0) as rate_usd,
       
       SUM(supply) as supply,
-      SUM(earning_tvl) as earning_tvl,
-      SUM(tvl) as tvl,
-      SUM(yield) as yield,
-      SUM(revenue) as revenue,
+      SUM(earning_tvl - inherited_tvl) as earning_tvl,
+      SUM(tvl - inherited_tvl) as tvl,
+      SUM(yield - inherited_yield) as yield,
+      SUM(revenue - inherited_revenue) as revenue,
       
       -- Calculate APY: (yield - revenue) / earning_tvl * 365
       CASE 
