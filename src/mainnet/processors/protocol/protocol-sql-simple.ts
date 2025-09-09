@@ -10,8 +10,8 @@ export const protocolSqlSimpleProcessor = defineProcessor({
     processor.includeAllBlocks({ from: 15000000 })
   },
   process: async (ctx: Context) => {
-    // Update once every ~5 minutes.
-    if (ctx.blocks.find((b) => b.header.height % 25 === 0)) {
+    // Update at head once every ~10 minutes.
+    if (ctx.isHead && ctx.blocks.find((b) => b.header.height % 50 === 0)) {
       const minDate = startDate
       await upsertProtocolDailyStatDetails(ctx, minDate)
       await upsertProtocolDailyStats(ctx, minDate)
