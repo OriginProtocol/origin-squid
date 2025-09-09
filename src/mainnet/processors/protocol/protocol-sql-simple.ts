@@ -76,11 +76,11 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
         '${product.product}' as product,
         (a.date::date + interval '1 day' - interval '1 second')::timestamp as timestamp,
         COALESCE(a.rate_usd, 0) as rate_usd,
-        COALESCE(a.total_assets * a.rate_eth::numeric / 1e18, 0) as earning_tvl,
-        COALESCE(a.total_assets * a.rate_eth::numeric / 1e18, 0) as tvl,
-        COALESCE(a.total_supply * a.rate_eth::numeric / 1e18, 0) as supply,
-        COALESCE((a.yield + a.fees) * a.rate_eth::numeric / 1e18, 0) as yield,
-        COALESCE(a.fees * a.rate_eth::numeric / 1e18, 0) as revenue,
+        COALESCE(a.total_assets * a.rate_eth, 0) as earning_tvl,
+        COALESCE(a.total_assets * a.rate_eth, 0) as tvl,
+        COALESCE(a.total_supply * a.rate_eth, 0) as supply,
+        COALESCE((a.yield + a.fees) * a.rate_eth, 0) as yield,
+        COALESCE(a.fees * a.rate_eth, 0) as revenue,
         COALESCE(a.apy, 0) as apy,
         0 as inherited_tvl,
         0 as inherited_yield,
@@ -205,17 +205,18 @@ const upsertProtocolDailyStats = async (ctx: Context, fromDate: string) => {
       COALESCE((
         SELECT rate
         FROM exchange_rate 
-        WHERE pair = 'ETH_USD' 
+        WHERE pair = 'OETH_USD' -- use OETH/USD which is same as ETH/USD but has end-of-day resolution
+        AND chain_id = 1
         AND timestamp <= (date::date + interval '1 day')::timestamp
         ORDER BY timestamp DESC 
         LIMIT 1
       ), 0) as rate_usd,
       
       SUM(supply) as supply,
-      SUM(earning_tvl) as earning_tvl,
-      SUM(tvl) as tvl,
-      SUM(yield) as yield,
-      SUM(revenue) as revenue,
+      SUM(earning_tvl - inherited_tvl) as earning_tvl,
+      SUM(tvl - inherited_tvl) as tvl,
+      SUM(yield - inherited_yield) as yield,
+      SUM(revenue - inherited_revenue) as revenue,
       
       -- Calculate APY: (yield - revenue) / earning_tvl * 365
       CASE 
