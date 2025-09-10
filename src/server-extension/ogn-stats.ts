@@ -46,10 +46,7 @@ export class OGNStatsResolver {
 
     // Only fetch the fields that are requested
     if (fields?.includes('circulatingSupply')) {
-      result.circulatingSupply = await getOGNCirculatingSupply().catch((err) => {
-        console.error(err)
-        return 0
-      })
+      result.circulatingSupply = await getOGNCirculatingSupply().then((supply) => Number(formatEther(supply)))
     }
     if (fields?.includes('totalSupply')) {
       result.totalSupply = await getTotalSupply().catch((err) => {
@@ -61,7 +58,6 @@ export class OGNStatsResolver {
     return result
   }
 }
-
 
 async function getTotalSupply(): Promise<number> {
   const totalSupply = (await ogn.read.totalSupply()) as bigint

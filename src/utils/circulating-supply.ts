@@ -1,4 +1,4 @@
-import { createPublicClient, fallback, formatEther, http, parseAbi } from 'viem'
+import { createPublicClient, fallback, http, parseAbi } from 'viem'
 import { mainnet } from 'viem/chains'
 
 import { chainConfigs } from '@originprotocol/squid-utils'
@@ -34,7 +34,7 @@ const OGN_EXCLUDE_ADDRESSES = [
   '0x69497A2A170c138876F05Df01bFfDd5C4b651CF2', // research_development
 ]
 
-export async function getOGNCirculatingSupply(blockNumber?: number | bigint): Promise<number> {
+export async function getOGNCirculatingSupply(blockNumber?: number | bigint): Promise<bigint> {
   const contractCalls = [
     { address: OGN_ADDRESS, abi, functionName: 'totalSupply' },
     ...OGN_EXCLUDE_ADDRESSES.map((addr) => ({
@@ -45,9 +45,9 @@ export async function getOGNCirculatingSupply(blockNumber?: number | bigint): Pr
     })),
   ] as never
 
-  const balances = await publicClient.multicall<{ result: bigint }[]>({ 
+  const balances = await publicClient.multicall<{ result: bigint }[]>({
     contracts: contractCalls,
-    blockNumber: blockNumber ? BigInt(blockNumber) : undefined
+    blockNumber: blockNumber ? BigInt(blockNumber) : undefined,
   })
 
   const circulatingSupply = balances.slice(1).reduce((m, o) => {
@@ -55,5 +55,5 @@ export async function getOGNCirculatingSupply(blockNumber?: number | bigint): Pr
     return (m -= o.result as bigint)
   }, balances[0].result as bigint)
 
-  return Number(formatEther(circulatingSupply))
+  return circulatingSupply
 }
