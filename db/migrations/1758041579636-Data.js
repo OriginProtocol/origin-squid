@@ -1,5 +1,5 @@
-module.exports = class Data1757378220510 {
-    name = 'Data1757378220510'
+module.exports = class Data1758041579636 {
+    name = 'Data1758041579636'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -130,7 +130,7 @@ module.exports = class Data1757378220510 {
         await db.query(`CREATE INDEX "IDX_7cbc465ce1e9ae06dfe3a8c625" ON "o_token_address" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_5342c499e930e396bade7faeb6" ON "o_token_address" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_75c7d29bf71b393e99c4407885" ON "o_token_address" ("address") `)
-        await db.query(`CREATE TABLE "o_token_apy" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "date" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, CONSTRAINT "PK_132f1c9570d48b38184ca5ac4cc" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "o_token_apy" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text, "date" text NOT NULL, "apr" numeric NOT NULL, "apy" numeric NOT NULL, "apy7_day_avg" numeric NOT NULL, "apy14_day_avg" numeric NOT NULL, "apy30_day_avg" numeric NOT NULL, "rebasing_credits_per_token" numeric NOT NULL, CONSTRAINT "PK_132f1c9570d48b38184ca5ac4cc" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5d9294486b1c57df8c3aad5145" ON "o_token_apy" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_4d4f1b0d9e7f6903a2038c6c38" ON "o_token_apy" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_5b81f5a25e913cc7bf1d4c145a" ON "o_token_apy" ("timestamp") `)
