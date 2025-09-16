@@ -107,7 +107,7 @@ async function createDailyStat(ctx: Context, date: Date) {
     totalSupply: totalSupply?.totalSupply || 0n,
     totalStaked: stakedBalance?.balance || 0n,
     totalSupplyUSD: 0,
-    circulatingSupply: 0,
+    circulatingSupply: 0n,
     tradingVolumeUSD: 0,
     marketCapUSD: 0,
     priceUSD: 0,
