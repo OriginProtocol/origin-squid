@@ -289,8 +289,12 @@ export class OTokenEntityProducer {
     return entries
   }
 
-  private async getOrCreateAPYEntity(trace: Trace): Promise<OTokenAPY> {
-    const dateStr = new Date(this.otoken.block.header.timestamp).toISOString().split('T')[0]
+  /**
+   * We do *not* refer to `this.otoken.block` in here because it may be called from the Daily Stats processor.
+   * There are days when no rebase happens, which means this never gets called until daily stats requires it.
+   */
+  public async getOrCreateAPYEntity({ block, trace }: { block: Block['header']; trace?: Trace }): Promise<OTokenAPY> {
+    const dateStr = new Date(block.timestamp).toISOString().split('T')[0]
     const id = `${this.ctx.chain.id}:${this.otoken.address}:${dateStr}`
 
     let apy = this.apyMap.get(id)
@@ -324,9 +328,9 @@ export class OTokenEntityProducer {
         id,
         chainId: this.ctx.chain.id,
         otoken: this.otoken.address,
-        timestamp: new Date(this.otoken.block.header.timestamp),
-        blockNumber: this.otoken.block.header.height,
-        txHash: trace.transaction!.hash,
+        timestamp: new Date(block.timestamp),
+        blockNumber: block.height,
+        txHash: trace?.transaction!.hash,
         date: dateStr,
         apr: 0,
         apy: 0,
@@ -339,9 +343,9 @@ export class OTokenEntityProducer {
 
     // Update current values
     apy.rebasingCreditsPerToken = currentCreditsPerToken
-    apy.timestamp = new Date(this.otoken.block.header.timestamp)
-    apy.blockNumber = this.otoken.block.header.height
-    apy.txHash = trace.transaction!.hash // Not a great field considering we can have more than one rebase per day.
+    apy.timestamp = new Date(block.timestamp)
+    apy.blockNumber = block.height
+    apy.txHash = trace?.transaction!.hash // Not a great field considering we can have more than one rebase per day.
 
     // Calculate APY if we have previous data
     if (previousApy) {
@@ -363,6 +367,9 @@ export class OTokenEntityProducer {
     return apy
   }
 
+  /**
+   * TODO: Potential choke point due to async within loop.
+   */
   private async updateAverageAPYs(currentApy: OTokenAPY): Promise<void> {
     const currentDate = dayjs.utc(currentApy.date)
 
@@ -378,7 +385,7 @@ export class OTokenEntityProducer {
 
       let pastApy = this.apyMap.get(pastId)
       if (!pastApy) {
-        pastApy = await this.ctx.store.get(OTokenAPY, pastId)
+        pastApy = await this.ctx.store.get(OTokenAPY, pastId) // TODO: <--- improve this?
       }
 
       if (pastApy) {
@@ -448,7 +455,7 @@ export class OTokenEntityProducer {
     }
 
     // Update with current values
-    rebase.apy = await this.getOrCreateAPYEntity(trace)
+    rebase.apy = await this.getOrCreateAPYEntity({ block: trace.block, trace })
     rebase.totalSupply = this.otoken.totalSupply
     rebase.rebasingCredits = this.otoken.rebasingCreditsHighres()
     rebase.rebasingCreditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
@@ -566,7 +573,7 @@ export class OTokenEntityProducer {
   async afterChangeSupply(trace: Trace, newTotalSupply: bigint, totalSupplyDiff: bigint): Promise<void> {
     if (totalSupplyDiff === 0n) return // Skip if there was no change in supply.
     await this.getOrCreateOTokenEntity()
-    await this.getOrCreateAPYEntity(trace)
+    await this.getOrCreateAPYEntity({ block: trace.block, trace })
 
     // Fee Logic
     let _yield = 0n
@@ -723,6 +730,7 @@ export class OTokenEntityProducer {
       rebases: Array.from(this.rebaseMap.values()),
       dailyStats: this.dailyStats,
       forceUpdate: this.hasChanges(),
+      producer: this,
     })
   }
 

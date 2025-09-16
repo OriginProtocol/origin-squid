@@ -12,6 +12,8 @@ import { Block, Context } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { Currency, CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 
+import { OTokenEntityProducer } from './otoken-entity-producer'
+
 /**
  * For sake of efficiency, we only want to update the daily stats if the block is within 20 seconds of the hourly crossover or if there has been recent activity on the OToken.
  */
@@ -37,6 +39,7 @@ export const processOTokenDailyStats = async (
       token: string
     }[]
     getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
+    producer: OTokenEntityProducer
     accountsOverThresholdMinimum: bigint
     forceUpdate: boolean
   },
@@ -79,58 +82,72 @@ export const processOTokenDailyStats = async (
         : null
 
     const asyncStartTime = Date.now()
-    const [otokenObject, apy, rebases, rateETH, rateUSD, dripperWETH, amoSupply, wrappedSupply, wrappedRate, rateNative] =
-      await Promise.all([
-        (async () => {
-          let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
-          if (!otokenObject) {
-            otokenObject = await ctx.store.findOne(OToken, {
-              where: {
-                chainId: ctx.chain.id,
-                otoken: params.otokenAddress,
-                timestamp: LessThanOrEqual(blockDate),
-              },
-              order: { timestamp: 'desc' },
-            })
-          }
-          return otokenObject
-        })(),
-        (async () => {
-          let apy = findLast(params.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
+    const [
+      otokenObject,
+      apy,
+      rebases,
+      rateETH,
+      rateUSD,
+      dripperWETH,
+      amoSupply,
+      wrappedSupply,
+      wrappedRate,
+      rateNative,
+    ] = await Promise.all([
+      (async () => {
+        let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
+        if (!otokenObject) {
+          otokenObject = await ctx.store.findOne(OToken, {
+            where: {
+              chainId: ctx.chain.id,
+              otoken: params.otokenAddress,
+              timestamp: LessThanOrEqual(blockDate),
+            },
+            order: { timestamp: 'desc' },
+          })
+        }
+        return otokenObject
+      })(),
+      (async () => {
+        let apy = findLast(params.apies, (apy) => apy.timestamp >= startOfDay && apy.timestamp <= blockDate)
+        if (!apy) {
+          apy = await ctx.store.findOne(OTokenAPY, {
+            order: { timestamp: 'desc' },
+            where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
+          })
           if (!apy) {
-            apy = await ctx.store.findOne(OTokenAPY, {
-              order: { timestamp: 'desc' },
-              where: { chainId: ctx.chain.id, otoken: params.otokenAddress, timestamp: Between(startOfDay, blockDate) },
-            })
+            apy = await params.producer.getOrCreateAPYEntity({ block: block.header })
           }
-          return apy
-        })(),
-        (async () => {
-          let rebases = params.rebases.filter(
-            (rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate,
-          )
-          rebases.push(
-            ...(await ctx.store.find(OTokenRebase, {
-              order: { timestamp: 'desc' },
-              where: {
-                chainId: ctx.chain.id,
-                otoken: params.otokenAddress,
-                timestamp: Between(startOfDay, blockDate),
-              },
-            })),
-          )
-          return rebases
-        })(),
-        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
-        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
-        getDripperAvailableFunds(),
-        params.getAmoSupply(ctx, block.header.height),
-        wotokenContract ? wotokenContract.totalSupply() : 0n,
-        wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
-        ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, ctx.chain.nativeCurrency.symbol as Currency).then(
-          (a) => a?.rate ?? 0n,
-        ),
-      ])
+        }
+        return apy
+      })(),
+      (async () => {
+        let rebases = params.rebases.filter((rebase) => rebase.timestamp >= startOfDay && rebase.timestamp <= blockDate)
+        rebases.push(
+          ...(await ctx.store.find(OTokenRebase, {
+            order: { timestamp: 'desc' },
+            where: {
+              chainId: ctx.chain.id,
+              otoken: params.otokenAddress,
+              timestamp: Between(startOfDay, blockDate),
+            },
+          })),
+        )
+        return rebases
+      })(),
+      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
+      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
+      getDripperAvailableFunds(),
+      params.getAmoSupply(ctx, block.header.height),
+      wotokenContract ? wotokenContract.totalSupply() : 0n,
+      wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
+      ensureExchangeRate(
+        ctx,
+        block,
+        params.otokenAddress as CurrencyAddress,
+        ctx.chain.nativeCurrency.symbol as Currency,
+      ).then((a) => a?.rate ?? 0n),
+    ])
     if (process.env.DEBUG_PERF === 'true') {
       ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
     }

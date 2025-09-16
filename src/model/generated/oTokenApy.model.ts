@@ -26,8 +26,8 @@ export class OTokenAPY {
     blockNumber!: number
 
     @Index_()
-    @StringColumn_({nullable: false})
-    txHash!: string
+    @StringColumn_({nullable: true})
+    txHash!: string | undefined | null
 
     @Index_()
     @StringColumn_({nullable: false})

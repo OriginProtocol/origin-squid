@@ -110,7 +110,7 @@ type OTokenAPY @entity {
   otoken: String! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
-  txHash: String! @index
+  txHash: String @index
   date: String! @index
   apr: Float!
   apy: Float!
