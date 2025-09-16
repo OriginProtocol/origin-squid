@@ -1,5 +1,6 @@
 import { parseEther } from 'viem'
 
+import * as erc20 from '@abi/erc20'
 import * as initializableAbstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
@@ -57,7 +58,13 @@ const otokenProcessor = createOTokenProcessor2({
       { height },
       sonicAddresses.OS.amoSwapX.strategy.address,
     )
-    return contract.checkBalance(sonicAddresses.tokens.wS)
+    const balance = await contract.checkBalance(sonicAddresses.tokens.wS)
+    const ws = new erc20.Contract(ctx, { height }, sonicAddresses.tokens.wS)
+    const os = new erc20.Contract(ctx, { height }, sonicAddresses.tokens.OS)
+    const wsBalance = await ws.balanceOf(sonicAddresses.OS.amoSwapX.pool)
+    const osBalance = await os.balanceOf(sonicAddresses.OS.amoSwapX.pool)
+    const ratio = (osBalance * 10n ** 18n) / (osBalance + wsBalance)
+    return (balance * ratio) / 10n ** 18n
   },
 })
 
