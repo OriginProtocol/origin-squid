@@ -1,5 +1,6 @@
 /.git
 /.idea
+/.claude
 /builds
 /node_modules
 /lib
@@ -12,4 +13,3 @@ npm-debug.log
 .DS_Store
 
 .env
-/.idea

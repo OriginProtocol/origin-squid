@@ -300,13 +300,13 @@ async function main() {
       BLOCK_TO: String(blockTo),
     }
     if (!continueRun) {
-      await runCmd('npm run migration:apply', { env: procEnv })
+      await runCmd('pnpm run migration:apply', { env: procEnv })
     }
-    await runWithRetries(`npm run process:${alias}`, { env: procEnv, retries: 5, delayMs: 30000 })
+    await runWithRetries(`pnpm run process:${alias}`, { env: procEnv, retries: 5, delayMs: 30000 })
 
     // Dump DB using existing script to get the AWS command
     console.log('Creating DB dump...')
-    const { stdout } = await runCmd(`npx --yes tsx scripts/dump-db.ts ${processorName}`, {
+    const { stdout } = await runCmd(`pnpm dlx tsx scripts/dump-db.ts ${processorName}`, {
       env: baseEnv,
       capture: true,
     })

@@ -32,49 +32,49 @@ BLOCK_TO=18421105 sqd process:oeth   # Process up to block 18421105
 
 ```shell
 # Code Generation
-yarn generate          # Generate new migration
-yarn typegen           # Generate ABI code
+pnpm run generate          # Generate new migration
+pnpm run typegen           # Generate ABI code
 
-yarn setup             # Reset database - run prior to starting processing for a fresh start
+pnpm run setup             # Reset database - run prior to starting processing for a fresh start
 
 # Processing Commands
-yarn process:arbitrum  # Run Arbitrum processor
-yarn process:base      # Run Base processor
-yarn process:sonic     # Run Sonic processor
-yarn process:oeth      # Run OETH processor
-yarn process:ousd      # Run OUSD processor
-yarn process:ogv       # Run OGV processor
-yarn process:mainnet   # Run misc mainnet processor
-yarn process:test      # Run test processor
-yarn process           # Run combined processor
+pnpm run process:arbitrum  # Run Arbitrum processor
+pnpm run process:base      # Run Base processor
+pnpm run process:sonic     # Run Sonic processor
+pnpm run process:oeth      # Run OETH processor
+pnpm run process:ousd      # Run OUSD processor
+pnpm run process:ogv       # Run OGV processor
+pnpm run process:mainnet   # Run misc mainnet processor
+pnpm run process:test      # Run test processor
+pnpm run process           # Run combined processor
 
 # Local GraphQL Server
-yarn serve             # You'll have to rebuild and rerun to see updates here.
+pnpm run serve             # You'll have to rebuild and rerun to see updates here.
 
 # Deployment Tools
-yarn postdeploy v81    # Run post-deployment tasks (processing times log and validations)
+pnpm run postdeploy v81    # Run post-deployment tasks (processing times log and validations)
 ```
 
 ## Quickstart
 
 ```bash
 # 0. Install @subsquid/cli a.k.a. the sqd command globally
-npm i -g @subsquid/cli
+pnpm add -g @subsquid/cli
 
 # 1. Install dependencies
-npm ci
+pnpm install
 
 # 2. Start a Postgres database container and setup
-yarn setup
+pnpm run setup
 
 # 3. Build and start the processor (choose one)
-yarn process:oeth
-yarn process:ousd
-yarn process:mainnet
+pnpm run process:oeth
+pnpm run process:ousd
+pnpm run process:mainnet
 # ... or other available processors
 
 # 4. In a separate terminal, start the GraphQL server
-yarn serve
+pnpm run serve
 ```
 
 A GraphiQL playground will be available at [localhost:4350/graphql](http://localhost:4350/graphql).
@@ -84,7 +84,7 @@ A GraphiQL playground will be available at [localhost:4350/graphql](http://local
 ### 1. Make Schema Changes
 
 - Add or modify GraphQL schema files in `src/**/*.graphql`
-- Run `yarn generate` to:
+- Run `pnpm run generate` to:
   - Combine GraphQL files into schema.graphql
   - Generate TypeORM entities
   - Create new database migration
@@ -93,7 +93,7 @@ A GraphiQL playground will be available at [localhost:4350/graphql](http://local
 ### 2. Add New Events/Contracts
 
 - Add ABI JSON files to `./abi/`
-- Run `yarn typegen` to generate TypeScript interfaces
+- Run `pnpm run typegen` to generate TypeScript interfaces
 - Create new processor in `src/processors/` or add to existing one
 - Update `squid.yaml` if adding new processor
 
@@ -101,21 +101,21 @@ A GraphiQL playground will be available at [localhost:4350/graphql](http://local
 
 ```bash
 # Start fresh
-yarn setup
+pnpm run setup
 
 # Run processor (choose one)
-yarn process:oeth
-yarn process:ousd
+pnpm run process:oeth
+pnpm run process:ousd
 # ... etc
 
 # In another terminal
-yarn serve
+pnpm run serve
 ```
 
 ### 4. Testing Changes
 
 - Use GraphiQL playground at [localhost:4350/graphql](http://localhost:4350/graphql)
-- Check processing times with `yarn log:processing-times`
+- Check processing times with `pnpm run log:processing-times`
 - Validate data integrity with generated validation queries
 
 ### 5. Deployment

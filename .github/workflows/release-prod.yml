@@ -16,11 +16,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install squid CLI
-        run: npm i -g @subsquid/cli
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-      - name: npm install
-        run: npm i
+      - name: Install squid CLI
+        run: pnpm add -g @subsquid/cli
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Authenticate to squid
         env:

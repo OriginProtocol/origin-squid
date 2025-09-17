@@ -1,5 +1,5 @@
-module.exports = class Data1758041579636 {
-    name = 'Data1758041579636'
+module.exports = class Data1758152245952 {
+    name = 'Data1758152245952'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
