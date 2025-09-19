@@ -28,7 +28,7 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
   if (exchangeRate) return exchangeRate
 
   const timestamp = new Date(block.header.timestamp)
-  const price = await getPrice(ctx, block.header.height, base, quote).catch((err) => {
+  const price = await getPrice(ctx, block.header, base, quote).catch((err) => {
     ctx.log.info({ base, quote, err, message: err.message })
     throw err
   })

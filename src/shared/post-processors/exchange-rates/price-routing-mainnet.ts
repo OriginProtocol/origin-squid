@@ -11,10 +11,11 @@ import * as oethOracleRouter from '@abi/oeth-oracle-router'
 import * as stakedFraxEth from '@abi/sfrx-eth'
 import * as uniswapV3 from '@abi/uniswap-v3'
 import * as woethAbi from '@abi/woeth'
-import { Context } from '@originprotocol/squid-utils'
+import { Block, Context } from '@originprotocol/squid-utils'
 import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
+import { ousdDailyPrices } from './data/coingecko-ousd.json'
 import {
   CurrencySymbol,
   MainnetCurrency,
@@ -48,7 +49,7 @@ const chainlinkPriceFeeds: Record<
 
 export const getMainnetPrice = async (
   ctx: Context,
-  height: number,
+  block: Block['header'],
   base: MainnetCurrency,
   quote: MainnetCurrency,
 ): Promise<[bigint, number]> => {
@@ -56,14 +57,14 @@ export const getMainnetPrice = async (
   quote = translateMainnetSymbol(quote)
 
   const feed = chainlinkPriceFeeds[`${base}_${quote}`]
-  if (feed && feed.height <= height) {
-    return [await feed.get(ctx, height), 18]
+  if (feed && feed.height <= block.height) {
+    return [await feed.get(ctx, block.height), 18]
   }
 
   const priceEntry = priceMap[`${base}_${quote}`]
   if (priceEntry) {
     const [getPrice, decimals] = priceEntry
-    return [await getPrice(ctx, height), decimals]
+    return [await getPrice(ctx, block.height), decimals]
   }
   throw new Error(`No price for ${base}_${quote}`)
 }
@@ -83,14 +84,18 @@ const getETHOETHPrice = async (ctx: Context, height: number) => {
   return await contract.get_dy(1n, 0n, 1000000000000000000n)
 }
 
-const getRETHPrice = async (ctx: Context, height: number) => {
-  if (height < 13846138) return 0n
+const getRETHPrice = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 13846138) return 0n
   // Balancer rETH Stable Pool Rate Provider
-  const rateProvider = await getBalancePoolRateProviders(ctx, { height }, '0x1e19cf2d73a72ef1332c882f20534b6519be0276')
+  const rateProvider = await getBalancePoolRateProviders(
+    ctx,
+    { height: block.height },
+    '0x1e19cf2d73a72ef1332c882f20534b6519be0276',
+  )
   // Balancer Vault `getPoolTokens` https://etherscan.io/address/0xba12222222228d8ba445958a75a0704d566bf2c8#readContract#F10
   const provider = new balancerRateProvider.Contract(
     ctx,
-    { height },
+    { height: block.height },
     rateProvider[0], // rETH Rate
   )
   return await provider.getRate()
@@ -136,17 +141,17 @@ const getOethOraclePrice = async (ctx: Context, height: number, quote: MainnetCu
 }
 
 const stakedFraxAddress = '0xac3e018457b222d93114458476f3e3416abbe38f'
-const getStakedFraxPrice = async (ctx: Context, height: number) => {
-  if (height < 15686046) return 0n
-  const router = new stakedFraxEth.Contract(ctx, { height }, stakedFraxAddress)
+const getStakedFraxPrice = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 15686046) return 0n
+  const router = new stakedFraxEth.Contract(ctx, { height: block.height }, stakedFraxAddress)
   return router.previewRedeem(1_000_000_000_000_000_000n)
 }
 
 const frxEthFraxOracleAddress = '0xC58F3385FBc1C8AD2c0C9a061D7c13b141D7A5Df'
-const getFrxEthPrice = async (ctx: Context, height: number) => {
+const getFrxEthPrice = async (ctx: Context, block: Block['header']) => {
   // Deploy block of 17571367 doesn't work, so we wait until it is functional.
-  if (height < 17571500) return 1_000_000_000_000_000_000n
-  const frxEth = new frxEthFraxOracle.Contract(ctx, { height }, frxEthFraxOracleAddress)
+  if (block.height < 17571500) return 1_000_000_000_000_000_000n
+  const frxEth = new frxEthFraxOracle.Contract(ctx, { height: block.height }, frxEthFraxOracleAddress)
   return frxEth.latestRoundData().then((lrd) => lrd.answer)
 }
 
@@ -158,32 +163,45 @@ export const getBalancePoolRateProviders = memoize(
   (_ctx, _block, address) => address.toLowerCase(),
 )
 
-const getPrice_OUSD_USD = async (ctx: Context, height: number) => {
-  if (height < 18071236) return 1_000_000_000_000_000_000n
-  const diaOracle = new diaOracleAbi.Contract(ctx, { height }, '0xafa00e7eff2ea6d216e432d99807c159d08c2b79')
+const getPrice_OUSD_USD = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 18071236) return 1_000_000_000_000_000_000n
+  if (block.height > 21696108 && block.height < 23390149) {
+    // ousdDailyPrices data is stripped down to only this timespan we need.
+    const price = ousdDailyPrices.find((p) => p[0] === Math.floor(block.timestamp / 86400000) * 86400000)
+    if (price) {
+      return BigInt(price[1] * 1e18)
+    } else {
+      return 1_000_000_000_000_000_000n
+    }
+  }
+  const diaOracle = new diaOracleAbi.Contract(
+    ctx,
+    { height: block.height },
+    '0xafa00e7eff2ea6d216e432d99807c159d08c2b79',
+  )
   return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
 }
 
-const getPrice_wOETH_OETH = async (ctx: Context, height: number) => {
-  if (height < 17141658) return 1_000_000_000_000_000_000n
-  const woeth = new woethAbi.Contract(ctx, { height }, mainnetCurrencies.wOETH)
+const getPrice_wOETH_OETH = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 17141658) return 1_000_000_000_000_000_000n
+  const woeth = new woethAbi.Contract(ctx, { height: block.height }, mainnetCurrencies.wOETH)
   return woeth.previewRedeem(1_000_000_000_000_000_000n)
 }
 
-const getPrice_OUSD_ETH = async (ctx: Context, height: number) => {
-  const ousdusd = await getPrice_OUSD_USD(ctx, height)
-  const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+const getPrice_OUSD_ETH = async (ctx: Context, block: Block['header']) => {
+  const ousdusd = await getPrice_OUSD_USD(ctx, block)
+  const ethusd = await getChainlinkPrice(ctx, block.height, 'ETH', 'USD')
   if (!ethusd) return 0n
   return (ousdusd * 10n ** 8n) / ethusd
 }
 
-const getMorphoEthPrice = async (ctx: Context, height: number) => {
-  const morpho = new uniswapV3.Contract(ctx, { height }, '0xc8219b876753a85025156b22176c2edea17aac53')
+const getMorphoEthPrice = async (ctx: Context, block: Block['header']) => {
+  const morpho = new uniswapV3.Contract(ctx, { height: block.height }, '0xc8219b876753a85025156b22176c2edea17aac53')
   return morpho.slot0().then((slot0) => getPriceFromSqrtPriceX96N(slot0.sqrtPriceX96))
 }
 
-const getPrice_OETH_USD = async (ctx: Context, height: number) => {
-  const ethusd = await getChainlinkPrice(ctx, height, 'ETH', 'USD')
+const getPrice_OETH_USD = async (ctx: Context, block: Block['header']) => {
+  const ethusd = await getChainlinkPrice(ctx, block.height, 'ETH', 'USD')
   return ethusd * 10n ** 10n
 }
 
@@ -201,9 +219,9 @@ export const derived = <Base extends MainnetCurrencySymbol, Quote extends Mainne
   return twoWay(
     base,
     quote,
-    async (ctx: Context, height: number) => {
+    async (ctx: Context, block: Block['header']) => {
       const baseExponent = 10n ** BigInt(decimals)
-      const rates = await Promise.all(connections.map(({ base, quote }) => getMainnetPrice(ctx, height, base, quote)))
+      const rates = await Promise.all(connections.map(({ base, quote }) => getMainnetPrice(ctx, block, base, quote)))
       return rates.reduce((acc, [rate]) => (acc * rate) / baseExponent, baseExponent)
     },
     decimals,
@@ -213,13 +231,13 @@ export const invertRate = (rate: bigint, decimals = 18) => (rate > 0n ? 10n ** B
 export const twoWay = <Base extends MainnetCurrencySymbol, Quote extends MainnetCurrencySymbol>(
   base: Base,
   quote: Quote,
-  getPrice: (ctx: Context, height: number) => Promise<bigint>,
+  getPrice: (ctx: Context, block: Block['header']) => Promise<bigint>,
   decimals: number = 18,
 ) =>
   ({
-    [`${base}_${quote}`]: [async (ctx: Context, height: number) => getPrice(ctx, height), decimals],
+    [`${base}_${quote}`]: [async (ctx: Context, block: Block['header']) => getPrice(ctx, block), decimals],
     [`${quote}_${base}`]: [
-      async (ctx: Context, height: number) => getPrice(ctx, height).then((rate) => invertRate(rate, decimals)),
+      async (ctx: Context, block: Block['header']) => getPrice(ctx, block).then((rate) => invertRate(rate, decimals)),
       decimals,
     ],
   }) as Record<`${Base}_${Quote}` | `${Quote}_${Base}`, [(ctx: Context, height: number) => Promise<bigint>, number]>
@@ -240,16 +258,16 @@ export const priceMap: Partial<
   ...twoWay('wOETH', 'OETH', getPrice_wOETH_OETH),
   ...twoWay('OUSD', 'USD', getPrice_OUSD_USD),
   ...twoWay('OUSD', 'ETH', getPrice_OUSD_ETH),
-  ...twoWay('ETH', 'stETH', (ctx, height) => getOethOraclePrice(ctx, height, 'stETH')),
+  ...twoWay('ETH', 'stETH', (ctx, block) => getOethOraclePrice(ctx, block.height, 'stETH')),
   ...twoWay('OETH', 'USD', getPrice_OETH_USD),
-  ...twoWay('ETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'), 8),
-  ...twoWay('WETH', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USD'), 8),
-  ...twoWay('DAI', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'DAI', 'USD'), 8),
-  ...twoWay('USDC', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'USD'), 8),
-  ...twoWay('USDT', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'USD'), 8),
-  ...twoWay('USDS', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'USDS', 'USD'), 8),
-  ...twoWay('ETH', 'USDS', (ctx, height) => getChainlinkPrice(ctx, height, 'ETH', 'USDS'), 8),
-  ...twoWay('BAL', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'BAL', 'USD'), 8),
+  ...twoWay('ETH', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'ETH', 'USD'), 8),
+  ...twoWay('WETH', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'ETH', 'USD'), 8),
+  ...twoWay('DAI', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'DAI', 'USD'), 8),
+  ...twoWay('USDC', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'USDC', 'USD'), 8),
+  ...twoWay('USDT', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'USDT', 'USD'), 8),
+  ...twoWay('USDS', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'USDS', 'USD'), 8),
+  ...twoWay('ETH', 'USDS', (ctx, block) => getChainlinkPrice(ctx, block.height, 'ETH', 'USDS'), 8),
+  ...twoWay('BAL', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'BAL', 'USD'), 8),
   ...derived(
     'BAL',
     'WETH',
@@ -304,14 +322,14 @@ export const priceMap: Partial<
     ],
     18,
   ),
-  ...twoWay('USDC', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDC', 'ETH')),
-  ...twoWay('USDT', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'USDT', 'ETH')),
-  ...twoWay('CRV', 'WETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'ETH')),
-  ...twoWay('CVX', 'WETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
-  ...twoWay('CRV', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'ETH')),
-  ...twoWay('CVX', 'ETH', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'ETH')),
-  ...twoWay('CVX', 'USD', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
-  ...twoWay('CVX', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'CVX', 'USD')),
-  ...twoWay('CRV', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'CRV', 'USD')),
-  ...twoWay('COMP', 'DAI', (ctx, height) => getChainlinkPrice(ctx, height, 'COMP', 'USD')),
+  ...twoWay('USDC', 'ETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'USDC', 'ETH')),
+  ...twoWay('USDT', 'ETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'USDT', 'ETH')),
+  ...twoWay('CRV', 'WETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CRV', 'ETH')),
+  ...twoWay('CVX', 'WETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CVX', 'ETH')),
+  ...twoWay('CRV', 'ETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CRV', 'ETH')),
+  ...twoWay('CVX', 'ETH', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CVX', 'ETH')),
+  ...twoWay('CVX', 'USD', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CVX', 'USD')),
+  ...twoWay('CVX', 'DAI', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CVX', 'USD')),
+  ...twoWay('CRV', 'DAI', (ctx, block) => getChainlinkPrice(ctx, block.height, 'CRV', 'USD')),
+  ...twoWay('COMP', 'DAI', (ctx, block) => getChainlinkPrice(ctx, block.height, 'COMP', 'USD')),
 }

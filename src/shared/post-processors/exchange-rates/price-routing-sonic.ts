@@ -1,5 +1,5 @@
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Context, invertMap } from '@originprotocol/squid-utils'
+import { Block, Context, invertMap } from '@originprotocol/squid-utils'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
 const PRECISION_DECIMALS = 18n
@@ -72,18 +72,23 @@ export type SonicCurrencySymbol = keyof typeof sonicAddresses.tokens | 'USD' | '
 export type SonicCurrencyAddress = (typeof sonicAddresses.tokens)[keyof typeof sonicAddresses.tokens]
 export type SonicCurrency = SonicCurrencySymbol | SonicCurrencyAddress
 
-export const getSonicPrice = async (ctx: Context, height: number, base: SonicCurrency, quote: SonicCurrency) => {
+export const getSonicPrice = async (
+  ctx: Context,
+  block: Block['header'],
+  base: SonicCurrency,
+  quote: SonicCurrency,
+) => {
   try {
     base = translateSonicSymbol(base)
     quote = translateSonicSymbol(quote)
     if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
-    if (feed && feed.height <= height) {
-      return [await feed.get(ctx, height), 18] as const
+    if (feed && feed.height <= block.height) {
+      return [await feed.get(ctx, block.height), 18] as const
     }
     return undefined
   } catch (err) {
-    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${height}, ${base}, ${quote}`)
+    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${block.height}, ${base}, ${quote}`)
     throw err
   }
 }

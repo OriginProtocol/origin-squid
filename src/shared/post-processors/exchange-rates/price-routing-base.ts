@@ -1,7 +1,7 @@
 import * as aerodromeClPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromePoolAbi from '@abi/aerodrome-pool'
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Context, invertMap } from '@originprotocol/squid-utils'
+import { Block, Context, invertMap } from '@originprotocol/squid-utils'
 import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 
@@ -87,22 +87,22 @@ export type BaseCurrencySymbol = keyof typeof baseAddresses.tokens | 'USD'
 export type BaseCurrencyAddress = (typeof baseAddresses.tokens)[keyof typeof baseAddresses.tokens]
 export type BaseCurrency = BaseCurrencySymbol | BaseCurrencyAddress
 
-export const getBasePrice = async (ctx: Context, height: number, base: BaseCurrency, quote: BaseCurrency) => {
+export const getBasePrice = async (ctx: Context, block: Block['header'], base: BaseCurrency, quote: BaseCurrency) => {
   try {
     base = translateBaseSymbol(base)
     quote = translateBaseSymbol(quote)
     if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
-    if (feed && feed.height <= height) {
-      return [await feed.get(ctx, height), 18] as const
+    if (feed && feed.height <= block.height) {
+      return [await feed.get(ctx, block.height), 18] as const
     }
     const alternateFeed = alternativePriceFeeds[`${base}_${quote}`]
     if (alternateFeed) {
-      return [await alternateFeed(ctx, height), 18] as const
+      return [await alternateFeed(ctx, block.height), 18] as const
     }
     return undefined
   } catch (err) {
-    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${height}, ${base}, ${quote}`)
+    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${block.height}, ${base}, ${quote}`)
     throw err
   }
 }

@@ -1,5 +1,5 @@
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Context, invertMap } from '@originprotocol/squid-utils'
+import { Block, Context, invertMap } from '@originprotocol/squid-utils'
 import { plumeAddresses } from '@utils/addresses-plume'
 
 const createEacAggregatorPriceFeed = (address: string, decimals: bigint) => {
@@ -27,22 +27,27 @@ export type PlumeCurrencySymbol = keyof typeof plumeAddresses.tokens | 'USD'
 export type PlumeCurrencyAddress = (typeof plumeAddresses.tokens)[keyof typeof plumeAddresses.tokens]
 export type PlumeCurrency = PlumeCurrencySymbol | PlumeCurrencyAddress
 
-export const getPlumePrice = async (ctx: Context, height: number, base: PlumeCurrency, quote: PlumeCurrency) => {
+export const getPlumePrice = async (
+  ctx: Context,
+  block: Block['header'],
+  base: PlumeCurrency,
+  quote: PlumeCurrency,
+) => {
   try {
     base = translatePlumeSymbol(base)
     quote = translatePlumeSymbol(quote)
     if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
     if (feed) {
-      return [await feed(ctx, height), 18] as const
+      return [await feed(ctx, block.height), 18] as const
     }
     const alternateFeed = alternativePriceFeeds[`${base}_${quote}`]
     if (alternateFeed) {
-      return [await alternateFeed(ctx, height), 18] as const
+      return [await alternateFeed(ctx, block.height), 18] as const
     }
     return undefined
   } catch (err) {
-    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${height}, ${base}, ${quote}`)
+    ctx.log.error(`Failed to get price for: ${ctx.chain.id}, ${block.height}, ${base}, ${quote}`)
     throw err
   }
 }
