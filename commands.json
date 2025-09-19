@@ -16,7 +16,7 @@
     },
     "down": {
       "description": "Drop a PG database",
-      "cmd": ["docker-compose", "down"]
+      "cmd": ["docker-compose", "down", "--volumes"]
     },
     "migration:apply": {
       "description": "Apply the DB migrations",

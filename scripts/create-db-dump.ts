@@ -283,7 +283,7 @@ async function main() {
   if (!continueRun || startedCompose) {
     if (!startedCompose) {
       console.log(`Starting dockerized Postgres at port ${DB_PORT} (project ${composeProject})...`)
-      await runCmd(`docker-compose -p ${composeProject} down`, { env: { ...baseEnv } })
+      await runCmd(`docker-compose -p ${composeProject} down --volumes`, { env: { ...baseEnv } })
       await runCmd(`docker-compose -p ${composeProject} up -d`, { env: { ...baseEnv } })
       startedCompose = true
     }
@@ -328,7 +328,7 @@ async function main() {
     if (startedCompose) {
       console.log('Shutting down docker compose project...')
       try {
-        await runCmd(`docker-compose -p ${composeProject} down`, { env: baseEnv })
+        await runCmd(`docker-compose -p ${composeProject} down --volumes`, { env: baseEnv })
       } catch (e) {
         console.warn('Failed to stop docker-compose project:', e)
       }
