@@ -64,23 +64,23 @@ export const getMainnetPrice = async (
   const priceEntry = priceMap[`${base}_${quote}`]
   if (priceEntry) {
     const [getPrice, decimals] = priceEntry
-    return [await getPrice(ctx, block.height), decimals]
+    return [await getPrice(ctx, block), decimals]
   }
   throw new Error(`No price for ${base}_${quote}`)
 }
 
-const getOETHETHPrice = async (ctx: Context, height: number) => {
-  if (height < 17230232) return 10n ** 18n
-  if (height < 19384550) {
-    const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
+const getOETHETHPrice = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 17230232) return 10n ** 18n
+  if (block.height < 19384550) {
+    const contract = new curveLpToken.Contract(ctx, { height: block.height }, CURVE_ETH_OETH_POOL_ADDRESS)
     return await contract.get_dy(0n, 1n, 1000000000000000000n)
   }
-  return chainlinkPriceFeeds['OETH_ETH']!.get(ctx, height)
+  return chainlinkPriceFeeds['OETH_ETH']!.get(ctx, block.height)
 }
 
-const getETHOETHPrice = async (ctx: Context, height: number) => {
-  if (height < 17230232) return 10n ** 18n
-  const contract = new curveLpToken.Contract(ctx, { height }, CURVE_ETH_OETH_POOL_ADDRESS)
+const getETHOETHPrice = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 17230232) return 10n ** 18n
+  const contract = new curveLpToken.Contract(ctx, { height: block.height }, CURVE_ETH_OETH_POOL_ADDRESS)
   return await contract.get_dy(1n, 0n, 1000000000000000000n)
 }
 
@@ -240,10 +240,10 @@ export const twoWay = <Base extends MainnetCurrencySymbol, Quote extends Mainnet
       async (ctx: Context, block: Block['header']) => getPrice(ctx, block).then((rate) => invertRate(rate, decimals)),
       decimals,
     ],
-  }) as Record<`${Base}_${Quote}` | `${Quote}_${Base}`, [(ctx: Context, height: number) => Promise<bigint>, number]>
+  }) as const
 
 export const priceMap: Partial<
-  Record<`${CurrencySymbol}_${CurrencySymbol}`, [(ctx: Context, height: number) => Promise<bigint>, number]>
+  Record<`${CurrencySymbol}_${CurrencySymbol}`, [(ctx: Context, block: Block['header']) => Promise<bigint>, number]>
 > = {
   ETH_WETH: [async () => 1_000_000_000_000_000_000n, 18],
   WETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
