@@ -670,6 +670,17 @@
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63"
+    },
+    {
+      "id": "1:0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63"
     }
   ],
   "strategyDailyYields_oeth_0x1827f9ea98e0bf96550b2fc20f7233277fcd7e63": [
@@ -1004,6 +1015,17 @@
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
       "balance": "24732687872586200797861",
       "balanceETH": "24732687872586200797861",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
+    },
+    {
+      "id": "1:0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "24772024979758945590932",
+      "balanceETH": "24772024979758945590932",
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6"
@@ -1737,6 +1759,17 @@
       "id": "1:0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5:0x5e8422345238f34275888049021821e8e08caa1f:23300000",
       "blockNumber": 23300000,
       "timestamp": "2025-09-05T22:50:35.000000Z",
+      "asset": "0x5e8422345238f34275888049021821e8e08caa1f",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "frxETH",
+      "strategy": "0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5"
+    },
+    {
+      "id": "1:0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5:0x5e8422345238f34275888049021821e8e08caa1f:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
       "asset": "0x5e8422345238f34275888049021821e8e08caa1f",
       "balance": "0",
       "balanceETH": "0",
@@ -2635,6 +2668,17 @@
       "id": "1:0xc1fc9e5ec3058921ea5025d703cbe31764756319:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23300000",
       "blockNumber": 23300000,
       "timestamp": "2025-09-05T22:50:35.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0xc1fc9e5ec3058921ea5025d703cbe31764756319"
+    },
+    {
+      "id": "1:0xc1fc9e5ec3058921ea5025d703cbe31764756319:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
       "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
       "balance": "0",
       "balanceETH": "0",
@@ -6497,6 +6541,17 @@
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238"
+    },
+    {
+      "id": "1:0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238"
     }
   ],
   "strategyDailyYields_oeth_0x34edb2ee25751ee67f68a45813b22811687c0238": [
@@ -6972,6 +7027,17 @@
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0x4685db8bf2df743c861d71e6cfb5347222992076"
+    },
+    {
+      "id": "1:0x4685db8bf2df743c861d71e6cfb5347222992076:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "16000002626335030463743",
+      "balanceETH": "16000002626335030463743",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0x4685db8bf2df743c861d71e6cfb5347222992076"
     }
   ],
   "strategyDailyYields_oeth_0x4685db8bf2df743c861d71e6cfb5347222992076": [
@@ -7335,6 +7401,17 @@
       "chainId": 1,
       "symbol": "WETH",
       "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63"
+    },
+    {
+      "id": "1:0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "balance": "13952000000000000000000",
+      "balanceETH": "13952000000000000000000",
+      "chainId": 1,
+      "symbol": "WETH",
+      "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63"
     }
   ],
   "strategyDailyYields_oeth_0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63": [
@@ -7569,6 +7646,17 @@
       "timestamp": "2025-09-05T22:50:35.000000Z",
       "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
       "balance": "1166866205984176511239144",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "USDS",
+      "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
+    },
+    {
+      "id": "1:0x5bd9af9c2506d29b6d79cb878284a270190eaeaa:0xdc035d45d973e3ec169d2276ddab16f1e407384f:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+      "balance": "1168940453496047673487091",
       "balanceETH": "0",
       "chainId": 1,
       "symbol": "USDS",
@@ -18346,6 +18434,17 @@
       "chainId": 1,
       "symbol": "DAI",
       "strategy": "0x6b69b755c629590ed59618a2712d8a2957ca98fc"
+    },
+    {
+      "id": "1:0x6b69b755c629590ed59618a2712d8a2957ca98fc:0x6b175474e89094c44da98b954eedeac495271d0f:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "balance": "0",
+      "balanceETH": "0",
+      "chainId": 1,
+      "symbol": "DAI",
+      "strategy": "0x6b69b755c629590ed59618a2712d8a2957ca98fc"
     }
   ],
   "strategyDailyYields_ousd_0x6b69b755c629590ed59618a2712d8a2957ca98fc": [
@@ -18855,6 +18954,17 @@
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0"
+    },
+    {
+      "id": "1:0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "balance": "84208240040",
+      "balanceETH": "18788508",
+      "chainId": 1,
+      "symbol": "USDC",
+      "strategy": "0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0"
     }
   ],
   "strategyDailyYields_ousd_0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0": [
@@ -19172,6 +19282,17 @@
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1"
+    },
+    {
+      "id": "1:0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "balance": "1847318021351",
+      "balanceETH": "412172855",
+      "chainId": 1,
+      "symbol": "USDC",
+      "strategy": "0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1"
     }
   ],
   "strategyDailyYields_ousd_0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1": [
@@ -19463,6 +19584,17 @@
       "chainId": 1,
       "symbol": "USDT",
       "strategy": "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
+    },
+    {
+      "id": "1:0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26:0xdac17f958d2ee523a2206206994597c13d831ec7:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "balance": "1829892235035",
+      "balanceETH": "409110240",
+      "chainId": 1,
+      "symbol": "USDT",
+      "strategy": "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
     }
   ],
   "strategyDailyYields_ousd_0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26": [
@@ -19663,6 +19795,17 @@
       "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "balance": "4571923202340",
       "balanceETH": "1055640699",
+      "chainId": 1,
+      "symbol": "USDC",
+      "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
+    },
+    {
+      "id": "1:0x26a02ec47acc2a3442b757f45e0a82b8e993ce11:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:23400000",
+      "blockNumber": 23400000,
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "balance": "4571964888044",
+      "balanceETH": "1020094970",
       "chainId": 1,
       "symbol": "USDC",
       "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11"
@@ -21567,6 +21710,39 @@
       "asset": "0x4200000000000000000000000000000000000006",
       "balance": "18933741157670993736802",
       "balanceETH": "18933741157670993736802",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
+    },
+    {
+      "id": "8453:0x80c864704dd06c3693ed5179190786ee38acf835:0x4200000000000000000000000000000000000006:35500000",
+      "blockNumber": 35500000,
+      "timestamp": "2025-09-13T18:49:07.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "18936712697671183371192",
+      "balanceETH": "18936712697671183371192",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
+    },
+    {
+      "id": "8453:0x80c864704dd06c3693ed5179190786ee38acf835:0x4200000000000000000000000000000000000006:35600000",
+      "blockNumber": 35600000,
+      "timestamp": "2025-09-16T02:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "18941171879494650777738",
+      "balanceETH": "18941171879494650777738",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
+    },
+    {
+      "id": "8453:0x80c864704dd06c3693ed5179190786ee38acf835:0x4200000000000000000000000000000000000006:35700000",
+      "blockNumber": 35700000,
+      "timestamp": "2025-09-18T09:55:47.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "18944146876076967774807",
+      "balanceETH": "18944146876076967774807",
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0x80c864704dd06c3693ed5179190786ee38acf835"
@@ -23482,6 +23658,39 @@
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
+    },
+    {
+      "id": "8453:0xf611cc500eee7e4e4763a05fe623e2363c86d2af:0x4200000000000000000000000000000000000006:35500000",
+      "blockNumber": 35500000,
+      "timestamp": "2025-09-13T18:49:07.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "182372112916278668462260",
+      "balanceETH": "182372112916278668462260",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
+    },
+    {
+      "id": "8453:0xf611cc500eee7e4e4763a05fe623e2363c86d2af:0x4200000000000000000000000000000000000006:35600000",
+      "blockNumber": 35600000,
+      "timestamp": "2025-09-16T02:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "182372112916278668462260",
+      "balanceETH": "182372112916278668462260",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
+    },
+    {
+      "id": "8453:0xf611cc500eee7e4e4763a05fe623e2363c86d2af:0x4200000000000000000000000000000000000006:35700000",
+      "blockNumber": 35700000,
+      "timestamp": "2025-09-18T09:55:47.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "182372112916278668462260",
+      "balanceETH": "182372112916278668462260",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af"
     }
   ],
   "strategyDailyYields_superoethb_0xf611cc500eee7e4e4763a05fe623e2363c86d2af": [
@@ -24613,6 +24822,39 @@
       "chainId": 8453,
       "symbol": "WETH",
       "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
+    },
+    {
+      "id": "8453:0x9cfcaf81600155e01c63e4d2993a8a81a8205829:0x4200000000000000000000000000000000000006:35600000",
+      "blockNumber": 35600000,
+      "timestamp": "2025-09-16T02:22:27.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "22595884381177231425029",
+      "balanceETH": "22595884381177231425029",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
+    },
+    {
+      "id": "8453:0x9cfcaf81600155e01c63e4d2993a8a81a8205829:0x4200000000000000000000000000000000000006:35700000",
+      "blockNumber": 35700000,
+      "timestamp": "2025-09-18T09:55:47.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "22595955851380176908753",
+      "balanceETH": "22595955851380176908753",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
+    },
+    {
+      "id": "8453:0x9cfcaf81600155e01c63e4d2993a8a81a8205829:0x4200000000000000000000000000000000000006:35800000",
+      "blockNumber": 35800000,
+      "timestamp": "2025-09-20T17:29:07.000000Z",
+      "asset": "0x4200000000000000000000000000000000000006",
+      "balance": "22695962266866423478491",
+      "balanceETH": "22695962266866423478491",
+      "chainId": 8453,
+      "symbol": "WETH",
+      "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829"
     }
   ],
   "strategyDailyYields_superoethb_0x9cfcaf81600155e01c63e4d2993a8a81a8205829": [
@@ -24652,7 +24894,7 @@
       "asset": "0x4200000000000000000000000000000000000006",
       "balance": "10568797467913592386019",
       "balanceWeight": 1,
-      "earnings": "384700297584597968",
+      "earnings": "380468667030492930",
       "earningsChange": "514584227939528"
     },
     {
@@ -24665,7 +24907,7 @@
       "asset": "0x4200000000000000000000000000000000000006",
       "balance": "14543254482480692570616",
       "balanceWeight": 1,
-      "earnings": "629128269230179588",
+      "earnings": "624515637277484731",
       "earningsChange": "3953243864475532"
     },
     {
@@ -24678,7 +24920,7 @@
       "asset": "0x4200000000000000000000000000000000000006",
       "balance": "21945804503655590057432",
       "balanceWeight": 1,
-      "earnings": "896182141550462887",
+      "earnings": "891557729854668691",
       "earningsChange": "4805257416738158"
     }
   ],
@@ -26347,6 +26589,15 @@
       "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
       "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
       "totalValue": "54694195161953930233508"
+    },
+    {
+      "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23400000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "blockNumber": 23400000,
+      "chainId": 1,
+      "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+      "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "totalValue": "54724483634046365876110"
     }
   ],
   "oeth_oTokenDailyStats": [
@@ -28847,6 +29098,15 @@
       "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
       "address": "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
       "totalValue": "9519497466551176511239144"
+    },
+    {
+      "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-23400000-0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "timestamp": "2025-09-19T22:07:11.000000Z",
+      "blockNumber": 23400000,
+      "chainId": 1,
+      "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+      "address": "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "totalValue": "9537120999734047673487091"
     }
   ],
   "ousd_oTokenDailyStats": [
@@ -31954,6 +32214,24 @@
       "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
       "address": "0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
       "totalValue": "223775377459596999361075"
+    },
+    {
+      "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-35400000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "timestamp": "2025-09-11T11:15:47.000000Z",
+      "blockNumber": 35400000,
+      "chainId": 8453,
+      "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "address": "0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "totalValue": "223922752876916689762106"
+    },
+    {
+      "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-35500000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "timestamp": "2025-09-13T18:49:07.000000Z",
+      "blockNumber": 35500000,
+      "chainId": 8453,
+      "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+      "address": "0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+      "totalValue": "223927269719578974526187"
     }
   ],
   "superoethb_oTokenDailyStats": [
@@ -38479,52 +38757,52 @@
   ],
   "ognDailyStats": [
     {
-      "id": "2024-09-18",
-      "blockNumber": 20780842,
-      "timestamp": "2024-09-18T23:45:11.000000Z",
-      "totalStaked": "449798459804615506935732186"
+      "id": "2024-09-23",
+      "blockNumber": 20816465,
+      "timestamp": "2024-09-23T23:07:59.000000Z",
+      "totalStaked": "450049978336146659414127375"
     },
     {
-      "id": "2024-11-07",
-      "blockNumber": 21139068,
-      "timestamp": "2024-11-07T23:31:47.000000Z",
-      "totalStaked": "471336105318505341518320941"
+      "id": "2024-11-12",
+      "blockNumber": 21174977,
+      "timestamp": "2024-11-12T23:46:11.000000Z",
+      "totalStaked": "471894798219885997111701530"
     },
     {
-      "id": "2024-12-27",
-      "blockNumber": 21497229,
-      "timestamp": "2024-12-27T23:58:35.000000Z",
-      "totalStaked": "474074031874371997718767487"
+      "id": "2025-01-01",
+      "blockNumber": 21532979,
+      "timestamp": "2025-01-01T23:43:59.000000Z",
+      "totalStaked": "474546216098216031117385802"
     },
     {
-      "id": "2025-02-15",
-      "blockNumber": 21855105,
-      "timestamp": "2025-02-15T23:30:35.000000Z",
-      "totalStaked": "475630117128830234126546986"
+      "id": "2025-02-20",
+      "blockNumber": 21890927,
+      "timestamp": "2025-02-20T23:46:35.000000Z",
+      "totalStaked": "479919383433218750723540443"
     },
     {
-      "id": "2025-04-06",
-      "blockNumber": 22213097,
-      "timestamp": "2025-04-06T23:18:11.000000Z",
-      "totalStaked": "482569510416245898560740839"
+      "id": "2025-04-11",
+      "blockNumber": 22249049,
+      "timestamp": "2025-04-11T23:40:35.000000Z",
+      "totalStaked": "482636744647367811929284156"
     },
     {
-      "id": "2025-05-26",
-      "blockNumber": 22570338,
-      "timestamp": "2025-05-26T23:46:47.000000Z",
-      "totalStaked": "483019470736268570964176617"
+      "id": "2025-05-31",
+      "blockNumber": 22606070,
+      "timestamp": "2025-05-31T23:45:35.000000Z",
+      "totalStaked": "484738702088912659027279386"
     },
     {
-      "id": "2025-07-15",
-      "blockNumber": 22927972,
-      "timestamp": "2025-07-15T23:48:59.000000Z",
-      "totalStaked": "496539121660449854976612650"
+      "id": "2025-07-20",
+      "blockNumber": 22963843,
+      "timestamp": "2025-07-20T23:59:59.000000Z",
+      "totalStaked": "499593690115424464800443437"
     },
     {
-      "id": "2025-09-03",
-      "blockNumber": 23285988,
-      "timestamp": "2025-09-03T23:52:35.000000Z",
-      "totalStaked": "533321092159716491060595712"
+      "id": "2025-09-08",
+      "blockNumber": 23321727,
+      "timestamp": "2025-09-08T23:42:59.000000Z",
+      "totalStaked": "536533439307269740283863980"
     }
   ],
   "beaconDepositEvents": [
@@ -39646,6 +39924,27 @@
       "id": "8453-0x6446021f4e396da3df4235c62537431372195d38-20300000",
       "timestamp": "2024-09-26T22:22:27.000000Z",
       "votes": "46606526766750364499081799"
+    },
+    {
+      "address": "0x6446021f4e396da3df4235c62537431372195d38",
+      "blockNumber": 20400000,
+      "bribes": [],
+      "chainId": 8453,
+      "emissions": "1166386220752063753",
+      "epoch": "1727308800",
+      "fees": [
+        {
+          "amount": "19960596896497630",
+          "token": "0x4200000000000000000000000000000000000006"
+        },
+        {
+          "amount": "167745398223412441",
+          "token": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3"
+        }
+      ],
+      "id": "8453-0x6446021f4e396da3df4235c62537431372195d38-20400000",
+      "timestamp": "2024-09-29T05:55:47.000000Z",
+      "votes": "46210594723669766643297872"
     }
   ],
   "protocolDailyStatDetails": [
