@@ -31,7 +31,7 @@ export type IStrategyData = {
   name: string
   contractName: string
   address: string
-  kind: 'Generic' | 'Vault' | 'CurveAMO' | 'BalancerMetaStablePool' | 'NativeStaking'
+  kind: 'Generic' | 'Vault' | 'CurveAMO' | 'BalancerMetaStablePool' | 'NativeStaking' | 'CompoundingStakingSSV'
   base: {
     address: string
     decimals: number
@@ -73,6 +73,7 @@ const processors: Record<
   CurveAMO: strategyCurveAMO,
   BalancerMetaStablePool: strategyBalancer,
   NativeStaking: strategyNativeStaking,
+  CompoundingStakingSSV: strategyNativeStaking,
 }
 
 export const createStrategySetup = (strategyData: IStrategyData) => {

@@ -10,6 +10,7 @@ import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_COMPOUND_STAKING_SSV_STRATEGIES,
   OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
   RETH_ADDRESS,
@@ -181,6 +182,25 @@ export const oethStrategies: readonly IStrategyData[] = [
         address: strategy.address,
         oTokenAddress: OETH_ADDRESS,
         kind: 'NativeStaking',
+        base: { address: WETH_ADDRESS, decimals: 18 },
+        assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+        earnings: {
+          passiveByDepositWithdrawal: true,
+          rewardTokenCollected: true,
+          rewardTokenCollectedSimple: true,
+        },
+      }) as const,
+  ),
+  ...OETH_COMPOUND_STAKING_SSV_STRATEGIES.map(
+    (strategy, index) =>
+      ({
+        chainId: 1,
+        from: strategy.from,
+        name: `OETH Compound Staking SSV ${index + 1}`,
+        contractName: 'CompoundingStakingSSVStrategy',
+        address: strategy.address,
+        oTokenAddress: OETH_ADDRESS,
+        kind: 'CompoundingStakingSSV',
         base: { address: WETH_ADDRESS, decimals: 18 },
         assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
         earnings: {
