@@ -1,7 +1,7 @@
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { notionProcessor } from 'mainnet/processors/notion'
 import { ognBuybacks } from 'mainnet/processors/ogn-buybacks'
-import { originArmProcessors } from 'mainnet/processors/origin-arm'
+import { originArmProcessors } from 'mainnet/processors/origin-arms'
 import { protocolSqlSimpleProcessor } from 'mainnet/processors/protocol/protocol-sql-simple'
 import 'tsconfig-paths/register'
 import { mainnet } from 'viem/chains'

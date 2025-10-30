@@ -1,6 +1,6 @@
-import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
-import { ContractBase, event, fun, indexed, viewFun } from '@subsquid/evm-abi'
 import * as p from '@subsquid/evm-codec'
+import { event, fun, viewFun, indexed, ContractBase } from '@subsquid/evm-abi'
+import type { EventParams as EParams, FunctionArguments, FunctionReturn } from '@subsquid/evm-abi'
 
 export const events = {
     BalancesSnapped: event("0xb7523e03ed4a74718427c422a01fee1138835adb5bd592240f30bd8b5e1b929a", "BalancesSnapped(bytes32,uint256)", {"blockRoot": indexed(p.bytes32), "ethBalance": p.uint256}),

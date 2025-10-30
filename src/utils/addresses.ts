@@ -193,10 +193,17 @@ export const ogv = {
   governance: OGV_GOVERNANCE_ADDRESS,
 }
 
-export const arm = {
-  address: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
-  capManager: '0xf54ebff575f699d281645c6f14fe427dffe629cf',
-  zapper: '0x01f30b7358ba51f637d1aa05d9b4a60f76dad680',
+export const arms: Record<string, { address: string; capManager: string; zapper: string }> = {
+  ['ARM-WETH-eETH']: {
+    address: '0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2',
+    capManager: '0xf2a18f7330141ec737eb73a0a5ea8e4d7e9be7ec',
+    zapper: '0xe11edbd5ae4fa434af7f8d7f03da1742996e7ab2',
+  },
+  ['ARM-WETH-stETH']: {
+    address: '0x85b78aca6deae198fbf201c82daf6ca21942acc6',
+    capManager: '0xf54ebff575f699d281645c6f14fe427dffe629cf',
+    zapper: '0x01f30b7358ba51f637d1aa05d9b4a60f76dad680',
+  },
 }
 
 export const multisig = {
@@ -210,5 +217,5 @@ export const addresses = {
   oeth,
   ousd,
   ogv,
-  arm,
+  arms,
 }

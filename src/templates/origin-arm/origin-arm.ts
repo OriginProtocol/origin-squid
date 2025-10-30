@@ -4,7 +4,8 @@ import { LessThan } from 'typeorm'
 import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
-import * as originArmAbi from '@abi/origin-arm'
+import * as originOsArmAbi from '@abi/origin-arm'
+import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
@@ -30,7 +31,7 @@ export const createOriginARMProcessors = ({
   underlyingToken,
   capManagerAddress,
   marketFrom,
-  lidoArm,
+  armType,
 }: {
   name: string
   from: number
@@ -38,7 +39,7 @@ export const createOriginARMProcessors = ({
   underlyingToken: Currency
   capManagerAddress: string
   marketFrom?: number
-  lidoArm: boolean
+  armType: 'lido' | 'etherfi' | 'os'
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
@@ -110,7 +111,7 @@ export const createOriginARMProcessors = ({
     if (entity) {
       armEntity = entity
     } else {
-      const armContract = new originArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
+      const armContract = new originOsArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
       const [name, symbol, decimals, token0, token1] = await Promise.all([
         armContract.name(),
         armContract.symbol(),
@@ -184,8 +185,10 @@ export const createOriginARMProcessors = ({
             return armStateEntity
           }
           const previousState = await getPreviousState(block)
+          const armContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
           const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
-          const armContract = new originArmAbi.Contract(ctx, block.header, armAddress)
+          const osArmContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
+          const etherfiArmContract = new originEtherfiArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
           const [
             assets0,
@@ -198,9 +201,13 @@ export const createOriginARMProcessors = ({
             assetsPerShare,
             activeMarket,
           ] = await Promise.all([
-            new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
-            new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
-            lidoArm ? lidoArmContract.lidoWithdrawalQueueAmount() : armContract.vaultWithdrawalAmount(),
+            armContract.balanceOf(armAddress),
+            armContract.balanceOf(armAddress),
+            {
+              lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
+              os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
+              etherfi: etherfiArmContract.etherfiWithdrawalQueueAmount.bind(etherfiArmContract),
+            }[armType](),
             armContract.feesAccrued(),
             armContract.totalAssets(),
             controllerContract.totalAssetsCap(),
@@ -212,9 +219,7 @@ export const createOriginARMProcessors = ({
             ? await new erc20Abi.Contract(ctx, block.header, activeMarket).balanceOf(armAddress)
             : 0n
           const marketAssets =
-            activeMarket && marketBalanceOf > 0n
-              ? await new originArmAbi.Contract(ctx, block.header, activeMarket).previewRedeem(marketBalanceOf)
-              : 0n
+            activeMarket && marketBalanceOf > 0n ? await armContract.previewRedeem(marketBalanceOf) : 0n
           const date = new Date(block.header.timestamp)
           armStateEntity = new ArmState({
             id: stateId,
@@ -321,8 +326,8 @@ export const createOriginARMProcessors = ({
                     data.from.toLowerCase() === armAddress
                       ? acc - data.value
                       : data.to.toLowerCase() === armAddress
-                      ? acc + data.value
-                      : acc,
+                        ? acc + data.value
+                        : acc,
                   0n,
                 )
                 const assets1 = transfers1.reduce(
@@ -330,8 +335,8 @@ export const createOriginARMProcessors = ({
                     data.from.toLowerCase() === armAddress
                       ? acc - data.value
                       : data.to.toLowerCase() === armAddress
-                      ? acc + data.value
-                      : acc,
+                        ? acc + data.value
+                        : acc,
                   0n,
                 )
 
