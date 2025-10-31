@@ -11,9 +11,9 @@
     "strategy": "0xaf04828ed923216c77dc22a2fc8e077fdadaa87d"
   },
   {
-    "id": "1:0xaf04828ed923216c77dc22a2fc8e077fdadaa87d:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23674968",
-    "blockNumber": 23674968,
-    "timestamp": "2025-10-28T09:15:47.000000Z",
+    "id": "1:0xaf04828ed923216c77dc22a2fc8e077fdadaa87d:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23674820",
+    "blockNumber": 23674820,
+    "timestamp": "2025-10-28T08:45:47.000000Z",
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "0",
     "balanceETH": "0",
@@ -22,9 +22,9 @@
     "strategy": "0xaf04828ed923216c77dc22a2fc8e077fdadaa87d"
   },
   {
-    "id": "1:0xaf04828ed923216c77dc22a2fc8e077fdadaa87d:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23682368",
-    "blockNumber": 23682368,
-    "timestamp": "2025-10-29T10:10:23.000000Z",
+    "id": "1:0xaf04828ed923216c77dc22a2fc8e077fdadaa87d:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23682220",
+    "blockNumber": 23682220,
+    "timestamp": "2025-10-29T09:40:35.000000Z",
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "0",
     "balanceETH": "0",

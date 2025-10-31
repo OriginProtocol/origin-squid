@@ -1,13 +1,13 @@
 [
   {
-    "id": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
-    "chainId": 1,
-    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
-    "name": "Ether.fi ARM",
-    "symbol": "ARM-WETH-eETH",
+    "id": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "chainId": 146,
+    "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "name": "Origin ARM",
+    "symbol": "ARM-WS-OS",
     "decimals": 18,
-    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "token1": "0x35fa164735182de50811e8e2e824cfb9b6118ac2"
+    "token0": "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
+    "token1": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794"
   },
   {
     "id": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -20,13 +20,13 @@
     "token1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
   },
   {
-    "id": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
-    "chainId": 146,
-    "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
-    "name": "Origin ARM",
-    "symbol": "ARM-WS-OS",
+    "id": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "chainId": 1,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "name": "Ether.fi ARM",
+    "symbol": "ARM-WETH-eETH",
     "decimals": 18,
-    "token0": "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
-    "token1": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794"
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0x35fa164735182de50811e8e2e824cfb9b6118ac2"
   }
 ]

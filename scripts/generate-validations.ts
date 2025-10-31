@@ -510,7 +510,7 @@ const arm = (prefix: string, armAddress: string) => {
 
 const arms = () => {
   return gql(`
-    arms: arms(limit: ${LIMIT}) {
+    arms: arms(limit: ${LIMIT}, orderBy: [id_ASC]) {
       id
       chainId
       address
