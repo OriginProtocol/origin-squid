@@ -8,14 +8,12 @@ import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
 
-import * as validate from './oethb/validate'
-
 export const processor = defineSquidProcessor({
   chainId: base.id,
   stateSchema: 'oethb-processor',
   processors: [...superOETHb],
   postProcessors: [exchangeRatesPostProcessor, processStatus('oethb')],
-  validators: [validate],
+  validators: [],
   fields: DEFAULT_FIELDS,
 })
 

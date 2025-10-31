@@ -30,7 +30,6 @@ import { erc20s } from './mainnet/processors/erc20s'
 import * as mainnetExchangeRates from './mainnet/processors/exchange-rates'
 import * as legacyStaking from './mainnet/processors/legacy-staking'
 import * as nativeStaking from './mainnet/processors/native-staking'
-import * as validate from './mainnet/validators/validate-mainnet'
 
 export const processor = defineSquidProcessor({
   stateSchema: 'mainnet-processor',
@@ -60,7 +59,7 @@ export const processor = defineSquidProcessor({
     notionProcessor,
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolSqlSimpleProcessor],
-  validators: [validate],
+  validators: [],
   fields: FIELDS_WITH_RECEIPTS_INFO,
 })
 export default processor

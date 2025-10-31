@@ -10,7 +10,6 @@ import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { baseERC20s, baseStrategiesProcessors, bridgedWoethStrategy } from './base'
 import { aerodromeProcessors } from './base/aerodrome'
 import * as exchangeRatesProcessor from './base/exchange-rates'
-import * as validate from './base/validate'
 
 export const processor = defineSquidProcessor({
   chainId: base.id,
@@ -24,7 +23,7 @@ export const processor = defineSquidProcessor({
     createPoolsProcessor(base.id),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('base')],
-  validators: [validate],
+  validators: [],
   fields: DEFAULT_FIELDS,
 })
 

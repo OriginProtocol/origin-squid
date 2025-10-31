@@ -8,14 +8,12 @@ import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
 
-import * as validate from './sonic/validate-os'
-
 export const processor = defineSquidProcessor({
   chainId: sonic.id,
   stateSchema: 'os-processor',
   processors: [...OS],
   postProcessors: [exchangeRatesPostProcessor, processStatus('os')],
-  validators: [validate],
+  validators: [],
   fields: DEFAULT_FIELDS,
 })
 

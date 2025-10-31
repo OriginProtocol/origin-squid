@@ -13,8 +13,6 @@ import { processStatus } from '@templates/processor-status'
 import { FIELDS_WITH_RECEIPTS_INFO } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
 
-import * as validate from './sonic/validate'
-
 export const processor = defineSquidProcessor({
   chainId: sonic.id,
   stateSchema: 'sonic-processor',
@@ -27,7 +25,7 @@ export const processor = defineSquidProcessor({
     ...sonicArmProcessors,
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
-  validators: [validate],
+  validators: [],
   fields: FIELDS_WITH_RECEIPTS_INFO, // Extra fields for gas info used by arm processor
 })
 
