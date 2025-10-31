@@ -1728,5 +1728,65 @@
     "totalAssets": "8888982776890233171849",
     "totalSupply": "8250053385452714840064",
     "assetsPerShare": "1077445485693964101"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36100000",
+    "timestamp": "2025-09-27T16:09:07.000000Z",
+    "blockNumber": 36100000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8621465758486381917031",
+    "totalSupply": "7999511030972473097487",
+    "assetsPerShare": "1077749093051541166"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36200000",
+    "timestamp": "2025-09-29T23:42:27.000000Z",
+    "blockNumber": 36200000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8460996660402845676889",
+    "totalSupply": "7848364699132700042121",
+    "assetsPerShare": "1078058549106140010"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36300000",
+    "timestamp": "2025-10-02T07:15:47.000000Z",
+    "blockNumber": 36300000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8365271972129768208950",
+    "totalSupply": "7757743509863077734630",
+    "assetsPerShare": "1078312522384155647"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36400000",
+    "timestamp": "2025-10-04T14:49:07.000000Z",
+    "blockNumber": 36400000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8420532547492182864993",
+    "totalSupply": "7806701572702311029216",
+    "assetsPerShare": "1078628722908565412"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36500000",
+    "timestamp": "2025-10-06T22:22:27.000000Z",
+    "blockNumber": 36500000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8624104569677733898603",
+    "totalSupply": "7993098016059258438794",
+    "assetsPerShare": "1078943927917647765"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36600000",
+    "timestamp": "2025-10-09T05:55:47.000000Z",
+    "blockNumber": 36600000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8317047348347393821379",
+    "totalSupply": "7706715242174794928046",
+    "assetsPerShare": "1079194843327358537"
   }
 ]

@@ -528,7 +528,11 @@ const ognDailyStats = () => {
     ognDailyStats: ognDailyStats(
       limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+      where: {
+        timestamp_lte: "${twoDaysAgo.toISOString()}",
+        timestamp_gte: "2022-01-01T00:00:00Z",
+        id_endsWith: "0"
+      }
     ) {
       id
       blockNumber
@@ -833,7 +837,8 @@ const main = async () => {
     erc20Balances('oeth', '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3'),
     erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
     erc20Balances('os', sonicAddresses.tokens.OS),
-    ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
+    ...arm('lidoarm', addresses.arms['ARM-WETH-stETH'].address),
+    ...arm('etherfiarm', addresses.arms['ARM-WETH-eETH'].address),
     ...arm('osarm', sonicAddresses.armOS.address),
     arms(),
     ognDailyStats(),
@@ -856,12 +861,13 @@ const main = async () => {
       throw new Error('Query failed')
     }
 
+    const takeAll = ['ognDailyStats']
     for (const key of Object.keys(result.data)) {
       let validationData
       const rawData = result.data[key]
 
       // If there are fewer than 20 total entries, save them all
-      if (rawData.length < 20) {
+      if (rawData.length < 20 || takeAll.includes(key)) {
         validationData = rawData
       } else {
         // Otherwise, filter to validation entries
