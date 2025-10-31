@@ -525,6 +525,7 @@ const main = async () => {
     erc20Balances('superoethb', '0xdbfefd2e8460a6ee4955a68582f85708baea60a3'),
     erc20Balances('os', sonicAddresses.tokens.OS),
     ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
+    ...arm('osarm', sonicAddresses.armOS.address),
     ognDailyStats(),
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
