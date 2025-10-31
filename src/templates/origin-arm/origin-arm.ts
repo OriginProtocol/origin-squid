@@ -201,8 +201,8 @@ export const createOriginARMProcessors = ({
             assetsPerShare,
             activeMarket,
           ] = await Promise.all([
-            armContract.balanceOf(armAddress),
-            armContract.balanceOf(armAddress),
+            new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
+            new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
             {
               lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
               os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
