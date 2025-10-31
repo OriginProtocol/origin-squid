@@ -1,7 +1,9 @@
 import fs from 'fs'
+import path from 'path'
 
 import { retry } from '@originprotocol/squid-utils'
 
+import { baseStrategies } from '../src/base/strategies'
 import { oethStrategies } from '../src/oeth/processors/strategies'
 import { ousdStrategies } from '../src/ousd/processors/strategies'
 import { IStrategyData } from '../src/templates/strategy'
@@ -230,6 +232,7 @@ const arm = (prefix: string, armAddress: string) => {
         assets1
         assetsPerShare
         outstandingAssets1
+        marketAssets
         totalAssets
         totalAssetsCap
         totalDeposits
@@ -277,6 +280,7 @@ const arm = (prefix: string, armAddress: string) => {
         date
         fees
         outstandingAssets1
+        marketAssets
         rateUSD
         totalAssets
         totalAssetsCap
@@ -509,12 +513,80 @@ const protocolDailyStatDetails = () => {
   `)
 }
 
+const kebabCase = (str: string) => {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_]+/g, '-')
+    .toLowerCase()
+}
+
+// Build a map from strategy address to strategy name
+const strategyNameMap = new Map<string, string>()
+const allStrategies = [...oethStrategies, ...ousdStrategies, ...baseStrategies]
+for (const strategy of allStrategies) {
+  strategyNameMap.set(strategy.address.toLowerCase(), strategy.name)
+}
+
+const getFilePathForEntity = (entityKey: string): string => {
+  const baseDir = path.join(__dirname, '../entities')
+
+  // Strategy entities: strategyBalances_oeth_0x123... or strategyDailyYields_ousd_0x123...
+  if (entityKey.startsWith('strategyBalances_') || entityKey.startsWith('strategyDailyYields_')) {
+    const [type, token, address] = entityKey.split('_')
+    const suffix = type.startsWith('strategyBalances') ? 'balances' : 'daily-yields'
+    const strategyName = strategyNameMap.get(address.toLowerCase())
+    if (!strategyName) {
+      throw new Error(`Unknown strategy address: ${address}`)
+    }
+    const fileName = kebabCase(strategyName)
+    return path.join(baseDir, `${token}/strategies/${fileName}-${suffix}.json`)
+  }
+
+  // ARM entities: lidoarm_armStates, osarm_armDailyStats, etc.
+  if (entityKey.includes('arm_arm') || entityKey.includes('arm_transaction')) {
+    const [prefix, ...rest] = entityKey.split('_')
+    const entityName = rest.join('_')
+    return path.join(baseDir, `arm/${prefix}-${kebabCase(entityName)}.json`)
+  }
+
+  // ERC20 balances: ogn_erc20Balances, ousd_erc20Balances, etc.
+  if (entityKey.endsWith('_erc20Balances')) {
+    const token = entityKey.replace('_erc20Balances', '')
+    return path.join(baseDir, `erc20/${token}-balances.json`)
+  }
+
+  // Token entities: oeth_oTokens, ousd_oTokenApies, superoethb_oTokenHistories, etc.
+  if (entityKey.match(/^(oeth|ousd|superoethb|os)_oToken/)) {
+    const [token, entityType] = entityKey.split('_')
+    const fileName = kebabCase(entityType)
+    return path.join(baseDir, `${token}/${fileName}.json`)
+  }
+
+  // Bridging entities
+  if (entityKey.startsWith('bridge')) {
+    return path.join(baseDir, `bridging/${kebabCase(entityKey)}.json`)
+  }
+
+  // Top-level entities (no prefix)
+  return path.join(baseDir, `${kebabCase(entityKey)}.json`)
+}
+
 const main = async () => {
   console.log(`Generating validations for: ${process.argv[2]}`)
+
+  // Clear existing validation data to prevent stale files
+  const entitiesDir = path.join(__dirname, '../entities')
+  if (fs.existsSync(entitiesDir)) {
+    console.log('Clearing existing validation data...')
+    fs.rmSync(entitiesDir, { recursive: true, force: true })
+  }
+  fs.mkdirSync(entitiesDir, { recursive: true })
+  console.log('✓ Entities directory cleared\n')
+
   const queries: string[] = [
     ...oethStrategies.map((s: IStrategyData) => strategy(`oeth_${s.address}`, s.address)),
     ...ousdStrategies.map((s: IStrategyData) => strategy(`ousd_${s.address}`, s.address)),
-    ...Object.values(baseAddresses.superOETHb.strategies).map((s: string) => strategy(`superoethb_${s}`, s)),
+    ...baseStrategies.map((s: IStrategyData) => strategy(`superoethb_${s.address}`, s.address)),
     ...oToken('oeth', addresses.oeth.address),
     ...oToken('ousd', addresses.ousd.address),
     ...oToken('superoethb', baseAddresses.superOETHb.address),
@@ -536,7 +608,7 @@ const main = async () => {
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
-  const entities = {} as Record<string, any[]>
+
   for (let i = 0; i < queries.length; i++) {
     const query = queries[i]
     console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
@@ -545,15 +617,28 @@ const main = async () => {
       console.log(result)
       throw new Error('Query failed')
     }
+
     for (const key of Object.keys(result.data)) {
-      entities[key] = takeValidationEntries(result.data[key])
-      if (entities[key].length < 5) {
-        entities[key] = takeEvery(result.data[key], 50)
+      let validationData = takeValidationEntries(result.data[key])
+      if (validationData.length < 5) {
+        validationData = takeEvery(result.data[key], 50)
       }
+
+      const filePath = getFilePathForEntity(key)
+      const dir = path.dirname(filePath)
+
+      // Ensure directory exists
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true })
+      }
+
+      // Write the file
+      fs.writeFileSync(filePath, JSON.stringify(validationData, null, 2))
+      console.log(`  ✓ Wrote ${validationData.length} entries to ${path.relative(__dirname + '/..', filePath)}`)
     }
   }
 
-  fs.writeFileSync(__dirname + '/../src/validation/entities.json', JSON.stringify(entities, null, 2))
+  console.log('\n✓ All validation files generated successfully')
 }
 
 main()
