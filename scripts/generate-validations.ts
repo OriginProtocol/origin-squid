@@ -549,6 +549,242 @@ const ognDailyStats = () => {
   // - tradingVolumeUSD
 }
 
+const exponentialStaking = (prefix: string, address: string) => [
+  gql(`
+    ${prefix}_esTokens: esTokens(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      circulating
+      staked
+      total
+    }
+  `),
+  gql(`
+    ${prefix}_esYields: esYields(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      assetBalance
+      rewardsPerSecond
+      apr
+      apy
+    }
+  `),
+  gql(`
+    ${prefix}_esAccounts: esAccounts(
+      limit: ${LIMIT},
+      orderBy: [id_ASC],
+      where: { address_eq: "${address}" }
+    ) {
+      id
+      chainId
+      address
+      account
+      assetBalance
+      stakedBalance
+      balance
+      votingPower
+    }
+  `),
+  gql(`
+    ${prefix}_esLockups: esLockups(
+      limit: ${LIMIT},
+      orderBy: [timestamp_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      account
+      lockupId
+      timestamp
+      txHash
+      lastUpdated
+      amount
+      end
+      points
+      withdrawAmount
+      penalty
+      state
+    }
+  `),
+  gql(`
+    ${prefix}_esLockupEvents: esLockupEvents(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      event
+    }
+  `),
+  gql(`
+    ${prefix}_esDelegateChangeds: esDelegateChangeds(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      delegator
+      fromDelegate
+      toDelegate
+    }
+  `),
+  gql(`
+    ${prefix}_esDelegateVotesChangeds: esDelegateVotesChangeds(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      delegate
+      previousBalance
+      newBalance
+    }
+  `),
+  gql(`
+    ${prefix}_esPenalties: esPenalties(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      account
+      amount
+    }
+  `),
+  gql(`
+    ${prefix}_esRewards: esRewards(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      account
+      amount
+    }
+  `),
+  gql(`
+    ${prefix}_esStakes: esStakes(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      account
+      lockupId
+      amount
+      end
+      points
+    }
+  `),
+  gql(`
+    ${prefix}_esUnstakes: esUnstakes(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { address_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      timestamp
+      blockNumber
+      txHash
+      account
+      lockupId
+      amount
+      end
+      points
+    }
+  `),
+]
+
+const governanceProposals = () => {
+  return gql(`
+    governanceProposals: governanceProposals(
+      limit: ${LIMIT},
+      orderBy: [timestamp_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      chainId
+      address
+      proposalId
+      description
+      proposer
+      timestamp
+      txHash
+      startBlock
+      endBlock
+      targets
+      values
+      signatures
+      calldatas
+      lastUpdated
+      status
+      quorum
+      choices
+      scores
+    }
+  `)
+}
+
+const governanceProposalEvents = () => {
+  return gql(`
+    governanceProposalEvents: governanceProposalEvents(
+      limit: ${LIMIT},
+      orderBy: [timestamp_ASC, id_ASC],
+      where: { timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      txHash
+      event
+      timestamp
+    }
+  `)
+}
+
 export const beaconDepositEvents = (address: string) => {
   return gql(`
     beaconDepositEvents: beaconDepositEvents(
@@ -803,9 +1039,21 @@ const getFilePathForEntity = (entityKey: string): string => {
     return path.join(baseDir, `${token}/${fileName}.json`)
   }
 
+  // Exponential Staking entities with prefix: xogn_esTokens, xogn_esYields, etc.
+  if (entityKey.includes('_es')) {
+    const [prefix, ...rest] = entityKey.split('_')
+    const entityName = rest.join('_')
+    return path.join(baseDir, `exponential-staking/${prefix}-${kebabCase(entityName)}.json`)
+  }
+
   // Bridging entities
   if (entityKey.startsWith('bridge')) {
     return path.join(baseDir, `bridging/${kebabCase(entityKey)}.json`)
+  }
+
+  // Governance entities
+  if (entityKey.startsWith('governance')) {
+    return path.join(baseDir, `governance/${kebabCase(entityKey)}.json`)
   }
 
   // Top-level entities (no prefix)
@@ -842,6 +1090,9 @@ const main = async () => {
     ...arm('osarm', sonicAddresses.armOS.address),
     arms(),
     ognDailyStats(),
+    ...exponentialStaking('xogn', addresses.tokens.xOGN),
+    governanceProposals(),
+    governanceProposalEvents(),
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
     ...bridging(),

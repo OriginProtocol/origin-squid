@@ -1,0 +1,222 @@
+[
+  {
+    "id": "1:0019920077-d430a-000178",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-21T18:29:59.000000Z",
+    "blockNumber": 19920077,
+    "txHash": "0x3afab8739b5cd940f7fdc6b1f2dcbb04a49974a5f171c1dec6c018d3271ccf0e",
+    "delegate": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f",
+    "previousBalance": "0",
+    "newBalance": "3499999999999999965000"
+  },
+  {
+    "id": "1:0019971021-048d9-000739",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-28T21:22:35.000000Z",
+    "blockNumber": 19971021,
+    "txHash": "0xd8d71dd731043ce88c847785f6f5a0711aa715b8dcdc63ae1d8045598bd87357",
+    "delegate": "0xd76d0a7110f9f8973344e2c026918f3758e721dc",
+    "previousBalance": "0",
+    "newBalance": "616203828972399577837961"
+  },
+  {
+    "id": "1:0019974314-48444-000177",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-29T08:25:47.000000Z",
+    "blockNumber": 19974314,
+    "txHash": "0x2ca5eb4f2fcb41efae8d7e4aeaa315ab2e08ca841be6ff94422ce56ab7c08121",
+    "delegate": "0x4ef1d0dda600f9e0ef8a3ca67ae5b2fb9ff554b9",
+    "previousBalance": "150022015065987202499779",
+    "newBalance": "291672542789290615752367"
+  },
+  {
+    "id": "1:0019981660-6884b-000231",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-30T09:06:11.000000Z",
+    "blockNumber": 19981660,
+    "txHash": "0xc10b7fa6f695906b97e0bbe7e0cc2466582de621c7f87eda04553c8ccfef5370",
+    "delegate": "0xee094968a69efe442598c30fd650b20afc5099f2",
+    "previousBalance": "251751763837207033836227",
+    "newBalance": "386051633575856135385775"
+  },
+  {
+    "id": "1:0020000512-0391d-000734",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-02T00:19:23.000000Z",
+    "blockNumber": 20000512,
+    "txHash": "0x5416effbb9bdfdbe6a52254b13575a0b6527619fbc228d6ac4742c048d7decd6",
+    "delegate": "0x3973601a6989ff4dde768746c6d67593bba0451c",
+    "previousBalance": "0",
+    "newBalance": "675896038223093268006"
+  },
+  {
+    "id": "1:0020020530-943d5-000328",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-04T19:24:35.000000Z",
+    "blockNumber": 20020530,
+    "txHash": "0x1dabcad2a66baf568d066a5999442ee030a8601dc68d9b98bc9c0885c7f4723f",
+    "delegate": "0xe555efa16d38747f9e496926b576fd1ebd31deca",
+    "previousBalance": "0",
+    "newBalance": "23131844863806274515957679"
+  },
+  {
+    "id": "1:0020026594-9d40c-000152",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-05T15:42:35.000000Z",
+    "blockNumber": 20026594,
+    "txHash": "0xa5fca96ce28e9738c1a663215410290b05fd4a0fcd5419f2d40e232a128584bc",
+    "delegate": "0x5c0fcc7650fcacdf0ae4928cb7ea54d263e04d34",
+    "previousBalance": "1777256819388693843268031",
+    "newBalance": "0"
+  },
+  {
+    "id": "1:0020079611-b6386-000766",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-13T01:26:11.000000Z",
+    "blockNumber": 20079611,
+    "txHash": "0x80a53d3037f1d215d81021feb95b4248e8e1dd420cff01871f2e739c5403da98",
+    "delegate": "0x7f79be95084951552b66ee3cc048b84181ba74fd",
+    "previousBalance": "0",
+    "newBalance": "1384429832320702180915"
+  },
+  {
+    "id": "1:0020177584-3edf9-000310",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-26T18:14:35.000000Z",
+    "blockNumber": 20177584,
+    "txHash": "0x436488ad237e93fbaea9504626e4ba28dc9ba93f6aa4cee7b9d4a3690c633d04",
+    "delegate": "0x1824db66ae6d644f0be2aec44eb0638b76e9a6a7",
+    "previousBalance": "0",
+    "newBalance": "1869339140566231840449"
+  },
+  {
+    "id": "1:0020217827-1d89f-000100",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-07-02T09:06:23.000000Z",
+    "blockNumber": 20217827,
+    "txHash": "0x69b784d0baa809dab4895ed48f536e02244f89440d54a865035010916b5daef0",
+    "delegate": "0x3bf943ee4e6a82ddd2c062c2223e7ad687c05af7",
+    "previousBalance": "0",
+    "newBalance": "12466952542946883967401"
+  },
+  {
+    "id": "1:0020337165-e7c3a-000092",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-07-19T01:03:23.000000Z",
+    "blockNumber": 20337165,
+    "txHash": "0xff3aa48439023662e89b26902989d0ac29150b50cde6590aad203ca08a9b493a",
+    "delegate": "0xf8f016ab5bf36f5d107749d413573654e7a5ebe9",
+    "previousBalance": "0",
+    "newBalance": "46007937125995036046567"
+  },
+  {
+    "id": "1:0020449975-b2908-000243",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-08-03T19:01:59.000000Z",
+    "blockNumber": 20449975,
+    "txHash": "0x7accd1b3685923acc92b33de4de6511689df31738d4682400cf6f6279512b966",
+    "delegate": "0x65ed4bd0b532448d6088e28ad775bd30099a3378",
+    "previousBalance": "645093588992981155682524",
+    "newBalance": "647938666537749696960035"
+  },
+  {
+    "id": "1:0020600245-bc114-000137",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-08-24T18:27:35.000000Z",
+    "blockNumber": 20600245,
+    "txHash": "0xd1fa2babd21b6f12c85455276e53882e982e5df793119c13bfa449a0b98faa85",
+    "delegate": "0x7338afb07db145220849b04a45243956f20b14d9",
+    "previousBalance": "0",
+    "newBalance": "9338986839601200406780"
+  },
+  {
+    "id": "1:0020755717-74c94-000147",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-09-15T11:28:23.000000Z",
+    "blockNumber": 20755717,
+    "txHash": "0x313fd94945dc389a41f87662b18fa11f368559bec1929f57762d6a7c5bd24e7a",
+    "delegate": "0x979685b62d40e210a91dbea4134d5a295c2901b4",
+    "previousBalance": "83647153646286120492164",
+    "newBalance": "83387544361820765231454"
+  },
+  {
+    "id": "1:0020941627-d2858-000224",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-10-11T09:56:47.000000Z",
+    "blockNumber": 20941627,
+    "txHash": "0xa51085aaba3322a689819dab05fbc12b1f858fe3d4a197629da9382e870726c9",
+    "delegate": "0x0d6b29b42d3f7ad6efc07aa56bea24c3e02dca35",
+    "previousBalance": "1611356258594166965213",
+    "newBalance": "1653861486308918346386"
+  },
+  {
+    "id": "1:0021093846-0b16a-000074",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-11-01T15:58:59.000000Z",
+    "blockNumber": 21093846,
+    "txHash": "0x802380595b97055f7ef7d5216e2cc140325c1d7a79c4b8b86b426ce8ec1190cb",
+    "delegate": "0x5c8b099faff65e8fd2b2f39b7f0a6062bde7a21f",
+    "previousBalance": "62675329288598968930522",
+    "newBalance": "63305917541645407491600"
+  },
+  {
+    "id": "1:0021202656-d1ff7-000445",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-11-16T20:29:47.000000Z",
+    "blockNumber": 21202656,
+    "txHash": "0x7a7c59993da991f5880105f36851ef0d80f813f26b99eb12154c1fee79dee71e",
+    "delegate": "0x2bf3388f8ce63b822e7c9abb423547e4e7b7f455",
+    "previousBalance": "0",
+    "newBalance": "70540079056045088285246"
+  },
+  {
+    "id": "1:0021311975-d8be5-000278",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-12-02T02:54:35.000000Z",
+    "blockNumber": 21311975,
+    "txHash": "0xaaca1a734a2d659d7e6cf12f008f1a5017232af2155ac36881676c4aed2fe0a7",
+    "delegate": "0xae85a03216a561aa48d4904acb9add7c35ef371a",
+    "previousBalance": "0",
+    "newBalance": "131018672167742870228"
+  },
+  {
+    "id": "1:0021415309-875e3-000509",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-12-16T13:14:35.000000Z",
+    "blockNumber": 21415309,
+    "txHash": "0xe7844699c23efb666e30b8d0b7694dd6927b10b794cbd0523c35f86aeff62b4a",
+    "delegate": "0x751b1d5235aa34ed5243c57d9313c67ac386ec08",
+    "previousBalance": "0",
+    "newBalance": "579869384024283385090"
+  },
+  {
+    "id": "1:0021536113-eea5c-000052",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-01-02T10:13:35.000000Z",
+    "blockNumber": 21536113,
+    "txHash": "0x9808f2f64632366ed60a93f2a454e4157346f92cb96a60e82f072bc6adb6f339",
+    "delegate": "0xc198c59eed21c8163b2eea88722dadd64742b927",
+    "previousBalance": "26366828348653705420469",
+    "newBalance": "26215061669759694268733"
+  }
+]

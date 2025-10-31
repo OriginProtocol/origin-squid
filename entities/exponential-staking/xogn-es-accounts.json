@@ -1,0 +1,202 @@
+[
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x000000000000000000000000000000000000dead",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x000000000000000000000000000000000000dead",
+    "assetBalance": "44208721661290045440",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0000000000f4def5f3572c846b1483daf4588d8f",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0000000000f4def5f3572c846b1483daf4588d8f",
+    "assetBalance": "130109792715576264",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0000007145e8dda90f799e9bcddb6d5e097e98ea",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0000007145e8dda90f799e9bcddb6d5e097e98ea",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0008dd8bb9e6fcce9b95f6356bc3929347f8928a",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0008dd8bb9e6fcce9b95f6356bc3929347f8928a",
+    "assetBalance": "44000000000000000000",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0020a29cfedb9ca19f53cfb24c2eda6de36f3c06",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0020a29cfedb9ca19f53cfb24c2eda6de36f3c06",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x003150e92f29568aa0d80bbcb730c9e190c9a936",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x003150e92f29568aa0d80bbcb730c9e190c9a936",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x003fa4b61302290b61bf099087c4259c062d5640",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x003fa4b61302290b61bf099087c4259c062d5640",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0050dac04ca9a20361ea0ba447d9e92ee78de445",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0050dac04ca9a20361ea0ba447d9e92ee78de445",
+    "assetBalance": "21696018683046391808",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x00666a4e67e70cefe16c10894b3edadb69222d74",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x00666a4e67e70cefe16c10894b3edadb69222d74",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x007933790a4f00000099e9001629d9fe7775b800",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x007933790a4f00000099e9001629d9fe7775b800",
+    "assetBalance": "30000000000000",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x008932be50098089c6a075d35f4b5182ee549f8a",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x008932be50098089c6a075d35f4b5182ee549f8a",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x009e02b21abefc7ecc1f2b11700b49106d7d552b",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x009e02b21abefc7ecc1f2b11700b49106d7d552b",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x00b0aad3540e81ebea5c5840ec4f66dc97bd8361",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x00b0aad3540e81ebea5c5840ec4f66dc97bd8361",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x00c8390dc13ff57e89c3d3882df516a09d91b44c",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x00c8390dc13ff57e89c3d3882df516a09d91b44c",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x00e0b75618172153d4a489547117270ff8a5f116",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x00e0b75618172153d4a489547117270ff8a5f116",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x00f75f8059ed4dfd16f03ee551d1b2b2b3aad6b1",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x00f75f8059ed4dfd16f03ee551d1b2b2b3aad6b1",
+    "assetBalance": "15271911480000000000",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0105b8006f62190fd4b8b8ef1ec0f1fcfdcbfb4d",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0105b8006f62190fd4b8b8ef1ec0f1fcfdcbfb4d",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x011e3248c11fbcc4caa2cb10c99cbb57fbee969d",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x011e3248c11fbcc4caa2cb10c99cbb57fbee969d",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0133d6a8371815893563ccfeb81d76c44de5feea",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x0133d6a8371815893563ccfeb81d76c44de5feea",
+    "assetBalance": "2078568820000000000",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x014d52f39bb16b228dfc3faf12401b1e11f497c8",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "account": "0x014d52f39bb16b228dfc3faf12401b1e11f497c8",
+    "assetBalance": "0",
+    "stakedBalance": "0",
+    "balance": "0",
+    "votingPower": "0"
+  }
+]

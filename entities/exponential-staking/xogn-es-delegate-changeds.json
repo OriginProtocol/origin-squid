@@ -1,0 +1,200 @@
+[
+  {
+    "id": "1:0019920077-d430a-000176",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-21T18:29:59.000000Z",
+    "blockNumber": 19920077,
+    "txHash": "0x3afab8739b5cd940f7fdc6b1f2dcbb04a49974a5f171c1dec6c018d3271ccf0e",
+    "delegator": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f"
+  },
+  {
+    "id": "1:0019973067-b91dc-000337",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-29T04:14:59.000000Z",
+    "blockNumber": 19973067,
+    "txHash": "0xb80d0232f2570d6eca005eb38d8f3713f44aea5ae03f84cf99286a3fba687963",
+    "delegator": "0xa14ed585b6a4745caa6cc94952379853d93cb3d6",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xa14ed585b6a4745caa6cc94952379853d93cb3d6"
+  },
+  {
+    "id": "1:0019984630-d5c35-000252",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-05-30T19:05:59.000000Z",
+    "blockNumber": 19984630,
+    "txHash": "0xe0d3a9cddcc06b40f37d6e9a3315653e9151b494152cdb403c44717bc88a88bb",
+    "delegator": "0xf2ff247544d60002403fcc4218dc72a7245b81f1",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xf2ff247544d60002403fcc4218dc72a7245b81f1"
+  },
+  {
+    "id": "1:0020009742-b89a4-000535",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-03T07:15:35.000000Z",
+    "blockNumber": 20009742,
+    "txHash": "0x887ae03139585f54a08dd9a0a3b7e5ae72673ea7182c27740bc6cee98477338f",
+    "delegator": "0x875af786ff560245243026b7585f4547a2e4a89f",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x875af786ff560245243026b7585f4547a2e4a89f"
+  },
+  {
+    "id": "1:0020026594-9d40c-000151",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-05T15:42:35.000000Z",
+    "blockNumber": 20026594,
+    "txHash": "0xa5fca96ce28e9738c1a663215410290b05fd4a0fcd5419f2d40e232a128584bc",
+    "delegator": "0x5c0fcc7650fcacdf0ae4928cb7ea54d263e04d34",
+    "fromDelegate": "0x5c0fcc7650fcacdf0ae4928cb7ea54d263e04d34",
+    "toDelegate": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241"
+  },
+  {
+    "id": "1:0020128892-ccbee-000232",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-06-19T22:53:11.000000Z",
+    "blockNumber": 20128892,
+    "txHash": "0x7735028bc05af75771c57d3a2bced8e5f5db3e0a41c42c611b2b73a9e72d082f",
+    "delegator": "0x7bfee91193d9df2ac0bfe90191d40f23c773c060",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x7bfee91193d9df2ac0bfe90191d40f23c773c060"
+  },
+  {
+    "id": "1:0020248487-bced4-000109",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-07-06T15:53:11.000000Z",
+    "blockNumber": 20248487,
+    "txHash": "0x788904ee34832dcd58833748c177210d1d0a3990c9ee3147a05d63437277f5bd",
+    "delegator": "0x991f16182637f46334e0ebe8fca00fee9c0fde50",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x991f16182637f46334e0ebe8fca00fee9c0fde50"
+  },
+  {
+    "id": "1:0020542067-7f705-000147",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-08-16T15:23:59.000000Z",
+    "blockNumber": 20542067,
+    "txHash": "0xf6f09477f7e9b4fa88fc8b5423682c6a194d836bfbc81d55daaeeb39a16dfb54",
+    "delegator": "0xc6071f6361f5f114f4d16ef0f7137e996c491a4c",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xc6071f6361f5f114f4d16ef0f7137e996c491a4c"
+  },
+  {
+    "id": "1:0020929928-0fd3c-000578",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-10-09T18:47:59.000000Z",
+    "blockNumber": 20929928,
+    "txHash": "0xd3a4a5a2c680f84eddfdd39834b164ee6c241dd53cd8de09ae48322af39c692a",
+    "delegator": "0x89fc66ba59f9672748cb0c3ca4e4616ac36d38aa",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x89fc66ba59f9672748cb0c3ca4e4616ac36d38aa"
+  },
+  {
+    "id": "1:0021165165-34f26-000323",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-11-11T14:53:59.000000Z",
+    "blockNumber": 21165165,
+    "txHash": "0x8a024a586c739c277d3d902dcfa972eb961c5dceafa6271472dc837720a2995a",
+    "delegator": "0xc7681482c9b3213d15c39036be41a33a8083fa95",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xc7681482c9b3213d15c39036be41a33a8083fa95"
+  },
+  {
+    "id": "1:0021345840-59aa7-000140",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2024-12-06T20:27:23.000000Z",
+    "blockNumber": 21345840,
+    "txHash": "0x63da294fc35811abb86da455c5cf9cb94dcf12d2274da1b09c5f2ba13d18627b",
+    "delegator": "0xbb741f0d26f6152a805000de9dc661b0f68ec72d",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xbb741f0d26f6152a805000de9dc661b0f68ec72d"
+  },
+  {
+    "id": "1:0021558520-59c37-000190",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-01-05T13:17:23.000000Z",
+    "blockNumber": 21558520,
+    "txHash": "0xfa7d59911099557dbd7a0590abb445624532be24ed2da9b9b43431d6a671d8b0",
+    "delegator": "0x678bf828f8109d012a223ee2e02919989a3ba06b",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x678bf828f8109d012a223ee2e02919989a3ba06b"
+  },
+  {
+    "id": "1:0021876166-2544d-000156",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-02-18T22:13:11.000000Z",
+    "blockNumber": 21876166,
+    "txHash": "0x611ff34bb0dd0c11883c7da586752f75d5d8eeb891139ab3d1142fb5ef71502a",
+    "delegator": "0x0073a21dc9338f0e72e2117471adaf280907c63a",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x0073a21dc9338f0e72e2117471adaf280907c63a"
+  },
+  {
+    "id": "1:0022313586-9c6fa-000111",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-04-20T23:46:59.000000Z",
+    "blockNumber": 22313586,
+    "txHash": "0x0cfd80b89d6ec4cd57adcd365e9b7e20acdaada2569abb9a1fc6ec6f8b5f287f",
+    "delegator": "0x79ec313e79d908e60d3090317694b9d1141ca903",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x79ec313e79d908e60d3090317694b9d1141ca903"
+  },
+  {
+    "id": "1:0022625323-ef0bc-000982",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-06-03T16:29:11.000000Z",
+    "blockNumber": 22625323,
+    "txHash": "0xd3c2fdd60a7e14362b27380d755c0af7a3a5289bf34e8eb378565d37e37bd3e7",
+    "delegator": "0x4dd73e94ba93a9995c943794136f3ffe1fea0725",
+    "fromDelegate": "0xb35659cbac913d5e4119f2af47fd490a45e2c826",
+    "toDelegate": "0x4dd73e94ba93a9995c943794136f3ffe1fea0725"
+  },
+  {
+    "id": "1:0023045341-af4a5-000301",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-08-01T09:29:11.000000Z",
+    "blockNumber": 23045341,
+    "txHash": "0xa54ed2dd4a13b75c16a0c5ba5a1c039114922162c40480c00a196fa4f722a3b5",
+    "delegator": "0xea875ec7b46fcc18bcc5650a29fc259bdc257e57",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xea875ec7b46fcc18bcc5650a29fc259bdc257e57"
+  },
+  {
+    "id": "1:0023241938-ca853-000320",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-08-28T20:15:35.000000Z",
+    "blockNumber": 23241938,
+    "txHash": "0x1afbf05e571d60fa73bca7fa050606b34afc65988c539c69d47f8d734179c477",
+    "delegator": "0xb7d1abe3d050bf6f44408f7399b734689236ce18",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xb7d1abe3d050bf6f44408f7399b734689236ce18"
+  },
+  {
+    "id": "1:0023413466-33ffd-000289",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-09-21T19:19:35.000000Z",
+    "blockNumber": 23413466,
+    "txHash": "0x5d89fe388e8cc8540a782d0954bb85ff7db97417d4df317521c89e02dd2aac25",
+    "delegator": "0x428f77f7a6d8d9ba2d9ea64a93e72ddd646b5476",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x428f77f7a6d8d9ba2d9ea64a93e72ddd646b5476"
+  }
+]

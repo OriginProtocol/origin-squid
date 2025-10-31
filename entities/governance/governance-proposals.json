@@ -1,0 +1,101 @@
+[
+  {
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:53980213092349896996295803812719804409663860838874549025842928538639056797995",
+    "chainId": 1,
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "53980213092349896996295803812719804409663860838874549025842928538639056797995",
+    "description": "Test passing proposal\nLet's pass this vote!\n\nIt sends 1 extra OGV to the rewards contract for distribution.\n\nHere's a link: http://ousd.com\n",
+    "proposer": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f",
+    "timestamp": "2022-09-23T15:28:11.000000Z",
+    "txHash": "0x45a15114bdd72969908513563d52e5aeb062e259ad3939232a6cea7cad60ec3e",
+    "startBlock": "15596940",
+    "endBlock": "15614220",
+    "targets": [
+      "0x9c354503c38481a7a7a51629142963f98ecc12d0"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x6ad460bf0000000000000000000000007d82e86cf1496f9485a8ea04012afeb3c74893970000000000000000000000000000000000000000000000000de0b6b3a7640000"
+    ],
+    "lastUpdated": "2022-09-26T01:19:35.000000Z",
+    "status": "Defeated",
+    "quorum": "1977923877096360349883664694",
+    "choices": [],
+    "scores": []
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:2626764423234271308388524116226544768850357228938163129912794625401165031109",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "2626764423234271308388524116226544768850357228938163129912794625401165031109",
+    "description": "Deployed a new strategy to convert stETH to WETH at 1:1 using the Lido withdrawal queue.",
+    "proposer": "0xfd9e6005187f448957a0972a7d0c0a6da2911236",
+    "timestamp": "2024-07-02T19:25:59.000000Z",
+    "txHash": "0xe54380b3b4bf8d4cc505a0abacda4eb28824ac1cfd377cca96b15beeef21ff22",
+    "startBlock": "20228103",
+    "endBlock": "20242519",
+    "targets": [
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x3b8ae39700000000000000000000000002087ea54ee7b6421089ae23e7ff6cd506f507f9"
+    ],
+    "lastUpdated": "2024-07-03T19:34:23.000000Z",
+    "status": "Canceled",
+    "quorum": "74466762001406430320906748",
+    "choices": [],
+    "scores": []
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:102952869103112185385289294460650789441590856926098847130687971800657890659280",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "102952869103112185385289294460650789441590856926098847130687971800657890659280",
+    "description": "Upgrade Morpho Steakhouse and Gauntlet Prime Strategies",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-05-06T05:00:47.000000Z",
+    "txHash": "0x7a7fa5151bb247cf62e8a3177f8e9735dc972a00440d909db9f32eee557222cf",
+    "startBlock": "22429646",
+    "endBlock": "22445925",
+    "targets": [
+      "0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0",
+      "0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1",
+      "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe600000000000000000000000041bd943923c31d277aa1becbc702b825f2bb8639",
+      "0x3659cfe6000000000000000000000000b08fd21afa2628318cb60d90234559602e7eae10",
+      "0x3659cfe600000000000000000000000093e86b889e03ea8526368e9fa8dfc1a032ebd12d"
+    ],
+    "lastUpdated": "2025-05-12T00:12:11.000000Z",
+    "status": "Executed",
+    "quorum": "140176840132136300500557684",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "336139438934931391646879979"
+    ]
+  }
+]
