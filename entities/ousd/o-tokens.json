@@ -1,0 +1,202 @@
+[
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13916310",
+    "timestamp": "2022-01-01T00:27:59.000000Z",
+    "blockNumber": 13916310,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "249221056290169155678587761",
+    "rebasingSupply": "47248181402580217801200703",
+    "totalSupply": "296469237692749373479788464"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13927836",
+    "timestamp": "2022-01-02T19:10:07.000000Z",
+    "blockNumber": 13927836,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "245719085724382024431527762",
+    "rebasingSupply": "50977897519850608490531663",
+    "totalSupply": "296696983244232632922059425"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13935537",
+    "timestamp": "2022-01-03T23:36:54.000000Z",
+    "blockNumber": 13935537,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "242868242577390134895262373",
+    "rebasingSupply": "53835909552700162201362623",
+    "totalSupply": "296704152130090297096624996"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13945110",
+    "timestamp": "2022-01-05T11:13:52.000000Z",
+    "blockNumber": 13945110,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "242753724245447728333164098",
+    "rebasingSupply": "53103355064243467595061750",
+    "totalSupply": "295857079309691195928225848"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13952335",
+    "timestamp": "2022-01-06T14:21:46.000000Z",
+    "blockNumber": 13952335,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "224108322030695233603244452",
+    "rebasingSupply": "54468935894200631372382955",
+    "totalSupply": "278577257924895864975627407"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13959256",
+    "timestamp": "2022-01-07T16:00:32.000000Z",
+    "blockNumber": 13959256,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "222369951529284257028720201",
+    "rebasingSupply": "56274914459560319311341720",
+    "totalSupply": "278644865988844576340061921"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13963296",
+    "timestamp": "2022-01-08T06:59:45.000000Z",
+    "blockNumber": 13963296,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "209324000249520605026868688",
+    "rebasingSupply": "69393782758022335573622691",
+    "totalSupply": "278717783007542940600491379"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13968523",
+    "timestamp": "2022-01-09T02:09:25.000000Z",
+    "blockNumber": 13968523,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "209742571430794952325319743",
+    "rebasingSupply": "68975211576747988275171636",
+    "totalSupply": "278717783007542940600491379"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13978367",
+    "timestamp": "2022-01-10T14:42:11.000000Z",
+    "blockNumber": 13978367,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "208318689963818409611223570",
+    "rebasingSupply": "70430805758062119528635209",
+    "totalSupply": "278749495721880529139858779"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13987644",
+    "timestamp": "2022-01-12T00:56:00.000000Z",
+    "blockNumber": 13987644,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "207869284698941687559509542",
+    "rebasingSupply": "70884270019644192733916466",
+    "totalSupply": "278753554718585880293426008"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:13996302",
+    "timestamp": "2022-01-13T09:16:02.000000Z",
+    "blockNumber": 13996302,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "211460804829829262726419499",
+    "rebasingSupply": "67328127202391761164706063",
+    "totalSupply": "278788932032221023891125562"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14005877",
+    "timestamp": "2022-01-14T20:49:19.000000Z",
+    "blockNumber": 14005877,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "212282630113823785311572938",
+    "rebasingSupply": "66597638938594715176186078",
+    "totalSupply": "278880269052418500487759016"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14017721",
+    "timestamp": "2022-01-16T16:44:45.000000Z",
+    "blockNumber": 14017721,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "207584031883674633043442905",
+    "rebasingSupply": "71382567250799795281843101",
+    "totalSupply": "278966599134474428325286006"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14028894",
+    "timestamp": "2022-01-18T10:11:34.000000Z",
+    "blockNumber": 14028894,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "199569949329335889122558954",
+    "rebasingSupply": "79462073249036789615459263",
+    "totalSupply": "279032022578372678738018217"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14035368",
+    "timestamp": "2022-01-19T10:16:28.000000Z",
+    "blockNumber": 14035368,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "198691142504319137757049533",
+    "rebasingSupply": "80370827565464370158458741",
+    "totalSupply": "279061970069783507915508274"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14042487",
+    "timestamp": "2022-01-20T12:44:57.000000Z",
+    "blockNumber": 14042487,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "199067924497370526045163412",
+    "rebasingSupply": "80006824497736680980095214",
+    "totalSupply": "279074748995107207025258626"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14048793",
+    "timestamp": "2022-01-21T12:01:04.000000Z",
+    "blockNumber": 14048793,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "190824080353564666450735297",
+    "rebasingSupply": "75548303416524118690468584",
+    "totalSupply": "266372383770088785141203881"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14054644",
+    "timestamp": "2022-01-22T09:40:48.000000Z",
+    "blockNumber": 14054644,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "185014950283629141130745824",
+    "rebasingSupply": "79368281091435980732994063",
+    "totalSupply": "264383231375065121863739887"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14059817",
+    "timestamp": "2022-01-23T04:48:07.000000Z",
+    "blockNumber": 14059817,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "185047050107723307325529691",
+    "rebasingSupply": "76846485923318392020125735",
+    "totalSupply": "261893536031041699345655426"
+  },
+  {
+    "id": "1:0x2a8e1e676ec238d8a992307b495b45b3feaa5e86:14066256",
+    "timestamp": "2022-01-24T04:51:02.000000Z",
+    "blockNumber": 14066256,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "chainId": 1,
+    "nonRebasingSupply": "184777333644166221193971029",
+    "rebasingSupply": "77130820071477364115252406",
+    "totalSupply": "261908153715643585309223435"
+  }
+]

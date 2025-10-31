@@ -1,0 +1,93 @@
+[
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-11-13",
+    "timestamp": "2024-11-13T23:59:59.999000Z",
+    "blockNumber": 21182212,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-01-02",
+    "timestamp": "2025-01-02T23:59:59.999000Z",
+    "blockNumber": 21540232,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "14688000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "20001621371016270306",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-02-21",
+    "timestamp": "2025-02-21T23:59:59.999000Z",
+    "blockNumber": 21898155,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "9952000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "77325955527414952936",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-04-12",
+    "timestamp": "2025-04-12T23:59:59.999000Z",
+    "blockNumber": 22256323,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "13600000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "135300615924094770264",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-06-01",
+    "timestamp": "2025-06-01T23:59:59.999000Z",
+    "blockNumber": 22613285,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "13248000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "187630381068755079390",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-07-21",
+    "timestamp": "2025-07-21T23:59:59.999000Z",
+    "blockNumber": 22971002,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0.13553169304786533,
+    "apy": 0.14511670055577186,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "16000000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "247034180630721268695",
+    "earningsChange": "5937048839879840256"
+  },
+  {
+    "id": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-09-09",
+    "timestamp": "2025-09-09T23:59:59.999000Z",
+    "blockNumber": 23328981,
+    "strategy": "0xe98538a0e8c2871c2482e1be8cc6bd9f8e8ffd63",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "13952000000000000000000",
+    "balanceWeight": 1,
+    "earnings": "309359598368404468455",
+    "earningsChange": "0"
+  }
+]
