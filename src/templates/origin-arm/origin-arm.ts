@@ -218,8 +218,13 @@ export const createOriginARMProcessors = ({
           const marketBalanceOf = activeMarket
             ? await new erc20Abi.Contract(ctx, block.header, activeMarket).balanceOf(armAddress)
             : 0n
+          const activeMarketContract = activeMarket
+            ? new originOsArmAbi.Contract(ctx, block.header, activeMarket)
+            : undefined
           const marketAssets =
-            activeMarket && marketBalanceOf > 0n ? await armContract.previewRedeem(marketBalanceOf) : 0n
+            activeMarketContract && marketBalanceOf > 0n
+              ? await activeMarketContract.previewRedeem(marketBalanceOf)
+              : 0n
           const date = new Date(block.header.timestamp)
           armStateEntity = new ArmState({
             id: stateId,
