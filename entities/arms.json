@@ -1,0 +1,22 @@
+[
+  {
+    "id": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "chainId": 146,
+    "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "name": "Origin ARM",
+    "symbol": "ARM-WS-OS",
+    "decimals": 18,
+    "token0": "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
+    "token1": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794"
+  },
+  {
+    "id": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "chainId": 1,
+    "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "name": "Lido ARM",
+    "symbol": "ARM-WETH-stETH",
+    "decimals": 18,
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
+  }
+]

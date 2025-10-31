@@ -1,0 +1,182 @@
+[
+  {
+    "id": "0020612739-8514e-000036",
+    "timestamp": "2024-10-04T04:07:05.000000Z",
+    "blockNumber": 20612739,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x58f881c1ff9970a777a75777b83663f440a6c53dfdb000c136fbdaab1fc4320b",
+    "yield": "46811608255861416091",
+    "fee": "11702902063965354022"
+  },
+  {
+    "id": "0020852235-4dadd-000615",
+    "timestamp": "2024-10-09T17:10:17.000000Z",
+    "blockNumber": 20852235,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xec62b0ffb13802c76b9c7541bf8b2b2dea0412fd8e3a4e5273a35166185ad73c",
+    "yield": "6283665176407306062",
+    "fee": "1570916294101826515"
+  },
+  {
+    "id": "0020933565-3b669-000599",
+    "timestamp": "2024-10-11T14:21:17.000000Z",
+    "blockNumber": 20933565,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xd2122fc13d90f92ece5e99342ca531687907c38bd8647d249d9af88b6eccde64",
+    "yield": "31785659860377581404",
+    "fee": "7946414965094395351"
+  },
+  {
+    "id": "0021065128-25201-000424",
+    "timestamp": "2024-10-14T15:26:43.000000Z",
+    "blockNumber": 21065128,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x50966cce2fbd92cddac657b02d8253c3590b1f5d6a105861f759b6b9a03ae6fa",
+    "yield": "39976366315620362544",
+    "fee": "9994091578905090635"
+  },
+  {
+    "id": "0021239888-65b80-000016",
+    "timestamp": "2024-10-18T16:32:03.000000Z",
+    "blockNumber": 21239888,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x0fbe2f8e6b0087ff7dba2f18840cdd67ff0dc5001cf496f72fc7e2aacab8a738",
+    "yield": "59581783031327791588",
+    "fee": "14895445757831947897"
+  },
+  {
+    "id": "0021526440-2278f-000133",
+    "timestamp": "2024-10-25T07:43:47.000000Z",
+    "blockNumber": 21526440,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x7ac154784309c0b7e8b7578a6bc83619d23c87fa89b4d4599f14c70772cb7841",
+    "yield": "46217007614240013134",
+    "fee": "11554251903560003283"
+  },
+  {
+    "id": "0021712280-f10c7-000085",
+    "timestamp": "2024-10-29T14:58:27.000000Z",
+    "blockNumber": 21712280,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x5d6a3271c38594f3bf7f605a82e04dc91b016c3e1778a3186bc06d6748658eeb",
+    "yield": "45130416587102302016",
+    "fee": "11282604146775575504"
+  },
+  {
+    "id": "0021867228-0337c-000297",
+    "timestamp": "2024-11-02T05:03:23.000000Z",
+    "blockNumber": 21867228,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x8fc1babaa92d891cc4cc41bd4ffd8b459127bbb3f8bd44e88f5dd386c555a1ab",
+    "yield": "63522785488152574168",
+    "fee": "15880696372038143542"
+  },
+  {
+    "id": "0022133828-66610-000247",
+    "timestamp": "2024-11-08T09:10:03.000000Z",
+    "blockNumber": 22133828,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x56e6f0c826b319f7de000bcd268042fe5d8c8d394d571e0fa8280435aebe9b1f",
+    "yield": "64011135348757849958",
+    "fee": "16002783837189462489"
+  },
+  {
+    "id": "0022430227-3762b-002435",
+    "timestamp": "2024-11-15T05:50:01.000000Z",
+    "blockNumber": 22430227,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x9b5bc7b071dd95e376d54406525360d76662292b3936c928e21c3cfcb8841efd",
+    "yield": "69695289082930178536",
+    "fee": "17423822270732544634"
+  },
+  {
+    "id": "0022742193-9a051-000313",
+    "timestamp": "2024-11-22T11:08:53.000000Z",
+    "blockNumber": 22742193,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x55fd4cc951cf188982c39e50d811c0337e8ecee5b4cb5d4462abe1a3e0429edc",
+    "yield": "68669824652296742637",
+    "fee": "17167456163074185659"
+  },
+  {
+    "id": "0023048629-f195a-000214",
+    "timestamp": "2024-11-29T13:23:25.000000Z",
+    "blockNumber": 23048629,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x8bf7c409ef89c38e68bbfa27a452820ed1fc922875cc1568e96c0adfa4826816",
+    "yield": "38917228521777279438",
+    "fee": "9729307130444319859"
+  },
+  {
+    "id": "0023251223-9004d-000170",
+    "timestamp": "2024-12-04T05:56:33.000000Z",
+    "blockNumber": 23251223,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xffde1e5b000c367896fb130a75a0cc6e1dd73139780415c4e43b7dce896c1ca1",
+    "yield": "56041326611081393760",
+    "fee": "14010331652770348440"
+  },
+  {
+    "id": "0023570994-5ccb2-000461",
+    "timestamp": "2024-12-11T15:35:35.000000Z",
+    "blockNumber": 23570994,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0x0ec7d3a0b9d0d696940ac32f354f90e85b4e2ce22120828c8868270ba053c0c4",
+    "yield": "51633841418169982835",
+    "fee": "12908460354542495708"
+  },
+  {
+    "id": "0023916406-e5359-000456",
+    "timestamp": "2024-12-19T15:29:19.000000Z",
+    "blockNumber": 23916406,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xd80c42738d781f97c2237337159543b247b68bcdf41fae77acefb2f1b8b54721",
+    "yield": "51547452636004501317",
+    "fee": "12886863159001125329"
+  },
+  {
+    "id": "0024546364-481fa-000248",
+    "timestamp": "2025-01-03T05:27:55.000000Z",
+    "blockNumber": 24546364,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xb280421662738aac4eaca2f3bbc1c2e131bd15a1575c7e06f4686790e8b46c11",
+    "yield": "28530749827251464651",
+    "fee": "7132687456812866162"
+  },
+  {
+    "id": "0024868825-75497-000233",
+    "timestamp": "2025-01-10T16:36:37.000000Z",
+    "blockNumber": 24868825,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xa4a2564f9a43640c4684e3ba0e2c6d77d684bc86f67210c31f20b2a1a860669c",
+    "yield": "22168650824178744490",
+    "fee": "5542162706044686122"
+  },
+  {
+    "id": "0025475234-5fe87-000352",
+    "timestamp": "2025-01-24T17:30:15.000000Z",
+    "blockNumber": 25475234,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xae3ff3b58389852f47e59dd241d0d275b950e88594da85c938bf115e94ab4122",
+    "yield": "13399720420649830368",
+    "fee": "3349930105162457592"
+  }
+]

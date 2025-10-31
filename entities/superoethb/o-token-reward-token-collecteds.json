@@ -1,0 +1,167 @@
+[
+  {
+    "id": "0019115394-d73b8-000193",
+    "timestamp": "2024-08-30T12:15:35.000000Z",
+    "blockNumber": 19115394,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x28bce2ee5775b652d92bb7c2891a89f036619703",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "262290859077418426806"
+  },
+  {
+    "id": "0021123743-fdde7-000093",
+    "timestamp": "2024-10-16T00:00:33.000000Z",
+    "blockNumber": 21123743,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "160488550123284347583598"
+  },
+  {
+    "id": "0022851742-d9245-000124",
+    "timestamp": "2024-11-25T00:00:31.000000Z",
+    "blockNumber": 22851742,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "38381575518522593386145"
+  },
+  {
+    "id": "0024795742-b5632-000084",
+    "timestamp": "2025-01-09T00:00:31.000000Z",
+    "blockNumber": 24795742,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "29040321228959338177046"
+  },
+  {
+    "id": "0026610142-0496d-000047",
+    "timestamp": "2025-02-20T00:00:31.000000Z",
+    "blockNumber": 26610142,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "10029930610115594771479"
+  },
+  {
+    "id": "0027646943-4ed39-000129",
+    "timestamp": "2025-03-16T00:00:33.000000Z",
+    "blockNumber": 27646943,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "1129613146363808206500"
+  },
+  {
+    "id": "0028726941-a3ce6-000210",
+    "timestamp": "2025-04-10T00:00:29.000000Z",
+    "blockNumber": 28726941,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "32072084858747663424098"
+  },
+  {
+    "id": "0029850141-9cf71-000087",
+    "timestamp": "2025-05-06T00:00:29.000000Z",
+    "blockNumber": 29850141,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "35487086702284716093498"
+  },
+  {
+    "id": "0030930141-6c648-000208",
+    "timestamp": "2025-05-31T00:00:29.000000Z",
+    "blockNumber": 30930141,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "26434154371084327053567"
+  },
+  {
+    "id": "0031794142-f94a3-000119",
+    "timestamp": "2025-06-20T00:00:31.000000Z",
+    "blockNumber": 31794142,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "18716826377363512559982"
+  },
+  {
+    "id": "0032639050-281ed-000167",
+    "timestamp": "2025-07-09T13:24:07.000000Z",
+    "blockNumber": 32639050,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x247872f58f2ff11f9e8f89c1c48e460cff0c6b29",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "3361289235464967655617"
+  },
+  {
+    "id": "0033305841-51831-000107",
+    "timestamp": "2025-07-24T23:50:29.000000Z",
+    "blockNumber": 33305841,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x0cbeacf86232fc04050cd679d860516f7254c22e",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "3022456615516253658408"
+  },
+  {
+    "id": "0034385841-fee74-000042",
+    "timestamp": "2025-08-18T23:50:29.000000Z",
+    "blockNumber": 34385841,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x0cbeacf86232fc04050cd679d860516f7254c22e",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "12464964389975610621505"
+  },
+  {
+    "id": "0035465841-a23ed-000040",
+    "timestamp": "2025-09-12T23:50:29.000000Z",
+    "blockNumber": 35465841,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0xf611cc500eee7e4e4763a05fe623e2363c86d2af",
+    "recipient": "0x0cbeacf86232fc04050cd679d860516f7254c22e",
+    "rewardToken": "0x940181a94a35a4569e4529a3cdfb74e38fd98631",
+    "amount": "1992309015096572705016"
+  },
+  {
+    "id": "0036718640-33777-000801",
+    "timestamp": "2025-10-11T23:50:27.000000Z",
+    "blockNumber": 36718640,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "strategy": "0x9cfcaf81600155e01c63e4d2993a8a81a8205829",
+    "recipient": "0x0cbeacf86232fc04050cd679d860516f7254c22e",
+    "rewardToken": "0x8ee73c484a26e0a5df2ee2a4960b789967dd0415",
+    "amount": "5383091249126601385467"
+  }
+]

@@ -57,6 +57,9 @@ const oTokens = (prefix: string, address: string) => {
       nonRebasingSupply
       rebasingSupply
       totalSupply
+      unallocatedSupply
+      creditsPerToken
+      holderCount
     }
   `)
 }
@@ -145,6 +148,7 @@ const oTokenVaults = (prefix: string, address: string) => {
       chainId
       otoken
       address
+      vaultBuffer
       totalValue
     }
   `)
@@ -188,6 +192,165 @@ const oTokenDailyStats = (prefix: string, address: string) => {
   `)
 }
 
+const woTokens = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_woTokens: woTokens(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      totalAssets
+      totalSupply
+      assetsPerShare
+    }
+  `)
+}
+
+const oTokenAssets = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenAssets: oTokenAssets(
+      limit: ${LIMIT},
+      where: { otoken_eq: "${address}" }
+    ) {
+      id
+      chainId
+      otoken
+      address
+      symbol
+    }
+  `)
+}
+
+const oTokenRebaseOptions = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenRebaseOptions: oTokenRebaseOptions(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      txHash
+      status
+      delegatedTo
+    }
+  `)
+}
+
+const oTokenDripperStates = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenDripperStates: oTokenDripperStates(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      wethBalance
+      availableFunds
+      lastCollect
+      perSecond
+      perSecondTarget
+      perSecondMax
+      dripDuration
+    }
+  `)
+}
+
+const oTokenHarvesterYieldSents = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenHarvesterYieldSents: oTokenHarvesterYieldSents(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      txHash
+      yield
+      fee
+    }
+  `)
+}
+
+const oTokenRewardTokenCollecteds = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenRewardTokenCollecteds: oTokenRewardTokenCollecteds(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      strategy
+      recipient
+      rewardToken
+      amount
+    }
+  `)
+}
+
+const oTokenWithdrawalRequests = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenWithdrawalRequests: oTokenWithdrawalRequests(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      requestId
+      withdrawer
+      amount
+      queued
+      claimed
+      claimedAt
+      queueWait
+      txHash
+    }
+  `)
+}
+
+const oTokenYieldForwardeds = (prefix: string, address: string) => {
+  return gql(`
+    ${prefix}_oTokenYieldForwardeds: oTokenYieldForwardeds(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { otoken_eq: "${address}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+    ) {
+      id
+      timestamp
+      blockNumber
+      chainId
+      otoken
+      from
+      to
+      fromBalance
+      amount
+    }
+  `)
+}
+
 const oToken = (otoken: string, address: string) => [
   oTokens(otoken, address),
   oTokenApies(otoken, address),
@@ -195,6 +358,14 @@ const oToken = (otoken: string, address: string) => [
   oTokenRebases(otoken, address),
   oTokenVaults(otoken, address),
   oTokenDailyStats(otoken, address),
+  woTokens(otoken, address),
+  oTokenAssets(otoken, address),
+  oTokenRebaseOptions(otoken, address),
+  oTokenDripperStates(otoken, address),
+  oTokenHarvesterYieldSents(otoken, address),
+  oTokenRewardTokenCollecteds(otoken, address),
+  oTokenWithdrawalRequests(otoken, address),
+  oTokenYieldForwardeds(otoken, address),
 ]
 
 const erc20Balances = (prefix: string, address: string) => {
@@ -233,12 +404,14 @@ const arm = (prefix: string, armAddress: string) => {
         assetsPerShare
         outstandingAssets1
         marketAssets
+        feesAccrued
         totalAssets
         totalAssetsCap
         totalDeposits
         totalFees
         totalSupply
         totalWithdrawals
+        totalWithdrawalsClaimed
         totalYield
       }
     `),
@@ -279,17 +452,75 @@ const arm = (prefix: string, armAddress: string) => {
         assetsPerShare
         date
         fees
+        feesAccrued
         outstandingAssets1
         marketAssets
         rateUSD
+        rateETH
+        rateNative
         totalAssets
         totalAssetsCap
         totalSupply
+        totalDeposits
+        totalWithdrawals
+        totalWithdrawalsClaimed
         yield
-        rateNative
+        cumulativeYield
+        cumulativeFees
+      }
+    `),
+    gql(`
+      ${prefix}_armSwaps: armSwaps(
+        limit: ${LIMIT},
+        orderBy: [blockNumber_ASC, id_ASC],
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+      ) {
+        id
+        chainId
+        txHash
+        txFrom
+        txTo
+        timestamp
+        blockNumber
+        address
+        from
+        assets0
+        assets1
+      }
+    `),
+    gql(`
+      ${prefix}_traderateChangeds: traderateChangeds(
+        limit: ${LIMIT},
+        orderBy: [blockNumber_ASC, id_ASC],
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+      ) {
+        id
+        chainId
+        txHash
+        txFee
+        timestamp
+        blockNumber
+        address
+        traderate0
+        traderate1
       }
     `),
   ]
+}
+
+const arms = () => {
+  return gql(`
+    arms: arms(limit: ${LIMIT}) {
+      id
+      chainId
+      address
+      name
+      symbol
+      decimals
+      token0
+      token1
+    }
+  `)
 }
 
 const ognDailyStats = () => {
@@ -388,6 +619,7 @@ const strategy = (prefix: string, strategies: string) => {
         id
         timestamp
         blockNumber
+        otoken
         strategy
         apr
         apy
@@ -542,11 +774,16 @@ const getFilePathForEntity = (entityKey: string): string => {
     return path.join(baseDir, `${token}/strategies/${fileName}-${suffix}.json`)
   }
 
-  // ARM entities: lidoarm_armStates, osarm_armDailyStats, etc.
-  if (entityKey.includes('arm_arm') || entityKey.includes('arm_transaction')) {
+  // ARM entities: lidoarm_armStates, lidoarm_armSwaps, lidoarm_traderateChangeds, etc.
+  if (entityKey.includes('arm_arm') || entityKey.includes('arm_transaction') || entityKey.includes('arm_traderate')) {
     const [prefix, ...rest] = entityKey.split('_')
     const entityName = rest.join('_')
     return path.join(baseDir, `arm/${prefix}-${kebabCase(entityName)}.json`)
+  }
+
+  // ARM metadata (top level)
+  if (entityKey === 'arms') {
+    return path.join(baseDir, 'arms.json')
   }
 
   // ERC20 balances: ogn_erc20Balances, ousd_erc20Balances, etc.
@@ -555,8 +792,8 @@ const getFilePathForEntity = (entityKey: string): string => {
     return path.join(baseDir, `erc20/${token}-balances.json`)
   }
 
-  // Token entities: oeth_oTokens, ousd_oTokenApies, superoethb_oTokenHistories, etc.
-  if (entityKey.match(/^(oeth|ousd|superoethb|os)_oToken/)) {
+  // Token entities: oeth_oTokens, ousd_oTokenApies, oeth_woTokens, etc.
+  if (entityKey.match(/^(oeth|ousd|superoethb|os)_(oToken|woToken)/)) {
     const [token, entityType] = entityKey.split('_')
     const fileName = kebabCase(entityType)
     return path.join(baseDir, `${token}/${fileName}.json`)
@@ -598,6 +835,7 @@ const main = async () => {
     erc20Balances('os', sonicAddresses.tokens.OS),
     ...arm('lidoarm', '0x85b78aca6deae198fbf201c82daf6ca21942acc6'),
     ...arm('osarm', sonicAddresses.armOS.address),
+    arms(),
     ognDailyStats(),
     beaconDepositEvents('0x00000000219ab540356cbb839cbe05303d7705fa'),
     transactionDetails('lidoarm', '0x39878253374355dbcc15c86458f084fb6f2d6de7'),
@@ -619,9 +857,18 @@ const main = async () => {
     }
 
     for (const key of Object.keys(result.data)) {
-      let validationData = takeValidationEntries(result.data[key])
-      if (validationData.length < 5) {
-        validationData = takeEvery(result.data[key], 50)
+      let validationData
+      const rawData = result.data[key]
+
+      // If there are fewer than 20 total entries, save them all
+      if (rawData.length < 20) {
+        validationData = rawData
+      } else {
+        // Otherwise, filter to validation entries
+        validationData = takeValidationEntries(rawData)
+        if (validationData.length < 5) {
+          validationData = takeEvery(rawData, 50)
+        }
       }
 
       const filePath = getFilePathForEntity(key)

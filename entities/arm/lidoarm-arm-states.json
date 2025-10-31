@@ -10,12 +10,14 @@
     "assetsPerShare": "1000250027784791045",
     "outstandingAssets1": "10913954802561231651",
     "marketAssets": "0",
+    "feesAccrued": "181517053414515",
     "totalAssets": "14444065683563324888",
     "totalAssetsCap": "740000000000000000000",
     "totalDeposits": "14471159019533911018",
     "totalFees": "545897692126161",
     "totalSupply": "14440455168546158894",
     "totalWithdrawals": "30003994952748843",
+    "totalWithdrawalsClaimed": "20003994952748844",
     "totalYield": "2910658982162713"
   },
   {
@@ -29,12 +31,14 @@
     "assetsPerShare": "1003127533380783678",
     "outstandingAssets1": "1253409021832786047468",
     "marketAssets": "0",
+    "feesAccrued": "15000120443320989",
     "totalAssets": "1588089208451602605387",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "1585855813260185772698",
     "totalFees": "652099498950381171",
     "totalSupply": "1583137891848463035553",
     "totalWithdrawals": "435004286157975980",
+    "totalWithdrawalsClaimed": "420003994952748842",
     "totalYield": "2668399477574808669"
   },
   {
@@ -48,12 +52,14 @@
     "assetsPerShare": "1006217539014000489",
     "outstandingAssets1": "2496511632007731003292",
     "marketAssets": "0",
+    "feesAccrued": "0",
     "totalAssets": "2499263628566344202918",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "2503213271371677895755",
     "totalFees": "2252426685191567272",
     "totalSupply": "2483820378459502782199",
     "totalWithdrawals": "12959350546099961985",
+    "totalWithdrawalsClaimed": "12944216710985698849",
     "totalYield": "9009707740766269148"
   },
   {
@@ -67,12 +73,14 @@
     "assetsPerShare": "1007993659014667661",
     "outstandingAssets1": "2019516599394079801863",
     "marketAssets": "0",
+    "feesAccrued": "15750386544853827",
     "totalAssets": "2833317339261288424687",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "2862052681279092747716",
     "totalFees": "3369243398673471535",
     "totalSupply": "2810848375803185338167",
     "totalWithdrawals": "42275318158677624567",
+    "totalWithdrawalsClaimed": "42260184323563361431",
     "totalYield": "13539976140873301538"
   },
   {
@@ -86,12 +94,14 @@
     "assetsPerShare": "1010317800776201573",
     "outstandingAssets1": "2904849533691095941970",
     "marketAssets": "0",
+    "feesAccrued": "254389474908550028",
     "totalAssets": "2904896598450649393676",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "2927063681279092747716",
     "totalFees": "4772669107650017578",
     "totalSupply": "2875230542527203740064",
     "totalWithdrawals": "42275318158677624567",
+    "totalWithdrawalsClaimed": "42260184323563361431",
     "totalYield": "20108235330234270527"
   },
   {
@@ -105,12 +115,14 @@
     "assetsPerShare": "1014262888804960893",
     "outstandingAssets1": "2335734538966869610106",
     "marketAssets": "0",
+    "feesAccrued": "313001419100679127",
     "totalAssets": "2930173765452963641852",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "2941927242388890753171",
     "totalFees": "7552241486712569367",
     "totalSupply": "2888968725756489273737",
     "totalWithdrawals": "43214449559180105416",
+    "totalWithdrawalsClaimed": "43199315724065842280",
     "totalYield": "31460972623252994097"
   },
   {
@@ -124,12 +136,14 @@
     "assetsPerShare": "1016297179199067431",
     "outstandingAssets1": "3229813626208818116405",
     "marketAssets": "0",
+    "feesAccrued": "181291932351218122",
     "totalAssets": "3271674252820250734874",
     "totalAssetsCap": "5000000000000000000000",
     "totalDeposits": "3288009605727489428796",
     "totalFees": "9245056972835886594",
     "totalSupply": "3219210207194140827240",
     "totalWithdrawals": "54040749527987112934",
+    "totalWithdrawalsClaimed": "54025615692872849798",
     "totalYield": "37705396620748419012"
   },
   {
@@ -143,12 +157,14 @@
     "assetsPerShare": "1021222075726865862",
     "outstandingAssets1": "4990451276095419461124",
     "marketAssets": "0",
+    "feesAccrued": "817617411612380589",
     "totalAssets": "4990331736924248818150",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "4993132862389438429952",
     "totalFees": "13011820909256637580",
     "totalSupply": "4886627361019713765281",
     "totalWithdrawals": "58118879748665684649",
+    "totalWithdrawalsClaimed": "58103745913551421513",
     "totalYield": "55317754283476072847"
   },
   {
@@ -162,12 +178,14 @@
     "assetsPerShare": "1025051172533376407",
     "outstandingAssets1": "5911413168322378114489",
     "marketAssets": "0",
+    "feesAccrued": "235417655159625407",
     "totalAssets": "5911619280423652659685",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "7343955491101788308756",
     "totalFees": "18937874673587101339",
     "totalSupply": "5767145522904288040735",
     "totalWithdrawals": "1509029380993122556252",
+    "totalWithdrawalsClaimed": "1509014247158008293116",
     "totalYield": "76693170314986907181"
   },
   {
@@ -181,12 +199,14 @@
     "assetsPerShare": "1026663003534714017",
     "outstandingAssets1": "7706085241542349663482",
     "marketAssets": "0",
+    "feesAccrued": "490639915599841375",
     "totalAssets": "7404703162800594409741",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "10399120116099129163859",
     "totalFees": "21405816944007986123",
     "totalSupply": "7212398944256125679720",
     "totalWithdrawals": "3082002781736966064332",
+    "totalWithdrawalsClaimed": "2776094527333368422668",
     "totalYield": "87585828438431310214"
   },
   {
@@ -200,12 +220,14 @@
     "assetsPerShare": "1029243636767291121",
     "outstandingAssets1": "6637372704512163375856",
     "marketAssets": "0",
+    "feesAccrued": "93606521570953003",
     "totalAssets": "8139501651569687269226",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "11831726402399492960631",
     "totalFees": "26434599353250484352",
     "totalSupply": "7908236068512128211664",
     "totalWithdrawals": "3798337575329091441072",
+    "totalWithdrawalsClaimed": "3798322241493977177937",
     "totalYield": "106112824499285749667"
   },
   {
@@ -219,12 +241,14 @@
     "assetsPerShare": "1030930326483869608",
     "outstandingAssets1": "1722159302556265002166",
     "marketAssets": "0",
+    "feesAccrued": "50041097313651558",
     "totalAssets": "7649048360890005911050",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "11843226402399492960630",
     "totalFees": "29757164978373638977",
     "totalSupply": "7419558979294112660588",
     "totalWithdrawals": "4313406866812236211991",
+    "totalWithdrawalsClaimed": "4313391532977121948856",
     "totalYield": "119228825302749162411"
   },
   {
@@ -238,12 +262,14 @@
     "assetsPerShare": "1031979746818089097",
     "outstandingAssets1": "6491277988987446709801",
     "marketAssets": "0",
+    "feesAccrued": "139104618607146164",
     "totalAssets": "6664949376056863370768",
     "totalAssetsCap": "10000000000000000000000",
     "totalDeposits": "12241438137294842840038",
     "totalFees": "31371679228917680302",
     "totalSupply": "6458411026579689988308",
     "totalWithdrawals": "5702531897628078775443",
+    "totalWithdrawalsClaimed": "5702516563792964512308",
     "totalYield": "126043136390099306173"
   }
 ]

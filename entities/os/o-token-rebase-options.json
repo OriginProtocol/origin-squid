@@ -1,0 +1,32 @@
+[
+  {
+    "id": "146-0x05dc6e26666fd2673c91dc3112e4943611e0b382456c8f8337e8bd5a54232583-0-0-0x9f0df7799f6fdad409300080cff680f5a23df4b1",
+    "timestamp": "2025-01-15T10:14:06.000000Z",
+    "blockNumber": 3979216,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "txHash": "0x05dc6e26666fd2673c91dc3112e4943611e0b382456c8f8337e8bd5a54232583",
+    "status": "OptIn",
+    "delegatedTo": null
+  },
+  {
+    "id": "146-0xb68da19a2b03c94d531423d9dc16aa325c73cfe2988339a44f19bc8cce70eac9-0-2-3-0xefb4da71d2fc85ceced7ad15f71e723ccd25f998",
+    "timestamp": "2025-03-10T08:22:07.000000Z",
+    "blockNumber": 12806035,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "txHash": "0xb68da19a2b03c94d531423d9dc16aa325c73cfe2988339a44f19bc8cce70eac9",
+    "status": "YieldDelegationTarget",
+    "delegatedTo": null
+  },
+  {
+    "id": "146-0x6fab0a050587e66bf1355f2710f45782ed10bddc88199d31aa3fe48a6dd30871-0-1-1-0x1397e736ba239bb51e971793f6e18136327fbcc8",
+    "timestamp": "2025-05-26T21:46:16.000000Z",
+    "blockNumber": 29802916,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "txHash": "0x6fab0a050587e66bf1355f2710f45782ed10bddc88199d31aa3fe48a6dd30871",
+    "status": "YieldDelegationTarget",
+    "delegatedTo": null
+  }
+]

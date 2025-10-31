@@ -7,7 +7,10 @@
     "chainId": 1,
     "nonRebasingSupply": "0",
     "rebasingSupply": "0",
-    "totalSupply": "0"
+    "totalSupply": "0",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "999999999999999999999999999",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17150380",
@@ -17,7 +20,10 @@
     "chainId": 1,
     "nonRebasingSupply": "263957625917146347350",
     "rebasingSupply": "38796038632393707531",
-    "totalSupply": "302753664549540054881"
+    "totalSupply": "302753664549540054881",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "981828872951666861526152535",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17187122",
@@ -27,7 +33,10 @@
     "chainId": 1,
     "nonRebasingSupply": "264046138339084854024",
     "rebasingSupply": "163906156744941879399",
-    "totalSupply": "427952295084026733423"
+    "totalSupply": "427952295084026733423",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "979446325649584204000261633",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17266841",
@@ -37,7 +46,10 @@
     "chainId": 1,
     "nonRebasingSupply": "264131509311674388935",
     "rebasingSupply": "172424767956743588367",
-    "totalSupply": "436556277268417977302"
+    "totalSupply": "436556277268417977302",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "975419690131261101078007925",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17278567",
@@ -47,7 +59,10 @@
     "chainId": 1,
     "nonRebasingSupply": "370461526342145074277",
     "rebasingSupply": "888214676398815811617",
-    "totalSupply": "1258676202740960885894"
+    "totalSupply": "1258676202740960885894",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "974949016334966785036450099",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17295338",
@@ -57,7 +72,10 @@
     "chainId": 1,
     "nonRebasingSupply": "1241462252205314237972",
     "rebasingSupply": "2285792550440598577171",
-    "totalSupply": "3527254802645912815143"
+    "totalSupply": "3527254802645912815143",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "974734667201856760100794014",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17312720",
@@ -67,7 +85,10 @@
     "chainId": 1,
     "nonRebasingSupply": "1341786887101134855846",
     "rebasingSupply": "3284962212613844083939",
-    "totalSupply": "4626749099714978939785"
+    "totalSupply": "4626749099714978939785",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "973525546660721357442647053",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17341334",
@@ -77,7 +98,10 @@
     "chainId": 1,
     "nonRebasingSupply": "1731587418575200490693",
     "rebasingSupply": "4277594056151605087066",
-    "totalSupply": "6009181474726805577759"
+    "totalSupply": "6009181474726805577759",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "972730575756819430621727168",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17375638",
@@ -87,7 +111,10 @@
     "chainId": 1,
     "nonRebasingSupply": "1980707355374764996298",
     "rebasingSupply": "5236535667809121974525",
-    "totalSupply": "7217243023183886970823"
+    "totalSupply": "7217243023183886970823",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "970804237753730840007482645",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17393282",
@@ -97,7 +124,10 @@
     "chainId": 1,
     "nonRebasingSupply": "2793184486410491183686",
     "rebasingSupply": "6472332593323146531164",
-    "totalSupply": "9265517079733637714850"
+    "totalSupply": "9265517079733637714850",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "970420280629086592920868590",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17416548",
@@ -107,7 +137,10 @@
     "chainId": 1,
     "nonRebasingSupply": "3651302117938202003529",
     "rebasingSupply": "7097496024915391749799",
-    "totalSupply": "10748798142853593753328"
+    "totalSupply": "10748798142853593753328",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "969790875548078467772541004",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17440337",
@@ -117,7 +150,10 @@
     "chainId": 1,
     "nonRebasingSupply": "4279271370005608620878",
     "rebasingSupply": "8349565233287804173267",
-    "totalSupply": "12628836603293412794145"
+    "totalSupply": "12628836603293412794145",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "968801667694295342432624612",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17453917",
@@ -127,7 +163,10 @@
     "chainId": 1,
     "nonRebasingSupply": "4603009504767489349877",
     "rebasingSupply": "8357652588939131797388",
-    "totalSupply": "12960662093706621147265"
+    "totalSupply": "12960662093706621147265",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "968396422735465060125327586",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17482374",
@@ -137,7 +176,10 @@
     "chainId": 1,
     "nonRebasingSupply": "6384551921506611488912",
     "rebasingSupply": "8626525544815296795421",
-    "totalSupply": "15011077466321908284333"
+    "totalSupply": "15011077466321908284333",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "967370348410195515529873376",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17502543",
@@ -147,7 +189,10 @@
     "chainId": 1,
     "nonRebasingSupply": "6104784529055317026737",
     "rebasingSupply": "9142331786449911175942",
-    "totalSupply": "15247116315505228202679"
+    "totalSupply": "15247116315505228202679",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "966678038547444545412590789",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17523818",
@@ -157,7 +202,10 @@
     "chainId": 1,
     "nonRebasingSupply": "6274017882309408960484",
     "rebasingSupply": "9746940515631123872061",
-    "totalSupply": "16020958397940532832545"
+    "totalSupply": "16020958397940532832545",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "965974096410146078718863082",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17542028",
@@ -167,7 +215,10 @@
     "chainId": 1,
     "nonRebasingSupply": "7850230657400796053591",
     "rebasingSupply": "10695426082369448286345",
-    "totalSupply": "18545656739770244339936"
+    "totalSupply": "18545656739770244339936",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "965476364543215274483671011",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17560999",
@@ -177,7 +228,10 @@
     "chainId": 1,
     "nonRebasingSupply": "7802637504830958893844",
     "rebasingSupply": "11228004567809353226911",
-    "totalSupply": "19030642072640312120755"
+    "totalSupply": "19030642072640312120755",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "964768042212220830683980107",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17583331",
@@ -187,7 +241,10 @@
     "chainId": 1,
     "nonRebasingSupply": "8760266242156392299353",
     "rebasingSupply": "12427013384454322031696",
-    "totalSupply": "21187279626610714331049"
+    "totalSupply": "21187279626610714331049",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "963907687618519656276956464",
+    "holderCount": 0
   },
   {
     "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:17603750",
@@ -197,6 +254,9 @@
     "chainId": 1,
     "nonRebasingSupply": "10139675536652233987400",
     "rebasingSupply": "13045013214772011001497",
-    "totalSupply": "23184688751424244988897"
+    "totalSupply": "23184688751424244988897",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "963437772285193654418647397",
+    "holderCount": 0
   }
 ]

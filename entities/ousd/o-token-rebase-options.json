@@ -1,0 +1,22 @@
+[
+  {
+    "id": "1-0x49bf374a85445a1bc940198170fcaab0c21636d176979c82d4d790da103b5a0d-0-0-0x241ca8553952a6c90dbe413abf061d5eeae14d95",
+    "timestamp": "2022-01-13T22:03:37.000000Z",
+    "blockNumber": 13999736,
+    "chainId": 1,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "txHash": "0x49bf374a85445a1bc940198170fcaab0c21636d176979c82d4d790da103b5a0d",
+    "status": "OptIn",
+    "delegatedTo": null
+  },
+  {
+    "id": "1-0xac96b28dd5808a5f94d81feec52f5224d96cd2574f62e9167c2f02e878a847b9-1-0-1-0-0x3f9db22d000d4b53dfcbf7eb5e721e9167e01cc9",
+    "timestamp": "2025-01-28T16:40:23.000000Z",
+    "blockNumber": 21724274,
+    "chainId": 1,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "txHash": "0xac96b28dd5808a5f94d81feec52f5224d96cd2574f62e9167c2f02e878a847b9",
+    "status": "OptIn",
+    "delegatedTo": null
+  }
+]

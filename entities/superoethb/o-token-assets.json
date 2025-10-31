@@ -1,0 +1,16 @@
+[
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "address": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "symbol": "superOETHb"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-0x4200000000000000000000000000000000000006",
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "address": "0x4200000000000000000000000000000000000006",
+    "symbol": "WETH"
+  }
+]
