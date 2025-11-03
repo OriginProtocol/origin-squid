@@ -144,6 +144,7 @@ export const strategies = {
     MorphoAaveStrategy: '0xc1fc9e5ec3058921ea5025d703cbe31764756319',
     BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
     NativeStakingStrategies: OETH_NATIVE_STRATEGIES.map((s) => s.address),
+    CompoundStakingStrategies: OETH_COMPOUND_STAKING_SSV_STRATEGIES.map((s) => s.address),
   },
   ousd: {
     ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
