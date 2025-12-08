@@ -7,6 +7,7 @@ import * as erc20Abi from '@abi/erc20'
 import * as originOsArmAbi from '@abi/origin-arm'
 import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
+import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
 import {
@@ -39,7 +40,7 @@ export const createOriginARMProcessors = ({
   underlyingToken: Currency
   capManagerAddress: string
   marketFrom?: number
-  armType: 'lido' | 'etherfi' | 'os'
+  armType: 'lido' | 'etherfi' | 'os' | 'ethena'
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
@@ -187,6 +188,7 @@ export const createOriginARMProcessors = ({
           const previousState = await getPreviousState(block)
           const armContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
           const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
+          const ethenaArmContract = new originEthenaArmAbi.Contract(ctx, block.header, armAddress)
           const osArmContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
           const etherfiArmContract = new originEtherfiArmAbi.Contract(ctx, block.header, armAddress)
           const controllerContract = new originLidoArmCapManagerAbi.Contract(ctx, block.header, capManagerAddress)
@@ -207,6 +209,7 @@ export const createOriginARMProcessors = ({
               lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
               os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
               etherfi: etherfiArmContract.etherfiWithdrawalQueueAmount.bind(etherfiArmContract),
+              ethena: ethenaArmContract.withdrawsQueued.bind(ethenaArmContract),
             }[armType](),
             armContract.feesAccrued(),
             armContract.totalAssets(),
