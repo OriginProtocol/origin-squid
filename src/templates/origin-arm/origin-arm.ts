@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { findLast } from 'lodash'
 import { LessThan } from 'typeorm'
-import { formatUnits } from 'viem'
+import { formatEther, formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
 import * as originOsArmAbi from '@abi/origin-arm'
@@ -326,24 +326,42 @@ export const createOriginARMProcessors = ({
                   .filter((log) => log.address === armEntity.token1)
                   .map((log) => erc20Abi.events.Transfer.decode(log))
 
-                const assets0 = transfers0.reduce(
-                  (acc, data) =>
-                    data.from.toLowerCase() === armAddress
-                      ? acc - data.value
-                      : data.to.toLowerCase() === armAddress
-                        ? acc + data.value
-                        : acc,
-                  0n,
-                )
-                const assets1 = transfers1.reduce(
-                  (acc, data) =>
-                    data.from.toLowerCase() === armAddress
-                      ? acc - data.value
-                      : data.to.toLowerCase() === armAddress
-                        ? acc + data.value
-                        : acc,
-                  0n,
-                )
+                const pairs: { assets0: bigint; assets1: bigint }[] = []
+
+                const transfersOut0 = transfers0.filter((t) => t.from.toLowerCase() === armAddress)
+                const transfersIn1 = transfers1.filter((t) => t.to.toLowerCase() === armAddress)
+                for (let i = 0; i < transfersOut0.length; i++) {
+                  for (let j = 0; j < transfersIn1.length; j++) {
+                    const out0 = transfersOut0[i]
+                    const in1 = transfersIn1[j]
+                    if (out0.value === 0n || in1.value === 0n) continue
+                    const rate = +formatEther((out0.value * 10n ** 18n) / in1.value)
+                    if (Math.abs(rate - 1) <= 0.001) {
+                      pairs.push({ assets0: -out0.value, assets1: in1.value })
+                      transfersIn1.splice(j, 1)
+                      break
+                    }
+                  }
+                }
+
+                const transfersOut1 = transfers1.filter((t) => t.from.toLowerCase() === armAddress)
+                const transfersIn0 = transfers0.filter((t) => t.to.toLowerCase() === armAddress)
+                for (let i = 0; i < transfersOut1.length; i++) {
+                  for (let j = 0; j < transfersIn0.length; j++) {
+                    const out1 = transfersOut1[i]
+                    const in0 = transfersIn0[j]
+                    if (out1.value === 0n || in0.value === 0n) continue
+                    const rate = +formatEther((out1.value * 10n ** 18n) / in0.value)
+                    if (Math.abs(rate - 1) <= 0.001) {
+                      pairs.push({ assets0: in0.value, assets1: -out1.value })
+                      transfersIn0.splice(j, 1)
+                      break
+                    }
+                  }
+                }
+
+                const assets0 = pairs.reduce((acc, pair) => acc + pair.assets0, 0n)
+                const assets1 = pairs.reduce((acc, pair) => acc + pair.assets1, 0n)
 
                 swaps.push(
                   new ArmSwap({
