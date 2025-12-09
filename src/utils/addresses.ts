@@ -207,6 +207,11 @@ export const arms: Record<string, { address: string; capManager: string; zapper:
     capManager: '0xf54ebff575f699d281645c6f14fe427dffe629cf',
     zapper: '0x01f30b7358ba51f637d1aa05d9b4a60f76dad680',
   },
+  ['ARM-USDe-sUSDe']: {
+    address: '0xceda2d856238aa0d12f6329de20b9115f07c366d',
+    capManager: '0x687afb5a52a15122fd5fc54a8b52cfd58346fb0c',
+    zapper: '',
+  },
 }
 
 export const multisig = {
