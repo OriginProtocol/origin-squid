@@ -922,5 +922,47 @@
     "perSecondTarget": "38453040800985",
     "perSecondMax": "1585489599",
     "dripDuration": "604800"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23700000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-10-31T21:25:23.000000Z",
+    "blockNumber": 23700000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "wethBalance": "155909067223686646517",
+    "availableFunds": "36257186935252228262",
+    "lastCollect": "1761911435",
+    "perSecond": "38453040800985",
+    "perSecondTarget": "38453040800985",
+    "perSecondMax": "1585489599",
+    "dripDuration": "604800"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23800000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-11-14T21:05:47.000000Z",
+    "blockNumber": 23800000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "wethBalance": "470020825906789205052",
+    "availableFunds": "21423201472634675326",
+    "lastCollect": "1763121035",
+    "perSecond": "31919562191705",
+    "perSecondTarget": "31919562191705",
+    "perSecondMax": "1585489599",
+    "dripDuration": "604800"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23900000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "wethBalance": "2116079352053979293802",
+    "availableFunds": "28494888748101478020",
+    "lastCollect": "1764330635",
+    "perSecond": "31919562191705",
+    "perSecondTarget": "31919562191705",
+    "perSecondMax": "1585489599",
+    "dripDuration": "604800"
   }
 ]

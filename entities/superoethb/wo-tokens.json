@@ -1788,5 +1788,55 @@
     "totalAssets": "8317047348347393821379",
     "totalSupply": "7706715242174794928046",
     "assetsPerShare": "1079194843327358537"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36700000",
+    "timestamp": "2025-10-11T13:29:07.000000Z",
+    "blockNumber": 36700000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8409117924248682236000",
+    "totalSupply": "7789728234444543411664",
+    "assetsPerShare": "1079513645555094927"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36800000",
+    "timestamp": "2025-10-13T21:02:27.000000Z",
+    "blockNumber": 36800000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8251528284542962169884",
+    "totalSupply": "7641645156305962406713",
+    "assetsPerShare": "1079810448635359373"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-36900000",
+    "timestamp": "2025-10-16T04:35:47.000000Z",
+    "blockNumber": 36900000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "8290152465631157187155",
+    "totalSupply": "7675362076289220953783",
+    "assetsPerShare": "1080099203559549425"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-37000000",
+    "timestamp": "2025-10-18T12:09:07.000000Z",
+    "blockNumber": 37000000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "7983384198578442818923",
+    "totalSupply": "7389399769562509240832",
+    "assetsPerShare": "1080383312249879875"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-37100000",
+    "timestamp": "2025-10-20T19:42:27.000000Z",
+    "blockNumber": 37100000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "totalAssets": "7830957425465952364675",
+    "totalSupply": "7246789038445053999332",
+    "assetsPerShare": "1080610651686121606"
   }
 ]
