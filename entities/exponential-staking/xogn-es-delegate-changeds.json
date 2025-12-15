@@ -196,5 +196,16 @@
     "delegator": "0x428f77f7a6d8d9ba2d9ea64a93e72ddd646b5476",
     "fromDelegate": "0x0000000000000000000000000000000000000000",
     "toDelegate": "0x428f77f7a6d8d9ba2d9ea64a93e72ddd646b5476"
+  },
+  {
+    "id": "1:0023756657-aa9b3-000418",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-11-08T19:33:47.000000Z",
+    "blockNumber": 23756657,
+    "txHash": "0x11836fcb3f0430f0836b10647d74fbee4c9cc934844369353a77522e0cd9c671",
+    "delegator": "0x60c8139c630c5c4f2f058cc62a0fe73674ee9237",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0x60c8139c630c5c4f2f058cc62a0fe73674ee9237"
   }
 ]

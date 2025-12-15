@@ -1,1 +1,31 @@
-[]
+[
+  {
+    "id": "1:2025-10-30:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "chainId": 1,
+    "blockNumber": 23693628,
+    "timestamp": "2025-10-30T23:59:59.000000Z",
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "apr": 0,
+    "apy": 0,
+    "assets0": "10000001000000000000",
+    "assets1": "0",
+    "assetsPerShare": "1000000000000000000",
+    "date": "2025-10-30",
+    "fees": "0",
+    "feesAccrued": "0",
+    "outstandingAssets1": "0",
+    "marketAssets": "0",
+    "rateUSD": 3790.5859,
+    "rateETH": 1,
+    "rateNative": 1,
+    "totalAssets": "10000001000000000000",
+    "totalAssetsCap": "250000000000000000000",
+    "totalSupply": "10000001000000000000",
+    "totalDeposits": "10000000000000000000",
+    "totalWithdrawals": "0",
+    "totalWithdrawalsClaimed": "0",
+    "yield": "1000000000000",
+    "cumulativeYield": "1000000000000",
+    "cumulativeFees": "0"
+  }
+]

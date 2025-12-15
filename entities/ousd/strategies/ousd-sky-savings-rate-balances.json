@@ -174,5 +174,38 @@
     "chainId": 1,
     "symbol": "USDS",
     "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
+  },
+  {
+    "id": "1:0x5bd9af9c2506d29b6d79cb878284a270190eaeaa:0xdc035d45d973e3ec169d2276ddab16f1e407384f:23700000",
+    "blockNumber": 23700000,
+    "timestamp": "2025-10-31T21:25:23.000000Z",
+    "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "balance": "1175005275018757248108295",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "USDS",
+    "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
+  },
+  {
+    "id": "1:0x5bd9af9c2506d29b6d79cb878284a270190eaeaa:0xdc035d45d973e3ec169d2276ddab16f1e407384f:23800000",
+    "blockNumber": 23800000,
+    "timestamp": "2025-11-14T21:05:47.000000Z",
+    "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "balance": "1176945667821716293838166",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "USDS",
+    "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
+  },
+  {
+    "id": "1:0x5bd9af9c2506d29b6d79cb878284a270190eaeaa:0xdc035d45d973e3ec169d2276ddab16f1e407384f:23900000",
+    "blockNumber": 23900000,
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "balance": "0",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "USDS",
+    "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
   }
 ]

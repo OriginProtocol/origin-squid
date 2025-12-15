@@ -658,5 +658,35 @@
     "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
     "vaultBuffer": "2000000000000000",
     "totalValue": "53816238755947699548809"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23700000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-10-31T21:25:23.000000Z",
+    "blockNumber": 23700000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "vaultBuffer": "2000000000000000",
+    "totalValue": "53869306462805452609530"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23800000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-11-14T21:05:47.000000Z",
+    "blockNumber": 23800000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "vaultBuffer": "2000000000000000",
+    "totalValue": "49440775465836392674188"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-23900000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "vaultBuffer": "2000000000000000",
+    "totalValue": "49487008583498210949206"
   }
 ]
