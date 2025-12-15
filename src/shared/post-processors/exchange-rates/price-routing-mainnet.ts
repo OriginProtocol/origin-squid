@@ -41,6 +41,7 @@ const chainlinkPriceFeeds: Record<
 > = {
   CRV_USD: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
   CRV_USDC: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
+  USDe_USD: { height: 19711161, get: createChainlinkPriceFeed('0xa569d910839ae8865da8f8e70fffb0cba869f961', 8n) },
   CVX_USD: { height: 13960589, get: createChainlinkPriceFeed('0xd962fc30a72a84ce50161031391756bf2876af5d', 8n) },
   OETH_ETH: { height: 19384550, get: createChainlinkPriceFeed('0x703118c4cbcccbf2ab31913e0f8075fbbb15f563', 18n) },
   COMP_USD: { height: 10730672, get: createChainlinkPriceFeed('0xdbd020caef83efd542f4de03e3cf0c28a4428bd5', 8n) },
@@ -273,6 +274,14 @@ export const priceMap: Partial<
     'WETH',
     [
       { base: 'BAL', quote: 'USD' },
+      { base: 'USD', quote: 'ETH' },
+    ],
+    18,
+  ), ...derived(
+    'USDe',
+    'ETH',
+    [
+      { base: 'USDe', quote: 'USD' },
       { base: 'USD', quote: 'ETH' },
     ],
     18,

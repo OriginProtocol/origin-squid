@@ -27,11 +27,11 @@ export const originArmProcessors = [
   // Ethena ARM
   ...createOriginARMProcessors({
     name: 'ARM-USDe-sUSDe',
-    from: 23924639,
+    from: 23924654,
     armAddress: addresses.arms['ARM-USDe-sUSDe'].address,
     underlyingToken: 'USDe',
     capManagerAddress: addresses.arms['ARM-USDe-sUSDe'].capManager,
     armType: 'ethena',
-    marketFrom: 23924639,
+    marketFrom: 23924654,
   }),
 ]
