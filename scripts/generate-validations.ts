@@ -1087,6 +1087,7 @@ const main = async () => {
     erc20Balances('os', sonicAddresses.tokens.OS),
     ...arm('lidoarm', addresses.arms['ARM-WETH-stETH'].address),
     ...arm('etherfiarm', addresses.arms['ARM-WETH-eETH'].address),
+    ...arm('ethenaarm', addresses.arms['ARM-USDe-sUSDe'].address),
     ...arm('osarm', sonicAddresses.armOS.address),
     arms(),
     ognDailyStats(),

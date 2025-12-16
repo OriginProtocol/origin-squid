@@ -757,5 +757,16 @@
     "chainId": 1,
     "symbol": "frxETH",
     "strategy": "0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5"
+  },
+  {
+    "id": "1:0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5:0x5e8422345238f34275888049021821e8e08caa1f:24000000",
+    "blockNumber": 24000000,
+    "timestamp": "2025-12-13T00:06:11.000000Z",
+    "asset": "0x5e8422345238f34275888049021821e8e08caa1f",
+    "balance": "0",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "frxETH",
+    "strategy": "0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5"
   }
 ]

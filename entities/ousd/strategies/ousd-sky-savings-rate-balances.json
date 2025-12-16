@@ -207,5 +207,16 @@
     "chainId": 1,
     "symbol": "USDS",
     "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
+  },
+  {
+    "id": "1:0x5bd9af9c2506d29b6d79cb878284a270190eaeaa:0xdc035d45d973e3ec169d2276ddab16f1e407384f:24000000",
+    "blockNumber": 24000000,
+    "timestamp": "2025-12-13T00:06:11.000000Z",
+    "asset": "0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "balance": "0",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "USDS",
+    "strategy": "0x5bd9af9c2506d29b6d79cb878284a270190eaeaa"
   }
 ]
