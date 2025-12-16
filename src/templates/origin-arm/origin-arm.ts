@@ -1,35 +1,32 @@
-import dayjs from 'dayjs'
-import { findLast } from 'lodash'
-import { LessThan } from 'typeorm'
-import { formatEther, formatUnits } from 'viem'
+import dayjs from 'dayjs';
+import { findLast } from 'lodash';
+import { LessThan } from 'typeorm';
+import { formatEther, formatUnits } from 'viem';
 
-import * as erc20Abi from '@abi/erc20'
-import * as originOsArmAbi from '@abi/origin-arm'
-import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
-import * as originLidoArmAbi from '@abi/origin-lido-arm'
-import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
-import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
-import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
-import {
-  Block,
-  Context,
-  EvmBatchProcessor,
-  Processor,
-  blockFrequencyTracker,
-  calculateAPY,
-  logFilter,
-} from '@originprotocol/squid-utils'
-import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { createERC20EventTracker } from '@templates/erc20/erc20-event'
-import { createEventProcessor } from '@templates/events/createEventProcessor'
-import { traceFilter } from '@utils/traceFilter'
+
+
+import * as erc20Abi from '@abi/erc20';
+import * as originOsArmAbi from '@abi/origin-arm';
+import * as originEthenaArmAbi from '@abi/origin-ethena-arm';
+import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm';
+import * as originLidoArmAbi from '@abi/origin-lido-arm';
+import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager';
+import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model';
+import { Block, Context, EvmBatchProcessor, Processor, blockFrequencyTracker, calculateAPY, logFilter } from '@originprotocol/squid-utils';
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates';
+import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
+import { createERC20EventTracker } from '@templates/erc20/erc20-event';
+import { createEventProcessor } from '@templates/events/createEventProcessor';
+import { traceFilter } from '@utils/traceFilter';
+
 
 export const createOriginARMProcessors = ({
   name,
   from,
   armAddress,
-  underlyingToken,
+  token0,
+  token1,
+  getRate1,
   capManagerAddress,
   marketFrom,
   armType,
@@ -37,7 +34,9 @@ export const createOriginARMProcessors = ({
   name: string
   from: number
   armAddress: string
-  underlyingToken: Currency
+  token0: Currency
+  token1: Currency
+  getRate1?: (ctx: Context, block: Block) => Promise<bigint>
   capManagerAddress: string
   marketFrom?: number
   armType: 'lido' | 'etherfi' | 'os' | 'ethena'
@@ -333,14 +332,18 @@ export const createOriginARMProcessors = ({
 
                 const transfersOut0 = transfers0.filter((t) => t.from.toLowerCase() === armAddress)
                 const transfersIn1 = transfers1.filter((t) => t.to.toLowerCase() === armAddress)
+
+                const rate1 = getRate1 ? await getRate1(ctx, block) : 10n ** 18n
+                const rate1Number = +formatEther(rate1)
+
                 for (let i = 0; i < transfersOut0.length; i++) {
                   for (let j = 0; j < transfersIn1.length; j++) {
                     const out0 = transfersOut0[i]
                     const in1 = transfersIn1[j]
                     if (out0.value === 0n || in1.value === 0n) continue
                     const rate = +formatEther((out0.value * 10n ** 18n) / in1.value)
-                    if (Math.abs(rate - 1) <= 0.001) {
-                      pairs.push({ assets0: -out0.value, assets1: in1.value })
+                    if (Math.abs(rate - rate1Number) <= 0.01) {
+                      pairs.push({ assets0: -out0.value, assets1: (in1.value * rate1) / 10n ** 18n })
                       transfersIn1.splice(j, 1)
                       break
                     }
@@ -355,8 +358,8 @@ export const createOriginARMProcessors = ({
                     const in0 = transfersIn0[j]
                     if (out1.value === 0n || in0.value === 0n) continue
                     const rate = +formatEther((out1.value * 10n ** 18n) / in0.value)
-                    if (Math.abs(rate - 1) <= 0.001) {
-                      pairs.push({ assets0: in0.value, assets1: -out1.value })
+                    if (Math.abs(rate - rate1Number) <= 0.01) {
+                      pairs.push({ assets0: in0.value, assets1: (-out1.value * rate1) / 10n ** 18n })
                       transfersIn0.splice(j, 1)
                       break
                     }
@@ -391,9 +394,9 @@ export const createOriginARMProcessors = ({
             const [state, yesterdayState, rateUSD, rateETH, rateNative] = await Promise.all([
               getCurrentState(block),
               getYesterdayState(block),
-              ensureExchangeRate(ctx, block, underlyingToken, 'USD'),
-              ensureExchangeRate(ctx, block, underlyingToken, 'ETH'),
-              ensureExchangeRate(ctx, block, underlyingToken, ctx.chain.nativeCurrency.symbol as Currency),
+              ensureExchangeRate(ctx, block, token0, 'USD'),
+              ensureExchangeRate(ctx, block, token0, 'ETH'),
+              ensureExchangeRate(ctx, block, token0, ctx.chain.nativeCurrency.symbol as Currency),
             ])
 
             // ArmDailyStat

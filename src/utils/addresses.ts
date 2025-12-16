@@ -1,4 +1,5 @@
-import { uniq } from 'lodash'
+import { uniq } from 'lodash';
+
 
 // Lowercase Addresses
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -12,6 +13,8 @@ export const USDT_ADDRESS = '0xdac17f958d2ee523a2206206994597c13d831ec7'
 export const USDC_ADDRESS = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
 export const LUSD_ADDRESS = '0x5f98805a4e8be255a32880fdec7f6728c6568ba0'
 export const USDS_ADDRESS = '0xdc035d45d973e3ec169d2276ddab16f1e407384f'
+export const USDE_ADDRESS = '0x4c9edd5852cd905f086c759e8383e09bff1e68b3'
+export const sUSDE_ADDRESS = '0x9d39a5de30e57443bff2a8307a4256c8797a3497'
 
 // ETH Stables
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
@@ -118,6 +121,8 @@ export const mainnetTokens = {
   USDS: USDS_ADDRESS,
   LUSD: LUSD_ADDRESS,
   CRV3: CRV3_ADDRESS,
+  sUSDe: sUSDE_ADDRESS,
+  USDe: USDE_ADDRESS,
 
   // Ether
   ETH: ETH_ADDRESS,
