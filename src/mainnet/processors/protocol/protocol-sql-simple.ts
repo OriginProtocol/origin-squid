@@ -75,7 +75,7 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
         a.date,
         '${product.product}' as product,
         (a.date::date + interval '1 day' - interval '1 second')::timestamp as timestamp,
-        COALESCE(a.rate_usd * 1e18, 0) as rate_usd,
+        COALESCE(ROUND(a.rate_usd * 1e18)::BIGINT, 0) as rate_usd,
         COALESCE(a.total_assets * a.rate_eth, 0) as earning_tvl,
         COALESCE(a.total_assets * a.rate_eth, 0) as tvl,
         COALESCE(a.total_supply * a.rate_eth, 0) as supply,
