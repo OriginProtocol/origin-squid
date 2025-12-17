@@ -22,8 +22,8 @@
     "blockNumber": 23785422,
     "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
-    "assets0": "0",
-    "assets1": "0"
+    "assets0": "-41631954112049133",
+    "assets1": "41673627739788922"
   },
   {
     "id": "1::0x6ff9072c69f43fdd4691240448e9bf8eacff4c67f0944c5ed83dbe779e276d3e:1:0:1:2:2:1",
@@ -48,8 +48,8 @@
     "blockNumber": 23847102,
     "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
-    "assets0": "0",
-    "assets1": "0"
+    "assets0": "-106895973876125880",
+    "assets1": "107013688933953229"
   },
   {
     "id": "1::0x271d49a9fcc8f936f255c4b7e30e8f01266a26518d9dbd3c84268e61a18d8260:1:0:1:2:2:1",
@@ -61,8 +61,8 @@
     "blockNumber": 23883013,
     "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
-    "assets0": "0",
-    "assets1": "0"
+    "assets0": "-117225798435609457",
+    "assets1": "117349014901255776"
   },
   {
     "id": "1::0xcc5f35c700b0de708ebc7a98875523b50557a8328b3dae07e6bedd9dd6575bb1:4:2:1",
