@@ -223,7 +223,16 @@ export const derived = <Base extends MainnetCurrencySymbol, Quote extends Mainne
     async (ctx: Context, block: Block['header']) => {
       const baseExponent = 10n ** BigInt(decimals)
       const rates = await Promise.all(connections.map(({ base, quote }) => getMainnetPrice(ctx, block, base, quote)))
-      return rates.reduce((acc, [rate]) => (acc * rate) / baseExponent, baseExponent)
+      // Normalize all rates to target decimals before multiplying
+      const normalizedRates = rates.map(([rate, rateDecimals]) => {
+        if (rateDecimals === decimals) return rate
+        if (rateDecimals < decimals) {
+          return rate * 10n ** BigInt(decimals - rateDecimals)
+        } else {
+          return rate / 10n ** BigInt(rateDecimals - decimals)
+        }
+      })
+      return normalizedRates.reduce((acc, rate) => (acc * rate) / baseExponent, baseExponent)
     },
     decimals,
   )
@@ -277,7 +286,8 @@ export const priceMap: Partial<
       { base: 'USD', quote: 'ETH' },
     ],
     18,
-  ), ...derived(
+  ),
+  ...derived(
     'USDe',
     'ETH',
     [
