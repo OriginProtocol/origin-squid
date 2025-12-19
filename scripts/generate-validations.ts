@@ -42,6 +42,57 @@ const takeEvery = (arr: any[], n: number = 25) => {
   return arr.filter((_, i) => i % n === 0)
 }
 
+/**
+ * For exchange rates, ensure we get at least one of every pair.
+ * We take a consistent sample by selecting entries at regular block intervals,
+ * ensuring coverage of all unique pairs.
+ */
+const takeExchangeRateValidationEntries = (arr: any[]) => {
+  // Group by pair
+  const byPair = new Map<string, any[]>()
+  for (const entry of arr) {
+    const pair = entry.pair
+    if (!byPair.has(pair)) {
+      byPair.set(pair, [])
+    }
+    byPair.get(pair)!.push(entry)
+  }
+
+  const result: any[] = []
+
+  // For each pair, take entries at consistent block intervals
+  for (const [pair, entries] of byPair) {
+    // Sort by blockNumber to ensure consistent ordering
+    entries.sort((a, b) => a.blockNumber - b.blockNumber)
+
+    // Always include the first entry for this pair
+    result.push(entries[0])
+
+    // Take entries at block intervals divisible by 100000
+    const atIntervals = entries.filter((entry) => entry.blockNumber % 100000 === 0)
+    for (const entry of atIntervals) {
+      if (!result.includes(entry)) {
+        result.push(entry)
+      }
+    }
+
+    // If we only have the first entry, take a few more at regular intervals
+    const entriesForPair = result.filter((e) => e.pair === pair)
+    if (entriesForPair.length < 3 && entries.length > 3) {
+      const step = Math.floor(entries.length / 3)
+      for (let i = step; i < entries.length; i += step) {
+        if (!result.includes(entries[i])) {
+          result.push(entries[i])
+        }
+      }
+    }
+  }
+
+  // Sort final result by blockNumber for consistency
+  result.sort((a, b) => a.blockNumber - b.blockNumber)
+  return result
+}
+
 const oTokens = (prefix: string, address: string) => {
   return gql(`
     ${prefix}_oTokens: oTokens(
@@ -985,6 +1036,26 @@ const protocolDailyStatDetails = () => {
   `)
 }
 
+const exchangeRates = () => {
+  return gql(`
+    exchangeRates: exchangeRates(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { timestamp_gte: "2025-01-01T00:00:00Z", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+    ) {
+      id
+      chainId
+      timestamp
+      blockNumber
+      pair
+      base
+      quote
+      rate
+      decimals
+    }
+  `)
+}
+
 const kebabCase = (str: string) => {
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -1100,6 +1171,7 @@ const main = async () => {
     aeroPoolEpochStates(),
     protocolDailyStatDetails(),
     protocolDailyStats(),
+    exchangeRates(),
   ].map((query) => `query Query { ${query} }`)
 
   console.log('Total queries:', queries.length)
@@ -1121,6 +1193,9 @@ const main = async () => {
       // If there are fewer than 20 total entries, save them all
       if (rawData.length < 20 || takeAll.includes(key)) {
         validationData = rawData
+      } else if (key === 'exchangeRates') {
+        // Special handling for exchange rates: ensure at least one of every pair
+        validationData = takeExchangeRateValidationEntries(rawData)
       } else {
         // Otherwise, filter to validation entries
         validationData = takeValidationEntries(rawData)
