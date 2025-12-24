@@ -61,6 +61,7 @@ export const functions = {
     initialize: fun("0xb3ddda2a", "initialize(string,string,address,uint256,address,address)", {"_name": p.string, "_symbol": p.string, "_operator": p.address, "_fee": p.uint256, "_feeCollector": p.address, "_capManager": p.address}, ),
     lastAvailableAssets: viewFun("0x2eb6328b", "lastAvailableAssets()", {}, p.int128),
     lastRequestTimestamp: viewFun("0xf664a16e", "lastRequestTimestamp()", {}, p.uint32),
+    liquidityAmountInCooldown: viewFun("0x15780107", "liquidityAmountInCooldown()", {}, p.uint256),
     liquidityAsset: viewFun("0x209b2bca", "liquidityAsset()", {}, p.address),
     minSharesToRedeem: viewFun("0x50d0ea39", "minSharesToRedeem()", {}, p.uint256),
     name: viewFun("0x06fdde03", "name()", {}, p.string),
@@ -205,6 +206,10 @@ export class Contract extends ContractBase {
 
     lastRequestTimestamp() {
         return this.eth_call(functions.lastRequestTimestamp, {})
+    }
+
+    liquidityAmountInCooldown() {
+        return this.eth_call(functions.liquidityAmountInCooldown, {})
     }
 
     liquidityAsset() {
@@ -425,6 +430,9 @@ export type LastAvailableAssetsReturn = FunctionReturn<typeof functions.lastAvai
 
 export type LastRequestTimestampParams = FunctionArguments<typeof functions.lastRequestTimestamp>
 export type LastRequestTimestampReturn = FunctionReturn<typeof functions.lastRequestTimestamp>
+
+export type LiquidityAmountInCooldownParams = FunctionArguments<typeof functions.liquidityAmountInCooldown>
+export type LiquidityAmountInCooldownReturn = FunctionReturn<typeof functions.liquidityAmountInCooldown>
 
 export type LiquidityAssetParams = FunctionArguments<typeof functions.liquidityAsset>
 export type LiquidityAssetReturn = FunctionReturn<typeof functions.liquidityAsset>

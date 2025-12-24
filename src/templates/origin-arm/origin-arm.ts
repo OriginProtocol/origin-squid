@@ -208,7 +208,7 @@ export const createOriginARMProcessors = ({
               lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
               os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
               etherfi: etherfiArmContract.etherfiWithdrawalQueueAmount.bind(etherfiArmContract),
-              ethena: ethenaArmContract.withdrawsQueued.bind(ethenaArmContract),
+              ethena: ethenaArmContract.liquidityAmountInCooldown.bind(ethenaArmContract),
             }[armType](),
             armContract.feesAccrued(),
             armContract.totalAssets(),
