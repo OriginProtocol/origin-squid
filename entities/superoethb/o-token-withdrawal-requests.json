@@ -73,5 +73,20 @@
     "claimedAt": "2025-07-13T00:04:45.000000Z",
     "queueWait": null,
     "txHash": "0x0d84b4813f745c856199f1fdcafc357476181609a71aabd8582455a1453c05d2"
+  },
+  {
+    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:0xdd05308604e57fa4513ee63cd4ae557ba5a7f725:251",
+    "timestamp": "2025-12-18T15:00:23.000000Z",
+    "blockNumber": 39640338,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "requestId": "251",
+    "withdrawer": "0xdd05308604e57fa4513ee63cd4ae557ba5a7f725",
+    "amount": "384908764855905",
+    "queued": "30102020089973536259231",
+    "claimed": false,
+    "claimedAt": null,
+    "queueWait": null,
+    "txHash": "0xf02a83ab72548c2f8c15e2fbcaa184a1f32638b4050b25f4ebea55133a21f66c"
   }
 ]

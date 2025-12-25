@@ -115,5 +115,31 @@
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
     "assets0": "-4518314989512473296",
     "assets1": "4520787117379451914"
+  },
+  {
+    "id": "1::0x66eefcea6b0b33f8dbe96931381196483c038369a5b6f2b29357f34730b2150a:0:0:2:3:1",
+    "chainId": 1,
+    "txHash": "0x66eefcea6b0b33f8dbe96931381196483c038369a5b6f2b29357f34730b2150a",
+    "txFrom": "0xa7bf267a672e3cd2664e73a1a882de33cdfe49d9",
+    "txTo": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
+    "timestamp": "2025-12-18T19:08:59.000000Z",
+    "blockNumber": 24041480,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
+    "assets0": "3500000000000000000",
+    "assets1": "-3500070001400028000"
+  },
+  {
+    "id": "1::0x5fc9149e08fc115ef9cbfe8a6b52b925c9353f219574b99ee442cf33e2beffa0:3:2:2:1",
+    "chainId": 1,
+    "txHash": "0x5fc9149e08fc115ef9cbfe8a6b52b925c9353f219574b99ee442cf33e2beffa0",
+    "txFrom": "0x110af020033b281bb27bc27ec0a90b5c2b70a6ef",
+    "txTo": "0x15a80ef197cf0be3592987af7c12bd4f056eac25",
+    "timestamp": "2025-12-22T08:22:47.000000Z",
+    "blockNumber": 24066930,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
+    "assets0": "-2098248967647082916",
+    "assets1": "2098773661062348504"
   }
 ]
