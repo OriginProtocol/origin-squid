@@ -1,24 +1,29 @@
-import dayjs from 'dayjs';
-import { findLast } from 'lodash';
-import { LessThan } from 'typeorm';
-import { formatEther, formatUnits } from 'viem';
+import dayjs from 'dayjs'
+import { findLast } from 'lodash'
+import { LessThan } from 'typeorm'
+import { formatEther, formatUnits } from 'viem'
 
-
-
-import * as erc20Abi from '@abi/erc20';
-import * as originOsArmAbi from '@abi/origin-arm';
-import * as originEthenaArmAbi from '@abi/origin-ethena-arm';
-import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm';
-import * as originLidoArmAbi from '@abi/origin-lido-arm';
-import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager';
-import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model';
-import { Block, Context, EvmBatchProcessor, Processor, blockFrequencyTracker, calculateAPY, logFilter } from '@originprotocol/squid-utils';
-import { ensureExchangeRate } from '@shared/post-processors/exchange-rates';
-import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
-import { createERC20EventTracker } from '@templates/erc20/erc20-event';
-import { createEventProcessor } from '@templates/events/createEventProcessor';
-import { traceFilter } from '@utils/traceFilter';
-
+import * as erc20Abi from '@abi/erc20'
+import * as originOsArmAbi from '@abi/origin-arm'
+import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
+import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
+import * as originLidoArmAbi from '@abi/origin-lido-arm'
+import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
+import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
+import {
+  Block,
+  Context,
+  EvmBatchProcessor,
+  Processor,
+  blockFrequencyTracker,
+  calculateAPY,
+  logFilter,
+} from '@originprotocol/squid-utils'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { createERC20EventTracker } from '@templates/erc20/erc20-event'
+import { createEventProcessor } from '@templates/events/createEventProcessor'
+import { traceFilter } from '@utils/traceFilter'
 
 export const createOriginARMProcessors = ({
   name,
@@ -209,7 +214,7 @@ export const createOriginARMProcessors = ({
               os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
               etherfi: etherfiArmContract.etherfiWithdrawalQueueAmount.bind(etherfiArmContract),
               ethena: async () => {
-                if (block.header.height < 24037158) return 0n
+                if (block.header.height < 24043952) return 0n
                 return await ethenaArmContract.liquidityAmountInCooldown()
               },
             }[armType](),
