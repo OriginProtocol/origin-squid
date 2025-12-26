@@ -72,7 +72,7 @@ export const ousdStrategies: readonly IStrategyData[] = [
   },
   {
     chainId: 1,
-    from: 24034329,
+    from: 24048349,
     oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
     kind: 'Generic',
     name: 'OUSD Morpho V2',
