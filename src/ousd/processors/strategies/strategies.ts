@@ -70,6 +70,18 @@ export const ousdStrategies: readonly IStrategyData[] = [
     assets: [USDC],
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
+  {
+    chainId: 1,
+    from: 24048349,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Morpho V2',
+    contractName: 'Generalized4626Strategy',
+    address: mainnetAddresses.strategies.ousd.MorphoV2Strategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDC],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
   // Deprecated
   // {
   //   from: 13369299,
