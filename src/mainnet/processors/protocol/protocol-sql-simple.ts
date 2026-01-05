@@ -103,38 +103,47 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
   }
 
   // Step 3: Calculate bridged TVL for super tokens
+  // Using LATERAL join for efficiency - finds latest balance at or before end of each day
   await runner.query(`
-    UPDATE protocol_daily_stat_detail 
-    SET bridged_tvl = COALESCE((
-      SELECT sb.balance_eth 
-      FROM strategy_balance sb 
-      WHERE sb.strategy = '0x80c864704dd06c3693ed5179190786ee38acf835'
-      AND sb.timestamp <= (date::date + interval '1 day')::timestamp
-      AND sb.timestamp = (
-        SELECT MAX(sb2.timestamp) 
-        FROM strategy_balance sb2 
-        WHERE sb2.strategy = sb.strategy 
-        AND sb2.timestamp <= (date::date + interval '1 day')::timestamp
-      )
-    ), 0)
-    WHERE product = 'superOETHb' AND date >= '${fromDate}';
+    UPDATE protocol_daily_stat_detail p
+    SET bridged_tvl = COALESCE(latest.balance_eth, 0)
+    FROM (
+      SELECT p2.date, sb.balance_eth
+      FROM protocol_daily_stat_detail p2
+      LEFT JOIN LATERAL (
+        SELECT balance_eth
+        FROM strategy_balance
+        WHERE strategy = '0x80c864704dd06c3693ed5179190786ee38acf835'
+          AND timestamp <= (p2.date::date + interval '1 day')::timestamp
+        ORDER BY timestamp DESC
+        LIMIT 1
+      ) sb ON true
+      WHERE p2.product = 'superOETHb' AND p2.date >= '${fromDate}'
+    ) latest
+    WHERE p.product = 'superOETHb'
+      AND p.date = latest.date
+      AND p.date >= '${fromDate}';
   `)
 
   await runner.query(`
-    UPDATE protocol_daily_stat_detail 
-    SET bridged_tvl = COALESCE((
-      SELECT sb.balance_eth 
-      FROM strategy_balance sb 
-      WHERE sb.strategy = '0x1e3edd5e019207d6355ea77f724b1f1bf639b569'
-      AND sb.timestamp <= (date::date + interval '1 day')::timestamp
-      AND sb.timestamp = (
-        SELECT MAX(sb2.timestamp) 
-        FROM strategy_balance sb2 
-        WHERE sb2.strategy = sb.strategy 
-        AND sb2.timestamp <= (date::date + interval '1 day')::timestamp
-      )
-    ), 0)
-    WHERE product = 'superOETHp' AND date >= '${fromDate}';
+    UPDATE protocol_daily_stat_detail p
+    SET bridged_tvl = COALESCE(latest.balance_eth, 0)
+    FROM (
+      SELECT p2.date, sb.balance_eth
+      FROM protocol_daily_stat_detail p2
+      LEFT JOIN LATERAL (
+        SELECT balance_eth
+        FROM strategy_balance
+        WHERE strategy = '0x1e3edd5e019207d6355ea77f724b1f1bf639b569'
+          AND timestamp <= (p2.date::date + interval '1 day')::timestamp
+        ORDER BY timestamp DESC
+        LIMIT 1
+      ) sb ON true
+      WHERE p2.product = 'superOETHp' AND p2.date >= '${fromDate}'
+    ) latest
+    WHERE p.product = 'superOETHp'
+      AND p.date = latest.date
+      AND p.date >= '${fromDate}';
   `)
 
   // Step 4: Calculate OETH inherited stats (sum of super token bridged TVL)

@@ -1,4 +1,4 @@
-type StrategyBalance @entity {
+type StrategyBalance @entity @index(fields: ["strategy", "timestamp"]) {
   id: ID!
   chainId: Int! @index
   timestamp: DateTime! @index

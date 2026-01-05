@@ -1,5 +1,6 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, IntColumn as IntColumn_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
+@Index_(["strategy", "timestamp"], {unique: false})
 @Entity_()
 export class StrategyBalance {
     constructor(props?: Partial<StrategyBalance>) {
@@ -25,7 +26,6 @@ export class StrategyBalance {
     @StringColumn_({nullable: false})
     otoken!: string
 
-    @Index_()
     @StringColumn_({nullable: false})
     strategy!: string
 

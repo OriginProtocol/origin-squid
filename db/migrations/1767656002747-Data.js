@@ -1,5 +1,5 @@
-module.exports = class Data1758152245952 {
-    name = 'Data1758152245952'
+module.exports = class Data1767656002747 {
+    name = 'Data1767656002747'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -445,7 +445,7 @@ module.exports = class Data1758152245952 {
         await db.query(`CREATE INDEX "IDX_0113bf0b63183bea0d22cd0d08" ON "strategy_balance" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_a88065dcd92011698bbe7df7b1" ON "strategy_balance" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_cf0381c2326669950af23bbee7" ON "strategy_balance" ("otoken") `)
-        await db.query(`CREATE INDEX "IDX_28b5d09a9e1898c8a071c9ee40" ON "strategy_balance" ("strategy") `)
+        await db.query(`CREATE INDEX "IDX_020dea1749f2d45d6979b867f7" ON "strategy_balance" ("strategy", "timestamp") `)
         await db.query(`CREATE TABLE "strategy_yield" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "otoken" text NOT NULL, "strategy" text NOT NULL, "asset" text NOT NULL, "balance" numeric NOT NULL, "balance_weight" numeric NOT NULL, "earnings" numeric NOT NULL, "earnings_change" numeric NOT NULL, CONSTRAINT "PK_e87c46575e870fe2202190c2728" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_5108f2a2563d5665892d0c06b0" ON "strategy_yield" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_41c3567c9d43c598e07a0029c5" ON "strategy_yield" ("block_number") `)
@@ -929,7 +929,7 @@ module.exports = class Data1758152245952 {
         await db.query(`DROP INDEX "public"."IDX_0113bf0b63183bea0d22cd0d08"`)
         await db.query(`DROP INDEX "public"."IDX_a88065dcd92011698bbe7df7b1"`)
         await db.query(`DROP INDEX "public"."IDX_cf0381c2326669950af23bbee7"`)
-        await db.query(`DROP INDEX "public"."IDX_28b5d09a9e1898c8a071c9ee40"`)
+        await db.query(`DROP INDEX "public"."IDX_020dea1749f2d45d6979b867f7"`)
         await db.query(`DROP TABLE "strategy_yield"`)
         await db.query(`DROP INDEX "public"."IDX_5108f2a2563d5665892d0c06b0"`)
         await db.query(`DROP INDEX "public"."IDX_41c3567c9d43c598e07a0029c5"`)
