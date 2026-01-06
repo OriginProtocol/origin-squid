@@ -18,5 +18,15 @@
     "txHash": "0xdfd838c280e42118f05106615cb20f6100b883de0e28d408700ed5557322b149",
     "status": "OptIn",
     "delegatedTo": null
+  },
+  {
+    "id": "8453-0xb8f9cb75f106d4d900c278aa5e7fd2de8af11b7875cbd4c64b90dd69cc01db57--0x73cbc02516f5f4945ce2f2facf002b2c6aa359e7",
+    "timestamp": "2025-12-24T08:45:13.000000Z",
+    "blockNumber": 39888283,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "txHash": "0xb8f9cb75f106d4d900c278aa5e7fd2de8af11b7875cbd4c64b90dd69cc01db57",
+    "status": "OptIn",
+    "delegatedTo": null
   }
 ]

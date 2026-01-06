@@ -284,5 +284,16 @@
     "chainId": 1,
     "symbol": "USDT",
     "strategy": "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
+  },
+  {
+    "id": "1:0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26:0xdac17f958d2ee523a2206206994597c13d831ec7:24100000",
+    "blockNumber": 24100000,
+    "timestamp": "2025-12-26T23:10:47.000000Z",
+    "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "balance": "0",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "USDT",
+    "strategy": "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
   }
 ]

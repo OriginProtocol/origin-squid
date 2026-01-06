@@ -374,10 +374,10 @@
     "decimals": 18
   },
   {
-    "id": "98866:2617700:superOETHp_ETH",
+    "id": "98866:2648463:superOETHp_ETH",
     "chainId": 98866,
-    "timestamp": "2025-05-27T14:42:52.000000Z",
-    "blockNumber": 2617700,
+    "timestamp": "2025-05-27T23:59:59.000000Z",
+    "blockNumber": 2648463,
     "pair": "superOETHp_ETH",
     "base": "superOETHp",
     "quote": "ETH",
@@ -726,10 +726,10 @@
     "decimals": 18
   },
   {
-    "id": "98866:4139543:superOETHp_ETH",
+    "id": "98866:4179595:superOETHp_ETH",
     "chainId": 98866,
-    "timestamp": "2025-06-09T10:38:20.000000Z",
-    "blockNumber": 4139543,
+    "timestamp": "2025-06-09T13:51:08.000000Z",
+    "blockNumber": 4179595,
     "pair": "superOETHp_ETH",
     "base": "superOETHp",
     "quote": "ETH",
@@ -1386,14 +1386,14 @@
     "decimals": 18
   },
   {
-    "id": "98866:5867701:superOETHp_ETH",
+    "id": "98866:5868322:superOETHp_USD",
     "chainId": 98866,
-    "timestamp": "2025-06-17T06:56:56.000000Z",
-    "blockNumber": 5867701,
-    "pair": "superOETHp_ETH",
+    "timestamp": "2025-06-17T07:00:29.000000Z",
+    "blockNumber": 5868322,
+    "pair": "superOETHp_USD",
     "base": "superOETHp",
-    "quote": "ETH",
-    "rate": "1000000000000000000",
+    "quote": "USD",
+    "rate": "2588650000000000000000",
     "decimals": 18
   },
   {
@@ -1405,17 +1405,6 @@
     "base": "OS",
     "quote": "ETH",
     "rate": "162708981954840",
-    "decimals": 18
-  },
-  {
-    "id": "98866:5899558:superOETHp_USD",
-    "chainId": 98866,
-    "timestamp": "2025-06-17T10:05:50.000000Z",
-    "blockNumber": 5899558,
-    "pair": "superOETHp_USD",
-    "base": "superOETHp",
-    "quote": "USD",
-    "rate": "2562680000000000000000",
     "decimals": 18
   },
   {
