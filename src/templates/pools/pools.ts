@@ -563,10 +563,11 @@ export const createAeroProcessor = () => {
                 token1Contract.decimals(),
               ])
             } catch (err) {
-              throw new Error(
+              ctx.log.error(
                 `Failed to fetch ERC20 metadata for Aerodrome pool ${data.pool} at block ${block.header.height}. ` +
                   `token0=${data.token0}, token1=${data.token1}. Original error: ${err}`,
               )
+              continue
             }
             const type = data.stable ? 'sAMM' : 'vAMM'
             const pool = new Pool({
@@ -597,10 +598,11 @@ export const createAeroProcessor = () => {
                 token1Contract.decimals(),
               ])
             } catch (err) {
-              throw new Error(
+              ctx.log.error(
                 `Failed to fetch ERC20 metadata for Aerodrome CL pool ${data.pool} at block ${block.header.height}. ` +
                   `token0=${data.token0}, token1=${data.token1}. Original error: ${err}`,
               )
+              continue
             }
             const type = `CL${data.tickSpacing}`
             const pool = new Pool({
