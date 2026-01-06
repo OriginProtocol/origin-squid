@@ -554,12 +554,20 @@ export const createAeroProcessor = () => {
             const data = aerodromePoolFactoryAbi.events.PoolCreated.decode(log)
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
-            const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
-              token0Contract.decimals(),
-              token1Contract.decimals(),
-            ])
+            let symbol0: string, symbol1: string, decimals0: number, decimals1: number
+            try {
+              ;[symbol0, symbol1, decimals0, decimals1] = await Promise.all([
+                token0Contract.symbol(),
+                token1Contract.symbol(),
+                token0Contract.decimals(),
+                token1Contract.decimals(),
+              ])
+            } catch (err) {
+              throw new Error(
+                `Failed to fetch ERC20 metadata for Aerodrome pool ${data.pool} at block ${block.header.height}. ` +
+                  `token0=${data.token0}, token1=${data.token1}. Original error: ${err}`,
+              )
+            }
             const type = data.stable ? 'sAMM' : 'vAMM'
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
@@ -580,12 +588,20 @@ export const createAeroProcessor = () => {
             const data = aerodromeCLPoolFactoryAbi.events.PoolCreated.decode(log)
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
-            const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
-              token0Contract.decimals(),
-              token1Contract.decimals(),
-            ])
+            let symbol0: string, symbol1: string, decimals0: number, decimals1: number
+            try {
+              ;[symbol0, symbol1, decimals0, decimals1] = await Promise.all([
+                token0Contract.symbol(),
+                token1Contract.symbol(),
+                token0Contract.decimals(),
+                token1Contract.decimals(),
+              ])
+            } catch (err) {
+              throw new Error(
+                `Failed to fetch ERC20 metadata for Aerodrome CL pool ${data.pool} at block ${block.header.height}. ` +
+                  `token0=${data.token0}, token1=${data.token1}. Original error: ${err}`,
+              )
+            }
             const type = `CL${data.tickSpacing}`
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
