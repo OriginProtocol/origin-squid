@@ -63,5 +63,18 @@
     "queued": "17104657694477252675643",
     "requestId": "200",
     "txHash": "0x9767cdca6799051bb95ba9f22e0d29bd908c108738ebe95a2e9762e481be67e0"
+  },
+  {
+    "id": "1:0x85b78aca6deae198fbf201c82daf6ca21942acc6:250",
+    "blockNumber": 24224625,
+    "timestamp": "2026-01-13T08:32:35.000000Z",
+    "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "account": "0xefcc0e753725a0fa7c6746a6bf6db319fa086ed8",
+    "amount": "18681000168222645739",
+    "chainId": 1,
+    "claimed": true,
+    "queued": "21253172366107929783451",
+    "requestId": "250",
+    "txHash": "0xdbbbff77114a006689db0d05bcfb6ecb7a7b13353952a68074a2eb75516b7c64"
   }
 ]

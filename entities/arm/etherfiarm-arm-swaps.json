@@ -180,5 +180,31 @@
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
     "assets0": "-7523043901609090114",
     "assets1": "7525116378502041123"
+  },
+  {
+    "id": "1::0xd7917de37ba5212a7e50652860335777ffa84e1e9d11d0d745844211126ce365:2:4:0",
+    "chainId": 1,
+    "txHash": "0xd7917de37ba5212a7e50652860335777ffa84e1e9d11d0d745844211126ce365",
+    "txFrom": "0x6e62b7e3b8aa1ff10a127f1106e88d95ac5f7a90",
+    "txTo": "0x6131b5fae19ea4f9d964eac0408e4408b66337b5",
+    "timestamp": "2026-01-07T23:56:23.000000Z",
+    "blockNumber": 24186223,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
+    "assets0": "-11314090637929600634",
+    "assets1": "11318584711542658415"
+  },
+  {
+    "id": "1::0x413a9195f3d751441dd6683b479cd0845b25b3d89bd928ca51e50dcb83948ba3:2:5:0",
+    "chainId": 1,
+    "txHash": "0x413a9195f3d751441dd6683b479cd0845b25b3d89bd928ca51e50dcb83948ba3",
+    "txFrom": "0xedfdd3a8fb159b8429f0eab6b0d23ce233c50552",
+    "txTo": "0x6131b5fae19ea4f9d964eac0408e4408b66337b5",
+    "timestamp": "2026-01-16T08:32:23.000000Z",
+    "blockNumber": 24246112,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
+    "assets0": "-11628308006970401891",
+    "assets1": "11631215810923132675"
   }
 ]

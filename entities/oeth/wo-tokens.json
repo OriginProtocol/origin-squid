@@ -708,5 +708,15 @@
     "totalAssets": "19108331872340487737639",
     "totalSupply": "16651165309941883228925",
     "assetsPerShare": "1147567243292666622"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-24200000",
+    "timestamp": "2026-01-09T22:05:47.000000Z",
+    "blockNumber": 24200000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "totalAssets": "17571507298301979756894",
+    "totalSupply": "15297106115365945223696",
+    "assetsPerShare": "1148681794176180697"
   }
 ]
