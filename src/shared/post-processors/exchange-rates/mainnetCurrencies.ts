@@ -1,4 +1,8 @@
 import { invertMap } from '@originprotocol/squid-utils'
+import { baseAddresses } from '@utils/addresses-base'
+import { plumeAddresses } from '@utils/addresses-plume'
+import { sonicAddresses } from '@utils/addresses-sonic'
+
 import {
   BaseCurrencyAddress,
   BaseCurrencySymbol,
@@ -51,3 +55,22 @@ export type CurrencySymbol = MainnetCurrencySymbol | BaseCurrencySymbol | SonicC
 export type CurrencyAddress = MainnetCurrencyAddress | BaseCurrencyAddress | SonicCurrencyAddress | PlumeCurrencyAddress
 
 export type Currency = CurrencySymbol | CurrencyAddress
+
+const tokensByChain: Record<number, Record<string, string>> = {
+  1: mainnetCurrencies,
+  8453: baseAddresses.tokens,
+  146: sonicAddresses.tokens,
+  98865: plumeAddresses.tokens,
+}
+
+/**
+ * Convert a Currency (symbol or address) to its address.
+ */
+export const currencyToAddress = (chainId: number, currency: Currency): string => {
+  if (currency.startsWith('0x')) return currency.toLowerCase()
+  const tokens = tokensByChain[chainId]
+  if (!tokens) throw new Error(`Unknown chainId: ${chainId}`)
+  const address = tokens[currency]
+  if (!address) throw new Error(`Unknown currency symbol: ${currency} for chainId: ${chainId}`)
+  return address.toLowerCase()
+}
