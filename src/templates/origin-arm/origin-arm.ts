@@ -1,29 +1,25 @@
-import dayjs from 'dayjs'
-import { findLast } from 'lodash'
-import { LessThan } from 'typeorm'
-import { formatEther, formatUnits } from 'viem'
+import dayjs from 'dayjs';
+import { findLast } from 'lodash';
+import { LessThan } from 'typeorm';
+import { formatEther, formatUnits } from 'viem';
 
-import * as erc20Abi from '@abi/erc20'
-import * as originOsArmAbi from '@abi/origin-arm'
-import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
-import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
-import * as originLidoArmAbi from '@abi/origin-lido-arm'
-import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
-import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
-import {
-  Block,
-  Context,
-  EvmBatchProcessor,
-  Processor,
-  blockFrequencyTracker,
-  calculateAPY,
-  logFilter,
-} from '@originprotocol/squid-utils'
-import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { createERC20EventTracker } from '@templates/erc20/erc20-event'
+
+
+import * as erc20Abi from '@abi/erc20';
+import * as originOsArmAbi from '@abi/origin-arm';
+import * as originEthenaArmAbi from '@abi/origin-ethena-arm';
+import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm';
+import * as originLidoArmAbi from '@abi/origin-lido-arm';
+import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager';
+import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model';
+import { Block, Context, EvmBatchProcessor, Processor, blockFrequencyTracker, calculateAPY, logFilter } from '@originprotocol/squid-utils';
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates';
+import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
+import { createERC20Entry } from '@templates/erc20/erc20-entry';
+import { createERC20EventTracker } from '@templates/erc20/erc20-event';
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { traceFilter } from '@utils/traceFilter'
+
 
 export const createOriginARMProcessors = ({
   name,
@@ -470,6 +466,14 @@ export const createOriginARMProcessors = ({
     createERC20EventTracker({
       from,
       address: armAddress,
+    }),
+    createERC20Entry({
+      from,
+      address: token0,
+    }),
+    createERC20Entry({
+      from,
+      address: token1,
     }),
   ]
 }
