@@ -14,12 +14,16 @@ import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager';
 import { Arm, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model';
 import { Block, Context, EvmBatchProcessor, Processor, blockFrequencyTracker, calculateAPY, logFilter } from '@originprotocol/squid-utils';
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates';
-import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
+import { Currency, mainnetCurrencies, MainnetCurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
 import { createERC20Entry } from '@templates/erc20/erc20-entry';
 import { createERC20EventTracker } from '@templates/erc20/erc20-event';
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { traceFilter } from '@utils/traceFilter'
 
+const currencyToAddress = (currency: Currency): string => {
+  if (currency.startsWith('0x')) return currency.toLowerCase()
+  return mainnetCurrencies[currency as MainnetCurrencySymbol].toLowerCase()
+}
 
 export const createOriginARMProcessors = ({
   name,
@@ -469,11 +473,11 @@ export const createOriginARMProcessors = ({
     }),
     createERC20Entry({
       from,
-      address: token0,
+      address: currencyToAddress(token0),
     }),
     createERC20Entry({
       from,
-      address: token1,
+      address: currencyToAddress(token1),
     }),
   ]
 }
