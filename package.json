@@ -28,7 +28,6 @@
     "process": "sqd process",
     "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
     "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts",
-    "setup:readonly-user": "ts-node --require tsconfig-paths/register scripts/setup-readonly-user.ts",
     "postdeploy": "sh -c 'pnpm run log:processing-times $1 && pnpm run generate:validations $1' --",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
