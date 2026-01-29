@@ -44,3 +44,8 @@ jobs:
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
         run: node scripts/update-grafana-ds.js
+
+      - name: setup readonly user
+        env:
+          READONLY_USER_PASSWORD: ${{ secrets.READONLY_USER_PASSWORD }}
+        run: pnpm run setup:readonly-user
