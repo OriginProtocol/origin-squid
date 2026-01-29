@@ -24,7 +24,6 @@ import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchang
 import { Trace } from '@subsquid/evm-processor'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-import { plumeAddresses } from '@utils/addresses-plume'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
@@ -48,7 +47,6 @@ export type OTokenContractAddress =
   | typeof OETH_ADDRESS
   | typeof baseAddresses.superOETHb.address
   | typeof sonicAddresses.tokens.OS
-  | typeof plumeAddresses.tokens.superOETHp
 
 // Performance tracking
 interface PerformanceStats {

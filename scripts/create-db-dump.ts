@@ -18,7 +18,6 @@ type ProcessorName =
   | 'oethb-processor'
   | 'sonic-processor'
   | 'os-processor'
-  | 'plume-processor'
 
 function parseArgs() {
   const args = process.argv.slice(2)
@@ -61,8 +60,6 @@ function getRpcEndpointEnvName(processorName: ProcessorName): string {
     case 'sonic-processor':
     case 'os-processor':
       return process.env['RPC_SONIC_ENV']!
-    case 'plume-processor':
-      return process.env['RPC_PLUME_ENV']!
     // mainnet family
     case 'mainnet-processor':
     case 'oeth-processor':

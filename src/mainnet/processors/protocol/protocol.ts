@@ -19,7 +19,6 @@ import {
 } from '@originprotocol/squid-utils'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { baseAddresses } from '@utils/addresses-base'
-import { plumeAddresses } from '@utils/addresses-plume'
 import { ProductName, armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
@@ -52,7 +51,7 @@ export const protocolProcessor = defineProcessor({
     const superTokenUpdatedDates = uniq([
       ...otherOTokenDetailsArrays
         .flat()
-        .filter((d) => d.product === 'superOETHb' || d.product === 'superOETHp')
+        .filter((d) => d.product === 'superOETHb')
         .map((d) => d.date),
     ])
 
@@ -173,13 +172,11 @@ const getOTokenDetails = async (
   const last = await getLatestProtocolDailyStatDetail(ctx, product)
 
   const lastDates = [last?.date ?? startDate]
-  if (product === 'OETH' || product === 'superOETHb' || product === 'superOETHp') {
+  if (product === 'OETH' || product === 'superOETHb') {
     const lastOETH = await getLatestProtocolDailyStatDetail(ctx, 'OETH')
     const lastSuperOETHb = await getLatestProtocolDailyStatDetail(ctx, 'superOETHb')
-    const lastSuperOETHp = await getLatestProtocolDailyStatDetail(ctx, 'superOETHp')
     lastDates.push(lastOETH?.date ?? startDate)
     lastDates.push(lastSuperOETHb?.date ?? startDate)
-    lastDates.push(lastSuperOETHp?.date ?? startDate)
   }
 
   // For OETH variants, use the minimum date to ensure all interdependent records are recalculated
@@ -288,21 +285,6 @@ const calculateOTokenBasicStats = async (
     if (oethTvl !== 0n) {
       detail.revenue += (oethRevenue * woethBalance) / oethTvl
     }
-  } else if (detail.product === 'superOETHp') {
-    // Prefer in-memory OETH data computed earlier in this run to avoid races
-    const detailOETH = opts?.oethCacheByDate?.[date] ?? (await getProtocolDailyStatDetail(ctx, date, 'OETH'))
-    const superOETHpWrappedOETH = await getLatestStrategyBalance(
-      ctx,
-      plumeAddresses.superOETHp.strategies.bridgedWOETH,
-      date,
-    )
-    const woethBalance = superOETHpWrappedOETH?.balanceETH ?? 0n
-    detail.bridgedTvl = woethBalance
-    const oethTvl = detailOETH?.tvl ?? 0n
-    const oethRevenue = detailOETH?.revenue ?? 0n
-    if (oethTvl !== 0n) {
-      detail.revenue += (oethRevenue * woethBalance) / oethTvl
-    }
   }
 }
 
@@ -312,16 +294,11 @@ const calculateOETHInheritedStats = async (ctx: Context, detail: ProtocolDailySt
     baseAddresses.superOETHb.strategies.bridgedWOETH,
     date,
   )
-  const superOETHpWrappedOETH = await getLatestStrategyBalance(
-    ctx,
-    plumeAddresses.superOETHp.strategies.bridgedWOETH,
-    date,
-  )
 
-  detail.inheritedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
+  detail.inheritedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
   detail.inheritedYield = detail.earningTvl !== 0n ? (detail.yield * detail.inheritedTvl) / detail.earningTvl : 0n
   detail.inheritedRevenue = detail.earningTvl !== 0n ? (detail.revenue * detail.inheritedTvl) / detail.earningTvl : 0n
-  detail.bridgedTvl = (superOETHbWrappedOETH?.balanceETH ?? 0n) + (superOETHpWrappedOETH?.balanceETH ?? 0n)
+  detail.bridgedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
 }
 
 const calculateForDates = async (
