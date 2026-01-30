@@ -9,7 +9,6 @@ import oeth from './main-oeth'
 import oethb from './main-oethb'
 import ogv from './main-ogv'
 import ousd from './main-ousd'
-import plume from './main-plume'
 import sonic from './main-sonic'
 
 Promise.all([
@@ -22,7 +21,6 @@ Promise.all([
   initProcessorFromDump(ogv),
   initProcessorFromDump(ousd),
   initProcessorFromDump(sonic),
-  initProcessorFromDump(plume),
 ]).catch((err) => {
   throw err
 })

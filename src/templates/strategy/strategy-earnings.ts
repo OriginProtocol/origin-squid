@@ -26,7 +26,6 @@ import {
   mainnetTokens,
 } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
-import { plumeAddresses } from '@utils/addresses-plume'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { convertDecimals, lastExcept } from '@utils/utils'
 
@@ -99,12 +98,6 @@ const oTokenValues = {
     rewardConversionTokenDecimals: 18,
     harvester: [sonicAddresses.OS.harvester],
     harvesterTargets: [sonicAddresses.OS.dripper, sonicAddresses.multisig['multichain-guardian']],
-  },
-  [plumeAddresses.superOETHp.address]: {
-    rewardConversionToken: [sonicAddresses.tokens.WETH],
-    rewardConversionTokenDecimals: 18,
-    harvester: compact<string>([plumeAddresses.superOETHp.harvester]),
-    harvesterTargets: [plumeAddresses.superOETHp.dripper, sonicAddresses.multisig['multichain-guardian']],
   },
 } as const
 
