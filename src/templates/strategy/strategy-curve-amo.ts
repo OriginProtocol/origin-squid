@@ -58,6 +58,10 @@ const getCurveAMOStrategyHoldings = async (
 }
 
 export const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {
+  // Use gauge-based balance calculation if gaugeAddress is provided
+  if (strategyData.curvePoolInfo?.gaugeAddress) {
+    return getCurveGaugeBalances(ctx, block, strategyData)
+  }
   return await Promise.all(
     strategyData.assets
       .filter((asset) => asset.checkBalance !== false)
@@ -69,6 +73,37 @@ export const getStrategyBalances = async (ctx: Context, block: { height: number 
   )
 }
 
+export const getCurveGaugeBalances = async (
+  ctx: Context,
+  block: { height: number },
+  strategyData: IStrategyData,
+) => {
+  const { address, curvePoolInfo } = strategyData
+  const { poolAddress, gaugeAddress } = curvePoolInfo!
+
+  const pool = new curvePool.Contract(ctx, block, poolAddress)
+  const gauge = new erc20.Contract(ctx, block, gaugeAddress!)
+
+  // Get pool state in parallel - use balances(i) instead of get_balances() for compatibility
+  const [poolBalance0, poolBalance1, totalSupply, strategyLpBalance, coin0, coin1] = await Promise.all([
+    pool.balances(0n),
+    pool.balances(1n),
+    pool.totalSupply(),
+    gauge.balanceOf(address),
+    pool.coins(0n),
+    pool.coins(1n),
+  ])
+
+  // Calculate strategy's share of each coin
+  const eth1 = 1000000000000000000n
+  const share = totalSupply > 0n ? (strategyLpBalance * eth1) / totalSupply : 0n
+
+  return [
+    { address, asset: coin0.toLowerCase(), balance: (poolBalance0 * share) / eth1 },
+    { address, asset: coin1.toLowerCase(), balance: (poolBalance1 * share) / eth1 },
+  ]
+}
+
 export const getConvexEthMetaStrategyBalances = async (
   ctx: Context,
   block: { height: number },
@@ -78,7 +113,7 @@ export const getConvexEthMetaStrategyBalances = async (
   const { poolAddress, rewardsPoolAddress } = curvePoolInfo!
 
   const pool = new curvePool.Contract(ctx, block, poolAddress)
-  const rewardsPool = new erc20.Contract(ctx, block, rewardsPoolAddress)
+  const rewardsPool = new erc20.Contract(ctx, block, rewardsPoolAddress!)
   const strategy = new abstractStrategyAbi.Contract(ctx, block, address)
 
   const lpPrice = await pool.get_virtual_price()

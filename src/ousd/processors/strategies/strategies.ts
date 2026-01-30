@@ -6,7 +6,7 @@ import * as mainnetAddresses from '@utils/addresses'
 import { USDS_ADDRESS } from '@utils/addresses'
 
 import { aaveStrategy } from './aave-strategy'
-import { USDC, USDT } from './const'
+import { OUSD, USDC, USDT } from './const'
 import { convexMetaStrategy } from './convex-meta-strategy'
 import { fluxStrategy } from './flux-strategy'
 import { makerDsrStrategy } from './maker-dsr-strategy'
@@ -62,12 +62,16 @@ export const ousdStrategies: readonly IStrategyData[] = [
     chainId: 1,
     from: 22224255,
     oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
-    kind: 'Generic',
+    kind: 'CurveAMO',
     name: 'OUSD Curve AMO',
     contractName: 'CurveAMOStrategy',
     address: mainnetAddresses.strategies.ousd.CurveUSDCAMOStrategy,
     base: { address: mainnetCurrencies.USD, decimals: 18 },
-    assets: [USDC],
+    assets: [OUSD, USDC],
+    curvePoolInfo: {
+      poolAddress: '0x6d18e1a7faeb1f0467a77c0d293872ab685426dc',
+      gaugeAddress: '0x1ef8b6ea6434e722c916314caf8bf16c81caf2f9',
+    },
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
   {

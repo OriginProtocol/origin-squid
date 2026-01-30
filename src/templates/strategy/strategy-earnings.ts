@@ -44,7 +44,7 @@ const depositWithdrawalFilter = (strategyData: IStrategyData) =>
 
 const curvePoolFilter = (strategyData: IStrategyData) =>
   logFilter({
-    address: [strategyData.curvePoolInfo!.rewardsPoolAddress],
+    address: [strategyData.curvePoolInfo!.rewardsPoolAddress!],
     topic0: [baseRewardPool.events.Staked.topic, baseRewardPool.events.Withdrawn.topic],
     topic1: [strategyData.address],
     range: { from: strategyData.from },
@@ -124,7 +124,7 @@ export const setupStrategyEarnings = (processor: EvmBatchProcessor, strategyData
 
     // Detect Staked/Withdrawn events
     // The curve incident caused us to fully withdraw from our pool and these logs contain that.
-    if (strategyData.kind === 'CurveAMO') {
+    if (strategyData.kind === 'CurveAMO' && strategyData.curvePoolInfo?.rewardsPoolAddress) {
       balanceUpdateFilters.push(curvePoolFilter(strategyData))
     }
   }

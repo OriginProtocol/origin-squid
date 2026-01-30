@@ -20,7 +20,7 @@ export type IBalancerPoolInfo = {
 export type ICurveAMOInfo = {
   poolAddress: string
   gaugeAddress?: string
-  rewardsPoolAddress: string
+  rewardsPoolAddress?: string
 }
 
 export type IStrategyData = {

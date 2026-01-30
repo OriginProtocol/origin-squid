@@ -1,4 +1,4 @@
-import { USDS_ADDRESS } from '@utils/addresses'
+import { OUSD_ADDRESS, USDS_ADDRESS } from '@utils/addresses'
 
 export const DAI = {
   address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -14,5 +14,9 @@ export const USDC = {
 }
 export const USDS = {
   address: USDS_ADDRESS,
+  decimals: 18,
+}
+export const OUSD = {
+  address: OUSD_ADDRESS,
   decimals: 18,
 }
