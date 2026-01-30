@@ -1,6 +1,5 @@
 import { addresses } from './addresses'
 import { baseAddresses } from './addresses-base'
-import { plumeAddresses } from './addresses-plume'
 import { sonicAddresses } from './addresses-sonic'
 
 export const otokenProducts = [
@@ -8,7 +7,6 @@ export const otokenProducts = [
   { product: 'OETH', processorId: 'oeth', otokenAddress: addresses.oeth.address },
   { product: 'superOETHb', processorId: 'oethb', otokenAddress: baseAddresses.superOETHb.address },
   { product: 'OS', processorId: 'sonic', otokenAddress: sonicAddresses.OS.address },
-  { product: 'superOETHp', processorId: 'plume', otokenAddress: plumeAddresses.superOETHp.address },
 ] as const
 
 export const armProducts = [

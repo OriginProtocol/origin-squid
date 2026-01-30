@@ -1,5 +1,5 @@
 import { compact } from 'lodash'
-import { base, mainnet, plumeMainnet, sonic } from 'viem/chains'
+import { base, mainnet, sonic } from 'viem/chains'
 
 import * as aerodromeCLPoolFactoryAbi from '@abi/aerodrome-cl-pool-factory'
 import * as aerodromePoolFactoryAbi from '@abi/aerodrome-pool-factory'
@@ -104,7 +104,6 @@ const chainParams: Record<
       from: 1440914,
     },
   },
-  [plumeMainnet.id]: {},
 }
 
 export const createPoolsProcessor = (chainId: number) => {
@@ -177,12 +176,6 @@ export const createPoolsProcessor = (chainId: number) => {
       chainId === base.id && createAeroProcessor(),
       chainId === sonic.id && createMetropolisProcessor(),
       chainId === sonic.id && createShadowProcessor(),
-      chainId === plumeMainnet.id &&
-        createMaverickV2Processor({
-          address: '0x056a588afdc0cdaa4cab50d8a4d2940c5d04172e',
-          from: 12119,
-          exchange: 'rooster',
-        }),
     ]),
   )
 }

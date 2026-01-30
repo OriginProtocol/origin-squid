@@ -1,9 +1,8 @@
-import { arbitrum, base, mainnet, plumeMainnet, sonic } from 'viem/chains'
+import { arbitrum, base, mainnet, sonic } from 'viem/chains'
 
 import { mainnetTokens } from './addresses'
 import { arbitrumTokens } from './addresses-arbitrum'
 import { baseTokens } from './addresses-base'
-import { plumeTokens } from './addresses-plume'
 import { sonicTokens } from './addresses-sonic'
 
 export const symbols = [
@@ -11,7 +10,6 @@ export const symbols = [
   ...Object.entries(baseTokens).map(([symbol, address]) => ({ chainId: base.id, address, symbol })),
   ...Object.entries(arbitrumTokens).map(([symbol, address]) => ({ chainId: arbitrum.id, address, symbol })),
   ...Object.entries(sonicTokens).map(([symbol, address]) => ({ chainId: sonic.id, address, symbol })),
-  ...Object.entries(plumeTokens).map(([symbol, address]) => ({ chainId: plumeMainnet.id, address, symbol })),
 ]
 
 export type TokenSymbol = (typeof symbols)[number]['symbol']
