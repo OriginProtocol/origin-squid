@@ -1,29 +1,27 @@
-import { memoize } from 'lodash'
+import { memoize } from 'lodash';
 
-import * as balancerMetaStablePoolAbi from '@abi/balancer-meta-stable-pool'
-import * as balancerRateProvider from '@abi/balancer-rate-provider'
-import * as chainlinkFeedRegistry from '@abi/chainlink-feed-registry'
-import * as curveLpToken from '@abi/curve-lp-token'
-import * as diaOracleAbi from '@abi/dia-oracle'
-import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle'
-import * as oethOracleRouter from '@abi/oeth-oracle-router'
-import * as stakedFraxEth from '@abi/sfrx-eth'
-import * as uniswapV3 from '@abi/uniswap-v3'
-import * as woethAbi from '@abi/woeth'
-import { Block, Context } from '@originprotocol/squid-utils'
-import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
-import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses'
 
-import { ousdDailyPrices } from './data/coingecko-ousd.json'
-import {
-  CurrencySymbol,
-  MainnetCurrency,
-  MainnetCurrencyAddress,
-  MainnetCurrencySymbol,
-  mainnetCurrencies,
-  mainnetCurrenciesByAddress,
-} from './mainnetCurrencies'
+
+import * as balancerMetaStablePoolAbi from '@abi/balancer-meta-stable-pool';
+import * as balancerRateProvider from '@abi/balancer-rate-provider';
+import * as chainlinkFeedRegistry from '@abi/chainlink-feed-registry';
+import * as curveLpToken from '@abi/curve-lp-token';
+import * as diaOracleAbi from '@abi/dia-oracle';
+import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy';
+import * as frxEthFraxOracle from '@abi/frx-eth-frax-oracle';
+import * as oethOracleRouter from '@abi/oeth-oracle-router';
+import * as stakedFraxEth from '@abi/sfrx-eth';
+import * as uniswapV3 from '@abi/uniswap-v3';
+import * as woethAbi from '@abi/woeth';
+import { Block, Context } from '@originprotocol/squid-utils';
+import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices';
+import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS } from '@utils/addresses';
+
+
+
+import { ousdDailyPrices } from './data/coingecko-ousd.json';
+import { CurrencySymbol, MainnetCurrency, MainnetCurrencyAddress, MainnetCurrencySymbol, mainnetCurrencies, mainnetCurrenciesByAddress } from './mainnetCurrencies';
+
 
 const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
   return async (ctx: Context, height: number) => {
@@ -338,6 +336,15 @@ export const priceMap: Partial<
     [
       { base: 'MORPHO', quote: 'ETH' },
       { base: 'ETH', quote: 'USDT' },
+    ],
+    18,
+  ),
+  ...derived(
+    'CRV',
+    'OUSD',
+    [
+      { base: 'CRV', quote: 'ETH' },
+      { base: 'ETH', quote: 'OUSD' },
     ],
     18,
   ),

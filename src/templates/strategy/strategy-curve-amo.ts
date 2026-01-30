@@ -1,15 +1,18 @@
-import * as curvePool from '@abi/curve-lp-token'
-import * as erc20 from '@abi/erc20'
-import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
-import { StrategyBalance } from '@model'
-import { Block, Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
-import { convertRate } from '@shared/post-processors/exchange-rates'
-import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
-import { addressToSymbol } from '@utils/symbols'
+import * as curvePool from '@abi/curve-lp-token';
+import * as erc20 from '@abi/erc20';
+import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy';
+import { StrategyBalance } from '@model';
+import { Block, Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils';
+import { convertRate } from '@shared/post-processors/exchange-rates';
+import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
+import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses';
+import { addressToSymbol } from '@utils/symbols';
 
-import { IStrategyData } from './index'
-import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
+
+
+import { IStrategyData } from './index';
+import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings';
+
 
 export const setup = (processor: EvmBatchProcessor, strategyData: IStrategyData) => {
   processor.includeAllBlocks({ from: strategyData.from })
@@ -58,8 +61,8 @@ const getCurveAMOStrategyHoldings = async (
 }
 
 export const getStrategyBalances = async (ctx: Context, block: { height: number }, strategyData: IStrategyData) => {
-  // Use gauge-based balance calculation if gaugeAddress is provided
-  if (strategyData.curvePoolInfo?.gaugeAddress) {
+  // Use gauge-based balance calculation if gaugeAddress is provided & no rewardsPoolAddress is provided
+  if (strategyData.curvePoolInfo?.gaugeAddress && !strategyData.curvePoolInfo.rewardsPoolAddress) {
     return getCurveGaugeBalances(ctx, block, strategyData)
   }
   return await Promise.all(
