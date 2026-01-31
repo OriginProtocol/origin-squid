@@ -702,5 +702,16 @@
     "chainId": 1,
     "symbol": "DAI",
     "strategy": "0x6b69b755c629590ed59618a2712d8a2957ca98fc"
+  },
+  {
+    "id": "1:0x6b69b755c629590ed59618a2712d8a2957ca98fc:0x6b175474e89094c44da98b954eedeac495271d0f:24300000",
+    "blockNumber": 24300000,
+    "timestamp": "2026-01-23T20:53:35.000000Z",
+    "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+    "balance": "0",
+    "balanceETH": "0",
+    "chainId": 1,
+    "symbol": "DAI",
+    "strategy": "0x6b69b755c629590ed59618a2712d8a2957ca98fc"
   }
 ]

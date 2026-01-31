@@ -304,19 +304,19 @@
     "state": "Closed"
   },
   {
-    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x0397e72c4893a2c17de1debb1c322b344114d0d3:0",
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x90b95c7c59dd329c84f5715da1934027c77e3637:0",
     "chainId": 1,
     "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
-    "account": "0x0397e72c4893a2c17de1debb1c322b344114d0d3",
+    "account": "0x90b95c7c59dd329c84f5715da1934027c77e3637",
     "lockupId": "0",
-    "timestamp": "2025-08-24T04:16:23.000000Z",
-    "txHash": "0x6ae06d768583d3e1bc8e1893a13e25bdbab19f0251e201092d98484be1fdf304",
-    "lastUpdated": "2025-09-23T17:56:47.000000Z",
-    "amount": "12050912000000000000000",
-    "end": "2025-09-23T14:16:23.000000Z",
-    "points": "18782785950975878536034",
-    "withdrawAmount": "12050912000000000000000",
+    "timestamp": "2025-08-25T06:45:59.000000Z",
+    "txHash": "0x31dc35a26b7adee94f06686ac099a0df853d1dc10318f2eeaa325816b2a0952d",
+    "lastUpdated": "2025-08-25T06:45:59.000000Z",
+    "amount": "1108040940000000000000",
+    "end": "2025-11-24T12:45:59.000000Z",
+    "points": "1828489693160426225904",
+    "withdrawAmount": "0",
     "penalty": "0",
-    "state": "Closed"
+    "state": "Open"
   }
 ]
