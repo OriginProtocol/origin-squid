@@ -551,7 +551,8 @@ export class OTokenEntityProducer {
         if (from) {
           const balance = this.otoken.balanceOf(account)
           const forwardedBalance = this.otoken.balanceOf(from)
-          const forwardedBalancePercentage = (forwardedBalance * 10n ** 18n) / (balance + forwardedBalance)
+          const totalPortion = balance + forwardedBalance
+          const forwardedBalancePercentage = totalPortion === 0n ? 0n : (forwardedBalance * 10n ** 18n) / totalPortion
           const to = account
           // Thought is put into more than once change supply happening in the same block.
           // Also thought is put into there possibly being yield forwarded, then forwarding changing, and then yield forwarded again to somewhere else.
