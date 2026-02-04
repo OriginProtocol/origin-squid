@@ -12,6 +12,7 @@ export const otokenProducts = [
 export const armProducts = [
   { product: 'ARM-WETH-stETH', processorId: 'mainnet', armAddress: addresses.arms['ARM-WETH-stETH'].address },
   { product: 'ARM-WETH-eETH', processorId: 'mainnet', armAddress: addresses.arms['ARM-WETH-eETH'].address },
+  { product: 'ARM-USDe-sUSDe', processorId: 'mainnet', armAddress: addresses.arms['ARM-USDe-sUSDe'].address },
   { product: 'ARM-WS-OS', processorId: 'sonic', armAddress: sonicAddresses.armOS.address },
 ] as const
 
