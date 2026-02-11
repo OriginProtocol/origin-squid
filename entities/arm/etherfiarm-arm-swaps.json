@@ -245,5 +245,18 @@
     "from": "0x63242a4ea82847b20e506b63b0e2e2eff0cc6cb0",
     "assets0": "-7110044491516435733",
     "assets1": "7112889647375385888"
+  },
+  {
+    "id": "1::0xa1d6de4ba51451b3793e1d2d81d796e22cef98525fd0a94135f945426f439951:0:1:3:0:1:1:1",
+    "chainId": 1,
+    "txHash": "0xa1d6de4ba51451b3793e1d2d81d796e22cef98525fd0a94135f945426f439951",
+    "txFrom": "0xaaaaa11120784c31adb462bbc15e750b9d46b325",
+    "txTo": "0x00000000008d5f1200332af8a6813cb8377b5bfd",
+    "timestamp": "2026-01-29T14:38:11.000000Z",
+    "blockNumber": 24341157,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "from": "0x990636ecb3ff04d33d92e970d3d588bf5cd8d086",
+    "assets0": "-8696209260959490270",
+    "assets1": "8699689136614135925"
   }
 ]

@@ -53,5 +53,16 @@
     "recipient": "0x7b0383b31c7662e3f6b6e9c743bc87b93c1f4498",
     "rewardToken": "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70",
     "amount": "8925587676849135709"
+  },
+  {
+    "id": "0062106273-3d474-000002",
+    "timestamp": "2026-02-05T23:50:28.000000Z",
+    "blockNumber": 62106273,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "strategy": "0xbe19cc5654e30daf04ad3b5e06213d70f4e882ee",
+    "recipient": "0x7b0383b31c7662e3f6b6e9c743bc87b93c1f4498",
+    "rewardToken": "0xa04bc7140c26fc9bb1f36b1a604c7a5a88fb0e70",
+    "amount": "1056946073237390987"
   }
 ]

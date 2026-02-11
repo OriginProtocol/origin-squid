@@ -132,17 +132,6 @@
     "decimals": 18
   },
   {
-    "id": "146:5493694:OS_ETH",
-    "chainId": 146,
-    "timestamp": "2025-01-26T20:13:58.000000Z",
-    "blockNumber": 5493694,
-    "pair": "OS_ETH",
-    "base": "OS",
-    "quote": "ETH",
-    "rate": "160693516309627",
-    "decimals": 18
-  },
-  {
     "id": "146:5500000:S_ETH",
     "chainId": 146,
     "timestamp": "2025-01-26T21:26:05.000000Z",
@@ -162,6 +151,17 @@
     "base": "S",
     "quote": "USD",
     "rate": "531096040000000000",
+    "decimals": 18
+  },
+  {
+    "id": "146:5504018:OS_ETH",
+    "chainId": 146,
+    "timestamp": "2025-01-26T22:15:38.000000Z",
+    "blockNumber": 5504018,
+    "pair": "OS_ETH",
+    "base": "OS",
+    "quote": "ETH",
+    "rate": "159823438024416",
     "decimals": 18
   },
   {
@@ -209,14 +209,14 @@
     "decimals": 18
   },
   {
-    "id": "146:5729863:OS_USD",
+    "id": "146:5734413:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-01-28T23:59:59.000000Z",
-    "blockNumber": 5729863,
+    "timestamp": "2025-01-29T01:04:45.000000Z",
+    "blockNumber": 5734413,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "440105390000000000",
+    "rate": "457088650000000000",
     "decimals": 18
   },
   {
@@ -308,25 +308,25 @@
     "decimals": 18
   },
   {
-    "id": "146:6159368:OS_ETH",
+    "id": "146:6183844:OS_ETH",
     "chainId": 146,
-    "timestamp": "2025-02-01T18:02:52.000000Z",
-    "blockNumber": 6159368,
+    "timestamp": "2025-02-01T23:07:22.000000Z",
+    "blockNumber": 6183844,
     "pair": "OS_ETH",
     "base": "OS",
     "quote": "ETH",
-    "rate": "160080474423293",
+    "rate": "158203514411390",
     "decimals": 18
   },
   {
-    "id": "146:6188255:OS_USD",
+    "id": "146:6197432:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-02-01T23:59:59.000000Z",
-    "blockNumber": 6188255,
+    "timestamp": "2025-02-02T02:10:28.000000Z",
+    "blockNumber": 6197432,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "492549930000000000",
+    "rate": "510924180000000000",
     "decimals": 18
   },
   {
@@ -462,25 +462,14 @@
     "decimals": 18
   },
   {
-    "id": "146:6748346:OS_ETH",
+    "id": "146:6769866:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-02-06T06:37:46.000000Z",
-    "blockNumber": 6748346,
-    "pair": "OS_ETH",
-    "base": "OS",
-    "quote": "ETH",
-    "rate": "157541490312774",
-    "decimals": 18
-  },
-  {
-    "id": "146:6757857:OS_USD",
-    "chainId": 146,
-    "timestamp": "2025-02-06T08:17:11.000000Z",
-    "blockNumber": 6757857,
+    "timestamp": "2025-02-06T10:15:32.000000Z",
+    "blockNumber": 6769866,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "463902120000000000",
+    "rate": "473302920000000000",
     "decimals": 18
   }
 ]
