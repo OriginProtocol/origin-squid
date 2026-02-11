@@ -7,7 +7,8 @@ let time = 0
 let count = 0
 
 const localStoragePath = './data'
-let cache: Map<string, { value: boolean; expiresAt: number; validFrom: number; blockNumber?: number }>
+const CACHE_TTL_MS = 10 * 60 * 1000 // 10 minutes wall-clock
+let cache: Map<string, { value: boolean; cachedAt: number; validFrom: number }>
 
 export const resetContractCache = async (ctx: Context) => {
   cache = new Map()
@@ -26,7 +27,7 @@ export const isContract = async (
   if (account === '0x0000000000000000000000000000000000000000') return false
   if (cache.has(account)) {
     const entry = cache.get(account)!
-    if (entry.expiresAt > block.header.timestamp && entry.validFrom <= block.header.timestamp) {
+    if (Date.now() - entry.cachedAt < CACHE_TTL_MS && entry.validFrom <= block.header.height) {
       return entry.value
     }
   }
@@ -55,8 +56,8 @@ export const isContract = async (
   if (codeAtBlock === codeAtLatest) {
     cache.set(account, {
       value: !isEOA,
-      expiresAt: Date.now(),
-      validFrom: block.header.timestamp,
+      cachedAt: Date.now(),
+      validFrom: block.header.height,
     })
   }
 
@@ -95,7 +96,7 @@ export const areContracts = async (
 
     if (cache.has(account)) {
       const entry = cache.get(account)!
-      if (entry.expiresAt > block.header.timestamp && entry.validFrom <= block.header.timestamp) {
+      if (Date.now() - entry.cachedAt < CACHE_TTL_MS && entry.validFrom <= block.header.height) {
         result.set(account, entry.value)
         continue
       }
@@ -137,8 +138,8 @@ export const areContracts = async (
     if (codeAtBlock === codeAtLatest) {
       cache.set(account, {
         value: !isEOA,
-        expiresAt: Date.now(),
-        validFrom: block.header.timestamp,
+        cachedAt: Date.now(),
+        validFrom: block.header.height,
       })
     }
   }
@@ -159,10 +160,10 @@ export const loadIsContractCache = async (ctx: Context) => {
   const id = `${ctx.chain.id}-isContract`
   const entity = await ctx.store.get(UtilCache, id)
   if (entity) {
-    const data = entity.data as Record<string, { value: boolean; expiresAt: number; validFrom?: number }>
+    const data = entity.data as Record<string, { value: boolean; cachedAt?: number; expiresAt?: number; validFrom?: number }>
     cache = new Map(
       Object.entries(data).map(([key, value]) => {
-        return [key, { ...value, validFrom: value.validFrom ?? 0 }]
+        return [key, { value: value.value, cachedAt: value.cachedAt ?? 0, validFrom: value.validFrom ?? 0 }]
       }),
     )
     ctx.log.info('Loaded isContract cache from database: ' + cache.size + ' entries')
@@ -171,7 +172,7 @@ export const loadIsContractCache = async (ctx: Context) => {
       const fileData = JSON.parse(readFileSync(`${localStoragePath}/${id}.json`, 'utf8'))
       cache = new Map(
         Object.entries(fileData).map(([key, value]: [string, any]) => {
-          return [key, { ...value, validFrom: value.validFrom ?? 0 }]
+          return [key, { value: value.value, cachedAt: value.cachedAt ?? 0, validFrom: value.validFrom ?? 0 }]
         }),
       )
       ctx.log.info('Loaded isContract cache from file: ' + cache.size + ' entries')
@@ -193,8 +194,9 @@ export const saveIsContractCache = async (ctx: Context, force: boolean = false) 
   // if (process.env.NODE_ENV === 'development') {
   //   writeFileSync(`${localStoragePath}/${id}.json`, JSON.stringify(Object.fromEntries(cache)))
   // }
+  const now = Date.now()
   for (const [key, value] of cache) {
-    if (value.expiresAt < Date.now()) {
+    if (now - value.cachedAt > CACHE_TTL_MS) {
       cache.delete(key)
     }
   }
