@@ -1,11 +1,12 @@
-import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
-import { Block, Context, invertMap } from '@originprotocol/squid-utils'
-import { sonicAddresses } from '@utils/addresses-sonic'
+import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy';
+import { Block, Context, invertMap } from '@originprotocol/squid-utils';
+import { sonicAddresses } from '@utils/addresses-sonic';
+
 
 const PRECISION_DECIMALS = 18n
 const PRECISION = 10n ** PRECISION_DECIMALS
 
-const createChainlinkPriceFeed = (address: string, decimals: bigint, from: number) => {
+const createChainlinkPriceFeed = (address: string, decimals: bigint, from: number, softFail: boolean = false) => {
   return async (ctx: Context, height: number) => {
     if (height < from) return 0n
     try {
@@ -13,8 +14,11 @@ const createChainlinkPriceFeed = (address: string, decimals: bigint, from: numbe
       const result = await feedContract.latestAnswer()
       return result * 10n ** (PRECISION_DECIMALS - decimals)
     } catch (err) {
-      console.log('Failed to get price for: ', address, height)
-      throw err
+      if (softFail) {
+        return 0n
+      } else {
+        throw err
+      }
     }
   }
 }
@@ -39,7 +43,7 @@ const chainlinkPriceFeeds: Record<string, { height: number; get: (ctx: Context, 
     },
     OS_S: {
       height: 21623950,
-      get: createChainlinkPriceFeed('0x30caC44b395eB969C9CA0d44dF39e6E0aE8f8D94', 18n, 4189824),
+      get: createChainlinkPriceFeed('0x30caC44b395eB969C9CA0d44dF39e6E0aE8f8D94', 18n, 4189824, true),
     },
     OS_ETH: {
       height: 4189824,
