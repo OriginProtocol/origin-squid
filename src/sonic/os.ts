@@ -77,6 +77,7 @@ const otokenActivityProcessor = createOTokenActivityProcessor({
 })
 
 const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
+  name: 'OS',
   oTokenAddress: sonicAddresses.OS.address,
   oTokenVaultAddress: sonicAddresses.OS.vault,
   from: sonicAddresses.OS.initializeBlock,

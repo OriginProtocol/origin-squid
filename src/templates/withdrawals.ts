@@ -9,10 +9,12 @@ interface ProcessResult {
 }
 
 export const createOTokenWithdrawalsProcessor = ({
+  name,
   oTokenAddress,
   oTokenVaultAddress,
   from,
 }: {
+  name: string
   oTokenAddress: string
   oTokenVaultAddress: string
   from: number
@@ -106,6 +108,7 @@ export const createOTokenWithdrawalsProcessor = ({
   }
 
   return {
+    name: `${name} withdrawals`,
     from,
     setup,
     process,
