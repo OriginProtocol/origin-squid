@@ -11,10 +11,23 @@ import { ousdCurveProcessor } from './ousd/processors/curve'
 import { erc20s } from './ousd/processors/erc20s'
 import { morphoMarketStatesProcessor } from './ousd/processors/morpho-market-states'
 import { ousdStrategiesProcessor } from './ousd/processors/strategies/strategies'
+import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
+import { addresses } from '@utils/addresses'
 
 export const processor = defineSquidProcessor({
   stateSchema: 'ousd-processor',
-  processors: [ousdProcessor, ousdStrategiesProcessor, ousdCurveProcessor, morphoMarketStatesProcessor, ...erc20s()],
+  processors: [
+    ousdProcessor,
+    ousdStrategiesProcessor,
+    ousdCurveProcessor,
+    morphoMarketStatesProcessor,
+    ...erc20s(),
+    createOTokenWithdrawalsProcessor({
+      oTokenAddress: addresses.ousd.address,
+      oTokenVaultAddress: addresses.ousd.vault,
+      from: 24477020,
+    }),
+  ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('ousd')],
   validators: [],
   fields: DEFAULT_FIELDS,
