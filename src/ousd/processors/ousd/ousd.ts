@@ -28,6 +28,7 @@ export const ousdProcessor = createOTokenProcessor2({
   feeStructure: [],
   Upgrade_CreditsBalanceOfHighRes: 13533937, // https://etherscan.io/tx/0xc9b6fc6a4fad18dad197ff7d0636f74bf066671d75656849a1c45122e00d54cf
   otokenAddress: OUSD_ADDRESS,
+  redemptionAsset: { asset: USDC_ADDRESS, symbol: 'USDC' },
   wotoken: {
     address: WOUSD_ADDRESS,
     from: 14566215, // https://etherscan.io/tx/0x5b16078d43861bf0e7a08aa3f061dbfce1c76bc5fc7cedaa96e2156d15651df1

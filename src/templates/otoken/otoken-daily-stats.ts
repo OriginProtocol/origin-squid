@@ -10,7 +10,8 @@ import * as wotokenAbi from '@abi/woeth'
 import { OToken, OTokenAPY, OTokenDailyStat, OTokenRebase } from '@model'
 import { Block, Context } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { Currency, CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { Currency, CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { translateSymbol } from '@shared/post-processors/exchange-rates/price-routing'
 
 import { OTokenEntityProducer } from './otoken-entity-producer'
 
@@ -38,6 +39,7 @@ export const processOTokenDailyStats = async (
       to?: number
       token: string
     }[]
+    redemptionAsset?: { asset: CurrencyAddress; symbol: CurrencySymbol }
     getAmoSupply: (ctx: Context, height: number) => Promise<bigint>
     producer: OTokenEntityProducer
     accountsOverThresholdMinimum: bigint
@@ -81,6 +83,17 @@ export const processOTokenDailyStats = async (
         ? new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
         : null
 
+    const USD_PEGGED = new Set(['USD', 'USDC', 'USDT', 'DAI'])
+    const ETH_PEGGED = new Set(['ETH', 'WETH'])
+    const rawUnderlying = params.redemptionAsset
+      ? translateSymbol(ctx, params.redemptionAsset.symbol as Currency)
+      : 'USD'
+    const underlyingSymbol = USD_PEGGED.has(rawUnderlying)
+      ? 'USD'
+      : ETH_PEGGED.has(rawUnderlying)
+        ? 'ETH'
+        : rawUnderlying
+
     const asyncStartTime = Date.now()
     const [
       otokenObject,
@@ -93,6 +106,8 @@ export const processOTokenDailyStats = async (
       wrappedSupply,
       wrappedRate,
       rateNative,
+      urateETH,
+      urateUSD,
     ] = await Promise.all([
       (async () => {
         let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
@@ -147,6 +162,12 @@ export const processOTokenDailyStats = async (
         params.otokenAddress as CurrencyAddress,
         ctx.chain.nativeCurrency.symbol as Currency,
       ).then((a) => a?.rate ?? 0n),
+      underlyingSymbol === 'ETH'
+        ? 10n ** 18n
+        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
+      underlyingSymbol === 'USD'
+        ? 10n ** 18n
+        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
     ])
     if (process.env.DEBUG_PERF === 'true') {
       ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
@@ -196,6 +217,8 @@ export const processOTokenDailyStats = async (
     entity.rateETH = rateETH
     entity.rateUSD = rateUSD
     entity.rateNative = rateNative
+    entity.urateETH = urateETH
+    entity.urateUSD = urateUSD
     entity.amoSupply = amoSupply
 
     entity.dripperWETH = dripperWETH
@@ -239,6 +262,8 @@ export const getOTokenDailyStat = async (
       rateUSD: 0n,
       rateETH: 0n,
       rateNative: 0n,
+      urateUSD: 0n,
+      urateETH: 0n,
 
       totalSupply: 0n,
       rebasingSupply: 0n,

@@ -54,6 +54,12 @@ export class OTokenDailyStat {
     rateNative!: bigint
 
     @BigIntColumn_({nullable: false})
+    urateUSD!: bigint
+
+    @BigIntColumn_({nullable: false})
+    urateETH!: bigint
+
+    @BigIntColumn_({nullable: false})
     totalSupply!: bigint
 
     @BigIntColumn_({nullable: false})
