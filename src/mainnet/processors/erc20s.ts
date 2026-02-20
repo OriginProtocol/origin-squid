@@ -1,10 +1,12 @@
-import { createERC20EventTracker } from '@templates/erc20/erc20-event'
-import { createERC20PollingTracker } from '@templates/erc20/erc20-polling'
+import { createERC20EventTracker } from '@templates/erc20/erc20-event';
+import { createERC20PollingTracker } from '@templates/erc20/erc20-polling';
 import {
   OETH_DRIPPER_ADDRESS,
   OETH_DRIPPER_ADDRESS_OLD,
   OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
+  OUSD_DRIPPER_ADDRESS,
+  OUSD_VAULT_ADDRESS,
   WOETH_ADDRESS,
   mainnetTokens,
   oethStrategyArray,
@@ -58,6 +60,12 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
       // '0xa4e0faA58465A2D369aa21B3e42d43374c6F9613', // Uniswap wstETH/WETH
       // '0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa', // Uniswap rETH/WETH
     ],
+    intervalTracking: true,
+  },
+  USDC: {
+    from: 24478546,
+    address: mainnetTokens.USDC,
+    accountFilter: [OUSD_VAULT_ADDRESS, OUSD_DRIPPER_ADDRESS],
     intervalTracking: true,
   },
   // rETH: {
