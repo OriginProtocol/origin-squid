@@ -44,3 +44,10 @@ jobs:
         env:
           GRAFANA_TOKEN: ${{ secrets.GRAFANA_TOKEN }}
         run: node scripts/update-grafana-ds.js
+
+      - name: update railway FDW connection
+        env:
+          RAILWAY_DATABASE_URL: ${{ secrets.RAILWAY_DATABASE_URL }}
+        run: |
+          pnpm add pg
+          node scripts/update-fdw.js
