@@ -4278,5 +4278,1595 @@
     "totalAssets": "25457456088967807476944617",
     "totalSupply": "24457580361076495588404539",
     "assetsPerShare": "1040882037925656132"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-46900000",
+    "timestamp": "2025-09-15T08:24:37.000000Z",
+    "blockNumber": 46900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "25438565222192041555274900",
+    "totalSupply": "24437442723163907348996027",
+    "assetsPerShare": "1040966745594831995"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47000000",
+    "timestamp": "2025-09-16T04:33:35.000000Z",
+    "blockNumber": 47000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "24469043187241191129081557",
+    "totalSupply": "23503436197587987009175044",
+    "assetsPerShare": "1041083651834377239"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47100000",
+    "timestamp": "2025-09-17T01:20:05.000000Z",
+    "blockNumber": 47100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "24051642007906560509955479",
+    "totalSupply": "23100361413656216001566955",
+    "assetsPerShare": "1041180333814516727"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47200000",
+    "timestamp": "2025-09-17T21:08:26.000000Z",
+    "blockNumber": 47200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "23730714706971794354760480",
+    "totalSupply": "22790271160492770644455523",
+    "assetsPerShare": "1041265131944076854"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47300000",
+    "timestamp": "2025-09-18T17:13:49.000000Z",
+    "blockNumber": 47300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "23530045450676089047032161",
+    "totalSupply": "22595527737134766985456636",
+    "assetsPerShare": "1041358525652201645"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47400000",
+    "timestamp": "2025-09-19T13:48:28.000000Z",
+    "blockNumber": 47400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "23739636979585290183630189",
+    "totalSupply": "22795910876432380420770348",
+    "assetsPerShare": "1041398920546253923"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47500000",
+    "timestamp": "2025-09-20T11:22:27.000000Z",
+    "blockNumber": 47500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "22797821106329765652277912",
+    "totalSupply": "21888099725582810779341557",
+    "assetsPerShare": "1041562373716877419"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47600000",
+    "timestamp": "2025-09-21T04:51:51.000000Z",
+    "blockNumber": 47600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "22083957028216345158961532",
+    "totalSupply": "21201550635949948839173107",
+    "assetsPerShare": "1041619898818634665"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47700000",
+    "timestamp": "2025-09-22T00:19:32.000000Z",
+    "blockNumber": 47700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "21958112727864518373756552",
+    "totalSupply": "21078510718764932148348732",
+    "assetsPerShare": "1041729798695717595"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47800000",
+    "timestamp": "2025-09-22T17:38:25.000000Z",
+    "blockNumber": 47800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "20644353247118579380406850",
+    "totalSupply": "19816256653371726984881283",
+    "assetsPerShare": "1041788749925478591"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-47900000",
+    "timestamp": "2025-09-23T12:01:57.000000Z",
+    "blockNumber": 47900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "20696294154661189003728275",
+    "totalSupply": "19864426166603372010977354",
+    "assetsPerShare": "1041877272521286151"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48000000",
+    "timestamp": "2025-09-24T07:09:40.000000Z",
+    "blockNumber": 48000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "20281742671441220017923187",
+    "totalSupply": "19464509429418872012349912",
+    "assetsPerShare": "1041985812433945690"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48100000",
+    "timestamp": "2025-09-25T03:55:02.000000Z",
+    "blockNumber": 48100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18930041757853174371198665",
+    "totalSupply": "18164457424020846641041629",
+    "assetsPerShare": "1042147382438184579"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48200000",
+    "timestamp": "2025-09-25T19:48:34.000000Z",
+    "blockNumber": 48200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18981952434997843472967183",
+    "totalSupply": "18213426828772643774184218",
+    "assetsPerShare": "1042195552404840263"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48300000",
+    "timestamp": "2025-09-26T12:13:57.000000Z",
+    "blockNumber": 48300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18973217479687161396345587",
+    "totalSupply": "18203715886797968991130238",
+    "assetsPerShare": "1042271676710097656"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48400000",
+    "timestamp": "2025-09-27T04:32:01.000000Z",
+    "blockNumber": 48400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "19118120428942082724210363",
+    "totalSupply": "18341023103496147052438833",
+    "assetsPerShare": "1042369355354980506"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48500000",
+    "timestamp": "2025-09-27T22:21:20.000000Z",
+    "blockNumber": 48500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "19053110112983793193452537",
+    "totalSupply": "18278655272338879227305254",
+    "assetsPerShare": "1042369355354980506"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48600000",
+    "timestamp": "2025-09-28T16:20:04.000000Z",
+    "blockNumber": 48600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "19067664861055988182589919",
+    "totalSupply": "18290729560528984846277912",
+    "assetsPerShare": "1042476998960370263"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48700000",
+    "timestamp": "2025-09-29T10:48:49.000000Z",
+    "blockNumber": 48700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "19023805016394386645655650",
+    "totalSupply": "18246781034391402895680393",
+    "assetsPerShare": "1042584167615014093"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48800000",
+    "timestamp": "2025-09-30T03:33:10.000000Z",
+    "blockNumber": 48800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "19029996402849794537642810",
+    "totalSupply": "18250829655914848541145147",
+    "assetsPerShare": "1042692127515552616"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-48900000",
+    "timestamp": "2025-09-30T21:42:28.000000Z",
+    "blockNumber": 48900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18952186733486576356125429",
+    "totalSupply": "18176205836179470721414366",
+    "assetsPerShare": "1042692127515552616"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49000000",
+    "timestamp": "2025-10-01T16:56:42.000000Z",
+    "blockNumber": 49000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18677655932696632133519484",
+    "totalSupply": "17910289500915572560661313",
+    "assetsPerShare": "1042845004361422067"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49100000",
+    "timestamp": "2025-10-02T13:42:38.000000Z",
+    "blockNumber": 49100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18678921822984734363430218",
+    "totalSupply": "17910223885934093722030940",
+    "assetsPerShare": "1042919504633012565"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49200000",
+    "timestamp": "2025-10-03T11:31:02.000000Z",
+    "blockNumber": 49200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18700967044243234815921095",
+    "totalSupply": "17929730379216748955191482",
+    "assetsPerShare": "1043014403937744932"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49300000",
+    "timestamp": "2025-10-04T09:46:36.000000Z",
+    "blockNumber": 49300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18752383816633930407447563",
+    "totalSupply": "17977151516921465951531549",
+    "assetsPerShare": "1043123199967623162"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49400000",
+    "timestamp": "2025-10-05T09:15:48.000000Z",
+    "blockNumber": 49400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18790902022251620430039539",
+    "totalSupply": "18012209792583219980639846",
+    "assetsPerShare": "1043231354655275994"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49500000",
+    "timestamp": "2025-10-06T07:59:36.000000Z",
+    "blockNumber": 49500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18710724165391655374808644",
+    "totalSupply": "17933458754733152024733496",
+    "assetsPerShare": "1043341634276397507"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49600000",
+    "timestamp": "2025-10-07T05:25:05.000000Z",
+    "blockNumber": 49600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "18056202466441551237683345",
+    "totalSupply": "17304209693992407600859247",
+    "assetsPerShare": "1043457215657194496"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49700000",
+    "timestamp": "2025-10-07T21:58:53.000000Z",
+    "blockNumber": 49700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "17134791353306914162793207",
+    "totalSupply": "16419680065944236794075499",
+    "assetsPerShare": "1043552084114347442"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49800000",
+    "timestamp": "2025-10-08T17:01:14.000000Z",
+    "blockNumber": 49800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "17023407268288787004573845",
+    "totalSupply": "16311729509224461853192720",
+    "assetsPerShare": "1043629816118631906"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-49900000",
+    "timestamp": "2025-10-09T13:49:34.000000Z",
+    "blockNumber": 49900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "17029362149207848044417478",
+    "totalSupply": "16316769260485241902602133",
+    "assetsPerShare": "1043672425426049963"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50000000",
+    "timestamp": "2025-10-10T11:57:32.000000Z",
+    "blockNumber": 50000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "16844066178023398437875672",
+    "totalSupply": "16136709199742252606742292",
+    "assetsPerShare": "1043835268363914264"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50100000",
+    "timestamp": "2025-10-11T01:44:26.000000Z",
+    "blockNumber": 50100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "16799516050672868162671404",
+    "totalSupply": "16093225238826947058354198",
+    "assetsPerShare": "1043887462044705926"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50200000",
+    "timestamp": "2025-10-11T14:58:17.000000Z",
+    "blockNumber": 50200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "16422527632928594324976280",
+    "totalSupply": "15731662281474729010719868",
+    "assetsPerShare": "1043915597671290824"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50300000",
+    "timestamp": "2025-10-12T09:00:46.000000Z",
+    "blockNumber": 50300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "16443164551711106623637708",
+    "totalSupply": "15749875413960273125454839",
+    "assetsPerShare": "1044018706150292486"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50400000",
+    "timestamp": "2025-10-13T02:13:56.000000Z",
+    "blockNumber": 50400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "16364737005504713784995861",
+    "totalSupply": "15673023018964706605981907",
+    "assetsPerShare": "1044134050317096954"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50500000",
+    "timestamp": "2025-10-13T18:58:36.000000Z",
+    "blockNumber": 50500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15854083816101826910855029",
+    "totalSupply": "15182778436847516661259255",
+    "assetsPerShare": "1044214922983075359"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50600000",
+    "timestamp": "2025-10-14T12:38:29.000000Z",
+    "blockNumber": 50600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15857162197617782551254829",
+    "totalSupply": "15184551950865775803848897",
+    "assetsPerShare": "1044295692683487879"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50700000",
+    "timestamp": "2025-10-15T07:25:50.000000Z",
+    "blockNumber": 50700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15833740175851504249034980",
+    "totalSupply": "15160989798641436571631981",
+    "assetsPerShare": "1044373776788000495"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50800000",
+    "timestamp": "2025-10-16T02:05:23.000000Z",
+    "blockNumber": 50800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15730738738763288008357810",
+    "totalSupply": "15060780370942953248663551",
+    "assetsPerShare": "1044483642369083214"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-50900000",
+    "timestamp": "2025-10-16T20:46:07.000000Z",
+    "blockNumber": 50900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15723750307068089719390011",
+    "totalSupply": "15053919207532271627009863",
+    "assetsPerShare": "1044495462630134628"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51000000",
+    "timestamp": "2025-10-17T15:11:30.000000Z",
+    "blockNumber": 51000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15692627796121768842141552",
+    "totalSupply": "15021634627924227905815823",
+    "assetsPerShare": "1044668452190296846"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51100000",
+    "timestamp": "2025-10-18T12:30:04.000000Z",
+    "blockNumber": 51100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15427059814770431833714913",
+    "totalSupply": "14766947466439158423123480",
+    "assetsPerShare": "1044702017788815917"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51200000",
+    "timestamp": "2025-10-19T10:39:10.000000Z",
+    "blockNumber": 51200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15435246977535670928443508",
+    "totalSupply": "14773110079067233106682083",
+    "assetsPerShare": "1044820413232190903"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51300000",
+    "timestamp": "2025-10-20T09:57:33.000000Z",
+    "blockNumber": 51300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15251125374285357144427860",
+    "totalSupply": "14594802682950630139559645",
+    "assetsPerShare": "1044969617307771529"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51400000",
+    "timestamp": "2025-10-21T10:55:37.000000Z",
+    "blockNumber": 51400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15267733267160810030424191",
+    "totalSupply": "14609095726467372040269760",
+    "assetsPerShare": "1045084073170947949"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51500000",
+    "timestamp": "2025-10-22T06:10:45.000000Z",
+    "blockNumber": 51500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15166921679506703173532421",
+    "totalSupply": "14511706371573450043504007",
+    "assetsPerShare": "1045150810742473049"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51600000",
+    "timestamp": "2025-10-23T01:05:56.000000Z",
+    "blockNumber": 51600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "15161996938249239526114542",
+    "totalSupply": "14505513565684847562806772",
+    "assetsPerShare": "1045257506367607017"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51700000",
+    "timestamp": "2025-10-24T00:13:06.000000Z",
+    "blockNumber": 51700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14789807242368404531437379",
+    "totalSupply": "14147878387830417363053522",
+    "assetsPerShare": "1045372799860235949"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51800000",
+    "timestamp": "2025-10-25T01:57:49.000000Z",
+    "blockNumber": 51800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14478248320699596648292386",
+    "totalSupply": "13848216523776600650513799",
+    "assetsPerShare": "1045495518924134903"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-51900000",
+    "timestamp": "2025-10-26T05:50:15.000000Z",
+    "blockNumber": 51900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14473593802061751196747412",
+    "totalSupply": "13842291100530959680767462",
+    "assetsPerShare": "1045606807207412083"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52000000",
+    "timestamp": "2025-10-27T03:54:59.000000Z",
+    "blockNumber": 52000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14181116744398377456493680",
+    "totalSupply": "13561150212731501639818775",
+    "assetsPerShare": "1045716367855348862"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52100000",
+    "timestamp": "2025-10-27T21:11:33.000000Z",
+    "blockNumber": 52100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14186169165875092105006689",
+    "totalSupply": "13564629574755139586886691",
+    "assetsPerShare": "1045820609231872236"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52200000",
+    "timestamp": "2025-10-28T09:36:35.000000Z",
+    "blockNumber": 52200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "14176818446028587470665488",
+    "totalSupply": "13554982869351254574634052",
+    "assetsPerShare": "1045875054411418384"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52300000",
+    "timestamp": "2025-10-28T21:34:55.000000Z",
+    "blockNumber": 52300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13774646343323499686203109",
+    "totalSupply": "13170451178869913026389999",
+    "assetsPerShare": "1045875054411418384"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52400000",
+    "timestamp": "2025-10-29T10:00:40.000000Z",
+    "blockNumber": 52400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13750582035689027666213606",
+    "totalSupply": "13146487695296139428114014",
+    "assetsPerShare": "1045951006412841002"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52500000",
+    "timestamp": "2025-10-29T22:00:43.000000Z",
+    "blockNumber": 52500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13210696460016530838725296",
+    "totalSupply": "12629346694834296303964594",
+    "assetsPerShare": "1046031657791136610"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52600000",
+    "timestamp": "2025-10-30T10:48:30.000000Z",
+    "blockNumber": 52600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13199315886954161966557958",
+    "totalSupply": "12617835429905940652273754",
+    "assetsPerShare": "1046084010231266421"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52700000",
+    "timestamp": "2025-10-30T23:13:10.000000Z",
+    "blockNumber": 52700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13146318551996327090477695",
+    "totalSupply": "12566336251118611119579832",
+    "assetsPerShare": "1046153651254245881"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52800000",
+    "timestamp": "2025-10-31T12:44:14.000000Z",
+    "blockNumber": 52800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13129436758906650831903067",
+    "totalSupply": "12549238269329892861933772",
+    "assetsPerShare": "1046233761533937274"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-52900000",
+    "timestamp": "2025-11-01T01:45:50.000000Z",
+    "blockNumber": 52900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13110619817431035291465387",
+    "totalSupply": "12530543470704516687840897",
+    "assetsPerShare": "1046292991846897476"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53000000",
+    "timestamp": "2025-11-01T14:29:35.000000Z",
+    "blockNumber": 53000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13094193863099513001719705",
+    "totalSupply": "12514130227753569638564483",
+    "assetsPerShare": "1046352692899063066"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53100000",
+    "timestamp": "2025-11-02T03:06:58.000000Z",
+    "blockNumber": 53100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13081680151085300580444912",
+    "totalSupply": "12501493188186513003357080",
+    "assetsPerShare": "1046409413192901194"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53200000",
+    "timestamp": "2025-11-02T15:24:50.000000Z",
+    "blockNumber": 53200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13067121089518921169190326",
+    "totalSupply": "12486728053072439078176380",
+    "assetsPerShare": "1046480794166384738"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53300000",
+    "timestamp": "2025-11-03T03:42:57.000000Z",
+    "blockNumber": 53300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "13056059747929452686054354",
+    "totalSupply": "12475599193279031373780205",
+    "assetsPerShare": "1046527669385461847"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53400000",
+    "timestamp": "2025-11-03T15:35:41.000000Z",
+    "blockNumber": 53400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12814064788011355420432812",
+    "totalSupply": "12243727061160825298027178",
+    "assetsPerShare": "1046582035355862997"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53500000",
+    "timestamp": "2025-11-04T04:03:29.000000Z",
+    "blockNumber": 53500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12841401705221339229747392",
+    "totalSupply": "12269166481885332834725543",
+    "assetsPerShare": "1046640105844262231"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53600000",
+    "timestamp": "2025-11-04T16:05:50.000000Z",
+    "blockNumber": 53600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12771713363151484882358539",
+    "totalSupply": "12201679908563993266994217",
+    "assetsPerShare": "1046717620758712267"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53700000",
+    "timestamp": "2025-11-05T03:36:36.000000Z",
+    "blockNumber": 53700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12691663534223868221693172",
+    "totalSupply": "12124710179163888497486687",
+    "assetsPerShare": "1046760157288895826"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53800000",
+    "timestamp": "2025-11-05T16:30:01.000000Z",
+    "blockNumber": 53800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12272742885730320041445177",
+    "totalSupply": "11723685132253134036084667",
+    "assetsPerShare": "1046833205368734132"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-53900000",
+    "timestamp": "2025-11-06T05:17:16.000000Z",
+    "blockNumber": 53900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12411570064850889099050497",
+    "totalSupply": "11855459300033496306971611",
+    "assetsPerShare": "1046907568129040902"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54000000",
+    "timestamp": "2025-11-06T17:36:45.000000Z",
+    "blockNumber": 54000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12369793086040539833598622",
+    "totalSupply": "11815056445431766465021621",
+    "assetsPerShare": "1046951670791489072"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54100000",
+    "timestamp": "2025-11-07T06:01:22.000000Z",
+    "blockNumber": 54100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12370625560205930654734173",
+    "totalSupply": "11815316917481250090848654",
+    "assetsPerShare": "1046999047643239975"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54200000",
+    "timestamp": "2025-11-07T17:45:14.000000Z",
+    "blockNumber": 54200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12368322838968183370446112",
+    "totalSupply": "11812510254770838322601143",
+    "assetsPerShare": "1047052876332772992"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54300000",
+    "timestamp": "2025-11-08T04:42:31.000000Z",
+    "blockNumber": 54300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12325919942163006268973839",
+    "totalSupply": "11771134970137042594318678",
+    "assetsPerShare": "1047130966846734297"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54400000",
+    "timestamp": "2025-11-08T15:56:50.000000Z",
+    "blockNumber": 54400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12326084303833716945825346",
+    "totalSupply": "11770749408713092382593020",
+    "assetsPerShare": "1047179230126974546"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54500000",
+    "timestamp": "2025-11-09T04:30:46.000000Z",
+    "blockNumber": 54500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12325081819409154097729892",
+    "totalSupply": "11769066304267868228981121",
+    "assetsPerShare": "1047243808537271603"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54600000",
+    "timestamp": "2025-11-09T17:41:56.000000Z",
+    "blockNumber": 54600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12062696189774565221172099",
+    "totalSupply": "11517872804096633608760842",
+    "assetsPerShare": "1047302431181923704"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54700000",
+    "timestamp": "2025-11-10T08:23:38.000000Z",
+    "blockNumber": 54700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12060956363417819965931897",
+    "totalSupply": "11515264553187694293105444",
+    "assetsPerShare": "1047388560437290642"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54800000",
+    "timestamp": "2025-11-10T23:42:19.000000Z",
+    "blockNumber": 54800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12064870966733571985921325",
+    "totalSupply": "11518881154377190290252068",
+    "assetsPerShare": "1047399552529362179"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-54900000",
+    "timestamp": "2025-11-11T17:29:01.000000Z",
+    "blockNumber": 54900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12058869818978619991720569",
+    "totalSupply": "11512269237964728450746837",
+    "assetsPerShare": "1047479829537979593"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55000000",
+    "timestamp": "2025-11-12T14:51:31.000000Z",
+    "blockNumber": 55000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12040720650187252099875621",
+    "totalSupply": "11493632036169507329566785",
+    "assetsPerShare": "1047599280392490576"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55100000",
+    "timestamp": "2025-11-13T11:03:21.000000Z",
+    "blockNumber": 55100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "12015872913891463530347951",
+    "totalSupply": "11468658135914809756913504",
+    "assetsPerShare": "1047713932309396944"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55200000",
+    "timestamp": "2025-11-14T04:51:03.000000Z",
+    "blockNumber": 55200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11926866502636060088443636",
+    "totalSupply": "11382340860277973708534388",
+    "assetsPerShare": "1047839512894783248"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55300000",
+    "timestamp": "2025-11-14T23:23:37.000000Z",
+    "blockNumber": 55300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11893030076777624019845906",
+    "totalSupply": "11349160585860220373138953",
+    "assetsPerShare": "1047921560965046521"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55400000",
+    "timestamp": "2025-11-16T01:34:09.000000Z",
+    "blockNumber": 55400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11875730259475443698960200",
+    "totalSupply": "11330953062117018255367221",
+    "assetsPerShare": "1048078673909592739"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55500000",
+    "timestamp": "2025-11-16T23:24:55.000000Z",
+    "blockNumber": 55500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11875155390917292855976327",
+    "totalSupply": "11329495073597634727446355",
+    "assetsPerShare": "1048162809884729128"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55600000",
+    "timestamp": "2025-11-17T20:11:30.000000Z",
+    "blockNumber": 55600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11874525296516940966360332",
+    "totalSupply": "11328035064653763552783436",
+    "assetsPerShare": "1048242279331246106"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55700000",
+    "timestamp": "2025-11-18T17:28:52.000000Z",
+    "blockNumber": 55700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11859990601287097920925715",
+    "totalSupply": "11312383045642908134379090",
+    "assetsPerShare": "1048407798200849202"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55800000",
+    "timestamp": "2025-11-19T17:21:40.000000Z",
+    "blockNumber": 55800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11834861494028433189632809",
+    "totalSupply": "11287154401626953740238967",
+    "assetsPerShare": "1048524816168239163"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-55900000",
+    "timestamp": "2025-11-20T16:21:25.000000Z",
+    "blockNumber": 55900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "11760014171658389441039684",
+    "totalSupply": "11214745953560678267092285",
+    "assetsPerShare": "1048620648238990085"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56000000",
+    "timestamp": "2025-11-21T11:04:36.000000Z",
+    "blockNumber": 56000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10778942605901010819288267",
+    "totalSupply": "10277950778164844307059423",
+    "assetsPerShare": "1048744330319279846"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56100000",
+    "timestamp": "2025-11-22T06:36:26.000000Z",
+    "blockNumber": 56100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10773036907976944191284784",
+    "totalSupply": "10271540476494273554156470",
+    "assetsPerShare": "1048823877258753089"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56200000",
+    "timestamp": "2025-11-23T11:28:06.000000Z",
+    "blockNumber": 56200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10772355043339990142447306",
+    "totalSupply": "10269793164723745783571304",
+    "assetsPerShare": "1048935929921404908"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56300000",
+    "timestamp": "2025-11-24T14:35:53.000000Z",
+    "blockNumber": 56300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10626661618405159811752459",
+    "totalSupply": "10129036214717916903020300",
+    "assetsPerShare": "1049128603466159219"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56400000",
+    "timestamp": "2025-11-25T16:09:00.000000Z",
+    "blockNumber": 56400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10627287484585802864164410",
+    "totalSupply": "10128631267673629232255019",
+    "assetsPerShare": "1049232339862511976"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56500000",
+    "timestamp": "2025-11-26T19:01:43.000000Z",
+    "blockNumber": 56500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10621496850164258943974343",
+    "totalSupply": "10122440696350749001113767",
+    "assetsPerShare": "1049301958765085693"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56600000",
+    "timestamp": "2025-11-28T03:01:23.000000Z",
+    "blockNumber": 56600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10409726078314154664419530",
+    "totalSupply": "9918326312668408941642953",
+    "assetsPerShare": "1049544625792165573"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56700000",
+    "timestamp": "2025-11-29T13:01:50.000000Z",
+    "blockNumber": 56700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10411149888037000350123344",
+    "totalSupply": "9918535868383078977524526",
+    "assetsPerShare": "1049666001735619813"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56800000",
+    "timestamp": "2025-12-01T00:27:31.000000Z",
+    "blockNumber": 56800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10401941791348549968237546",
+    "totalSupply": "9907529275660961194572457",
+    "assetsPerShare": "1049902705501176025"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-56900000",
+    "timestamp": "2025-12-01T23:29:27.000000Z",
+    "blockNumber": 56900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10397688746590958802473558",
+    "totalSupply": "9902653039909733529312030",
+    "assetsPerShare": "1049990210167530792"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57000000",
+    "timestamp": "2025-12-03T01:31:43.000000Z",
+    "blockNumber": 57000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10352326428628795943883777",
+    "totalSupply": "9857953855730946038576376",
+    "assetsPerShare": "1050149613209078390"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57100000",
+    "timestamp": "2025-12-04T00:26:17.000000Z",
+    "blockNumber": 57100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10352735579461670383025078",
+    "totalSupply": "9857208709212921704736602",
+    "assetsPerShare": "1050270506069898919"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57200000",
+    "timestamp": "2025-12-05T02:22:45.000000Z",
+    "blockNumber": 57200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "10351609518757596436360193",
+    "totalSupply": "9855049567923278933305361",
+    "assetsPerShare": "1050386347365572499"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57300000",
+    "timestamp": "2025-12-06T10:03:33.000000Z",
+    "blockNumber": 57300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9668147156068455923382706",
+    "totalSupply": "9203230303116476114912181",
+    "assetsPerShare": "1050516703118311155"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57400000",
+    "timestamp": "2025-12-07T21:49:04.000000Z",
+    "blockNumber": 57400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9667992221563480363143989",
+    "totalSupply": "9201877903959864719972933",
+    "assetsPerShare": "1050654260192153997"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57500000",
+    "timestamp": "2025-12-09T05:55:03.000000Z",
+    "blockNumber": 57500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9666404321223598377524761",
+    "totalSupply": "9198457148181143202686608",
+    "assetsPerShare": "1050872354515994533"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57600000",
+    "timestamp": "2025-12-10T14:27:38.000000Z",
+    "blockNumber": 57600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9545826792480634929150998",
+    "totalSupply": "9082705242449186674748269",
+    "assetsPerShare": "1050989384513656829"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57700000",
+    "timestamp": "2025-12-11T16:47:19.000000Z",
+    "blockNumber": 57700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9545918721419098353209166",
+    "totalSupply": "9081753217043285275966788",
+    "assetsPerShare": "1051109680397914382"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57800000",
+    "timestamp": "2025-12-12T20:45:04.000000Z",
+    "blockNumber": 57800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9530260793309049120228474",
+    "totalSupply": "9065087845089800488988667",
+    "assetsPerShare": "1051314775561851219"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-57900000",
+    "timestamp": "2025-12-14T09:14:11.000000Z",
+    "blockNumber": 57900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9518427152212458187276192",
+    "totalSupply": "9052292341496181718661044",
+    "assetsPerShare": "1051493565732459844"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58000000",
+    "timestamp": "2025-12-15T15:45:36.000000Z",
+    "blockNumber": 58000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9519490301757592281987371",
+    "totalSupply": "9052269017120049695658449",
+    "assetsPerShare": "1051613720687477705"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58100000",
+    "timestamp": "2025-12-16T20:07:00.000000Z",
+    "blockNumber": 58100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9481384920112967145463869",
+    "totalSupply": "9014184925737643841758602",
+    "assetsPerShare": "1051829421985936421"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58200000",
+    "timestamp": "2025-12-17T21:47:26.000000Z",
+    "blockNumber": 58200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9444241248431627494147166",
+    "totalSupply": "8978527795650261762023401",
+    "assetsPerShare": "1051869689929231527"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58300000",
+    "timestamp": "2025-12-18T23:35:45.000000Z",
+    "blockNumber": 58300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9296846079536671822616785",
+    "totalSupply": "8836590252752401856533685",
+    "assetsPerShare": "1052085228987607576"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58400000",
+    "timestamp": "2025-12-20T04:29:33.000000Z",
+    "blockNumber": 58400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9130208442050317544550536",
+    "totalSupply": "8676732381005727877908726",
+    "assetsPerShare": "1052263460613040925"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58500000",
+    "timestamp": "2025-12-21T09:28:01.000000Z",
+    "blockNumber": 58500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "9063055677388487517658291",
+    "totalSupply": "8611774650633456668625636",
+    "assetsPerShare": "1052402790953411205"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58600000",
+    "timestamp": "2025-12-22T14:56:48.000000Z",
+    "blockNumber": 58600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8589721862049500912278283",
+    "totalSupply": "8160748370732537815929049",
+    "assetsPerShare": "1052565459909953933"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58700000",
+    "timestamp": "2025-12-23T15:47:34.000000Z",
+    "blockNumber": 58700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8555355819246919917940524",
+    "totalSupply": "8127184542085886034655022",
+    "assetsPerShare": "1052683838412157108"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58800000",
+    "timestamp": "2025-12-24T17:01:41.000000Z",
+    "blockNumber": 58800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8548284703607179434323991",
+    "totalSupply": "8119747862801165081325036",
+    "assetsPerShare": "1052777111807776867"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-58900000",
+    "timestamp": "2025-12-25T17:43:26.000000Z",
+    "blockNumber": 58900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8549933870238834621741320",
+    "totalSupply": "8120215587885547242450681",
+    "assetsPerShare": "1052919565706405499"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59000000",
+    "timestamp": "2025-12-26T20:00:39.000000Z",
+    "blockNumber": 59000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8549900688154760209908736",
+    "totalSupply": "8119187577366157438146447",
+    "assetsPerShare": "1053048794190849935"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59100000",
+    "timestamp": "2025-12-28T09:00:37.000000Z",
+    "blockNumber": 59100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8550872913956579087138933",
+    "totalSupply": "8118297476205859262698046",
+    "assetsPerShare": "1053284009241909038"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59200000",
+    "timestamp": "2025-12-29T21:15:03.000000Z",
+    "blockNumber": 59200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8547768175814458172758743",
+    "totalSupply": "8114353120364897265840804",
+    "assetsPerShare": "1053413383546471848"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59300000",
+    "timestamp": "2025-12-31T11:59:10.000000Z",
+    "blockNumber": 59300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8547484422083336073331185",
+    "totalSupply": "8112136992347169590029424",
+    "assetsPerShare": "1053666183170583125"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59400000",
+    "timestamp": "2026-01-02T00:40:15.000000Z",
+    "blockNumber": 59400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8657159961233973261538109",
+    "totalSupply": "8214166039475082868875597",
+    "assetsPerShare": "1053930480541783572"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59500000",
+    "timestamp": "2026-01-03T12:24:16.000000Z",
+    "blockNumber": 59500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8653766104046003717201095",
+    "totalSupply": "8210019209742589394080674",
+    "assetsPerShare": "1054049434351728784"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59600000",
+    "timestamp": "2026-01-04T18:02:19.000000Z",
+    "blockNumber": 59600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8645144743226390510536482",
+    "totalSupply": "8200758644100686890207993",
+    "assetsPerShare": "1054188413342145855"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59700000",
+    "timestamp": "2026-01-06T00:51:37.000000Z",
+    "blockNumber": 59700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "8658435931350108968890819",
+    "totalSupply": "8211383394008555986235642",
+    "assetsPerShare": "1054443023287372662"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59800000",
+    "timestamp": "2026-01-07T04:26:01.000000Z",
+    "blockNumber": 59800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7928265124479210363902627",
+    "totalSupply": "7517937158344029710301811",
+    "assetsPerShare": "1054579861136477400"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-59900000",
+    "timestamp": "2026-01-08T08:11:48.000000Z",
+    "blockNumber": 59900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7488791814268168795283623",
+    "totalSupply": "7100218203679270808752602",
+    "assetsPerShare": "1054726995627760080"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60000000",
+    "timestamp": "2026-01-09T12:25:56.000000Z",
+    "blockNumber": 60000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7691653640806269579121709",
+    "totalSupply": "7291841405505883498160666",
+    "assetsPerShare": "1054830078311700259"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60100000",
+    "timestamp": "2026-01-10T19:07:52.000000Z",
+    "blockNumber": 60100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7668626960837441827624083",
+    "totalSupply": "7269125843976524915225291",
+    "assetsPerShare": "1054958618881520504"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60200000",
+    "timestamp": "2026-01-12T05:17:03.000000Z",
+    "blockNumber": 60200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7666689029357665347900706",
+    "totalSupply": "7265385965588437666645493",
+    "assetsPerShare": "1055234927045851082"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60300000",
+    "timestamp": "2026-01-13T13:57:07.000000Z",
+    "blockNumber": 60300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7666441859836232365779811",
+    "totalSupply": "7264252135534699853692492",
+    "assetsPerShare": "1055365606369048275"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60400000",
+    "timestamp": "2026-01-14T22:20:23.000000Z",
+    "blockNumber": 60400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7667786987295283342630911",
+    "totalSupply": "7264627031172688113945023",
+    "assetsPerShare": "1055496304819590355"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60500000",
+    "timestamp": "2026-01-16T08:04:52.000000Z",
+    "blockNumber": 60500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7640512994676138106096179",
+    "totalSupply": "7236995611390179860911922",
+    "assetsPerShare": "1055757582974192957"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60600000",
+    "timestamp": "2026-01-18T00:58:50.000000Z",
+    "blockNumber": 60600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7631530517674051016543615",
+    "totalSupply": "7226705415503549504344207",
+    "assetsPerShare": "1056017933331283258"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60700000",
+    "timestamp": "2026-01-19T14:09:49.000000Z",
+    "blockNumber": 60700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7628502914136340017918344",
+    "totalSupply": "7222944731111368321513211",
+    "assetsPerShare": "1056148592869347614"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60800000",
+    "timestamp": "2026-01-20T21:03:07.000000Z",
+    "blockNumber": 60800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7617900873729878666173375",
+    "totalSupply": "7211412494014312577410036",
+    "assetsPerShare": "1056367373250797061"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-60900000",
+    "timestamp": "2026-01-22T05:01:54.000000Z",
+    "blockNumber": 60900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7616719046402221139017973",
+    "totalSupply": "7208959548719305873458993",
+    "assetsPerShare": "1056562877753330577"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61000000",
+    "timestamp": "2026-01-23T15:32:07.000000Z",
+    "blockNumber": 61000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7620520744362300409615755",
+    "totalSupply": "7211522898322370130215110",
+    "assetsPerShare": "1056714490379705540"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61100000",
+    "timestamp": "2026-01-25T08:54:51.000000Z",
+    "blockNumber": 61100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7615484193588922252633241",
+    "totalSupply": "7205274600944615912654171",
+    "assetsPerShare": "1056931847204064590"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61200000",
+    "timestamp": "2026-01-26T15:00:37.000000Z",
+    "blockNumber": 61200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7615872599762714386945971",
+    "totalSupply": "7204747894808474197980033",
+    "assetsPerShare": "1057063024405126562"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61300000",
+    "timestamp": "2026-01-28T01:53:38.000000Z",
+    "blockNumber": 61300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7615613706414004404407900",
+    "totalSupply": "7202719254343426992593347",
+    "assetsPerShare": "1057324801577069843"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61400000",
+    "timestamp": "2026-01-29T12:16:45.000000Z",
+    "blockNumber": 61400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7625815460118517403981455",
+    "totalSupply": "7211424819927687801326685",
+    "assetsPerShare": "1057463074293685125"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61500000",
+    "timestamp": "2026-01-30T17:42:36.000000Z",
+    "blockNumber": 61500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7627916608106655635255712",
+    "totalSupply": "7212223585425221599023832",
+    "assetsPerShare": "1057637290047619262"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61600000",
+    "timestamp": "2026-01-31T20:12:38.000000Z",
+    "blockNumber": 61600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7615980766277614952929609",
+    "totalSupply": "7200485539083086443182576",
+    "assetsPerShare": "1057703779132571924"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61700000",
+    "timestamp": "2026-02-01T22:10:43.000000Z",
+    "blockNumber": 61700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7616872695194267560515953",
+    "totalSupply": "7200470737797863093282405",
+    "assetsPerShare": "1057829824265594287"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61800000",
+    "timestamp": "2026-02-02T19:43:21.000000Z",
+    "blockNumber": 61800000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7617569204132041880027785",
+    "totalSupply": "7200268554194677252876696",
+    "assetsPerShare": "1057956261880573442"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-61900000",
+    "timestamp": "2026-02-03T23:27:58.000000Z",
+    "blockNumber": 61900000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7610669643559205233042709",
+    "totalSupply": "7192890151677682963555478",
+    "assetsPerShare": "1058082284460312328"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62000000",
+    "timestamp": "2026-02-05T03:06:35.000000Z",
+    "blockNumber": 62000000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7610344476783116924337474",
+    "totalSupply": "7190868483657778937191727",
+    "assetsPerShare": "1058334538321574634"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62100000",
+    "timestamp": "2026-02-05T22:33:40.000000Z",
+    "blockNumber": 62100000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7308719030227508036246242",
+    "totalSupply": "6905868386208478755715308",
+    "assetsPerShare": "1058334538321574634"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62200000",
+    "timestamp": "2026-02-06T21:16:54.000000Z",
+    "blockNumber": 62200000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7299960775142590963162772",
+    "totalSupply": "6896759681626504721423688",
+    "assetsPerShare": "1058462395694349738"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62300000",
+    "timestamp": "2026-02-08T06:51:15.000000Z",
+    "blockNumber": 62300000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7299402312642437476445148",
+    "totalSupply": "6894579760352063820348395",
+    "assetsPerShare": "1058716059043706219"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62400000",
+    "timestamp": "2026-02-09T14:41:51.000000Z",
+    "blockNumber": 62400000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7301821306837663545356719",
+    "totalSupply": "6896034556367647936379332",
+    "assetsPerShare": "1058843491451956396"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62500000",
+    "timestamp": "2026-02-10T15:26:53.000000Z",
+    "blockNumber": 62500000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7301746232490455518579568",
+    "totalSupply": "6895142455046711889544375",
+    "assetsPerShare": "1058969597813913338"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62600000",
+    "timestamp": "2026-02-11T13:59:59.000000Z",
+    "blockNumber": 62600000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7302197474310299107152879",
+    "totalSupply": "6894747973569452742520526",
+    "assetsPerShare": "1059095633705942016"
+  },
+  {
+    "id": "146-0xb1e25689d55734fd3fffc939c4c3eb52dff8a794-62700000",
+    "timestamp": "2026-02-12T10:39:18.000000Z",
+    "blockNumber": 62700000,
+    "chainId": 146,
+    "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "totalAssets": "7302571566322448599994956",
+    "totalSupply": "6894281925299491188287851",
+    "assetsPerShare": "1059221488974026993"
   }
 ]

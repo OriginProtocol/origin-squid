@@ -24,7 +24,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "0",
     "balanceWeight": 1,
-    "earnings": "364345488054671832",
+    "earnings": "364254025702580325",
     "earningsChange": "0"
   },
   {
@@ -38,7 +38,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24754159923058131796088",
     "balanceWeight": 1,
-    "earnings": "91714726683527164713",
+    "earnings": "91710722977413828038",
     "earningsChange": "2309106699646487213"
   },
   {
@@ -52,7 +52,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24772085475475424008904",
     "balanceWeight": 1,
-    "earnings": "190611513688126293889",
+    "earnings": "190607906806394080395",
     "earningsChange": "2003291546604543346"
   },
   {
@@ -66,7 +66,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24772747867513043398905",
     "balanceWeight": 1,
-    "earnings": "257762833661920419333",
+    "earnings": "257759226780188205839",
     "earningsChange": "966588072023160736"
   },
   {
@@ -80,7 +80,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24773227349226772107104",
     "balanceWeight": 1,
-    "earnings": "306404816336786648326",
+    "earnings": "306401209455054434832",
     "earningsChange": "1007140809428236172"
   }
 ]

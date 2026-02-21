@@ -271,5 +271,26 @@
     "totalWithdrawals": "5702531897628078775443",
     "totalWithdrawalsClaimed": "5702516563792964512308",
     "totalYield": "126043136390099306173"
+  },
+  {
+    "id": "1:22300000:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "chainId": 1,
+    "timestamp": "2025-04-19T02:15:23.000000Z",
+    "blockNumber": 22300000,
+    "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "assets0": "955148110487590380976",
+    "assets1": "18670501480466775017",
+    "assetsPerShare": "1034571987930562318",
+    "outstandingAssets1": "5812984209106582965838",
+    "marketAssets": "0",
+    "feesAccrued": "349829462127059388",
+    "totalAssets": "6769294761648035765663",
+    "totalAssetsCap": "10000000000000000000000",
+    "totalDeposits": "12371057383714410520497",
+    "totalFees": "35335651809305036762",
+    "totalSupply": "6543087228940488743951",
+    "totalWithdrawals": "5744504548152103139762",
+    "totalWithdrawalsClaimed": "5727348185237773889660",
+    "totalYield": "142741926085728384928"
   }
 ]
