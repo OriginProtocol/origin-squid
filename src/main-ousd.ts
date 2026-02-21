@@ -1,7 +1,7 @@
 import { ousdProcessor } from 'ousd/processors/ousd'
 import 'tsconfig-paths/register'
 
-import { defineSquidProcessor } from '@originprotocol/squid-utils'
+import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
@@ -36,7 +36,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  initProcessorFromDump(processor).catch((error) => {
+  run(processor).catch((error) => {
     throw error
   })
 }
