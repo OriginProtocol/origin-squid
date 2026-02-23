@@ -164,10 +164,14 @@ export const processOTokenDailyStats = async (
       ).then((a) => a?.rate ?? 0n),
       underlyingSymbol === 'ETH'
         ? 10n ** 18n
-        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
+        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'ETH').then(
+            (a) => (a ? a.rate * 10n ** BigInt(18 - a.decimals) : 0n),
+          ),
       underlyingSymbol === 'USD'
         ? 10n ** 18n
-        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
+        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'USD').then(
+            (a) => (a ? a.rate * 10n ** BigInt(18 - a.decimals) : 0n),
+          ),
     ])
     if (process.env.DEBUG_PERF === 'true') {
       ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
