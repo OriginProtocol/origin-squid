@@ -13,7 +13,9 @@ async function main() {
   // Step 1: Get SQD credentials
   const sqdOutput = execSync('sqd view -o origin -n origin-squid -t prod --json', { encoding: 'utf8' })
   const sqd = JSON.parse(sqdOutput)
-  const params = sqd.addons.postgres.connections[0].params
+  const connections = sqd.addons.postgres.connections
+  const readConn = connections.find((c) => c.type === 'read')
+  const params = (readConn || connections[0]).params
 
   // Step 2: Connect to Railway database
   const client = new Client({ connectionString: RAILWAY_DATABASE_URL })
