@@ -103,5 +103,26 @@
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
     "totalYield": "73344130036427563060"
+  },
+  {
+    "id": "1:24500000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
+    "chainId": 1,
+    "timestamp": "2026-02-20T18:57:23.000000Z",
+    "blockNumber": 24500000,
+    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
+    "assets0": "2506870081096335955878",
+    "assets1": "22252883220373897863",
+    "assetsPerShare": "1005584291774542727",
+    "outstandingAssets1": "6967064899916849503614",
+    "marketAssets": "10599897991839320069325",
+    "feesAccrued": "515166700650572267",
+    "totalAssets": "20100477407177100624708",
+    "totalAssetsCap": "100000000000000000000000",
+    "totalDeposits": "20000000000000000000000",
+    "totalFees": "24604184843624583870",
+    "totalSupply": "19988853815234151542918",
+    "totalWithdrawals": "0",
+    "totalWithdrawalsClaimed": "0",
+    "totalYield": "100477407177100624708"
   }
 ]

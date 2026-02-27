@@ -1956,27 +1956,5 @@
     "chainId": 1,
     "symbol": "rETH",
     "strategy": "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
-  },
-  {
-    "id": "1:0x39254033945aa2e4809cc2977e7087bee48bd7ab:0xae7ab96520de3a18e5e111b5eaab095312d7fe84:23100000",
-    "blockNumber": 23100000,
-    "timestamp": "2025-08-09T00:44:59.000000Z",
-    "asset": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-    "balance": "8",
-    "balanceETH": "8",
-    "chainId": 1,
-    "symbol": "stETH",
-    "strategy": "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
-  },
-  {
-    "id": "1:0x39254033945aa2e4809cc2977e7087bee48bd7ab:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:23100000",
-    "blockNumber": 23100000,
-    "timestamp": "2025-08-09T00:44:59.000000Z",
-    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "balance": "1089803686481834319131",
-    "balanceETH": "1089803686481834319131",
-    "chainId": 1,
-    "symbol": "WETH",
-    "strategy": "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
   }
 ]

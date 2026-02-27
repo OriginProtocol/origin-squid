@@ -232,6 +232,7 @@ const oTokenDailyStats = (prefix: string, address: string) => {
       cumulativeYield
       dripperWETH
       fees
+      peg
       rateETH
       rateUSD
       rateNative

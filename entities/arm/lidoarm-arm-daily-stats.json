@@ -11,7 +11,7 @@
     "assets1": "10913954802561231651",
     "assetsPerShare": "1000040926379428522",
     "date": "2024-10-17",
-    "fees": "0",
+    "fees": "109139548025612",
     "feesAccrued": "109139548025612",
     "outstandingAssets1": "0",
     "marketAssets": "0",
@@ -26,7 +26,7 @@
     "totalWithdrawalsClaimed": "0",
     "yield": "437558192102449",
     "cumulativeYield": "437558192102449",
-    "cumulativeFees": "0"
+    "cumulativeFees": "109139548025612"
   },
   {
     "id": "1:2024-12-06:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -40,7 +40,7 @@
     "assets1": "10251649510832251455",
     "assetsPerShare": "1009412341004903255",
     "date": "2024-12-06",
-    "fees": "0",
+    "fees": "184188047657247024",
     "feesAccrued": "201700867267708331",
     "outstandingAssets1": "2852148688982491229769",
     "marketAssets": "0",
@@ -55,7 +55,7 @@
     "totalWithdrawalsClaimed": "42260184323563361431",
     "yield": "736752190628988097",
     "cumulativeYield": "17535310465985504182",
-    "cumulativeFees": "4182126499228667690"
+    "cumulativeFees": "4383827366496376021"
   },
   {
     "id": "1:2025-01-25:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -69,7 +69,7 @@
     "assets1": "102289599656243879",
     "assetsPerShare": "1021248650453268428",
     "date": "2025-01-25",
-    "fees": "817756785772058315",
+    "fees": "32612523973630770",
     "feesAccrued": "32383436890269953",
     "outstandingAssets1": "4906255838663798324484",
     "marketAssets": "0",
@@ -84,7 +84,7 @@
     "totalWithdrawalsClaimed": "58103745913551421513",
     "yield": "130450095894523082",
     "cumulativeYield": "55447845527675863565",
-    "cumulativeFees": "13829577695028695895"
+    "cumulativeFees": "13861961131918965848"
   },
   {
     "id": "1:2025-03-16:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -98,7 +98,7 @@
     "assets1": "13806354630639333885",
     "assetsPerShare": "1030574847155826626",
     "date": "2025-03-16",
-    "fees": "269718879409802025",
+    "fees": "177094673558008374",
     "feesAccrued": "47766382381944469",
     "outstandingAssets1": "4054057472058109203690",
     "marketAssets": "0",
@@ -113,7 +113,7 @@
     "totalWithdrawalsClaimed": "4009417910940413929457",
     "yield": "708378694232033498",
     "cumulativeYield": "116504263044093824695",
-    "cumulativeFees": "29078299128641511640"
+    "cumulativeFees": "29126065511023456109"
   },
   {
     "id": "1:2025-05-05:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -127,7 +127,7 @@
     "assets1": "52172215332531514045",
     "assetsPerShare": "1036232239065818879",
     "date": "2025-05-05",
-    "fees": "793725984083608",
+    "fees": "853942959424925",
     "feesAccrued": "73722062986879",
     "outstandingAssets1": "6141261918510961609897",
     "marketAssets": "0",
@@ -142,7 +142,7 @@
     "totalWithdrawalsClaimed": "5805389759633867842528",
     "yield": "3415771837699697",
     "cumulativeYield": "153504212453407101604",
-    "cumulativeFees": "38375979141288788434"
+    "cumulativeFees": "38376052863351775313"
   },
   {
     "id": "1:2025-06-24:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -156,7 +156,7 @@
     "assets1": "343732428611878044",
     "assetsPerShare": "1038773599997436978",
     "date": "2025-06-24",
-    "fees": "8207186628682647",
+    "fees": "8112589326672",
     "feesAccrued": "3402234969109",
     "outstandingAssets1": "409447078386543065000",
     "marketAssets": "0",
@@ -171,7 +171,7 @@
     "totalWithdrawalsClaimed": "12297882404519311931594",
     "yield": "32450357306687",
     "cumulativeYield": "162955325403711449081",
-    "cumulativeFees": "40738827698692893053"
+    "cumulativeFees": "40738831100927862162"
   },
   {
     "id": "1:2025-08-13:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -185,7 +185,7 @@
     "assets1": "144000000000000000",
     "assetsPerShare": "1046845890081384275",
     "date": "2025-08-13",
-    "fees": "51692803728522042",
+    "fees": "258004516464428884",
     "feesAccrued": "206311712735906842",
     "outstandingAssets1": "2145095290117300575288",
     "marketAssets": "1",
@@ -200,7 +200,7 @@
     "totalWithdrawalsClaimed": "12513156027547031129776",
     "yield": "1032018065857715537",
     "cumulativeYield": "171741513399302858606",
-    "cumulativeFees": "42729066387089807684"
+    "cumulativeFees": "42935378099825714526"
   },
   {
     "id": "1:2025-10-02:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -214,7 +214,7 @@
     "assets1": "1430306809086164974",
     "assetsPerShare": "1053663565019077275",
     "date": "2025-10-02",
-    "fees": "201991924050932275",
+    "fees": "140881883679321039",
     "feesAccrued": "20212002083618692",
     "outstandingAssets1": "2886327488138803669430",
     "marketAssets": "2461182534521840136257",
@@ -229,7 +229,7 @@
     "totalWithdrawalsClaimed": "12814212878981451053521",
     "yield": "563527534717284157",
     "cumulativeYield": "196575785028053463168",
-    "cumulativeFees": "49123734004929746956"
+    "cumulativeFees": "49143946007013365648"
   },
   {
     "id": "1:2025-11-21:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -243,7 +243,7 @@
     "assets1": "1083526303714127909",
     "assetsPerShare": "1061386450833682037",
     "date": "2025-11-21",
-    "fees": "428603137791251849",
+    "fees": "304446630714876565",
     "feesAccrued": "141636720570527591",
     "outstandingAssets1": "5094753062540823651541",
     "marketAssets": "1",
@@ -258,7 +258,7 @@
     "totalWithdrawalsClaimed": "17052367905268967613684",
     "yield": "1217786522859506265",
     "cumulativeYield": "243865330006615440714",
-    "cumulativeFees": "60824695531083332418"
+    "cumulativeFees": "60966332251653860009"
   },
   {
     "id": "1:2026-01-10:0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -272,7 +272,7 @@
     "assets1": "1518294336185241655",
     "assetsPerShare": "1064860856430882165",
     "date": "2026-01-10",
-    "fees": "21582509816290753",
+    "fees": "20807917608068860",
     "feesAccrued": "10069432268461980",
     "outstandingAssets1": "0",
     "marketAssets": "2816040860022719428267",
@@ -287,6 +287,6 @@
     "totalWithdrawalsClaimed": "21225624582525662459087",
     "yield": "83231670432275438",
     "cumulativeYield": "262414133772941960889",
-    "cumulativeFees": "65593463760967028046"
+    "cumulativeFees": "65603533193235490026"
   }
 ]

@@ -86,5 +86,16 @@
     "chainId": 1,
     "symbol": "WETH",
     "strategy": "0xaf04828ed923216c77dc22a2fc8e077fdadaa87d"
+  },
+  {
+    "id": "1:0xaf04828ed923216c77dc22a2fc8e077fdadaa87d:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:24500000",
+    "blockNumber": 24500000,
+    "timestamp": "2026-02-20T18:57:23.000000Z",
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "242703770728550269930",
+    "balanceETH": "242703770728550269930",
+    "chainId": 1,
+    "symbol": "WETH",
+    "strategy": "0xaf04828ed923216c77dc22a2fc8e077fdadaa87d"
   }
 ]
