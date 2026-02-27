@@ -45,6 +45,9 @@ export class OTokenDailyStat {
     apy30!: number
 
     @BigIntColumn_({nullable: false})
+    peg!: bigint
+
+    @BigIntColumn_({nullable: false})
     rateUSD!: bigint
 
     @BigIntColumn_({nullable: false})
@@ -52,12 +55,6 @@ export class OTokenDailyStat {
 
     @BigIntColumn_({nullable: false})
     rateNative!: bigint
-
-    @BigIntColumn_({nullable: false})
-    urateUSD!: bigint
-
-    @BigIntColumn_({nullable: false})
-    urateETH!: bigint
 
     @BigIntColumn_({nullable: false})
     totalSupply!: bigint

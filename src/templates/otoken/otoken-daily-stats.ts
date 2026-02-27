@@ -99,15 +99,14 @@ export const processOTokenDailyStats = async (
       otokenObject,
       apy,
       rebases,
+      peg,
       rateETH,
       rateUSD,
+      rateNative,
       dripperWETH,
       amoSupply,
       wrappedSupply,
       wrappedRate,
-      rateNative,
-      urateETH,
-      urateUSD,
     ] = await Promise.all([
       (async () => {
         let otokenObject = findLast(params.otokens, (o) => o.timestamp <= blockDate)
@@ -150,28 +149,37 @@ export const processOTokenDailyStats = async (
         )
         return rebases
       })(),
-      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'ETH').then((a) => a?.rate ?? 0n),
-      ensureExchangeRate(ctx, block, params.otokenAddress as CurrencyAddress, 'USD').then((a) => a?.rate ?? 0n),
-      getDripperAvailableFunds(),
-      params.getAmoSupply(ctx, block.header.height),
-      wotokenContract ? wotokenContract.totalSupply() : 0n,
-      wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
+      // peg: OToken → underlying (e.g., OETH→ETH, OUSD→USD, OS→S)
       ensureExchangeRate(
         ctx,
         block,
         params.otokenAddress as CurrencyAddress,
-        ctx.chain.nativeCurrency.symbol as Currency,
+        (underlyingSymbol === 'ETH' || underlyingSymbol === 'USD')
+          ? underlyingSymbol as Currency
+          : ctx.chain.nativeCurrency.symbol as Currency,
       ).then((a) => a?.rate ?? 0n),
+      // rateETH: underlying → ETH
       underlyingSymbol === 'ETH'
         ? 10n ** 18n
         : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'ETH').then(
             (a) => (a ? a.rate * 10n ** BigInt(18 - a.decimals) : 0n),
           ),
+      // rateUSD: underlying → USD
       underlyingSymbol === 'USD'
         ? 10n ** 18n
         : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, 'USD').then(
             (a) => (a ? a.rate * 10n ** BigInt(18 - a.decimals) : 0n),
           ),
+      // rateNative: underlying → chain native currency
+      underlyingSymbol === ctx.chain.nativeCurrency.symbol
+        ? 10n ** 18n
+        : ensureExchangeRate(ctx, block, underlyingSymbol as CurrencyAddress, ctx.chain.nativeCurrency.symbol as Currency).then(
+            (a) => (a ? a.rate * 10n ** BigInt(18 - a.decimals) : 0n),
+          ),
+      getDripperAvailableFunds(),
+      params.getAmoSupply(ctx, block.header.height),
+      wotokenContract ? wotokenContract.totalSupply() : 0n,
+      wotokenContract ? wotokenContract.previewRedeem(10n ** 18n) : 0n,
     ])
     if (process.env.DEBUG_PERF === 'true') {
       ctx.log.info(`getOTokenDailyStat async calls took ${Date.now() - asyncStartTime}ms`)
@@ -218,11 +226,10 @@ export const processOTokenDailyStats = async (
     entity.cumulativeYield = (last?.cumulativeYield ?? 0n) + entity.yield
     entity.cumulativeFees = (last?.cumulativeFees ?? 0n) + entity.fees
 
+    entity.peg = peg
     entity.rateETH = rateETH
     entity.rateUSD = rateUSD
     entity.rateNative = rateNative
-    entity.urateETH = urateETH
-    entity.urateUSD = urateUSD
     entity.amoSupply = amoSupply
 
     entity.dripperWETH = dripperWETH
@@ -263,11 +270,10 @@ export const getOTokenDailyStat = async (
       apy14: 0,
       apy30: 0,
 
+      peg: 0n,
       rateUSD: 0n,
       rateETH: 0n,
       rateNative: 0n,
-      urateUSD: 0n,
-      urateETH: 0n,
 
       totalSupply: 0n,
       rebasingSupply: 0n,

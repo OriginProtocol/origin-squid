@@ -181,6 +181,7 @@ async function waitForDbReady({
 type RunCmdOptions = { env?: NodeJS.ProcessEnv; capture?: boolean }
 
 async function runCmd(cmd: string, opts: RunCmdOptions = {}) {
+  console.log(`Running command: ${cmd}`)
   const { env, capture = false } = opts
   return await new Promise<{ stdout: string }>((resolve, reject) => {
     const child = spawn(cmd, {
@@ -321,7 +322,6 @@ async function main() {
     await runCmd(`${awsCmd}`)
 
     console.log('Done.')
-  } finally {
     if (startedCompose) {
       console.log('Shutting down docker compose project...')
       try {
@@ -332,6 +332,14 @@ async function main() {
     } else {
       console.log('Leaving existing docker compose project running.')
     }
+  } catch (err) {
+    console.error('Error during processing/upload:', err)
+    if (startedCompose) {
+      console.warn(`\nDocker compose project "${composeProject}" left running to preserve data.`)
+      console.warn(`Re-run with --continue to retry, or manually tear down with:`)
+      console.warn(`  DB_PORT=${DB_PORT} docker-compose -p ${composeProject} down --volumes`)
+    }
+    throw err
   }
 }
 

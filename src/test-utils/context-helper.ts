@@ -61,6 +61,7 @@ export const createMockOTokenDailyStat = (overrides: Partial<OTokenDailyStat> = 
     otoken: OETH_ADDRESS,
     timestamp: new Date('2023-10-01T23:59:59Z'),
     blockNumber: 18000000,
+    peg: BigInt(10 ** 18), // 1:1 peg to underlying
     rateETH: BigInt(10 ** 18), // 1:1 rate
     rateUSD: BigInt(1800 * 10 ** 18), // $1800 ETH
     totalSupply: BigInt(100000 * 10 ** 18), // 100k tokens

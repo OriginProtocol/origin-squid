@@ -527,11 +527,10 @@ type OTokenDailyStat @entity {
   apy14: Float!
   apy30: Float!
 
+  peg: BigInt!
   rateUSD: BigInt!
   rateETH: BigInt!
   rateNative: BigInt!
-  urateUSD: BigInt!
-  urateETH: BigInt!
 
   totalSupply: BigInt!
   rebasingSupply: BigInt!
