@@ -21,6 +21,9 @@ import { Pool } from '@model'
 import { Context, EvmBatchProcessor, defineProcessor, joinProcessors, logFilter } from '@originprotocol/squid-utils'
 import { baseAddresses } from '@utils/addresses-base'
 
+/** Strip null bytes that some contracts return from bytes32 storage. PostgreSQL rejects \0 in text. */
+const clean = (s: string) => s.replace(/\0/g, '')
+
 /**
  * For curve data refer to the AddressProvider:
  * https://docs.curve.fi/integration/address-provider/?h=addressprovider
@@ -226,15 +229,15 @@ export const createCurveStableProcessor = (params: { address: string; from: numb
               // Handle meta pool
               const poolContract = new stableSwapMetaNgAbi.Contract(ctx, block.header, poolAddress)
               const [name, symbol, coins] = await Promise.all([
-                poolContract.name(),
-                poolContract.symbol(),
+                poolContract.name().then(clean),
+                poolContract.symbol().then(clean),
                 factory.get_coins(poolAddress),
               ])
               const [symbols, decimals] = await Promise.all([
                 Promise.all(
                   coins.map(async (coin) => {
                     const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.symbol()
+                    return tokenContract.symbol().then(clean)
                   }),
                 ),
                 Promise.all(
@@ -264,15 +267,15 @@ export const createCurveStableProcessor = (params: { address: string; from: numb
               // Handle plain pool
               const poolContract = new stableSwapNgAbi.Contract(ctx, block.header, poolAddress)
               const [name, symbol, coins] = await Promise.all([
-                poolContract.name(),
-                poolContract.symbol(),
+                poolContract.name().then(clean),
+                poolContract.symbol().then(clean),
                 factory.get_coins(poolAddress),
               ])
               const [symbols, decimals] = await Promise.all([
                 Promise.all(
                   coins.map(async (coin) => {
                     const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.symbol()
+                    return tokenContract.symbol().then(clean)
                   }),
                 ),
                 Promise.all(
@@ -329,7 +332,7 @@ export const createCurveTwoCryptoProcessor = (params: { address: string; from: n
               Promise.all(
                 data.coins.map(async (coin) => {
                   const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.symbol()
+                  return tokenContract.symbol().then(clean)
                 }),
               ),
               Promise.all(
@@ -343,8 +346,8 @@ export const createCurveTwoCryptoProcessor = (params: { address: string; from: n
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
               address: data.pool,
-              name: data.name,
-              symbol: data.symbol,
+              name: clean(data.name),
+              symbol: clean(data.symbol),
               createdAtBlock: block.header.height,
               createdAt: new Date(block.header.timestamp),
               tokens: data.coins.map((coin) => coin.toLowerCase()),
@@ -384,7 +387,7 @@ export const createCurveTriCryptoProcessor = (params: { address: string; from: n
               Promise.all(
                 data.coins.map(async (coin) => {
                   const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.symbol()
+                  return tokenContract.symbol().then(clean)
                 }),
               ),
               Promise.all(
@@ -398,8 +401,8 @@ export const createCurveTriCryptoProcessor = (params: { address: string; from: n
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
               address: data.pool,
-              name: data.name,
-              symbol: data.symbol,
+              name: clean(data.name),
+              symbol: clean(data.symbol),
               createdAtBlock: block.header.height,
               createdAt: new Date(block.header.timestamp),
               tokens: data.coins.map((coin) => coin.toLowerCase()),
@@ -439,10 +442,10 @@ export const createSwapxPairProcessor = (params: { address: string; from: number
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const poolContract = new erc20Abi.Contract(ctx, block.header, data.pair)
             const [name, symbol, symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              poolContract.name(),
-              poolContract.symbol(),
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              poolContract.name().then(clean),
+              poolContract.symbol().then(clean),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
@@ -491,8 +494,8 @@ export const createAlgebraProcessor = (params: { address: string; from: number }
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const poolContract = new algebraPoolAbi.Contract(ctx, block.header, data.pool)
             const [symbol0, symbol1, decimals0, decimals1, tickSpacing] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
               poolContract.tickSpacing(),
@@ -550,8 +553,8 @@ export const createAeroProcessor = () => {
             let symbol0: string, symbol1: string, decimals0: number, decimals1: number
             try {
               ;[symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-                token0Contract.symbol(),
-                token1Contract.symbol(),
+                token0Contract.symbol().then(clean),
+                token1Contract.symbol().then(clean),
                 token0Contract.decimals(),
                 token1Contract.decimals(),
               ])
@@ -585,8 +588,8 @@ export const createAeroProcessor = () => {
             let symbol0: string, symbol1: string, decimals0: number, decimals1: number
             try {
               ;[symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-                token0Contract.symbol(),
-                token1Contract.symbol(),
+                token0Contract.symbol().then(clean),
+                token1Contract.symbol().then(clean),
                 token0Contract.decimals(),
                 token1Contract.decimals(),
               ])
@@ -648,8 +651,8 @@ export const createMetropolisProcessor = () => {
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
@@ -673,8 +676,8 @@ export const createMetropolisProcessor = () => {
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.tokenX)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.tokenY)
             const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
@@ -729,8 +732,8 @@ export const createShadowProcessor = () => {
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
@@ -754,8 +757,8 @@ export const createShadowProcessor = () => {
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.token0)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.token1)
             const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
@@ -803,8 +806,8 @@ export const createMaverickV2Processor = (params: { address: string; from: numbe
             const token0Contract = new erc20Abi.Contract(ctx, block.header, data.tokenA)
             const token1Contract = new erc20Abi.Contract(ctx, block.header, data.tokenB)
             const [symbol0, symbol1, decimals0, decimals1] = await Promise.all([
-              token0Contract.symbol(),
-              token1Contract.symbol(),
+              token0Contract.symbol().then(clean),
+              token1Contract.symbol().then(clean),
               token0Contract.decimals(),
               token1Contract.decimals(),
             ])
