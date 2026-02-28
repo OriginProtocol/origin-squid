@@ -52,9 +52,10 @@ export const processOTokenDailyStats = async (
     if (block.header.height < params.from) continue
     const blockDate = new Date(block.header.timestamp)
 
-    // Only update if we're within 20 seconds of the end of the hour (or force update is enabled)
+    // Only update if we're within 20 seconds of the end of the hour, force update is enabled, or the entity is uninitialized.
+    const needsInit = entity.totalSupply === 0n
     const secondsUntilHourEnd = dayjs.utc(blockDate).endOf('hour').diff(dayjs.utc(blockDate), 'seconds')
-    if (!params.forceUpdate && secondsUntilHourEnd >= 20) continue
+    if (!needsInit && !params.forceUpdate && secondsUntilHourEnd >= 20) continue
 
     const startOfDay = dayjs.utc(blockDate).startOf('day').toDate()
     const getDripperAvailableFunds = async () => {
