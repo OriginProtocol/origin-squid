@@ -1,3 +1,4 @@
+import { startToastVacuumMonitor } from '@utils/toast-vacuum'
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
 import { notionProcessor } from 'mainnet/processors/notion'
 import { ognBuybacks } from 'mainnet/processors/ogn-buybacks'
@@ -65,6 +66,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
+  startToastVacuumMonitor()
   run(processor).catch((error) => {
     throw error
   })
