@@ -28,5 +28,15 @@
     "txHash": "0x241bd3522f42c7e578c9a3d1d4dcae02737a15fb2c0212f423d9e983ab5d905a",
     "status": "OptIn",
     "delegatedTo": null
+  },
+  {
+    "id": "1-0xee93196923fdb617e343d5c48070617ecaba62d50bc57419a2f2f8c83507247b-0-1-0x0649871d36c4dac5e854dc85a02a1c95dcedcc6c",
+    "timestamp": "2026-03-06T13:13:59.000000Z",
+    "blockNumber": 24598642,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "txHash": "0xee93196923fdb617e343d5c48070617ecaba62d50bc57419a2f2f8c83507247b",
+    "status": "OptIn",
+    "delegatedTo": null
   }
 ]
