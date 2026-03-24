@@ -1,7 +1,8 @@
 import * as feeAccumulatorAbi from '@abi/fee-accumulator'
+import * as compoundStakingSSVAbi from '@abi/strategy-compound-staking-ssv'
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
-import { Context, EvmBatchProcessor, defineProcessor } from '@originprotocol/squid-utils'
+import { Context, EvmBatchProcessor, defineProcessor, logFilter } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
@@ -189,6 +190,13 @@ export const oethStrategies: readonly IStrategyData[] = [
           rewardTokenCollected: true,
           rewardTokenCollectedSimple: true,
         },
+        balanceUpdateLogFilters: [
+          logFilter({
+            address: [strategy.address],
+            topic0: [nativeStakingAbi.events.ConsolidationConfirmed.topic],
+            range: { from: strategy.from },
+          }),
+        ] as ReturnType<typeof logFilter>[],
       }) as const,
   ),
   ...OETH_COMPOUND_STAKING_SSV_STRATEGIES.map(
@@ -208,6 +216,13 @@ export const oethStrategies: readonly IStrategyData[] = [
           rewardTokenCollected: true,
           rewardTokenCollectedSimple: true,
         },
+        balanceUpdateLogFilters: [
+          logFilter({
+            address: [strategy.address],
+            topic0: [compoundStakingSSVAbi.events.BalancesVerified.topic],
+            range: { from: strategy.from },
+          }),
+        ] as ReturnType<typeof logFilter>[],
       }) as const,
   ),
 ]

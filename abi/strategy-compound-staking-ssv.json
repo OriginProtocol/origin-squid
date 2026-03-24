@@ -11,76 +11,32 @@
         "type": "tuple"
       },
       { "internalType": "address", "name": "_wethAddress", "type": "address" },
-      { "internalType": "address", "name": "_ssvToken", "type": "address" },
       { "internalType": "address", "name": "_ssvNetwork", "type": "address" },
-      { "internalType": "uint256", "name": "_maxValidators", "type": "uint256" },
-      { "internalType": "address", "name": "_feeAccumulator", "type": "address" },
-      { "internalType": "address", "name": "_beaconChainDepositContract", "type": "address" }
+      { "internalType": "address", "name": "_beaconChainDepositContract", "type": "address" },
+      { "internalType": "address", "name": "_beaconProofs", "type": "address" },
+      { "internalType": "uint64", "name": "_beaconGenesisTimestamp", "type": "uint64" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }],
-    "name": "AccountingConsensusRewards",
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "blockRoot", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint256", "name": "ethBalance", "type": "uint256" }
+    ],
+    "name": "BalancesSnapped",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "noOfValidators", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "remainingValidators", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "wethSentToVault", "type": "uint256" }
+      { "indexed": true, "internalType": "uint64", "name": "timestamp", "type": "uint64" },
+      { "indexed": false, "internalType": "uint256", "name": "totalDepositsWei", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "totalValidatorBalance", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "ethBalance", "type": "uint256" }
     ],
-    "name": "AccountingFullyWithdrawnValidator",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "int256", "name": "validatorsDelta", "type": "int256" },
-      { "indexed": false, "internalType": "int256", "name": "consensusRewardsDelta", "type": "int256" },
-      { "indexed": false, "internalType": "uint256", "name": "wethToVault", "type": "uint256" }
-    ],
-    "name": "AccountingManuallyFixed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "remainingValidators", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "wethSentToVault", "type": "uint256" }
-    ],
-    "name": "AccountingValidatorSlashed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "consolidationCount", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "activeDepositedValidators", "type": "uint256" }
-    ],
-    "name": "ConsolidationConfirmed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "bytes[]", "name": "sourcePubKeys", "type": "bytes[]" },
-      { "indexed": false, "internalType": "uint256", "name": "consolidationCount", "type": "uint256" }
-    ],
-    "name": "ConsolidationFailed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": false, "internalType": "bytes[]", "name": "sourcePubKeys", "type": "bytes[]" },
-      { "indexed": false, "internalType": "bytes", "name": "targetPubKey", "type": "bytes" },
-      { "indexed": false, "internalType": "uint256", "name": "consolidationCount", "type": "uint256" }
-    ],
-    "name": "ConsolidationRequested",
+    "name": "BalancesVerified",
     "type": "event"
   },
   {
@@ -96,22 +52,24 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
-      { "indexed": false, "internalType": "bytes", "name": "pubKey", "type": "bytes" },
-      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+      { "indexed": true, "internalType": "bytes32", "name": "pendingDepositRoot", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint256", "name": "amountWei", "type": "uint256" }
     ],
-    "name": "ETHStaked",
+    "name": "DepositVerified",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "start", "type": "uint256" },
-      { "indexed": false, "internalType": "uint256", "name": "end", "type": "uint256" }
+      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "indexed": true, "internalType": "bytes32", "name": "pendingDepositRoot", "type": "bytes32" },
+      { "indexed": false, "internalType": "bytes", "name": "pubKey", "type": "bytes" },
+      { "indexed": false, "internalType": "uint256", "name": "amountWei", "type": "uint256" }
     ],
-    "name": "FuseIntervalUpdated",
+    "name": "ETHStaked",
     "type": "event"
   },
+  { "anonymous": false, "inputs": [], "name": "FirstDepositReset", "type": "event" },
   {
     "anonymous": false,
     "inputs": [
@@ -192,49 +150,48 @@
     "anonymous": false,
     "inputs": [
       { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
-      { "indexed": false, "internalType": "bytes", "name": "pubKey", "type": "bytes" },
-      { "indexed": false, "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" }
-    ],
-    "name": "SSVValidatorExitCompleted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
-      { "indexed": false, "internalType": "bytes", "name": "pubKey", "type": "bytes" },
-      { "indexed": false, "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" }
-    ],
-    "name": "SSVValidatorExitInitiated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
-      { "indexed": false, "internalType": "bytes", "name": "pubKey", "type": "bytes" },
       { "indexed": false, "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" }
     ],
     "name": "SSVValidatorRegistered",
     "type": "event"
   },
-  { "anonymous": false, "inputs": [], "name": "StakeETHTallyReset", "type": "event" },
   {
     "anonymous": false,
-    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }],
-    "name": "StakeETHThresholdChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [{ "indexed": true, "internalType": "address", "name": "newAddress", "type": "address" }],
-    "name": "StakingMonitorChanged",
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" }
+    ],
+    "name": "SSVValidatorRemoved",
     "type": "event"
   },
   {
     "anonymous": false,
     "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
     "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" }],
+    "name": "ValidatorInvalid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "indexed": true, "internalType": "uint40", "name": "validatorIndex", "type": "uint40" }
+    ],
+    "name": "ValidatorVerified",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "indexed": false, "internalType": "uint256", "name": "amountWei", "type": "uint256" }
+    ],
+    "name": "ValidatorWithdraw",
     "type": "event"
   },
   {
@@ -249,71 +206,15 @@
   },
   {
     "inputs": [],
-    "name": "BEACON_CHAIN_DEPOSIT_CONTRACT",
+    "name": "BEACON_PROOFS",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "FEE_ACCUMULATOR_ADDRESS",
-    "outputs": [{ "internalType": "address payable", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "FULL_STAKE",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MAX_VALIDATORS",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MIN_FIX_ACCOUNTING_CADENCE",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SSV_NETWORK",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SSV_TOKEN",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "VAULT_ADDRESS",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "WETH",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "activeDepositedValidators",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "SNAP_BALANCES_DELAY",
+    "outputs": [{ "internalType": "uint64", "name": "", "type": "uint64" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -334,20 +235,6 @@
   { "inputs": [], "name": "claimGovernance", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   { "inputs": [], "name": "collectRewardTokens", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
-    "inputs": [{ "internalType": "uint256", "name": "consolidationCount", "type": "uint256" }],
-    "name": "confirmConsolidation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "consensusRewards",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       { "internalType": "address", "name": "_asset", "type": "address" },
       { "internalType": "uint256", "name": "_amount", "type": "uint256" }
@@ -359,6 +246,20 @@
   },
   { "inputs": [], "name": "depositAll", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "depositList",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "depositListLength",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "depositedWethAccountedFor",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
@@ -366,40 +267,22 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "doAccounting",
-    "outputs": [{ "internalType": "bool", "name": "accountingValid", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes", "name": "publicKey", "type": "bytes" },
-      { "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" }
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "deposits",
+    "outputs": [
+      { "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "internalType": "uint64", "name": "amountGwei", "type": "uint64" },
+      { "internalType": "uint64", "name": "slot", "type": "uint64" },
+      { "internalType": "uint32", "name": "depositIndex", "type": "uint32" },
+      { "internalType": "enum CompoundingValidatorManager.DepositStatus", "name": "status", "type": "uint8" }
     ],
-    "name": "exitSsvValidator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "bytes[]", "name": "sourcePubKeys", "type": "bytes[]" }],
-    "name": "failConsolidation",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "fuseIntervalEnd",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "fuseIntervalStart",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "firstDeposit",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -444,20 +327,9 @@
   },
   {
     "inputs": [],
-    "name": "lastFixAccountingBlockNumber",
+    "name": "lastVerifiedEthBalance",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "int256", "name": "_validatorsDelta", "type": "int256" },
-      { "internalType": "int256", "name": "_consensusRewardsDelta", "type": "int256" },
-      { "internalType": "uint256", "name": "_ethToVaultAmount", "type": "uint256" }
-    ],
-    "name": "manuallyFixAccounting",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -498,9 +370,9 @@
   },
   {
     "inputs": [
-      { "internalType": "bytes[]", "name": "publicKeys", "type": "bytes[]" },
+      { "internalType": "bytes", "name": "publicKey", "type": "bytes" },
       { "internalType": "uint64[]", "name": "operatorIds", "type": "uint64[]" },
-      { "internalType": "bytes[]", "name": "sharesData", "type": "bytes[]" },
+      { "internalType": "bytes", "name": "sharesData", "type": "bytes" },
       {
         "components": [
           { "internalType": "uint32", "name": "validatorCount", "type": "uint32" },
@@ -514,16 +386,16 @@
         "type": "tuple"
       }
     ],
-    "name": "registerSsvValidators",
+    "name": "registerSsvValidator",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_assetIndex", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "removePToken",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -548,17 +420,7 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "inputs": [
-      { "internalType": "bytes[]", "name": "sourcePubKeys", "type": "bytes[]" },
-      { "internalType": "bytes", "name": "targetPubKey", "type": "bytes" }
-    ],
-    "name": "requestConsolidation",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  { "inputs": [], "name": "resetStakeETHTally", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  { "inputs": [], "name": "resetFirstDeposit", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
     "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "rewardTokenAddresses",
@@ -567,17 +429,6 @@
     "type": "function"
   },
   { "inputs": [], "name": "safeApproveAllTokens", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-  { "inputs": [], "name": "setFeeRecipient", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "_fuseIntervalStart", "type": "uint256" },
-      { "internalType": "uint256", "name": "_fuseIntervalEnd", "type": "uint256" }
-    ],
-    "name": "setFuseInterval",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
   {
     "inputs": [{ "internalType": "address", "name": "_harvesterAddress", "type": "address" }],
     "name": "setHarvesterAddress",
@@ -587,12 +438,12 @@
   },
   {
     "inputs": [
-      { "internalType": "address", "name": "_asset", "type": "address" },
-      { "internalType": "address", "name": "_pToken", "type": "address" }
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" }
     ],
     "name": "setPTokenAddress",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -609,31 +460,15 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_amount", "type": "uint256" }],
-    "name": "setStakeETHThreshold",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "_address", "type": "address" }],
-    "name": "setStakingMonitor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
+  { "inputs": [], "name": "snapBalances", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
     "inputs": [],
-    "name": "stakeETHTally",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stakeETHThreshold",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "snappedBalance",
+    "outputs": [
+      { "internalType": "bytes32", "name": "blockRoot", "type": "bytes32" },
+      { "internalType": "uint64", "name": "timestamp", "type": "uint64" },
+      { "internalType": "uint128", "name": "ethBalance", "type": "uint128" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -645,21 +480,15 @@
           { "internalType": "bytes", "name": "signature", "type": "bytes" },
           { "internalType": "bytes32", "name": "depositDataRoot", "type": "bytes32" }
         ],
-        "internalType": "struct ValidatorStakeData[]",
-        "name": "validators",
-        "type": "tuple[]"
-      }
+        "internalType": "struct CompoundingValidatorManager.ValidatorStakeData",
+        "name": "validatorStakeData",
+        "type": "tuple"
+      },
+      { "internalType": "uint64", "name": "depositAmountGwei", "type": "uint64" }
     ],
     "name": "stakeEth",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stakingMonitor",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -686,6 +515,17 @@
     "stateMutability": "nonpayable",
     "type": "function"
   },
+  { "inputs": [], "name": "unPause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "validator",
+    "outputs": [
+      { "internalType": "enum CompoundingValidatorManager.ValidatorState", "name": "state", "type": "uint8" },
+      { "internalType": "uint40", "name": "index", "type": "uint40" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
   {
     "inputs": [],
     "name": "validatorRegistrator",
@@ -694,10 +534,13 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
-    "name": "validatorsStates",
-    "outputs": [{ "internalType": "enum ValidatorRegistrator.VALIDATOR_STATE", "name": "", "type": "uint8" }],
-    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "bytes", "name": "publicKey", "type": "bytes" },
+      { "internalType": "uint64", "name": "amountGwei", "type": "uint64" }
+    ],
+    "name": "validatorWithdrawal",
+    "outputs": [],
+    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -705,6 +548,91 @@
     "name": "vaultAddress",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "verifiedValidators",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "verifiedValidatorsLength",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "balancesContainerRoot", "type": "bytes32" },
+          { "internalType": "bytes", "name": "balancesContainerProof", "type": "bytes" },
+          { "internalType": "bytes32[]", "name": "validatorBalanceLeaves", "type": "bytes32[]" },
+          { "internalType": "bytes[]", "name": "validatorBalanceProofs", "type": "bytes[]" }
+        ],
+        "internalType": "struct CompoundingValidatorManager.BalanceProofs",
+        "name": "balanceProofs",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          { "internalType": "bytes32", "name": "pendingDepositContainerRoot", "type": "bytes32" },
+          { "internalType": "bytes", "name": "pendingDepositContainerProof", "type": "bytes" },
+          { "internalType": "uint32[]", "name": "pendingDepositIndexes", "type": "uint32[]" },
+          { "internalType": "bytes[]", "name": "pendingDepositProofs", "type": "bytes[]" }
+        ],
+        "internalType": "struct CompoundingValidatorManager.PendingDepositProofs",
+        "name": "pendingDepositProofs",
+        "type": "tuple"
+      }
+    ],
+    "name": "verifyBalances",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "pendingDepositRoot", "type": "bytes32" },
+      { "internalType": "uint64", "name": "depositProcessedSlot", "type": "uint64" },
+      {
+        "components": [
+          { "internalType": "uint64", "name": "slot", "type": "uint64" },
+          { "internalType": "bytes", "name": "proof", "type": "bytes" }
+        ],
+        "internalType": "struct CompoundingValidatorManager.FirstPendingDepositSlotProofData",
+        "name": "firstPendingDeposit",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          { "internalType": "uint64", "name": "withdrawableEpoch", "type": "uint64" },
+          { "internalType": "bytes", "name": "withdrawableEpochProof", "type": "bytes" }
+        ],
+        "internalType": "struct CompoundingValidatorManager.StrategyValidatorProofData",
+        "name": "strategyValidatorData",
+        "type": "tuple"
+      }
+    ],
+    "name": "verifyDeposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint64", "name": "nextBlockTimestamp", "type": "uint64" },
+      { "internalType": "uint40", "name": "validatorIndex", "type": "uint40" },
+      { "internalType": "bytes32", "name": "pubKeyHash", "type": "bytes32" },
+      { "internalType": "bytes32", "name": "withdrawalCredentials", "type": "bytes32" },
+      { "internalType": "bytes", "name": "validatorPubKeyProof", "type": "bytes" }
+    ],
+    "name": "verifyValidator",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {

@@ -7,6 +7,9 @@ export const events = {
     AccountingFullyWithdrawnValidator: event("0xbe7040030ff7b347853214bf49820c6d455fedf58f3815f85c7bc5216993682b", "AccountingFullyWithdrawnValidator(uint256,uint256,uint256)", {"noOfValidators": p.uint256, "remainingValidators": p.uint256, "wethSentToVault": p.uint256}),
     AccountingManuallyFixed: event("0x80d022717ea022455c5886b8dd8a29c037570aae58aeb4d7b136d7a10ec2e431", "AccountingManuallyFixed(int256,int256,uint256)", {"validatorsDelta": p.int256, "consensusRewardsDelta": p.int256, "wethToVault": p.uint256}),
     AccountingValidatorSlashed: event("0x6aa7e30787b26429ced603a7aba8b19c4b5d5bcf29a3257da953c8d53bcaa3a6", "AccountingValidatorSlashed(uint256,uint256)", {"remainingValidators": p.uint256, "wethSentToVault": p.uint256}),
+    ConsolidationConfirmed: event("0xb7f9b24f2efc7c0499fca5fd498666e42547910efe905fd5c16f835af7781990", "ConsolidationConfirmed(uint256,uint256)", {"consolidationCount": p.uint256, "activeDepositedValidators": p.uint256}),
+    ConsolidationFailed: event("0x074b3c18e21730a43902b43af97fb84b42b016f1cf86c3e0c829ca01ca8c7b63", "ConsolidationFailed(bytes[],uint256)", {"sourcePubKeys": p.array(p.bytes), "consolidationCount": p.uint256}),
+    ConsolidationRequested: event("0x4112c6a63b43261097d9a5032ac2fff06997b110d3105de2f2320bb86f27cc58", "ConsolidationRequested(bytes[],bytes,uint256)", {"sourcePubKeys": p.array(p.bytes), "targetPubKey": p.bytes, "consolidationCount": p.uint256}),
     Deposit: event("0x5548c837ab068cf56a2c2479df0882a4922fd203edb7517321831d95078c5f62", "Deposit(address,address,uint256)", {"_asset": indexed(p.address), "_pToken": p.address, "_amount": p.uint256}),
     ETHStaked: event("0x958934bb53d6b4dc911b6173e586864efbc8076684a31f752c53d5778340b37f", "ETHStaked(bytes32,bytes,uint256)", {"pubKeyHash": indexed(p.bytes32), "pubKey": p.bytes, "amount": p.uint256}),
     FuseIntervalUpdated: event("0xcb8d24e46eb3c402bf344ee60a6576cba9ef2f59ea1af3b311520704924e901a", "FuseIntervalUpdated(uint256,uint256)", {"start": p.uint256, "end": p.uint256}),
@@ -44,13 +47,14 @@ export const functions = {
     checkBalance: viewFun("0x5f515226", "checkBalance(address)", {"_asset": p.address}, p.uint256),
     claimGovernance: fun("0x5d36b190", "claimGovernance()", {}, ),
     collectRewardTokens: fun("0x5a063f63", "collectRewardTokens()", {}, ),
+    confirmConsolidation: fun("0x75c20dd1", "confirmConsolidation(uint256)", {"consolidationCount": p.uint256}, ),
     consensusRewards: viewFun("0x842f5c46", "consensusRewards()", {}, p.uint256),
     deposit: fun("0x47e7ef24", "deposit(address,uint256)", {"_asset": p.address, "_amount": p.uint256}, ),
     depositAll: fun("0xde5f6268", "depositAll()", {}, ),
-    depositSSV: fun("0x22495dc8", "depositSSV(uint64[],uint256,(uint32,uint64,uint64,bool,uint256))", {"operatorIds": p.array(p.uint64), "ssvAmount": p.uint256, "cluster": p.struct({"validatorCount": p.uint32, "networkFeeIndex": p.uint64, "index": p.uint64, "active": p.bool, "balance": p.uint256})}, ),
     depositedWethAccountedFor: viewFun("0xd059f6ef", "depositedWethAccountedFor()", {}, p.uint256),
     doAccounting: fun("0xa4f98af4", "doAccounting()", {}, p.bool),
     exitSsvValidator: fun("0xd9f00ec7", "exitSsvValidator(bytes,uint64[])", {"publicKey": p.bytes, "operatorIds": p.array(p.uint64)}, ),
+    failConsolidation: fun("0x1d622328", "failConsolidation(bytes[])", {"sourcePubKeys": p.array(p.bytes)}, ),
     fuseIntervalEnd: viewFun("0x484be812", "fuseIntervalEnd()", {}, p.uint256),
     fuseIntervalStart: viewFun("0x3c864959", "fuseIntervalStart()", {}, p.uint256),
     getRewardTokenAddresses: viewFun("0xf6ca71b0", "getRewardTokenAddresses()", {}, p.array(p.address)),
@@ -60,15 +64,18 @@ export const functions = {
     isGovernor: viewFun("0xc7af3352", "isGovernor()", {}, p.bool),
     lastFixAccountingBlockNumber: viewFun("0xe7529239", "lastFixAccountingBlockNumber()", {}, p.uint256),
     manuallyFixAccounting: fun("0x8d7c0e46", "manuallyFixAccounting(int256,int256,uint256)", {"_validatorsDelta": p.int256, "_consensusRewardsDelta": p.int256, "_ethToVaultAmount": p.uint256}, ),
+    migrateClusterToETH: fun("0x36e87b12", "migrateClusterToETH(uint64[],(uint32,uint64,uint64,bool,uint256))", {"operatorIds": p.array(p.uint64), "cluster": p.struct({"validatorCount": p.uint32, "networkFeeIndex": p.uint64, "index": p.uint64, "active": p.bool, "balance": p.uint256})}, ),
     pause: fun("0x8456cb59", "pause()", {}, ),
     paused: viewFun("0x5c975abb", "paused()", {}, p.bool),
     platformAddress: viewFun("0xdbe55e56", "platformAddress()", {}, p.address),
-    registerSsvValidators: fun("0x59b80c0a", "registerSsvValidators(bytes[],uint64[],bytes[],uint256,(uint32,uint64,uint64,bool,uint256))", {"publicKeys": p.array(p.bytes), "operatorIds": p.array(p.uint64), "sharesData": p.array(p.bytes), "ssvAmount": p.uint256, "cluster": p.struct({"validatorCount": p.uint32, "networkFeeIndex": p.uint64, "index": p.uint64, "active": p.bool, "balance": p.uint256})}, ),
+    registerSsvValidators: fun("0x31856682", "registerSsvValidators(bytes[],uint64[],bytes[],(uint32,uint64,uint64,bool,uint256))", {"publicKeys": p.array(p.bytes), "operatorIds": p.array(p.uint64), "sharesData": p.array(p.bytes), "cluster": p.struct({"validatorCount": p.uint32, "networkFeeIndex": p.uint64, "index": p.uint64, "active": p.bool, "balance": p.uint256})}, ),
     removePToken: fun("0x9136616a", "removePToken(uint256)", {"_assetIndex": p.uint256}, ),
     removeSsvValidator: fun("0x71a735f3", "removeSsvValidator(bytes,uint64[],(uint32,uint64,uint64,bool,uint256))", {"publicKey": p.bytes, "operatorIds": p.array(p.uint64), "cluster": p.struct({"validatorCount": p.uint32, "networkFeeIndex": p.uint64, "index": p.uint64, "active": p.bool, "balance": p.uint256})}, ),
+    requestConsolidation: fun("0x22be1ffd", "requestConsolidation(bytes[],bytes)", {"sourcePubKeys": p.array(p.bytes), "targetPubKey": p.bytes}, ),
     resetStakeETHTally: fun("0xee7afe2d", "resetStakeETHTally()", {}, ),
     rewardTokenAddresses: viewFun("0x7b2d9b2c", "rewardTokenAddresses(uint256)", {"_0": p.uint256}, p.address),
     safeApproveAllTokens: fun("0xad1728cb", "safeApproveAllTokens()", {}, ),
+    setFeeRecipient: fun("0x13cf69dd", "setFeeRecipient()", {}, ),
     setFuseInterval: fun("0xab12edf5", "setFuseInterval(uint256,uint256)", {"_fuseIntervalStart": p.uint256, "_fuseIntervalEnd": p.uint256}, ),
     setHarvesterAddress: fun("0xc2e1e3f4", "setHarvesterAddress(address)", {"_harvesterAddress": p.address}, ),
     setPTokenAddress: fun("0x0ed57b3a", "setPTokenAddress(address,address)", {"_asset": p.address, "_pToken": p.address}, ),
@@ -222,6 +229,9 @@ export type AccountingConsensusRewardsEventArgs = EParams<typeof events.Accounti
 export type AccountingFullyWithdrawnValidatorEventArgs = EParams<typeof events.AccountingFullyWithdrawnValidator>
 export type AccountingManuallyFixedEventArgs = EParams<typeof events.AccountingManuallyFixed>
 export type AccountingValidatorSlashedEventArgs = EParams<typeof events.AccountingValidatorSlashed>
+export type ConsolidationConfirmedEventArgs = EParams<typeof events.ConsolidationConfirmed>
+export type ConsolidationFailedEventArgs = EParams<typeof events.ConsolidationFailed>
+export type ConsolidationRequestedEventArgs = EParams<typeof events.ConsolidationRequested>
 export type DepositEventArgs = EParams<typeof events.Deposit>
 export type ETHStakedEventArgs = EParams<typeof events.ETHStaked>
 export type FuseIntervalUpdatedEventArgs = EParams<typeof events.FuseIntervalUpdated>
@@ -286,6 +296,9 @@ export type ClaimGovernanceReturn = FunctionReturn<typeof functions.claimGoverna
 export type CollectRewardTokensParams = FunctionArguments<typeof functions.collectRewardTokens>
 export type CollectRewardTokensReturn = FunctionReturn<typeof functions.collectRewardTokens>
 
+export type ConfirmConsolidationParams = FunctionArguments<typeof functions.confirmConsolidation>
+export type ConfirmConsolidationReturn = FunctionReturn<typeof functions.confirmConsolidation>
+
 export type ConsensusRewardsParams = FunctionArguments<typeof functions.consensusRewards>
 export type ConsensusRewardsReturn = FunctionReturn<typeof functions.consensusRewards>
 
@@ -295,9 +308,6 @@ export type DepositReturn = FunctionReturn<typeof functions.deposit>
 export type DepositAllParams = FunctionArguments<typeof functions.depositAll>
 export type DepositAllReturn = FunctionReturn<typeof functions.depositAll>
 
-export type DepositSSVParams = FunctionArguments<typeof functions.depositSSV>
-export type DepositSSVReturn = FunctionReturn<typeof functions.depositSSV>
-
 export type DepositedWethAccountedForParams = FunctionArguments<typeof functions.depositedWethAccountedFor>
 export type DepositedWethAccountedForReturn = FunctionReturn<typeof functions.depositedWethAccountedFor>
 
@@ -306,6 +316,9 @@ export type DoAccountingReturn = FunctionReturn<typeof functions.doAccounting>
 
 export type ExitSsvValidatorParams = FunctionArguments<typeof functions.exitSsvValidator>
 export type ExitSsvValidatorReturn = FunctionReturn<typeof functions.exitSsvValidator>
+
+export type FailConsolidationParams = FunctionArguments<typeof functions.failConsolidation>
+export type FailConsolidationReturn = FunctionReturn<typeof functions.failConsolidation>
 
 export type FuseIntervalEndParams = FunctionArguments<typeof functions.fuseIntervalEnd>
 export type FuseIntervalEndReturn = FunctionReturn<typeof functions.fuseIntervalEnd>
@@ -334,6 +347,9 @@ export type LastFixAccountingBlockNumberReturn = FunctionReturn<typeof functions
 export type ManuallyFixAccountingParams = FunctionArguments<typeof functions.manuallyFixAccounting>
 export type ManuallyFixAccountingReturn = FunctionReturn<typeof functions.manuallyFixAccounting>
 
+export type MigrateClusterToETHParams = FunctionArguments<typeof functions.migrateClusterToETH>
+export type MigrateClusterToETHReturn = FunctionReturn<typeof functions.migrateClusterToETH>
+
 export type PauseParams = FunctionArguments<typeof functions.pause>
 export type PauseReturn = FunctionReturn<typeof functions.pause>
 
@@ -352,6 +368,9 @@ export type RemovePTokenReturn = FunctionReturn<typeof functions.removePToken>
 export type RemoveSsvValidatorParams = FunctionArguments<typeof functions.removeSsvValidator>
 export type RemoveSsvValidatorReturn = FunctionReturn<typeof functions.removeSsvValidator>
 
+export type RequestConsolidationParams = FunctionArguments<typeof functions.requestConsolidation>
+export type RequestConsolidationReturn = FunctionReturn<typeof functions.requestConsolidation>
+
 export type ResetStakeETHTallyParams = FunctionArguments<typeof functions.resetStakeETHTally>
 export type ResetStakeETHTallyReturn = FunctionReturn<typeof functions.resetStakeETHTally>
 
@@ -360,6 +379,9 @@ export type RewardTokenAddressesReturn = FunctionReturn<typeof functions.rewardT
 
 export type SafeApproveAllTokensParams = FunctionArguments<typeof functions.safeApproveAllTokens>
 export type SafeApproveAllTokensReturn = FunctionReturn<typeof functions.safeApproveAllTokens>
+
+export type SetFeeRecipientParams = FunctionArguments<typeof functions.setFeeRecipient>
+export type SetFeeRecipientReturn = FunctionReturn<typeof functions.setFeeRecipient>
 
 export type SetFuseIntervalParams = FunctionArguments<typeof functions.setFuseInterval>
 export type SetFuseIntervalReturn = FunctionReturn<typeof functions.setFuseInterval>
