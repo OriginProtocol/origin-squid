@@ -22,8 +22,10 @@ export const createMorphoVaultApyProcessor = (params: { from: number }) => {
         throw new Error(`No Morpho config for ${ctx.chain.name} (${ctx.chain.id})`)
       }
       const snapshots: MorphoVaultApy[] = []
+      const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
 
       await frequencyUpdate(ctx, async (ctx, block) => {
+        if (block.header.timestamp < oneWeekAgo) return
         let apy: number | null
         try {
           apy = await fetchVaultApy(ctx, block.header, vaultAddress, morphoAddress)
