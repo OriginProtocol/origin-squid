@@ -19,7 +19,7 @@ importers:
         version: 2.1.1
       '@originprotocol/squid-utils':
         specifier: github:OriginProtocol/squid-utils#main
-        version: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/45399d30fc7b007a66d3887eddcbc69b9fbe4208(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
+        version: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@subsquid/big-decimal':
         specifier: ^1.0.0
         version: 1.0.0
@@ -831,8 +831,8 @@ packages:
     resolution: {integrity: sha512-y7efHHwghQfk28G2z3tlZ67pLG0XdfYbcVG26r7YIXALRsrVQcTq4/tdenSmdOrEsNahIYA/eh8aEVROWGFUDg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/45399d30fc7b007a66d3887eddcbc69b9fbe4208':
-    resolution: {tarball: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/45399d30fc7b007a66d3887eddcbc69b9fbe4208}
+  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2':
+    resolution: {tarball: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2}
     version: 1.0.0
 
   '@pkgjs/parseargs@0.11.0':
@@ -4563,7 +4563,7 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/45399d30fc7b007a66d3887eddcbc69b9fbe4208(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@subsquid/archive-registry': 3.3.2(encoding@0.1.13)
       '@subsquid/evm-abi': 0.3.1
