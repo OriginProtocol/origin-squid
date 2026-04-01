@@ -133,9 +133,6 @@ deploy:
       #   # BLOCK_FROM: 20919091
     - name: os-processor
       cmd: ['sqd', 'process:os:prod']
-    ########## HYPEREVM NETWORK ##########
-    - name: hyperevm-processor
-      cmd: ['sqd', 'process:hyperevm:prod']
       # env:
       #   ### Fork Setup Stage 1
       #   ARCHIVE_ONLY: 'true'
@@ -146,6 +143,9 @@ deploy:
       #   # RPC_SONIC_ENDPOINT: https://virtual.base.rpc.tenderly.co/103020a8-b59a-4d51-9f8b-b156564e9fb8
       #   ### Time Travel Fix
       #   # BLOCK_FROM: 20919091
+    ########## HYPEREVM NETWORK ##########
+    - name: hyperevm-processor
+      cmd: ['sqd', 'process:hyperevm:prod']
   api:
     cmd:
       - npx

@@ -7,7 +7,7 @@ import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
 
 export const processor = defineSquidProcessor({
-  chainId: hyperEvm.id as any, // cast needed until squid-utils adds HyperEVM to chainConfigs
+  chainId: hyperEvm.id,
   stateSchema: 'hyperevm-processor',
   processors: [
     createMorphoVaultApyProcessor({

@@ -9,16 +9,16 @@
  * - `fetchVaultApy` — Subsquid version, returns null if vault has no markets
  * - `fetchVaultApyViem` — viem version, returns { apy, markets } or null
  */
+import type { PublicClient } from 'viem'
+import { getAddress } from 'viem'
 
 import * as erc20 from '@abi/erc20'
 import * as irmAbi from '@abi/irm-adaptive-curve'
 import * as metaMorphoAbi from '@abi/meta-morpho'
 import * as morphoAbi from '@abi/morpho'
 import { Block, Context, multicall, range } from '@originprotocol/squid-utils'
-import type { PublicClient } from 'viem'
-import { getAddress } from 'viem'
-
 import { ADDRESS_ZERO } from '@utils/addresses'
+
 import type { MarketForApy } from './math'
 import { weightedVaultApy } from './math'
 
@@ -49,10 +49,22 @@ export async function fetchVaultMarkets(
   // 2. Market IDs from both queues (via multicall, parallel)
   const [supplyIds, withdrawIds] = await Promise.all([
     supplyLen > 0
-      ? multicall(ctx, block, metaMorphoAbi.functions.supplyQueue, vaultAddress, range(supplyLen).map((i) => ({ _0: i })))
+      ? multicall(
+          ctx,
+          block,
+          metaMorphoAbi.functions.supplyQueue,
+          vaultAddress,
+          range(supplyLen).map((i) => ({ _0: i })),
+        )
       : ([] as string[]),
     withdrawLen > 0
-      ? multicall(ctx, block, metaMorphoAbi.functions.withdrawQueue, vaultAddress, range(withdrawLen).map((i) => ({ _0: i })))
+      ? multicall(
+          ctx,
+          block,
+          metaMorphoAbi.functions.withdrawQueue,
+          vaultAddress,
+          range(withdrawLen).map((i) => ({ _0: i })),
+        )
       : ([] as string[]),
   ])
 
@@ -67,10 +79,34 @@ export async function fetchVaultMarkets(
 
   // 4. Fetch market state, vault position, market params, vault config (parallel multicalls)
   const [marketStates, positions, marketParams, configs] = await Promise.all([
-    multicall(ctx, block, morphoAbi.functions.market, morphoAddress, allIds.map((id) => ({ _0: id }))),
-    multicall(ctx, block, morphoAbi.functions.position, morphoAddress, allIds.map((id) => ({ _0: id, _1: vaultAddress }))),
-    multicall(ctx, block, morphoAbi.functions.idToMarketParams, morphoAddress, allIds.map((id) => ({ _0: id }))),
-    multicall(ctx, block, metaMorphoAbi.functions.config, vaultAddress, allIds.map((id) => ({ _0: id }))),
+    multicall(
+      ctx,
+      block,
+      morphoAbi.functions.market,
+      morphoAddress,
+      allIds.map((id) => ({ _0: id })),
+    ),
+    multicall(
+      ctx,
+      block,
+      morphoAbi.functions.position,
+      morphoAddress,
+      allIds.map((id) => ({ _0: id, _1: vaultAddress })),
+    ),
+    multicall(
+      ctx,
+      block,
+      morphoAbi.functions.idToMarketParams,
+      morphoAddress,
+      allIds.map((id) => ({ _0: id })),
+    ),
+    multicall(
+      ctx,
+      block,
+      metaMorphoAbi.functions.config,
+      vaultAddress,
+      allIds.map((id) => ({ _0: id })),
+    ),
   ])
 
   // 5. Per-market: IRM rateAtTarget + loanToken decimals (parallel)
@@ -131,20 +167,92 @@ export async function fetchVaultMarkets(
 // Minimal inline ABIs for viem readContract / multicall
 const META_MORPHO_VIEM_ABI = [
   { type: 'function', name: 'supplyQueueLength', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
-  { type: 'function', name: 'supplyQueue', inputs: [{ name: 'index', type: 'uint256' }], outputs: [{ type: 'bytes32' }], stateMutability: 'view' },
-  { type: 'function', name: 'withdrawQueueLength', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
-  { type: 'function', name: 'withdrawQueue', inputs: [{ name: 'index', type: 'uint256' }], outputs: [{ type: 'bytes32' }], stateMutability: 'view' },
-  { type: 'function', name: 'config', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: 'cap', type: 'uint184' }, { name: 'enabled', type: 'bool' }, { name: 'removableAt', type: 'uint64' }], stateMutability: 'view' },
+  {
+    type: 'function',
+    name: 'supplyQueue',
+    inputs: [{ name: 'index', type: 'uint256' }],
+    outputs: [{ type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'withdrawQueueLength',
+    inputs: [],
+    outputs: [{ type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'withdrawQueue',
+    inputs: [{ name: 'index', type: 'uint256' }],
+    outputs: [{ type: 'bytes32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'config',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [
+      { name: 'cap', type: 'uint184' },
+      { name: 'enabled', type: 'bool' },
+      { name: 'removableAt', type: 'uint64' },
+    ],
+    stateMutability: 'view',
+  },
 ] as const
 
 const MORPHO_VIEM_ABI = [
-  { type: 'function', name: 'market', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: 'totalSupplyAssets', type: 'uint128' }, { name: 'totalSupplyShares', type: 'uint128' }, { name: 'totalBorrowAssets', type: 'uint128' }, { name: 'totalBorrowShares', type: 'uint128' }, { name: 'lastUpdate', type: 'uint128' }, { name: 'fee', type: 'uint128' }], stateMutability: 'view' },
-  { type: 'function', name: 'position', inputs: [{ name: 'id', type: 'bytes32' }, { name: 'user', type: 'address' }], outputs: [{ name: 'supplyShares', type: 'uint256' }, { name: 'borrowShares', type: 'uint128' }, { name: 'collateral', type: 'uint128' }], stateMutability: 'view' },
-  { type: 'function', name: 'idToMarketParams', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: 'loanToken', type: 'address' }, { name: 'collateralToken', type: 'address' }, { name: 'oracle', type: 'address' }, { name: 'irm', type: 'address' }, { name: 'lltv', type: 'uint256' }], stateMutability: 'view' },
+  {
+    type: 'function',
+    name: 'market',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [
+      { name: 'totalSupplyAssets', type: 'uint128' },
+      { name: 'totalSupplyShares', type: 'uint128' },
+      { name: 'totalBorrowAssets', type: 'uint128' },
+      { name: 'totalBorrowShares', type: 'uint128' },
+      { name: 'lastUpdate', type: 'uint128' },
+      { name: 'fee', type: 'uint128' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'position',
+    inputs: [
+      { name: 'id', type: 'bytes32' },
+      { name: 'user', type: 'address' },
+    ],
+    outputs: [
+      { name: 'supplyShares', type: 'uint256' },
+      { name: 'borrowShares', type: 'uint128' },
+      { name: 'collateral', type: 'uint128' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'idToMarketParams',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [
+      { name: 'loanToken', type: 'address' },
+      { name: 'collateralToken', type: 'address' },
+      { name: 'oracle', type: 'address' },
+      { name: 'irm', type: 'address' },
+      { name: 'lltv', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
 ] as const
 
 const IRM_VIEM_ABI = [
-  { type: 'function', name: 'rateAtTarget', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ type: 'int256' }], stateMutability: 'view' },
+  {
+    type: 'function',
+    name: 'rateAtTarget',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [{ type: 'int256' }],
+    stateMutability: 'view',
+  },
 ] as const
 
 const ERC20_DECIMALS_ABI = [
@@ -178,8 +286,18 @@ export async function fetchVaultMarketsViem(
 
   // 2. Market IDs from both queues
   const queueCalls = [
-    ...Array.from({ length: supplyLenN }, (_, i) => ({ address: vault, abi: META_MORPHO_VIEM_ABI, functionName: 'supplyQueue' as const, args: [BigInt(i)] })),
-    ...Array.from({ length: withdrawLenN }, (_, i) => ({ address: vault, abi: META_MORPHO_VIEM_ABI, functionName: 'withdrawQueue' as const, args: [BigInt(i)] })),
+    ...Array.from({ length: supplyLenN }, (_, i) => ({
+      address: vault,
+      abi: META_MORPHO_VIEM_ABI,
+      functionName: 'supplyQueue' as const,
+      args: [BigInt(i)],
+    })),
+    ...Array.from({ length: withdrawLenN }, (_, i) => ({
+      address: vault,
+      abi: META_MORPHO_VIEM_ABI,
+      functionName: 'withdrawQueue' as const,
+      args: [BigInt(i)],
+    })),
   ]
 
   const queueResults = await client.multicall({ contracts: queueCalls, allowFailure: false })
@@ -208,7 +326,12 @@ export async function fetchVaultMarketsViem(
   // Parse per-market results (4 calls per market)
   const parsed = allIds.map((_, i) => {
     const base = i * 4
-    const state = perMarketResults[base] as unknown as { totalSupplyAssets: bigint; totalSupplyShares: bigint; totalBorrowAssets: bigint; fee: bigint }
+    const state = perMarketResults[base] as unknown as {
+      totalSupplyAssets: bigint
+      totalSupplyShares: bigint
+      totalBorrowAssets: bigint
+      fee: bigint
+    }
     const pos = perMarketResults[base + 1] as unknown as { supplyShares: bigint }
     const params = perMarketResults[base + 2] as unknown as { loanToken: `0x${string}`; irm: `0x${string}` }
     const cfg = perMarketResults[base + 3] as unknown as { cap: bigint }
@@ -220,13 +343,18 @@ export async function fetchVaultMarketsViem(
     const hasIrm = params.irm && params.irm.toLowerCase() !== ADDRESS_ZERO
     return [
       hasIrm
-        ? { address: getAddress(params.irm), abi: IRM_VIEM_ABI, functionName: 'rateAtTarget' as const, args: [allIds[i]] }
+        ? {
+            address: getAddress(params.irm),
+            abi: IRM_VIEM_ABI,
+            functionName: 'rateAtTarget' as const,
+            args: [allIds[i]],
+          }
         : null,
       { address: getAddress(params.loanToken), abi: ERC20_DECIMALS_ABI, functionName: 'decimals' as const },
     ]
   })
   const irmAndDecimalResults = await client.multicall({
-    contracts: irmAndDecimalCalls.filter((c): c is NonNullable<typeof c> => c !== null).map((c) => ({ ...c, allowFailure: true })) as any,
+    contracts: irmAndDecimalCalls.filter((c): c is NonNullable<typeof c> => c !== null),
     allowFailure: true,
   })
 

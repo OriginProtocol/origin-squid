@@ -4,8 +4,8 @@ import { EntityManager, MoreThanOrEqual } from 'typeorm'
 import { createPublicClient, fallback, http } from 'viem'
 import { base, hyperEvm, mainnet } from 'viem/chains'
 
-import { chainConfigs } from '@originprotocol/squid-utils'
 import { MorphoVaultApy } from '@model'
+import { chainConfigs } from '@originprotocol/squid-utils'
 import { computeDepositImpact } from '@templates/morpho/deposit-impact'
 
 import './fetch-polyfill'
@@ -19,23 +19,31 @@ function parseWindowMs(window: string): number | null {
   return unit === 'h' ? n * 3600 * 1000 : n * 86400 * 1000
 }
 
+const clients = {
+  [mainnet.id]: createPublicClient({
+    chain: mainnet,
+    transport: fallback((chainConfigs[mainnet.id]?.endpoints ?? []).map((url) => http(url))),
+  }),
+  [base.id]: createPublicClient({
+    chain: base,
+    transport: fallback((chainConfigs[base.id]?.endpoints ?? []).map((url) => http(url))),
+  }),
+  [hyperEvm.id]: createPublicClient({
+    chain: hyperEvm,
+    transport: http(process.env.RPC_HYPEREVM_ENDPOINT ?? 'https://rpc.hyperliquid.xyz/evm'),
+  }),
+}
+
 /** Build a viem PublicClient for a given chainId. */
 function getViemClient(chainId: number) {
   if (chainId === mainnet.id) {
-    return createPublicClient({
-      chain: mainnet,
-      transport: fallback((chainConfigs[mainnet.id]?.endpoints ?? []).map((url) => http(url))),
-    })
+    return clients[mainnet.id]
   }
   if (chainId === base.id) {
-    return createPublicClient({
-      chain: base,
-      transport: fallback((chainConfigs[base.id]?.endpoints ?? []).map((url) => http(url))),
-    })
+    return clients[base.id]
   }
   if (chainId === hyperEvm.id) {
-    const rpc = process.env.RPC_HYPEREVM_ENDPOINT ?? 'https://rpc.hyperliquid.xyz/evm'
-    return createPublicClient({ chain: hyperEvm, transport: http(rpc) })
+    return clients[hyperEvm.id]
   }
   throw new Error(`Unsupported chainId: ${chainId}. Supported: ${mainnet.id}, ${base.id}, ${hyperEvm.id}`)
 }
@@ -130,9 +138,7 @@ export class MorphoVaultApyResolver {
     })
 
     const timeWindowHours = windowMs / 3600000
-    const averageApy = snapshots.length > 0
-      ? snapshots.reduce((sum, s) => sum + s.apy, 0) / snapshots.length
-      : 0
+    const averageApy = snapshots.length > 0 ? snapshots.reduce((sum, s) => sum + s.apy, 0) / snapshots.length : 0
 
     return new MorphoVaultApyAverageResult({ averageApy, timeWindowHours })
   }
