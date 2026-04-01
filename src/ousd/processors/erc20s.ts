@@ -1,5 +1,5 @@
-import { createERC20PollingTracker } from '@templates/erc20'
-import { OUSD_VAULT_ADDRESS, mainnetTokens, ousdStrategyArray } from '@utils/addresses'
+import { createERC20EventTracker, createERC20PollingTracker } from '@templates/erc20'
+import { OUSD_VAULT_ADDRESS, WOUSD_ADDRESS, mainnetTokens, ousdStrategyArray } from '@utils/addresses'
 
 const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = {
   // OUSD Related
@@ -42,4 +42,10 @@ const tracks: Record<string, Parameters<typeof createERC20PollingTracker>[0]> = 
 }
 
 // This is a function to allow others to subscribe to balance tracking
-export const erc20s = () => [...Object.values(tracks).map(createERC20PollingTracker)]
+export const erc20s = () => [
+  ...Object.values(tracks).map(createERC20PollingTracker),
+  createERC20EventTracker({
+    from: 14566204, // wOUSD deploy date
+    address: WOUSD_ADDRESS,
+  }),
+]
