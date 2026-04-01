@@ -13,6 +13,9 @@ import { ousdCurveProcessor } from './ousd/processors/curve'
 import { erc20s } from './ousd/processors/erc20s'
 import { morphoMarketStatesProcessor } from './ousd/processors/morpho-market-states'
 import { ousdStrategiesProcessor } from './ousd/processors/strategies/strategies'
+import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
+
+const MORPHO_ETH_FROM = 24_736_000 // ~7 days before 2026-04-01
 
 export const processor = defineSquidProcessor({
   stateSchema: 'ousd-processor',
@@ -27,6 +30,7 @@ export const processor = defineSquidProcessor({
     }),
     ousdCurveProcessor,
     morphoMarketStatesProcessor,
+    createMorphoVaultApyProcessor({ name: 'Morpho Vault APY - Ethereum', from: MORPHO_ETH_FROM, chainId: 1 }),
     ...erc20s(),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('ousd')],

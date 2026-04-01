@@ -24,6 +24,7 @@ deploy:
     - RPC_ARBITRUM_ENV
     - RPC_SONIC_ENDPOINT
     - RPC_SONIC_ENV
+    - RPC_HYPEREVM_ENDPOINT
     - NOTION_SECRET
     - AWS_ACCESS_KEY_ID
     - AWS_SECRET_ACCESS_KEY
@@ -131,6 +132,9 @@ deploy:
       #   # BLOCK_FROM: 20919091
     - name: os-processor
       cmd: ['sqd', 'process:os:prod']
+    ########## HYPEREVM NETWORK ##########
+    - name: hyperevm-processor
+      cmd: ['sqd', 'process:hyperevm:prod']
       # env:
       #   ### Fork Setup Stage 1
       #   ARCHIVE_ONLY: 'true'

@@ -1,0 +1,11 @@
+type MorphoVaultApy @entity {
+  """
+  Format: '{chainId}:{vaultAddress}:{blockNumber}'
+  """
+  id: ID!
+  chainId: Int! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  vaultAddress: String! @index
+  apy: Float!
+}

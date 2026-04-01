@@ -61,7 +61,12 @@
     "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.16",
     "uuid": "^9.0.0",
-    "viem": "^2.22.12"
+    "viem": "^2.40.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "ox": "^0.9.6"
+    }
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^3.3.4",
