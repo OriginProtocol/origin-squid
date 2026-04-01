@@ -23,6 +23,7 @@
     "process:ousd": "sqd process:ousd",
     "process:ogv": "sqd process:ogv",
     "process:mainnet": "sqd process:mainnet",
+    "process:hyperevm": "sqd process:hyperevm",
     "process:test": "sqd process:test",
     "process": "sqd process",
     "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
@@ -62,11 +63,6 @@
     "typeorm": "^0.3.16",
     "uuid": "^9.0.0",
     "viem": "^2.40.1"
-  },
-  "pnpm": {
-    "overrides": {
-      "ox": "^0.9.6"
-    }
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^3.3.4",

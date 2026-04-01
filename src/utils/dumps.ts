@@ -39,7 +39,7 @@ export async function checkAndRestoreDump(processorName: string) {
 }
 
 export async function initProcessorFromDump(processor: SquidProcessor) {
-  if (!process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
+  if (process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
     const blockHeight = await checkAndRestoreDump(processor.stateSchema)
     if (blockHeight) {
       console.log(`Starting processor from block height ${blockHeight}`)

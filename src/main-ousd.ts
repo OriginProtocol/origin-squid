@@ -3,6 +3,7 @@ import 'tsconfig-paths/register'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
 import { processStatus } from '@templates/processor-status'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { addresses } from '@utils/addresses'
@@ -13,9 +14,6 @@ import { ousdCurveProcessor } from './ousd/processors/curve'
 import { erc20s } from './ousd/processors/erc20s'
 import { morphoMarketStatesProcessor } from './ousd/processors/morpho-market-states'
 import { ousdStrategiesProcessor } from './ousd/processors/strategies/strategies'
-import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
-
-const MORPHO_ETH_FROM = 24_736_000 // ~7 days before 2026-04-01
 
 export const processor = defineSquidProcessor({
   stateSchema: 'ousd-processor',
@@ -30,7 +28,9 @@ export const processor = defineSquidProcessor({
     }),
     ousdCurveProcessor,
     morphoMarketStatesProcessor,
-    createMorphoVaultApyProcessor({ name: 'Morpho Vault APY - Ethereum', from: MORPHO_ETH_FROM, chainId: 1 }),
+    createMorphoVaultApyProcessor({
+      from: 24_736_000, // ~7 days before 2026-04-01
+    }),
     ...erc20s(),
   ],
   postProcessors: [exchangeRatesPostProcessor, processStatus('ousd')],

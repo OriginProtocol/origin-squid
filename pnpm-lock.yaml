@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  ox: ^0.9.6
-
 importers:
 
   .:
@@ -19,7 +16,7 @@ importers:
         version: 2.1.1
       '@originprotocol/squid-utils':
         specifier: github:OriginProtocol/squid-utils#main
-        version: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
+        version: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/aa198564e0332229c5563290c43774bdc731e9ed(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@subsquid/big-decimal':
         specifier: ^1.0.0
         version: 1.0.0
@@ -831,8 +828,8 @@ packages:
     resolution: {integrity: sha512-y7efHHwghQfk28G2z3tlZ67pLG0XdfYbcVG26r7YIXALRsrVQcTq4/tdenSmdOrEsNahIYA/eh8aEVROWGFUDg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2':
-    resolution: {tarball: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2}
+  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/aa198564e0332229c5563290c43774bdc731e9ed':
+    resolution: {tarball: https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/aa198564e0332229c5563290c43774bdc731e9ed}
     version: 1.0.0
 
   '@pkgjs/parseargs@0.11.0':
@@ -2803,8 +2800,8 @@ packages:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
 
-  ox@0.9.17:
-    resolution: {integrity: sha512-rKAnhzhRU3Xh3hiko+i1ZxywZ55eWQzeS/Q4HRKLx2PqfHOolisZHErSsJVipGlmQKHW5qwOED/GighEw9dbLg==}
+  ox@0.14.7:
+    resolution: {integrity: sha512-zSQ/cfBdolj7U4++NAvH7sI+VG0T3pEohITCgcQj8KlawvTDY4vGVhDT64Atsm0d6adWfIYHDpu88iUBMMp+AQ==}
     peerDependencies:
       typescript: '>=5.4.0'
     peerDependenciesMeta:
@@ -4563,7 +4560,7 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/0beabe3f83b606de91755337ab0ebc0a9f84f8f2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@originprotocol/squid-utils@https://codeload.github.com/OriginProtocol/squid-utils/tar.gz/aa198564e0332229c5563290c43774bdc731e9ed(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@subsquid/archive-registry': 3.3.2(encoding@0.1.13)
       '@subsquid/evm-abi': 0.3.1
@@ -6946,7 +6943,7 @@ snapshots:
       type-check: 0.4.0
       word-wrap: 1.2.5
 
-  ox@0.9.17(typescript@5.9.2):
+  ox@0.14.7(typescript@5.9.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -7538,7 +7535,7 @@ snapshots:
       '@scure/bip39': 1.6.0
       abitype: 1.2.3(typescript@5.9.2)
       isows: 1.0.7(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      ox: 0.9.17(typescript@5.9.2)
+      ox: 0.14.7(typescript@5.9.2)
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     optionalDependencies:
       typescript: 5.9.2

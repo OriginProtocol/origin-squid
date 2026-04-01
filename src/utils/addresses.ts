@@ -197,15 +197,15 @@ export const ousd = {
   morpho: {
     /** Morpho Blue singleton address per chain. */
     blue: {
-      1: '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb', // Ethereum
-      8453: '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb', // Base
-      999: '0x68e37dE8d93d3496ae143F2E900490f6280C57cD', // HyperEVM
+      1: '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb', // Ethereum
+      8453: '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb', // Base
+      999: '0x68e37de8d93d3496ae143f2e900490f6280c57cd', // HyperEVM
     } as Record<number, `0x${string}`>,
     /** Origin MetaMorpho V1.1 vault addresses per chain. */
     vault: {
-      1: '0x5B8b9FA8e4145eE06025F642cAdB1B47e5F39F04', // Ethereum
-      8453: '0x581Cc9a73Ec7431723A4a80699B8f801205841F1', // Base
-      999: '0x0fb7e41A0A85Eb0BcA55172b73942cc6685e2B2E', // HyperEVM
+      1: '0x5b8b9fa8e4145ee06025f642cadb1b47e5f39f04', // Ethereum
+      8453: '0x581cc9a73ec7431723a4a80699b8f801205841f1', // Base
+      999: '0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e', // HyperEVM
     } as Record<number, `0x${string}`>,
   },
 }

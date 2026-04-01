@@ -46,13 +46,15 @@ export async function fetchVaultMarkets(
 
   if (supplyLen === 0 && withdrawLen === 0) return []
 
-  // 2. Market IDs from both queues (via multicall)
-  const supplyIds = supplyLen > 0
-    ? await multicall(ctx, block, metaMorphoAbi.functions.supplyQueue, vaultAddress, range(supplyLen).map((i) => ({ _0: i })))
-    : ([] as string[])
-  const withdrawIds = withdrawLen > 0
-    ? await multicall(ctx, block, metaMorphoAbi.functions.withdrawQueue, vaultAddress, range(withdrawLen).map((i) => ({ _0: i })))
-    : ([] as string[])
+  // 2. Market IDs from both queues (via multicall, parallel)
+  const [supplyIds, withdrawIds] = await Promise.all([
+    supplyLen > 0
+      ? multicall(ctx, block, metaMorphoAbi.functions.supplyQueue, vaultAddress, range(supplyLen).map((i) => ({ _0: i })))
+      : ([] as string[]),
+    withdrawLen > 0
+      ? multicall(ctx, block, metaMorphoAbi.functions.withdrawQueue, vaultAddress, range(withdrawLen).map((i) => ({ _0: i })))
+      : ([] as string[]),
+  ])
 
   // 3. Union: supply queue first, then withdraw-only markets
   const supplySet = new Set(supplyIds)
@@ -63,36 +65,40 @@ export async function fetchVaultMarkets(
 
   if (allIds.length === 0) return []
 
-  // 4. Fetch market state, vault position, market params, vault config (all multicall)
-  const marketStates = await multicall(ctx, block, morphoAbi.functions.market, morphoAddress, allIds.map((id) => ({ _0: id })))
-  const positions = await multicall(ctx, block, morphoAbi.functions.position, morphoAddress, allIds.map((id) => ({ _0: id, _1: vaultAddress })))
-  const marketParams = await multicall(ctx, block, morphoAbi.functions.idToMarketParams, morphoAddress, allIds.map((id) => ({ _0: id })))
-  const configs = await multicall(ctx, block, metaMorphoAbi.functions.config, vaultAddress, allIds.map((id) => ({ _0: id })))
+  // 4. Fetch market state, vault position, market params, vault config (parallel multicalls)
+  const [marketStates, positions, marketParams, configs] = await Promise.all([
+    multicall(ctx, block, morphoAbi.functions.market, morphoAddress, allIds.map((id) => ({ _0: id }))),
+    multicall(ctx, block, morphoAbi.functions.position, morphoAddress, allIds.map((id) => ({ _0: id, _1: vaultAddress }))),
+    multicall(ctx, block, morphoAbi.functions.idToMarketParams, morphoAddress, allIds.map((id) => ({ _0: id }))),
+    multicall(ctx, block, metaMorphoAbi.functions.config, vaultAddress, allIds.map((id) => ({ _0: id }))),
+  ])
 
-  // 5. Per-market: IRM rateAtTarget + loanToken decimals
-  const ratesAtTarget = await Promise.all(
-    marketParams.map(async (params, i) => {
-      const irmAddress = params.irm
-      if (!irmAddress || irmAddress === ADDRESS_ZERO) return 0n
-      try {
-        const irm = new irmAbi.Contract(ctx, block, irmAddress)
-        const rate = await irm.rateAtTarget(allIds[i])
-        return rate < 0n ? 0n : rate // treat negative rateAtTarget as 0
-      } catch {
-        return 0n
-      }
-    }),
-  )
-  const decimals = await Promise.all(
-    marketParams.map(async (params) => {
-      try {
-        const token = new erc20.Contract(ctx, block, params.loanToken)
-        return await token.decimals()
-      } catch {
-        return 18 // default if decimals() is unavailable
-      }
-    }),
-  )
+  // 5. Per-market: IRM rateAtTarget + loanToken decimals (parallel)
+  const [ratesAtTarget, decimals] = await Promise.all([
+    Promise.all(
+      marketParams.map(async (params, i) => {
+        const irmAddress = params.irm
+        if (!irmAddress || irmAddress === ADDRESS_ZERO) return 0n
+        try {
+          const irm = new irmAbi.Contract(ctx, block, irmAddress)
+          const rate = await irm.rateAtTarget(allIds[i])
+          return rate < 0n ? 0n : rate // treat negative rateAtTarget as 0
+        } catch {
+          return 0n
+        }
+      }),
+    ),
+    Promise.all(
+      marketParams.map(async (params) => {
+        try {
+          const token = new erc20.Contract(ctx, block, params.loanToken)
+          return await token.decimals()
+        } catch {
+          return 18 // default if decimals() is unavailable
+        }
+      }),
+    ),
+  ])
 
   // 6. Assemble MarketForApy objects
   return allIds.map((marketId, i) => {
@@ -209,28 +215,37 @@ export async function fetchVaultMarketsViem(
     return { state, pos, params, cfg }
   })
 
-  // 5. Per-market IRM + decimals
-  const ratesAtTarget = await Promise.all(
-    parsed.map(async ({ params }, i) => {
-      const irmAddr = params.irm
-      if (!irmAddr || irmAddr.toLowerCase() === ADDRESS_ZERO) return 0n
-      try {
-        const rate = await client.readContract({ address: getAddress(irmAddr), abi: IRM_VIEM_ABI, functionName: 'rateAtTarget', args: [allIds[i]] }) as bigint
-        return rate < 0n ? 0n : rate
-      } catch {
-        return 0n
-      }
-    }),
-  )
-  const decimals = await Promise.all(
-    parsed.map(async ({ params }) => {
-      try {
-        return await client.readContract({ address: getAddress(params.loanToken), abi: ERC20_DECIMALS_ABI, functionName: 'decimals' }) as number
-      } catch {
-        return 18
-      }
-    }),
-  )
+  // 5. Per-market IRM + decimals (single multicall batch)
+  const irmAndDecimalCalls = parsed.flatMap(({ params }, i) => {
+    const hasIrm = params.irm && params.irm.toLowerCase() !== ADDRESS_ZERO
+    return [
+      hasIrm
+        ? { address: getAddress(params.irm), abi: IRM_VIEM_ABI, functionName: 'rateAtTarget' as const, args: [allIds[i]] }
+        : null,
+      { address: getAddress(params.loanToken), abi: ERC20_DECIMALS_ABI, functionName: 'decimals' as const },
+    ]
+  })
+  const irmAndDecimalResults = await client.multicall({
+    contracts: irmAndDecimalCalls.filter((c): c is NonNullable<typeof c> => c !== null).map((c) => ({ ...c, allowFailure: true })) as any,
+    allowFailure: true,
+  })
+
+  // Map results back, accounting for skipped IRM calls
+  let resultIdx = 0
+  const ratesAtTarget: bigint[] = []
+  const decimals: number[] = []
+  for (const { params } of parsed) {
+    const hasIrm = params.irm && params.irm.toLowerCase() !== ADDRESS_ZERO
+    if (hasIrm) {
+      const r = irmAndDecimalResults[resultIdx++]
+      const rate = r.status === 'success' ? (r.result as bigint) : 0n
+      ratesAtTarget.push(rate < 0n ? 0n : rate)
+    } else {
+      ratesAtTarget.push(0n)
+    }
+    const d = irmAndDecimalResults[resultIdx++]
+    decimals.push(d.status === 'success' ? Number(d.result) : 18)
+  }
 
   // 6. Assemble
   return allIds.map((marketId, i) => {

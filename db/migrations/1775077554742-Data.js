@@ -1,5 +1,5 @@
-module.exports = class Data1772051944284 {
-    name = 'Data1772051944284'
+module.exports = class Data1775077554742 {
+    name = 'Data1775077554742'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -195,6 +195,11 @@ module.exports = class Data1772051944284 {
         await db.query(`CREATE INDEX "IDX_74ae9edf4f308f86740b16b7cd" ON "o_token_yield_forwarded" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_b8b0b44e2b80be2fbeb211debe" ON "o_token_yield_forwarded" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_8e58218e9917d409803beb1479" ON "o_token_yield_forwarded" ("otoken") `)
+        await db.query(`CREATE TABLE "morpho_vault_apy" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "vault_address" text NOT NULL, "apy" numeric NOT NULL, CONSTRAINT "PK_1eb48a8bffe750af2755aac0f94" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_ef9b1dc35540b19ffcba78287c" ON "morpho_vault_apy" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_428890d4341fab14d1b350355e" ON "morpho_vault_apy" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_87d21220457c7025845c0d5760" ON "morpho_vault_apy" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_c2be559e927f6cf24bba874de4" ON "morpho_vault_apy" ("vault_address") `)
         await db.query(`CREATE TABLE "arm" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "symbol" text NOT NULL, "decimals" integer NOT NULL, "token0" text NOT NULL, "token1" text NOT NULL, CONSTRAINT "PK_711e2a749a8c4baeccf8365290c" PRIMARY KEY ("id"))`)
         await db.query(`CREATE TABLE "arm_state" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "assets0" numeric NOT NULL, "assets1" numeric NOT NULL, "outstanding_assets1" numeric NOT NULL, "market_assets" numeric NOT NULL, "fees_accrued" numeric NOT NULL, "total_assets" numeric NOT NULL, "total_assets_cap" numeric NOT NULL, "total_supply" numeric NOT NULL, "assets_per_share" numeric NOT NULL, "total_deposits" numeric NOT NULL, "total_withdrawals" numeric NOT NULL, "total_withdrawals_claimed" numeric NOT NULL, "total_yield" numeric NOT NULL, "total_fees" numeric NOT NULL, CONSTRAINT "PK_e58fff61dd95dfeac112204c378" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_68943c1b73a665919e9377027e" ON "arm_state" ("chain_id") `)
@@ -679,6 +684,11 @@ module.exports = class Data1772051944284 {
         await db.query(`DROP INDEX "public"."IDX_74ae9edf4f308f86740b16b7cd"`)
         await db.query(`DROP INDEX "public"."IDX_b8b0b44e2b80be2fbeb211debe"`)
         await db.query(`DROP INDEX "public"."IDX_8e58218e9917d409803beb1479"`)
+        await db.query(`DROP TABLE "morpho_vault_apy"`)
+        await db.query(`DROP INDEX "public"."IDX_ef9b1dc35540b19ffcba78287c"`)
+        await db.query(`DROP INDEX "public"."IDX_428890d4341fab14d1b350355e"`)
+        await db.query(`DROP INDEX "public"."IDX_87d21220457c7025845c0d5760"`)
+        await db.query(`DROP INDEX "public"."IDX_c2be559e927f6cf24bba874de4"`)
         await db.query(`DROP TABLE "arm"`)
         await db.query(`DROP TABLE "arm_state"`)
         await db.query(`DROP INDEX "public"."IDX_68943c1b73a665919e9377027e"`)
