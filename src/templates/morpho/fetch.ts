@@ -181,13 +181,19 @@ export async function fetchVaultMarketsViem(
   const perMarketResults = await client.multicall({ contracts: perMarketCalls, allowFailure: false })
 
   // Parse per-market results (4 calls per market)
+  // viem returns multi-output functions as arrays, so destructure by position.
   const parsed = allIds.map((_, i) => {
     const base = i * 4
-    const state = perMarketResults[base] as unknown as { totalSupplyAssets: bigint; totalSupplyShares: bigint; totalBorrowAssets: bigint; fee: bigint }
-    const pos = perMarketResults[base + 1] as unknown as { supplyShares: bigint }
-    const params = perMarketResults[base + 2] as unknown as { loanToken: `0x${string}`; irm: `0x${string}` }
-    const cfg = perMarketResults[base + 3] as unknown as { cap: bigint }
-    return { state, pos, params, cfg }
+    const [totalSupplyAssets, totalSupplyShares, totalBorrowAssets, , , fee] = perMarketResults[base] as unknown as bigint[]
+    const [supplyShares] = perMarketResults[base + 1] as unknown as bigint[]
+    const [loanToken, , , irm] = perMarketResults[base + 2] as unknown as `0x${string}`[]
+    const [cap] = perMarketResults[base + 3] as unknown as bigint[]
+    return {
+      state: { totalSupplyAssets, totalSupplyShares, totalBorrowAssets, fee },
+      pos: { supplyShares },
+      params: { loanToken, irm },
+      cfg: { cap },
+    }
   })
 
   // 5. Per-market IRM + decimals (single multicall batch)
