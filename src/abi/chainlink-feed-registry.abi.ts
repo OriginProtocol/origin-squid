@@ -1,864 +1,932 @@
 export const ABI_JSON = [
     {
-        "type": "event",
         "anonymous": false,
-        "name": "AccessControllerSet",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "accessController",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "sender",
-                "indexed": true
+                "type": "address"
             }
-        ]
+        ],
+        "name": "AccessControllerSet",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "FeedConfirmed",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "asset",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "denomination",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "latestAggregator",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "previousAggregator",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "uint16",
+                "indexed": false,
+                "internalType": "uint16",
                 "name": "nextPhaseId",
-                "indexed": false
+                "type": "uint16"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "sender",
-                "indexed": false
+                "type": "address"
             }
-        ]
+        ],
+        "name": "FeedConfirmed",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "FeedProposed",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "asset",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "denomination",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "proposedAggregator",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "currentAggregator",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "sender",
-                "indexed": false
+                "type": "address"
             }
-        ]
+        ],
+        "name": "FeedProposed",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
         "name": "OwnershipTransferRequested",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "from",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "to",
-                "indexed": true
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "OwnershipTransferred",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "from",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "to",
-                "indexed": true
+                "type": "address"
             }
-        ]
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "acceptOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "aggregator",
+                "type": "address"
+            }
+        ],
         "name": "confirmFeed",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "address",
-                "name": "aggregator"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "decimals",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint8",
-                "name": ""
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "description",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "string",
-                "name": ""
+                "internalType": "string",
+                "name": "",
+                "type": "string"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "getAccessController",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "getAccessController",
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract AccessControllerInterface",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
+            }
+        ],
         "name": "getAnswer",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint256",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "getCurrentPhaseId",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint16",
-                "name": "currentPhaseId"
+                "internalType": "uint16",
+                "name": "currentPhaseId",
+                "type": "uint16"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "getFeed",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": "aggregator"
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "aggregator",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "getNextRoundId",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint80",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "nextRoundId"
+                "internalType": "uint80",
+                "name": "nextRoundId",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "getPhase",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "base"
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
             },
             {
-                "type": "address",
-                "name": "quote"
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
             },
             {
-                "type": "uint16",
-                "name": "phaseId"
+                "internalType": "uint16",
+                "name": "phaseId",
+                "type": "uint16"
             }
         ],
+        "name": "getPhase",
         "outputs": [
             {
-                "type": "tuple",
-                "name": "phase",
                 "components": [
                     {
-                        "type": "uint16",
-                        "name": "phaseId"
+                        "internalType": "uint16",
+                        "name": "phaseId",
+                        "type": "uint16"
                     },
                     {
-                        "type": "uint80",
-                        "name": "startingAggregatorRoundId"
+                        "internalType": "uint80",
+                        "name": "startingAggregatorRoundId",
+                        "type": "uint80"
                     },
                     {
-                        "type": "uint80",
-                        "name": "endingAggregatorRoundId"
+                        "internalType": "uint80",
+                        "name": "endingAggregatorRoundId",
+                        "type": "uint80"
                     }
-                ]
+                ],
+                "internalType": "struct FeedRegistryInterface.Phase",
+                "name": "phase",
+                "type": "tuple"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint16",
+                "name": "phaseId",
+                "type": "uint16"
+            }
+        ],
         "name": "getPhaseFeed",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint16",
-                "name": "phaseId"
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": "aggregator"
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "aggregator",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint16",
+                "name": "phaseId",
+                "type": "uint16"
+            }
+        ],
         "name": "getPhaseRange",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint16",
-                "name": "phaseId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "startingRoundId"
+                "internalType": "uint80",
+                "name": "startingRoundId",
+                "type": "uint80"
             },
             {
-                "type": "uint80",
-                "name": "endingRoundId"
+                "internalType": "uint80",
+                "name": "endingRoundId",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "getPreviousRoundId",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint80",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "previousRoundId"
+                "internalType": "uint80",
+                "name": "previousRoundId",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "getProposedFeed",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": "proposedAggregator"
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "proposedAggregator",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint80",
+                "name": "_roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "getRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint80",
-                "name": "_roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "roundId"
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "getRoundFeed",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint80",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": "aggregator"
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "aggregator",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
+            }
+        ],
         "name": "getTimestamp",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint256",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint256",
-                "name": "timestamp"
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "aggregator",
+                "type": "address"
+            }
+        ],
         "name": "isFeedEnabled",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "aggregator"
-            }
-        ],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "latestAnswer",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "latestRound",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint256",
-                "name": "roundId"
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "latestRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "roundId"
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "latestTimestamp",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint256",
-                "name": "timestamp"
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "owner",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "aggregator",
+                "type": "address"
+            }
+        ],
         "name": "proposeFeed",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "address",
-                "name": "aggregator"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            },
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "proposedGetRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            },
-            {
-                "type": "uint80",
-                "name": "roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "id"
+                "internalType": "uint80",
+                "name": "id",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
+            }
+        ],
         "name": "proposedLatestRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "base"
-            },
-            {
-                "type": "address",
-                "name": "quote"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "id"
+                "internalType": "uint80",
+                "name": "id",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "contract AccessControllerInterface",
+                "name": "_accessController",
+                "type": "address"
+            }
+        ],
         "name": "setAccessController",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_accessController"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
         "name": "transferOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "to"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "typeAndVersion",
-        "constant": true,
-        "stateMutability": "pure",
-        "payable": false,
         "inputs": [],
+        "name": "typeAndVersion",
         "outputs": [
             {
-                "type": "string",
-                "name": ""
+                "internalType": "string",
+                "name": "",
+                "type": "string"
             }
-        ]
+        ],
+        "stateMutability": "pure",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "version",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "base"
+                "internalType": "address",
+                "name": "base",
+                "type": "address"
             },
             {
-                "type": "address",
-                "name": "quote"
+                "internalType": "address",
+                "name": "quote",
+                "type": "address"
             }
         ],
+        "name": "version",
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

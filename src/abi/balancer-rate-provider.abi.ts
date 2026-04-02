@@ -1,41 +1,39 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "_rocketTokenRETH"
+                "internalType": "contract RocketTokenRETHInterface",
+                "name": "_rocketTokenRETH",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "getRate",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "rocketTokenRETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "rocketTokenRETH",
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract RocketTokenRETHInterface",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

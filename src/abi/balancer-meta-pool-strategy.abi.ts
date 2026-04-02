@@ -1,824 +1,850 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "platformAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "vaultAddress",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct InitializableAbstractStrategy.BaseStrategyConfig",
                 "name": "_stratConfig",
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "platformAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "vaultAddress"
-                    }
-                ]
+                "type": "tuple"
             },
             {
-                "type": "tuple",
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "rEthAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "stEthAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "wstEthAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "frxEthAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "sfrxEthAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "balancerVaultAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "balancerPoolId",
+                        "type": "bytes32"
+                    }
+                ],
+                "internalType": "struct BaseBalancerStrategy.BaseBalancerConfig",
                 "name": "_balancerConfig",
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "rEthAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "stEthAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "wstEthAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "frxEthAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "sfrxEthAddress"
-                    },
-                    {
-                        "type": "address",
-                        "name": "balancerVaultAddress"
-                    },
-                    {
-                        "type": "bytes32",
-                        "name": "balancerPoolId"
-                    }
-                ]
+                "type": "tuple"
             },
             {
-                "type": "address",
-                "name": "_auraRewardPoolAddress"
+                "internalType": "address",
+                "name": "_auraRewardPoolAddress",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_pToken",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
         "name": "Deposit",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "_pToken",
-                "indexed": false
-            },
-            {
-                "type": "uint256",
-                "name": "_amount",
-                "indexed": false
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousGovernor",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newGovernor",
+                "type": "address"
+            }
+        ],
         "name": "GovernorshipTransferred",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "previousGovernor",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "newGovernor",
-                "indexed": true
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "HarvesterAddressesUpdated",
         "inputs": [
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "_oldHarvesterAddress",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "_newHarvesterAddress",
-                "indexed": false
+                "type": "address"
             }
-        ]
+        ],
+        "name": "HarvesterAddressesUpdated",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_prevMaxDeviationPercentage",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_newMaxDeviationPercentage",
+                "type": "uint256"
+            }
+        ],
         "name": "MaxDepositDeviationUpdated",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_prevMaxDeviationPercentage",
-                "indexed": false
-            },
-            {
-                "type": "uint256",
-                "name": "_newMaxDeviationPercentage",
-                "indexed": false
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_prevMaxDeviationPercentage",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_newMaxDeviationPercentage",
+                "type": "uint256"
+            }
+        ],
         "name": "MaxWithdrawalDeviationUpdated",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_prevMaxDeviationPercentage",
-                "indexed": false
-            },
-            {
-                "type": "uint256",
-                "name": "_newMaxDeviationPercentage",
-                "indexed": false
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_pToken",
+                "type": "address"
+            }
+        ],
         "name": "PTokenAdded",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "_pToken",
-                "indexed": false
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_pToken",
+                "type": "address"
+            }
+        ],
         "name": "PTokenRemoved",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "_pToken",
-                "indexed": false
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "PendingGovernorshipTransfer",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "previousGovernor",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "newGovernor",
-                "indexed": true
+                "type": "address"
             }
-        ]
+        ],
+        "name": "PendingGovernorshipTransfer",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "_oldAddresses",
+                "type": "address[]"
+            },
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "_newAddresses",
+                "type": "address[]"
+            }
+        ],
         "name": "RewardTokenAddressesUpdated",
-        "inputs": [
-            {
-                "type": "address[]",
-                "name": "_oldAddresses"
-            },
-            {
-                "type": "address[]",
-                "name": "_newAddresses"
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "RewardTokenCollected",
         "inputs": [
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "recipient",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "rewardToken",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "amount",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "RewardTokenCollected",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "Withdrawal",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "_asset",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "_pToken",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "_amount",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "Withdrawal",
+        "type": "event"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
         "name": "assetToPToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "auraRewardPoolAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "balancerPoolId",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "bytes32",
-                "name": ""
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "balancerVault",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "checkBalance",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
+                "internalType": "contract IBalancerVault",
+                "name": "",
+                "type": "address"
             }
         ],
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": "amount"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "checkBalance",
-        "constant": true,
         "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": "value"
-            }
-        ]
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            }
+        ],
+        "name": "checkBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "checkBalance",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "claimGovernance",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "collectRewardTokens",
-        "constant": false,
-        "payable": false,
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "deposit",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": ""
-            },
-            {
-                "type": "uint256",
-                "name": ""
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "deposit",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address[]",
-                "name": ""
-            },
-            {
-                "type": "uint256[]",
-                "name": ""
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
         "name": "depositAll",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "frxETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "getRewardTokenAddresses",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address[]",
-                "name": ""
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "governor",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "harvesterAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "_rewardTokenAddresses",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address[]",
+                "name": "_assets",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address[]",
+                "name": "_pTokens",
+                "type": "address[]"
+            }
+        ],
         "name": "initialize",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address[]",
-                "name": "_rewardTokenAddresses"
-            },
-            {
-                "type": "address[]",
-                "name": "_assets"
-            },
-            {
-                "type": "address[]",
-                "name": "_pTokens"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "isGovernor",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "maxDepositDeviation",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "maxWithdrawalDeviation",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "platformAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "rETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_assetIndex",
+                "type": "uint256"
+            }
+        ],
         "name": "removePToken",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_assetIndex"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "name": "rewardTokenAddresses",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": ""
-            }
-        ],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "safeApproveAllTokens",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_harvesterAddress",
+                "type": "address"
+            }
+        ],
         "name": "setHarvesterAddress",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_harvesterAddress"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_maxDepositDeviation",
+                "type": "uint256"
+            }
+        ],
         "name": "setMaxDepositDeviation",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_maxDepositDeviation"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_maxWithdrawalDeviation",
+                "type": "uint256"
+            }
+        ],
         "name": "setMaxWithdrawalDeviation",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_maxWithdrawalDeviation"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_pToken",
+                "type": "address"
+            }
+        ],
         "name": "setPTokenAddress",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
-            },
-            {
-                "type": "address",
-                "name": "_pToken"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "_rewardTokenAddresses",
+                "type": "address[]"
+            }
+        ],
         "name": "setRewardTokenAddresses",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address[]",
-                "name": "_rewardTokenAddresses"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "sfrxETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "stETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            }
+        ],
         "name": "supportsAsset",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
-            }
-        ],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_newGovernor",
+                "type": "address"
+            }
+        ],
         "name": "transferGovernance",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_newGovernor"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_asset",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
         "name": "transferToken",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_asset"
-            },
-            {
-                "type": "uint256",
-                "name": "_amount"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "vaultAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "withdraw",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_recipient"
-            },
-            {
-                "type": "address",
-                "name": "_strategyAsset"
-            },
-            {
-                "type": "uint256",
-                "name": "_strategyAmount"
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "outputs": []
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "withdraw",
-        "constant": false,
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "_recipient"
+                "internalType": "address",
+                "name": "_recipient",
+                "type": "address"
             },
             {
-                "type": "address[]",
-                "name": "_strategyAssets"
+                "internalType": "address",
+                "name": "_strategyAsset",
+                "type": "address"
             },
             {
-                "type": "uint256[]",
-                "name": "_strategyAmounts"
+                "internalType": "uint256",
+                "name": "_strategyAmount",
+                "type": "uint256"
             }
         ],
-        "outputs": []
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_recipient",
+                "type": "address"
+            },
+            {
+                "internalType": "address[]",
+                "name": "_strategyAssets",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "_strategyAmounts",
+                "type": "uint256[]"
+            }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "withdrawAll",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "wstETH",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "wstETH",
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

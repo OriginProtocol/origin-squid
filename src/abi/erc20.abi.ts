@@ -1,218 +1,222 @@
 export const ABI_JSON = [
     {
-        "type": "function",
+        "constant": true,
+        "inputs": [],
         "name": "name",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "string",
-                "name": ""
+                "name": "",
+                "type": "string"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_spender",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
         "name": "approve",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_spender"
-            },
-            {
-                "type": "uint256",
-                "name": "_value"
-            }
-        ],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "constant": true,
+        "inputs": [],
         "name": "totalSupply",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_from",
+                "type": "address"
+            },
+            {
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
         "name": "transferFrom",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_from"
-            },
-            {
-                "type": "address",
-                "name": "_to"
-            },
-            {
-                "type": "uint256",
-                "name": "_value"
-            }
-        ],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "constant": true,
+        "inputs": [],
         "name": "decimals",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint8",
-                "name": ""
+                "name": "",
+                "type": "uint8"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
         "name": "balanceOf",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_owner"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint256",
-                "name": "balance"
+                "name": "balance",
+                "type": "uint256"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "symbol",
         "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "symbol",
         "outputs": [
             {
-                "type": "string",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "transfer",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_to"
-            },
-            {
-                "type": "uint256",
-                "name": "_value"
+                "name": "",
+                "type": "string"
             }
         ],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "allowance",
-        "constant": true,
+        "payable": false,
         "stateMutability": "view",
-        "payable": false,
+        "type": "function"
+    },
+    {
+        "constant": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "_owner"
+                "name": "_to",
+                "type": "address"
             },
             {
-                "type": "address",
-                "name": "_spender"
+                "name": "_value",
+                "type": "uint256"
             }
         ],
+        "name": "transfer",
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "fallback",
-        "stateMutability": "payable"
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "Approval",
+        "constant": true,
         "inputs": [
             {
-                "type": "address",
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_spender",
+                "type": "address"
+            }
+        ],
+        "name": "allowance",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "fallback"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
                 "name": "owner",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
                 "name": "spender",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "uint256",
+                "indexed": false,
                 "name": "value",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "Approval",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "Transfer",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
                 "name": "from",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
                 "name": "to",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "uint256",
+                "indexed": false,
                 "name": "value",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "Transfer",
+        "type": "event"
     }
-]
+] as const

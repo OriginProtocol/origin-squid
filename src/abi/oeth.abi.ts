@@ -653,4 +653,4 @@ export const ABI_JSON = [
             }
         ]
     }
-]
+] as const

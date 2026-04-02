@@ -1,149 +1,149 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "_oeth"
+                "internalType": "address",
+                "name": "_oeth",
+                "type": "address"
             },
             {
-                "type": "address",
-                "name": "_vault"
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "Zap",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "minter",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "asset",
-                "indexed": true
-            },
-            {
-                "type": "uint256",
-                "name": "amount",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "deposit",
-        "constant": false,
-        "stateMutability": "payable",
-        "payable": true,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "depositSFRXETH",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "amount"
-            },
-            {
-                "type": "uint256",
-                "name": "minOETH"
+                "internalType": "address",
+                "name": "_vault",
+                "type": "address"
             }
         ],
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": ""
-            }
-        ]
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "function",
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "minter",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "Zap",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "deposit",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "minOETH",
+                "type": "uint256"
+            }
+        ],
+        "name": "depositSFRXETH",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "frxeth",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "oeth",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "sfrxeth",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract ISfrxETH",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "vault",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract IVault",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "weth",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "contract IWETH9",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "receive",
-        "stateMutability": "payable"
+        "stateMutability": "payable",
+        "type": "receive"
     }
-]
+] as const

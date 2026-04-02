@@ -12,7 +12,7 @@
     "prettier-fix": "prettier --write src",
     "setup": "sqd down && sqd up && sleep 2 && sqd migration:apply",
     "serve": "sqd serve",
-    "typegen": "sqd typegen",
+    "typegen": "sqd typegen && ts-node scripts/generate-abi-exports.ts",
     "migration:apply": "sqd migration:apply",
     "process:arbitrum": "sqd process:arbitrum",
     "process:base": "sqd process:base",

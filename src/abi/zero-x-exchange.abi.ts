@@ -231,4 +231,4 @@ export const ABI_JSON = [
         ],
         "outputs": []
     }
-]
+] as const

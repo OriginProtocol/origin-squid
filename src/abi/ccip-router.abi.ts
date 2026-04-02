@@ -1,648 +1,702 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "wrappedNative"
+                "internalType": "address",
+                "name": "wrappedNative",
+                "type": "address"
             },
             {
-                "type": "address",
-                "name": "armProxy"
+                "internalType": "address",
+                "name": "armProxy",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "BadARMSignal",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "FailedToSendValue",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "InsufficientFeeTokenAmount",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "InvalidMsgValue",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
         "name": "InvalidRecipientAddress",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "to"
-            }
-        ]
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "chainSelector",
+                "type": "uint64"
+            },
+            {
+                "internalType": "address",
+                "name": "offRamp",
+                "type": "address"
+            }
+        ],
         "name": "OffRampMismatch",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "chainSelector"
-            },
-            {
-                "type": "address",
-                "name": "offRamp"
-            }
-        ]
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "OnlyOffRamp",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
-        "name": "UnsupportedDestinationChain",
         "inputs": [
             {
-                "type": "uint64",
-                "name": "destChainSelector"
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "MessageExecuted",
-        "inputs": [
-            {
-                "type": "bytes32",
-                "name": "messageId",
-                "indexed": false
-            },
-            {
-                "type": "uint64",
-                "name": "sourceChainSelector",
-                "indexed": false
-            },
-            {
-                "type": "address",
-                "name": "offRamp",
-                "indexed": false
-            },
-            {
-                "type": "bytes32",
-                "name": "calldataHash",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "OffRampAdded",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sourceChainSelector",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "offRamp",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "OffRampRemoved",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sourceChainSelector",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "offRamp",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "OnRampSet",
-        "inputs": [
-            {
-                "type": "uint64",
+                "internalType": "uint64",
                 "name": "destChainSelector",
-                "indexed": true
+                "type": "uint64"
+            }
+        ],
+        "name": "UnsupportedDestinationChain",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "messageId",
+                "type": "bytes32"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "sourceChainSelector",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "offRamp",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "calldataHash",
+                "type": "bytes32"
+            }
+        ],
+        "name": "MessageExecuted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "sourceChainSelector",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "offRamp",
+                "type": "address"
+            }
+        ],
+        "name": "OffRampAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "sourceChainSelector",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "offRamp",
+                "type": "address"
+            }
+        ],
+        "name": "OffRampRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "destChainSelector",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "onRamp",
-                "indexed": false
+                "type": "address"
             }
-        ]
+        ],
+        "name": "OnRampSet",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
         "name": "OwnershipTransferRequested",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "from",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "to",
-                "indexed": true
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "OwnershipTransferred",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "from",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "to",
-                "indexed": true
+                "type": "address"
             }
-        ]
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "MAX_RET_BYTES",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint16",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "acceptOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "applyRampUpdates",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "tuple[]",
-                "name": "onRampUpdates",
-                "components": [
-                    {
-                        "type": "uint64",
-                        "name": "destChainSelector"
-                    },
-                    {
-                        "type": "address",
-                        "name": "onRamp"
-                    }
-                ]
-            },
-            {
-                "type": "tuple[]",
-                "name": "offRampRemoves",
-                "components": [
-                    {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
-                    },
-                    {
-                        "type": "address",
-                        "name": "offRamp"
-                    }
-                ]
-            },
-            {
-                "type": "tuple[]",
-                "name": "offRampAdds",
-                "components": [
-                    {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
-                    },
-                    {
-                        "type": "address",
-                        "name": "offRamp"
-                    }
-                ]
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "ccipSend",
-        "constant": false,
-        "stateMutability": "payable",
-        "payable": true,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "destinationChainSelector"
-            },
-            {
-                "type": "tuple",
-                "name": "message",
-                "components": [
-                    {
-                        "type": "bytes",
-                        "name": "receiver"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "data"
-                    },
-                    {
-                        "type": "tuple[]",
-                        "name": "tokenAmounts",
-                        "components": [
-                            {
-                                "type": "address",
-                                "name": "token"
-                            },
-                            {
-                                "type": "uint256",
-                                "name": "amount"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "address",
-                        "name": "feeToken"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "extraArgs"
-                    }
-                ]
-            }
-        ],
-        "outputs": [
-            {
-                "type": "bytes32",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getArmProxy",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getFee",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "destinationChainSelector"
-            },
-            {
-                "type": "tuple",
-                "name": "message",
-                "components": [
-                    {
-                        "type": "bytes",
-                        "name": "receiver"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "data"
-                    },
-                    {
-                        "type": "tuple[]",
-                        "name": "tokenAmounts",
-                        "components": [
-                            {
-                                "type": "address",
-                                "name": "token"
-                            },
-                            {
-                                "type": "uint256",
-                                "name": "amount"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "address",
-                        "name": "feeToken"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "extraArgs"
-                    }
-                ]
-            }
-        ],
-        "outputs": [
-            {
-                "type": "uint256",
-                "name": "fee"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getOffRamps",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "tuple[]",
+                "internalType": "uint16",
                 "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "acceptOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "components": [
                     {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
+                        "internalType": "uint64",
+                        "name": "destChainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "address",
-                        "name": "offRamp"
+                        "internalType": "address",
+                        "name": "onRamp",
+                        "type": "address"
                     }
-                ]
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getOnRamp",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "destChainSelector"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getSupportedTokens",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "chainSelector"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "address[]",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getWrappedNative",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "isChainSupported",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "chainSelector"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "isOffRamp",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sourceChainSelector"
+                ],
+                "internalType": "struct Router.OnRamp[]",
+                "name": "onRampUpdates",
+                "type": "tuple[]"
             },
             {
-                "type": "address",
-                "name": "offRamp"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "owner",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "recoverTokens",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "tokenAddress"
-            },
-            {
-                "type": "address",
-                "name": "to"
-            },
-            {
-                "type": "uint256",
-                "name": "amount"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "routeMessage",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "tuple",
-                "name": "message",
                 "components": [
                     {
-                        "type": "bytes32",
-                        "name": "messageId"
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
+                        "internalType": "address",
+                        "name": "offRamp",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Router.OffRamp[]",
+                "name": "offRampRemoves",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "bytes",
-                        "name": "sender"
+                        "internalType": "address",
+                        "name": "offRamp",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Router.OffRamp[]",
+                "name": "offRampAdds",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "applyRampUpdates",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "destinationChainSelector",
+                "type": "uint64"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes",
+                        "name": "receiver",
+                        "type": "bytes"
                     },
                     {
-                        "type": "bytes",
-                        "name": "data"
+                        "internalType": "bytes",
+                        "name": "data",
+                        "type": "bytes"
                     },
                     {
-                        "type": "tuple[]",
-                        "name": "destTokenAmounts",
                         "components": [
                             {
-                                "type": "address",
-                                "name": "token"
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
                             },
                             {
-                                "type": "uint256",
-                                "name": "amount"
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
                             }
-                        ]
+                        ],
+                        "internalType": "struct Client.EVMTokenAmount[]",
+                        "name": "tokenAmounts",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "feeToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "extraArgs",
+                        "type": "bytes"
                     }
-                ]
-            },
-            {
-                "type": "uint16",
-                "name": "gasForCallExactCheck"
-            },
-            {
-                "type": "uint256",
-                "name": "gasLimit"
-            },
-            {
-                "type": "address",
-                "name": "receiver"
+                ],
+                "internalType": "struct Client.EVM2AnyMessage",
+                "name": "message",
+                "type": "tuple"
             }
         ],
+        "name": "ccipSend",
         "outputs": [
             {
-                "type": "bool",
-                "name": "success"
-            },
-            {
-                "type": "bytes",
-                "name": "retData"
-            },
-            {
-                "type": "uint256",
-                "name": "gasUsed"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "setWrappedNative",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "wrappedNative"
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
             }
         ],
-        "outputs": []
+        "stateMutability": "payable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "transferOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "to"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "typeAndVersion",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "getArmProxy",
         "outputs": [
             {
-                "type": "string",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "destinationChainSelector",
+                "type": "uint64"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "bytes",
+                        "name": "receiver",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "data",
+                        "type": "bytes"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct Client.EVMTokenAmount[]",
+                        "name": "tokenAmounts",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "feeToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "extraArgs",
+                        "type": "bytes"
+                    }
+                ],
+                "internalType": "struct Client.EVM2AnyMessage",
+                "name": "message",
+                "type": "tuple"
+            }
+        ],
+        "name": "getFee",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "fee",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getOffRamps",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "offRamp",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Router.OffRamp[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "destChainSelector",
+                "type": "uint64"
+            }
+        ],
+        "name": "getOnRamp",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "chainSelector",
+                "type": "uint64"
+            }
+        ],
+        "name": "getSupportedTokens",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getWrappedNative",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "chainSelector",
+                "type": "uint64"
+            }
+        ],
+        "name": "isChainSupported",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sourceChainSelector",
+                "type": "uint64"
+            },
+            {
+                "internalType": "address",
+                "name": "offRamp",
+                "type": "address"
+            }
+        ],
+        "name": "isOffRamp",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "recoverTokens",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "messageId",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "sender",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "data",
+                        "type": "bytes"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct Client.EVMTokenAmount[]",
+                        "name": "destTokenAmounts",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct Client.Any2EVMMessage",
+                "name": "message",
+                "type": "tuple"
+            },
+            {
+                "internalType": "uint16",
+                "name": "gasForCallExactCheck",
+                "type": "uint16"
+            },
+            {
+                "internalType": "uint256",
+                "name": "gasLimit",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "receiver",
+                "type": "address"
+            }
+        ],
+        "name": "routeMessage",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "success",
+                "type": "bool"
+            },
+            {
+                "internalType": "bytes",
+                "name": "retData",
+                "type": "bytes"
+            },
+            {
+                "internalType": "uint256",
+                "name": "gasUsed",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "wrappedNative",
+                "type": "address"
+            }
+        ],
+        "name": "setWrappedNative",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "typeAndVersion",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

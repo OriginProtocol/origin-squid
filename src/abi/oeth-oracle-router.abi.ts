@@ -1,39 +1,40 @@
 export const ABI_JSON = [
     {
-        "type": "function",
-        "name": "cacheDecimals",
-        "constant": false,
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "asset"
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
             }
         ],
+        "name": "cacheDecimals",
         "outputs": [
             {
-                "type": "uint8",
-                "name": ""
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "price",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [
             {
-                "type": "address",
-                "name": "asset"
+                "internalType": "address",
+                "name": "asset",
+                "type": "address"
             }
         ],
+        "name": "price",
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

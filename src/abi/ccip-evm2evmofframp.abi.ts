@@ -1,1415 +1,1572 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
-                "name": "staticConfig",
                 "components": [
                     {
-                        "type": "address",
-                        "name": "commitStore"
+                        "internalType": "address",
+                        "name": "commitStore",
+                        "type": "address"
                     },
                     {
-                        "type": "uint64",
-                        "name": "chainSelector"
+                        "internalType": "uint64",
+                        "name": "chainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "address",
-                        "name": "onRamp"
+                        "internalType": "address",
+                        "name": "onRamp",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "prevOffRamp"
+                        "internalType": "address",
+                        "name": "prevOffRamp",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "armProxy"
+                        "internalType": "address",
+                        "name": "armProxy",
+                        "type": "address"
                     }
-                ]
+                ],
+                "internalType": "struct EVM2EVMOffRamp.StaticConfig",
+                "name": "staticConfig",
+                "type": "tuple"
             },
             {
-                "type": "address[]",
-                "name": "sourceTokens"
+                "internalType": "contract IERC20[]",
+                "name": "sourceTokens",
+                "type": "address[]"
             },
             {
-                "type": "address[]",
-                "name": "pools"
+                "internalType": "contract IPool[]",
+                "name": "pools",
+                "type": "address[]"
             },
             {
-                "type": "tuple",
+                "components": [
+                    {
+                        "internalType": "bool",
+                        "name": "isEnabled",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint128",
+                        "name": "capacity",
+                        "type": "uint128"
+                    },
+                    {
+                        "internalType": "uint128",
+                        "name": "rate",
+                        "type": "uint128"
+                    }
+                ],
+                "internalType": "struct RateLimiter.Config",
                 "name": "rateLimiterConfig",
-                "components": [
-                    {
-                        "type": "bool",
-                        "name": "isEnabled"
-                    },
-                    {
-                        "type": "uint128",
-                        "name": "capacity"
-                    },
-                    {
-                        "type": "uint128",
-                        "name": "rate"
-                    }
-                ]
+                "type": "tuple"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "error",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "capacity",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "requested",
+                "type": "uint256"
+            }
+        ],
         "name": "AggregateValueMaxCapacityExceeded",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "capacity"
-            },
-            {
-                "type": "uint256",
-                "name": "requested"
-            }
-        ]
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "minWaitInSeconds",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "available",
+                "type": "uint256"
+            }
+        ],
         "name": "AggregateValueRateLimitReached",
+        "type": "error"
+    },
+    {
         "inputs": [
             {
-                "type": "uint256",
-                "name": "minWaitInSeconds"
-            },
-            {
-                "type": "uint256",
-                "name": "available"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "AlreadyAttempted",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "AlreadyExecuted",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "BadARMSignal",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "BucketOverfilled",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "CanOnlySelfCall",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "CommitStoreAlreadyInUse",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "ConfigDigestMismatch",
-        "inputs": [
-            {
-                "type": "bytes32",
-                "name": "expected"
-            },
-            {
-                "type": "bytes32",
-                "name": "actual"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "EmptyReport",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "ExecutionError",
-        "inputs": [
-            {
-                "type": "bytes",
-                "name": "error"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "ForkedChain",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "expected"
-            },
-            {
-                "type": "uint256",
-                "name": "actual"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "InvalidConfig",
-        "inputs": [
-            {
-                "type": "string",
-                "name": "message"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "InvalidManualExecutionGasLimit",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "index"
-            },
-            {
-                "type": "uint256",
-                "name": "newLimit"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "InvalidMessageId",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "InvalidNewState",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            },
-            {
-                "type": "uint8",
-                "name": "newState"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "InvalidSourceChain",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sourceChainSelector"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "InvalidTokenPoolConfig",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "ManualExecutionGasLimitMismatch",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "ManualExecutionNotYetEnabled",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "MessageTooLarge",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "maxSize"
-            },
-            {
-                "type": "uint256",
-                "name": "actualSize"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "OnlyCallableByAdminOrOwner",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "OracleCannotBeZeroAddress",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "PoolAlreadyAdded",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "PoolDoesNotExist",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "PriceNotFoundForToken",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "token"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "ReceiverError",
-        "inputs": [
-            {
-                "type": "bytes",
-                "name": "error"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "RootNotCommitted",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "TokenDataMismatch",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "TokenHandlingError",
-        "inputs": [
-            {
-                "type": "bytes",
-                "name": "error"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "TokenMaxCapacityExceeded",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "capacity"
-            },
-            {
-                "type": "uint256",
-                "name": "requested"
-            },
-            {
-                "type": "address",
-                "name": "tokenAddress"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "TokenPoolMismatch",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "TokenRateLimitReached",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "minWaitInSeconds"
-            },
-            {
-                "type": "uint256",
-                "name": "available"
-            },
-            {
-                "type": "address",
-                "name": "tokenAddress"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "UnauthorizedTransmitter",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "UnexpectedTokenData",
-        "inputs": []
-    },
-    {
-        "type": "error",
-        "name": "UnsupportedNumberOfTokens",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "UnsupportedToken",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "token"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "WrongMessageLength",
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "expected"
-            },
-            {
-                "type": "uint256",
-                "name": "actual"
-            }
-        ]
-    },
-    {
-        "type": "error",
-        "name": "ZeroAddressNotAllowed",
-        "inputs": []
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "AdminSet",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "newAdmin",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "ConfigSet",
-        "inputs": [
-            {
-                "type": "tuple",
-                "name": "staticConfig",
-                "indexed": false,
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "commitStore"
-                    },
-                    {
-                        "type": "uint64",
-                        "name": "chainSelector"
-                    },
-                    {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
-                    },
-                    {
-                        "type": "address",
-                        "name": "onRamp"
-                    },
-                    {
-                        "type": "address",
-                        "name": "prevOffRamp"
-                    },
-                    {
-                        "type": "address",
-                        "name": "armProxy"
-                    }
-                ]
-            },
-            {
-                "type": "tuple",
-                "name": "dynamicConfig",
-                "indexed": false,
-                "components": [
-                    {
-                        "type": "uint32",
-                        "name": "permissionLessExecutionThresholdSeconds"
-                    },
-                    {
-                        "type": "address",
-                        "name": "router"
-                    },
-                    {
-                        "type": "address",
-                        "name": "priceRegistry"
-                    },
-                    {
-                        "type": "uint16",
-                        "name": "maxNumberOfTokensPerMsg"
-                    },
-                    {
-                        "type": "uint32",
-                        "name": "maxDataBytes"
-                    },
-                    {
-                        "type": "uint32",
-                        "name": "maxPoolReleaseOrMintGas"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "ConfigSet",
-        "inputs": [
-            {
-                "type": "uint32",
-                "name": "previousConfigBlockNumber",
-                "indexed": false
-            },
-            {
-                "type": "bytes32",
-                "name": "configDigest",
-                "indexed": false
-            },
-            {
-                "type": "uint64",
-                "name": "configCount",
-                "indexed": false
-            },
-            {
-                "type": "address[]",
-                "name": "signers"
-            },
-            {
-                "type": "address[]",
-                "name": "transmitters"
-            },
-            {
-                "type": "uint8",
-                "name": "f",
-                "indexed": false
-            },
-            {
-                "type": "bytes",
-                "name": "onchainConfig",
-                "indexed": false
-            },
-            {
-                "type": "uint64",
-                "name": "offchainConfigVersion",
-                "indexed": false
-            },
-            {
-                "type": "bytes",
-                "name": "offchainConfig",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "ExecutionStateChanged",
-        "inputs": [
-            {
-                "type": "uint64",
+                "internalType": "uint64",
                 "name": "sequenceNumber",
-                "indexed": true
-            },
-            {
-                "type": "bytes32",
-                "name": "messageId",
-                "indexed": true
-            },
-            {
-                "type": "uint8",
-                "name": "state",
-                "indexed": false
-            },
-            {
-                "type": "bytes",
-                "name": "returnData",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "OwnershipTransferRequested",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "from",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "to",
-                "indexed": true
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "OwnershipTransferred",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "from",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "to",
-                "indexed": true
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "PoolAdded",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "token",
-                "indexed": false
-            },
-            {
-                "type": "address",
-                "name": "pool",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "PoolRemoved",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "token",
-                "indexed": false
-            },
-            {
-                "type": "address",
-                "name": "pool",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "SkippedIncorrectNonce",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "nonce",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "sender",
-                "indexed": true
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "SkippedSenderWithPreviousRampMessageInflight",
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "nonce",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "sender",
-                "indexed": true
-            }
-        ]
-    },
-    {
-        "type": "event",
-        "anonymous": false,
-        "name": "Transmitted",
-        "inputs": [
-            {
-                "type": "bytes32",
-                "name": "configDigest",
-                "indexed": false
-            },
-            {
-                "type": "uint32",
-                "name": "epoch",
-                "indexed": false
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "acceptOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "applyPoolUpdates",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "tuple[]",
-                "name": "removes",
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "token"
-                    },
-                    {
-                        "type": "address",
-                        "name": "pool"
-                    }
-                ]
-            },
-            {
-                "type": "tuple[]",
-                "name": "adds",
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "token"
-                    },
-                    {
-                        "type": "address",
-                        "name": "pool"
-                    }
-                ]
+                "type": "uint64"
             }
         ],
-        "outputs": []
+        "name": "AlreadyAttempted",
+        "type": "error"
     },
     {
-        "type": "function",
-        "name": "ccipReceive",
-        "constant": true,
-        "stateMutability": "pure",
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
-                "name": "",
-                "components": [
-                    {
-                        "type": "bytes32",
-                        "name": "messageId"
-                    },
-                    {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "sender"
-                    },
-                    {
-                        "type": "bytes",
-                        "name": "data"
-                    },
-                    {
-                        "type": "tuple[]",
-                        "name": "destTokenAmounts",
-                        "components": [
-                            {
-                                "type": "address",
-                                "name": "token"
-                            },
-                            {
-                                "type": "uint256",
-                                "name": "amount"
-                            }
-                        ]
-                    }
-                ]
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
             }
         ],
-        "outputs": []
+        "name": "AlreadyExecuted",
+        "type": "error"
     },
     {
-        "type": "function",
-        "name": "currentRateLimiterState",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
-        "outputs": [
-            {
-                "type": "tuple",
-                "name": "",
-                "components": [
-                    {
-                        "type": "uint128",
-                        "name": "tokens"
-                    },
-                    {
-                        "type": "uint32",
-                        "name": "lastUpdated"
-                    },
-                    {
-                        "type": "bool",
-                        "name": "isEnabled"
-                    },
-                    {
-                        "type": "uint128",
-                        "name": "capacity"
-                    },
-                    {
-                        "type": "uint128",
-                        "name": "rate"
-                    }
-                ]
-            }
-        ]
+        "name": "BadARMSignal",
+        "type": "error"
     },
     {
-        "type": "function",
-        "name": "executeSingleMessage",
-        "constant": false,
-        "payable": false,
+        "inputs": [],
+        "name": "BucketOverfilled",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "CanOnlySelfCall",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "CommitStoreAlreadyInUse",
+        "type": "error"
+    },
+    {
         "inputs": [
             {
-                "type": "tuple",
+                "internalType": "bytes32",
+                "name": "expected",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "actual",
+                "type": "bytes32"
+            }
+        ],
+        "name": "ConfigDigestMismatch",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "EmptyReport",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes",
+                "name": "error",
+                "type": "bytes"
+            }
+        ],
+        "name": "ExecutionError",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "expected",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "actual",
+                "type": "uint256"
+            }
+        ],
+        "name": "ForkedChain",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
                 "name": "message",
+                "type": "string"
+            }
+        ],
+        "name": "InvalidConfig",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "newLimit",
+                "type": "uint256"
+            }
+        ],
+        "name": "InvalidManualExecutionGasLimit",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidMessageId",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
+            },
+            {
+                "internalType": "enum Internal.MessageExecutionState",
+                "name": "newState",
+                "type": "uint8"
+            }
+        ],
+        "name": "InvalidNewState",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sourceChainSelector",
+                "type": "uint64"
+            }
+        ],
+        "name": "InvalidSourceChain",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidTokenPoolConfig",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ManualExecutionGasLimitMismatch",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ManualExecutionNotYetEnabled",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "maxSize",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "actualSize",
+                "type": "uint256"
+            }
+        ],
+        "name": "MessageTooLarge",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OnlyCallableByAdminOrOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "OracleCannotBeZeroAddress",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PoolAlreadyAdded",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PoolDoesNotExist",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "PriceNotFoundForToken",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes",
+                "name": "error",
+                "type": "bytes"
+            }
+        ],
+        "name": "ReceiverError",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "RootNotCommitted",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
+            }
+        ],
+        "name": "TokenDataMismatch",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes",
+                "name": "error",
+                "type": "bytes"
+            }
+        ],
+        "name": "TokenHandlingError",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "capacity",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "requested",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "TokenMaxCapacityExceeded",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TokenPoolMismatch",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "minWaitInSeconds",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "available",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "TokenRateLimitReached",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "UnauthorizedTransmitter",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "UnexpectedTokenData",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
+            }
+        ],
+        "name": "UnsupportedNumberOfTokens",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "UnsupportedToken",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "expected",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "actual",
+                "type": "uint256"
+            }
+        ],
+        "name": "WrongMessageLength",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ZeroAddressNotAllowed",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "newAdmin",
+                "type": "address"
+            }
+        ],
+        "name": "AdminSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
                 "components": [
                     {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
+                        "internalType": "address",
+                        "name": "commitStore",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "sender"
+                        "internalType": "uint64",
+                        "name": "chainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "address",
-                        "name": "receiver"
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
                     },
                     {
-                        "type": "uint64",
-                        "name": "sequenceNumber"
+                        "internalType": "address",
+                        "name": "onRamp",
+                        "type": "address"
                     },
                     {
-                        "type": "uint256",
-                        "name": "gasLimit"
+                        "internalType": "address",
+                        "name": "prevOffRamp",
+                        "type": "address"
                     },
                     {
-                        "type": "bool",
-                        "name": "strict"
+                        "internalType": "address",
+                        "name": "armProxy",
+                        "type": "address"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct EVM2EVMOffRamp.StaticConfig",
+                "name": "staticConfig",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "uint32",
+                        "name": "permissionLessExecutionThresholdSeconds",
+                        "type": "uint32"
                     },
                     {
-                        "type": "uint64",
-                        "name": "nonce"
+                        "internalType": "address",
+                        "name": "router",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "feeToken"
+                        "internalType": "address",
+                        "name": "priceRegistry",
+                        "type": "address"
                     },
                     {
-                        "type": "uint256",
-                        "name": "feeTokenAmount"
+                        "internalType": "uint16",
+                        "name": "maxNumberOfTokensPerMsg",
+                        "type": "uint16"
                     },
                     {
-                        "type": "bytes",
-                        "name": "data"
+                        "internalType": "uint32",
+                        "name": "maxDataBytes",
+                        "type": "uint32"
                     },
                     {
-                        "type": "tuple[]",
-                        "name": "tokenAmounts",
+                        "internalType": "uint32",
+                        "name": "maxPoolReleaseOrMintGas",
+                        "type": "uint32"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct EVM2EVMOffRamp.DynamicConfig",
+                "name": "dynamicConfig",
+                "type": "tuple"
+            }
+        ],
+        "name": "ConfigSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint32",
+                "name": "previousConfigBlockNumber",
+                "type": "uint32"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "configDigest",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "configCount",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "signers",
+                "type": "address[]"
+            },
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "transmitters",
+                "type": "address[]"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "f",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes",
+                "name": "onchainConfig",
+                "type": "bytes"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "offchainConfigVersion",
+                "type": "uint64"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes",
+                "name": "offchainConfig",
+                "type": "bytes"
+            }
+        ],
+        "name": "ConfigSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
+            },
+            {
+                "indexed": true,
+                "internalType": "bytes32",
+                "name": "messageId",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "enum Internal.MessageExecutionState",
+                "name": "state",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "bytes",
+                "name": "returnData",
+                "type": "bytes"
+            }
+        ],
+        "name": "ExecutionStateChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferRequested",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "pool",
+                "type": "address"
+            }
+        ],
+        "name": "PoolAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "pool",
+                "type": "address"
+            }
+        ],
+        "name": "PoolRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "nonce",
+                "type": "uint64"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "SkippedIncorrectNonce",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "uint64",
+                "name": "nonce",
+                "type": "uint64"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "SkippedSenderWithPreviousRampMessageInflight",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bytes32",
+                "name": "configDigest",
+                "type": "bytes32"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint32",
+                "name": "epoch",
+                "type": "uint32"
+            }
+        ],
+        "name": "Transmitted",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "acceptOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "pool",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Internal.PoolUpdate[]",
+                "name": "removes",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "pool",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Internal.PoolUpdate[]",
+                "name": "adds",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "applyPoolUpdates",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "bytes32",
+                        "name": "messageId",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "sender",
+                        "type": "bytes"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "data",
+                        "type": "bytes"
+                    },
+                    {
                         "components": [
                             {
-                                "type": "address",
-                                "name": "token"
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
                             },
                             {
-                                "type": "uint256",
-                                "name": "amount"
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
                             }
-                        ]
-                    },
-                    {
-                        "type": "bytes[]",
-                        "name": "sourceTokenData"
-                    },
-                    {
-                        "type": "bytes32",
-                        "name": "messageId"
+                        ],
+                        "internalType": "struct Client.EVMTokenAmount[]",
+                        "name": "destTokenAmounts",
+                        "type": "tuple[]"
                     }
-                ]
-            },
-            {
-                "type": "bytes[]",
-                "name": "offchainTokenData"
-            }
-        ],
-        "outputs": []
-    },
-    {
-        "type": "function",
-        "name": "getDestinationToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "sourceToken"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getDestinationTokens",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address[]",
-                "name": "destTokens"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getDynamicConfig",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "tuple",
+                ],
+                "internalType": "struct Client.Any2EVMMessage",
                 "name": "",
+                "type": "tuple"
+            }
+        ],
+        "name": "ccipReceive",
+        "outputs": [],
+        "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "currentRateLimiterState",
+        "outputs": [
+            {
                 "components": [
                     {
-                        "type": "uint32",
-                        "name": "permissionLessExecutionThresholdSeconds"
+                        "internalType": "uint128",
+                        "name": "tokens",
+                        "type": "uint128"
                     },
                     {
-                        "type": "address",
-                        "name": "router"
+                        "internalType": "uint32",
+                        "name": "lastUpdated",
+                        "type": "uint32"
                     },
                     {
-                        "type": "address",
-                        "name": "priceRegistry"
+                        "internalType": "bool",
+                        "name": "isEnabled",
+                        "type": "bool"
                     },
                     {
-                        "type": "uint16",
-                        "name": "maxNumberOfTokensPerMsg"
+                        "internalType": "uint128",
+                        "name": "capacity",
+                        "type": "uint128"
                     },
                     {
-                        "type": "uint32",
-                        "name": "maxDataBytes"
-                    },
-                    {
-                        "type": "uint32",
-                        "name": "maxPoolReleaseOrMintGas"
+                        "internalType": "uint128",
+                        "name": "rate",
+                        "type": "uint128"
                     }
-                ]
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getExecutionState",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint64",
-                "name": "sequenceNumber"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "uint8",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getPoolByDestToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "destToken"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getPoolBySourceToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "sourceToken"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getSenderNonce",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "sender"
-            }
-        ],
-        "outputs": [
-            {
-                "type": "uint64",
-                "name": "nonce"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getStaticConfig",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "tuple",
+                ],
+                "internalType": "struct RateLimiter.TokenBucket",
                 "name": "",
-                "components": [
-                    {
-                        "type": "address",
-                        "name": "commitStore"
-                    },
-                    {
-                        "type": "uint64",
-                        "name": "chainSelector"
-                    },
-                    {
-                        "type": "uint64",
-                        "name": "sourceChainSelector"
-                    },
-                    {
-                        "type": "address",
-                        "name": "onRamp"
-                    },
-                    {
-                        "type": "address",
-                        "name": "prevOffRamp"
-                    },
-                    {
-                        "type": "address",
-                        "name": "armProxy"
-                    }
-                ]
+                "type": "tuple"
             }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getSupportedTokens",
-        "constant": true,
+        ],
         "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address[]",
-                "name": "sourceTokens"
-            }
-        ]
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "getTokenLimitAdmin",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "getTransmitters",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "address[]",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "latestConfigDetails",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "uint32",
-                "name": "configCount"
-            },
-            {
-                "type": "uint32",
-                "name": "blockNumber"
-            },
-            {
-                "type": "bytes32",
-                "name": "configDigest"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "latestConfigDigestAndEpoch",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "bool",
-                "name": "scanLogs"
-            },
-            {
-                "type": "bytes32",
-                "name": "configDigest"
-            },
-            {
-                "type": "uint32",
-                "name": "epoch"
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "manuallyExecute",
-        "constant": false,
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
-                "name": "report",
                 "components": [
                     {
-                        "type": "tuple[]",
-                        "name": "messages",
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "receiver",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "sequenceNumber",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "gasLimit",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "strict",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "nonce",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "feeToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "feeTokenAmount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "bytes",
+                        "name": "data",
+                        "type": "bytes"
+                    },
+                    {
                         "components": [
                             {
-                                "type": "uint64",
-                                "name": "sourceChainSelector"
+                                "internalType": "address",
+                                "name": "token",
+                                "type": "address"
                             },
                             {
-                                "type": "address",
-                                "name": "sender"
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct Client.EVMTokenAmount[]",
+                        "name": "tokenAmounts",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "bytes[]",
+                        "name": "sourceTokenData",
+                        "type": "bytes[]"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "messageId",
+                        "type": "bytes32"
+                    }
+                ],
+                "internalType": "struct Internal.EVM2EVMMessage",
+                "name": "message",
+                "type": "tuple"
+            },
+            {
+                "internalType": "bytes[]",
+                "name": "offchainTokenData",
+                "type": "bytes[]"
+            }
+        ],
+        "name": "executeSingleMessage",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "sourceToken",
+                "type": "address"
+            }
+        ],
+        "name": "getDestinationToken",
+        "outputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getDestinationTokens",
+        "outputs": [
+            {
+                "internalType": "contract IERC20[]",
+                "name": "destTokens",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getDynamicConfig",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint32",
+                        "name": "permissionLessExecutionThresholdSeconds",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "router",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "priceRegistry",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint16",
+                        "name": "maxNumberOfTokensPerMsg",
+                        "type": "uint16"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "maxDataBytes",
+                        "type": "uint32"
+                    },
+                    {
+                        "internalType": "uint32",
+                        "name": "maxPoolReleaseOrMintGas",
+                        "type": "uint32"
+                    }
+                ],
+                "internalType": "struct EVM2EVMOffRamp.DynamicConfig",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint64",
+                "name": "sequenceNumber",
+                "type": "uint64"
+            }
+        ],
+        "name": "getExecutionState",
+        "outputs": [
+            {
+                "internalType": "enum Internal.MessageExecutionState",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "destToken",
+                "type": "address"
+            }
+        ],
+        "name": "getPoolByDestToken",
+        "outputs": [
+            {
+                "internalType": "contract IPool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "sourceToken",
+                "type": "address"
+            }
+        ],
+        "name": "getPoolBySourceToken",
+        "outputs": [
+            {
+                "internalType": "contract IPool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "sender",
+                "type": "address"
+            }
+        ],
+        "name": "getSenderNonce",
+        "outputs": [
+            {
+                "internalType": "uint64",
+                "name": "nonce",
+                "type": "uint64"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getStaticConfig",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "commitStore",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "chainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "uint64",
+                        "name": "sourceChainSelector",
+                        "type": "uint64"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "onRamp",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "prevOffRamp",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "armProxy",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct EVM2EVMOffRamp.StaticConfig",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getSupportedTokens",
+        "outputs": [
+            {
+                "internalType": "contract IERC20[]",
+                "name": "sourceTokens",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTokenLimitAdmin",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getTransmitters",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestConfigDetails",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "configCount",
+                "type": "uint32"
+            },
+            {
+                "internalType": "uint32",
+                "name": "blockNumber",
+                "type": "uint32"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "configDigest",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestConfigDigestAndEpoch",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "scanLogs",
+                "type": "bool"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "configDigest",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "uint32",
+                "name": "epoch",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint64",
+                                "name": "sourceChainSelector",
+                                "type": "uint64"
                             },
                             {
-                                "type": "address",
-                                "name": "receiver"
+                                "internalType": "address",
+                                "name": "sender",
+                                "type": "address"
                             },
                             {
-                                "type": "uint64",
-                                "name": "sequenceNumber"
+                                "internalType": "address",
+                                "name": "receiver",
+                                "type": "address"
                             },
                             {
-                                "type": "uint256",
-                                "name": "gasLimit"
+                                "internalType": "uint64",
+                                "name": "sequenceNumber",
+                                "type": "uint64"
                             },
                             {
-                                "type": "bool",
-                                "name": "strict"
+                                "internalType": "uint256",
+                                "name": "gasLimit",
+                                "type": "uint256"
                             },
                             {
-                                "type": "uint64",
-                                "name": "nonce"
+                                "internalType": "bool",
+                                "name": "strict",
+                                "type": "bool"
                             },
                             {
-                                "type": "address",
-                                "name": "feeToken"
+                                "internalType": "uint64",
+                                "name": "nonce",
+                                "type": "uint64"
                             },
                             {
-                                "type": "uint256",
-                                "name": "feeTokenAmount"
+                                "internalType": "address",
+                                "name": "feeToken",
+                                "type": "address"
                             },
                             {
-                                "type": "bytes",
-                                "name": "data"
+                                "internalType": "uint256",
+                                "name": "feeTokenAmount",
+                                "type": "uint256"
                             },
                             {
-                                "type": "tuple[]",
-                                "name": "tokenAmounts",
+                                "internalType": "bytes",
+                                "name": "data",
+                                "type": "bytes"
+                            },
+                            {
                                 "components": [
                                     {
-                                        "type": "address",
-                                        "name": "token"
+                                        "internalType": "address",
+                                        "name": "token",
+                                        "type": "address"
                                     },
                                     {
-                                        "type": "uint256",
-                                        "name": "amount"
+                                        "internalType": "uint256",
+                                        "name": "amount",
+                                        "type": "uint256"
                                     }
-                                ]
+                                ],
+                                "internalType": "struct Client.EVMTokenAmount[]",
+                                "name": "tokenAmounts",
+                                "type": "tuple[]"
                             },
                             {
-                                "type": "bytes[]",
-                                "name": "sourceTokenData"
+                                "internalType": "bytes[]",
+                                "name": "sourceTokenData",
+                                "type": "bytes[]"
                             },
                             {
-                                "type": "bytes32",
-                                "name": "messageId"
+                                "internalType": "bytes32",
+                                "name": "messageId",
+                                "type": "bytes32"
                             }
-                        ]
+                        ],
+                        "internalType": "struct Internal.EVM2EVMMessage[]",
+                        "name": "messages",
+                        "type": "tuple[]"
                     },
                     {
-                        "type": "bytes[][]",
-                        "name": "offchainTokenData"
+                        "internalType": "bytes[][]",
+                        "name": "offchainTokenData",
+                        "type": "bytes[][]"
                     },
                     {
-                        "type": "bytes32[]",
-                        "name": "proofs"
+                        "internalType": "bytes32[]",
+                        "name": "proofs",
+                        "type": "bytes32[]"
                     },
                     {
-                        "type": "uint256",
-                        "name": "proofFlagBits"
+                        "internalType": "uint256",
+                        "name": "proofFlagBits",
+                        "type": "uint256"
                     }
-                ]
+                ],
+                "internalType": "struct Internal.ExecutionReport",
+                "name": "report",
+                "type": "tuple"
             },
             {
-                "type": "uint256[]",
-                "name": "gasLimitOverrides"
+                "internalType": "uint256[]",
+                "name": "gasLimitOverrides",
+                "type": "uint256[]"
             }
         ],
-        "outputs": []
+        "name": "manuallyExecute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "owner",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "owner",
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newAdmin",
+                "type": "address"
+            }
+        ],
         "name": "setAdmin",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "newAdmin"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "signers",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address[]",
+                "name": "transmitters",
+                "type": "address[]"
+            },
+            {
+                "internalType": "uint8",
+                "name": "f",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bytes",
+                "name": "onchainConfig",
+                "type": "bytes"
+            },
+            {
+                "internalType": "uint64",
+                "name": "offchainConfigVersion",
+                "type": "uint64"
+            },
+            {
+                "internalType": "bytes",
+                "name": "offchainConfig",
+                "type": "bytes"
+            }
+        ],
         "name": "setOCR2Config",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address[]",
-                "name": "signers"
-            },
-            {
-                "type": "address[]",
-                "name": "transmitters"
-            },
-            {
-                "type": "uint8",
-                "name": "f"
-            },
-            {
-                "type": "bytes",
-                "name": "onchainConfig"
-            },
-            {
-                "type": "uint64",
-                "name": "offchainConfigVersion"
-            },
-            {
-                "type": "bytes",
-                "name": "offchainConfig"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "setRateLimiterConfig",
-        "constant": false,
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
-                "name": "config",
                 "components": [
                     {
-                        "type": "bool",
-                        "name": "isEnabled"
+                        "internalType": "bool",
+                        "name": "isEnabled",
+                        "type": "bool"
                     },
                     {
-                        "type": "uint128",
-                        "name": "capacity"
+                        "internalType": "uint128",
+                        "name": "capacity",
+                        "type": "uint128"
                     },
                     {
-                        "type": "uint128",
-                        "name": "rate"
+                        "internalType": "uint128",
+                        "name": "rate",
+                        "type": "uint128"
                     }
-                ]
+                ],
+                "internalType": "struct RateLimiter.Config",
+                "name": "config",
+                "type": "tuple"
             }
         ],
-        "outputs": []
+        "name": "setRateLimiterConfig",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
+            }
+        ],
         "name": "transferOwnership",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "to"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "bytes32[3]",
+                "name": "reportContext",
+                "type": "bytes32[3]"
+            },
+            {
+                "internalType": "bytes",
+                "name": "report",
+                "type": "bytes"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "rs",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "ss",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
         "name": "transmit",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "bytes32[3]",
-                "name": "reportContext"
-            },
-            {
-                "type": "bytes",
-                "name": "report"
-            },
-            {
-                "type": "bytes32[]",
-                "name": "rs"
-            },
-            {
-                "type": "bytes32[]",
-                "name": "ss"
-            },
-            {
-                "type": "bytes32",
-                "name": ""
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "typeAndVersion",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
         "inputs": [],
+        "name": "typeAndVersion",
         "outputs": [
             {
-                "type": "string",
-                "name": ""
+                "internalType": "string",
+                "name": "",
+                "type": "string"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const

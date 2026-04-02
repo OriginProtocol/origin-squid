@@ -1,553 +1,570 @@
 export const ABI_JSON = [
     {
-        "type": "constructor",
-        "stateMutability": "undefined",
-        "payable": false,
         "inputs": [
             {
-                "type": "tuple",
-                "name": "_params",
                 "components": [
                     {
-                        "type": "address",
-                        "name": "timelockAddress"
+                        "internalType": "address",
+                        "name": "timelockAddress",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "baseErc20"
+                        "internalType": "address",
+                        "name": "baseErc20",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "quoteErc20"
+                        "internalType": "address",
+                        "name": "quoteErc20",
+                        "type": "address"
                     },
                     {
-                        "type": "address",
-                        "name": "priceSource"
+                        "internalType": "address",
+                        "name": "priceSource",
+                        "type": "address"
                     },
                     {
-                        "type": "uint256",
-                        "name": "maximumDeviation"
+                        "internalType": "uint256",
+                        "name": "maximumDeviation",
+                        "type": "uint256"
                     },
                     {
-                        "type": "uint256",
-                        "name": "maximumOracleDelay"
+                        "internalType": "uint256",
+                        "name": "maximumOracleDelay",
+                        "type": "uint256"
                     }
-                ]
+                ],
+                "internalType": "struct ConstructorParams",
+                "name": "_params",
+                "type": "tuple"
             }
-        ]
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "CalledWithFutureTimestamp",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "CalledWithTimestampBeforePreviousRound",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "NoPriceData",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "OnlyPendingTimelock",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "OnlyPriceSource",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "OnlyTimelock",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "SameMaximumDeviation",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "SameMaximumOracleDelay",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "error",
+        "inputs": [],
         "name": "SamePriceSource",
-        "inputs": []
+        "type": "error"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "SetMaximumDeviation",
         "inputs": [
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "oldMaxDeviation",
-                "indexed": false
+                "type": "uint256"
             },
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "newMaxDeviation",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "SetMaximumDeviation",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "SetMaximumOracleDelay",
         "inputs": [
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "oldMaxOracleDelay",
-                "indexed": false
+                "type": "uint256"
             },
             {
-                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256",
                 "name": "newMaxOracleDelay",
-                "indexed": false
+                "type": "uint256"
             }
-        ]
+        ],
+        "name": "SetMaximumOracleDelay",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "SetPriceSource",
         "inputs": [
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "oldPriceSource",
-                "indexed": false
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": false,
+                "internalType": "address",
                 "name": "newPriceSource",
-                "indexed": false
+                "type": "address"
             }
-        ]
+        ],
+        "name": "SetPriceSource",
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "previousTimelock",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newTimelock",
+                "type": "address"
+            }
+        ],
         "name": "TimelockTransferStarted",
-        "inputs": [
-            {
-                "type": "address",
-                "name": "previousTimelock",
-                "indexed": true
-            },
-            {
-                "type": "address",
-                "name": "newTimelock",
-                "indexed": true
-            }
-        ]
+        "type": "event"
     },
     {
-        "type": "event",
         "anonymous": false,
-        "name": "TimelockTransferred",
         "inputs": [
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "previousTimelock",
-                "indexed": true
+                "type": "address"
             },
             {
-                "type": "address",
+                "indexed": true,
+                "internalType": "address",
                 "name": "newTimelock",
-                "indexed": true
+                "type": "address"
             }
-        ]
+        ],
+        "name": "TimelockTransferred",
+        "type": "event"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "BASE_TOKEN",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "QUOTE_TOKEN",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "acceptTransferTimelock",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "_isBadData",
+                "type": "bool"
+            },
+            {
+                "internalType": "uint104",
+                "name": "_priceLow",
+                "type": "uint104"
+            },
+            {
+                "internalType": "uint104",
+                "name": "_priceHigh",
+                "type": "uint104"
+            },
+            {
+                "internalType": "uint40",
+                "name": "_timestamp",
+                "type": "uint40"
+            }
+        ],
         "name": "addRoundData",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "bool",
-                "name": "_isBadData"
-            },
-            {
-                "type": "uint104",
-                "name": "_priceLow"
-            },
-            {
-                "type": "uint104",
-                "name": "_priceHigh"
-            },
-            {
-                "type": "uint40",
-                "name": "_timestamp"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "decimals",
-        "constant": true,
-        "stateMutability": "pure",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint8",
-                "name": "_decimals"
+                "internalType": "uint8",
+                "name": "_decimals",
+                "type": "uint8"
             }
-        ]
+        ],
+        "stateMutability": "pure",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "description",
-        "constant": true,
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "_description",
+                "type": "string"
+            }
+        ],
         "stateMutability": "pure",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-            {
-                "type": "string",
-                "name": "_description"
-            }
-        ]
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "getPrices",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "bool",
-                "name": "_isBadData"
+                "internalType": "bool",
+                "name": "_isBadData",
+                "type": "bool"
             },
             {
-                "type": "uint256",
-                "name": "_priceLow"
+                "internalType": "uint256",
+                "name": "_priceLow",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "_priceHigh"
+                "internalType": "uint256",
+                "name": "_priceHigh",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint80",
+                "name": "_roundId",
+                "type": "uint80"
+            }
+        ],
         "name": "getRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint80",
-                "name": "_roundId"
-            }
-        ],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "roundId"
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "lastCorrectRoundId",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint80",
-                "name": ""
+                "internalType": "uint80",
+                "name": "",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "latestRoundData",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint80",
-                "name": "roundId"
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
             },
             {
-                "type": "int256",
-                "name": "answer"
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
             },
             {
-                "type": "uint256",
-                "name": "startedAt"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint256",
-                "name": "updatedAt"
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
             },
             {
-                "type": "uint80",
-                "name": "answeredInRound"
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "maximumDeviation",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "maximumOracleDelay",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "uint256",
-                "name": ""
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "pendingTimelockAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "priceSource",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "renounceTimelock",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "name": "rounds",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": ""
-            }
-        ],
         "outputs": [
             {
-                "type": "uint104",
-                "name": "priceLow"
+                "internalType": "uint104",
+                "name": "priceLow",
+                "type": "uint104"
             },
             {
-                "type": "uint104",
-                "name": "priceHigh"
+                "internalType": "uint104",
+                "name": "priceHigh",
+                "type": "uint104"
             },
             {
-                "type": "uint40",
-                "name": "timestamp"
+                "internalType": "uint40",
+                "name": "timestamp",
+                "type": "uint40"
             },
             {
-                "type": "bool",
-                "name": "isBadData"
+                "internalType": "bool",
+                "name": "isBadData",
+                "type": "bool"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_newMaxDeviation",
+                "type": "uint256"
+            }
+        ],
         "name": "setMaximumDeviation",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_newMaxDeviation"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_newMaxOracleDelay",
+                "type": "uint256"
+            }
+        ],
         "name": "setMaximumOracleDelay",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "uint256",
-                "name": "_newMaxOracleDelay"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_newPriceSource",
+                "type": "address"
+            }
+        ],
         "name": "setPriceSource",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_newPriceSource"
-            }
-        ],
-        "outputs": []
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [
+            {
+                "internalType": "bytes4",
+                "name": "interfaceId",
+                "type": "bytes4"
+            }
+        ],
         "name": "supportsInterface",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-            {
-                "type": "bytes4",
-                "name": "interfaceId"
-            }
-        ],
         "outputs": [
             {
-                "type": "bool",
-                "name": ""
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
+        "inputs": [],
         "name": "timelockAddress",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
         "outputs": [
             {
-                "type": "address",
-                "name": ""
-            }
-        ]
-    },
-    {
-        "type": "function",
-        "name": "transferTimelock",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-            {
-                "type": "address",
-                "name": "_newTimelock"
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "outputs": []
+        "stateMutability": "view",
+        "type": "function"
     },
     {
-        "type": "function",
-        "name": "version",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_newTimelock",
+                "type": "address"
+            }
+        ],
+        "name": "transferTimelock",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
+        "name": "version",
         "outputs": [
             {
-                "type": "uint256",
-                "name": "_version"
+                "internalType": "uint256",
+                "name": "_version",
+                "type": "uint256"
             }
-        ]
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
-]
+] as const
