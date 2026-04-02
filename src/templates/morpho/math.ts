@@ -10,16 +10,21 @@ const STEEPNESS = 4
 const WAD = 1e18
 const SECONDS_PER_YEAR = 365 * 24 * 3600 // 365-day year, no leap year — matches Morpho convention
 
-/**
- * Adaptive Curve IRM: deviation from target utilisation.
- * Returns a signed multiplier applied to rateAtTarget.
- */
-function _curve(util: number): number {
-  const err = (util - TARGET_UTIL) / TARGET_UTIL
-  if (err < 0) {
-    return STEEPNESS * err // below target: linear decrease
+/** Normalized distance from target utilization. Range: [-1, +1]. */
+function _error(util: number): number {
+  if (util > TARGET_UTIL) {
+    return (util - TARGET_UTIL) / (1 - TARGET_UTIL)
   }
-  return (STEEPNESS * (util - TARGET_UTIL)) / (1 - TARGET_UTIL) // above target: steeper increase
+  return (util - TARGET_UTIL) / TARGET_UTIL
+}
+
+/** IRM rate multiplier at a given utilization. Always positive. */
+function _curveMultiplier(util: number): number {
+  const err = _error(util)
+  if (util <= TARGET_UTIL) {
+    return (1 - 1 / STEEPNESS) * err + 1 // 0.75 * err + 1
+  }
+  return (STEEPNESS - 1) * err + 1 // 3 * err + 1
 }
 
 /**
@@ -43,11 +48,13 @@ export function estimateMarketApy(
     return { supplyApy: 0, borrowApy: 0 }
   }
 
-  const util = Math.min(totalBorrows / supply, 0.9999) // clamp to avoid division by zero
+  let util = Math.min(totalBorrows / supply, 0.9999) // clamp to avoid division by zero
+  if (util < 0.0001) util = 0
+
   const ratePerSec = rateAtTarget / WAD
-  const borrowRate = ratePerSec * Math.exp(_curve(util))
-  const borrowApy = Math.exp(borrowRate * SECONDS_PER_YEAR) - 1 // continuous compounding
-  const supplyApy = borrowApy * util * (1 - fee / WAD) // supply earns util% minus protocol fee
+  const borrowRate = ratePerSec * _curveMultiplier(util)
+  const borrowApy = Math.max(0, Math.min(Math.exp(borrowRate * SECONDS_PER_YEAR) - 1, 8.0)) // continuous compounding, clamped to [0, 800%]
+  const supplyApy = Math.max(0, Math.min(borrowApy * util * (1 - fee / WAD), 8.0))
 
   return { supplyApy, borrowApy }
 }
