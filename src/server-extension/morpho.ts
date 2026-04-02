@@ -29,7 +29,10 @@ const clients = {
     transport: fallback((chainConfigs[base.id]?.endpoints ?? []).map((url) => http(url))),
   }),
   [hyperEvm.id]: createPublicClient({
-    chain: hyperEvm,
+    chain: {
+      ...hyperEvm,
+      contracts: { multicall3: { address: '0xcA11bde05977b3631167028862bE2a173976CA11' as const } },
+    },
     transport: http(process.env.RPC_HYPEREVM_ENDPOINT ?? 'https://rpc.hyperliquid.xyz/evm'),
   }),
 }
