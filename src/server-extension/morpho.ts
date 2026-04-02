@@ -35,7 +35,13 @@ function getViemClient(chainId: number) {
   }
   if (chainId === hyperEvm.id) {
     const rpc = process.env.RPC_HYPEREVM_ENDPOINT ?? 'https://rpc.hyperliquid.xyz/evm'
-    return createPublicClient({ chain: hyperEvm, transport: http(rpc) })
+    return createPublicClient({
+      chain: {
+        ...hyperEvm,
+        contracts: { multicall3: { address: '0xcA11bde05977b3631167028862bE2a173976CA11' as const } },
+      },
+      transport: http(rpc),
+    })
   }
   throw new Error(`Unsupported chainId: ${chainId}. Supported: ${mainnet.id}, ${base.id}, ${hyperEvm.id}`)
 }
