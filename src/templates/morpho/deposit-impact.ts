@@ -17,13 +17,13 @@ export interface DepositImpactResult {
  * @param client   viem PublicClient for the target chain
  * @param chainId  Chain ID (used to resolve the Morpho Blue singleton address)
  * @param vaultAddress  MetaMorpho V1.1 vault address
- * @param depositAmount  Deposit size as a decimal string in loan-token units
+ * @param depositAmount  Deposit size in loan-token base units (e.g. 1e18 for 1 ETH)
  */
 export async function computeDepositImpact(
   client: PublicClient,
   chainId: number,
   vaultAddress: string,
-  depositAmount: string,
+  depositAmount: bigint,
 ): Promise<DepositImpactResult> {
   const morphoAddress = ousd.morpho.blue[chainId]
   if (!morphoAddress) {
@@ -36,14 +36,8 @@ export async function computeDepositImpact(
   }
 
   const { apy: currentApy, markets } = result
-  const sim = simulateDeposit(markets, BigInt(depositAmount))
-
-  let newApy = currentApy
-  try {
-    newApy = weightedVaultApy(markets, sim)
-  } catch {
-    // If simulation fails, newApy stays at currentApy → impactBps = 0
-  }
+  const sim = simulateDeposit(markets, depositAmount)
+  const newApy = weightedVaultApy(markets, sim)
 
   return {
     currentApy,

@@ -9,6 +9,7 @@
  * - `fetchVaultApy` — Subsquid version, returns null if vault has no markets
  * - `fetchVaultApyViem` — viem version, returns { apy, markets } or null
  */
+import { compact } from 'lodash'
 import type { PublicClient } from 'viem'
 import { getAddress } from 'viem'
 
@@ -192,8 +193,18 @@ export async function fetchVaultMarketsViem(
 
   // 2. Market IDs from both queues
   const queueCalls = [
-    ...Array.from({ length: supplyLenN }, (_, i) => ({ address: vault, abi: META_MORPHO_ABI_JSON, functionName: 'supplyQueue' as const, args: [BigInt(i)] })),
-    ...Array.from({ length: withdrawLenN }, (_, i) => ({ address: vault, abi: META_MORPHO_ABI_JSON, functionName: 'withdrawQueue' as const, args: [BigInt(i)] })),
+    ...Array.from({ length: supplyLenN }, (_, i) => ({
+      address: vault,
+      abi: META_MORPHO_ABI_JSON,
+      functionName: 'supplyQueue' as const,
+      args: [BigInt(i)],
+    })),
+    ...Array.from({ length: withdrawLenN }, (_, i) => ({
+      address: vault,
+      abi: META_MORPHO_ABI_JSON,
+      functionName: 'withdrawQueue' as const,
+      args: [BigInt(i)],
+    })),
   ]
 
   const queueResults = await client.multicall({ contracts: queueCalls, allowFailure: false })
@@ -206,44 +217,38 @@ export async function fetchVaultMarketsViem(
 
   if (allIds.length === 0) return []
 
-  // 4. Fetch market state, position, params, config
-  const perMarketCalls = allIds.flatMap((id) => [
-    { address: morpho, abi: MORPHO_ABI_JSON, functionName: 'market' as const, args: [id] },
-    { address: morpho, abi: MORPHO_ABI_JSON, functionName: 'position' as const, args: [id, vault] },
-    { address: morpho, abi: MORPHO_ABI_JSON, functionName: 'idToMarketParams' as const, args: [id] },
-    { address: vault, abi: META_MORPHO_ABI_JSON, functionName: 'config' as const, args: [id] },
+  // 4. Fetch market state, position, params, config (parallel multicalls)
+  const [marketStates, positions, marketParams, configs] = await Promise.all([
+    client.multicall({
+      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'market' as const, args: [id] })),
+      allowFailure: false,
+    }),
+    client.multicall({
+      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'position' as const, args: [id, vault] })),
+      allowFailure: false,
+    }),
+    client.multicall({
+      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'idToMarketParams' as const, args: [id] })),
+      allowFailure: false,
+    }),
+    client.multicall({
+      contracts: allIds.map((id) => ({ address: vault, abi: META_MORPHO_ABI_JSON, functionName: 'config' as const, args: [id] })),
+      allowFailure: false,
+    }),
   ])
 
-  const perMarketResults = await client.multicall({ contracts: perMarketCalls, allowFailure: false })
-
-  // Parse per-market results (4 calls per market)
-  // viem returns multi-output functions as arrays, so destructure by position.
-  const parsed = allIds.map((_, i) => {
-    const base = i * 4
-    const [totalSupplyAssets, totalSupplyShares, totalBorrowAssets, , , fee] = perMarketResults[base] as unknown as bigint[]
-    const [supplyShares] = perMarketResults[base + 1] as unknown as bigint[]
-    const [loanToken, , , irm] = perMarketResults[base + 2] as unknown as `0x${string}`[]
-    const [cap] = perMarketResults[base + 3] as unknown as bigint[]
-    return {
-      state: { totalSupplyAssets, totalSupplyShares, totalBorrowAssets, fee },
-      pos: { supplyShares },
-      params: { loanToken, irm },
-      cfg: { cap },
-    }
-  })
-
   // 5. Per-market IRM + decimals (single multicall batch)
-  const irmAndDecimalCalls = parsed.flatMap(({ params }, i) => {
-    const hasIrm = params.irm && params.irm.toLowerCase() !== ADDRESS_ZERO
+  const irmAndDecimalCalls = marketParams.flatMap(([loanToken, , , irm], i) => {
+    const hasIrm = irm && irm.toLowerCase() !== ADDRESS_ZERO
     return [
       hasIrm
-        ? { address: getAddress(params.irm), abi: IRM_ABI_JSON, functionName: 'rateAtTarget' as const, args: [allIds[i]] }
+        ? { address: getAddress(irm), abi: IRM_ABI_JSON, functionName: 'rateAtTarget' as const, args: [allIds[i]] }
         : null,
-      { address: getAddress(params.loanToken), abi: ERC20_ABI_JSON, functionName: 'decimals' as const },
+      { address: getAddress(loanToken), abi: ERC20_ABI_JSON, functionName: 'decimals' as const },
     ]
   })
   const irmAndDecimalResults = await client.multicall({
-    contracts: irmAndDecimalCalls.filter((c): c is NonNullable<typeof c> => c !== null),
+    contracts: compact(irmAndDecimalCalls),
     allowFailure: true,
   })
 
@@ -251,8 +256,8 @@ export async function fetchVaultMarketsViem(
   let resultIdx = 0
   const ratesAtTarget: bigint[] = []
   const decimals: number[] = []
-  for (const { params } of parsed) {
-    const hasIrm = params.irm && params.irm.toLowerCase() !== ADDRESS_ZERO
+  for (const [, , , irm] of marketParams) {
+    const hasIrm = irm && irm.toLowerCase() !== ADDRESS_ZERO
     if (hasIrm) {
       const r = irmAndDecimalResults[resultIdx++]
       const rate = r.status === 'success' ? (r.result as bigint) : 0n
@@ -266,20 +271,26 @@ export async function fetchVaultMarketsViem(
 
   // 6. Assemble
   return allIds.map((marketId, i) => {
-    const { state, pos, cfg } = parsed[i]
+    // market: [totalSupplyAssets, totalSupplyShares, totalBorrowAssets, totalBorrowShares, lastUpdate, fee]
+    const [totalSupplyAssets, totalSupplyShares, totalBorrowAssets, , , fee] = marketStates[i]
+    // position: [supplyShares, borrowShares, collateral]
+    const [supplyShares] = positions[i]
+    // config: [cap, enabled, removableAt]
+    const [cap] = configs[i]
+
     let vaultSupplyAssets = 0n
-    if (pos.supplyShares > 0n && state.totalSupplyShares > 0n) {
-      vaultSupplyAssets = (pos.supplyShares * state.totalSupplyAssets) / state.totalSupplyShares
+    if (supplyShares > 0n && totalSupplyShares > 0n) {
+      vaultSupplyAssets = (supplyShares * totalSupplyAssets) / totalSupplyShares
     }
 
     return {
       marketId,
-      totalSupplyAssets: state.totalSupplyAssets,
-      totalBorrowAssets: state.totalBorrowAssets,
-      fee: state.fee,
+      totalSupplyAssets,
+      totalBorrowAssets,
+      fee,
       vaultSupplyAssets,
       rateAtTarget: ratesAtTarget[i],
-      cap: cfg.cap,
+      cap,
       decimals: decimals[i],
       inSupplyQueue: supplySet.has(marketId as `0x${string}`),
     } satisfies MarketForApy

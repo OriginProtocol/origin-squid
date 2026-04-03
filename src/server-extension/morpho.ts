@@ -164,8 +164,17 @@ export class MorphoVaultApyResolver {
     @Arg('depositAmount', () => String) depositAmount: string,
     @Info() _info: GraphQLResolveInfo,
   ): Promise<MorphoDepositImpactResult> {
+    let amount: bigint
+    try {
+      amount = BigInt(depositAmount)
+    } catch {
+      throw new Error(`Invalid depositAmount: "${depositAmount}". Must be a valid integer string.`)
+    }
+    if (amount <= 0n) {
+      throw new Error(`depositAmount must be positive, got ${depositAmount}`)
+    }
     const client = getViemClient(chainId)
-    const result = await computeDepositImpact(client as any, chainId, vaultAddress, depositAmount)
+    const result = await computeDepositImpact(client as any, chainId, vaultAddress, amount)
     return new MorphoDepositImpactResult(result)
   }
 }

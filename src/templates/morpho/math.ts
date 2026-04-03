@@ -100,14 +100,13 @@ export function weightedVaultApy(markets: MarketForApy[], depositSim: Record<str
     // Apply deposit simulation: increase totalSupplyAssets for target markets
     const simSupply = depositSim[m.marketId] ? m.totalSupplyAssets + depositSim[m.marketId] : m.totalSupplyAssets
 
-    // Convert BigInt → float via string to avoid Number.MAX_SAFE_INTEGER overflow
-    const supply = Number(simSupply.toString()) / scale
-    const borrows = Number(m.totalBorrowAssets.toString()) / scale
-    const fee = Number(m.fee.toString()) // stays WAD-scaled; /WAD done inside estimateMarketApy
-    const rate = Number(m.rateAtTarget.toString()) // stays WAD-scaled
+    const supply = Number(simSupply) / scale
+    const borrows = Number(m.totalBorrowAssets) / scale
+    const fee = Number(m.fee) // stays WAD-scaled; /WAD done inside estimateMarketApy
+    const rate = Number(m.rateAtTarget) // stays WAD-scaled
 
     const { supplyApy } = estimateMarketApy(0, supply, borrows, fee, rate)
-    const weight = Number(m.vaultSupplyAssets.toString()) / scale
+    const weight = Number(m.vaultSupplyAssets) / scale
 
     if (weight <= 0) continue
 
