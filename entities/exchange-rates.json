@@ -449,5 +449,16 @@
     "quote": "USD",
     "rate": "434416750000000000",
     "decimals": 18
+  },
+  {
+    "id": "146:6779942:OS_USD",
+    "chainId": 146,
+    "timestamp": "2025-02-06T12:08:25.000000Z",
+    "blockNumber": 6779942,
+    "pair": "OS_USD",
+    "base": "OS",
+    "quote": "USD",
+    "rate": "462393690000000000",
+    "decimals": 18
   }
 ]

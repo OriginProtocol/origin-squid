@@ -1,0 +1,42 @@
+[
+  {
+    "id": "999:0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e:31100000",
+    "chainId": 999,
+    "timestamp": "2026-03-30T04:25:18.000000Z",
+    "blockNumber": 31100000,
+    "vaultAddress": "0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e",
+    "apy": 0.04876265165792569
+  },
+  {
+    "id": "999:0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e:31200000",
+    "chainId": 999,
+    "timestamp": "2026-03-31T07:44:39.000000Z",
+    "blockNumber": 31200000,
+    "vaultAddress": "0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e",
+    "apy": 0.04521151681015403
+  },
+  {
+    "id": "999:0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e:31300000",
+    "chainId": 999,
+    "timestamp": "2026-04-01T11:04:00.000000Z",
+    "blockNumber": 31300000,
+    "vaultAddress": "0x0fb7e41a0a85eb0bca55172b73942cc6685e2b2e",
+    "apy": 0.04729079460881448
+  },
+  {
+    "id": "8453:0x581cc9a73ec7431723a4a80699b8f801205841f1:44000000",
+    "chainId": 8453,
+    "timestamp": "2026-03-29T13:02:27.000000Z",
+    "blockNumber": 44000000,
+    "vaultAddress": "0x581cc9a73ec7431723a4a80699b8f801205841f1",
+    "apy": 0.03837311047876076
+  },
+  {
+    "id": "8453:0x581cc9a73ec7431723a4a80699b8f801205841f1:44100000",
+    "chainId": 8453,
+    "timestamp": "2026-03-31T20:35:47.000000Z",
+    "blockNumber": 44100000,
+    "vaultAddress": "0x581cc9a73ec7431723a4a80699b8f801205841f1",
+    "apy": 0.03758572110462238
+  }
+]

@@ -575,6 +575,49 @@ const arms = () => {
   `)
 }
 
+const morphoVaultApys = () => {
+  return gql(`
+    morphoVaultApys: morphoVaultApies(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: {
+        timestamp_lte: "${twoDaysAgo.toISOString()}"
+      }
+    ) {
+      id
+      chainId
+      timestamp
+      blockNumber
+      vaultAddress
+      apy
+    }
+  `)
+}
+
+const morphoMarketStates = () => {
+  return gql(`
+    morphoMarketStates: morphoMarketStates(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: {
+        timestamp_lte: "${twoDaysAgo.toISOString()}"
+      }
+    ) {
+      id
+      chainId
+      timestamp
+      blockNumber
+      marketId
+      totalSupplyAssets
+      totalSupplyShares
+      totalBorrowAssets
+      totalBorrowShares
+      lastUpdate
+      fee
+    }
+  `)
+}
+
 const ognDailyStats = () => {
   return gql(`
     ognDailyStats: ognDailyStats(
@@ -1133,18 +1176,21 @@ const getFilePathForEntity = (entityKey: string): string => {
 }
 
 const main = async () => {
-  console.log(`Generating validations for: ${process.argv[2]}`)
+  const filter = process.argv[3]?.toLowerCase()
+  console.log(`Generating validations for: ${process.argv[2]}${filter ? ` (filter: ${filter})` : ''}`)
 
-  // Clear existing validation data to prevent stale files
   const entitiesDir = path.join(__dirname, '../entities')
-  if (fs.existsSync(entitiesDir)) {
-    console.log('Clearing existing validation data...')
-    fs.rmSync(entitiesDir, { recursive: true, force: true })
+  if (!filter) {
+    // Clear existing validation data to prevent stale files
+    if (fs.existsSync(entitiesDir)) {
+      console.log('Clearing existing validation data...')
+      fs.rmSync(entitiesDir, { recursive: true, force: true })
+    }
+    console.log('✓ Entities directory cleared\n')
   }
   fs.mkdirSync(entitiesDir, { recursive: true })
-  console.log('✓ Entities directory cleared\n')
 
-  const queries: string[] = [
+  let queries: string[] = [
     ...oethStrategies.map((s: IStrategyData) => strategy(`oeth_${s.address}`, s.address)),
     ...ousdStrategies.map((s: IStrategyData) => strategy(`ousd_${s.address}`, s.address)),
     ...baseStrategies.map((s: IStrategyData) => strategy(`superoethb_${s.address}`, s.address)),
@@ -1173,7 +1219,17 @@ const main = async () => {
     protocolDailyStatDetails(),
     protocolDailyStats(),
     exchangeRates(),
+    morphoVaultApys(),
+    morphoMarketStates(),
   ].map((query) => `query Query { ${query} }`)
+
+  if (filter) {
+    queries = queries.filter((q) => q.toLowerCase().includes(filter))
+    if (queries.length === 0) {
+      console.log(`No queries matched filter "${filter}"`)
+      return
+    }
+  }
 
   console.log('Total queries:', queries.length)
 

@@ -28,7 +28,7 @@
     "process": "sqd process",
     "generate:validations": "ts-node --require tsconfig-paths/register scripts/generate-validations.ts",
     "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts",
-    "postdeploy": "sh -c 'pnpm run log:processing-times $1 && pnpm run generate:validations $1' --",
+    "postdeploy": "sh -c 'pnpm run log:processing-times $1 && pnpm run generate:validations $1 $2' --",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "check-unused-abis": "ts-node --require tsconfig-paths/register scripts/check-unused-abis.ts"
