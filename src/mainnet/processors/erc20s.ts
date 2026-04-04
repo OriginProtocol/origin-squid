@@ -6,6 +6,7 @@ import {
   OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
   WOETH_ADDRESS,
+  WOUSD_ADDRESS,
   mainnetTokens,
   oethStrategyArray,
 } from '@utils/addresses'
@@ -37,6 +38,10 @@ const simpleTracks: Record<string, Parameters<typeof createERC20EventTracker>[0]
   primeETH: {
     from: 19138973,
     address: mainnetTokens.primeETH,
+  },
+  wOUSD: {
+    from: 14566204, // wOUSD deploy date
+    address: WOUSD_ADDRESS,
   },
 }
 
