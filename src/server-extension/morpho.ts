@@ -7,6 +7,8 @@ import { base, hyperEvm, mainnet } from 'viem/chains'
 import { MorphoVaultApy } from '@model'
 import { chainConfigs } from '@originprotocol/squid-utils'
 import { computeDepositImpact } from '@templates/morpho/deposit-impact'
+import { fetchVaultApyViem } from '@templates/morpho/fetch'
+import { ousd } from '@utils/addresses'
 
 import './fetch-polyfill'
 
@@ -109,6 +111,32 @@ export class MorphoVaultApyResolver {
       order: { timestamp: 'DESC' },
     })
     return row?.apy ?? 0
+  }
+
+  /**
+   * Returns the current on-chain APY for a MetaMorpho vault.
+   * Makes live on-chain RPC calls and may be slower than indexed queries.
+   *
+   * @param chainId  Chain ID: 1 (Ethereum), 8453 (Base), 999 (HyperEVM)
+   * @param vaultAddress  MetaMorpho V1.1 vault address (checksummed or lowercase)
+   *
+   * @example
+   * { morphoVaultApyLive(chainId: 1, vaultAddress: "0x5B8b...") }
+   */
+  @Query(() => Float)
+  async morphoVaultApyLive(
+    @Arg('chainId', () => Int) chainId: number,
+    @Arg('vaultAddress', () => String) vaultAddress: string,
+    @Info() _info: GraphQLResolveInfo,
+  ): Promise<number> {
+    const client = getViemClient(chainId)
+    const morphoAddress = ousd.morpho.blue[chainId]
+    if (!morphoAddress) {
+      throw new Error(`No Morpho Blue address configured for chainId ${chainId}`)
+    }
+
+    const result = await fetchVaultApyViem(client as any, vaultAddress.toLowerCase(), morphoAddress)
+    return result?.apy ?? 0
   }
 
   /**
