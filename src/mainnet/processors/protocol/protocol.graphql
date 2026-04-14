@@ -15,6 +15,7 @@ type ProtocolDailyStat @entity {
 type ProtocolDailyStatDetail @entity {
   id: ID!
   date: String! @index
+  productId: String! @index # Format: `chainId:symbol` (e.g. `1:OETH`)
   product: String! @index
   timestamp: DateTime! @index
   rateUSD: BigInt!
@@ -28,4 +29,49 @@ type ProtocolDailyStatDetail @entity {
   inheritedYield: BigInt! # Yield of the product that is inherited from another product.
   inheritedRevenue: BigInt! # Fees of the product that is inherited from another product.
   bridgedTvl: BigInt! # TVL of the product that is bridged from another product.
+}
+
+type ProtocolDailyRevenue @entity {
+  id: ID!
+  date: String! @index
+  timestamp: DateTime! @index
+  totalEth: BigInt!
+  totalUsd: BigInt!
+  avg7Eth: BigInt!
+  avg14Eth: BigInt!
+  avg30Eth: BigInt!
+  avg7Usd: BigInt!
+  avg14Usd: BigInt!
+  avg30Usd: BigInt!
+  split: JSON!
+}
+
+type ProtocolDailyTvl @entity {
+  id: ID!
+  date: String! @index
+  timestamp: DateTime! @index
+  totalEth: BigInt!
+  totalUsd: BigInt!
+  avg7Eth: BigInt!
+  avg14Eth: BigInt!
+  avg30Eth: BigInt!
+  avg7Usd: BigInt!
+  avg14Usd: BigInt!
+  avg30Usd: BigInt!
+  split: JSON!
+}
+
+type ProtocolDailyTokenSupply @entity {
+  id: ID!
+  date: String! @index
+  timestamp: DateTime! @index
+  totalEth: BigInt!
+  totalUsd: BigInt!
+  avg7Eth: BigInt!
+  avg14Eth: BigInt!
+  avg30Eth: BigInt!
+  avg7Usd: BigInt!
+  avg14Usd: BigInt!
+  avg30Usd: BigInt!
+  split: JSON!
 }

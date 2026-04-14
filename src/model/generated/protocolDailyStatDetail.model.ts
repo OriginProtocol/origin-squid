@@ -15,6 +15,10 @@ export class ProtocolDailyStatDetail {
 
     @Index_()
     @StringColumn_({nullable: false})
+    productId!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
     product!: string
 
     @Index_()

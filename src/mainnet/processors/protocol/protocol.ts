@@ -19,7 +19,7 @@ import {
 } from '@originprotocol/squid-utils'
 import { getLatestExchangeRateForDate } from '@shared/post-processors/exchange-rates/exchange-rates'
 import { baseAddresses } from '@utils/addresses-base'
-import { ProductName, armProducts, otokenProducts } from '@utils/products'
+import { ProductName, armProducts, getProductByName, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
 
@@ -130,17 +130,20 @@ const getProtocolDailyStat = async (ctx: Context, date: string) => {
     meta: {},
   })
 }
-const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: string) => {
+const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: ProductName) => {
+  const productMeta = getProductByName(product)
   const dailyStatDetail = await ctx.store.findOne(ProtocolDailyStatDetail, {
     where: { date, product },
     order: { date: 'desc' },
   })
   if (dailyStatDetail) {
+    dailyStatDetail.productId = dailyStatDetail.productId ?? productMeta?.productId ?? `1:${product}`
     return dailyStatDetail
   }
   return new ProtocolDailyStatDetail({
     id: `${date}-${product}`,
     date,
+    productId: productMeta?.productId ?? `0:${product}`,
     product,
     timestamp: dayjs.utc(date).endOf('day').toDate(),
     rateUSD: 0n,
