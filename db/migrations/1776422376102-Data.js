@@ -1,5 +1,5 @@
-module.exports = class Data1776412662075 {
-    name = 'Data1776412662075'
+module.exports = class Data1776422376102 {
+    name = 'Data1776422376102'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -88,6 +88,12 @@ module.exports = class Data1776412662075 {
         await db.query(`CREATE INDEX "IDX_2b58051dcc72cf0f02aa41ff14" ON "exchange_rate" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_9e23a3f1bf3634820c873a0fe8" ON "exchange_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_c61a93768eed9e58ce399bbe01" ON "exchange_rate" ("block_number") `)
+        await db.query(`CREATE TABLE "exchange_rate_daily" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "pair" text NOT NULL, "base" text NOT NULL, "quote" text NOT NULL, "rate" numeric NOT NULL, "decimals" integer NOT NULL, CONSTRAINT "PK_28948bd4e66a27f171f56ba0b4f" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_75a5e016ee89095c71233c2631" ON "exchange_rate_daily" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_ee06a45adcc9be153ea4d1a4df" ON "exchange_rate_daily" ("date") `)
+        await db.query(`CREATE INDEX "IDX_c86ebf583f87235cdbdeca9fe9" ON "exchange_rate_daily" ("timestamp") `)
+        await db.query(`CREATE INDEX "IDX_c46615b7946e1f9d20ebe12986" ON "exchange_rate_daily" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_1d24ee5f933fa86496c855a591" ON "exchange_rate_daily" ("pair") `)
         await db.query(`CREATE TABLE "erc20" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "decimals" integer NOT NULL, "symbol" text NOT NULL, CONSTRAINT "PK_8d43ce15401ba044c55a72a8ceb" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_905ff854e6782fc32dc4268a25" ON "erc20" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_40fd11c1a0d0f2562824894e85" ON "erc20" ("address") `)
@@ -577,6 +583,12 @@ module.exports = class Data1776412662075 {
         await db.query(`DROP INDEX "public"."IDX_2b58051dcc72cf0f02aa41ff14"`)
         await db.query(`DROP INDEX "public"."IDX_9e23a3f1bf3634820c873a0fe8"`)
         await db.query(`DROP INDEX "public"."IDX_c61a93768eed9e58ce399bbe01"`)
+        await db.query(`DROP TABLE "exchange_rate_daily"`)
+        await db.query(`DROP INDEX "public"."IDX_75a5e016ee89095c71233c2631"`)
+        await db.query(`DROP INDEX "public"."IDX_ee06a45adcc9be153ea4d1a4df"`)
+        await db.query(`DROP INDEX "public"."IDX_c86ebf583f87235cdbdeca9fe9"`)
+        await db.query(`DROP INDEX "public"."IDX_c46615b7946e1f9d20ebe12986"`)
+        await db.query(`DROP INDEX "public"."IDX_1d24ee5f933fa86496c855a591"`)
         await db.query(`DROP TABLE "erc20"`)
         await db.query(`DROP INDEX "public"."IDX_905ff854e6782fc32dc4268a25"`)
         await db.query(`DROP INDEX "public"."IDX_40fd11c1a0d0f2562824894e85"`)

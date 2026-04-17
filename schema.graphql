@@ -335,6 +335,25 @@ type ExchangeRate @entity {
   rate: BigInt!
   decimals: Int!
 }
+
+"""
+Daily historical exchange rates for selected FX pairs.
+"""
+type ExchangeRateDaily @entity {
+  """
+  Format: 'chainId:date:pair' ex '1:2026-04-17:ETH_USD'
+  """
+  id: ID!
+  chainId: Int! @index
+  date: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  pair: String! @index
+  base: String!
+  quote: String!
+  rate: BigInt!
+  decimals: Int!
+}
 type ERC20 @entity {
   id: ID!
   chainId: Int! @index
