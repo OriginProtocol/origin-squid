@@ -1,5 +1,5 @@
 import { compact } from 'lodash'
-import { Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
+import { LessThanOrEqual } from 'typeorm'
 
 import { ExchangeRate, ExchangeRateDaily } from '@model'
 import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
@@ -120,32 +120,6 @@ export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, d
     },
     order: {
       timestamp: 'desc',
-    },
-  })
-}
-
-export const getDailyExchangeRates = async (
-  ctx: Context,
-  pair: string,
-  range?: { from?: Date; to?: Date },
-) => {
-  let timestamp
-  if (range?.from && range?.to) {
-    timestamp = Between(range.from, range.to)
-  } else if (range?.from) {
-    timestamp = MoreThanOrEqual(range.from)
-  } else if (range?.to) {
-    timestamp = LessThanOrEqual(range.to)
-  }
-
-  return await ctx.store.find(ExchangeRateDaily, {
-    where: {
-      chainId: ctx.chain.id,
-      pair,
-      ...(timestamp ? { timestamp } : {}),
-    },
-    order: {
-      timestamp: 'asc',
     },
   })
 }
