@@ -11,45 +11,6 @@ const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rate
 const useDailyExchangeRates = (ctx: Context) =>
   useProcessorState(ctx, 'exchange-rates-daily', new Map<string, ExchangeRateDaily>())
 
-type OracleExchangeRate = {
-  base: Currency
-  quote: Currency
-  pair: string
-  timestamp: Date
-  blockNumber: number
-  rate: bigint
-  decimals: number
-}
-
-const getOracleExchangeRate = async (
-  ctx: Context,
-  block: Block,
-  base: Currency,
-  quote: Currency,
-): Promise<OracleExchangeRate | undefined> => {
-  base = translateSymbol(ctx, base)
-  quote = translateSymbol(ctx, quote)
-  const pair = `${base}_${quote}`
-  const blockNumber = block.header.height
-  const timestamp = new Date(block.header.timestamp)
-  const price = await getPrice(ctx, block.header, base, quote).catch((err) => {
-    ctx.log.info({ base, quote, err, message: err.message })
-    throw err
-  })
-
-  if (!price) return
-
-  return {
-    base,
-    quote,
-    pair,
-    timestamp,
-    blockNumber,
-    rate: price[0],
-    decimals: price[1],
-  }
-}
-
 export const process = async (ctx: Context) => {
   const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
@@ -64,13 +25,21 @@ export const process = async (ctx: Context) => {
 }
 
 export const ensureExchangeRate = async (ctx: Context, block: Block, base: Currency, quote: Currency) => {
+  base = translateSymbol(ctx, base)
+  quote = translateSymbol(ctx, quote)
   const [exchangeRates] = useExchangeRates(ctx)
-  const exchangeRateData = await getOracleExchangeRate(ctx, block, base, quote)
-  if (!exchangeRateData) return
-  const { base: translatedBase, quote: translatedQuote, pair, blockNumber, timestamp, rate, decimals } = exchangeRateData
+  const pair = `${base}_${quote}`
+  const blockNumber = block.header.height
   const id = `${ctx.chain.id}:${blockNumber}:${pair}`
   let exchangeRate = exchangeRates.get(id)
   if (exchangeRate) return exchangeRate
+
+  const timestamp = new Date(block.header.timestamp)
+  const price = await getPrice(ctx, block.header, base, quote).catch((err) => {
+    ctx.log.info({ base, quote, err, message: err.message })
+    throw err
+  })
+  if (!price) return
 
   exchangeRate = new ExchangeRate({
     id,
@@ -78,10 +47,10 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
     timestamp,
     blockNumber,
     pair,
-    base: translatedBase,
-    quote: translatedQuote,
-    rate,
-    decimals,
+    base,
+    quote,
+    rate: price[0],
+    decimals: price[1],
   })
   exchangeRates.set(id, exchangeRate)
 
@@ -95,12 +64,12 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
       chainId: ctx.chain.id,
       date,
       pair,
-      base: translatedBase,
-      quote: translatedQuote,
+      base,
+      quote,
       timestamp,
       blockNumber,
-      rate,
-      decimals,
+      rate: price[0],
+      decimals: price[1],
     }),
   )
 
