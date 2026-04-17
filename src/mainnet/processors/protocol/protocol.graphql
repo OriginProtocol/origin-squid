@@ -18,6 +18,7 @@ type ProtocolDailyStatDetail @entity {
   product: String! @index
   timestamp: DateTime! @index
   rateUSD: BigInt!
+  rateETH: BigInt!
   supply: BigInt!
   earningTvl: BigInt!
   tvl: BigInt!
