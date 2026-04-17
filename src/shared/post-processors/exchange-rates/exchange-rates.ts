@@ -1,19 +1,26 @@
 import { compact } from 'lodash'
 import { LessThanOrEqual } from 'typeorm'
 
-import { ExchangeRate } from '@model'
+import { ExchangeRate, ExchangeRateDaily } from '@model'
 import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
 import { getPrice, translateSymbol } from '@shared/post-processors/exchange-rates/price-routing'
 
 import { Currency } from './mainnetCurrencies'
 
 const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rates', new Map<string, ExchangeRate>())
+const useDailyExchangeRates = (ctx: Context) =>
+  useProcessorState(ctx, 'exchange-rates-daily', new Map<string, ExchangeRateDaily>())
 
 export const process = async (ctx: Context) => {
   const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
     ctx.log.debug({ count: rates.size }, 'exchange-rates')
     await ctx.store.upsert([...rates.values()])
+  }
+  const [dailyRates] = useDailyExchangeRates(ctx)
+  if (dailyRates.size > 0) {
+    ctx.log.debug({ count: dailyRates.size }, 'exchange-rates-daily')
+    await ctx.store.upsert([...dailyRates.values()])
   }
 }
 
@@ -32,21 +39,40 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
     ctx.log.info({ base, quote, err, message: err.message })
     throw err
   })
-  // ctx.log.info(`${base}, ${quote}, ${price}`)
-  if (price) {
-    exchangeRate = new ExchangeRate({
-      id,
+  if (!price) return
+
+  exchangeRate = new ExchangeRate({
+    id,
+    chainId: ctx.chain.id,
+    timestamp,
+    blockNumber,
+    pair,
+    base,
+    quote,
+    rate: price[0],
+    decimals: price[1],
+  })
+  exchangeRates.set(id, exchangeRate)
+
+  const [dailyRates] = useDailyExchangeRates(ctx)
+  const date = timestamp.toISOString().substring(0, 10)
+  const dailyId = `${ctx.chain.id}:${date}:${pair}`
+  dailyRates.set(
+    dailyId,
+    new ExchangeRateDaily({
+      id: dailyId,
       chainId: ctx.chain.id,
-      timestamp,
-      blockNumber,
+      date,
       pair,
       base,
       quote,
+      timestamp,
+      blockNumber,
       rate: price[0],
       decimals: price[1],
-    })
-    exchangeRates.set(id, exchangeRate)
-  }
+    }),
+  )
+
   return exchangeRate
 }
 

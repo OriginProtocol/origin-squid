@@ -28,7 +28,7 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
   for (const product of otokenProducts) {
     const sql = `
       INSERT INTO protocol_daily_stat_detail (
-        id, date, product, timestamp, rate_usd, earning_tvl, tvl, supply, yield, revenue, apy,
+        id, date, product, timestamp, rate_usd, rate_eth, earning_tvl, tvl, supply, yield, revenue, apy,
         inherited_tvl, inherited_yield, inherited_revenue, bridged_tvl
       )
       SELECT 
@@ -37,11 +37,12 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
         '${product.product}' as product,
         (o.date::date + interval '1 day' - interval '1 second')::timestamp as timestamp,
         COALESCE(o.rate_usd, 0) as rate_usd,
-        COALESCE(o.rebasing_supply * o.rate_eth / 1e18, 0) as earning_tvl,
-        COALESCE((o.total_supply - COALESCE(o.amo_supply, 0)) * o.rate_eth / 1e18, 0) as tvl,
-        COALESCE(o.total_supply * o.rate_eth / 1e18, 0) as supply,
-        COALESCE((o.yield + o.fees) * o.rate_eth / 1e18, 0) as yield,
-        COALESCE(o.fees * o.rate_eth / 1e18, 0) as revenue,
+        COALESCE(o.rate_eth, 0) as rate_eth,
+        COALESCE(TRUNC(o.rebasing_supply * o.rate_eth / 1e18, 0), 0) as earning_tvl,
+        COALESCE(TRUNC((o.total_supply - COALESCE(o.amo_supply, 0)) * o.rate_eth / 1e18, 0), 0) as tvl,
+        COALESCE(TRUNC(o.total_supply * o.rate_eth / 1e18, 0), 0) as supply,
+        COALESCE(TRUNC((o.yield + o.fees) * o.rate_eth / 1e18, 0), 0) as yield,
+        COALESCE(TRUNC(o.fees * o.rate_eth / 1e18, 0), 0) as revenue,
         COALESCE(o.apy, 0) as apy,
         0 as inherited_tvl,
         0 as inherited_yield, 
@@ -53,6 +54,7 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
       ON CONFLICT (id) DO UPDATE SET
         timestamp = EXCLUDED.timestamp,
         rate_usd = EXCLUDED.rate_usd,
+        rate_eth = EXCLUDED.rate_eth,
         earning_tvl = EXCLUDED.earning_tvl,
         tvl = EXCLUDED.tvl,
         supply = EXCLUDED.supply,
@@ -67,7 +69,7 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
   for (const product of armProducts) {
     const sql = `
       INSERT INTO protocol_daily_stat_detail (
-        id, date, product, timestamp, rate_usd, earning_tvl, tvl, supply, yield, revenue, apy,
+        id, date, product, timestamp, rate_usd, rate_eth, earning_tvl, tvl, supply, yield, revenue, apy,
         inherited_tvl, inherited_yield, inherited_revenue, bridged_tvl
       )
       SELECT 
@@ -76,11 +78,12 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
         '${product.product}' as product,
         (a.date::date + interval '1 day' - interval '1 second')::timestamp as timestamp,
         COALESCE(ROUND(a.rate_usd * 1e18), 0) as rate_usd,
-        COALESCE(a.total_assets * a.rate_eth, 0) as earning_tvl,
-        COALESCE(a.total_assets * a.rate_eth, 0) as tvl,
-        COALESCE(a.total_supply * a.rate_eth, 0) as supply,
-        COALESCE((a.yield + a.fees) * a.rate_eth, 0) as yield,
-        COALESCE(a.fees * a.rate_eth, 0) as revenue,
+        COALESCE(ROUND(a.rate_eth * 1e18), 0) as rate_eth,
+        COALESCE(TRUNC(a.total_assets * ROUND(a.rate_eth * 1e18) / 1e18, 0), 0) as earning_tvl,
+        COALESCE(TRUNC(a.total_assets * ROUND(a.rate_eth * 1e18) / 1e18, 0), 0) as tvl,
+        COALESCE(TRUNC(a.total_supply * ROUND(a.rate_eth * 1e18) / 1e18, 0), 0) as supply,
+        COALESCE(TRUNC((a.yield + a.fees) * ROUND(a.rate_eth * 1e18) / 1e18, 0), 0) as yield,
+        COALESCE(TRUNC(a.fees * ROUND(a.rate_eth * 1e18) / 1e18, 0), 0) as revenue,
         COALESCE(a.apy, 0) as apy,
         0 as inherited_tvl,
         0 as inherited_yield,
@@ -92,6 +95,7 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
       ON CONFLICT (id) DO UPDATE SET
         timestamp = EXCLUDED.timestamp,
         rate_usd = EXCLUDED.rate_usd,
+        rate_eth = EXCLUDED.rate_eth,
         earning_tvl = EXCLUDED.earning_tvl,
         tvl = EXCLUDED.tvl,
         supply = EXCLUDED.supply,

@@ -25,6 +25,9 @@ export class ProtocolDailyStatDetail {
     rateUSD!: bigint
 
     @BigIntColumn_({nullable: false})
+    rateETH!: bigint
+
+    @BigIntColumn_({nullable: false})
     supply!: bigint
 
     @BigIntColumn_({nullable: false})

@@ -144,6 +144,7 @@ const getProtocolDailyStatDetail = async (ctx: Context, date: string, product: s
     product,
     timestamp: dayjs.utc(date).endOf('day').toDate(),
     rateUSD: 0n,
+    rateETH: 0n,
     earningTvl: 0n,
     tvl: 0n,
     yield: 0n,
@@ -225,6 +226,7 @@ const getArmDetails = async (
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
     const eth = (value: bigint) => (value * BigInt(Math.round(armDailyStat.rateETH * 1e18))) / BigInt(10 ** 18)
     detail.rateUSD = BigInt(Math.round(armDailyStat.rateUSD * 1e18))
+    detail.rateETH = BigInt(Math.round(armDailyStat.rateETH * 1e18))
     detail.earningTvl = eth(armDailyStat.totalAssets)
     detail.tvl = eth(armDailyStat.totalAssets)
     detail.supply = eth(armDailyStat.totalSupply)
@@ -258,6 +260,7 @@ const calculateOTokenBasicStats = async (
   const eth = (value: bigint) => (value * otokenDailyStat.rateETH) / BigInt(10 ** 18)
 
   detail.rateUSD = otokenDailyStat.rateUSD
+  detail.rateETH = otokenDailyStat.rateETH
   detail.earningTvl = eth(otokenDailyStat.rebasingSupply)
   detail.tvl = eth(otokenDailyStat.totalSupply - (otokenDailyStat.amoSupply ?? 0n))
   detail.supply = eth(otokenDailyStat.totalSupply)
