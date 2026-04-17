@@ -1,6 +1,5 @@
 import { compact } from 'lodash'
 import { Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
-import { base as baseChain, mainnet, sonic } from 'viem/chains'
 
 import { ExchangeRate, ExchangeRateDaily } from '@model'
 import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
@@ -11,23 +10,6 @@ import { Currency } from './mainnetCurrencies'
 const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rates', new Map<string, ExchangeRate>())
 const useDailyExchangeRates = (ctx: Context) =>
   useProcessorState(ctx, 'exchange-rates-daily', new Map<string, ExchangeRateDaily>())
-type DailyExchangeRatePair = {
-  from: number
-  pair: [Currency, Currency]
-}
-
-const DAILY_EXCHANGE_RATE_PAIRS: Partial<Record<number, DailyExchangeRatePair[]>> = {
-  [mainnet.id]: [
-    { from: 13_000_000, pair: ['ETH', 'USD'] },
-    // USDe/USD oracle support starts at mainnet block 19,711,161.
-    { from: 19_711_161, pair: ['USDe', 'USD'] },
-  ],
-  [baseChain.id]: [{ from: 16_586_878, pair: ['ETH', 'USD'] }],
-  [sonic.id]: [
-    { from: 3_394_366, pair: ['ETH', 'USD'] },
-    { from: 4_189_824, pair: ['S', 'USD'] },
-  ],
-}
 
 type OracleExchangeRate = {
   base: Currency
@@ -69,24 +51,12 @@ const getOracleExchangeRate = async (
 }
 
 export const process = async (ctx: Context) => {
-  const [dailyRates] = useDailyExchangeRates(ctx)
-  const desiredPairs = DAILY_EXCHANGE_RATE_PAIRS[ctx.chain.id] ?? []
-  if (desiredPairs.length > 0) {
-    for (const block of ctx.frequencyBlocks) {
-      const activePairs = desiredPairs
-        .filter(({ from }) => block.header.height >= from)
-        .map(({ pair }) => pair)
-      if (activePairs.length > 0) {
-        await ensureDailyExchangeRates(ctx, block, activePairs)
-      }
-    }
-  }
-
   const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
     ctx.log.debug({ count: rates.size }, 'exchange-rates')
     await ctx.store.upsert([...rates.values()])
   }
+  const [dailyRates] = useDailyExchangeRates(ctx)
   if (dailyRates.size > 0) {
     ctx.log.debug({ count: dailyRates.size }, 'exchange-rates-daily')
     await ctx.store.upsert([...dailyRates.values()])
@@ -114,25 +84,14 @@ export const ensureExchangeRate = async (ctx: Context, block: Block, base: Curre
     decimals,
   })
   exchangeRates.set(id, exchangeRate)
-  return exchangeRate
-}
 
-export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
-  return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
-}
-
-export const ensureDailyExchangeRate = async (ctx: Context, block: Block, base: Currency, quote: Currency) => {
-  const exchangeRateData = await getOracleExchangeRate(ctx, block, base, quote)
-  if (!exchangeRateData) return
-
-  const { base: translatedBase, quote: translatedQuote, pair, timestamp, blockNumber, rate, decimals } = exchangeRateData
   const [dailyRates] = useDailyExchangeRates(ctx)
   const date = timestamp.toISOString().substring(0, 10)
-  const id = `${ctx.chain.id}:${date}:${pair}`
-  let dailyRate = dailyRates.get(id)
-  if (!dailyRate) {
-    dailyRate = new ExchangeRateDaily({
-      id,
+  const dailyId = `${ctx.chain.id}:${date}:${pair}`
+  dailyRates.set(
+    dailyId,
+    new ExchangeRateDaily({
+      id: dailyId,
       chainId: ctx.chain.id,
       date,
       pair,
@@ -142,19 +101,14 @@ export const ensureDailyExchangeRate = async (ctx: Context, block: Block, base: 
       blockNumber,
       rate,
       decimals,
-    })
-  } else {
-    dailyRate.timestamp = timestamp
-    dailyRate.blockNumber = blockNumber
-    dailyRate.rate = rate
-    dailyRate.decimals = decimals
-  }
-  dailyRates.set(id, dailyRate)
-  return dailyRate
+    }),
+  )
+
+  return exchangeRate
 }
 
-export const ensureDailyExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
-  return await Promise.all(pairs.map(([base, quote]) => ensureDailyExchangeRate(ctx, block, base, quote))).then(compact)
+export const ensureExchangeRates = async (ctx: Context, block: Block, pairs: [Currency, Currency][]) => {
+  return await Promise.all(pairs.map(([base, quote]) => ensureExchangeRate(ctx, block, base, quote))).then(compact)
 }
 
 export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, date: Date) => {
