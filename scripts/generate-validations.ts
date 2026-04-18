@@ -1100,6 +1100,27 @@ const exchangeRates = () => {
   `)
 }
 
+const exchangeRateDailies = () => {
+  return gql(`
+    exchangeRateDailies: exchangeRateDailies(
+      limit: ${LIMIT},
+      orderBy: [blockNumber_ASC, id_ASC],
+      where: { timestamp_gte: "2025-01-01T00:00:00Z", timestamp_lte: "${twoDaysAgo.toISOString()}" }
+    ) {
+      id
+      chainId
+      date
+      timestamp
+      blockNumber
+      pair
+      base
+      quote
+      rate
+      decimals
+    }
+  `)
+}
+
 const kebabCase = (str: string) => {
   return str
     .replace(/([a-z])([A-Z])/g, '$1-$2')
@@ -1219,6 +1240,7 @@ const main = async () => {
     protocolDailyStatDetails(),
     protocolDailyStats(),
     exchangeRates(),
+    exchangeRateDailies(),
     morphoVaultApys(),
     morphoMarketStates(),
   ].map((query) => `query Query { ${query} }`)
@@ -1250,7 +1272,7 @@ const main = async () => {
       // If there are fewer than 20 total entries, save them all
       if (rawData.length < 20 || takeAll.includes(key)) {
         validationData = rawData
-      } else if (key === 'exchangeRates') {
+      } else if (key === 'exchangeRates' || key === 'exchangeRateDailies') {
         // Special handling for exchange rates: ensure at least one of every pair
         validationData = takeExchangeRateValidationEntries(rawData)
       } else {
