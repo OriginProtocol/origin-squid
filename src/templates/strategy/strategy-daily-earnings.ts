@@ -106,8 +106,8 @@ export const processStrategyDailyEarnings = async (ctx: Context, blocks: Block[]
         yieldBalance,
         yieldBalance + current.earningsChange,
       )
-      current.apr = apr
-      current.apy = apy
+      current.apr = Number.isFinite(apr) ? apr : 0
+      current.apy = Number.isFinite(apy) ? apy : 0
     }
 
     // ctx.log.info(current, `Daily Earnings: ${current.id}`)

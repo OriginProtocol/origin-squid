@@ -207,5 +207,16 @@
     "delegator": "0x60c8139c630c5c4f2f058cc62a0fe73674ee9237",
     "fromDelegate": "0x0000000000000000000000000000000000000000",
     "toDelegate": "0x60c8139c630c5c4f2f058cc62a0fe73674ee9237"
+  },
+  {
+    "id": "1:0024808746-9af1a-000254",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2026-04-04T20:42:35.000000Z",
+    "blockNumber": 24808746,
+    "txHash": "0x72f692e0928cb174e52ddfcf1428a28138e2f7e74e0df41601278f22c7e5999e",
+    "delegator": "0xb7cbbe0c80b3fb252c365b838091111aadcc97d6",
+    "fromDelegate": "0x0000000000000000000000000000000000000000",
+    "toDelegate": "0xb7cbbe0c80b3fb252c365b838091111aadcc97d6"
   }
 ]

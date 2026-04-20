@@ -386,7 +386,7 @@
     "rateNative": "1000000000000000000",
     "yield": "1162761907651044481",
     "marketCapUSD": 6.1169144107370036e+25,
-    "accountsOverThreshold": 255,
+    "accountsOverThreshold": 254,
     "rateWrapped": "1093895911641198021"
   }
 ]

@@ -89,12 +89,12 @@
     "blockNumber": 24573203,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6",
-    "apr": 0.012936706600401138,
-    "apy": 0.013020515724970982,
+    "apr": 0.012936699188183964,
+    "apy": 0.013020508216508908,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "balance": "24773948897230139434051",
+    "balance": "24773948897732874363362",
     "balanceWeight": 1,
-    "earnings": "362805005520681150639",
-    "earningsChange": "877462856169278495"
+    "earnings": "362805005017946221328",
+    "earningsChange": "877462353434349184"
   }
 ]
