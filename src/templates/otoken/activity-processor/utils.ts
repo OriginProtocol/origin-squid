@@ -26,6 +26,8 @@ export const createActivity = <T extends Activity>(
     status?: T['status']
   } & Omit<T, 'id' | 'chainId' | 'blockNumber' | 'timestamp' | 'status' | 'txHash'>,
 ) => {
+  const { account, counterparty } = extractParticipants(partial)
+
   const activity = new OTokenActivity({
     chainId: ctx.chain.id,
     blockNumber: block.header.height,
@@ -33,6 +35,8 @@ export const createActivity = <T extends Activity>(
     txHash: log.transactionHash,
     type: OTokenActivityType[partial.type],
     otoken: otokenAddress,
+    account,
+    counterparty,
     data: {
       status: 'success',
       ...partial,
@@ -46,4 +50,35 @@ export const createActivity = <T extends Activity>(
     .substring(0, 8)}`
 
   return activity
+}
+
+const extractParticipants = (partial: Record<string, unknown>) => {
+  const account = firstAddress([
+    partial.account,
+    partial.sender,
+    partial.from,
+    partial.owner,
+    partial.transactor,
+    partial.delegator,
+    partial.voter,
+  ])
+
+  const counterparty = firstAddress([
+    partial.to,
+    partial.receiver,
+    partial.spender,
+    partial.delegateTo,
+  ])
+
+  return { account, counterparty }
+}
+
+const firstAddress = (values: unknown[]) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.startsWith('0x') && value.length === 42) {
+      return value.toLowerCase()
+    }
+  }
+
+  return null
 }
