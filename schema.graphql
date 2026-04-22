@@ -1176,6 +1176,8 @@ type OTokenActivity @entity {
   id: ID!
   chainId: Int! @index
   otoken: String! @index
+  account: String @index
+  counterparty: String @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
   txHash: String! @index

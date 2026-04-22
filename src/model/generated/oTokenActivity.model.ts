@@ -19,6 +19,14 @@ export class OTokenActivity {
     otoken!: string
 
     @Index_()
+    @StringColumn_({nullable: true})
+    account!: string | undefined | null
+
+    @Index_()
+    @StringColumn_({nullable: true})
+    counterparty!: string | undefined | null
+
+    @Index_()
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
 
