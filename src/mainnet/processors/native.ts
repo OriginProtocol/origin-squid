@@ -20,6 +20,10 @@ const tracks = [
     from: 19072024, // As of this block, none of these addresses have ever held ETH.
     addresses: [...ousdStrategyArray, OUSD_VAULT_ADDRESS, ...oethStrategyArray, OETH_VAULT_ADDRESS],
   },
+  {
+    from: 25000000, // DIA oracle updater — tracked to monitor gas funding.
+    addresses: ['0x3a4b859279998e5841e4f305b9b43e63e2f57645'],
+  },
 ]
 
 const from = minBy(tracks, 'from')?.from ?? 19072024
