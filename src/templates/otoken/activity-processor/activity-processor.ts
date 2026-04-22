@@ -85,9 +85,9 @@ export const createOTokenActivityProcessor = (params: {
     // Mints & Redeems
     vaultActivityProcessor({ otokenAddress: params.otokenAddress, vaultAddress: params.vaultAddress }),
 
-    // Transfers & Swaps
+    // Transfers
     transferActivityProcessor({ otokenAddress: params.otokenAddress }),
-  ]).filter((p) => p.name.includes('Approval'))
+  ])
 
   const from = params.from
   const setup = (processor: EvmBatchProcessor) => {
