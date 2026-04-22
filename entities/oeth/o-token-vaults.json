@@ -778,5 +778,15 @@
     "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
     "vaultBuffer": "2000000000000000",
     "totalValue": "42097899161393153315997"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-24900000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2026-04-17T13:53:47.000000Z",
+    "blockNumber": 24900000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "address": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "vaultBuffer": "2000000000000000",
+    "totalValue": "43189867013516523552163"
   }
 ]
