@@ -2,6 +2,10 @@ import { Context, defineProcessor } from '@originprotocol/squid-utils'
 import { armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
+const FIVE_MINUTES_MS = 5 * 60 * 1000
+
+let lastRunBlockTimestamp = 0
+let lastRunDate = ''
 
 export const protocolSqlSimpleProcessor = defineProcessor({
   name: 'protocol-sql-simple',
@@ -10,12 +14,23 @@ export const protocolSqlSimpleProcessor = defineProcessor({
     processor.includeAllBlocks({ from: 15000000 })
   },
   process: async (ctx: Context) => {
-    // Update at head once every ~10 minutes.
-    if (ctx.isHead && ctx.blocks.find((b) => b.header.height % 50 === 0)) {
-      const minDate = startDate
-      await upsertProtocolDailyStatDetails(ctx, minDate)
-      await upsertProtocolDailyStats(ctx, minDate)
-    }
+    if (!ctx.isHead) return
+    const lastBlock = ctx.blocks[ctx.blocks.length - 1]
+    if (!lastBlock) return
+
+    const blockTimestamp = lastBlock.header.timestamp
+    const blockDate = new Date(blockTimestamp).toISOString().slice(0, 10)
+
+    const dayChanged = lastRunDate !== '' && blockDate !== lastRunDate
+    const enoughTimeElapsed = blockTimestamp - lastRunBlockTimestamp >= FIVE_MINUTES_MS
+
+    if (!dayChanged && !enoughTimeElapsed) return
+
+    await upsertProtocolDailyStatDetails(ctx, startDate)
+    await upsertProtocolDailyStats(ctx, startDate)
+
+    lastRunBlockTimestamp = blockTimestamp
+    lastRunDate = blockDate
   },
 })
 
