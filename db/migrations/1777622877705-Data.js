@@ -1,5 +1,5 @@
-module.exports = class Data1776771673268 {
-    name = 'Data1776771673268'
+module.exports = class Data1777622877705 {
+    name = 'Data1777622877705'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -272,6 +272,16 @@ module.exports = class Data1776771673268 {
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8da1e323ff87677d898da36c4c" ON "arm_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
+        await db.query(`CREATE TABLE "arm_history" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "tx_hash" text NOT NULL, "type" character varying(8) NOT NULL, "address_id" character varying, CONSTRAINT "PK_3272ee36ffb83183b8ac63c36fd" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_1ea83550ceab497f0753da6222" ON "arm_history" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_10ff1d63cf22d6a335a333c8d3" ON "arm_history" ("arm") `)
+        await db.query(`CREATE INDEX "IDX_a2d8a88e7ced075fac8ccf3b84" ON "arm_history" ("address_id") `)
+        await db.query(`CREATE INDEX "IDX_032226bd4ec66f713e8989955b" ON "arm_history" ("block_number") `)
+        await db.query(`CREATE INDEX "IDX_e9b782249021c64951c255919a" ON "arm_history" ("tx_hash") `)
+        await db.query(`CREATE TABLE "arm_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "balance" numeric NOT NULL, "deposited" numeric NOT NULL, "withdrawn" numeric NOT NULL, "earned" numeric NOT NULL, "roi" numeric NOT NULL, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_b9a92c26f21bfb95296220d1034" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_09b2fd81523d32e7754eff486d" ON "arm_address" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_49c27db84181022daa7b273608" ON "arm_address" ("arm") `)
+        await db.query(`CREATE INDEX "IDX_7431b6f993c524405ab209a90f" ON "arm_address" ("address") `)
         await db.query(`CREATE TABLE "arm_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_13dc23b0e4ee7f803645e930896" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_330af8826e0e9369301bebc3e7" ON "arm_withdrawal_request" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_501cc246901cfad5d624da98d6" ON "arm_withdrawal_request" ("tx_hash") `)
@@ -491,6 +501,7 @@ module.exports = class Data1776771673268 {
         await db.query(`ALTER TABLE "es_account" ADD CONSTRAINT "FK_7b43e7bb90d3b435d074112f572" FOREIGN KEY ("delegate_to_id") REFERENCES "es_account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "es_lockup_event" ADD CONSTRAINT "FK_46d53d4fad340d5939955836004" FOREIGN KEY ("lockup_id") REFERENCES "es_lockup"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "aero_cl_pool_state" ADD CONSTRAINT "FK_02aa86fe0e78999620744402a0c" FOREIGN KEY ("tick_id") REFERENCES "aero_cl_pool_tick"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
+        await db.query(`ALTER TABLE "arm_history" ADD CONSTRAINT "FK_a2d8a88e7ced075fac8ccf3b840" FOREIGN KEY ("address_id") REFERENCES "arm_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "governance_proposal_event" ADD CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a" FOREIGN KEY ("proposal_id") REFERENCES "governance_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "governance_proposal_vote" ADD CONSTRAINT "FK_5531af241c24a09c854ead9d551" FOREIGN KEY ("proposal_id") REFERENCES "governance_proposal"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "o_token_history" ADD CONSTRAINT "FK_2f1457755464ec5951d1e96542a" FOREIGN KEY ("address_id") REFERENCES "o_token_address"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
@@ -769,6 +780,16 @@ module.exports = class Data1776771673268 {
         await db.query(`DROP INDEX "public"."IDX_052999e1ef63fabca403e9c3b8"`)
         await db.query(`DROP INDEX "public"."IDX_8da1e323ff87677d898da36c4c"`)
         await db.query(`DROP INDEX "public"."IDX_9dbe5617230d5421831774b4b3"`)
+        await db.query(`DROP TABLE "arm_history"`)
+        await db.query(`DROP INDEX "public"."IDX_1ea83550ceab497f0753da6222"`)
+        await db.query(`DROP INDEX "public"."IDX_10ff1d63cf22d6a335a333c8d3"`)
+        await db.query(`DROP INDEX "public"."IDX_a2d8a88e7ced075fac8ccf3b84"`)
+        await db.query(`DROP INDEX "public"."IDX_032226bd4ec66f713e8989955b"`)
+        await db.query(`DROP INDEX "public"."IDX_e9b782249021c64951c255919a"`)
+        await db.query(`DROP TABLE "arm_address"`)
+        await db.query(`DROP INDEX "public"."IDX_09b2fd81523d32e7754eff486d"`)
+        await db.query(`DROP INDEX "public"."IDX_49c27db84181022daa7b273608"`)
+        await db.query(`DROP INDEX "public"."IDX_7431b6f993c524405ab209a90f"`)
         await db.query(`DROP TABLE "arm_withdrawal_request"`)
         await db.query(`DROP INDEX "public"."IDX_330af8826e0e9369301bebc3e7"`)
         await db.query(`DROP INDEX "public"."IDX_501cc246901cfad5d624da98d6"`)
@@ -988,6 +1009,7 @@ module.exports = class Data1776771673268 {
         await db.query(`ALTER TABLE "es_account" DROP CONSTRAINT "FK_7b43e7bb90d3b435d074112f572"`)
         await db.query(`ALTER TABLE "es_lockup_event" DROP CONSTRAINT "FK_46d53d4fad340d5939955836004"`)
         await db.query(`ALTER TABLE "aero_cl_pool_state" DROP CONSTRAINT "FK_02aa86fe0e78999620744402a0c"`)
+        await db.query(`ALTER TABLE "arm_history" DROP CONSTRAINT "FK_a2d8a88e7ced075fac8ccf3b840"`)
         await db.query(`ALTER TABLE "governance_proposal_event" DROP CONSTRAINT "FK_ce984d23fc99c537b8f22fd663a"`)
         await db.query(`ALTER TABLE "governance_proposal_vote" DROP CONSTRAINT "FK_5531af241c24a09c854ead9d551"`)
         await db.query(`ALTER TABLE "o_token_history" DROP CONSTRAINT "FK_2f1457755464ec5951d1e96542a"`)

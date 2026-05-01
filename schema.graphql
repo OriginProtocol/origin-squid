@@ -817,6 +817,36 @@ type ArmDailyStat @entity {
   rateNative: Float!
 }
 
+type ArmAddress @entity {
+  id: ID! @index
+  chainId: Int! @index
+  arm: String! @index
+  address: String! @index
+  isContract: Boolean!
+  balance: BigInt!
+  deposited: BigInt!
+  withdrawn: BigInt!
+  earned: BigInt!
+  roi: Float!
+  blockNumber: Int!
+  lastUpdated: DateTime!
+  since: DateTime
+  history: [ArmHistory!]! @derivedFrom(field: "address")
+}
+
+type ArmHistory @entity {
+  id: ID!
+  chainId: Int! @index
+  arm: String! @index
+  address: ArmAddress! @index
+  value: BigInt!
+  balance: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  txHash: String! @index
+  type: HistoryType!
+}
+
 type ArmWithdrawalRequest @entity {
   id: ID!
   chainId: Int! @index
