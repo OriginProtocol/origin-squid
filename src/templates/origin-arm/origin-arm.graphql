@@ -89,20 +89,18 @@ type ArmAddress @entity {
   blockNumber: Int!
   lastUpdated: DateTime!
   since: DateTime
-  history: [ArmHistory!]! @derivedFrom(field: "address")
 }
 
-type ArmHistory @entity {
+type ArmAddressYield @entity {
   id: ID!
   chainId: Int! @index
   arm: String! @index
-  address: ArmAddress! @index
+  address: String! @index
   value: BigInt!
   balance: BigInt!
   timestamp: DateTime!
   blockNumber: Int! @index
-  txHash: String! @index
-  type: HistoryType!
+  date: String! @index
 }
 
 type ArmWithdrawalRequest @entity {

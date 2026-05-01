@@ -12,12 +12,11 @@ import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import {
   Arm,
   ArmAddress,
+  ArmAddressYield,
   ArmDailyStat,
-  ArmHistory,
   ArmState,
   ArmSwap,
   ArmWithdrawalRequest,
-  HistoryType,
   TraderateChanged,
 } from '@model'
 import {
@@ -33,11 +32,12 @@ import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrenci
 import { createERC20Entry } from '@templates/erc20/erc20-entry'
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
-import { ADDRESS_ZERO } from '@utils/addresses'
 import { isContract } from '@utils/isContract'
 import { traceFilter } from '@utils/traceFilter'
 
-import { calculateArmAddressRoi, calculateArmDailyApy, convertSharesToAssets } from './arm-apy'
+import { calculateArmAddressRoi, calculateArmDailyApy } from './arm-apy'
+
+const YIELD_DUST_THRESHOLD = 10n ** 13n // 0.00001 ether
 
 export const createOriginARMProcessors = ({
   name,
@@ -85,11 +85,6 @@ export const createOriginARMProcessors = ({
     topic0: [originLidoArmAbi.events.FeeCollected.topic],
     range: { from },
   })
-  const transferFilter = logFilter({
-    address: [armAddress],
-    topic0: [originLidoArmAbi.events.Transfer.topic],
-    range: { from },
-  })
   const swapFilter = traceFilter({
     type: ['call'],
     callTo: [armAddress],
@@ -128,6 +123,8 @@ export const createOriginARMProcessors = ({
   const tracker = blockFrequencyTracker({ from })
   let armEntity: Arm
   let initialized = false
+  const armAddressMap = new Map<string, ArmAddress>()
+  let armAddressMapInitialized = false
   let initialize = async (ctx: Context) => {
     if (ctx.blocks[0].header.height < from) return
     const id = `${ctx.chain.id}:${armAddress}`
@@ -169,7 +166,6 @@ export const createOriginARMProcessors = ({
         p.addLog(depositFilter.value)
         p.addLog(withdrawalFilter.value)
         p.addLog(feeCollectedFilter.value)
-        p.addLog(transferFilter.value)
         p.addTrace(swapFilter.value)
         tradeRateProcessor.setup(p)
       },
@@ -179,11 +175,19 @@ export const createOriginARMProcessors = ({
           // We can only initialize once we've hit our target block.
           await initialize(ctx)
         }
+        if (!armAddressMapInitialized) {
+          // Bulk-load all ArmAddress rows for this arm into the persistent cache once.
+          // The cache survives across batches so per-event getOrCreate hits memory.
+          const rows = await ctx.store.find(ArmAddress, {
+            where: { chainId: ctx.chain.id, arm: armAddress },
+          })
+          for (const row of rows) armAddressMap.set(row.id, row)
+          armAddressMapInitialized = true
+        }
         const states: ArmState[] = []
         const dailyStatsMap = new Map<string, ArmDailyStat>()
-        const armAddressMap = new Map<string, ArmAddress>()
         const changedArmAddressMap = new Map<string, ArmAddress>()
-        const armHistories = new Map<string, ArmHistory>()
+        const armAddressYields = new Map<string, ArmAddressYield>()
         const redemptionMap = new Map<string, ArmWithdrawalRequest>()
         const swaps: ArmSwap[] = []
         const getStateId = (block: Block) => `${ctx.chain.id}:${block.header.height}:${armAddress}`
@@ -329,70 +333,30 @@ export const createOriginARMProcessors = ({
           changedArmAddressMap.set(address.id, address)
           return address
         }
-        const createArmHistory = async ({
-          account,
-          block,
-          idSuffix,
-          txHash,
-          type,
-          value,
-          assetsPerShare,
-        }: {
-          account: string
-          block: Block
-          idSuffix: string
-          txHash: string
-          type: HistoryType
-          value: bigint
-          assetsPerShare: bigint
-        }) => {
-          const address = await updateArmAddress(account, block, assetsPerShare)
-          const history = new ArmHistory({
-            id: `${ctx.chain.id}:${armAddress}:${idSuffix}:${account}:${type}`,
-            chainId: ctx.chain.id,
-            arm: armAddress,
-            address,
-            value,
-            balance: address.balance,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            txHash,
-            type,
-          })
-          armHistories.set(history.id, history)
-        }
         const updateDailyAddressEarnings = async (block: Block, state: ArmState) => {
-          const addresses = await ctx.store.find(ArmAddress, {
-            where: {
-              chainId: ctx.chain.id,
-              arm: armAddress,
-            },
-          })
-          const addressMap = new Map(
-            [...addresses, ...changedArmAddressMap.values()].map((address) => [address.id, address]),
-          )
-          for (const address of addressMap.values()) {
+          // armAddressMap was preloaded at the top of process and stays in sync via
+          // getOrCreateArmAddress, so no per-rollover bulk fetch or per-row store.get.
+          const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
+          for (const address of armAddressMap.values()) {
             if (address.balance === 0n) continue
             const previousEarned = address.earned
             const updated = await updateArmAddress(address.address, block, state.assetsPerShare)
             const earnedDiff = updated.earned - previousEarned
-            if (earnedDiff <= 0n) continue
-            const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
-            const id = `${ctx.chain.id}:${armAddress}:${updated.address}:${dateStr}:yield`
-            const value = (armHistories.get(id)?.value ?? 0n) + earnedDiff
-            const history = new ArmHistory({
+            if (earnedDiff < YIELD_DUST_THRESHOLD) continue
+            const id = `${ctx.chain.id}:${armAddress}:${updated.address}:${dateStr}`
+            const value = (armAddressYields.get(id)?.value ?? 0n) + earnedDiff
+            const yieldEntity = new ArmAddressYield({
               id,
               chainId: ctx.chain.id,
               arm: armAddress,
-              address: updated,
+              address: updated.address,
               value,
               balance: updated.balance,
               timestamp: new Date(block.header.timestamp),
               blockNumber: block.header.height,
-              txHash: '',
-              type: HistoryType.Yield,
+              date: dateStr,
             })
-            armHistories.set(history.id, history)
+            armAddressYields.set(yieldEntity.id, yieldEntity)
           }
         }
 
@@ -436,15 +400,7 @@ export const createOriginARMProcessors = ({
               const address = await getOrCreateArmAddress(event.owner, block)
               address.deposited += event.assets
               address.balance += event.shares
-              await createArmHistory({
-                account: event.owner,
-                block,
-                idSuffix: log.id,
-                txHash: log.transactionHash,
-                type: HistoryType.Received,
-                value: event.assets,
-                assetsPerShare: state.assetsPerShare,
-              })
+              await updateArmAddress(event.owner, block, state.assetsPerShare)
             } else if (withdrawalFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemRequested.decode(log)
               const state = await getCurrentState(block)
@@ -454,15 +410,7 @@ export const createOriginARMProcessors = ({
               const shares = state.assetsPerShare === 0n ? 0n : (event.assets * 10n ** 18n) / state.assetsPerShare
               address.withdrawn += event.assets
               address.balance = address.balance > shares ? address.balance - shares : 0n
-              await createArmHistory({
-                account: event.withdrawer,
-                block,
-                idSuffix: log.id,
-                txHash: log.transactionHash,
-                type: HistoryType.Sent,
-                value: event.assets,
-                assetsPerShare: state.assetsPerShare,
-              })
+              await updateArmAddress(event.withdrawer, block, state.assetsPerShare)
             } else if (redeemClaimedFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemClaimed.decode(log)
               const state = await getCurrentState(block)
@@ -472,37 +420,6 @@ export const createOriginARMProcessors = ({
               const event = originLidoArmAbi.events.FeeCollected.decode(log)
               const state = await getCurrentState(block)
               state.totalFees += event.fee
-            }
-            if (transferFilter.matches(log)) {
-              const event = originLidoArmAbi.events.Transfer.decode(log)
-              if (event.from.toLowerCase() !== ADDRESS_ZERO && event.to.toLowerCase() !== ADDRESS_ZERO) {
-                const state = await getCurrentState(block)
-                const assets = convertSharesToAssets(event.value, state.assetsPerShare)
-                const fromAddress = await getOrCreateArmAddress(event.from, block)
-                const toAddress = await getOrCreateArmAddress(event.to, block)
-                fromAddress.withdrawn += assets
-                fromAddress.balance = fromAddress.balance > event.value ? fromAddress.balance - event.value : 0n
-                toAddress.deposited += assets
-                toAddress.balance += event.value
-                await createArmHistory({
-                  account: event.from,
-                  block,
-                  idSuffix: `${log.id}:from`,
-                  txHash: log.transactionHash,
-                  type: HistoryType.Sent,
-                  value: assets,
-                  assetsPerShare: state.assetsPerShare,
-                })
-                await createArmHistory({
-                  account: event.to,
-                  block,
-                  idSuffix: `${log.id}:to`,
-                  txHash: log.transactionHash,
-                  type: HistoryType.Received,
-                  value: assets,
-                  assetsPerShare: state.assetsPerShare,
-                })
-              }
             }
           }
 
@@ -645,7 +562,7 @@ export const createOriginARMProcessors = ({
           ctx.store.insert(states),
           ctx.store.upsert([...dailyStatsMap.values()]),
           ctx.store.upsert([...changedArmAddressMap.values()]),
-          ctx.store.upsert([...armHistories.values()]),
+          ctx.store.upsert([...armAddressYields.values()]),
           ctx.store.upsert([...redemptionMap.values()]),
           ctx.store.insert(swaps),
           tradeRateProcessor.process(ctx),
