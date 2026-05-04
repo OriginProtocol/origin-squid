@@ -303,9 +303,16 @@ export const createOriginARMProcessors = ({
         }
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
-        const checkpoint = (account: string, block: Block, R: bigint, balanceDelta: bigint) => {
+        const checkpoint = (
+          account: string,
+          block: Block,
+          R: bigint,
+          balanceDelta: bigint,
+          costBasisDelta?: bigint,
+        ) => {
           // Wei-exact accrual checkpoint for a holder. Updates today's row in-place,
           // creating it (seeded from prior state) when the date rolls over.
+          // Cost basis: outflows reduce proportionally, inflows take the explicit delta.
           const lower = account.toLowerCase()
           const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
           const id = `${ctx.chain.id}:${armAddress}:${lower}:${dateStr}`
@@ -324,8 +331,10 @@ export const createOriginARMProcessors = ({
               blockNumber: block.header.height,
               balance: seed?.balance ?? 0n,
               value: 0n,
+              costBasis: seed?.costBasis ?? 0n,
               yield: 0n,
               cumulativeYield: seed?.cumulativeYield ?? 0n,
+              roi: 0,
               lastR: seed?.lastR ?? R,
               yieldRemainder: seed?.yieldRemainder ?? 0n,
             })
@@ -342,9 +351,18 @@ export const createOriginARMProcessors = ({
           row.cumulativeYield += intPart
           row.yieldRemainder = remainder
           row.lastR = R
+          // Cost basis: outflow → proportional removal; inflow → explicit delta.
+          if (balanceDelta < 0n && row.balance > 0n) {
+            const sharesOut = -balanceDelta
+            const costRemoved = (row.costBasis * sharesOut) / row.balance
+            row.costBasis -= costRemoved
+          } else if (costBasisDelta !== undefined) {
+            row.costBasis += costBasisDelta
+          }
           row.balance += balanceDelta
           row.value = (row.balance * R) / 10n ** 18n
           row.yield = row.cumulativeYield - (previousDayRows.get(lower)?.cumulativeYield ?? 0n)
+          row.roi = row.costBasis > 0n ? Number(row.value) / Number(row.costBasis) - 1 : 0
           row.timestamp = new Date(block.header.timestamp)
           row.blockNumber = block.header.height
           changedYieldRows.set(row.id, row)
@@ -387,6 +405,9 @@ export const createOriginARMProcessors = ({
               const state = await getCurrentState(block)
               state.totalDeposits += event.assets
               state.totalYield = calculateTotalYield(state)
+              // Cost basis for the depositor: the actual asset amount paid in.
+              // Balance change is handled by the paired Transfer (mint) below.
+              checkpoint(event.owner, block, state.assetsPerShare, 0n, event.assets)
             } else if (withdrawalFilter.matches(log)) {
               const event = originLidoArmAbi.events.RedeemRequested.decode(log)
               const state = await getCurrentState(block)
@@ -403,16 +424,22 @@ export const createOriginARMProcessors = ({
               state.totalFees += event.fee
             }
             if (transferFilter.matches(log)) {
-              // Mints/burns/peer transfers: drive holder bookkeeping. Mint = from 0,
-              // burn = to 0; we skip the zero side.
+              // Mint = from 0; burn = to 0; peer transfer otherwise.
+              // Mint cost basis is set by the Deposit event above; here we only move balance.
+              // Burns and peer-outs reduce cost basis proportionally (auto in checkpoint).
+              // Peer-ins mark new cost basis at current R.
               const event = originLidoArmAbi.events.Transfer.decode(log)
               const state = await getCurrentState(block)
               const R = state.assetsPerShare
-              if (event.from.toLowerCase() !== ADDRESS_ZERO) {
+              const fromZero = event.from.toLowerCase() === ADDRESS_ZERO
+              const toZero = event.to.toLowerCase() === ADDRESS_ZERO
+              if (!fromZero) {
                 checkpoint(event.from, block, R, -event.value)
               }
-              if (event.to.toLowerCase() !== ADDRESS_ZERO) {
-                checkpoint(event.to, block, R, event.value)
+              if (!toZero) {
+                const isPeer = !fromZero
+                const costBasisDelta = isPeer ? (event.value * R) / 10n ** 18n : undefined
+                checkpoint(event.to, block, R, event.value, costBasisDelta)
               }
             }
           }

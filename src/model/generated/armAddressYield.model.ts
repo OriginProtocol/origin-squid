@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class ArmAddressYield {
@@ -39,10 +39,16 @@ export class ArmAddressYield {
     value!: bigint
 
     @BigIntColumn_({nullable: false})
+    costBasis!: bigint
+
+    @BigIntColumn_({nullable: false})
     yield!: bigint
 
     @BigIntColumn_({nullable: false})
     cumulativeYield!: bigint
+
+    @FloatColumn_({nullable: false})
+    roi!: number
 
     @BigIntColumn_({nullable: false})
     lastR!: bigint

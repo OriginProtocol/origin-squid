@@ -1,5 +1,5 @@
-module.exports = class Data1777930111169 {
-    name = 'Data1777930111169'
+module.exports = class Data1777931889628 {
+    name = 'Data1777931889628'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -220,7 +220,7 @@ module.exports = class Data1777930111169 {
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8da1e323ff87677d898da36c4c" ON "arm_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
-        await db.query(`CREATE TABLE "arm_address_yield" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "value" numeric NOT NULL, "yield" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "last_r" numeric NOT NULL, "yield_remainder" numeric NOT NULL, CONSTRAINT "PK_4653ba4d0619effbb7dec942253" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_address_yield" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "value" numeric NOT NULL, "cost_basis" numeric NOT NULL, "yield" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "roi" numeric NOT NULL, "last_r" numeric NOT NULL, "yield_remainder" numeric NOT NULL, CONSTRAINT "PK_4653ba4d0619effbb7dec942253" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_8df13f9e0d70aa65367b24475e" ON "arm_address_yield" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_3b00df42da735a3976408cc68a" ON "arm_address_yield" ("arm") `)
         await db.query(`CREATE INDEX "IDX_8fabfa2b0691f4d6ae283bb638" ON "arm_address_yield" ("address") `)

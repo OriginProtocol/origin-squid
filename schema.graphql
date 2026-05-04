@@ -748,8 +748,10 @@ type ArmAddressYield @entity {
   blockNumber: Int! @index
   balance: BigInt!
   value: BigInt!
+  costBasis: BigInt!
   yield: BigInt!
   cumulativeYield: BigInt!
+  roi: Float!
   lastR: BigInt!
   yieldRemainder: BigInt!
 }
