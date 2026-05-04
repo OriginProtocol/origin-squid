@@ -1,5 +1,5 @@
-module.exports = class Data1777649080111 {
-    name = 'Data1777649080111'
+module.exports = class Data1777930111169 {
+    name = 'Data1777930111169'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -220,16 +220,12 @@ module.exports = class Data1777649080111 {
         await db.query(`CREATE INDEX "IDX_052999e1ef63fabca403e9c3b8" ON "arm_daily_stat" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_8da1e323ff87677d898da36c4c" ON "arm_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_9dbe5617230d5421831774b4b3" ON "arm_daily_stat" ("address") `)
-        await db.query(`CREATE TABLE "arm_address" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "is_contract" boolean NOT NULL, "balance" numeric NOT NULL, "deposited" numeric NOT NULL, "withdrawn" numeric NOT NULL, "earned" numeric NOT NULL, "roi" numeric NOT NULL, "block_number" integer NOT NULL, "last_updated" TIMESTAMP WITH TIME ZONE NOT NULL, "since" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_b9a92c26f21bfb95296220d1034" PRIMARY KEY ("id"))`)
-        await db.query(`CREATE INDEX "IDX_09b2fd81523d32e7754eff486d" ON "arm_address" ("chain_id") `)
-        await db.query(`CREATE INDEX "IDX_49c27db84181022daa7b273608" ON "arm_address" ("arm") `)
-        await db.query(`CREATE INDEX "IDX_7431b6f993c524405ab209a90f" ON "arm_address" ("address") `)
-        await db.query(`CREATE TABLE "arm_address_yield" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "value" numeric NOT NULL, "balance" numeric NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "date" text NOT NULL, CONSTRAINT "PK_4653ba4d0619effbb7dec942253" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "arm_address_yield" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "arm" text NOT NULL, "address" text NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "value" numeric NOT NULL, "yield" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "last_r" numeric NOT NULL, "yield_remainder" numeric NOT NULL, CONSTRAINT "PK_4653ba4d0619effbb7dec942253" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_8df13f9e0d70aa65367b24475e" ON "arm_address_yield" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_3b00df42da735a3976408cc68a" ON "arm_address_yield" ("arm") `)
         await db.query(`CREATE INDEX "IDX_8fabfa2b0691f4d6ae283bb638" ON "arm_address_yield" ("address") `)
-        await db.query(`CREATE INDEX "IDX_d4540a0c059efb82d22fe0e412" ON "arm_address_yield" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_1706616a44b8303752ec76a045" ON "arm_address_yield" ("date") `)
+        await db.query(`CREATE INDEX "IDX_d4540a0c059efb82d22fe0e412" ON "arm_address_yield" ("block_number") `)
         await db.query(`CREATE TABLE "arm_withdrawal_request" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "tx_hash" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "account" text NOT NULL, "request_id" numeric NOT NULL, "amount" numeric NOT NULL, "queued" numeric NOT NULL, "claimed" boolean NOT NULL, "claimed_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "PK_13dc23b0e4ee7f803645e930896" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_330af8826e0e9369301bebc3e7" ON "arm_withdrawal_request" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_501cc246901cfad5d624da98d6" ON "arm_withdrawal_request" ("tx_hash") `)
@@ -727,16 +723,12 @@ module.exports = class Data1777649080111 {
         await db.query(`DROP INDEX "public"."IDX_052999e1ef63fabca403e9c3b8"`)
         await db.query(`DROP INDEX "public"."IDX_8da1e323ff87677d898da36c4c"`)
         await db.query(`DROP INDEX "public"."IDX_9dbe5617230d5421831774b4b3"`)
-        await db.query(`DROP TABLE "arm_address"`)
-        await db.query(`DROP INDEX "public"."IDX_09b2fd81523d32e7754eff486d"`)
-        await db.query(`DROP INDEX "public"."IDX_49c27db84181022daa7b273608"`)
-        await db.query(`DROP INDEX "public"."IDX_7431b6f993c524405ab209a90f"`)
         await db.query(`DROP TABLE "arm_address_yield"`)
         await db.query(`DROP INDEX "public"."IDX_8df13f9e0d70aa65367b24475e"`)
         await db.query(`DROP INDEX "public"."IDX_3b00df42da735a3976408cc68a"`)
         await db.query(`DROP INDEX "public"."IDX_8fabfa2b0691f4d6ae283bb638"`)
-        await db.query(`DROP INDEX "public"."IDX_d4540a0c059efb82d22fe0e412"`)
         await db.query(`DROP INDEX "public"."IDX_1706616a44b8303752ec76a045"`)
+        await db.query(`DROP INDEX "public"."IDX_d4540a0c059efb82d22fe0e412"`)
         await db.query(`DROP TABLE "arm_withdrawal_request"`)
         await db.query(`DROP INDEX "public"."IDX_330af8826e0e9369301bebc3e7"`)
         await db.query(`DROP INDEX "public"."IDX_501cc246901cfad5d624da98d6"`)
