@@ -32,10 +32,17 @@ export const process = async (ctx: Context) => {
 
   const ognDailyStats = [] as OGNDailyStat[]
 
-  const coingeckoData = await getCoingeckoData(ctx, {
-    coinId: 'origin-protocol',
-    vsCurrency: 'usd',
-  })
+  let coingeckoData: Awaited<ReturnType<typeof getCoingeckoData>> = {}
+  try {
+    coingeckoData = await getCoingeckoData(ctx, {
+      coinId: 'origin-protocol',
+      vsCurrency: 'usd',
+    })
+  } catch (err) {
+    // First-time deploys may have neither fresh API data nor DB cache. Skip
+    // the price-dependent fields rather than crashing the whole processor.
+    console.warn(`OGN daily stats: coingecko unavailable (${(err as Error).message}); skipping price data`)
+  }
 
   for (const date of dates) {
     const newDailyStat = await createDailyStat(ctx, date)

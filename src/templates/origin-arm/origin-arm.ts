@@ -264,11 +264,15 @@ export const createOriginARMProcessors = ({
             armContract.previewRedeem(10n ** 18n),
             marketFrom && block.header.height >= marketFrom ? armContract.activeMarket() : Promise.resolve(undefined),
           ])
-          const marketBalanceOf = activeMarket
-            ? await new erc20Abi.Contract(ctx, block.header, activeMarket).balanceOf(armAddress)
+          // Guard against the zero address: an ARM may expose activeMarket()
+          // from its deploy block but not have a market wired up until later.
+          // Calling balanceOf on 0x0 returns empty bytes and crashes the decoder.
+          const hasMarket = !!activeMarket && activeMarket !== ADDRESS_ZERO
+          const marketBalanceOf = hasMarket
+            ? await new erc20Abi.Contract(ctx, block.header, activeMarket!).balanceOf(armAddress)
             : 0n
-          const activeMarketContract = activeMarket
-            ? new originOsArmAbi.Contract(ctx, block.header, activeMarket)
+          const activeMarketContract = hasMarket
+            ? new originOsArmAbi.Contract(ctx, block.header, activeMarket!)
             : undefined
           const marketAssets =
             activeMarketContract && marketBalanceOf > 0n
