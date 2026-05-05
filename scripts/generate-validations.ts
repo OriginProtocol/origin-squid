@@ -15,10 +15,15 @@ const LIMIT = 1000
 
 const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 
+const TARGET = process.argv[2]
+const GRAPHQL_URL = /^https?:\/\//.test(TARGET)
+  ? TARGET
+  : `https://origin.squids.live/origin-squid@${TARGET}/api/graphql`
+
 const gql = (query: string) => query
 
 const executeQuery = async (query: string) => {
-  const response = await fetch(`https://origin.squids.live/origin-squid@${process.argv[2]}/api/graphql`, {
+  const response = await fetch(GRAPHQL_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1198,7 +1203,7 @@ const getFilePathForEntity = (entityKey: string): string => {
 
 const main = async () => {
   const filter = process.argv[3]?.toLowerCase()
-  console.log(`Generating validations for: ${process.argv[2]}${filter ? ` (filter: ${filter})` : ''}`)
+  console.log(`Generating validations for: ${TARGET}${filter ? ` (filter: ${filter})` : ''}`)
 
   const entitiesDir = path.join(__dirname, '../entities')
   if (!filter) {

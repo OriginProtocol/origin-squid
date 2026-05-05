@@ -2,6 +2,7 @@ import { WalletLabels } from '@model'
 import { defineProcessor } from '@originprotocol/squid-utils'
 
 let lastUpdate = 'nothing' // new Date().toJSON().slice(0, 7)
+let haveNotifiedWarning = false
 
 export const notionProcessor = defineProcessor({
   name: 'wallet-labels',
@@ -11,7 +12,10 @@ export const notionProcessor = defineProcessor({
   },
   process: async (ctx) => {
     if (!process.env.NOTION_SECRET) {
-      ctx.log.info('NOTION_SECRET not set, skipping update')
+      if (!haveNotifiedWarning) {
+        ctx.log.warn('NOTION_SECRET not set, skipping update')
+        haveNotifiedWarning = true
+      }
       return
     }
     const now = new Date().toJSON().slice(0, 13)

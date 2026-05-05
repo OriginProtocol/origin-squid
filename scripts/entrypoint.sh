@@ -4,6 +4,11 @@
 # in the Railway env; nothing about the image needs to change between roles.
 set -eu
 
+# @subsquid/logger writes ALL levels (including info) to stderr, which Railway
+# classifies as error output. Fold stderr into stdout so info/debug logs aren't
+# falsely surfaced as errors. The JSON `level` field is preserved for filtering.
+exec 2>&1
+
 apply_migrations() {
   # Idempotent. Subsquid's typeorm-migration uses TypeORM's migration table to
   # skip already-applied migrations, and TypeORM serializes concurrent runs via

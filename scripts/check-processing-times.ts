@@ -2,10 +2,15 @@ import fs from 'fs'
 
 const LIMIT = 1000
 
+const TARGET = process.argv[2]
+const GRAPHQL_URL = /^https?:\/\//.test(TARGET)
+  ? TARGET
+  : `https://origin.squids.live/origin-squid@${TARGET}/api/graphql`
+
 const gql = (query: string) => query
 
 const executeQuery = async <T>(query: string): Promise<T> => {
-  const response = await fetch(`https://origin.squids.live/origin-squid@${process.argv[2]}/api/graphql`, {
+  const response = await fetch(GRAPHQL_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -25,7 +30,7 @@ const executeQuery = async <T>(query: string): Promise<T> => {
 }
 
 const main = async () => {
-  console.log(`Checking processing times for: ${process.argv[2]}`)
+  console.log(`Checking processing times for: ${TARGET}`)
   const result = await executeQuery<{
     data: {
       processingStatuses: {
@@ -52,7 +57,7 @@ const main = async () => {
 
   let output = `Processing Times\n`
   output += '==============================\n'
-  output += `Version: ${process.argv[2]}\nDate: ${new Date().toISOString()}\n`
+  output += `Target: ${TARGET}\nDate: ${new Date().toISOString()}\n`
   output += '==============================\n'
   for (const status of result.data.processingStatuses) {
     const minutes = (Date.parse(status.headTimestamp) - Date.parse(status.startTimestamp)) / (1000 * 60)
