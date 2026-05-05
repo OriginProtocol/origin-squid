@@ -225,82 +225,89 @@ export const createCurveStableProcessor = (params: { address: string; from: numb
             // Check if it's a meta pool or plain pool
             const isMetaPool = await factory.is_meta(poolAddress)
 
-            if (isMetaPool) {
-              // Handle meta pool
-              const poolContract = new stableSwapMetaNgAbi.Contract(ctx, block.header, poolAddress)
-              const [name, symbol, coins] = await Promise.all([
-                poolContract.name().then(clean),
-                poolContract.symbol().then(clean),
-                factory.get_coins(poolAddress),
-              ])
-              const [symbols, decimals] = await Promise.all([
-                Promise.all(
-                  coins.map(async (coin) => {
-                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.symbol().then(clean)
-                  }),
-                ),
-                Promise.all(
-                  coins.map(async (coin) => {
-                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.decimals()
-                  }),
-                ),
-              ])
+            try {
+              if (isMetaPool) {
+                // Handle meta pool
+                const poolContract = new stableSwapMetaNgAbi.Contract(ctx, block.header, poolAddress)
+                const [name, symbol, coins] = await Promise.all([
+                  poolContract.name().then(clean),
+                  poolContract.symbol().then(clean),
+                  factory.get_coins(poolAddress),
+                ])
+                const [symbols, decimals] = await Promise.all([
+                  Promise.all(
+                    coins.map(async (coin) => {
+                      const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                      return tokenContract.symbol().then(clean)
+                    }),
+                  ),
+                  Promise.all(
+                    coins.map(async (coin) => {
+                      const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                      return tokenContract.decimals()
+                    }),
+                  ),
+                ])
 
-              const pool = new Pool({
-                id: `${ctx.chain.id}:${poolAddress}`,
-                chainId: ctx.chain.id,
-                address: poolAddress,
-                name,
-                symbol,
-                createdAtBlock: block.header.height,
-                createdAt: new Date(block.header.timestamp),
-                tokens: coins.map((coin) => coin.toLowerCase()),
-                symbols,
-                decimals,
-                exchange: 'curve',
-                type: 'stable-meta',
-              })
-              pools.set(pool.id, pool)
-            } else {
-              // Handle plain pool
-              const poolContract = new stableSwapNgAbi.Contract(ctx, block.header, poolAddress)
-              const [name, symbol, coins] = await Promise.all([
-                poolContract.name().then(clean),
-                poolContract.symbol().then(clean),
-                factory.get_coins(poolAddress),
-              ])
-              const [symbols, decimals] = await Promise.all([
-                Promise.all(
-                  coins.map(async (coin) => {
-                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.symbol().then(clean)
-                  }),
-                ),
-                Promise.all(
-                  coins.map(async (coin) => {
-                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                    return tokenContract.decimals()
-                  }),
-                ),
-              ])
+                const pool = new Pool({
+                  id: `${ctx.chain.id}:${poolAddress}`,
+                  chainId: ctx.chain.id,
+                  address: poolAddress,
+                  name,
+                  symbol,
+                  createdAtBlock: block.header.height,
+                  createdAt: new Date(block.header.timestamp),
+                  tokens: coins.map((coin) => coin.toLowerCase()),
+                  symbols,
+                  decimals,
+                  exchange: 'curve',
+                  type: 'stable-meta',
+                })
+                pools.set(pool.id, pool)
+              } else {
+                // Handle plain pool
+                const poolContract = new stableSwapNgAbi.Contract(ctx, block.header, poolAddress)
+                const [name, symbol, coins] = await Promise.all([
+                  poolContract.name().then(clean),
+                  poolContract.symbol().then(clean),
+                  factory.get_coins(poolAddress),
+                ])
+                const [symbols, decimals] = await Promise.all([
+                  Promise.all(
+                    coins.map(async (coin) => {
+                      const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                      return tokenContract.symbol().then(clean)
+                    }),
+                  ),
+                  Promise.all(
+                    coins.map(async (coin) => {
+                      const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                      return tokenContract.decimals()
+                    }),
+                  ),
+                ])
 
-              const pool = new Pool({
-                id: `${ctx.chain.id}:${poolAddress}`,
-                chainId: ctx.chain.id,
-                address: poolAddress,
-                name,
-                symbol,
-                createdAtBlock: block.header.height,
-                createdAt: new Date(block.header.timestamp),
-                tokens: coins.map((coin) => coin.toLowerCase()),
-                symbols,
-                decimals,
-                exchange: 'curve',
-                type: 'stable',
-              })
-              pools.set(pool.id, pool)
+                const pool = new Pool({
+                  id: `${ctx.chain.id}:${poolAddress}`,
+                  chainId: ctx.chain.id,
+                  address: poolAddress,
+                  name,
+                  symbol,
+                  createdAtBlock: block.header.height,
+                  createdAt: new Date(block.header.timestamp),
+                  tokens: coins.map((coin) => coin.toLowerCase()),
+                  symbols,
+                  decimals,
+                  exchange: 'curve',
+                  type: 'stable',
+                })
+                pools.set(pool.id, pool)
+              }
+            } catch (err) {
+              ctx.log.error(
+                `Failed to fetch metadata for Curve ${isMetaPool ? 'meta' : 'plain'} pool ${poolAddress} at block ${block.header.height}. Original error: ${err}`,
+              )
+              continue
             }
           }
         }
@@ -328,20 +335,29 @@ export const createCurveTwoCryptoProcessor = (params: { address: string; from: n
         for (const log of block.logs) {
           if (twocryptoPoolDeployedFilter.matches(log)) {
             const data = twocryptoFactoryAbi.events.TwocryptoPoolDeployed.decode(log)
-            const [symbols, decimals] = await Promise.all([
-              Promise.all(
-                data.coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.symbol().then(clean)
-                }),
-              ),
-              Promise.all(
-                data.coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.decimals()
-                }),
-              ),
-            ])
+            let symbols: string[], decimals: number[]
+            try {
+              ;[symbols, decimals] = await Promise.all([
+                Promise.all(
+                  data.coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.symbol().then(clean)
+                  }),
+                ),
+                Promise.all(
+                  data.coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.decimals()
+                  }),
+                ),
+              ])
+            } catch (err) {
+              ctx.log.error(
+                `Failed to fetch ERC20 metadata for Curve twocrypto pool ${data.pool} at block ${block.header.height}. ` +
+                  `coins=${data.coins.join(',')}. Original error: ${err}`,
+              )
+              continue
+            }
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
@@ -383,20 +399,29 @@ export const createCurveTriCryptoProcessor = (params: { address: string; from: n
         for (const log of block.logs) {
           if (twocryptoPoolDeployedFilter.matches(log)) {
             const data = triCryptoFactoryAbi.events.TricryptoPoolDeployed.decode(log)
-            const [symbols, decimals] = await Promise.all([
-              Promise.all(
-                data.coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.symbol().then(clean)
-                }),
-              ),
-              Promise.all(
-                data.coins.map(async (coin) => {
-                  const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
-                  return tokenContract.decimals()
-                }),
-              ),
-            ])
+            let symbols: string[], decimals: number[]
+            try {
+              ;[symbols, decimals] = await Promise.all([
+                Promise.all(
+                  data.coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.symbol().then(clean)
+                  }),
+                ),
+                Promise.all(
+                  data.coins.map(async (coin) => {
+                    const tokenContract = new erc20Abi.Contract(ctx, block.header, coin)
+                    return tokenContract.decimals()
+                  }),
+                ),
+              ])
+            } catch (err) {
+              ctx.log.error(
+                `Failed to fetch ERC20 metadata for Curve tricrypto pool ${data.pool} at block ${block.header.height}. ` +
+                  `coins=${data.coins.join(',')}. Original error: ${err}`,
+              )
+              continue
+            }
             const pool = new Pool({
               id: `${ctx.chain.id}:${data.pool}`,
               chainId: ctx.chain.id,
