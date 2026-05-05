@@ -50,8 +50,14 @@ if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
   exit 1
 fi
 
-status=$(railway status --json 2>/dev/null) || {
+# IMPORTANT: when RAILWAY_API_TOKEN (or RAILWAY_TOKEN) is set, the CLI switches
+# to headless auth and loses the linked-project context — `railway status` then
+# fails with "Project Token not found" or similar. Unset both for the CLI call;
+# we only need the API token for the curl GraphQL call below.
+status=$(env -u RAILWAY_API_TOKEN -u RAILWAY_TOKEN railway status --json 2>&1) || {
   err "railway status failed — is a project linked? Run from the repo root."
+  err "details:"
+  printf '%s\n' "$status" >&2
   exit 1
 }
 
@@ -62,21 +68,25 @@ if [ -z "$env_id" ] || [ "$env_id" = "null" ]; then
   exit 1
 fi
 
-# Build a name -> id map of services in this environment.
-declare -A service_ids
-while IFS=$'\t' read -r name id; do
-  [ -n "$name" ] && service_ids[$name]=$id
-done < <(printf '%s' "$status" | jq -r --arg n "$ENVIRONMENT_NAME" \
-  '.environments.edges[]
-   | select(.node.name == $n)
-   | .node.serviceInstances.edges[].node
-   | "\(.serviceName)\t\(.serviceId)"')
+# Look up a service's id from the cached status JSON. Avoids associative
+# arrays so this works on macOS's stock bash 3.2.
+service_id_for() {
+  printf '%s' "$status" | jq -r \
+    --arg envname "$ENVIRONMENT_NAME" --arg svcname "$1" \
+    '.environments.edges[]
+     | select(.node.name == $envname)
+     | .node.serviceInstances.edges[].node
+     | select(.serviceName == $svcname)
+     | .serviceId' \
+    | head -n 1
+}
 
 # ---- mutation ----
 gql_set_limits() {
   local svc=$1 vcpu=$2 mem=$3
-  local svc_id=${service_ids[$svc]:-}
-  if [ -z "$svc_id" ]; then
+  local svc_id
+  svc_id=$(service_id_for "$svc")
+  if [ -z "$svc_id" ] || [ "$svc_id" = "null" ]; then
     err "service '$svc' not found in $ENVIRONMENT_NAME — skipping"
     return 1
   fi

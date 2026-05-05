@@ -32,6 +32,7 @@
     "cache:restore": "ts-node scripts/cache-s3.ts restore",
     "cache:list": "ts-node scripts/cache-s3.ts list",
     "log:processing-times": "ts-node --require tsconfig-paths/register scripts/check-processing-times.ts",
+    "check-status": "ts-node --require tsconfig-paths/register scripts/check-status.ts",
     "postdeploy": "sh -c 'pnpm run log:processing-times $1 && pnpm run generate:validations $1 $2' --",
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
