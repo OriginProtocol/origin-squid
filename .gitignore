@@ -13,6 +13,8 @@
 /.idea
 
 .env
+.env.railway
+deploy/.env.railway
 .yarn.lock
 .DS_Store
 

@@ -10,6 +10,10 @@ export const notionProcessor = defineProcessor({
     p.includeAllBlocks()
   },
   process: async (ctx) => {
+    if (!process.env.NOTION_SECRET) {
+      ctx.log.info('NOTION_SECRET not set, skipping update')
+      return
+    }
     const now = new Date().toJSON().slice(0, 13)
     if (now !== lastUpdate) {
       lastUpdate = now
