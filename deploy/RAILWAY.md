@@ -47,6 +47,23 @@ To deploy a second copy (e.g. to test a branch alongside main), check out that b
 
 Migrations are idempotent and run on every container start. TypeORM serializes concurrent migration runs via advisory locks, so parallel service starts are safe.
 
+## Resource limits (CPU / memory)
+
+Railway's default per-service limits depend on your plan tier. To cap each service explicitly:
+
+```bash
+# Create a personal token at https://railway.com/account/tokens
+export RAILWAY_API_TOKEN=<token>
+
+# Defaults: processors 4 vCPU / 8 GB, api 2 vCPU / 4 GB
+bash deploy/railway-set-limits.sh
+
+# Or override
+PROCESSOR_VCPU=2 PROCESSOR_MEMORY=4 bash deploy/railway-set-limits.sh
+```
+
+The Railway CLI doesn't expose limit settings, so this script uses the public GraphQL API directly. Limits take effect on the next deploy of each service. Re-run `bash deploy/railway-bootstrap.sh -y` (or `railway up --service <name>` per service) to redeploy with the new caps.
+
 ## Backoff behavior
 
 `scripts/run-with-backoff.sh` keeps the container up across processor crashes:

@@ -97,14 +97,31 @@ confirm() {
   [[ "$ans" =~ ^[Yy]$ ]] || { log "aborted"; exit 0; }
 }
 
-# Try to add; treat "already exists" as success.
+# List service names in the linked project, parsed from `railway status --json`.
+# Railway nests them at environments[].serviceInstances[].serviceName.
+list_service_names() {
+  railway status --json 2>/dev/null \
+    | grep -oE '"serviceName"[[:space:]]*:[[:space:]]*"[^"]+"' \
+    | sed -E 's/.*"serviceName"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/' \
+    | sort -u
+}
+
+service_exists() {
+  list_service_names | grep -qFx "$1"
+}
+
+# `railway add --database postgres` does NOT fail when a Postgres already
+# exists — it silently creates a duplicate (with an auto-suffix like
+# "Postgres-abc1"). So check the service list first.
 ensure_postgres() {
   log "Ensuring Postgres plugin"
+  if list_service_names | grep -qE '^[Pp]ostgres'; then
+    printf '    %s(already provisioned)%s\n' "$c_dim" "$c_off"
+    return 0
+  fi
   local out
   if out=$(railway add --database postgres 2>&1); then
     printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
-  elif printf '%s' "$out" | grep -qiE 'already|exists'; then
-    printf '    %s(already provisioned)%s\n' "$c_dim" "$c_off"
   else
     err "failed to add Postgres plugin:"
     printf '%s\n' "$out" >&2
@@ -114,11 +131,13 @@ ensure_postgres() {
 
 ensure_service() {
   local name=$1
+  if service_exists "$name"; then
+    log "Service exists: $name"
+    return 0
+  fi
   local out
   if out=$(railway add --service "$name" 2>&1); then
     log "Created service: $name"
-  elif printf '%s' "$out" | grep -qiE 'already|exists'; then
-    log "Service exists: $name"
   else
     err "failed to create service '$name':"
     printf '%s\n' "$out" >&2
@@ -158,12 +177,15 @@ EOV
 }
 
 # Build a single `railway variables --set K=V --set K=V ...` invocation.
-# Reads K=V pairs from stdin, one per line; ignores empty values.
+# Reads K=V pairs from stdin, one per line. Skips blank lines and any pair with
+# an empty value (the CLI rejects `KEY=` as invalid).
 apply_vars() {
   local svc=$1
   local args=()
   while IFS= read -r line; do
     [ -z "$line" ] && continue
+    local value=${line#*=}
+    [ -z "$value" ] && continue
     args+=(--set "$line")
   done
   if [ "${#args[@]}" -eq 0 ]; then

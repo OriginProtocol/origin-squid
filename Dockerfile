@@ -11,8 +11,9 @@ WORKDIR /app
 
 # Install dependencies first to maximize layer cache reuse.
 COPY package.json pnpm-lock.yaml .npmrc* ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+# Note: no `--mount=type=cache` here — Railway's BuildKit rejects custom cache
+# IDs without their internal cacheKey prefix. Docker layer caching still applies.
+RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the source and build.
 COPY tsconfig.json commands.json ./
