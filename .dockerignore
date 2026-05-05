@@ -1,0 +1,25 @@
+node_modules
+lib
+.git
+.github
+.idea
+.vscode
+
+.env
+.env.*
+!.env.example
+
+dump
+dumps
+data
+cache
+out
+builds
+
+*.log
+*.txt
+.DS_Store
+
+# Don't ship local docker-compose state into the image
+docker-compose.yml
+.docker
