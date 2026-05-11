@@ -75,6 +75,24 @@ type ArmDailyStat @entity {
   rateNative: Float!
 }
 
+type ArmAddressYield @entity {
+  id: ID!
+  chainId: Int! @index
+  arm: String! @index
+  address: String! @index
+  date: String! @index
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  balance: BigInt!
+  value: BigInt!
+  costBasis: BigInt!
+  yield: BigInt!
+  cumulativeYield: BigInt!
+  roi: Float!
+  lastR: BigInt!
+  yieldRemainder: BigInt!
+}
+
 type ArmWithdrawalRequest @entity {
   id: ID!
   chainId: Int! @index
