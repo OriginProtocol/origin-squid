@@ -1,0 +1,10 @@
+allowBuilds:
+  '@apollo/protobufjs': true
+  '@lavamoat/preinstall-always-fail': false
+  "@originprotocol/squid-utils": true
+  bufferutil: true
+  es5-ext: true
+  esbuild: true
+  keccak: true
+  type-graphql: true
+  utf-8-validate: true

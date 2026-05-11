@@ -11,6 +11,7 @@ import {
   OToken,
   OTokenAPY,
   OTokenAddress,
+  OTokenAddressYield,
   OTokenDailyStat,
   OTokenHarvesterYieldSent,
   OTokenHistory,
@@ -54,6 +55,10 @@ export class OTokenEntityProducer {
   private otokenMap: Map<string, OToken> = new Map()
   private addressMap: Map<string, OTokenAddress> = new Map()
   private changedAddressMap: Map<string, OTokenAddress> = new Map() // Only to contain addresses whose content has changed during the context.
+  private currentDayAddressYieldRows: Map<string, OTokenAddressYield> = new Map()
+  private previousDayAddressYieldRows: Map<string, OTokenAddressYield> = new Map()
+  private changedAddressYieldRows: Map<string, OTokenAddressYield> = new Map()
+  private addressYieldRowsInitialized = false
   private histories: Map<string, OTokenHistory> = new Map()
   private apyMap: Map<string, OTokenAPY> = new Map()
   private rebaseMap: Map<string, OTokenRebase> = new Map()
@@ -107,6 +112,27 @@ export class OTokenEntityProducer {
     // Populate the addressMap with all retrieved addresses
     for (const address of addresses) {
       this.addressMap.set(address.address, address)
+    }
+
+    if (!this.addressYieldRowsInitialized) {
+      const today = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
+      const rows = await this.ctx.store.find(OTokenAddressYield, {
+        where: {
+          chainId: this.ctx.chain.id,
+          otoken: this.otoken.address,
+        },
+        order: { date: 'DESC' },
+      })
+      for (const row of rows) {
+        if (row.date === today) {
+          if (!this.currentDayAddressYieldRows.has(row.address)) {
+            this.currentDayAddressYieldRows.set(row.address, row)
+          }
+        } else if (!this.previousDayAddressYieldRows.has(row.address)) {
+          this.previousDayAddressYieldRows.set(row.address, row)
+        }
+      }
+      this.addressYieldRowsInitialized = true
     }
 
     this.initialized = true
@@ -243,6 +269,64 @@ export class OTokenEntityProducer {
 
     this.changedAddressMap.set(account, address)
     return address
+  }
+
+  private checkpointAddressYield(
+    account: string,
+    block: Block,
+    creditsPerToken: bigint,
+    balanceDelta: bigint,
+    cumulativeYieldDelta = 0n,
+    costBasisDelta?: bigint,
+  ): OTokenAddressYield {
+    const address = account.toLowerCase()
+    const date = new Date(block.header.timestamp).toISOString().slice(0, 10)
+    const id = `${this.ctx.chain.id}:${this.otoken.address}:${address}:${date}`
+    let row = this.currentDayAddressYieldRows.get(address)
+    if (!row || row.date !== date) {
+      if (row) this.previousDayAddressYieldRows.set(address, row)
+      const seed = row ?? this.previousDayAddressYieldRows.get(address)
+      row = new OTokenAddressYield({
+        id,
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+        address,
+        date,
+        timestamp: new Date(block.header.timestamp),
+        blockNumber: block.header.height,
+        balance: seed?.balance ?? 0n,
+        value: seed?.value ?? 0n,
+        costBasis: seed?.costBasis ?? 0n,
+        yield: 0n,
+        cumulativeYield: seed?.cumulativeYield ?? 0n,
+        roi: 0,
+        lastCreditsPerToken: seed?.lastCreditsPerToken ?? creditsPerToken,
+        yieldRemainder: seed?.yieldRemainder ?? 0n,
+      })
+      this.currentDayAddressYieldRows.set(address, row)
+    }
+
+    // Cost basis parity with ARM:
+    // - outflows reduce basis proportionally to remaining position
+    // - inflows use explicit basis delta when provided
+    if (balanceDelta < 0n && row.balance > 0n) {
+      const amountOut = -balanceDelta
+      const removedBasis = (row.costBasis * amountOut) / row.balance
+      row.costBasis -= removedBasis
+    } else if (costBasisDelta !== undefined) {
+      row.costBasis += costBasisDelta
+    }
+
+    row.balance += balanceDelta
+    row.cumulativeYield += cumulativeYieldDelta
+    row.value = row.balance
+    row.yield = row.cumulativeYield - (this.previousDayAddressYieldRows.get(address)?.cumulativeYield ?? 0n)
+    row.roi = row.costBasis > 0n ? Number(row.value) / Number(row.costBasis) - 1 : 0
+    row.lastCreditsPerToken = creditsPerToken
+    row.timestamp = new Date(block.header.timestamp)
+    row.blockNumber = block.header.height
+    this.changedAddressYieldRows.set(row.id, row)
+    return row
   }
 
   private async createHistory(
@@ -488,6 +572,7 @@ export class OTokenEntityProducer {
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, null, to, value)
+    this.checkpointAddressYield(to, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -502,6 +587,7 @@ export class OTokenEntityProducer {
   async afterBurn(trace: Trace, from: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, null, value)
+    this.checkpointAddressYield(from, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), -value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -516,6 +602,9 @@ export class OTokenEntityProducer {
   async afterTransfer(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
+    const creditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
+    this.checkpointAddressYield(from, this.otoken.block, creditsPerToken, -value)
+    this.checkpointAddressYield(to, this.otoken.block, creditsPerToken, value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -530,6 +619,9 @@ export class OTokenEntityProducer {
   async afterTransferFrom(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
+    const creditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
+    this.checkpointAddressYield(from, this.otoken.block, creditsPerToken, -value)
+    this.checkpointAddressYield(to, this.otoken.block, creditsPerToken, value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -619,6 +711,9 @@ export class OTokenEntityProducer {
         // Update the address state and check new earnings.
         address = this.updateAddress(account, true)
         const earnedDiff = address.earned - earned
+        if (earnedDiff > 0n) {
+          this.checkpointAddressYield(account, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), 0n, earnedDiff)
+        }
 
         if (earnedDiff > 0n) {
           const hourlyEarnings = (this.accountEarningsByHour.get(id) ?? 0n) + earnedDiff
@@ -788,6 +883,7 @@ export class OTokenEntityProducer {
           this.ctx.store.insert([...this.otokenMap.values()]),
           this.ctx.store.upsert([...this.rebaseMap.values()]),
           this.ctx.store.upsert([...this.histories.values()]),
+          this.ctx.store.upsert([...this.changedAddressYieldRows.values()]),
           this.ctx.store.insert(this.rebaseOptions),
           this.ctx.store.insert(this.harvesterYieldSent),
           this.ctx.store.upsert([...this.dailyStats.values()].map((ds) => ds.entity)),
@@ -804,6 +900,7 @@ export class OTokenEntityProducer {
         this.apyMap.size +
         this.rebaseMap.size +
         this.histories.size +
+        this.changedAddressYieldRows.size +
         this.rebaseOptions.length +
         this.harvesterYieldSent.length +
         [...this.dailyStats.values()].length +
@@ -822,6 +919,7 @@ export class OTokenEntityProducer {
           apy: this.apyMap.size,
           rebases: this.rebaseMap.size,
           histories: this.histories.size,
+          addressYieldRows: this.changedAddressYieldRows.size,
           rebaseOptions: this.rebaseOptions.length,
           harvesterYieldSent: this.harvesterYieldSent.length,
           dailyStats: [...this.dailyStats.values()].length,
@@ -842,6 +940,7 @@ export class OTokenEntityProducer {
     this.otokenMap = new Map()
     // We don't reset `this.addressMap` - keep it in memory for performance.
     this.changedAddressMap = new Map()
+    this.changedAddressYieldRows = new Map()
     this.histories = new Map()
     this.apyMap = new Map()
     this.rebaseMap = new Map()
@@ -857,6 +956,7 @@ export class OTokenEntityProducer {
     return (
       this.otokenMap.size > 0 ||
       this.changedAddressMap.size > 0 ||
+      this.changedAddressYieldRows.size > 0 ||
       this.histories.size > 0 ||
       this.apyMap.size > 0 ||
       this.rebaseMap.size > 0 ||

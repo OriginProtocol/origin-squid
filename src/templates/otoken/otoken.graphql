@@ -60,6 +60,24 @@ type OTokenAddress @entity {
   history: [OTokenHistory!]! @derivedFrom(field: "address")
 }
 
+type OTokenAddressYield @entity {
+  id: ID!
+  chainId: Int! @index
+  otoken: String! @index
+  address: String! @index
+  date: String! @index
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  balance: BigInt!
+  value: BigInt!
+  costBasis: BigInt!
+  yield: BigInt!
+  cumulativeYield: BigInt!
+  roi: Float!
+  lastCreditsPerToken: BigInt!
+  yieldRemainder: BigInt!
+}
+
 type OTokenHistory @entity {
   id: ID!
   chainId: Int! @index
