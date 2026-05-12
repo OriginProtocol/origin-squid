@@ -355,7 +355,15 @@ export class OTokenEntityProducer {
     row.roi = row.costBasis > 0n ? Number(row.balance) / Number(row.costBasis) - 1 : 0
     row.timestamp = new Date(block.header.timestamp)
     row.blockNumber = block.header.height
-    this.changedAddressYieldRows.set(row.id, row)
+    // Skip persisting rows that carry no state (e.g. zero-value Transfer events,
+    // or same-day receive-then-send-same-amount flow-through contracts). If an
+    // earlier event in this batch added the row to changedAddressYieldRows and
+    // a later event zeroed it back out, remove it.
+    if (row.balance > 0n || row.costBasis > 0n || row.cumulativeYield > 0n) {
+      this.changedAddressYieldRows.set(row.id, row)
+    } else {
+      this.changedAddressYieldRows.delete(row.id)
+    }
     return row
   }
 
@@ -727,6 +735,41 @@ export class OTokenEntityProducer {
 
     // Create Rebase Entity
     await this.getOrCreateRebaseEntity(trace, _yield, _fee)
+
+    // Pre-fetch yield seeds for above-threshold accounts that aren't cached
+    // (typically because they were evicted as dust and crossed back over the
+    // threshold). The rebase loop below is sync; without this, those accounts
+    // would create a new row with seed=undefined and lose their prior balance
+    // and cumulativeYield history.
+    const accountsNeedingSeed: string[] = []
+    for (const account of Object.keys(this.otoken.creditBalances)) {
+      if (this.otoken.balanceOf(account) > this.rebaseBalanceUpdateThreshold) {
+        const lower = account.toLowerCase()
+        if (!this.currentDayAddressYieldRows.has(lower) && !this.previousDayAddressYieldRows.has(lower)) {
+          accountsNeedingSeed.push(lower)
+        }
+      }
+    }
+    if (accountsNeedingSeed.length > 0) {
+      const rows = await this.ctx.store.find(OTokenAddressYield, {
+        where: {
+          chainId: this.ctx.chain.id,
+          otoken: this.otoken.address,
+          address: In(accountsNeedingSeed),
+        },
+        order: { date: 'DESC' },
+      })
+      const today = new Date(this.otoken.block.header.timestamp).toISOString().slice(0, 10)
+      for (const row of rows) {
+        if (row.date === today) {
+          if (!this.currentDayAddressYieldRows.has(row.address)) {
+            this.currentDayAddressYieldRows.set(row.address, row)
+          }
+        } else if (!this.previousDayAddressYieldRows.has(row.address)) {
+          this.previousDayAddressYieldRows.set(row.address, row)
+        }
+      }
+    }
 
     // Trying not to have any async calls within this loop.
     for (const account of Object.keys(this.otoken.creditBalances)) {
