@@ -69,13 +69,10 @@ type OTokenAddressYield @entity {
   timestamp: DateTime!
   blockNumber: Int! @index
   balance: BigInt!
-  value: BigInt!
   costBasis: BigInt!
   yield: BigInt!
   cumulativeYield: BigInt!
   roi: Float!
-  lastCreditsPerToken: BigInt!
-  yieldRemainder: BigInt!
 }
 
 type OTokenHistory @entity {

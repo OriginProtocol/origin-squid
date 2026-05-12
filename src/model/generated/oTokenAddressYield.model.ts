@@ -36,9 +36,6 @@ export class OTokenAddressYield {
     balance!: bigint
 
     @BigIntColumn_({nullable: false})
-    value!: bigint
-
-    @BigIntColumn_({nullable: false})
     costBasis!: bigint
 
     @BigIntColumn_({nullable: false})
@@ -49,10 +46,4 @@ export class OTokenAddressYield {
 
     @FloatColumn_({nullable: false})
     roi!: number
-
-    @BigIntColumn_({nullable: false})
-    lastCreditsPerToken!: bigint
-
-    @BigIntColumn_({nullable: false})
-    yieldRemainder!: bigint
 }

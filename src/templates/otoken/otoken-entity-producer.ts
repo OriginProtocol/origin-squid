@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { LessThan } from 'typeorm'
+import { In, LessThan } from 'typeorm'
 import { parseUnits } from 'viem'
 
 import * as otokenHarvester from '@abi/otoken-base-harvester'
@@ -115,21 +115,32 @@ export class OTokenEntityProducer {
     }
 
     if (!this.addressYieldRowsInitialized) {
-      const today = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
-      const rows = await this.ctx.store.find(OTokenAddressYield, {
-        where: {
-          chainId: this.ctx.chain.id,
-          otoken: this.otoken.address,
-        },
-        order: { date: 'DESC' },
-      })
-      for (const row of rows) {
-        if (row.date === today) {
-          if (!this.currentDayAddressYieldRows.has(row.address)) {
-            this.currentDayAddressYieldRows.set(row.address, row)
+      // Only preload yield rows for addresses currently above the dust threshold.
+      // Dust accounts get skipped during rebase processing anyway and would just
+      // bloat memory. Re-encounters (a dust account receiving more tokens) are
+      // handled by `ensureYieldSeed` on demand.
+      const activeAddresses = [...this.addressMap.values()]
+        .filter((a) => a.balance > this.rebaseBalanceUpdateThreshold)
+        .map((a) => a.address)
+
+      if (activeAddresses.length > 0) {
+        const today = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
+        const rows = await this.ctx.store.find(OTokenAddressYield, {
+          where: {
+            chainId: this.ctx.chain.id,
+            otoken: this.otoken.address,
+            address: In(activeAddresses),
+          },
+          order: { date: 'DESC' },
+        })
+        for (const row of rows) {
+          if (row.date === today) {
+            if (!this.currentDayAddressYieldRows.has(row.address)) {
+              this.currentDayAddressYieldRows.set(row.address, row)
+            }
+          } else if (!this.previousDayAddressYieldRows.has(row.address)) {
+            this.previousDayAddressYieldRows.set(row.address, row)
           }
-        } else if (!this.previousDayAddressYieldRows.has(row.address)) {
-          this.previousDayAddressYieldRows.set(row.address, row)
         }
       }
       this.addressYieldRowsInitialized = true
@@ -271,10 +282,34 @@ export class OTokenEntityProducer {
     return address
   }
 
+  // Lazy-load the most recent prior yield row for an address into the current/
+  // previous-day cache when not already present. This lets us evict dust holders
+  // from memory and still preserve `cumulativeYield` history if they come back.
+  private async ensureYieldSeed(account: string): Promise<void> {
+    const address = account.toLowerCase()
+    if (this.currentDayAddressYieldRows.has(address) || this.previousDayAddressYieldRows.has(address)) {
+      return
+    }
+    const row = await this.ctx.store.findOne(OTokenAddressYield, {
+      where: {
+        chainId: this.ctx.chain.id,
+        otoken: this.otoken.address,
+        address,
+      },
+      order: { date: 'DESC' },
+    })
+    if (!row) return
+    const today = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
+    if (row.date === today) {
+      this.currentDayAddressYieldRows.set(address, row)
+    } else {
+      this.previousDayAddressYieldRows.set(address, row)
+    }
+  }
+
   private checkpointAddressYield(
     account: string,
     block: Block,
-    creditsPerToken: bigint,
     balanceDelta: bigint,
     cumulativeYieldDelta = 0n,
     costBasisDelta?: bigint,
@@ -295,13 +330,10 @@ export class OTokenEntityProducer {
         timestamp: new Date(block.header.timestamp),
         blockNumber: block.header.height,
         balance: seed?.balance ?? 0n,
-        value: seed?.value ?? 0n,
         costBasis: seed?.costBasis ?? 0n,
         yield: 0n,
         cumulativeYield: seed?.cumulativeYield ?? 0n,
         roi: 0,
-        lastCreditsPerToken: seed?.lastCreditsPerToken ?? creditsPerToken,
-        yieldRemainder: seed?.yieldRemainder ?? 0n,
       })
       this.currentDayAddressYieldRows.set(address, row)
     }
@@ -319,10 +351,8 @@ export class OTokenEntityProducer {
 
     row.balance += balanceDelta
     row.cumulativeYield += cumulativeYieldDelta
-    row.value = row.balance
     row.yield = row.cumulativeYield - (this.previousDayAddressYieldRows.get(address)?.cumulativeYield ?? 0n)
-    row.roi = row.costBasis > 0n ? Number(row.value) / Number(row.costBasis) - 1 : 0
-    row.lastCreditsPerToken = creditsPerToken
+    row.roi = row.costBasis > 0n ? Number(row.balance) / Number(row.costBasis) - 1 : 0
     row.timestamp = new Date(block.header.timestamp)
     row.blockNumber = block.header.height
     this.changedAddressYieldRows.set(row.id, row)
@@ -572,7 +602,8 @@ export class OTokenEntityProducer {
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, null, to, value)
-    this.checkpointAddressYield(to, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), value, 0n, value)
+    await this.ensureYieldSeed(to)
+    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -587,7 +618,8 @@ export class OTokenEntityProducer {
   async afterBurn(trace: Trace, from: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, null, value)
-    this.checkpointAddressYield(from, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), -value)
+    await this.ensureYieldSeed(from)
+    this.checkpointAddressYield(from, this.otoken.block, -value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -602,9 +634,10 @@ export class OTokenEntityProducer {
   async afterTransfer(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
-    const creditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
-    this.checkpointAddressYield(from, this.otoken.block, creditsPerToken, -value)
-    this.checkpointAddressYield(to, this.otoken.block, creditsPerToken, value, 0n, value)
+    await this.ensureYieldSeed(from)
+    await this.ensureYieldSeed(to)
+    this.checkpointAddressYield(from, this.otoken.block, -value)
+    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -619,9 +652,10 @@ export class OTokenEntityProducer {
   async afterTransferFrom(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
     await this.createHistory(trace, from, to, value)
-    const creditsPerToken = this.otoken.rebasingCreditsPerTokenHighres()
-    this.checkpointAddressYield(from, this.otoken.block, creditsPerToken, -value)
-    this.checkpointAddressYield(to, this.otoken.block, creditsPerToken, value, 0n, value)
+    await this.ensureYieldSeed(from)
+    await this.ensureYieldSeed(to)
+    this.checkpointAddressYield(from, this.otoken.block, -value)
+    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -712,7 +746,10 @@ export class OTokenEntityProducer {
         address = this.updateAddress(account, true)
         const earnedDiff = address.earned - earned
         if (earnedDiff > 0n) {
-          this.checkpointAddressYield(account, this.otoken.block, this.otoken.rebasingCreditsPerTokenHighres(), 0n, earnedDiff)
+          // Rebase yield grows the holder's on-chain balance; mirror that on the
+          // row so row.balance stays in sync with balanceOf. No costBasisDelta
+          // — yield is not new basis.
+          this.checkpointAddressYield(account, this.otoken.block, earnedDiff, earnedDiff)
         }
 
         if (earnedDiff > 0n) {
@@ -941,6 +978,20 @@ export class OTokenEntityProducer {
     // We don't reset `this.addressMap` - keep it in memory for performance.
     this.changedAddressMap = new Map()
     this.changedAddressYieldRows = new Map()
+    // Evict dust/empty yield rows from memory. Dust holders are skipped by the
+    // rebase threshold gate anyway, so there's nothing to gain from tracking
+    // them. `ensureYieldSeed` will re-hydrate from DB if they come back.
+    for (const [addr, row] of this.currentDayAddressYieldRows) {
+      if (row.balance <= this.rebaseBalanceUpdateThreshold) {
+        this.currentDayAddressYieldRows.delete(addr)
+        this.previousDayAddressYieldRows.delete(addr)
+      }
+    }
+    for (const [addr, row] of this.previousDayAddressYieldRows) {
+      if (row.balance <= this.rebaseBalanceUpdateThreshold) {
+        this.previousDayAddressYieldRows.delete(addr)
+      }
+    }
     this.histories = new Map()
     this.apyMap = new Map()
     this.rebaseMap = new Map()
