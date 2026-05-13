@@ -1031,20 +1031,6 @@ export class OTokenEntityProducer {
     // We don't reset `this.addressMap` - keep it in memory for performance.
     this.changedAddressMap = new Map()
     this.changedAddressYieldRows = new Map()
-    // Evict dust/empty yield rows from memory. Dust holders are skipped by the
-    // rebase threshold gate anyway, so there's nothing to gain from tracking
-    // them. `ensureYieldSeed` will re-hydrate from DB if they come back.
-    for (const [addr, row] of this.currentDayAddressYieldRows) {
-      if (row.balance <= this.rebaseBalanceUpdateThreshold) {
-        this.currentDayAddressYieldRows.delete(addr)
-        this.previousDayAddressYieldRows.delete(addr)
-      }
-    }
-    for (const [addr, row] of this.previousDayAddressYieldRows) {
-      if (row.balance <= this.rebaseBalanceUpdateThreshold) {
-        this.previousDayAddressYieldRows.delete(addr)
-      }
-    }
     this.histories = new Map()
     this.apyMap = new Map()
     this.rebaseMap = new Map()
