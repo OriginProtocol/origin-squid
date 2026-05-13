@@ -307,64 +307,67 @@ export class OTokenEntityProducer {
     }
   }
 
-  private checkpointAddressYield(
-    account: string,
-    block: Block,
-    balanceDelta: bigint,
-    cumulativeYieldDelta = 0n,
-    costBasisDelta?: bigint,
-  ): OTokenAddressYield {
-    const address = account.toLowerCase()
-    const date = new Date(block.header.timestamp).toISOString().slice(0, 10)
-    const id = `${this.ctx.chain.id}:${this.otoken.address}:${address}:${date}`
-    let row = this.currentDayAddressYieldRows.get(address)
+  // Snapshot the current OTokenAddress state into today's yield row. Derives
+  // costBasis from the implied capital flow: balance moves that aren't
+  // attributable to yield (address.earned growth) are inflows/outflows.
+  // Caller must have ensured the address's seed row is in memory (via
+  // ensureYieldSeed or the bulk pre-fetch in afterChangeSupply).
+  private snapshotAddressYield(account: string): void {
+    const address = this.addressMap.get(account)
+    if (!address) throw new Error('Address must exist before snapshot: ' + account)
+
+    const lower = account.toLowerCase()
+    const date = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
+    const id = `${this.ctx.chain.id}:${this.otoken.address}:${lower}:${date}`
+
+    let row = this.currentDayAddressYieldRows.get(lower)
     if (!row || row.date !== date) {
-      if (row) this.previousDayAddressYieldRows.set(address, row)
-      const seed = row ?? this.previousDayAddressYieldRows.get(address)
+      if (row) this.previousDayAddressYieldRows.set(lower, row)
+      const seed = row ?? this.previousDayAddressYieldRows.get(lower)
       row = new OTokenAddressYield({
         id,
         chainId: this.ctx.chain.id,
         otoken: this.otoken.address,
-        address,
+        address: lower,
         date,
-        timestamp: new Date(block.header.timestamp),
-        blockNumber: block.header.height,
+        timestamp: new Date(this.block.header.timestamp),
+        blockNumber: this.block.header.height,
         balance: seed?.balance ?? 0n,
         costBasis: seed?.costBasis ?? 0n,
         yield: 0n,
         cumulativeYield: seed?.cumulativeYield ?? 0n,
         roi: 0,
       })
-      this.currentDayAddressYieldRows.set(address, row)
+      this.currentDayAddressYieldRows.set(lower, row)
     }
 
-    // Cost basis parity with ARM:
-    // - outflows reduce basis proportionally to remaining position
-    // - inflows use explicit basis delta when provided
-    if (balanceDelta < 0n && row.balance > 0n) {
-      const amountOut = -balanceDelta
-      const removedBasis = (row.costBasis * amountOut) / row.balance
-      row.costBasis -= removedBasis
-    } else if (costBasisDelta !== undefined) {
-      row.costBasis += costBasisDelta
+    // address.earned is cumulative yield since inception, so the diff vs the
+    // row's prior cumulativeYield is yield accrued since the last snapshot.
+    // Whatever balance moved beyond that is capital flow.
+    const balanceDelta = address.balance - row.balance
+    const yieldDelta = address.earned - row.cumulativeYield
+    const capitalFlow = balanceDelta - yieldDelta
+
+    if (capitalFlow < 0n && row.balance > 0n) {
+      const outflow = -capitalFlow
+      const removeBasis = (row.costBasis * (outflow > row.balance ? row.balance : outflow)) / row.balance
+      row.costBasis -= removeBasis
+    } else if (capitalFlow > 0n) {
+      row.costBasis += capitalFlow
     }
 
-    row.balance += balanceDelta
-    row.cumulativeYield += cumulativeYieldDelta
-    row.yield = row.cumulativeYield - (this.previousDayAddressYieldRows.get(address)?.cumulativeYield ?? 0n)
+    row.balance = address.balance
+    row.cumulativeYield = address.earned
+    row.yield = row.cumulativeYield - (this.previousDayAddressYieldRows.get(lower)?.cumulativeYield ?? 0n)
     row.roi = row.costBasis > 0n ? Number(row.balance) / Number(row.costBasis) - 1 : 0
-    row.timestamp = new Date(block.header.timestamp)
-    row.blockNumber = block.header.height
-    // Skip persisting rows that carry no state (e.g. zero-value Transfer events,
-    // or same-day receive-then-send-same-amount flow-through contracts). If an
-    // earlier event in this batch added the row to changedAddressYieldRows and
-    // a later event zeroed it back out, remove it.
+    row.timestamp = new Date(this.block.header.timestamp)
+    row.blockNumber = this.block.header.height
+
     if (row.balance > 0n || row.costBasis > 0n || row.cumulativeYield > 0n) {
       this.changedAddressYieldRows.set(row.id, row)
     } else {
       this.changedAddressYieldRows.delete(row.id)
     }
-    return row
   }
 
   private async createHistory(
@@ -609,9 +612,9 @@ export class OTokenEntityProducer {
 
   async afterMint(trace: Trace, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
-    await this.createHistory(trace, null, to, value)
     await this.ensureYieldSeed(to)
-    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
+    await this.createHistory(trace, null, to, value)
+    this.snapshotAddressYield(to)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -625,9 +628,9 @@ export class OTokenEntityProducer {
 
   async afterBurn(trace: Trace, from: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
-    await this.createHistory(trace, from, null, value)
     await this.ensureYieldSeed(from)
-    this.checkpointAddressYield(from, this.otoken.block, -value)
+    await this.createHistory(trace, from, null, value)
+    this.snapshotAddressYield(from)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -641,11 +644,11 @@ export class OTokenEntityProducer {
 
   async afterTransfer(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
-    await this.createHistory(trace, from, to, value)
     await this.ensureYieldSeed(from)
     await this.ensureYieldSeed(to)
-    this.checkpointAddressYield(from, this.otoken.block, -value)
-    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
+    await this.createHistory(trace, from, to, value)
+    this.snapshotAddressYield(from)
+    this.snapshotAddressYield(to)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -659,11 +662,11 @@ export class OTokenEntityProducer {
 
   async afterTransferFrom(trace: Trace, from: string, to: string, value: bigint): Promise<void> {
     await this.getOrCreateOTokenEntity()
-    await this.createHistory(trace, from, to, value)
     await this.ensureYieldSeed(from)
     await this.ensureYieldSeed(to)
-    this.checkpointAddressYield(from, this.otoken.block, -value)
-    this.checkpointAddressYield(to, this.otoken.block, value, 0n, value)
+    await this.createHistory(trace, from, to, value)
+    this.snapshotAddressYield(from)
+    this.snapshotAddressYield(to)
     this.transfers.push({
       block: this.block,
       transactionHash: trace.transaction!.hash,
@@ -789,10 +792,9 @@ export class OTokenEntityProducer {
         address = this.updateAddress(account, true)
         const earnedDiff = address.earned - earned
         if (earnedDiff > 0n) {
-          // Rebase yield grows the holder's on-chain balance; mirror that on the
-          // row so row.balance stays in sync with balanceOf. No costBasisDelta
-          // — yield is not new basis.
-          this.checkpointAddressYield(account, this.otoken.block, earnedDiff, earnedDiff)
+          // address.earned and address.balance both grew by the rebase yield;
+          // snapshot picks that up as pure yield (capitalFlow=0).
+          this.snapshotAddressYield(account)
         }
 
         if (earnedDiff > 0n) {
