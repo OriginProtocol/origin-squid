@@ -124,23 +124,31 @@ export class OTokenEntityProducer {
         .map((a) => a.address)
 
       if (activeAddresses.length > 0) {
-        const today = new Date(this.block.header.timestamp).toISOString().slice(0, 10)
-        const rows = await this.ctx.store.find(OTokenAddressYield, {
-          where: {
-            chainId: this.ctx.chain.id,
-            otoken: this.otoken.address,
-            address: In(activeAddresses),
-          },
-          order: { date: 'DESC' },
-        })
-        for (const row of rows) {
-          if (row.date === today) {
-            if (!this.currentDayAddressYieldRows.has(row.address)) {
-              this.currentDayAddressYieldRows.set(row.address, row)
-            }
-          } else if (!this.previousDayAddressYieldRows.has(row.address)) {
-            this.previousDayAddressYieldRows.set(row.address, row)
-          }
+        const today = dayjs.utc(this.block.header.timestamp).format('YYYY-MM-DD')
+        const yesterday = dayjs.utc(this.block.header.timestamp).subtract(1, 'day').format('YYYY-MM-DD')
+        const [todayRows, yesterdayRows] = await Promise.all([
+          this.ctx.store.find(OTokenAddressYield, {
+            where: {
+              chainId: this.ctx.chain.id,
+              otoken: this.otoken.address,
+              address: In(activeAddresses),
+              date: today,
+            },
+          }),
+          this.ctx.store.find(OTokenAddressYield, {
+            where: {
+              chainId: this.ctx.chain.id,
+              otoken: this.otoken.address,
+              address: In(activeAddresses),
+              date: yesterday,
+            },
+          }),
+        ])
+        for (const row of todayRows) {
+          this.currentDayAddressYieldRows.set(row.address, row)
+        }
+        for (const row of yesterdayRows) {
+          this.previousDayAddressYieldRows.set(row.address, row)
         }
       }
       this.addressYieldRowsInitialized = true
