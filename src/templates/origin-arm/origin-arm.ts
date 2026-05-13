@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { findLast } from 'lodash'
-import { LessThan } from 'typeorm'
+import { IsNull, LessThan, LessThanOrEqual } from 'typeorm'
 import { formatEther, formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
@@ -9,15 +9,7 @@ import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
 import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
-import {
-  Arm,
-  ArmAddressYield,
-  ArmDailyStat,
-  ArmState,
-  ArmSwap,
-  ArmWithdrawalRequest,
-  TraderateChanged,
-} from '@model'
+import { Arm, ArmAddressYield, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
 import {
   Block,
   Context,
@@ -27,7 +19,7 @@ import {
   logFilter,
 } from '@originprotocol/squid-utils'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
-import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+import { Currency, currencyToAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createERC20Entry } from '@templates/erc20/erc20-entry'
 import { createERC20EventTracker } from '@templates/erc20/erc20-event'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
@@ -37,6 +29,7 @@ import { traceFilter } from '@utils/traceFilter'
 import { calculateArmDailyApy } from './arm-apy'
 
 export const createOriginARMProcessors = ({
+  chainId = 1,
   name,
   from,
   armAddress,
@@ -47,6 +40,7 @@ export const createOriginARMProcessors = ({
   marketFrom,
   armType,
 }: {
+  chainId?: number
   name: string
   from: number
   armAddress: string
@@ -85,6 +79,15 @@ export const createOriginARMProcessors = ({
   const transferFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.Transfer.topic],
+    range: { from },
+  })
+  // Inbound transfers of the base asset (token0) advance the ARM's claimable
+  // pointer. Mainnet-only template, so resolve the symbol against chainId 1.
+  const token0Address = currencyToAddress(chainId, token0)
+  const baseAssetInboundFilter = logFilter({
+    address: [token0Address],
+    topic0: [erc20Abi.events.Transfer.topic],
+    topic2: [armAddress],
     range: { from },
   })
   const swapFilter = traceFilter({
@@ -170,6 +173,7 @@ export const createOriginARMProcessors = ({
         p.addLog(withdrawalFilter.value)
         p.addLog(feeCollectedFilter.value)
         p.addLog(transferFilter.value)
+        p.addLog(baseAssetInboundFilter.value)
         p.addTrace(swapFilter.value)
         tradeRateProcessor.setup(p)
       },
@@ -245,6 +249,7 @@ export const createOriginARMProcessors = ({
             totalSupply,
             assetsPerShare,
             activeMarket,
+            claimable,
           ] = await Promise.all([
             new erc20Abi.Contract(ctx, block.header, armEntity.token0).balanceOf(armAddress),
             new erc20Abi.Contract(ctx, block.header, armEntity.token1).balanceOf(armAddress),
@@ -263,6 +268,7 @@ export const createOriginARMProcessors = ({
             armContract.totalSupply(),
             armContract.previewRedeem(10n ** 18n),
             marketFrom && block.header.height >= marketFrom ? armContract.activeMarket() : Promise.resolve(undefined),
+            armContract.claimable(),
           ])
           // Guard against the zero address: an ARM may expose activeMarket()
           // from its deploy block but not have a market wired up until later.
@@ -299,11 +305,40 @@ export const createOriginARMProcessors = ({
             totalWithdrawalsClaimed: previousState?.totalWithdrawalsClaimed ?? 0n,
             totalFees: previousState?.totalFees ?? 0n,
             totalYield: 0n,
+            claimable,
           })
           armStateEntity.totalYield = calculateTotalYield(armStateEntity)
           states.push(armStateEntity)
           states.sort((a, b) => a.blockNumber - b.blockNumber) // sort ascending
+          await resolveClaimableRequests(block, claimable)
           return armStateEntity
+        }
+        const computeClaimableAt = (requestTimestampMs: number, blockTimestampMs: number): Date => {
+          // 10-minute floor: even when the vault already has enough liquidity,
+          // a request can never have been claimable sooner than 10 minutes
+          // after it was made (per product spec).
+          const floor = requestTimestampMs + 10 * 60 * 1000
+          return new Date(blockTimestampMs > floor ? blockTimestampMs : floor)
+        }
+        const resolveClaimableRequests = async (block: Block, claimable: bigint) => {
+          for (const req of redemptionMap.values()) {
+            if (req.claimableAt == null && req.queued <= claimable) {
+              req.claimableAt = computeClaimableAt(req.timestamp.getTime(), block.header.timestamp)
+            }
+          }
+          const rows = await ctx.store.find(ArmWithdrawalRequest, {
+            where: {
+              chainId: ctx.chain.id,
+              address: armAddress,
+              claimableAt: IsNull(),
+              queued: LessThanOrEqual(claimable),
+            },
+          })
+          for (const row of rows) {
+            if (redemptionMap.has(row.id)) continue
+            row.claimableAt = computeClaimableAt(row.timestamp.getTime(), block.header.timestamp)
+            redemptionMap.set(row.id, row)
+          }
         }
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
@@ -445,6 +480,11 @@ export const createOriginARMProcessors = ({
                 const costBasisDelta = isPeer ? (event.value * R) / 10n ** 18n : undefined
                 checkpoint(event.to, block, R, event.value, costBasisDelta)
               }
+            }
+            if (baseAssetInboundFilter.matches(log)) {
+              // Inbound base-asset transfer changes the ARM's liquidity, which can
+              // advance claimable. Snapshot ArmState so the new value is captured.
+              await getCurrentState(block)
             }
           }
 

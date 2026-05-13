@@ -36,7 +36,7 @@ import { OToken_2023_12_21 } from './otoken-2023-12-21'
 import { OToken_2025_03_04 } from './otoken-2025-03-04'
 import { OToken_2025_07_01 } from './otoken-2025-07-01'
 import { OTokenEntityProducer } from './otoken-entity-producer'
-import { otokenFrequencyProcessor } from './otoken-frequency'
+import { otokenStateProcessor } from './otoken-state'
 import { OTokenClass } from './types'
 import { isYieldDelegationContract } from './utils'
 
@@ -132,7 +132,7 @@ export const createOTokenProcessor2 = (params: {
 }) => {
   const { otokenAddress, from, otokenVaultAddress } = params
 
-  const frequencyUpdater = otokenFrequencyProcessor(params)
+  const stateUpdater = otokenStateProcessor(params)
 
   // Create trace filter for rebase opt events
   const generalTraceParams = {
@@ -340,6 +340,7 @@ export const createOTokenProcessor2 = (params: {
       processor.includeAllBlocks({ from })
     },
     initialize: async (ctx: Context) => {
+      await stateUpdater.initialize(ctx)
       const assetsCount = await ctx.store.count(OTokenAsset, {
         where: { chainId: ctx.chain.id, otoken: params.otokenAddress },
       })
@@ -365,7 +366,7 @@ export const createOTokenProcessor2 = (params: {
      */
     async process(ctx: Context): Promise<void> {
       await loadIsContractCache(ctx)
-      const frequencyUpdatePromise = frequencyUpdater(ctx)
+      const stateUpdaterPromise = stateUpdater.process(ctx)
 
       if (!otoken) {
         if (process.env.BLOCK_FROM) {
@@ -780,15 +781,15 @@ export const createOTokenProcessor2 = (params: {
         // )
       }
 
-      const frequencyUpdateResults = await frequencyUpdatePromise
+      const stateUpdaterResults = await stateUpdaterPromise
 
       startSection('finalSave')
       await Promise.all([
         saveIsContractCache(ctx),
         producer.save(),
-        ctx.store.insert(frequencyUpdateResults.vaults),
-        ctx.store.insert(frequencyUpdateResults.wotokens),
-        ctx.store.insert(frequencyUpdateResults.dripperStates),
+        ctx.store.insert(stateUpdaterResults.vaults),
+        ctx.store.insert(stateUpdaterResults.wotokens),
+        ctx.store.insert(stateUpdaterResults.dripperStates),
       ])
       endSection('finalSave')
 

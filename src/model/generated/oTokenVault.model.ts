@@ -34,4 +34,7 @@ export class OTokenVault {
 
     @BigIntColumn_({nullable: false})
     totalValue!: bigint
+
+    @BigIntColumn_({nullable: false})
+    claimable!: bigint
 }

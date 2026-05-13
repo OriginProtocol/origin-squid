@@ -47,4 +47,7 @@ export class ArmWithdrawalRequest {
 
     @DateTimeColumn_({nullable: true})
     claimedAt!: Date | undefined | null
+
+    @DateTimeColumn_({nullable: true})
+    claimableAt!: Date | undefined | null
 }

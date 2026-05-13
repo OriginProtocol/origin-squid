@@ -144,6 +144,7 @@ type OTokenVault @entity {
   address: String! @index
   vaultBuffer: BigInt!
   totalValue: BigInt!
+  claimable: BigInt!
 }
 
 type OTokenActivity @entity {
@@ -265,6 +266,7 @@ type OTokenWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
   claimedAt: DateTime
+  claimableAt: DateTime
   queueWait: BigInt
   txHash: String! @index
 }

@@ -1,8 +1,13 @@
+import { In, IsNull, LessThanOrEqual, Not } from 'typeorm'
+
 import * as oethVault from '@abi/otoken-vault'
 import { OTokenWithdrawalRequest } from '@model'
-import { Context, EvmBatchProcessor, logFilter } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, logFilter } from '@originprotocol/squid-utils'
 
-// export const from = 20428558
+// Minimum time-to-claimable per spec. Even if the vault's claimable pointer
+// already covers a request, the request cannot have been claimed sooner than
+// this floor relative to the request's own block timestamp.
+const CLAIMABLE_FLOOR_MS = 10 * 60 * 1000
 
 interface ProcessResult {
   withdrawalRequests: Map<string, OTokenWithdrawalRequest>
@@ -29,10 +34,50 @@ export const createOTokenWithdrawalsProcessor = ({
     topic0: [oethVault.events.WithdrawalClaimed.topic],
     range: { from },
   })
+  const withdrawalClaimableFilter = logFilter({
+    address: [oTokenVaultAddress],
+    topic0: [oethVault.events.WithdrawalClaimable.topic],
+    range: { from },
+  })
 
   const setup = (processor: EvmBatchProcessor) => {
     processor.addLog(withdrawalRequestedFilter.value)
     processor.addLog(withdrawalClaimedFilter.value)
+    processor.addLog(withdrawalClaimableFilter.value)
+  }
+
+  // Running claimable pointer for this vault. Lazy-loaded from chain on the
+  // first WithdrawalRequested encountered with unknown state, then advanced by
+  // every WithdrawalClaimable event we observe. Persisted across batches.
+  let currentClaimable: bigint | undefined
+
+  const computeClaimableAt = (requestTimestampMs: number, blockTimestampMs: number): Date => {
+    const floor = requestTimestampMs + CLAIMABLE_FLOOR_MS
+    return new Date(blockTimestampMs > floor ? blockTimestampMs : floor)
+  }
+
+  const resolvePending = async (ctx: Context, result: ProcessResult, block: Block, claimable: bigint) => {
+    // In-batch entries first; they take precedence over any DB row with the same id.
+    for (const req of result.withdrawalRequests.values()) {
+      if (req.claimableAt == null && req.queued <= claimable) {
+        req.claimableAt = computeClaimableAt(req.timestamp.getTime(), block.header.timestamp)
+      }
+    }
+    // Update any records we don't have in memory.
+    const inBatchIds = [...result.withdrawalRequests.keys()]
+    const rows = await ctx.store.find(OTokenWithdrawalRequest, {
+      where: {
+        chainId: ctx.chain.id,
+        otoken: oTokenAddress,
+        claimableAt: IsNull(),
+        queued: LessThanOrEqual(claimable),
+        ...(inBatchIds.length > 0 ? { id: Not(In(inBatchIds)) } : {}),
+      },
+    })
+    for (const row of rows) {
+      row.claimableAt = computeClaimableAt(row.timestamp.getTime(), block.header.timestamp)
+      result.withdrawalRequests.set(row.id, row)
+    }
   }
 
   const process = async (ctx: Context) => {
@@ -46,6 +91,10 @@ export const createOTokenWithdrawalsProcessor = ({
           await processWithdrawalRequested(ctx, result, block, log)
         } else if (withdrawalClaimedFilter.matches(log)) {
           await processWithdrawalClaimed(ctx, result, block, log)
+        } else if (withdrawalClaimableFilter.matches(log)) {
+          const data = oethVault.events.WithdrawalClaimable.decode(log)
+          currentClaimable = data._newClaimable
+          await resolvePending(ctx, result, block, data._newClaimable)
         }
       }
     }
@@ -56,7 +105,7 @@ export const createOTokenWithdrawalsProcessor = ({
   const processWithdrawalRequested = async (
     ctx: Context,
     result: ProcessResult,
-    block: Context['blocks'][number],
+    block: Block,
     log: Context['blocks'][number]['logs'][number],
   ) => {
     const data = oethVault.events.WithdrawalRequested.decode(log)
@@ -69,6 +118,14 @@ export const createOTokenWithdrawalsProcessor = ({
         queueWait = BigInt('0x' + extraBytes)
       }
     }
+    if (currentClaimable === undefined) {
+      // First request we've seen; sync the running pointer from chain so we
+      // can decide whether this request is born claimable.
+      const meta = await new oethVault.Contract(ctx, block.header, oTokenVaultAddress).withdrawalQueueMetadata()
+      currentClaimable = meta.claimable
+    }
+    const claimableAt =
+      data._queued <= currentClaimable ? computeClaimableAt(block.header.timestamp, block.header.timestamp) : null
     const withdrawalRequest = new OTokenWithdrawalRequest({
       id,
       chainId: ctx.chain.id,
@@ -82,6 +139,7 @@ export const createOTokenWithdrawalsProcessor = ({
       withdrawer: data._withdrawer.toLowerCase(),
       txHash: log.transactionHash,
       queueWait,
+      claimableAt,
     })
     result.withdrawalRequests.set(withdrawalRequest.id, withdrawalRequest)
   }
@@ -89,7 +147,7 @@ export const createOTokenWithdrawalsProcessor = ({
   const processWithdrawalClaimed = async (
     ctx: Context,
     result: ProcessResult,
-    block: Context['blocks'][number],
+    block: Block,
     log: Context['blocks'][number]['logs'][number],
   ) => {
     const data = oethVault.events.WithdrawalClaimed.decode(log)

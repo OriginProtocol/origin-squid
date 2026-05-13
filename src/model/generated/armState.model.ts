@@ -66,4 +66,7 @@ export class ArmState {
 
     @BigIntColumn_({nullable: false})
     totalFees!: bigint
+
+    @BigIntColumn_({nullable: false})
+    claimable!: bigint
 }

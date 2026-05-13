@@ -43,6 +43,7 @@ type ArmState @entity {
   totalWithdrawalsClaimed: BigInt!
   totalYield: BigInt!
   totalFees: BigInt!
+  claimable: BigInt!
 }
 
 type ArmDailyStat @entity {
@@ -106,6 +107,7 @@ type ArmWithdrawalRequest @entity {
   queued: BigInt!
   claimed: Boolean!
   claimedAt: DateTime
+  claimableAt: DateTime
 }
 
 type ArmSwap @entity {

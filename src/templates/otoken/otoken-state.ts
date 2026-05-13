@@ -4,9 +4,9 @@ import * as dripperAbi from '@abi/otoken-dripper'
 import * as otokenVault from '@abi/otoken-vault'
 import * as wotokenAbi from '@abi/woeth'
 import { OTokenDripperState, OTokenVault, WOToken } from '@model'
-import { Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
+import { Block, Context, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 
-export const otokenFrequencyProcessor = (params: {
+export const otokenStateProcessor = (params: {
   otokenAddress: string
   otokenVaultAddress: string
   vaultFrom: number
@@ -30,27 +30,65 @@ export const otokenFrequencyProcessor = (params: {
         Number.MAX_SAFE_INTEGER,
     ),
   })
-  return async (ctx: Context) => {
-    const vaults: OTokenVault[] = []
+  // Running claimable pointer; advanced whenever WithdrawalClaimable fires.
+  // Monotonic per the contract, so the latest event value is always current.
+  let currentClaimable = 0n
+  const vaultAddrLc = params.otokenVaultAddress.toLowerCase()
+
+  const initialize = async (ctx: Context) => {
+    // Seed claimable from the most recent persisted snapshot so a restart
+    // mid-history doesn't write claimable=0 until the next event fires.
+    const last = await ctx.store.findOne(OTokenVault, {
+      where: {
+        chainId: ctx.chain.id,
+        otoken: params.otokenAddress,
+        address: params.otokenVaultAddress,
+      },
+      order: { blockNumber: 'desc' },
+    })
+    if (last) currentClaimable = last.claimable
+  }
+
+  const process = async (ctx: Context) => {
+    // Keyed by id so an event-driven + frequency snapshot on the same block dedupe.
+    const vaults = new Map<string, OTokenVault>()
     const wotokens: WOToken[] = []
     const dripperStates: OTokenDripperState[] = []
-    await frequencyUpdate(ctx, async (ctx, block) => {
-      if (block.header.height >= params.vaultFrom) {
-        const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
-        const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
-        vaults.push(
-          new OTokenVault({
-            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`,
-            chainId: ctx.chain.id,
-            otoken: params.otokenAddress,
-            blockNumber: block.header.height,
-            timestamp: new Date(block.header.timestamp),
-            address: params.otokenVaultAddress,
-            vaultBuffer,
-            totalValue,
-          }),
-        )
+
+    const upsertVaultState = async (block: Block, newClaimable?: bigint) => {
+      if (newClaimable !== undefined) currentClaimable = newClaimable
+      if (block.header.height < params.vaultFrom) return
+      const vaultContract = new otokenVault.Contract(ctx, block.header, params.otokenVaultAddress)
+      const [vaultBuffer, totalValue] = await Promise.all([vaultContract.vaultBuffer(), vaultContract.totalValue()])
+      const id = `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}-${params.otokenVaultAddress}`
+      vaults.set(
+        id,
+        new OTokenVault({
+          id,
+          chainId: ctx.chain.id,
+          otoken: params.otokenAddress,
+          blockNumber: block.header.height,
+          timestamp: new Date(block.header.timestamp),
+          address: params.otokenVaultAddress,
+          vaultBuffer,
+          totalValue,
+          claimable: currentClaimable,
+        }),
+      )
+    }
+
+    // Event-driven: snapshot at each WithdrawalClaimable block, capturing the new pointer.
+    for (const block of ctx.blocksWithContent) {
+      for (const log of block.logs) {
+        if (log.address === vaultAddrLc && log.topics[0] === otokenVault.events.WithdrawalClaimable.topic) {
+          const data = otokenVault.events.WithdrawalClaimable.decode(log)
+          await upsertVaultState(block, data._newClaimable)
+        }
       }
+    }
+
+    await frequencyUpdate(ctx, async (ctx, block) => {
+      await upsertVaultState(block)
 
       if (params.wotoken && block.header.height >= params.wotoken.from) {
         const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
@@ -146,9 +184,11 @@ export const otokenFrequencyProcessor = (params: {
     })
 
     return {
-      vaults,
+      vaults: [...vaults.values()],
       wotokens,
       dripperStates,
     }
   }
+
+  return { initialize, process }
 }
