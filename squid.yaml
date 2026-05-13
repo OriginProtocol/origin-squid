@@ -7,6 +7,12 @@ deploy:
   env:
     TS_NODE_BASEURL: './lib'
     IGNORE_VALIDATION: 'true'
+    PORTAL_URL_ETHEREUM: ${{ addons.portal.ethereum_mainnet.http }}
+    PORTAL_URL_BASE: ${{ addons.portal.base_mainnet.http }}
+    PORTAL_URL_SONIC: ${{ addons.portal.sonic_mainnet.http }}
+    PORTAL_URL_ARBITRUM: ${{ addons.portal.arbitrum_one.http }}
+    PORTAL_URL_HYPEREVM: ${{ addons.portal.hyperliquid-mainnet.http }}
+
     # DEBUG_PERF: 'true'
   addons:
     postgres:
