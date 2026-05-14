@@ -158,7 +158,10 @@ export class DBDumpManager {
         const now = new Date()
 
         // Check if the lock has expired
-        if (now.getTime() - lockTimestamp.getTime() > this.LOCK_TIMEOUT_MS) {
+        if (
+          now.getTime() - lockTimestamp.getTime() > this.LOCK_TIMEOUT_MS ||
+          lockData.processorName === processorName // A past runtime opened this lock.
+        ) {
           console.log(`Removing expired restore lock for processor: ${lockData.processorName}`)
           await client.query('DELETE FROM "util_cache" WHERE id = $1', [this.LOCK_KEY])
         } else {
