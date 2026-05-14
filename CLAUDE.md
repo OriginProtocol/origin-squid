@@ -67,7 +67,7 @@ Entry points: `src/main-*.ts` files (e.g., `main-oeth.ts`, `main-ousd.ts`)
 - `src/utils/` - Shared utilities including chain-specific addresses (`addresses-*.ts`)
 - `src/shared/` - Shared modules (ERC20 state, post-processors)
 - `src/model/` - TypeORM entities (generated from GraphQL)
-- `abi/` - Raw ABI JSON files
+- `src/abi-json/` - Raw ABI JSON files (kept inside src/ so JSON imports don't shift tsc output into lib/src/)
 - `src/abi/` - Generated TypeScript ABI interfaces
 
 ### Path Aliases (tsconfig.json)
@@ -89,7 +89,7 @@ Entry points: `src/main-*.ts` files (e.g., `main-oeth.ts`, `main-ousd.ts`)
 ## Development Workflow
 
 ### Adding New Events/Contracts
-1. Add ABI JSON to `abi/`
+1. Add ABI JSON to `src/abi-json/`
 2. Run `pnpm run typegen` to generate TypeScript interfaces
 3. Create processor in `src/[network]/processors/` or use existing template
 4. Update `squid.yaml` if adding new processor

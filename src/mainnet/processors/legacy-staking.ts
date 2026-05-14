@@ -13,10 +13,10 @@ export const setup = (processor: EvmBatchProcessor) => {
   processor.addLog({
     address: [LEGACY_OGN_STAKING],
     topic0: [
-      legacyStakingAbi.events['Staked(address indexed,uint256)'],
-      legacyStakingAbi.events['Staked(address indexed,uint256,uint256,uint256)'],
-      legacyStakingAbi.events['Withdrawn(address indexed,uint256)'],
-      legacyStakingAbi.events['Withdrawn(address indexed,uint256,uint256)'],
+      legacyStakingAbi.events.Staked_1,
+      legacyStakingAbi.events.Staked,
+      legacyStakingAbi.events.Withdrawn_1,
+      legacyStakingAbi.events.Withdrawn,
       legacyStakingAbi.events.StakesTransfered,
     ].map((ev) => ev.topic),
     range: { from },
@@ -36,24 +36,23 @@ export const process = async (ctx: Context) => {
         continue
       }
 
-      if (firstTopic === legacyStakingAbi.events['Staked(address indexed,uint256)'].topic) {
-        let { user, amount } = legacyStakingAbi.events['Staked(address indexed,uint256)'].decode(log)
+      if (firstTopic === legacyStakingAbi.events.Staked_1.topic) {
+        let { user, amount } = legacyStakingAbi.events.Staked_1.decode(log)
         const staker = await _getStaker(ctx, user, result)
         staker.inputAmount += amount
         staker.balance += amount
-      } else if (firstTopic === legacyStakingAbi.events['Staked(address indexed,uint256,uint256,uint256)'].topic) {
-        let { user, amount } = legacyStakingAbi.events['Staked(address indexed,uint256,uint256,uint256)'].decode(log)
+      } else if (firstTopic === legacyStakingAbi.events.Staked.topic) {
+        let { user, amount } = legacyStakingAbi.events.Staked.decode(log)
         const staker = await _getStaker(ctx, user, result)
         staker.inputAmount += amount
         staker.balance += amount
-      } else if (firstTopic === legacyStakingAbi.events['Withdrawn(address indexed,uint256)'].topic) {
-        let { user, amount } = legacyStakingAbi.events['Withdrawn(address indexed,uint256)'].decode(log)
+      } else if (firstTopic === legacyStakingAbi.events.Withdrawn_1.topic) {
+        let { user, amount } = legacyStakingAbi.events.Withdrawn_1.decode(log)
         const staker = await _getStaker(ctx, user, result)
         staker.outputAmount += amount
         staker.balance -= amount
-      } else if (firstTopic === legacyStakingAbi.events['Withdrawn(address indexed,uint256,uint256)'].topic) {
-        let { user, amount, stakedAmount } =
-          legacyStakingAbi.events['Withdrawn(address indexed,uint256,uint256)'].decode(log)
+      } else if (firstTopic === legacyStakingAbi.events.Withdrawn.topic) {
+        let { user, amount, stakedAmount } = legacyStakingAbi.events.Withdrawn.decode(log)
         const staker = await _getStaker(ctx, user, result)
         staker.outputAmount += stakedAmount
         staker.rewardAmount += amount - stakedAmount

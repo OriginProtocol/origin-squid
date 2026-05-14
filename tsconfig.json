@@ -20,16 +20,16 @@
       "@templates/*": ["templates/*"],
       "@utils/*": ["utils/*"],
       "@test-utils/*": ["test-utils/*"],
-      "@validation/*": ["validation/*"]
-    }
+      "@validation/*": ["validation/*"],
+    },
   },
   "ts-node": {
     "transpileOnly": true,
     "files": true,
     "compilerOptions": {
-      "module": "commonjs"
-    }
+      "module": "commonjs",
+    },
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

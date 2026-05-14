@@ -1,5 +1,5 @@
 /**
- * Generate .abi.ts files from raw JSON ABIs in ./abi/.
+ * Generate .abi.ts files from raw JSON ABIs in ./src/abi-json/.
  * Each generated file re-exports the ABI with `as const` for proper viem type inference.
  *
  * Usage: ts-node scripts/generate-abi-exports.ts
@@ -8,7 +8,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const abiDir = path.resolve(__dirname, '../abi')
+const abiDir = path.resolve(__dirname, '../src/abi-json')
 const outDir = path.resolve(__dirname, '../src/abi')
 
 const jsonFiles = fs.readdirSync(abiDir).filter((f) => f.endsWith('.json'))

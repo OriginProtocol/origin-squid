@@ -41,12 +41,12 @@
       "cmd": ["squid-typeorm-codegen"]
     },
     "typegen": {
-      "description": "Generate data access classes for an ABI file(s) in the ./abi folder",
+      "description": "Generate data access classes for an ABI file(s) in the ./src/abi-json folder",
       "cmd": [
         "squid-evm-typegen",
         "./src/abi",
         {
-          "glob": "./abi/*.json"
+          "glob": "./src/abi-json/*.json"
         },
         "--multicall"
       ]

@@ -6,18 +6,18 @@ import { execSync } from 'child_process'
  * Checks for unused ABI files in the codebase.
  *
  * ABI workflow:
- * 1. JSON ABI files live in /abi/
+ * 1. JSON ABI files live in /src/abi-json/
  * 2. They get typegenned into /src/abi/
  * 3. Code imports from @abi/filename
  *
  * This script finds which ABIs in src/abi/ are not imported
  * anywhere outside of src/abi/, and reports the corresponding
- * JSON files in abi/ that can be deleted.
+ * JSON files in src/abi-json/ that can be deleted.
  */
 
 const ROOT_DIR = path.resolve(__dirname, '..')
 const SRC_ABI_DIR = path.join(ROOT_DIR, 'src', 'abi')
-const ABI_JSON_DIR = path.join(ROOT_DIR, 'abi')
+const ABI_JSON_DIR = path.join(ROOT_DIR, 'src', 'abi-json')
 const SRC_DIR = path.join(ROOT_DIR, 'src')
 
 // ABIs to ignore (auto-generated or intentionally kept without direct imports)
@@ -116,7 +116,7 @@ function main() {
     for (const { tsFile, jsonFile } of unused) {
       console.log(`  src/abi/${tsFile}.ts`)
       if (jsonFile) {
-        console.log(`    -> abi/${jsonFile}`)
+        console.log(`    -> src/abi-json/${jsonFile}`)
       }
     }
 
@@ -129,7 +129,7 @@ function main() {
     console.log('Commands to delete unused files:')
     console.log('```')
     for (const jsonFile of jsonFiles) {
-      console.log(`rm abi/${jsonFile}`)
+      console.log(`rm src/abi-json/${jsonFile}`)
     }
     for (const srcFile of srcFiles) {
       console.log(`rm src/abi/${srcFile}`)

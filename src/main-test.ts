@@ -5,7 +5,7 @@ import { formatUnits } from 'viem'
 import { base } from 'viem/chains'
 
 import * as aerodromeLPSugarAbi from '@abi/aerodrome-lp-sugar-v3'
-import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter.extended'
+import * as mixedQuoterAbi from '@abi/aerodrome-mixed-quoter'
 import * as erc20Abi from '@abi/erc20'
 import * as otokenAbi from '@abi/otoken'
 import { Context, EvmBatchProcessor, defineProcessor, logFilter, multicall, run } from '@originprotocol/squid-utils'

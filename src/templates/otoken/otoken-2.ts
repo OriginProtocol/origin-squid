@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { pick, uniq } from 'lodash'
-import { getAddress } from 'viem'
+import { type AbiFunction, getAddress, toFunctionSelector } from 'viem'
 
 import * as proxyAbi from '@abi/governed-upgradeability-proxy'
 import * as otokenAbi from '@abi/otoken'
@@ -9,6 +9,7 @@ import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenUpgradeAccountsAbi from '@abi/otoken-upgradeAccounts'
 import * as otokenVaultAbi from '@abi/otoken-vault'
+import OTOKEN_2024_12_21_ABI_JSON from '../../abi-json/otoken-2024-12-21.json'
 import { OTokenAsset, OTokenRawData } from '@model'
 import {
   Block,
@@ -41,6 +42,12 @@ import { OTokenClass } from './types'
 import { isYieldDelegationContract } from './utils'
 
 const DEBUG_PERF = process.env.DEBUG_PERF === 'true'
+
+const otokenViewSelectors = new Set<string>(
+  (OTOKEN_2024_12_21_ABI_JSON as AbiFunction[])
+    .filter((f) => f.type === 'function' && (f.stateMutability === 'view' || f.stateMutability === 'pure'))
+    .map((f) => toFunctionSelector(f)),
+)
 
 export type OTokenContractAddress =
   | typeof OUSD_ADDRESS
@@ -733,19 +740,13 @@ export const createOTokenProcessor2 = (params: {
                   trace.action.input.startsWith(value.selector),
                 )
                 if (fun) {
-                  if (!fun.isView) {
-                    ctx.log.info({ data: trace.action.input, hash: trace.transaction?.hash }, fun.signature)
+                  if (!otokenViewSelectors.has(fun.selector)) {
+                    ctx.log.info({ data: trace.action.input, hash: trace.transaction?.hash }, fun.sighash)
                   }
                 } else {
                   ctx.log.info({ data: trace.action.input, hash: trace.transaction?.hash }, 'unknown')
                 }
 
-                if (!fun?.isView) {
-                  ctx.log.error(
-                    { data: trace.action.input, hash: trace.transaction?.hash },
-                    'write function not being processed',
-                  )
-                }
                 endSection('trace_unknown')
               }
             }
@@ -822,18 +823,18 @@ const loadOTokenRawData = (ctx: Context, block: Block, entity: OTokenRawData) =>
     entity.type === 'OToken_2021_01_02'
       ? new OToken_2021_01_02(ctx, block, entity.otoken)
       : entity.type === 'OToken_2021_01_08'
-      ? new OToken_2021_01_08(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2021_01_25'
-      ? new OToken_2021_01_25(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2021_06_06'
-      ? new OToken_2021_06_06(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2023_12_21'
-      ? new OToken_2023_12_21(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2025_03_04'
-      ? new OToken_2025_03_04(ctx, block, entity.otoken)
-      : entity.type === 'OToken_2025_07_01'
-      ? new OToken_2025_07_01(ctx, block, entity.otoken)
-      : undefined
+        ? new OToken_2021_01_08(ctx, block, entity.otoken)
+        : entity.type === 'OToken_2021_01_25'
+          ? new OToken_2021_01_25(ctx, block, entity.otoken)
+          : entity.type === 'OToken_2021_06_06'
+            ? new OToken_2021_06_06(ctx, block, entity.otoken)
+            : entity.type === 'OToken_2023_12_21'
+              ? new OToken_2023_12_21(ctx, block, entity.otoken)
+              : entity.type === 'OToken_2025_03_04'
+                ? new OToken_2025_03_04(ctx, block, entity.otoken)
+                : entity.type === 'OToken_2025_07_01'
+                  ? new OToken_2025_07_01(ctx, block, entity.otoken)
+                  : undefined
   if (!otoken) throw new Error('Class type not set up for loadOTokenRawData')
 
   Object.assign(otoken, entity.data)
@@ -858,50 +859,50 @@ const saveOTokenRawData = async (ctx: Context, block: Block, otoken: OTokenClass
           'rebaseState',
         ]
       : otoken instanceof OToken_2023_12_21
-      ? [
-          'totalSupply',
-          'allowances',
-          'vaultAddress',
-          'creditBalances',
-          '_rebasingCredits',
-          '_rebasingCreditsPerToken',
-          'nonRebasingSupply',
-          'nonRebasingCreditsPerToken',
-          'rebaseState',
-          'isUpgraded',
-          'governor',
-        ]
-      : otoken instanceof OToken_2025_03_04
-      ? [
-          'totalSupply',
-          'allowances',
-          'vaultAddress',
-          'creditBalances',
-          'rebasingCredits',
-          'rebasingCreditsPerToken',
-          'nonRebasingSupply',
-          'alternativeCreditsPerToken',
-          'rebaseState',
-          'yieldTo',
-          'yieldFrom',
-          'governor',
-        ]
-      : otoken instanceof OToken_2025_07_01
-      ? [
-          'totalSupply',
-          'allowances',
-          'vaultAddress',
-          'creditBalances',
-          'rebasingCredits',
-          'rebasingCreditsPerToken',
-          'nonRebasingSupply',
-          'alternativeCreditsPerToken',
-          'rebaseState',
-          'yieldTo',
-          'yieldFrom',
-          'governor',
-        ]
-      : undefined
+        ? [
+            'totalSupply',
+            'allowances',
+            'vaultAddress',
+            'creditBalances',
+            '_rebasingCredits',
+            '_rebasingCreditsPerToken',
+            'nonRebasingSupply',
+            'nonRebasingCreditsPerToken',
+            'rebaseState',
+            'isUpgraded',
+            'governor',
+          ]
+        : otoken instanceof OToken_2025_03_04
+          ? [
+              'totalSupply',
+              'allowances',
+              'vaultAddress',
+              'creditBalances',
+              'rebasingCredits',
+              'rebasingCreditsPerToken',
+              'nonRebasingSupply',
+              'alternativeCreditsPerToken',
+              'rebaseState',
+              'yieldTo',
+              'yieldFrom',
+              'governor',
+            ]
+          : otoken instanceof OToken_2025_07_01
+            ? [
+                'totalSupply',
+                'allowances',
+                'vaultAddress',
+                'creditBalances',
+                'rebasingCredits',
+                'rebasingCreditsPerToken',
+                'nonRebasingSupply',
+                'alternativeCreditsPerToken',
+                'rebaseState',
+                'yieldTo',
+                'yieldFrom',
+                'governor',
+              ]
+            : undefined
 
   if (!keys) throw new Error('Keys not set up for saveOTokenRawData')
 

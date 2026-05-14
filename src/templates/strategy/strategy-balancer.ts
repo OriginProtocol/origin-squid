@@ -54,7 +54,7 @@ export const getStrategyETHBalance = async (ctx: Context, block: { height: numbe
     {
       address,
       asset: WETH_ADDRESS,
-      balance: await strategy['checkBalance()'](),
+      balance: await strategy.checkBalance_1(),
     },
   ]
 }
@@ -73,7 +73,7 @@ export const getBalancerStrategyHoldings = async (
   const balancerVault = new balancerVaultAbi.Contract(ctx, block, BALANCER_VAULT)
   const { tokens: poolAssets, balances } = await balancerVault.getPoolTokens(poolId)
 
-  const totalStrategyBalance = await strategy['checkBalance()']() // in WETH
+  const totalStrategyBalance = await strategy.checkBalance_1() // in WETH
   const eth1 = BigInt('1000000000000000000')
 
   let totalPoolValue = BigInt(0)

@@ -10,20 +10,25 @@
  * - `fetchVaultApyViem` — viem version, returns { apy, markets } or null
  */
 import { compact } from 'lodash'
-import type { PublicClient } from 'viem'
+import type { Abi, PublicClient } from 'viem'
 import { getAddress } from 'viem'
 
 import * as erc20 from '@abi/erc20'
-import { ABI_JSON as ERC20_ABI_JSON } from '@abi/erc20.abi'
 import * as irmAbi from '@abi/irm-adaptive-curve'
-import { ABI_JSON as IRM_ABI_JSON } from '@abi/irm-adaptive-curve.abi'
 import * as metaMorphoAbi from '@abi/meta-morpho'
-import { ABI_JSON as META_MORPHO_ABI_JSON } from '@abi/meta-morpho.abi'
 import * as morphoAbi from '@abi/morpho'
-import { ABI_JSON as MORPHO_ABI_JSON } from '@abi/morpho.abi'
 import { Block, Context, multicall, range } from '@originprotocol/squid-utils'
 import { ADDRESS_ZERO } from '@utils/addresses'
 
+import IRM_ABI_JSON_RAW from '../../abi-json/aave-lending-pool.json'
+import ERC20_ABI_JSON_RAW from '../../abi-json/erc20.json'
+import META_MORPHO_ABI_JSON_RAW from '../../abi-json/meta-morpho.json'
+import MORPHO_ABI_JSON_RAW from '../../abi-json/morpho.json'
+
+const IRM_ABI_JSON = IRM_ABI_JSON_RAW as Abi
+const ERC20_ABI_JSON = ERC20_ABI_JSON_RAW as Abi
+const META_MORPHO_ABI_JSON = META_MORPHO_ABI_JSON_RAW as Abi
+const MORPHO_ABI_JSON = MORPHO_ABI_JSON_RAW as Abi
 import type { MarketForApy } from './math'
 import { weightedVaultApy } from './math'
 
@@ -218,24 +223,49 @@ export async function fetchVaultMarketsViem(
   if (allIds.length === 0) return []
 
   // 4. Fetch market state, position, params, config (parallel multicalls)
-  const [marketStates, positions, marketParams, configs] = await Promise.all([
+  const [marketStates, positions, marketParams, configs] = (await Promise.all([
     client.multicall({
-      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'market' as const, args: [id] })),
+      contracts: allIds.map((id) => ({
+        address: morpho,
+        abi: MORPHO_ABI_JSON,
+        functionName: 'market' as const,
+        args: [id],
+      })),
       allowFailure: false,
     }),
     client.multicall({
-      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'position' as const, args: [id, vault] })),
+      contracts: allIds.map((id) => ({
+        address: morpho,
+        abi: MORPHO_ABI_JSON,
+        functionName: 'position' as const,
+        args: [id, vault],
+      })),
       allowFailure: false,
     }),
     client.multicall({
-      contracts: allIds.map((id) => ({ address: morpho, abi: MORPHO_ABI_JSON, functionName: 'idToMarketParams' as const, args: [id] })),
+      contracts: allIds.map((id) => ({
+        address: morpho,
+        abi: MORPHO_ABI_JSON,
+        functionName: 'idToMarketParams' as const,
+        args: [id],
+      })),
       allowFailure: false,
     }),
     client.multicall({
-      contracts: allIds.map((id) => ({ address: vault, abi: META_MORPHO_ABI_JSON, functionName: 'config' as const, args: [id] })),
+      contracts: allIds.map((id) => ({
+        address: vault,
+        abi: META_MORPHO_ABI_JSON,
+        functionName: 'config' as const,
+        args: [id],
+      })),
       allowFailure: false,
     }),
-  ])
+  ])) as unknown as [
+    [bigint, bigint, bigint, bigint, bigint, bigint][],
+    [bigint, bigint, bigint][],
+    [`0x${string}`, `0x${string}`, `0x${string}`, `0x${string}`, bigint][],
+    [bigint, boolean, bigint][],
+  ]
 
   // 5. Per-market IRM + decimals (single multicall batch)
   const irmAndDecimalCalls = marketParams.flatMap(([loanToken, , , irm], i) => {
@@ -248,7 +278,7 @@ export async function fetchVaultMarketsViem(
     ]
   })
   const irmAndDecimalResults = await client.multicall({
-    contracts: compact(irmAndDecimalCalls),
+    contracts: compact(irmAndDecimalCalls) as { address: `0x${string}`; abi: Abi; functionName: string; args?: readonly unknown[] }[],
     allowFailure: true,
   })
 
