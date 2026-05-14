@@ -306,7 +306,7 @@ export class DBDumpManager {
               // Keep the last line as partial if it doesn't end with a newline
               partial = chunkStr.endsWith('\n') ? null : lines.pop() || null
 
-              const tablesWithConflicts = ['exchange_rate', 'exchange_rate_daily']
+              const tablesWithConflicts = ['erc20', 'exchange_rate', 'exchange_rate_daily']
 
               let action = async () => {
                 for (const line of lines) {
