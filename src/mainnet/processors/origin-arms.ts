@@ -5,6 +5,7 @@ import { addresses } from '@utils/addresses'
 export const originArmProcessors = [
   // Lido ARM
   ...createOriginARMProcessors({
+    chainId: 1,
     name: 'ARM-WETH-stETH',
     from: 20987226,
     armAddress: addresses.arms['ARM-WETH-stETH'].address,
@@ -17,6 +18,7 @@ export const originArmProcessors = [
 
   // Ether.fi ARM
   ...createOriginARMProcessors({
+    chainId: 1,
     name: 'ARM-WETH-eETH',
     from: 23689028,
     armAddress: addresses.arms['ARM-WETH-eETH'].address,
@@ -29,6 +31,7 @@ export const originArmProcessors = [
 
   // Ethena ARM
   ...createOriginARMProcessors({
+    chainId: 1,
     name: 'ARM-USDe-sUSDe',
     from: 23924654,
     armAddress: addresses.arms['ARM-USDe-sUSDe'].address,
