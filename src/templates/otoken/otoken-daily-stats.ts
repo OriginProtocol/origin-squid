@@ -221,7 +221,7 @@ export const processOTokenDailyStats = async (
     // }
     entity.fees = rebases.reduce((sum, current) => sum + current.fee, 0n)
 
-    const lastDayString = dayjs(block.header.timestamp).subtract(1, 'day').toISOString().substring(0, 10)
+    const lastDayString = dayjs.utc(block.header.timestamp).subtract(1, 'day').format('YYYY-MM-DD')
     const lastId = `${ctx.chain.id}-${params.otokenAddress}-${lastDayString}`
     const last = params.dailyStats.get(lastId)?.entity ?? (await ctx.store.get(OTokenDailyStat, lastId))
     entity.cumulativeYield = (last?.cumulativeYield ?? 0n) + entity.yield

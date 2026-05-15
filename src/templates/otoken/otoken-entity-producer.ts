@@ -785,7 +785,7 @@ export class OTokenEntityProducer {
     // Trying not to have any async calls within this loop.
     for (const account of Object.keys(this.otoken.creditBalances)) {
       //Delete previous hour accrual
-      const previousDateHour = dayjs(this.otoken.block.header.timestamp).subtract(1, 'hour').toISOString().slice(0, 13)
+      const previousDateHour = dayjs.utc(this.otoken.block.header.timestamp).subtract(1, 'hour').format('YYYY-MM-DDTHH')
       this.accountEarningsByHour.delete(previousDateHour)
       if (this.otoken.balanceOf(account) > this.rebaseBalanceUpdateThreshold) {
         const dateHour = dayjs(this.otoken.block.header.timestamp).toISOString().slice(0, 13) // Date including hour

@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
 import { findLast } from 'lodash'
 import { IsNull, LessThan, LessThanOrEqual } from 'typeorm'
 import { formatEther, formatUnits } from 'viem'
@@ -27,6 +28,8 @@ import { ADDRESS_ZERO } from '@utils/addresses'
 import { traceFilter } from '@utils/traceFilter'
 
 import { calculateArmDailyApy } from './arm-apy'
+
+dayjs.extend(utc)
 
 export const createOriginARMProcessors = ({
   chainId = 1,
@@ -588,7 +591,7 @@ export const createOriginARMProcessors = ({
             // ArmDailyStat
             const date = new Date(block.header.timestamp)
             const dateStr = date.toISOString().slice(0, 10)
-            const previousDateStr = dayjs(date).subtract(1, 'day').toISOString().slice(0, 10)
+            const previousDateStr = dayjs.utc(date).subtract(1, 'day').format('YYYY-MM-DD')
             const currentDayId = `${ctx.chain.id}:${dateStr}:${armAddress}`
             const previousDayId = `${ctx.chain.id}:${previousDateStr}:${armAddress}`
             const previousDailyStat =
