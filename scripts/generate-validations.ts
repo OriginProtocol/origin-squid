@@ -998,7 +998,7 @@ const bridging = () => {
       bridgeTransferStates: bridgeTransferStates(
         limit: ${LIMIT},
       orderBy: [blockNumber_ASC, id_ASC],
-      ) {  
+      ) {
         blockNumber
         id
         state
@@ -1255,47 +1255,61 @@ const main = async () => {
 
   console.log('Total queries:', queries.length)
 
-  for (let i = 0; i < queries.length; i++) {
-    const query = queries[i]
-    console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
-    const result = await retry(() => executeQuery(query), 5)
-    if (!result.data) {
-      console.log(result)
-      throw new Error('Query failed')
-    }
-
-    const takeAll = ['ognDailyStats']
-    for (const key of Object.keys(result.data)) {
-      let validationData
-      const rawData = result.data[key]
-
-      // If there are fewer than 20 total entries, save them all
-      if (rawData.length < 20 || takeAll.includes(key)) {
-        validationData = rawData
-      } else if (key === 'exchangeRates' || key === 'exchangeRateDailies') {
-        // Special handling for exchange rates: ensure at least one of every pair
-        validationData = takeExchangeRateValidationEntries(rawData)
-      } else {
-        // Otherwise, filter to validation entries
-        validationData = takeValidationEntries(rawData)
-        if (validationData.length < 5) {
-          validationData = takeEvery(rawData, 50)
-        }
-      }
-
-      const filePath = getFilePathForEntity(key)
-      const dir = path.dirname(filePath)
-
-      // Ensure directory exists
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true })
-      }
-
-      // Write the file
-      fs.writeFileSync(filePath, JSON.stringify(validationData, null, 2))
-      console.log(`  ✓ Wrote ${validationData.length} entries to ${path.relative(__dirname + '/..', filePath)}`)
+  const runConcurrently = async (fns: (() => Promise<void>)[], concurrency: number) => {
+    const queue = [...fns]
+    while (queue.length > 0) {
+      const batch = queue.splice(0, concurrency)
+      await Promise.all(batch.map((fn) => fn()))
     }
   }
+
+  const fns: (() => Promise<void>)[] = []
+  for (let i = 0; i < queries.length; i++) {
+    const fn = async () => {
+      const query = queries[i]
+      console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
+      const result = await retry(() => executeQuery(query), 5)
+      if (!result.data) {
+        console.log(result)
+        throw new Error('Query failed')
+      }
+
+      const takeAll = ['ognDailyStats']
+      for (const key of Object.keys(result.data)) {
+        let validationData
+        const rawData = result.data[key]
+
+        // If there are fewer than 20 total entries, save them all
+        if (rawData.length < 20 || takeAll.includes(key)) {
+          validationData = rawData
+        } else if (key === 'exchangeRates' || key === 'exchangeRateDailies') {
+          // Special handling for exchange rates: ensure at least one of every pair
+          validationData = takeExchangeRateValidationEntries(rawData)
+        } else {
+          // Otherwise, filter to validation entries
+          validationData = takeValidationEntries(rawData)
+          if (validationData.length < 5) {
+            validationData = takeEvery(rawData, 50)
+          }
+        }
+
+        const filePath = getFilePathForEntity(key)
+        const dir = path.dirname(filePath)
+
+        // Ensure directory exists
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true })
+        }
+
+        // Write the file
+        fs.writeFileSync(filePath, JSON.stringify(validationData, null, 2))
+        console.log(`  ✓ Wrote ${validationData.length} entries to ${path.relative(__dirname + '/..', filePath)}`)
+      }
+    }
+    fns.push(fn)
+  }
+
+  await runConcurrently(fns, 10)
 
   console.log('\n✓ All validation files generated successfully')
 }
