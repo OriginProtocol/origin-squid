@@ -220,7 +220,7 @@ export const createOriginARMProcessors = ({
           )
         }
         const getYesterdayState = async (block: Block) => {
-          const startOfToday = dayjs(block.header.timestamp).startOf('day').toDate()
+          const startOfToday = dayjs.utc(block.header.timestamp).startOf('day').toDate()
           return (
             findLast(states, (state) => state.timestamp < startOfToday) ??
             (await ctx.store.findOne(ArmState, {
