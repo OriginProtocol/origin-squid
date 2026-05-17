@@ -48,6 +48,10 @@ export const processOTokenDailyStats = async (
 ) => {
   // Daily Stats
   // Whatever days we've just crossed over, let's update their respective daily stat entry using the last block seen at that time.
+  // params.balances reflects addressMap state at end-of-batch — only meaningful for the day matching the batch's last block.
+  // For older days in this batch (batch spanning a UTC boundary), skip accountsOverThreshold so the prior batch's
+  // near-EOD value isn't overwritten with a snapshot from the next day.
+  const lastBatchDate = new Date(ctx.blocks[ctx.blocks.length - 1].header.timestamp).toISOString().substring(0, 10)
   for (const { block, entity } of params.dailyStats.values()) {
     if (block.header.height < params.from) continue
     const blockDate = new Date(block.header.timestamp)
@@ -237,9 +241,15 @@ export const processOTokenDailyStats = async (
     entity.marketCapUSD = +formatUnits(entity.totalSupply * entity.rateUSD, 18)
     entity.wrappedSupply = wrappedSupply
     entity.rateWrapped = wrappedRate
-    entity.accountsOverThreshold = Array.from(params.balances.values()).filter(
-      (balance) => balance >= params.accountsOverThresholdMinimum,
-    ).length
+    // Only refresh accountsOverThreshold when the entity's day matches the batch's
+    // last block — otherwise params.balances reflects a snapshot from a later day.
+    // Exception: if the entity is uninitialized (e.g., created earlier in this same
+    // multi-day batch), set an initial value rather than leaving it at 0.
+    if (entity.date === lastBatchDate || needsInit) {
+      entity.accountsOverThreshold = Array.from(params.balances.values()).filter(
+        (balance) => balance >= params.accountsOverThresholdMinimum,
+      ).length
+    }
     ctx.log.info(`Updated OTokenDailyStat: ${entity.id}`)
   }
 }
