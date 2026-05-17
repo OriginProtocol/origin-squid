@@ -214,7 +214,12 @@ export const processStrategyEarnings = async (
         })
     }
     const balanceTrackingUpdate = async () => {
-      // ctx.log.info(`balanceTrackingUpdate`)
+      // Skip if we've already updated balances for this block. Multiple matching
+      // logs/traces in the same block would otherwise call processDepositWithdrawal
+      // multiple times, and the `current.earningsChange += earningsChange` accumulator
+      // in that function would double-count. The eth_call at this block returns the
+      // same value regardless of how many events fired, so one pass per block is correct.
+      if (didUpdate) return
       didUpdate = true
       const balances = await getBalances()
       await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances)
