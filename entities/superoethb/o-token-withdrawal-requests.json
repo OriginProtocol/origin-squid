@@ -189,8 +189,8 @@
     "withdrawer": "0x9e4fd83c166ca6d65821878f97719195fb432e5d",
     "amount": "1645255067451855246",
     "queued": "36979616036689341619527",
-    "claimed": false,
-    "claimedAt": null,
+    "claimed": true,
+    "claimedAt": "2026-05-13T12:09:39.000000Z",
     "queueWait": null,
     "txHash": "0x46df79d5fe16b0b9bc36ef1a9a7cd2776ec62a2ff18c8572a96efdca51b5d823"
   }

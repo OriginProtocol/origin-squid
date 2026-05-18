@@ -193,5 +193,20 @@
     "date": "2026-03-23",
     "rebasingCreditsPerToken": "914163760334085227197436748",
     "txHash": "0xe83b6f9b14a2c1e402335bc992a61f5b6b016e74b4fc9fce54be408ce1a0960d"
+  },
+  {
+    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:2026-05-12",
+    "timestamp": "2026-05-12T23:50:15.000000Z",
+    "blockNumber": 45920234,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "apr": 0.024045095733836175,
+    "apy": 0.024335699363080554,
+    "apy14DayAvg": 0.024624362047623367,
+    "apy30DayAvg": 0.025447299652479594,
+    "apy7DayAvg": 0.023455592485843373,
+    "date": "2026-05-12",
+    "rebasingCreditsPerToken": "910902039626155610186064835",
+    "txHash": "0x2c24cabdc7c33eda20c489a30dc23921ffd3ad702917372f634f81b9bc0a8dbf"
   }
 ]

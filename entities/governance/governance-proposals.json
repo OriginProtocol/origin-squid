@@ -97,5 +97,50 @@
     "scores": [
       "336139438934931391646879979"
     ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:9948092462276445509780797495205471799644905864792185620552351889756709358003",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "9948092462276445509780797495205471799644905864792185620552351889756709358003",
+    "description": "Upgrade OUSD and OETH vaults: permissioned rebase, drop auto-rebase triggers",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-05-10T09:58:11.000000Z",
+    "txHash": "0xb641456a1960e93704f856ed6897c63606734fbe424ff38440c0fa9bacb06441",
+    "startBlock": "25071148",
+    "endBlock": "25085564",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe600000000000000000000000082948060c4b72684bededec342350ab344975145",
+      "0x9e4285520000000000000000000000000abcda6fa7d500cf69b0ea5de9a607cd9941221c",
+      "0x3659cfe60000000000000000000000000e979edf516f88119fa2843fa3f08a9643f8e575",
+      "0x9e4285520000000000000000000000000abcda6fa7d500cf69b0ea5de9a607cd9941221c"
+    ],
+    "lastUpdated": "2026-05-16T09:44:11.000000Z",
+    "status": "Executed",
+    "quorum": "280571142902164168144683250",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "661653822175422849262388562"
+    ]
   }
 ]

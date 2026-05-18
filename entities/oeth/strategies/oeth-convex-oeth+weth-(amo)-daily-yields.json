@@ -24,7 +24,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "0",
     "balanceWeight": 1,
-    "earnings": "364254025702580325",
+    "earnings": "364207751134045022",
     "earningsChange": "0"
   },
   {
@@ -38,7 +38,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24754159923058131796088",
     "balanceWeight": 1,
-    "earnings": "91713787182499733175",
+    "earnings": "91709083901244683781",
     "earningsChange": "2309106699646487213"
   },
   {
@@ -52,7 +52,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24772085475475424008904",
     "balanceWeight": 1,
-    "earnings": "190610519240872169568",
+    "earnings": "190605507198053825663",
     "earningsChange": "2003291546604543346"
   },
   {
@@ -66,7 +66,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24772747867513043398905",
     "balanceWeight": 1,
-    "earnings": "257761839214666295012",
+    "earnings": "257756827171847951107",
     "earningsChange": "966588072023160736"
   },
   {
@@ -80,7 +80,7 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24773227349226772107104",
     "balanceWeight": 1,
-    "earnings": "306403821889532524005",
+    "earnings": "306398809846714180100",
     "earningsChange": "1007140809428236172"
   },
   {
@@ -89,13 +89,13 @@
     "blockNumber": 24573203,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6",
-    "apr": 0.012936706600401138,
-    "apy": 0.013020515724970982,
+    "apr": 0.012936699188346168,
+    "apy": 0.013020508216673221,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "24773948897230139434051",
     "balanceWeight": 1,
-    "earnings": "362805005520681150639",
-    "earningsChange": "877462856169278495"
+    "earnings": "362799992975127877423",
+    "earningsChange": "877462353434349184"
   },
   {
     "id": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-04-21",
@@ -103,12 +103,12 @@
     "blockNumber": 24931742,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6",
-    "apr": 0.010620783885658014,
-    "apy": 0.010677228552778972,
+    "apr": 0.010616178156092948,
+    "apy": 0.010672573792828377,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "balance": "27447905071416605238689",
+    "balance": "27447905417519147737076",
     "balanceWeight": 1,
-    "earnings": "402822019490347764922",
-    "earningsChange": "798133519172410433"
+    "earnings": "402537900235156068292",
+    "earningsChange": "797787416629912046"
   }
 ]
