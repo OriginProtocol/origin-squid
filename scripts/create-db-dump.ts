@@ -5,6 +5,7 @@ import * as fs from 'fs'
 import { createServer } from 'net'
 import * as path from 'path'
 import { Pool } from 'pg'
+import { createInterface } from 'readline'
 import { setTimeout as delay } from 'timers/promises'
 import { createPublicClient, http } from 'viem'
 
@@ -22,13 +23,14 @@ type ProcessorName =
 function parseArgs() {
   const args = process.argv.slice(2)
   if (args.length === 0) {
-    console.error('Usage: tsx create-db-dump.ts <processor-name> [--profile <aws-profile>] [--continue]')
+    console.error('Usage: tsx create-db-dump.ts <processor-name> [--profile <aws-profile>] [--continue] [-y|--yes]')
     process.exit(1)
   }
 
   const processorName = args[0] as ProcessorName
   let awsProfile: string | undefined
   let continueRun = false
+  let assumeYes = false
 
   for (let i = 1; i < args.length; i++) {
     const arg = args[i]
@@ -40,9 +42,12 @@ function parseArgs() {
     if (arg === '--continue') {
       continueRun = true
     }
+    if (arg === '-y' || arg === '--yes') {
+      assumeYes = true
+    }
   }
 
-  return { processorName, awsProfile, continueRun }
+  return { processorName, awsProfile, continueRun, assumeYes }
 }
 
 function getProcessorAlias(processorName: ProcessorName): string {
@@ -129,6 +134,23 @@ async function findFreePort(preferredStart = 24000, preferredEnd = 65000): Promi
     if (ok) return port
   }
   throw new Error('No free port found')
+}
+
+async function promptYNC(message: string): Promise<'y' | 'n' | 'c'> {
+  if (!process.stdin.isTTY) {
+    console.error('Non-interactive shell: refusing to wipe existing data. Re-run with --continue or use -y.')
+    process.exit(1)
+  }
+  const rl = createInterface({ input: process.stdin, output: process.stdout })
+  try {
+    const answer: string = await new Promise((resolve) => rl.question(message, resolve))
+    const a = answer.trim().toLowerCase()
+    if (a === 'y' || a === 'yes') return 'y'
+    if (a === 'c' || a === 'continue') return 'c'
+    return 'n'
+  } finally {
+    rl.close()
+  }
 }
 
 async function getExistingDbPort(composeProject: string): Promise<number | null> {
@@ -227,7 +249,9 @@ async function main() {
     dotenv.config({ path: devEnvPath, override: false })
   }
 
-  const { processorName, awsProfile, continueRun } = parseArgs()
+  const parsed = parseArgs()
+  const { processorName, awsProfile, assumeYes } = parsed
+  let continueRun = parsed.continueRun
   const alias = getProcessorAlias(processorName)
 
   // Determine RPC URL for the chain
@@ -255,13 +279,41 @@ async function main() {
   const composeProject = `squid_${alias}`
   let DB_PORT = 0
   let startedCompose = false
+  const existingPort = await getExistingDbPort(composeProject)
+
+  // Guard against the common mistake: forgetting --continue, which would wipe the in-progress dump.
+  if (existingPort && !continueRun && !assumeYes) {
+    console.warn(``)
+    console.warn(`Existing dockerized Postgres found for '${processorName}'`)
+    console.warn(`  compose project: ${composeProject}`)
+    console.warn(`  port:            ${existingPort}`)
+    console.warn(``)
+    console.warn(`Running without --continue would WIPE this data (--volumes) and restart from scratch.`)
+    console.warn(`Each full reprocess takes hours — this is almost certainly NOT what you want.`)
+    console.warn(``)
+    console.warn(`  [y] yes, wipe and start over from scratch`)
+    console.warn(`  [c] continue from existing data (acts as if --continue was passed)`)
+    console.warn(`  [n] no, abort (default)`)
+    console.warn(``)
+    const choice = await promptYNC(`choice [y/c/N]: `)
+    if (choice === 'n') {
+      console.log('Aborted.')
+      process.exit(0)
+    }
+    if (choice === 'c') {
+      console.log(`→ continuing from existing data`)
+      continueRun = true
+    } else {
+      console.log(`→ wiping existing data and starting over`)
+    }
+  }
+
   if (continueRun) {
-    const existingPort = await getExistingDbPort(composeProject)
     if (existingPort) {
       DB_PORT = existingPort
       console.log(`Reusing existing dockerized Postgres at port ${DB_PORT} (project ${composeProject})...`)
     } else {
-      console.log(`No existing Postgres found.`)
+      console.log(`No existing Postgres found; --continue requires existing data. Aborting.`)
       process.exit(1)
     }
   } else {
