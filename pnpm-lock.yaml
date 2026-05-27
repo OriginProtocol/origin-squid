@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@subsquid/portal-client@0.3.2':
+    hash: 3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f
+    path: patches/@subsquid__portal-client@0.3.2.patch
+
 importers:
 
   .:
@@ -5066,7 +5071,7 @@ snapshots:
     dependencies:
       '@subsquid/http-client': 1.8.1
       '@subsquid/logger': 1.6.0
-      '@subsquid/portal-client': 0.3.2(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)
+      '@subsquid/portal-client': 0.3.2(patch_hash=3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f)(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)
       '@subsquid/rpc-client': 4.15.0
       '@subsquid/util-internal': 3.3.0
       '@subsquid/util-internal-archive-client': 0.1.2(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)
@@ -5195,7 +5200,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@subsquid/portal-client@0.3.2(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)':
+  '@subsquid/portal-client@0.3.2(patch_hash=3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f)(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)':
     dependencies:
       '@subsquid/http-client': 1.8.1
       '@subsquid/util-internal': 3.3.0
