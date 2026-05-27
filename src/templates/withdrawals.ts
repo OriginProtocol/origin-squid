@@ -59,17 +59,20 @@ export const createOTokenWithdrawalsProcessor = ({
   const resolvePending = async (ctx: Context, result: ProcessResult, block: Block, claimable: bigint) => {
     // In-batch entries first; they take precedence over any DB row with the same id.
     for (const req of result.withdrawalRequests.values()) {
-      if (req.claimableAt == null && req.queued <= claimable) {
+      if (req.claimableAt == null && !req.claimed && req.queued <= claimable) {
         req.claimableAt = computeClaimableAt(req.timestamp.getTime(), block.header.timestamp)
       }
     }
-    // Update any records we don't have in memory.
+    // Update any records we don't have in memory. Exclude already-claimed rows:
+    // their claimableAt must be set at claim time, not stamped here much later
+    // when an unrelated WithdrawalClaimable advances the pointer.
     const inBatchIds = [...result.withdrawalRequests.keys()]
     const rows = await ctx.store.find(OTokenWithdrawalRequest, {
       where: {
         chainId: ctx.chain.id,
         otoken: oTokenAddress,
         claimableAt: IsNull(),
+        claimed: false,
         queued: LessThanOrEqual(claimable),
         ...(inBatchIds.length > 0 ? { id: Not(In(inBatchIds)) } : {}),
       },
@@ -93,8 +96,11 @@ export const createOTokenWithdrawalsProcessor = ({
           await processWithdrawalClaimed(ctx, result, block, log)
         } else if (withdrawalClaimableFilter.matches(log)) {
           const data = oethVault.events.WithdrawalClaimable.decode(log)
-          currentClaimable = data._newClaimable
-          await resolvePending(ctx, result, block, data._newClaimable)
+          // The event params are misleadingly named: `_claimable` is the new
+          // cumulative claimable pointer, `_newClaimable` is the delta added by
+          // this event. We need the cumulative to compare against `queued`.
+          currentClaimable = data._claimable
+          await resolvePending(ctx, result, block, data._claimable)
         }
       }
     }
@@ -161,6 +167,13 @@ export const createOTokenWithdrawalsProcessor = ({
     if (updated) {
       updated.claimed = true
       updated.claimedAt = new Date(block.header.timestamp)
+      // Safety net: if some edge case left claimableAt null, anchor it at
+      // claim time. A claim proves the row was claimable by then. With the
+      // event-cumulative fix above this should rarely fire, but it prevents
+      // a future unrelated WithdrawalClaimable from stamping a wrong date.
+      if (updated.claimableAt == null) {
+        updated.claimableAt = computeClaimableAt(updated.timestamp.getTime(), block.header.timestamp)
+      }
       result.withdrawalRequests.set(id, updated)
     }
   }
