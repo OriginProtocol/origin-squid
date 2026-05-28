@@ -8,5 +8,26 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "${DB_PORT}:5432"
-      # command: ["postgres", "-c", "log_statement=all"]
-    shm_size: 1gb
+    # DEV-ONLY tuning — fsync=off + full_page_writes=off mean a crash
+    # corrupts the DB. Fine for `pnpm run setup` workflow; never for prod.
+    command:
+      - postgres
+      - -c
+      - synchronous_commit=off
+      - -c
+      - fsync=off
+      - -c
+      - full_page_writes=off
+      - -c
+      - shared_buffers=2GB
+      - -c
+      - work_mem=64MB
+      - -c
+      - maintenance_work_mem=512MB
+      - -c
+      - wal_buffers=64MB
+      - -c
+      - checkpoint_timeout=30min
+      - -c
+      - max_wal_size=8GB
+    shm_size: 2gb
