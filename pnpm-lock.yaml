@@ -31,6 +31,9 @@ importers:
       '@subsquid/graphql-server':
         specifier: ^4.12.0
         version: 4.12.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(class-validator@0.14.2)(encoding@0.1.13)(type-graphql@1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1))(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(utf-8-validate@5.0.10)
+      '@subsquid/portal-client':
+        specifier: 0.3.2
+        version: 0.3.2(patch_hash=3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f)(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)
       '@subsquid/rpc-client':
         specifier: 4.15.0
         version: 4.15.0
