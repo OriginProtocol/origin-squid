@@ -8,6 +8,8 @@
     "amount": "1000000001059190",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2026-02-10T21:11:35.000000Z",
+    "claimedAt": "2026-02-10T21:11:35.000000Z",
     "queued": "1000000001059190",
     "requestId": "0",
     "txHash": "0xfa13ebaa07b03b7eab4c83701266d2b8fb23276e787a5771f5f3dae589cf4541"

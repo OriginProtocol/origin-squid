@@ -11,6 +11,7 @@
     "queued": "100000000000000000",
     "claimed": true,
     "claimedAt": "2024-08-12T00:54:23.000000Z",
+    "claimableAt": "2024-08-12T00:54:23.000000Z",
     "queueWait": null,
     "txHash": "0x95712c4abe5810e7bfbfecda898e122befda4f20759a5b0bd8b44be3d73f465a"
   },
@@ -26,6 +27,7 @@
     "queued": "3644150519246121619979",
     "claimed": true,
     "claimedAt": "2024-09-17T20:50:35.000000Z",
+    "claimableAt": "2024-09-17T09:07:59.000000Z",
     "queueWait": null,
     "txHash": "0x64d70f140edf0658e6361b0d009fcff15cf13b4f2dd4ec5b2e3cb8d7c8e0c5a3"
   },
@@ -41,6 +43,7 @@
     "queued": "8417882148415035907154",
     "claimed": true,
     "claimedAt": "2024-11-08T03:12:59.000000Z",
+    "claimableAt": "2024-11-08T03:09:59.000000Z",
     "queueWait": null,
     "txHash": "0xb6b40e054379a1d77500c2e479a8b855894b49a39c2c8d43cad7d8e9d95c74bc"
   },
@@ -56,6 +59,7 @@
     "queued": "12084999370054879278969",
     "claimed": true,
     "claimedAt": "2024-12-25T03:20:35.000000Z",
+    "claimableAt": "2024-12-25T03:20:35.000000Z",
     "queueWait": null,
     "txHash": "0x93fc188705032a9a7b8e418da19642b9475314271eb151b63399097a9737c1b1"
   },
@@ -71,6 +75,7 @@
     "queued": "21961950043626210882454",
     "claimed": true,
     "claimedAt": "2025-02-06T00:51:11.000000Z",
+    "claimableAt": "2025-02-06T00:51:11.000000Z",
     "queueWait": null,
     "txHash": "0x55dcf6af92050e01752a631636ea6c731b6d9013182dd36924135e2134728d13"
   },
@@ -86,6 +91,7 @@
     "queued": "23960769703319369272956",
     "claimed": true,
     "claimedAt": "2025-03-14T18:20:35.000000Z",
+    "claimableAt": "2025-03-14T18:20:35.000000Z",
     "queueWait": null,
     "txHash": "0xdef8aa516f1e23cdf26584cc48a1b9c548a161ea7d22de397cddc080038114be"
   },
@@ -101,6 +107,7 @@
     "queued": "24680620873702917234119",
     "claimed": true,
     "claimedAt": "2025-04-02T09:20:35.000000Z",
+    "claimableAt": "2025-04-02T07:51:23.000000Z",
     "queueWait": null,
     "txHash": "0xc0352b6e9c2484c3994ee2a45cf6546debf5f60acdc5aa4adb427e1e151a51b9"
   },
@@ -116,6 +123,7 @@
     "queued": "25736209578491583180312",
     "claimed": true,
     "claimedAt": "2025-04-18T00:20:35.000000Z",
+    "claimableAt": "2025-04-18T00:20:35.000000Z",
     "queueWait": null,
     "txHash": "0xf953cce5ef0cc5869d3f488f061d827fd3e15b3b4c5b9d19274a2d0f5a016e55"
   },
@@ -131,6 +139,7 @@
     "queued": "26435167522542797964564",
     "claimed": true,
     "claimedAt": "2025-04-27T15:20:35.000000Z",
+    "claimableAt": "2025-04-27T15:20:35.000000Z",
     "queueWait": null,
     "txHash": "0xa69b714a92ad38d93a42dc0845471c3758ce3882d62aa72b890d5c0a02b80bc7"
   },
@@ -146,6 +155,7 @@
     "queued": "26675282672077785160213",
     "claimed": true,
     "claimedAt": "2025-05-13T21:20:35.000000Z",
+    "claimableAt": "2025-05-13T21:20:35.000000Z",
     "queueWait": null,
     "txHash": "0x7a02cd587a6e778dacddb4ff12243c175311087ea07412b264f7c40e461c9a6b"
   },
@@ -161,6 +171,7 @@
     "queued": "29118428051845946488434",
     "claimed": true,
     "claimedAt": "2025-05-30T21:20:35.000000Z",
+    "claimableAt": "2025-05-30T19:59:35.000000Z",
     "queueWait": null,
     "txHash": "0xee44d33d0b5c6f1d1c7f0d232c96d13dffcc738e57ecf945a1961acc53e9a731"
   },
@@ -176,6 +187,7 @@
     "queued": "34913990058145213532108",
     "claimed": true,
     "claimedAt": "2025-06-13T18:20:35.000000Z",
+    "claimableAt": "2025-06-13T18:20:35.000000Z",
     "queueWait": null,
     "txHash": "0x158a6fe1f5574e5de5d558eb20392e60947dd6a7aff9a46542eb20f4be340a6f"
   },
@@ -191,6 +203,7 @@
     "queued": "50143729621583134270757",
     "claimed": true,
     "claimedAt": "2025-12-11T10:55:35.000000Z",
+    "claimableAt": "2025-11-10T18:22:23.000000Z",
     "queueWait": null,
     "txHash": "0x6fb209416c1b90f9ed4cd4366d9730958c96aedda3a468430cc641b4ba40edbb"
   },
@@ -206,6 +219,7 @@
     "queued": "58107211490798203056432",
     "claimed": true,
     "claimedAt": "2026-01-30T05:15:47.000000Z",
+    "claimableAt": "2026-01-30T05:15:47.000000Z",
     "queueWait": "777600",
     "txHash": "0xcd4b3c01121a5963e858975a083c096055f942bf209e7dbfe08c7e1df8b2ecfe"
   },
@@ -221,6 +235,7 @@
     "queued": "60414068356453202382193",
     "claimed": true,
     "claimedAt": "2026-04-10T13:37:47.000000Z",
+    "claimableAt": "2026-04-10T13:37:47.000000Z",
     "queueWait": null,
     "txHash": "0x97c71f550864d64710c895b60efafc1fa440bbc0ee88819aebe0276b2468f346"
   }

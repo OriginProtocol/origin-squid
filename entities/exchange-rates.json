@@ -253,14 +253,14 @@
     "decimals": 18
   },
   {
-    "id": "146:5934423:OS_USD",
+    "id": "146:5916981:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-01-30T20:00:03.000000Z",
-    "blockNumber": 5934423,
+    "timestamp": "2025-01-30T16:33:39.000000Z",
+    "blockNumber": 5916981,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "532867870000000000",
+    "rate": "527812790000000000",
     "decimals": 18
   },
   {
@@ -396,14 +396,14 @@
     "decimals": 18
   },
   {
-    "id": "146:6563399:OS_USD",
+    "id": "146:6524318:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-02-04T18:20:14.000000Z",
-    "blockNumber": 6563399,
+    "timestamp": "2025-02-04T11:02:28.000000Z",
+    "blockNumber": 6524318,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "441628750000000000",
+    "rate": "424400000000000000",
     "decimals": 18
   },
   {
@@ -517,14 +517,14 @@
     "decimals": 18
   },
   {
-    "id": "146:7079918:OS_USD",
+    "id": "146:7035641:OS_USD",
     "chainId": 146,
-    "timestamp": "2025-02-08T23:50:29.000000Z",
-    "blockNumber": 7079918,
+    "timestamp": "2025-02-08T16:01:26.000000Z",
+    "blockNumber": 7035641,
     "pair": "OS_USD",
     "base": "OS",
     "quote": "USD",
-    "rate": "415500000000000000",
+    "rate": "389492370000000000",
     "decimals": 18
   }
 ]

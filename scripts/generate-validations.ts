@@ -377,6 +377,7 @@ const oTokenWithdrawalRequests = (prefix: string, address: string) => {
       queued
       claimed
       claimedAt
+      claimableAt
       queueWait
       txHash
     }
@@ -481,6 +482,8 @@ const arm = (prefix: string, armAddress: string) => {
         amount
         chainId
         claimed
+        claimableAt
+        claimedAt
         queued
         requestId
         txHash

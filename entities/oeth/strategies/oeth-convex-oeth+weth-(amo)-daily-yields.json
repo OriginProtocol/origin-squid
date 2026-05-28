@@ -103,10 +103,10 @@
     "blockNumber": 24931742,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6",
-    "apr": 0.010616178156092948,
-    "apy": 0.010672573792828377,
+    "apr": 0.01061617829153294,
+    "apy": 0.010672573929709772,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "balance": "27447905417519147737076",
+    "balance": "27447905067308571793923",
     "balanceWeight": 1,
     "earnings": "402537900235156068292",
     "earningsChange": "797787416629912046"

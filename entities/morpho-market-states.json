@@ -1454,5 +1454,57 @@
     "totalBorrowShares": "53112592520409066487",
     "lastUpdate": "1763150087",
     "fee": "0"
+  },
+  {
+    "id": "1-23900000-0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
+    "chainId": 1,
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
+    "totalSupplyAssets": "158276240767460",
+    "totalSupplyShares": "142441180583783707242",
+    "totalBorrowAssets": "137167476002825",
+    "totalBorrowShares": "121578329177437084765",
+    "lastUpdate": "1764360155",
+    "fee": "0"
+  },
+  {
+    "id": "1-23900000-0x54efdee08e272e929034a8f26f7ca34b1ebe364b275391169b28c6d7db24dbc8",
+    "chainId": 1,
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "marketId": "0x54efdee08e272e929034a8f26f7ca34b1ebe364b275391169b28c6d7db24dbc8",
+    "totalSupplyAssets": "897671906017",
+    "totalSupplyShares": "897671906017000000",
+    "totalBorrowAssets": "0",
+    "totalBorrowShares": "0",
+    "lastUpdate": "1764367019",
+    "fee": "0"
+  },
+  {
+    "id": "1-23900000-0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+    "chainId": 1,
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+    "totalSupplyAssets": "489712914685424",
+    "totalSupplyShares": "461130684315381887919",
+    "totalBorrowAssets": "422108769959151",
+    "totalBorrowShares": "394136654065001616684",
+    "lastUpdate": "1764367019",
+    "fee": "0"
+  },
+  {
+    "id": "1-23900000-0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+    "chainId": 1,
+    "timestamp": "2025-11-28T21:58:11.000000Z",
+    "blockNumber": 23900000,
+    "marketId": "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+    "totalSupplyAssets": "78498702278063",
+    "totalSupplyShares": "70604362698360769695",
+    "totalBorrowAssets": "68993041166701",
+    "totalBorrowShares": "61100425645578186521",
+    "lastUpdate": "1764360155",
+    "fee": "0"
   }
 ]

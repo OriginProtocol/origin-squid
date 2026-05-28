@@ -3834,5 +3834,61 @@
     "perSecondTarget": "12649283243309",
     "perSecondMax": "1113906008",
     "dripDuration": "604800"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-45700000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+    "timestamp": "2026-05-07T21:29:07.000000Z",
+    "blockNumber": 45700000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "wethBalance": "79898789551743475463",
+    "availableFunds": "9702246023465003263",
+    "lastCollect": "1778176187",
+    "perSecond": "11263391218861",
+    "perSecondTarget": "11263391218861",
+    "perSecondMax": "1113906008",
+    "dripDuration": "604800"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-45800000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+    "timestamp": "2026-05-10T05:02:27.000000Z",
+    "blockNumber": 45800000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "wethBalance": "79898789551743475463",
+    "availableFunds": "8897426251912871111",
+    "lastCollect": "1778364907",
+    "perSecond": "11263391218861",
+    "perSecondTarget": "11263391218861",
+    "perSecondMax": "1113906008",
+    "dripDuration": "604800"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-45900000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+    "timestamp": "2026-05-12T12:35:47.000000Z",
+    "blockNumber": 45900000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "wethBalance": "32590817493396297525",
+    "availableFunds": "7792725171502817599",
+    "lastCollect": "1778580909",
+    "perSecond": "11263391218861",
+    "perSecondTarget": "11263391218861",
+    "perSecondMax": "1113906008",
+    "dripDuration": "604800"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-46000000-0x98a0cbef61bd2d21435f433be4cd42b56b38cc93",
+    "timestamp": "2026-05-14T20:09:07.000000Z",
+    "blockNumber": 46000000,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "wethBalance": "59989818702204881685",
+    "availableFunds": "6976643972885441799",
+    "lastCollect": "1778770641",
+    "perSecond": "11263391218861",
+    "perSecondTarget": "11263391218861",
+    "perSecondMax": "1113906008",
+    "dripDuration": "604800"
   }
 ]

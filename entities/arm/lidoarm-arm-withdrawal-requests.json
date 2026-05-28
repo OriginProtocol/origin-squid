@@ -8,6 +8,8 @@
     "amount": "10001997476374422",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2024-10-18T08:36:47.000000Z",
+    "claimedAt": "2024-10-18T08:36:47.000000Z",
     "queued": "10001997476374422",
     "requestId": "0",
     "txHash": "0x39dcc7b2521377e7c4ef13923e052c40ffec06440acd1d474356808feb253526"
@@ -21,6 +23,8 @@
     "amount": "9999999999999999997",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2025-02-25T12:30:35.000000Z",
+    "claimedAt": "2025-02-25T15:01:35.000000Z",
     "queued": "3697716359474187901198",
     "requestId": "50",
     "txHash": "0x99fddb3815bde366529be38ce02c153af24f8967964ee0f2dbc8e4181c991d2e"
@@ -34,6 +38,8 @@
     "amount": "590987165016640022723",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2025-06-10T16:56:59.000000Z",
+    "claimedAt": "2025-06-10T16:56:59.000000Z",
     "queued": "10895540525436387204382",
     "requestId": "100",
     "txHash": "0xe9a7c4635cb96cbf8e0f880030b5d167de5456752501b6ce5beec92b85dab4cf"
@@ -47,6 +53,8 @@
     "amount": "8938706595578595945",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2025-10-13T21:53:59.000000Z",
+    "claimedAt": "2025-10-13T21:53:59.000000Z",
     "queued": "13794222638253401208294",
     "requestId": "150",
     "txHash": "0x3f5c00dafd3617b27e64b0353e99759b6d25bc53092f8fbd42d35f3bf8ed294f"
@@ -60,6 +68,8 @@
     "amount": "6212769208329184972",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2025-12-04T07:42:59.000000Z",
+    "claimedAt": "2025-12-04T07:42:59.000000Z",
     "queued": "17104657694477252675643",
     "requestId": "200",
     "txHash": "0x9767cdca6799051bb95ba9f22e0d29bd908c108738ebe95a2e9762e481be67e0"
@@ -73,6 +83,8 @@
     "amount": "18681000168222645739",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2026-01-13T08:42:35.000000Z",
+    "claimedAt": "2026-01-13T12:04:47.000000Z",
     "queued": "21253172366107929783451",
     "requestId": "250",
     "txHash": "0xdbbbff77114a006689db0d05bcfb6ecb7a7b13353952a68074a2eb75516b7c64"
@@ -86,6 +98,8 @@
     "amount": "1000065715525744",
     "chainId": 1,
     "claimed": false,
+    "claimableAt": "2026-03-22T11:36:11.000000Z",
+    "claimedAt": null,
     "queued": "22641229280649550053017",
     "requestId": "300",
     "txHash": "0xded6676d250800d919098fae34c03cef6064b3519b690f75363f451b2baf157a"
@@ -99,6 +113,8 @@
     "amount": "4593246204966660090",
     "chainId": 1,
     "claimed": true,
+    "claimableAt": "2026-05-07T04:35:59.000000Z",
+    "claimedAt": "2026-05-07T04:35:59.000000Z",
     "queued": "27948002687462685094472",
     "requestId": "350",
     "txHash": "0x2be440a499f8b26289c0684e8710036c77b9d51598c1e3f0ddf1f4bfcd8948c7"

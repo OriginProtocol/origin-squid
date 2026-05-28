@@ -11,6 +11,7 @@
     "queued": "42237467272",
     "claimed": true,
     "claimedAt": "2026-02-19T05:53:23.000000Z",
+    "claimableAt": "2026-02-19T05:48:47.000000Z",
     "queueWait": "735795",
     "txHash": "0xd9a523a9f73c6759b20948c297ae336f420aea601e3ba0f7ed40c87aa932521e"
   },
@@ -26,6 +27,7 @@
     "queued": "1266061767132",
     "claimed": true,
     "claimedAt": "2026-05-09T02:02:11.000000Z",
+    "claimableAt": "2026-05-08T23:40:35.000000Z",
     "queueWait": "950400",
     "txHash": "0x5967993170f1dff038e0425e82dbfe1b3bb5e49846cd4b3d64c8b5635cee6a9f"
   }

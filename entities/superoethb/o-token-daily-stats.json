@@ -56,7 +56,7 @@
     "rateNative": "1000000000000000000",
     "yield": "2904183872115195152",
     "marketCapUSD": 1.7337153451853234e+26,
-    "accountsOverThreshold": 99,
+    "accountsOverThreshold": 98,
     "rateWrapped": "1009274560327753118"
   },
   {
@@ -86,7 +86,7 @@
     "rateNative": "1000000000000000000",
     "yield": "10949463796973786752",
     "marketCapUSD": 4.788427137435896e+26,
-    "accountsOverThreshold": 477,
+    "accountsOverThreshold": 469,
     "rateWrapped": "1025107844893837036"
   },
   {
@@ -116,7 +116,7 @@
     "rateNative": "1000000000000000000",
     "yield": "7856515434092837742",
     "marketCapUSD": 4.5478173817897955e+26,
-    "accountsOverThreshold": 501,
+    "accountsOverThreshold": 500,
     "rateWrapped": "1037467826124977952"
   },
   {
@@ -146,7 +146,7 @@
     "rateNative": "1000000000000000000",
     "yield": "3150696022628581435",
     "marketCapUSD": 3.9995954007688115e+26,
-    "accountsOverThreshold": 399,
+    "accountsOverThreshold": 398,
     "rateWrapped": "1046055939457118023"
   },
   {
