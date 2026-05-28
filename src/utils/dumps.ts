@@ -1,5 +1,6 @@
 import { SquidProcessor, run } from '@originprotocol/squid-utils'
 
+import { setupRpcCache } from '../polyfills/rpc-cache'
 import { DBDumpManager } from './db-dump-manager'
 
 export async function checkAndRestoreDump(processorName: string) {
@@ -39,6 +40,7 @@ export async function checkAndRestoreDump(processorName: string) {
 }
 
 export async function initProcessorFromDump(processor: SquidProcessor) {
+  setupRpcCache(processor.stateSchema)
   if (process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
     const blockHeight = await checkAndRestoreDump(processor.stateSchema)
     if (blockHeight) {
