@@ -22,11 +22,12 @@
  *   PORTAL_CACHE_DIR            default `.portal-cache`
  *   PORTAL_CACHE_LOG_INTERVAL   seconds; 0 disables (default 30)
  */
-import { PortalClient, PortalStreamData } from '@subsquid/portal-client'
 import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { promisify } from 'node:util'
 import zlib from 'node:zlib'
+
+import { PortalClient, PortalStreamData } from '@subsquid/portal-client'
 
 import { bigintJsonParse, bigintJsonStringify } from '../utils/bigintJson'
 
@@ -61,13 +62,13 @@ interface PortalCacheDb {
 }
 
 interface CacheCounters {
-  hit_chunks: number      // chunks served from disk (replay phase)
-  hit_blocks: number      // total blocks across hit chunks
-  saved_chunks: number    // new chunks written to disk (live phase)
-  saved_blocks: number    // finalized blocks across saved chunks
-  saved_bytes: number     // compressed bytes written
-  live_batches: number    // live batches yielded without producing a save
-  live_blocks: number     // blocks across live-only batches
+  hit_chunks: number // chunks served from disk (replay phase)
+  hit_blocks: number // total blocks across hit chunks
+  saved_chunks: number // new chunks written to disk (live phase)
+  saved_blocks: number // finalized blocks across saved chunks
+  saved_bytes: number // compressed bytes written
+  live_batches: number // live batches yielded without producing a save
+  live_blocks: number // blocks across live-only batches
 }
 
 class PortalCacheStats {
@@ -136,9 +137,7 @@ function openCacheDb(path: string): PortalCacheDb {
   `)
   db.pragma('journal_mode = WAL')
   db.pragma('synchronous = NORMAL')
-  const selectStmt = db.prepare(
-    'SELECT block_to, value FROM portal_cache WHERE block_from = ? AND query_hash = ?',
-  )
+  const selectStmt = db.prepare('SELECT block_to, value FROM portal_cache WHERE block_from = ? AND query_hash = ?')
   const insertStmt = db.prepare(
     'INSERT OR IGNORE INTO portal_cache (block_from, block_to, query_hash, value) VALUES (?, ?, ?, ?)',
   )
@@ -161,11 +160,7 @@ function openCacheDb(path: string): PortalCacheDb {
 // Generic stream signature we operate against; intentionally looser
 // than PortalClient.prototype.getStream so we don't pin to the exact
 // block type emitted by the evm-processor branch.
-type AnyGetStream = (
-  this: PortalClient,
-  query: any,
-  options?: any,
-) => AsyncIterable<PortalStreamData<BlockLike>>
+type AnyGetStream = (this: PortalClient, query: any, options?: any) => AsyncIterable<PortalStreamData<BlockLike>>
 
 async function* cachedStream(
   client: PortalClient,
@@ -173,6 +168,7 @@ async function* cachedStream(
   query: any,
   options: any,
   db: PortalCacheDb,
+  watermarks: Map<string, number>,
   stats: PortalCacheStats,
   log: (msg: string) => void,
 ): AsyncGenerator<PortalStreamData<BlockLike>, void, unknown> {
@@ -183,6 +179,29 @@ async function* cachedStream(
   }
   let chunksReplayed = 0
 
+  // Watermark is keyed by `queryHash` and persists across `getFinalizedStream`
+  // calls. Subsquid's `getFinalizedBlocks` iterates over `requests` and calls
+  // `getFinalizedStream` once per request, so a per-generator watermark would
+  // reset between requests — while `state.height` in the runner does NOT
+  // reset. When two requests share the same `queryHash` (which happens when
+  // they differ only in fromBlock/toBlock — hashQuery strips those), the
+  // second request can replay cached chunks whose blocks the runner has
+  // already committed via the first. The shared watermark catches that.
+  const filterAdvancing = <T extends PortalStreamData<BlockLike>>(batch: T): T | undefined => {
+    if (batch.blocks.length === 0) return batch
+    let mark = watermarks.get(queryHash) ?? -1
+    const lastHeight = lastOf(batch.blocks).header.number
+    if (lastHeight > mark) {
+      watermarks.set(queryHash, lastHeight)
+      return batch
+    }
+    const advanced = batch.blocks.filter((b) => b.header.number > mark)
+    if (advanced.length === 0) return undefined
+    mark = lastOf(advanced).header.number
+    watermarks.set(queryHash, mark)
+    return { ...batch, blocks: advanced }
+  }
+
   // 1. Replay contiguous chunks from cache.
   while (true) {
     const row = db.selectChunk(cursor.number, queryHash)
@@ -191,7 +210,8 @@ async function* cachedStream(
     const decoded = bigintJsonParse(buf.toString('utf8')) as PortalStreamData<BlockLike>
     stats.bump('hit_chunks')
     stats.bump('hit_blocks', decoded.blocks.length)
-    yield decoded
+    const filtered = filterAdvancing(decoded)
+    if (filtered) yield filtered
     chunksReplayed++
     if (!decoded.blocks.length) break
     const lastBlock = lastOf(decoded.blocks)
@@ -224,9 +244,7 @@ async function* cachedStream(
       const finalizedBlocks = batch.blocks.filter((b: BlockLike) => b.header.number <= finalizedHead)
       if (finalizedBlocks.length > 0) {
         const last = lastOf(finalizedBlocks).header.number
-        const payload = (await compressAsync(
-          bigintJsonStringify({ ...batch, blocks: finalizedBlocks }),
-        )) as Buffer
+        const payload = (await compressAsync(bigintJsonStringify({ ...batch, blocks: finalizedBlocks }))) as Buffer
         db.insertChunk(chunkStart, last, queryHash, payload)
         stats.bump('saved_chunks')
         stats.bump('saved_blocks', finalizedBlocks.length)
@@ -238,7 +256,9 @@ async function* cachedStream(
       stats.bump('live_batches')
       stats.bump('live_blocks', batch.blocks.length)
     }
-    yield batch
+    const filtered = filterAdvancing(batch)
+    if (filtered) yield filtered
+    chunksReplayed++
   }
 }
 
@@ -266,6 +286,9 @@ export function setupPortalCache(stateSchema: string): void {
   const dbPath = `${cacheDir}/${stateSchema}.sqlite`
   const db = openCacheDb(dbPath)
   const stats = new PortalCacheStats()
+  // Highest block height yielded per queryHash, shared across every
+  // `getFinalizedStream`/`getStream` invocation for the life of the process.
+  const watermarks = new Map<string, number>()
   startStatsLogger(stateSchema, stats, logIntervalSec)
   const compressor = 'zstdCompress' in zlib ? 'zstd' : 'gzip'
   console.log(`[portal-cache ${stateSchema}] enabled at ${dbPath} (compression=${compressor})`)
@@ -277,9 +300,9 @@ export function setupPortalCache(stateSchema: string): void {
   const innerGetStream = PortalClient.prototype.getStream as unknown as AnyGetStream
   const innerGetFinalizedStream = PortalClient.prototype.getFinalizedStream as unknown as AnyGetStream
   PortalClient.prototype.getStream = function (this: PortalClient, query: any, options?: any): any {
-    return cachedStream(this, innerGetStream, query, options, db, stats, log)
+    return cachedStream(this, innerGetStream, query, options, db, watermarks, stats, log)
   }
   PortalClient.prototype.getFinalizedStream = function (this: PortalClient, query: any, options?: any): any {
-    return cachedStream(this, innerGetFinalizedStream, query, options, db, stats, log)
+    return cachedStream(this, innerGetFinalizedStream, query, options, db, watermarks, stats, log)
   }
 }
