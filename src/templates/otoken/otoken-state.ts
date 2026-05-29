@@ -82,7 +82,9 @@ export const otokenStateProcessor = (params: {
       for (const log of block.logs) {
         if (log.address === vaultAddrLc && log.topics[0] === otokenVault.events.WithdrawalClaimable.topic) {
           const data = otokenVault.events.WithdrawalClaimable.decode(log)
-          await upsertVaultState(block, data._newClaimable)
+          // `_claimable` is the new cumulative pointer; `_newClaimable` is the
+          // delta added by this event. We snapshot the cumulative.
+          await upsertVaultState(block, data._claimable)
         }
       }
     }
