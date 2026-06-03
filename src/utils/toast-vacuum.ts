@@ -58,9 +58,9 @@ async function configureSessionTimeouts(pool: Pool): Promise<void> {
   const client = await pool.connect()
   try {
     const dbName = process.env.DB_NAME || 'squid'
-    await client.query(`ALTER DATABASE "${dbName}" SET idle_in_transaction_session_timeout = '2min'`)
-    await client.query(`ALTER DATABASE "${dbName}" SET idle_session_timeout = '5min'`)
-    console.log('[toast-vacuum] Configured database session timeouts (idle_in_transaction=2min, idle_session=5min)')
+    await client.query(`ALTER DATABASE "${dbName}" SET idle_in_transaction_session_timeout = '10min'`)
+    await client.query(`ALTER DATABASE "${dbName}" SET idle_session_timeout = '20min'`)
+    console.log('[toast-vacuum] Configured database session timeouts (idle_in_transaction=10min, idle_session=20min)')
   } catch (err) {
     console.error('[toast-vacuum] Error configuring session timeouts:', err)
   } finally {
@@ -82,10 +82,12 @@ export function startToastVacuumMonitor(): void {
   })
 
   // Configure database-level session timeouts to prevent idle transactions from blocking VACUUM
-  configureSessionTimeouts(pool).then(() => checkAndVacuumToast(pool)).then(() => {
-    // Then repeat every 30 minutes
-    setInterval(() => {
-      checkAndVacuumToast(pool)
-    }, CHECK_INTERVAL_MS)
-  })
+  configureSessionTimeouts(pool)
+    .then(() => checkAndVacuumToast(pool))
+    .then(() => {
+      // Then repeat every 30 minutes
+      setInterval(() => {
+        checkAndVacuumToast(pool)
+      }, CHECK_INTERVAL_MS)
+    })
 }
