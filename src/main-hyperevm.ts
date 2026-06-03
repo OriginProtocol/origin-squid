@@ -1,10 +1,11 @@
 import 'tsconfig-paths/register'
 import { hyperEvm } from 'viem/chains'
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
+import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
+import { initProcessorFromDump } from '@utils/dumps'
 
 export const processor = defineSquidProcessor({
   chainId: hyperEvm.id,
@@ -22,7 +23,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  run(processor).catch((error) => {
+  initProcessorFromDump(processor).catch((error) => {
     throw error
   })
 }

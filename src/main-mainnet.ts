@@ -7,7 +7,7 @@ import { protocolSqlSimpleProcessor } from 'mainnet/processors/protocol/protocol
 import 'tsconfig-paths/register'
 import { mainnet } from 'viem/chains'
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
+import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { ccip } from '@templates/ccip'
 import { createESTracker } from '@templates/exponential-staking'
@@ -24,6 +24,7 @@ import {
   XOGN_ADDRESS,
 } from '@utils/addresses'
 import { FIELDS_WITH_RECEIPTS_INFO } from '@utils/batch-proccesor-fields'
+import { initProcessorFromDump } from '@utils/dumps'
 
 import * as dailyStats from './mainnet/post-processors/ogn-daily-stats'
 import * as curve from './mainnet/processors/curve'
@@ -67,7 +68,7 @@ export default processor
 
 if (require.main === module) {
   startToastVacuumMonitor()
-  run(processor).catch((error) => {
+  initProcessorFromDump(processor).catch((error) => {
     throw error
   })
 }

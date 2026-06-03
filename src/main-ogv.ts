@@ -1,8 +1,9 @@
 import 'tsconfig-paths/register'
 
-import { defineSquidProcessor, run } from '@originprotocol/squid-utils'
+import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import { processStatus } from '@templates/processor-status'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
+import { initProcessorFromDump } from '@utils/dumps'
 
 import * as dailyStats from './ogv/post-processors/daily-stats'
 import * as governance from './ogv/post-processors/governance'
@@ -19,7 +20,7 @@ export const processor = defineSquidProcessor({
 export default processor
 
 if (require.main === module) {
-  run(processor).catch((error) => {
+  initProcessorFromDump(processor).catch((error) => {
     throw error
   })
 }
