@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Index as Index_, Relation as Relation_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVProposalState} from "./_ogvProposalState"
 import {OGVProposalTxLog} from "./ogvProposalTxLog.model"
@@ -17,7 +17,7 @@ export class OGVProposal {
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})
-    proposer!: OGVAddress
+    proposer!: Relation_<OGVAddress>
 
     @DateTimeColumn_({nullable: false})
     timestamp!: Date
@@ -35,7 +35,7 @@ export class OGVProposal {
     status!: OGVProposalState
 
     @OneToMany_(() => OGVProposalTxLog, e => e.proposal)
-    logs!: OGVProposalTxLog[]
+    logs!: Relation_<OGVProposalTxLog[]>
 
     @BigIntColumn_({nullable: false})
     quorum!: bigint

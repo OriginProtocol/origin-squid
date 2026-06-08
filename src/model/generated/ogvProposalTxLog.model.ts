@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Index as Index_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Index as Index_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {OGVProposalEvent} from "./_ogvProposalEvent"
 import {OGVProposal} from "./ogvProposal.model"
 
@@ -22,5 +22,5 @@ export class OGVProposalTxLog {
 
     @Index_()
     @ManyToOne_(() => OGVProposal, {nullable: true})
-    proposal!: OGVProposal
+    proposal!: Relation_<OGVProposal>
 }

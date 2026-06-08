@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Relation as Relation_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class ESAccount {
@@ -35,8 +35,8 @@ export class ESAccount {
 
     @Index_()
     @ManyToOne_(() => ESAccount, {nullable: true})
-    delegateTo!: ESAccount | undefined | null
+    delegateTo!: Relation_<ESAccount> | undefined | null
 
     @OneToMany_(() => ESAccount, e => e.delegateTo)
-    delegatesFrom!: ESAccount[]
+    delegatesFrom!: Relation_<ESAccount[]>
 }

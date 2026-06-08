@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, ManyToOne as ManyToOne_, OneToMany as OneToMany_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, Index as Index_, ManyToOne as ManyToOne_, Relation as Relation_, OneToMany as OneToMany_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVLockupTxLog} from "./ogvLockupTxLog.model"
 
@@ -17,10 +17,10 @@ export class OGVLockup {
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})
-    address!: OGVAddress
+    address!: Relation_<OGVAddress>
 
     @OneToMany_(() => OGVLockupTxLog, e => e.ogvLockup)
-    logs!: OGVLockupTxLog[]
+    logs!: Relation_<OGVLockupTxLog[]>
 
     @BigIntColumn_({nullable: false})
     amount!: bigint

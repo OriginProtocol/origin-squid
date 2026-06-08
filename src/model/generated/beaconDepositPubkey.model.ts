@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, DateTimeColumn as DateTimeColumn_, IntColumn as IntColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, DateTimeColumn as DateTimeColumn_, IntColumn as IntColumn_, OneToMany as OneToMany_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {BeaconDepositEvent} from "./beaconDepositEvent.model"
 
 @Entity_()
@@ -20,5 +20,5 @@ export class BeaconDepositPubkey {
     count!: number
 
     @OneToMany_(() => BeaconDepositEvent, e => e.pubkey)
-    deposits!: BeaconDepositEvent[]
+    deposits!: Relation_<BeaconDepositEvent[]>
 }

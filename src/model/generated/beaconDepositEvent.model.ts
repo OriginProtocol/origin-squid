@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {BeaconDepositPubkey} from "./beaconDepositPubkey.model"
 
 @Entity_()
@@ -36,7 +36,7 @@ export class BeaconDepositEvent {
 
     @Index_()
     @ManyToOne_(() => BeaconDepositPubkey, {nullable: true})
-    pubkey!: BeaconDepositPubkey
+    pubkey!: Relation_<BeaconDepositPubkey>
 
     @StringColumn_({nullable: false})
     withdrawalCredentials!: string

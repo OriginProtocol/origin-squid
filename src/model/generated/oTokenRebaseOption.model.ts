@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {OTokenAddress} from "./oTokenAddress.model"
 import {RebasingOption} from "./_rebasingOption"
 
@@ -33,7 +33,7 @@ export class OTokenRebaseOption {
 
     @Index_()
     @ManyToOne_(() => OTokenAddress, {nullable: true})
-    address!: OTokenAddress
+    address!: Relation_<OTokenAddress>
 
     @Column_("varchar", {length: 21, nullable: false})
     status!: RebasingOption

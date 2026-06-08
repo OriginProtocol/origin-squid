@@ -91,4 +91,7 @@ export class ArmDailyStat {
 
     @FloatColumn_({nullable: false})
     rateNative!: number
+
+    @FloatColumn_({nullable: false})
+    rateAsset1!: number
 }

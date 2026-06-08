@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, ManyToOne as ManyToOne_, Relation as Relation_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {OTokenAddress} from "./oTokenAddress.model"
 import {HistoryType} from "./_historyType"
 
@@ -21,7 +21,7 @@ export class OTokenHistory {
 
     @Index_()
     @ManyToOne_(() => OTokenAddress, {nullable: true})
-    address!: OTokenAddress
+    address!: Relation_<OTokenAddress>
 
     @BigIntColumn_({nullable: false})
     value!: bigint

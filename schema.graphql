@@ -754,6 +754,7 @@ type ArmDailyStat @entity {
   rateUSD: Float!
   rateETH: Float!
   rateNative: Float!
+  rateAsset1: Float!
 }
 
 type ArmAddressYield @entity {

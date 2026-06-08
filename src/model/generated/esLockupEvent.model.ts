@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, ManyToOne as ManyToOne_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {ESLockupEventType} from "./_esLockupEventType"
 import {ESLockup} from "./esLockup.model"
 
@@ -36,5 +36,5 @@ export class ESLockupEvent {
 
     @Index_()
     @ManyToOne_(() => ESLockup, {nullable: true})
-    lockup!: ESLockup
+    lockup!: Relation_<ESLockup>
 }

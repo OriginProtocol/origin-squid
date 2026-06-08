@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, Relation as Relation_, BigIntColumn as BigIntColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 import {OGVProposal} from "./ogvProposal.model"
 import {OGVAddress} from "./ogvAddress.model"
 import {OGVVoteType} from "./_ogvVoteType"
@@ -14,11 +14,11 @@ export class OGVProposalVote {
 
     @Index_()
     @ManyToOne_(() => OGVProposal, {nullable: true})
-    proposal!: OGVProposal
+    proposal!: Relation_<OGVProposal>
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})
-    voter!: OGVAddress
+    voter!: Relation_<OGVAddress>
 
     @BigIntColumn_({nullable: false})
     weight!: bigint

@@ -570,12 +570,13 @@ export const createOriginARMProcessors = ({
 
           if (tracker(ctx, block) || (block.header.height > from && ctx.latestBlockOfDay(block))) {
             // ArmState
-            const [state, yesterdayState, rateUSD, rateETH, rateNative] = await Promise.all([
+            const [state, yesterdayState, rateUSD, rateETH, rateNative, rateAsset1] = await Promise.all([
               getCurrentState(block),
               getYesterdayState(block),
               ensureExchangeRate(ctx, block, token0, 'USD'),
               ensureExchangeRate(ctx, block, token0, 'ETH'),
               ensureExchangeRate(ctx, block, token0, ctx.chain.nativeCurrency.symbol as Currency),
+              getRate1?.(ctx, block),
             ])
 
             // Per-holder yield checkpoint: capture share-appreciation accrual for
@@ -629,6 +630,7 @@ export const createOriginARMProcessors = ({
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
               rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
               rateNative: +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18),
+              rateAsset1: +formatUnits(rateAsset1 ?? 10n ** 18n, 18),
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }

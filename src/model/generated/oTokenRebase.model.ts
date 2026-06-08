@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {OTokenAPY} from "./oTokenApy.model"
 
 @Entity_()
@@ -41,7 +41,7 @@ export class OTokenRebase {
 
     @Index_()
     @ManyToOne_(() => OTokenAPY, {nullable: true})
-    apy!: OTokenAPY
+    apy!: Relation_<OTokenAPY>
 
     @BigIntColumn_({nullable: false})
     fee!: bigint

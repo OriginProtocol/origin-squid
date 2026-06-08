@@ -1,4 +1,5 @@
 import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { createOriginARMProcessors } from '@templates/origin-arm'
 import { addresses } from '@utils/addresses'
 
@@ -39,8 +40,8 @@ export const originArmProcessors = [
     token1: 'sUSDe',
     getRate1: async (ctx, block) => {
       // The same standard exists on sUSDe to determine it's rate to USDe
-      const contract = new originEthenaArmAbi.Contract(ctx, block.header, addresses.tokens.sUSDe)
-      return await contract.convertToAssets(10n ** 18n)
+      const rate = await ensureExchangeRate(ctx, block, 'sUSDe', 'USDe')
+      return rate?.rate ?? 10n ** 18n
     },
     capManagerAddress: addresses.arms['ARM-USDe-sUSDe'].capManager,
     armType: 'ethena',

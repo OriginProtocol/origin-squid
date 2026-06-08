@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {RebasingOption} from "./_rebasingOption"
 import {OTokenHistory} from "./oTokenHistory.model"
 
@@ -57,5 +57,5 @@ export class OTokenAddress {
     since!: Date | undefined | null
 
     @OneToMany_(() => OTokenHistory, e => e.address)
-    history!: OTokenHistory[]
+    history!: Relation_<OTokenHistory[]>
 }

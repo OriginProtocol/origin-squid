@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Index as Index_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Index as Index_, Relation as Relation_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class OGVAddress {
@@ -23,7 +23,7 @@ export class OGVAddress {
 
     @Index_()
     @ManyToOne_(() => OGVAddress, {nullable: true})
-    delegatee!: OGVAddress | undefined | null
+    delegatee!: Relation_<OGVAddress> | undefined | null
 
     @DateTimeColumn_({nullable: false})
     lastUpdated!: Date

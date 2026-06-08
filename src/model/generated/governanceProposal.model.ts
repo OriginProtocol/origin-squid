@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, OneToMany as OneToMany_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {GovernanceProposalState} from "./_governanceProposalState"
 import {GovernanceProposalEvent} from "./governanceProposalEvent.model"
 
@@ -60,7 +60,7 @@ export class GovernanceProposal {
     status!: GovernanceProposalState
 
     @OneToMany_(() => GovernanceProposalEvent, e => e.proposal)
-    events!: GovernanceProposalEvent[]
+    events!: Relation_<GovernanceProposalEvent[]>
 
     @BigIntColumn_({nullable: false})
     quorum!: bigint

@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Index as Index_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, IntColumn as IntColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Index as Index_, Relation as Relation_} from "@subsquid/typeorm-store"
 import {OGVLockupEventType} from "./_ogvLockupEventType"
 import {OGVLockup} from "./ogvLockup.model"
 
@@ -28,5 +28,5 @@ export class OGVLockupTxLog {
 
     @Index_()
     @ManyToOne_(() => OGVLockup, {nullable: true})
-    ogvLockup!: OGVLockup
+    ogvLockup!: Relation_<OGVLockup>
 }

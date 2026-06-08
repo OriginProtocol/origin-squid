@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, DateTimeColumn as DateTimeColumn_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, ManyToOne as ManyToOne_, Relation as Relation_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 import {AeroCLPoolTick} from "./aeroClPoolTick.model"
 
 @Entity_()
@@ -49,7 +49,7 @@ export class AeroCLPoolState {
 
     @Index_()
     @ManyToOne_(() => AeroCLPoolTick, {nullable: true})
-    tick!: AeroCLPoolTick
+    tick!: Relation_<AeroCLPoolTick>
 
     @FloatColumn_({nullable: false})
     tickPrice!: number
