@@ -513,6 +513,7 @@ const arm = (prefix: string, armAddress: string) => {
         rateUSD
         rateETH
         rateNative
+        rateAsset1
         totalAssets
         totalAssetsCap
         totalSupply
