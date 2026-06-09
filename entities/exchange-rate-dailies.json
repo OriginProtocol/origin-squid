@@ -420,6 +420,30 @@
     "decimals": 18
   },
   {
+    "id": "146:2025-02-07:S_ETH",
+    "chainId": 146,
+    "date": "2025-02-07",
+    "timestamp": "2025-02-07T13:35:41.000000Z",
+    "blockNumber": 6900000,
+    "pair": "S_ETH",
+    "base": "S",
+    "quote": "ETH",
+    "rate": "159191758508104",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-02-07:S_USD",
+    "chainId": 146,
+    "date": "2025-02-07",
+    "timestamp": "2025-02-07T13:35:41.000000Z",
+    "blockNumber": 6900000,
+    "pair": "S_USD",
+    "base": "S",
+    "quote": "USD",
+    "rate": "435100920000000000",
+    "decimals": 18
+  },
+  {
     "id": "146:2025-02-08:S_ETH",
     "chainId": 146,
     "date": "2025-02-08",
@@ -441,6 +465,30 @@
     "base": "S",
     "quote": "USD",
     "rate": "386733560000000000",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-02-09:S_ETH",
+    "chainId": 146,
+    "date": "2025-02-09",
+    "timestamp": "2025-02-09T04:13:19.000000Z",
+    "blockNumber": 7100000,
+    "pair": "S_ETH",
+    "base": "S",
+    "quote": "ETH",
+    "rate": "153900347219539",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-02-09:S_USD",
+    "chainId": 146,
+    "date": "2025-02-09",
+    "timestamp": "2025-02-09T04:13:19.000000Z",
+    "blockNumber": 7100000,
+    "pair": "S_USD",
+    "base": "S",
+    "quote": "USD",
+    "rate": "412294090000000000",
     "decimals": 18
   },
   {
@@ -468,30 +516,6 @@
     "decimals": 18
   },
   {
-    "id": "146:2025-02-11:S_ETH",
-    "chainId": 146,
-    "date": "2025-02-11",
-    "timestamp": "2025-02-11T12:38:09.000000Z",
-    "blockNumber": 7400000,
-    "pair": "S_ETH",
-    "base": "S",
-    "quote": "ETH",
-    "rate": "171948372039438",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-02-11:S_USD",
-    "chainId": 146,
-    "date": "2025-02-11",
-    "timestamp": "2025-02-11T12:38:09.000000Z",
-    "blockNumber": 7400000,
-    "pair": "S_USD",
-    "base": "S",
-    "quote": "USD",
-    "rate": "462676960000000000",
-    "decimals": 18
-  },
-  {
     "id": "146:2025-02-12:S_ETH",
     "chainId": 146,
     "date": "2025-02-12",
@@ -513,30 +537,6 @@
     "base": "S",
     "quote": "USD",
     "rate": "538257070000000000",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-02-13:S_ETH",
-    "chainId": 146,
-    "date": "2025-02-13",
-    "timestamp": "2025-02-13T12:57:12.000000Z",
-    "blockNumber": 7700000,
-    "pair": "S_ETH",
-    "base": "S",
-    "quote": "ETH",
-    "rate": "211613514001942",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-02-13:S_USD",
-    "chainId": 146,
-    "date": "2025-02-13",
-    "timestamp": "2025-02-13T12:57:12.000000Z",
-    "blockNumber": 7700000,
-    "pair": "S_USD",
-    "base": "S",
-    "quote": "USD",
-    "rate": "562058190000000000",
     "decimals": 18
   },
   {
@@ -681,30 +681,6 @@
     "base": "S",
     "quote": "USD",
     "rate": "726382100000000000",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-02-20:S_ETH",
-    "chainId": 146,
-    "date": "2025-02-20",
-    "timestamp": "2025-02-20T15:02:10.000000Z",
-    "blockNumber": 8900000,
-    "pair": "S_ETH",
-    "base": "S",
-    "quote": "ETH",
-    "rate": "278961300375226",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-02-20:S_USD",
-    "chainId": 146,
-    "date": "2025-02-20",
-    "timestamp": "2025-02-20T15:02:10.000000Z",
-    "blockNumber": 8900000,
-    "pair": "S_USD",
-    "base": "S",
-    "quote": "USD",
-    "rate": "762008580000000000",
     "decimals": 18
   },
   {
@@ -936,6 +912,30 @@
     "decimals": 18
   },
   {
+    "id": "146:2025-03-02:S_ETH",
+    "chainId": 146,
+    "date": "2025-03-02",
+    "timestamp": "2025-03-02T15:05:52.000000Z",
+    "blockNumber": 11200000,
+    "pair": "S_ETH",
+    "base": "S",
+    "quote": "ETH",
+    "rate": "329496101266746",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-03-02:S_USD",
+    "chainId": 146,
+    "date": "2025-03-02",
+    "timestamp": "2025-03-02T15:05:52.000000Z",
+    "blockNumber": 11200000,
+    "pair": "S_USD",
+    "base": "S",
+    "quote": "USD",
+    "rate": "722591540000000000",
+    "decimals": 18
+  },
+  {
     "id": "146:2025-03-03:S_ETH",
     "chainId": 146,
     "date": "2025-03-03",
@@ -1101,6 +1101,30 @@
     "base": "S",
     "quote": "USD",
     "rate": "451100000000000000",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-03-10:S_ETH",
+    "chainId": 146,
+    "date": "2025-03-10",
+    "timestamp": "2025-03-10T18:45:33.000000Z",
+    "blockNumber": 12900000,
+    "pair": "S_ETH",
+    "base": "S",
+    "quote": "ETH",
+    "rate": "222525005531031",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-03-10:S_USD",
+    "chainId": 146,
+    "date": "2025-03-10",
+    "timestamp": "2025-03-10T18:45:33.000000Z",
+    "blockNumber": 12900000,
+    "pair": "S_USD",
+    "base": "S",
+    "quote": "USD",
+    "rate": "422437020000000000",
     "decimals": 18
   },
   {
@@ -1620,30 +1644,6 @@
     "decimals": 18
   },
   {
-    "id": "146:2025-04-01:S_ETH",
-    "chainId": 146,
-    "date": "2025-04-01",
-    "timestamp": "2025-04-01T16:47:36.000000Z",
-    "blockNumber": 17500000,
-    "pair": "S_ETH",
-    "base": "S",
-    "quote": "ETH",
-    "rate": "267294919978702",
-    "decimals": 18
-  },
-  {
-    "id": "146:2025-04-01:S_USD",
-    "chainId": 146,
-    "date": "2025-04-01",
-    "timestamp": "2025-04-01T16:47:36.000000Z",
-    "blockNumber": 17500000,
-    "pair": "S_USD",
-    "base": "S",
-    "quote": "USD",
-    "rate": "512067570000000000",
-    "decimals": 18
-  },
-  {
     "id": "146:2025-04-02:S_ETH",
     "chainId": 146,
     "date": "2025-04-02",
@@ -1785,6 +1785,30 @@
     "base": "S",
     "quote": "USD",
     "rate": "425830000000000000",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-04-08:S_ETH",
+    "chainId": 146,
+    "date": "2025-04-08",
+    "timestamp": "2025-04-08T19:44:57.000000Z",
+    "blockNumber": 19000000,
+    "pair": "S_ETH",
+    "base": "S",
+    "quote": "ETH",
+    "rate": "275804721305416",
+    "decimals": 18
+  },
+  {
+    "id": "146:2025-04-08:S_USD",
+    "chainId": 146,
+    "date": "2025-04-08",
+    "timestamp": "2025-04-08T19:44:57.000000Z",
+    "blockNumber": 19000000,
+    "pair": "S_USD",
+    "base": "S",
+    "quote": "USD",
+    "rate": "402990000000000000",
     "decimals": 18
   },
   {
@@ -2386,18 +2410,6 @@
     "quote": "USD",
     "rate": "487600000000000000",
     "decimals": 18
-  },
-  {
-    "id": "1:2025-01-11:ETH_USD",
-    "chainId": 1,
-    "date": "2025-01-11",
-    "timestamp": "2025-01-11T08:19:11.000000Z",
-    "blockNumber": 21600000,
-    "pair": "ETH_USD",
-    "base": "ETH",
-    "quote": "USD",
-    "rate": "323441947141",
-    "decimals": 8
   },
   {
     "id": "1:2025-01-11:ETH_USDC",
@@ -3034,18 +3046,6 @@
     "quote": "USD",
     "rate": "518973890000000000",
     "decimals": 18
-  },
-  {
-    "id": "1:2025-02-08:ETH_USD",
-    "chainId": 1,
-    "date": "2025-02-08",
-    "timestamp": "2025-02-08T06:27:11.000000Z",
-    "blockNumber": 21800000,
-    "pair": "ETH_USD",
-    "base": "ETH",
-    "quote": "USD",
-    "rate": "262454132012",
-    "decimals": 8
   },
   {
     "id": "1:2025-02-08:ETH_USDC",

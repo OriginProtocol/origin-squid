@@ -1,15 +1,15 @@
 Processing Times
 ==============================
-Version: v153
-Date: 2026-05-28T16:41:49.572Z
+Version: v154
+Date: 2026-06-09T05:34:36.581Z
 ==============================
-arbitrum: 63.07 minutes
-base: 197.50 minutes
-hyperevm: 1.31 minutes
-mainnet: 308.10 minutes
-oeth: 16.39 minutes
-oethb: 23.87 minutes
-ogv: 86.85 minutes
-os: 38.07 minutes
-ousd: 40.50 minutes
-sonic: 110.12 minutes
+arbitrum: 69.40 minutes
+base: 204.69 minutes
+hyperevm: 1.60 minutes
+mainnet: 175.97 minutes
+oeth: 21.30 minutes
+oethb: 30.44 minutes
+ogv: 85.34 minutes
+os: 65.56 minutes
+ousd: 43.44 minutes
+sonic: 117.98 minutes

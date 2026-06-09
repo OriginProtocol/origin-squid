@@ -28,5 +28,15 @@
     "txHash": "0xbc63fc01a030b9f3437e8d69b5659662bfe355974c322efec217d710815df77c",
     "status": "YieldDelegationSource",
     "delegatedTo": "0x028c6f98c20094367f7b048f0afa1e11ce0a8dbd"
+  },
+  {
+    "id": "1-0x389c9242040da68ef82d1f6369bd45c0afc037935a58ff63bec8783710a20675-3-0-4-0x7bcec263aaae3044c41942294156b794c3b3e35d",
+    "timestamp": "2026-06-03T18:26:23.000000Z",
+    "blockNumber": 25238643,
+    "chainId": 1,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "txHash": "0x389c9242040da68ef82d1f6369bd45c0afc037935a58ff63bec8783710a20675",
+    "status": "OptIn",
+    "delegatedTo": null
   }
 ]

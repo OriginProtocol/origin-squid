@@ -247,13 +247,13 @@
     "lockupId": "2",
     "timestamp": "2025-05-30T22:48:23.000000Z",
     "txHash": "0x62a405d8504207d65ee206972c0eb105d979a98d5bcecb23153a2f21ab99918e",
-    "lastUpdated": "2025-05-30T22:48:23.000000Z",
+    "lastUpdated": "2026-06-01T15:23:47.000000Z",
     "amount": "282887040805717411250555",
     "end": "2026-05-30T22:48:23.000000Z",
     "points": "554859260482404495350082",
-    "withdrawAmount": "0",
+    "withdrawAmount": "282887040805717411250555",
     "penalty": "0",
-    "state": "Open"
+    "state": "Closed"
   },
   {
     "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0xa78cbab3780c17c3163cd38767f6cd407ff7c43a:0",

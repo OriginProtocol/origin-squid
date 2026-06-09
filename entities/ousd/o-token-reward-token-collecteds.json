@@ -152,5 +152,16 @@
     "recipient": "0xd400341aefed0bc75176714cfde82e8bdaa2d3b8",
     "rewardToken": "0x58d97b57bb95320f9a05dc918aef65434969c2b2",
     "amount": "13760795372304222599"
+  },
+  {
+    "id": "0025200785-f0521-000310",
+    "timestamp": "2026-05-29T11:40:47.000000Z",
+    "blockNumber": 25200785,
+    "chainId": 1,
+    "otoken": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "strategy": "0x26a02ec47acc2a3442b757f45e0a82b8e993ce11",
+    "recipient": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "rewardToken": "0xd533a949740bb3306d119cc777fa900ba034cd52",
+    "amount": "323513308945329176537"
   }
 ]
