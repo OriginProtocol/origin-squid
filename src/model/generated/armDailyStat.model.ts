@@ -94,4 +94,13 @@ export class ArmDailyStat {
 
     @FloatColumn_({nullable: false})
     rateAsset1!: number
+
+    @StringColumn_({array: true, nullable: false})
+    assetBalances!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetTotals!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetRates!: (string)[]
 }

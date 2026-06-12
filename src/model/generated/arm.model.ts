@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, StringColumn as StringColumn_, BooleanColumn as BooleanColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class Arm {
@@ -29,4 +29,19 @@ export class Arm {
 
     @StringColumn_({nullable: false})
     token1!: string
+
+    @StringColumn_({array: true, nullable: false})
+    assets!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetSymbols!: (string)[]
+
+    @BooleanColumn_({array: true, nullable: false})
+    assetPegged!: (boolean)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetAdapters!: (string)[]
+
+    @IntColumn_({nullable: true})
+    upgradeBlock!: number | undefined | null
 }

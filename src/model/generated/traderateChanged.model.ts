@@ -37,4 +37,20 @@ export class TraderateChanged {
 
     @BigIntColumn_({nullable: false})
     traderate1!: bigint
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    asset!: string
+
+    @BigIntColumn_({nullable: false})
+    buyPrice!: bigint
+
+    @BigIntColumn_({nullable: false})
+    sellPrice!: bigint
+
+    @BigIntColumn_({nullable: true})
+    buyLiquidityRemaining!: bigint | undefined | null
+
+    @BigIntColumn_({nullable: true})
+    sellLiquidityRemaining!: bigint | undefined | null
 }

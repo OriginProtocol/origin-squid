@@ -699,8 +699,20 @@ type Arm @entity {
   name: String!
   symbol: String!
   decimals: Int!
-  token0: String!
-  token1: String!
+  token0: String! # liquidity asset (WETH / USDe / wS)
+  token1: String! # primary base asset; == baseAssets[0] (legacy, kept for back-compat)
+  # Full asset registry (arm-oeth PR #221). Ordered and APPEND-ONLY: [0] = liquidity
+  # asset (== token0); [1+] = base assets, appended on BaseAssetAdded. Index i is the
+  # alignment key for every asset* array on ArmState / ArmDailyStat. Never reorder/remove.
+  assets: [String!]! # asset addresses, e.g. [WETH, stETH, wstETH]
+  assetSymbols: [String!]! # e.g. ["WETH", "stETH", "wstETH"]
+  assetPegged: [Boolean!]! # true = 1:1 with liquidity asset (rate 1.0); [0] is always true
+  # IAssetAdapter address per asset (from BaseAssetAdded), used for the rate via
+  # convertToAssets. Zero address for [0] (liquidity asset) and pre-upgrade base assets.
+  assetAdapters: [String!]!
+  # Block at which the first BaseAssetAdded was observed = the multi-base upgrade
+  # (arm-oeth PR #221). Null pre-upgrade. Drives old-format vs new-format reads.
+  upgradeBlock: Int
 }
 
 type ArmState @entity {
@@ -724,6 +736,12 @@ type ArmState @entity {
   totalYield: BigInt!
   totalFees: BigInt!
   claimable: BigInt!
+  # Aligned to Arm.assets (append-only). Decimal strings (Subsquid can't codegen BigInt arrays).
+  # assetBalances[i] = raw balanceOf(asset i); [0] = idle liquidity (== assets0).
+  assetBalances: [String!]!
+  # assetTotals[0] = assets0 + outstandingAssets1 + marketAssets (all liquidity-denominated value);
+  # assetTotals[i>0] = balanceOf(asset i). assetTotals[i] x assetRates[i] = value in liquidity terms.
+  assetTotals: [String!]!
 }
 
 type ArmDailyStat @entity {
@@ -754,7 +772,13 @@ type ArmDailyStat @entity {
   rateUSD: Float!
   rateETH: Float!
   rateNative: Float!
-  rateAsset1: Float!
+  rateAsset1: Float! # primary base->liquidity rate; == assetRates[1] (legacy)
+  # Aligned to Arm.assets (append-only). [0] = liquidity asset.
+  assetBalances: [String!]! # raw balanceOf(asset i); [0] = idle liquidity
+  # assetTotals[0] = assets0 + outstandingAssets1 + marketAssets; [i>0] = balanceOf(asset i).
+  assetTotals: [String!]!
+  # asset->liquidity rate, 1e18-scaled (PRICE_SCALE). [0] = 1e18; pegged base = 1e18.
+  assetRates: [String!]!
 }
 
 type ArmAddressYield @entity {
@@ -801,6 +825,10 @@ type ArmSwap @entity {
   blockNumber: Int! @index
   address: String! @index
   from: String!
+  # One row per transaction (aggregated). Amounts are paired from the tx's ERC20
+  # Transfer logs and normalized to liquidity-asset terms. Per-action decoding via
+  # trace return data was reverted: the portal serves callResultOutput only for
+  # recent blocks, which silently dropped most pre-Dec-2025 swaps.
   assets0: BigInt!
   assets1: BigInt!
 }
@@ -813,8 +841,17 @@ type TraderateChanged @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
   address: String! @index
+  # One entity covers both event versions (arm-oeth PR #221 / withdraw-on-swap), dual-written:
+  # the old event maps traderate0->buyPrice, traderate1->sellPrice (asset = token1); the new
+  # event maps buyPrice->traderate0, sellPrice->traderate1. So traderate*/buy/sellPrice and asset
+  # are always set (non-null). The liquidity-remaining fields only exist on the new event -> nullable.
   traderate0: BigInt!
   traderate1: BigInt!
+  asset: String! @index
+  buyPrice: BigInt!
+  sellPrice: BigInt!
+  buyLiquidityRemaining: BigInt # new event only (per-side remaining swap-liquidity cap)
+  sellLiquidityRemaining: BigInt # new event only
 }
 type ERC20 @entity {
   id: ID!

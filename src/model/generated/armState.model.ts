@@ -69,4 +69,10 @@ export class ArmState {
 
     @BigIntColumn_({nullable: false})
     claimable!: bigint
+
+    @StringColumn_({array: true, nullable: false})
+    assetBalances!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetTotals!: (string)[]
 }
