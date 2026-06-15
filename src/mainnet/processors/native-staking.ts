@@ -1,14 +1,20 @@
 import * as beaconAbi from '@abi/beacon-deposit-contract'
 import { BeaconDepositEvent, BeaconDepositPubkey } from '@model'
 import { Block, Context, EvmBatchProcessor, logFilter, readLinesFromUrlInBatches } from '@originprotocol/squid-utils'
-import { OETH_NATIVE_STRATEGIES } from '@utils/addresses'
+import { OETH_COMPOUNDING_STAKING_STRATEGIES, OETH_NATIVE_STRATEGIES } from '@utils/addresses'
 
 export const from = 20029793 // Dump contains pubkeys up until 20029793.
 
 const beaconDepositContractAddress = '0x00000000219ab540356cbb839cbe05303d7705fa'
-const withdrawCredentials = OETH_NATIVE_STRATEGIES.map(
-  (strategy) => `0x010000000000000000000000${strategy.address.slice(2)}`,
-)
+const withdrawCredentials = [
+  ...OETH_NATIVE_STRATEGIES.map((strategy) => `0x010000000000000000000000${strategy.address.slice(2)}`),
+  // The new compounding strategy hasn't staked validators yet and is EIP-7251-style
+  // (ConsolidationController), so its withdrawal prefix may be 0x02. Match both to be safe.
+  ...OETH_COMPOUNDING_STAKING_STRATEGIES.flatMap((strategy) => [
+    `0x010000000000000000000000${strategy.address.slice(2)}`,
+    `0x020000000000000000000000${strategy.address.slice(2)}`,
+  ]),
+]
 
 const beaconDepositFilter = logFilter({
   address: [beaconDepositContractAddress],

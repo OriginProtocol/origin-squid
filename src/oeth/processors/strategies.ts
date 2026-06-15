@@ -1,5 +1,6 @@
 import * as feeAccumulatorAbi from '@abi/fee-accumulator'
 import * as compoundStakingSSVAbi from '@abi/strategy-compound-staking-ssv'
+import * as compoundStakingAbi from '@abi/strategy-compounding-staking'
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
 import { Context, EvmBatchProcessor, defineProcessor, logFilter } from '@originprotocol/squid-utils'
@@ -11,6 +12,7 @@ import {
   ETH_ADDRESS,
   FRXETH_ADDRESS,
   OETH_ADDRESS,
+  OETH_COMPOUNDING_STAKING_STRATEGIES,
   OETH_COMPOUND_STAKING_SSV_STRATEGIES,
   OETH_NATIVE_STRATEGIES,
   OETH_VAULT_ADDRESS,
@@ -220,6 +222,32 @@ export const oethStrategies: readonly IStrategyData[] = [
           logFilter({
             address: [strategy.address],
             topic0: [compoundStakingSSVAbi.events.BalancesVerified.topic],
+            range: { from: strategy.from },
+          }),
+        ] as ReturnType<typeof logFilter>[],
+      }) as const,
+  ),
+  ...OETH_COMPOUNDING_STAKING_STRATEGIES.map(
+    (strategy, index) =>
+      ({
+        chainId: 1,
+        from: strategy.from,
+        name: `OETH Compounding Staking ${index + 1}`,
+        contractName: 'CompoundingStakingStrategy',
+        address: strategy.address,
+        oTokenAddress: OETH_ADDRESS,
+        kind: 'CompoundingStaking',
+        base: { address: WETH_ADDRESS, decimals: 18 },
+        assets: [WETH_ADDRESS].map((address) => ({ address, decimals: 18 })),
+        earnings: {
+          passiveByDepositWithdrawal: true,
+          rewardTokenCollected: true,
+          rewardTokenCollectedSimple: true,
+        },
+        balanceUpdateLogFilters: [
+          logFilter({
+            address: [strategy.address],
+            topic0: [compoundStakingAbi.events.BalancesVerified.topic],
             range: { from: strategy.from },
           }),
         ] as ReturnType<typeof logFilter>[],

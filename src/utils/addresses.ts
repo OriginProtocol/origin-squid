@@ -1,5 +1,4 @@
-import { uniq } from 'lodash';
-
+import { uniq } from 'lodash'
 
 // Lowercase Addresses
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -85,6 +84,10 @@ export const OETH_NATIVE_STRATEGIES = [
 export const OETH_COMPOUND_STAKING_SSV_STRATEGIES = [
   { address: '0xaf04828ed923216c77dc22a2fc8e077fdadaa87d', from: 23667476 },
 ]
+// Non-SSV "vanilla validator" compounding staking strategy (origin-dollar PR #2921).
+export const OETH_COMPOUNDING_STAKING_STRATEGIES = [
+  { address: '0x25e1d468b14005716111d5e8464573e5135275f4', from: 25285131 },
+]
 export const OETH_NATIVE_STRATEGY_FEE_ACCUMULATOR_ADDRESS = '0x7ed4ccb74a1ee903af5fbd9be00ca8616f23d627'
 export const OETH_VAULT_ERC20_ADDRESSES = [WETH_ADDRESS, STETH_ADDRESS, RETH_ADDRESS, FRXETH_ADDRESS]
 
@@ -150,6 +153,7 @@ export const strategies = {
     BalancerMetaPoolStrategy: '0x49109629ac1deb03f2e9b2fe2ac4a623e0e7dfdc',
     NativeStakingStrategies: OETH_NATIVE_STRATEGIES.map((s) => s.address),
     CompoundStakingStrategies: OETH_COMPOUND_STAKING_SSV_STRATEGIES.map((s) => s.address),
+    CompoundingStakingStrategies: OETH_COMPOUNDING_STAKING_STRATEGIES.map((s) => s.address),
   },
   ousd: {
     ConvexOUSDMetaStrategy: '0x89eb88fedc50fc77ae8a18aad1ca0ac27f777a90',
