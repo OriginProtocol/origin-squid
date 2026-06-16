@@ -466,6 +466,8 @@ const arm = (prefix: string, armAddress: string) => {
         totalWithdrawals
         totalWithdrawalsClaimed
         totalYield
+        assetBalances
+        assetTotals
       }
     `),
     gql(`
@@ -523,6 +525,9 @@ const arm = (prefix: string, armAddress: string) => {
         yield
         cumulativeYield
         cumulativeFees
+        assetBalances
+        assetTotals
+        assetRates
       }
     `),
     gql(`
@@ -559,6 +564,11 @@ const arm = (prefix: string, armAddress: string) => {
         address
         traderate0
         traderate1
+        asset
+        buyPrice
+        sellPrice
+        buyLiquidityRemaining
+        sellLiquidityRemaining
       }
     `),
   ]
@@ -575,6 +585,11 @@ const arms = () => {
       decimals
       token0
       token1
+      assets
+      assetSymbols
+      assetPegged
+      assetAdapters
+      upgradeBlock
     }
   `)
 }
