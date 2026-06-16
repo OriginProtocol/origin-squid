@@ -18,7 +18,15 @@
     "totalSupply": "10000001000000000000",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "483706917266657"
+    "totalYield": "483706917266657",
+    "assetBalances": [
+      "999992100000000000",
+      "32007058908688"
+    ],
+    "assetTotals": [
+      "10000572382989086415",
+      "32007058908688"
+    ]
   },
   {
     "id": "1:23800000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -39,7 +47,15 @@
     "totalSupply": "157590564251493811072",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "230943746050500009"
+    "totalYield": "230943746050500009",
+    "assetBalances": [
+      "3228405671571872186",
+      "4678721733966250041"
+    ],
+    "assetTotals": [
+      "153458908714397942853",
+      "4678721733966250041"
+    ]
   },
   {
     "id": "1:23900000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -60,7 +76,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "481583319489941569"
+    "totalYield": "481583319489941569",
+    "assetBalances": [
+      "11469880610856779823",
+      "139666406411179555"
+    ],
+    "assetTotals": [
+      "232152482589246838094",
+      "139666406411179555"
+    ]
   },
   {
     "id": "1:24000000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -81,7 +105,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "630040129468058518"
+    "totalYield": "630040129468058518",
+    "assetBalances": [
+      "11414480461725895435",
+      "204183959073797496"
+    ],
+    "assetTotals": [
+      "232236197661275740075",
+      "204183959073797496"
+    ]
   },
   {
     "id": "1:24100000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -102,7 +134,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "745125264977353442"
+    "totalYield": "745125264977353442",
+    "assetBalances": [
+      "53205366194343459810",
+      "2089250972353278940"
+    ],
+    "assetTotals": [
+      "230470494362766260033",
+      "2089250972353278940"
+    ]
   },
   {
     "id": "1:24200000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -123,7 +163,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "903436705791326970"
+    "totalYield": "903436705791326970",
+    "assetBalances": [
+      "13691493258738392171",
+      "530663316972524981"
+    ],
+    "assetTotals": [
+      "232184275523286336471",
+      "530663316972524981"
+    ]
   },
   {
     "id": "1:24300000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -144,7 +192,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "1068045044160040793"
+    "totalYield": "1068045044160040793",
+    "assetBalances": [
+      "11383352149554227434",
+      "275038405425377773"
+    ],
+    "assetTotals": [
+      "232605049322886280403",
+      "275038405425377773"
+    ]
   },
   {
     "id": "1:24400000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -165,7 +221,15 @@
     "totalSupply": "231197140676489126712",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "totalYield": "1676337129102312723"
+    "totalYield": "1676337129102312723",
+    "assetBalances": [
+      "438021426882579321",
+      "289596791410777952"
+    ],
+    "assetTotals": [
+      "233242932714516098119",
+      "289596791410777952"
+    ]
   },
   {
     "id": "1:24500000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -186,7 +250,15 @@
     "totalSupply": "388579067887265382094",
     "totalWithdrawals": "6500000003031844",
     "totalWithdrawalsClaimed": "1000000001059190",
-    "totalYield": "2188630388825645003"
+    "totalYield": "2188630388825645003",
+    "assetBalances": [
+      "10953883960110287650",
+      "1"
+    ],
+    "assetTotals": [
+      "393205975064538322867",
+      "1"
+    ]
   },
   {
     "id": "1:24600000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -207,6 +279,43 @@
     "totalSupply": "1704374164098062448393",
     "totalWithdrawals": "18736561630440533544",
     "totalWithdrawalsClaimed": "18731061630438560890",
-    "totalYield": "3827699995316730018"
+    "totalYield": "3827699995316730018",
+    "assetBalances": [
+      "172806726264207637973",
+      "47839624774744933975"
+    ],
+    "assetTotals": [
+      "1680202629992803275915",
+      "47839624774744933975"
+    ]
+  },
+  {
+    "id": "1:24700000:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "chainId": 1,
+    "timestamp": "2026-03-20T16:46:47.000000Z",
+    "blockNumber": 24700000,
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "assets0": "933557240281706013649",
+    "assets1": "1",
+    "assetsPerShare": "1015214609390371001",
+    "outstandingAssets1": "2328376587716931389953",
+    "marketAssets": "1",
+    "feesAccrued": "52864717950255332",
+    "totalAssets": "3261875463280685175617",
+    "totalAssetsCap": "1000000000000000000000",
+    "totalDeposits": "3425157587460186049365",
+    "totalFees": "1710697795565913010",
+    "totalSupply": "3212991059338101624301",
+    "totalWithdrawals": "170336375233565547374",
+    "totalWithdrawalsClaimed": "170330875233563574720",
+    "totalYield": "7054251054064673626",
+    "assetBalances": [
+      "933557240281706013649",
+      "1"
+    ],
+    "assetTotals": [
+      "3261933827998637403603",
+      "1"
+    ]
   }
 ]

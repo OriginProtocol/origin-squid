@@ -7,7 +7,24 @@
     "symbol": "ARM-WS-OS",
     "decimals": 18,
     "token0": "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
-    "token1": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794"
+    "token1": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "assets": [
+      "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",
+      "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794"
+    ],
+    "assetSymbols": [
+      "wS",
+      "OS"
+    ],
+    "assetPegged": [
+      true,
+      true
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "upgradeBlock": null
   },
   {
     "id": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -17,7 +34,24 @@
     "symbol": "ARM-WETH-stETH",
     "decimals": 18,
     "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "token1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
+    "token1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+    "assets": [
+      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "0xae7ab96520de3a18e5e111b5eaab095312d7fe84"
+    ],
+    "assetSymbols": [
+      "WETH",
+      "stETH"
+    ],
+    "assetPegged": [
+      true,
+      true
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "upgradeBlock": null
   },
   {
     "id": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -27,7 +61,24 @@
     "symbol": "ARM-sUSDe-USDe",
     "decimals": 18,
     "token0": "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
-    "token1": "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
+    "token1": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "assets": [
+      "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+      "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
+    ],
+    "assetSymbols": [
+      "USDe",
+      "sUSDe"
+    ],
+    "assetPegged": [
+      true,
+      false
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "upgradeBlock": null
   },
   {
     "id": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -37,6 +88,23 @@
     "symbol": "ARM-WETH-eETH",
     "decimals": 18,
     "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "token1": "0x35fa164735182de50811e8e2e824cfb9b6118ac2"
+    "token1": "0x35fa164735182de50811e8e2e824cfb9b6118ac2",
+    "assets": [
+      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "0x35fa164735182de50811e8e2e824cfb9b6118ac2"
+    ],
+    "assetSymbols": [
+      "WETH",
+      "eETH"
+    ],
+    "assetPegged": [
+      true,
+      true
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "upgradeBlock": null
   }
 ]

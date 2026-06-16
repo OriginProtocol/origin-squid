@@ -1,0 +1,58 @@
+[
+  {
+    "id": "0x25e1d468b14005716111d5e8464573e5135275f4:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-06-10",
+    "timestamp": "2026-06-10T23:59:59.999000Z",
+    "blockNumber": 25290492,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x25e1d468b14005716111d5e8464573e5135275f4",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0x25e1d468b14005716111d5e8464573e5135275f4:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-06-11",
+    "timestamp": "2026-06-11T23:59:59.999000Z",
+    "blockNumber": 25297657,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x25e1d468b14005716111d5e8464573e5135275f4",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0x25e1d468b14005716111d5e8464573e5135275f4:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-06-12",
+    "timestamp": "2026-06-12T23:59:59.999000Z",
+    "blockNumber": 25304829,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x25e1d468b14005716111d5e8464573e5135275f4",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
+  },
+  {
+    "id": "0x25e1d468b14005716111d5e8464573e5135275f4:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-06-13",
+    "timestamp": "2026-06-13T23:59:59.999000Z",
+    "blockNumber": 25312002,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x25e1d468b14005716111d5e8464573e5135275f4",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
+  }
+]
