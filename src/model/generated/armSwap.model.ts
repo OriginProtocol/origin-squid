@@ -38,6 +38,26 @@ export class ArmSwap {
     @StringColumn_({nullable: false})
     from!: string
 
+    @Index_()
+    @StringColumn_({nullable: false})
+    tokenIn!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    tokenOut!: string
+
+    @BigIntColumn_({nullable: false})
+    amountIn!: bigint
+
+    @BigIntColumn_({nullable: false})
+    amountOut!: bigint
+
+    @BigIntColumn_({nullable: false})
+    rateIn!: bigint
+
+    @BigIntColumn_({nullable: false})
+    rateOut!: bigint
+
     @BigIntColumn_({nullable: false})
     assets0!: bigint
 

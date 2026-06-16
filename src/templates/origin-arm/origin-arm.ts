@@ -421,6 +421,21 @@ export const createOriginARMProcessors = ({
         }
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
+        // A base asset's rate in asset0 (liquidity) terms, 1e18-scaled (token0 per base).
+        // Mirrors the assetRates logic: pegged base assets and the liquidity asset are 1:1;
+        // appreciating assets use their adapter (post-upgrade) or getRate1 (pre-upgrade single base).
+        const getBaseAssetRate = async (block: Block, assetIdx: number): Promise<bigint> => {
+          if (assetIdx === 0 || armEntity.assetPegged[assetIdx]) return 10n ** 18n
+          const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
+          if (upgraded) {
+            return new originMultibaseArmAbi.Contract(
+              ctx,
+              block.header,
+              armEntity.assetAdapters[assetIdx],
+            ).convertToAssets(10n ** 18n)
+          }
+          return getRate1 ? await getRate1(ctx, block) : 10n ** 18n
+        }
         const checkpoint = (
           account: string,
           block: Block,
@@ -607,66 +622,104 @@ export const createOriginARMProcessors = ({
                 const transfers0 = transfers
                   .filter((log) => log.address === armEntity.token0)
                   .map((log) => erc20Abi.events.Transfer.decode(log))
-                const transfers1 = transfers
-                  .filter((log) => log.address === armEntity.token1)
-                  .map((log) => erc20Abi.events.Transfer.decode(log))
 
-                const pairs: { assets0: bigint; assets1: bigint }[] = []
-
-                const transfersOut0 = transfers0.filter((t) => t.from.toLowerCase() === armAddress)
-                const transfersIn1 = transfers1.filter((t) => t.to.toLowerCase() === armAddress)
-
-                const rate1 = getRate1 ? await getRate1(ctx, block) : 10n ** 18n
-                const rate1Number = +formatEther(rate1)
-
-                for (let i = 0; i < transfersOut0.length; i++) {
-                  for (let j = 0; j < transfersIn1.length; j++) {
-                    const out0 = transfersOut0[i]
-                    const in1 = transfersIn1[j]
-                    if (out0.value === 0n || in1.value === 0n) continue
-                    const rate = +formatEther((out0.value * 10n ** 18n) / in1.value)
-                    if (Math.abs(rate - rate1Number) <= 0.01) {
-                      pairs.push({ assets0: -out0.value, assets1: (in1.value * rate1) / 10n ** 18n })
-                      transfersIn1.splice(j, 1)
-                      break
-                    }
-                  }
+                const ONE = 10n ** 18n
+                const swapMeta = {
+                  chainId: ctx.chain.id,
+                  txHash: transactionHash,
+                  txFrom: trace.transaction?.from ?? '',
+                  txTo: trace.transaction?.to ?? '',
+                  timestamp: new Date(block.header.timestamp),
+                  blockNumber: block.header.height,
+                  address: armAddress,
+                  from: trace.action.from,
                 }
 
-                const transfersOut1 = transfers1.filter((t) => t.from.toLowerCase() === armAddress)
-                const transfersIn0 = transfers0.filter((t) => t.to.toLowerCase() === armAddress)
-                for (let i = 0; i < transfersOut1.length; i++) {
-                  for (let j = 0; j < transfersIn0.length; j++) {
-                    const out1 = transfersOut1[i]
-                    const in0 = transfersIn0[j]
-                    if (out1.value === 0n || in0.value === 0n) continue
-                    const rate = +formatEther((out1.value * 10n ** 18n) / in0.value)
-                    if (Math.abs(rate - rate1Number) <= 0.01) {
-                      pairs.push({ assets0: in0.value, assets1: (-out1.value * rate1) / 10n ** 18n })
-                      transfersIn0.splice(j, 1)
-                      break
+                // Every swap is liquidityAsset(token0) <-> one base asset (the contract forbids
+                // base<->base). Pair token0 transfers against each base asset and emit one ArmSwap
+                // per (tx, baseAsset, direction) with raw amounts and each side's asset0 rate.
+                for (let assetIdx = 1; assetIdx < armEntity.assets.length; assetIdx++) {
+                  const baseAsset = armEntity.assets[assetIdx]
+                  const transfersB = transfers
+                    .filter((log) => log.address === baseAsset)
+                    .map((log) => erc20Abi.events.Transfer.decode(log))
+                  if (transfersB.length === 0) continue
+
+                  const rateB = await getBaseAssetRate(block, assetIdx) // token0 per base
+                  const rateBNumber = +formatEther(rateB)
+
+                  // Trader sells base for token0: ARM receives base, sends token0.
+                  const transfersOut0 = transfers0.filter((t) => t.from.toLowerCase() === armAddress)
+                  const transfersInB = transfersB.filter((t) => t.to.toLowerCase() === armAddress)
+                  let sellBaseIn = 0n
+                  let sellToken0Out = 0n
+                  for (let i = 0; i < transfersOut0.length; i++) {
+                    for (let j = 0; j < transfersInB.length; j++) {
+                      const out0 = transfersOut0[i]
+                      const inB = transfersInB[j]
+                      if (out0.value === 0n || inB.value === 0n) continue
+                      const rate = +formatEther((out0.value * ONE) / inB.value) // token0 per base
+                      if (Math.abs(rate - rateBNumber) <= 0.01) {
+                        sellBaseIn += inB.value
+                        sellToken0Out += out0.value
+                        transfersInB.splice(j, 1)
+                        break
+                      }
                     }
                   }
+                  if (sellBaseIn > 0n) {
+                    swaps.push(
+                      new ArmSwap({
+                        ...swapMeta,
+                        id: `${ctx.chain.id}::${transactionHash}:${baseAsset}:sell`,
+                        tokenIn: baseAsset,
+                        amountIn: sellBaseIn,
+                        rateIn: rateB,
+                        tokenOut: armEntity.token0,
+                        amountOut: sellToken0Out,
+                        rateOut: ONE,
+                        assets0: -sellToken0Out,
+                        assets1: (sellBaseIn * rateB) / ONE,
+                      }),
+                    )
+                  }
+
+                  // Trader buys base with token0: ARM receives token0, sends base.
+                  const transfersOutB = transfersB.filter((t) => t.from.toLowerCase() === armAddress)
+                  const transfersIn0 = transfers0.filter((t) => t.to.toLowerCase() === armAddress)
+                  let buyBaseOut = 0n
+                  let buyToken0In = 0n
+                  for (let i = 0; i < transfersOutB.length; i++) {
+                    for (let j = 0; j < transfersIn0.length; j++) {
+                      const outB = transfersOutB[i]
+                      const in0 = transfersIn0[j]
+                      if (outB.value === 0n || in0.value === 0n) continue
+                      const rate = +formatEther((in0.value * ONE) / outB.value) // token0 per base
+                      if (Math.abs(rate - rateBNumber) <= 0.01) {
+                        buyBaseOut += outB.value
+                        buyToken0In += in0.value
+                        transfersIn0.splice(j, 1)
+                        break
+                      }
+                    }
+                  }
+                  if (buyBaseOut > 0n) {
+                    swaps.push(
+                      new ArmSwap({
+                        ...swapMeta,
+                        id: `${ctx.chain.id}::${transactionHash}:${baseAsset}:buy`,
+                        tokenIn: armEntity.token0,
+                        amountIn: buyToken0In,
+                        rateIn: ONE,
+                        tokenOut: baseAsset,
+                        amountOut: buyBaseOut,
+                        rateOut: rateB,
+                        assets0: buyToken0In,
+                        assets1: -(buyBaseOut * rateB) / ONE,
+                      }),
+                    )
+                  }
                 }
-
-                const assets0 = pairs.reduce((acc, pair) => acc + pair.assets0, 0n)
-                const assets1 = pairs.reduce((acc, pair) => acc + pair.assets1, 0n)
-
-                swaps.push(
-                  new ArmSwap({
-                    id: `${ctx.chain.id}::${transactionHash}:${trace.traceAddress.join(':')}`,
-                    chainId: ctx.chain.id,
-                    txHash: transactionHash,
-                    txFrom: trace.transaction?.from ?? '',
-                    txTo: trace.transaction?.to ?? '',
-                    timestamp: new Date(block.header.timestamp),
-                    blockNumber: block.header.height,
-                    address: armAddress,
-                    from: trace.action.from,
-                    assets0,
-                    assets1,
-                  }),
-                )
               }
             }
           }

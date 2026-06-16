@@ -832,10 +832,21 @@ type ArmSwap @entity {
   blockNumber: Int! @index
   address: String! @index
   from: String!
-  # One row per transaction (aggregated). Amounts are paired from the tx's ERC20
-  # Transfer logs and normalized to liquidity-asset terms. Per-action decoding via
-  # trace return data was reverted: the portal serves callResultOutput only for
-  # recent blocks, which silently dropped most pre-Dec-2025 swaps.
+  # One row per (transaction, base asset, direction), paired from the tx's ERC20 Transfer logs.
+  # Modeled as an explicit swap: tokenIn/amountIn = what the trader supplied (ARM received);
+  # tokenOut/amountOut = what the trader received (ARM sent). amount* are RAW token units; rate*
+  # is each token's asset0 (liquidity) rate at the swap block, 1e18-scaled (== 1e18 for the
+  # liquidity asset and pegged base assets). Every swap has the liquidity asset on exactly one
+  # side (the contract forbids base<->base). Derived: asset0 value = amount x rate / 1e18;
+  # execution price = amountOut / amountIn; spread = valueOut / valueIn.
+  tokenIn: String! @index
+  tokenOut: String! @index
+  amountIn: BigInt!
+  amountOut: BigInt!
+  rateIn: BigInt!
+  rateOut: BigInt!
+  # Legacy ARM-perspective signed deltas in asset0 terms (assets1 = base x rate). Kept for
+  # back-compat; superseded by the token*/amount*/rate* fields above.
   assets0: BigInt!
   assets1: BigInt!
 }
