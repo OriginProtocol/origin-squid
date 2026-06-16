@@ -56,6 +56,11 @@ type ArmState @entity {
   totalYield: BigInt!
   totalFees: BigInt!
   claimable: BigInt!
+  # Snapshot of the ARM asset registry at this state.
+  assets: [String!]!
+  assetSymbols: [String!]!
+  # Aligned to Arm.assets. [0] = 0; [i>0] = per-base pending redeem assets when available.
+  outstandingAssets: [String!]!
   # Aligned to Arm.assets (append-only). Decimal strings (Subsquid can't codegen BigInt arrays).
   # assetBalances[i] = raw balanceOf(asset i); [0] = idle liquidity (== assets0).
   assetBalances: [String!]!
@@ -93,6 +98,15 @@ type ArmDailyStat @entity {
   rateETH: Float!
   rateNative: Float!
   rateAsset1: Float! # primary base->liquidity rate; == assetRates[1] (legacy)
+  # Quote rates aligned to assets. Decimal strings, derived from the liquidity asset rate and assetRates.
+  ratesUSD: [String!]!
+  ratesETH: [String!]!
+  ratesNative: [String!]!
+  # Snapshot copied from ArmState so daily stat consumers can interpret aligned arrays directly.
+  assets: [String!]! # asset addresses, e.g. [WETH, stETH, wstETH]
+  assetSymbols: [String!]! # e.g. ["WETH", "stETH", "wstETH"]
+  # Aligned to assets. [0] = 0; [i>0] = per-base pending redeem assets when available.
+  outstandingAssets: [String!]!
   # Aligned to Arm.assets (append-only). [0] = liquidity asset.
   assetBalances: [String!]! # raw balanceOf(asset i); [0] = idle liquidity
   # assetTotals[0] = assets0 + outstandingAssets1 + marketAssets; [i>0] = balanceOf(asset i).

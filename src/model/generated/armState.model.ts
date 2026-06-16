@@ -71,6 +71,15 @@ export class ArmState {
     claimable!: bigint
 
     @StringColumn_({array: true, nullable: false})
+    assets!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetSymbols!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    outstandingAssets!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
     assetBalances!: (string)[]
 
     @StringColumn_({array: true, nullable: false})

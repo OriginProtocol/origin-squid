@@ -58,7 +58,7 @@ export const processor = defineSquidProcessor({
     // Defender Relayer for Lido ARM
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
     createPoolsProcessor(mainnet.id),
-    notionProcessor,
+    // notionProcessor,
   ],
   postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolSqlSimpleProcessor],
   validators: [],

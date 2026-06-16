@@ -306,11 +306,13 @@ export const createOriginARMProcessors = ({
           const assets0 = assetBalancesBig[0] ?? 0n // idle liquidity asset (WETH / USDe)
           const assets1 = assetBalancesBig[1] ?? 0n // legacy primary base asset
           let outstandingAssets1: bigint
+          let outstandingAssetsBig: bigint[]
           if (upgraded) {
             // Post-upgrade: pending protocol redemptions live per base asset in liquidity terms.
             const multibase = new originMultibaseArmAbi.Contract(ctx, block.header, armAddress)
             const configs = await Promise.all(armEntity.assets.slice(1).map((a) => multibase.baseAssetConfigs(a)))
-            outstandingAssets1 = configs.reduce((acc, c) => acc + c.pendingRedeemAssets, 0n)
+            outstandingAssetsBig = [0n, ...configs.map((c) => c.pendingRedeemAssets)]
+            outstandingAssets1 = outstandingAssetsBig.reduce((acc, value) => acc + value, 0n)
           } else {
             outstandingAssets1 = await {
               lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
@@ -321,6 +323,7 @@ export const createOriginARMProcessors = ({
                 return await ethenaArmContract.liquidityAmountInCooldown()
               },
             }[armType]()
+            outstandingAssetsBig = [0n, outstandingAssets1]
           }
           const [feesAccrued, totalAssets, totalAssetsCap, totalSupply, assetsPerShare, activeMarket, claimable] =
             await Promise.all([
@@ -368,6 +371,9 @@ export const createOriginARMProcessors = ({
             totalFees: previousState?.totalFees ?? 0n,
             totalYield: 0n,
             claimable,
+            assets: armEntity.assets,
+            assetSymbols: armEntity.assetSymbols,
+            outstandingAssets: outstandingAssetsBig.map((b) => b.toString()),
             // Aligned to armEntity.assets (append-only). [0] = idle liquidity (== assets0).
             assetBalances: assetBalancesBig.map((b) => b.toString()),
             // [0] aggregates all liquidity-denominated value (idle + redeeming + market);
@@ -717,6 +723,13 @@ export const createOriginARMProcessors = ({
             } else {
               assetRates = [ONE, (rateAsset1 ?? 10n ** 18n).toString()]
             }
+            const rateUSDNumber = +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18)
+            const rateETHNumber = +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18)
+            const rateNativeNumber = +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18)
+            const rateMultipliers = assetRates.map((rate) => +formatUnits(BigInt(rate), 18))
+            const ratesUSD = rateMultipliers.map((rate) => (rateUSDNumber * rate).toString())
+            const ratesETH = rateMultipliers.map((rate) => (rateETHNumber * rate).toString())
+            const ratesNative = rateMultipliers.map((rate) => (rateNativeNumber * rate).toString())
 
             const armDailyStatEntity = new ArmDailyStat({
               id: currentDayId,
@@ -746,10 +759,16 @@ export const createOriginARMProcessors = ({
               yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
               cumulativeFees: state.totalFees + state.feesAccrued,
               cumulativeYield: state.totalYield,
-              rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
-              rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
-              rateNative: +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18),
+              rateUSD: rateUSDNumber,
+              rateETH: rateETHNumber,
+              rateNative: rateNativeNumber,
               rateAsset1: +formatUnits(rateAsset1 ?? 10n ** 18n, 18),
+              ratesUSD,
+              ratesETH,
+              ratesNative,
+              assets: state.assets,
+              assetSymbols: state.assetSymbols,
+              outstandingAssets: state.outstandingAssets,
               // Aligned to armEntity.assets (append-only). [0] = liquidity asset.
               assetBalances: state.assetBalances,
               assetTotals: state.assetTotals,

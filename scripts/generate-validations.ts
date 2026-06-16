@@ -466,6 +466,11 @@ const arm = (prefix: string, armAddress: string) => {
         totalWithdrawals
         totalWithdrawalsClaimed
         totalYield
+        assets
+        assetSymbols
+        outstandingAssets
+        assetBalances
+        assetTotals
       }
     `),
     gql(`
@@ -514,6 +519,15 @@ const arm = (prefix: string, armAddress: string) => {
         rateETH
         rateNative
         rateAsset1
+        ratesUSD
+        ratesETH
+        ratesNative
+        assets
+        assetSymbols
+        outstandingAssets
+        assetBalances
+        assetTotals
+        assetRates
         totalAssets
         totalAssetsCap
         totalSupply
