@@ -75,4 +75,7 @@ export class ArmState {
 
     @StringColumn_({array: true, nullable: false})
     assetTotals!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    outstandingAssets!: (string)[]
 }

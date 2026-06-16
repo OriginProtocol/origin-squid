@@ -103,4 +103,7 @@ export class ArmDailyStat {
 
     @StringColumn_({array: true, nullable: false})
     assetRates!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    outstandingAssets!: (string)[]
 }

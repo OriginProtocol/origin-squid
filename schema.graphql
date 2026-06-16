@@ -742,6 +742,10 @@ type ArmState @entity {
   # assetTotals[0] = assets0 + outstandingAssets1 + marketAssets (all liquidity-denominated value);
   # assetTotals[i>0] = balanceOf(asset i). assetTotals[i] x assetRates[i] = value in liquidity terms.
   assetTotals: [String!]!
+  # Per-asset protocol redemptions in-flight (adapter withdrawal queues), aligned to Arm.assets.
+  # [0] = liquidity asset (never redeems into itself) = 0; [i>0] = pendingRedeemAssets for base
+  # asset i, liquidity-denominated. Per-asset form of outstandingAssets1 (== sum of [1+]).
+  outstandingAssets: [String!]!
 }
 
 type ArmDailyStat @entity {
@@ -779,6 +783,9 @@ type ArmDailyStat @entity {
   assetTotals: [String!]!
   # asset->liquidity rate, 1e18-scaled (PRICE_SCALE). [0] = 1e18; pegged base = 1e18.
   assetRates: [String!]!
+  # Per-asset protocol redemptions in-flight, aligned to Arm.assets. [0] = 0 (liquidity asset);
+  # [i>0] = liquidity-denominated pendingRedeemAssets for base asset i. == sum is outstandingAssets1.
+  outstandingAssets: [String!]!
 }
 
 type ArmAddressYield @entity {

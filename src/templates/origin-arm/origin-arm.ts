@@ -305,14 +305,19 @@ export const createOriginARMProcessors = ({
           )
           const assets0 = assetBalancesBig[0] ?? 0n // idle liquidity asset (WETH / USDe)
           const assets1 = assetBalancesBig[1] ?? 0n // legacy primary base asset
-          let outstandingAssets1: bigint
+          // Per-asset protocol redemptions in-flight (adapter withdrawal queues), aligned to
+          // armEntity.assets. [0] = liquidity asset (never redeems into itself) = 0; [i>0] =
+          // liquidity-denominated amount pending for base asset i. Multiple base assets can be
+          // redeeming at once post-upgrade. Legacy scalar outstandingAssets1 == sum of [1+].
+          let outstandingAssetsBig: bigint[]
           if (upgraded) {
             // Post-upgrade: pending protocol redemptions live per base asset in liquidity terms.
             const multibase = new originMultibaseArmAbi.Contract(ctx, block.header, armAddress)
             const configs = await Promise.all(armEntity.assets.slice(1).map((a) => multibase.baseAssetConfigs(a)))
-            outstandingAssets1 = configs.reduce((acc, c) => acc + c.pendingRedeemAssets, 0n)
+            outstandingAssetsBig = [0n, ...configs.map((c) => c.pendingRedeemAssets)]
           } else {
-            outstandingAssets1 = await {
+            // Pre-upgrade: single base asset, one chain-specific withdrawal-queue call.
+            const single = await {
               lido: lidoArmContract.lidoWithdrawalQueueAmount.bind(lidoArmContract),
               os: osArmContract.vaultWithdrawalAmount.bind(osArmContract),
               etherfi: etherfiArmContract.etherfiWithdrawalQueueAmount.bind(etherfiArmContract),
@@ -321,7 +326,9 @@ export const createOriginARMProcessors = ({
                 return await ethenaArmContract.liquidityAmountInCooldown()
               },
             }[armType]()
+            outstandingAssetsBig = [0n, single]
           }
+          const outstandingAssets1 = outstandingAssetsBig.reduce((acc, b) => acc + b, 0n)
           const [feesAccrued, totalAssets, totalAssetsCap, totalSupply, assetsPerShare, activeMarket, claimable] =
             await Promise.all([
               armContract.feesAccrued(),
@@ -376,6 +383,8 @@ export const createOriginARMProcessors = ({
               (assets0 + outstandingAssets1 + marketAssets).toString(),
               ...assetBalancesBig.slice(1).map((b) => b.toString()),
             ],
+            // Per-asset redemptions in-flight, aligned to assets. [0] = 0; sum of [1+] == outstandingAssets1.
+            outstandingAssets: outstandingAssetsBig.map((b) => b.toString()),
           })
           armStateEntity.totalYield = calculateTotalYield(armStateEntity)
           states.push(armStateEntity)
@@ -754,6 +763,7 @@ export const createOriginARMProcessors = ({
               assetBalances: state.assetBalances,
               assetTotals: state.assetTotals,
               assetRates,
+              outstandingAssets: state.outstandingAssets,
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
           }
