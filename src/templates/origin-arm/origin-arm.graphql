@@ -66,6 +66,13 @@ type ArmState @entity {
   # [0] = liquidity asset (never redeems into itself) = 0; [i>0] = pendingRedeemAssets for base
   # asset i, liquidity-denominated. Per-asset form of outstandingAssets1 (== sum of [1+]).
   outstandingAssets: [String!]!
+  # Lending-market position factors (for yield-source attribution). marketShares =
+  # IERC4626(activeMarket).balanceOf(arm); marketPricePerShare = convertToAssets(1e18), 1e18-scaled
+  # (== 1e18 when no market). marketAssets == marketShares x marketPricePerShare / 1e18.
+  # activeMarket = current market address (ADDRESS_ZERO if none); a change signals a market switch.
+  marketShares: BigInt!
+  marketPricePerShare: BigInt!
+  activeMarket: String!
 }
 
 type ArmDailyStat @entity {
@@ -106,6 +113,16 @@ type ArmDailyStat @entity {
   # Per-asset protocol redemptions in-flight, aligned to Arm.assets. [0] = 0 (liquidity asset);
   # [i>0] = liquidity-denominated pendingRedeemAssets for base asset i. == sum is outstandingAssets1.
   outstandingAssets: [String!]!
+  # Lending-market position factors (carried day-over-day for ArmDailyAssetYield.lendingYield).
+  # See ArmState for semantics.
+  marketShares: BigInt!
+  marketPricePerShare: BigInt!
+  activeMarket: String!
+  # Net signed flow into the lending market for the day (deposits − withdrawals), liquidity-asset
+  # terms. Derived from the actual market-share change x price-per-share at each allocation (not the
+  # Allocated event amount, which on old ARMs is a target, not the filled amount).
+  # lendingYield = Δ marketAssets − marketNetFlow.
+  marketNetFlow: BigInt!
 }
 
 type ArmAddressYield @entity {
@@ -169,6 +186,11 @@ type ArmSwap @entity {
   # back-compat; superseded by the token*/amount*/rate* fields above.
   assets0: BigInt!
   assets1: BigInt!
+  # Realized trading profit in liquidity (token0) terms: (amountIn*rateIn - amountOut*rateOut)/1e18.
+  # The redeemable-value delta this swap causes, valuing each leg at its redemption rate (liquidity
+  # asset = 1e18, base asset = adapter rate). >0 when the ARM acquires base below redeemable value;
+  # ~0 on rearm-to-liquidity legs. Summed per base asset per day into ArmDailyAssetYield.tradingYield.
+  spread: BigInt!
 }
 
 type TraderateChanged @entity {
@@ -190,4 +212,35 @@ type TraderateChanged @entity {
   sellPrice: BigInt!
   buyLiquidityRemaining: BigInt # new event only (per-side remaining swap-liquidity cap)
   sellLiquidityRemaining: BigInt # new event only
+}
+
+# Per arm x day x asset yield-source attribution (star schema dimensioned by asset). Partitions
+# the day's redeemable-value change into non-overlapping sources, so consumers can rank assets by
+# yield. One row per entry in Arm.assets: the liquidity asset [0] carries lendingYield; each base
+# asset carries tradingYield + appreciationYield. yield = trading + appreciation + lending.
+# All amounts in liquidity (token0) terms. This is an economic (par-valued) attribution: the sum
+# over assets converges to on-chain cumulative yield over time, not tick-for-tick per day.
+type ArmDailyAssetYield @entity {
+  id: ID! # chainId:date:arm:asset
+  chainId: Int! @index
+  address: String! @index # arm address
+  asset: String! @index # the asset this row attributes (base asset, or the liquidity asset)
+  assetSymbol: String!
+  date: String! @index
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+  # Σ ArmSwap.spread for this asset over the day (redeemable-value delta from trading). 0 for the
+  # liquidity asset (it is not a traded base asset).
+  tradingYield: BigInt!
+  # Held base inventory drift between events: prevBalance x (rateNow - ratePrev) / 1e18. 0 for the
+  # liquidity asset and for pegged base assets (rate is constant). Captures wstETH/weETH/sUSDe-style
+  # adapter-rate appreciation. Does NOT capture rebasing balance growth (e.g. stETH).
+  appreciationYield: BigInt!
+  # ERC4626 lending-market growth: prevMarketShares x (ppsNow - ppsPrev) / 1e18. Only nonzero on the
+  # liquidity-asset row. Zeroed across a market switch (activeMarket changed day-over-day).
+  lendingYield: BigInt!
+  # tradingYield + appreciationYield + lendingYield.
+  yield: BigInt!
+  # Liquidity (token0) terms volume traded for this asset over the day (context for per-asset APY).
+  swapVolume: BigInt!
 }

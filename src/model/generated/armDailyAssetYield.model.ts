@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, DateTimeColumn as DateTimeColumn_, BigIntColumn as BigIntColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
-export class ArmSwap {
-    constructor(props?: Partial<ArmSwap>) {
+export class ArmDailyAssetYield {
+    constructor(props?: Partial<ArmDailyAssetYield>) {
         Object.assign(this, props)
     }
 
@@ -15,13 +15,18 @@ export class ArmSwap {
 
     @Index_()
     @StringColumn_({nullable: false})
-    txHash!: string
+    address!: string
+
+    @Index_()
+    @StringColumn_({nullable: false})
+    asset!: string
 
     @StringColumn_({nullable: false})
-    txFrom!: string
+    assetSymbol!: string
 
+    @Index_()
     @StringColumn_({nullable: false})
-    txTo!: string
+    date!: string
 
     @Index_()
     @DateTimeColumn_({nullable: false})
@@ -31,39 +36,18 @@ export class ArmSwap {
     @IntColumn_({nullable: false})
     blockNumber!: number
 
-    @Index_()
-    @StringColumn_({nullable: false})
-    address!: string
-
-    @StringColumn_({nullable: false})
-    from!: string
-
-    @Index_()
-    @StringColumn_({nullable: false})
-    tokenIn!: string
-
-    @Index_()
-    @StringColumn_({nullable: false})
-    tokenOut!: string
+    @BigIntColumn_({nullable: false})
+    tradingYield!: bigint
 
     @BigIntColumn_({nullable: false})
-    amountIn!: bigint
+    appreciationYield!: bigint
 
     @BigIntColumn_({nullable: false})
-    amountOut!: bigint
+    lendingYield!: bigint
 
     @BigIntColumn_({nullable: false})
-    rateIn!: bigint
+    yield!: bigint
 
     @BigIntColumn_({nullable: false})
-    rateOut!: bigint
-
-    @BigIntColumn_({nullable: false})
-    assets0!: bigint
-
-    @BigIntColumn_({nullable: false})
-    assets1!: bigint
-
-    @BigIntColumn_({nullable: false})
-    spread!: bigint
+    swapVolume!: bigint
 }
