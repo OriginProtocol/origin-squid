@@ -5,7 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  '@subsquid/portal-client@0.3.2': 3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f
+  '@subsquid/portal-client@0.3.2':
+    hash: 3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f
+    path: patches/@subsquid__portal-client@0.3.2.patch
 
 importers:
 
@@ -19,7 +21,7 @@ importers:
         version: 2.1.1
       '@originprotocol/squid-utils':
         specifier: 1.0.1
-        version: 1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
+        version: 1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@subsquid/big-decimal':
         specifier: ^1.0.0
         version: 1.0.0
@@ -28,7 +30,7 @@ importers:
         version: 1.30.1
       '@subsquid/graphql-server':
         specifier: ^4.12.0
-        version: 4.12.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(class-validator@0.14.2)(encoding@0.1.13)(type-graphql@1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1))(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(utf-8-validate@5.0.10)
+        version: 4.12.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(class-validator@0.14.2)(encoding@0.1.13)(type-graphql@1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1))(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(utf-8-validate@5.0.10)
       '@subsquid/portal-client':
         specifier: 0.3.2
         version: 0.3.2(patch_hash=3e4a7267b245339fccee0fa65e648781d440fafd5fb03688b47a3940c0b69e0f)(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)
@@ -37,10 +39,10 @@ importers:
         version: 4.15.0
       '@subsquid/typeorm-migration':
         specifier: ^1.3.1
-        version: 1.3.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+        version: 1.3.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       '@subsquid/typeorm-store':
         specifier: ^1.9.1
-        version: 1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+        version: 1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       '@tanstack/query-core':
         specifier: ^5.32.0
         version: 5.89.0
@@ -94,7 +96,7 @@ importers:
         version: 1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1)
       typeorm:
         specifier: ^0.3.16
-        version: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
+        version: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
       uuid:
         specifier: ^9.0.0
         version: 9.0.1
@@ -104,7 +106,7 @@ importers:
     devDependencies:
       '@lavamoat/allow-scripts':
         specifier: ^3.3.4
-        version: 3.3.5(supports-color@8.1.1)
+        version: 3.3.5
       '@subsquid/evm-abi':
         specifier: 1.0.0
         version: 1.0.0
@@ -119,7 +121,7 @@ importers:
         version: 2.2.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^4.2.0
-        version: 4.3.0(prettier@3.6.2)(supports-color@8.1.1)
+        version: 4.3.0(prettier@3.6.2)
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
@@ -155,10 +157,10 @@ importers:
         version: 1.0.10
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.26.0
-        version: 8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2))(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
+        version: 8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0)(typescript@5.9.2))(eslint@9.35.0)(typescript@5.9.2)
       '@typescript-eslint/parser':
         specifier: ^8.26.0
-        version: 8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
+        version: 8.44.0(eslint@9.35.0)(typescript@5.9.2)
       better-sqlite3:
         specifier: ^12.10.0
         version: 12.10.0
@@ -167,7 +169,7 @@ importers:
         version: 7.0.3
       eslint:
         specifier: ^9.21.0
-        version: 9.35.0(supports-color@8.1.1)
+        version: 9.35.0
       glob:
         specifier: ^10.3.10
         version: 10.4.5
@@ -4327,7 +4329,7 @@ snapshots:
       '@babel/parser': 7.28.4
       '@babel/types': 7.28.4
 
-  '@babel/traverse@7.23.2(supports-color@8.1.1)':
+  '@babel/traverse@7.23.2':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/generator': 7.28.3
@@ -4425,14 +4427,14 @@ snapshots:
   '@esbuild/win32-x64@0.19.12':
     optional: true
 
-  '@eslint-community/eslint-utils@4.9.0(eslint@9.35.0(supports-color@8.1.1))':
+  '@eslint-community/eslint-utils@4.9.0(eslint@9.35.0)':
     dependencies:
-      eslint: 9.35.0(supports-color@8.1.1)
+      eslint: 9.35.0
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.1': {}
 
-  '@eslint/config-array@0.21.0(supports-color@8.1.1)':
+  '@eslint/config-array@0.21.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
       debug: 4.4.3(supports-color@8.1.1)
@@ -4446,7 +4448,7 @@ snapshots:
     dependencies:
       '@types/json-schema': 7.0.15
 
-  '@eslint/eslintrc@3.3.1(supports-color@8.1.1)':
+  '@eslint/eslintrc@3.3.1':
     dependencies:
       ajv: 6.12.6
       debug: 4.4.3(supports-color@8.1.1)
@@ -4601,10 +4603,10 @@ snapshots:
     dependencies:
       resolve: 1.22.10
 
-  '@lavamoat/allow-scripts@3.3.5(supports-color@8.1.1)':
+  '@lavamoat/allow-scripts@3.3.5':
     dependencies:
       '@lavamoat/aa': 4.3.4
-      '@npmcli/run-script': 8.1.0(supports-color@8.1.1)
+      '@npmcli/run-script': 8.1.0
       bin-links: 4.0.4
       npm-normalize-package-bin: 3.0.1
       type-fest: 4.41.0
@@ -4641,13 +4643,13 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@npmcli/agent@2.2.2(supports-color@8.1.1)':
+  '@npmcli/agent@2.2.2':
     dependencies:
       agent-base: 7.1.4
-      http-proxy-agent: 7.0.2(supports-color@8.1.1)
-      https-proxy-agent: 7.0.6(supports-color@8.1.1)
+      http-proxy-agent: 7.0.2
+      https-proxy-agent: 7.0.6
       lru-cache: 10.4.3
-      socks-proxy-agent: 8.0.5(supports-color@8.1.1)
+      socks-proxy-agent: 8.0.5
     transitivePeerDependencies:
       - supports-color
 
@@ -4687,26 +4689,26 @@ snapshots:
     dependencies:
       which: 4.0.0
 
-  '@npmcli/run-script@8.1.0(supports-color@8.1.1)':
+  '@npmcli/run-script@8.1.0':
     dependencies:
       '@npmcli/node-gyp': 3.0.0
       '@npmcli/package-json': 5.2.1
       '@npmcli/promise-spawn': 7.0.2
-      node-gyp: 10.3.1(supports-color@8.1.1)
+      node-gyp: 10.3.1
       proc-log: 4.2.0
       which: 4.0.0
     transitivePeerDependencies:
       - bluebird
       - supports-color
 
-  '@originprotocol/squid-utils@1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@originprotocol/squid-utils@1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@subsquid/archive-registry': 3.3.2(encoding@0.1.13)
       '@subsquid/evm-abi': 1.0.0
       '@subsquid/evm-codec': 1.0.0
       '@subsquid/evm-processor': 1.28.0-portal-api.721f49
       '@subsquid/rpc-client': 4.15.0
-      '@subsquid/typeorm-store': 1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+      '@subsquid/typeorm-store': 1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       dayjs: 1.11.18
       lodash: 4.17.21
       node-fetch: 2.7.0(encoding@0.1.13)
@@ -5231,7 +5233,7 @@ snapshots:
 
   '@subsquid/graphiql-console@0.3.0': {}
 
-  '@subsquid/graphql-server@4.12.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(class-validator@0.14.2)(encoding@0.1.13)(type-graphql@1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1))(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(utf-8-validate@5.0.10)':
+  '@subsquid/graphql-server@4.12.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(class-validator@0.14.2)(encoding@0.1.13)(type-graphql@1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1))(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(utf-8-validate@5.0.10)':
     dependencies:
       '@apollo/utils.keyvadapter': 1.1.2
       '@apollo/utils.keyvaluecache': 1.0.2
@@ -5243,7 +5245,7 @@ snapshots:
       '@subsquid/apollo-server-express': 3.14.1(encoding@0.1.13)(express@4.21.2)(graphql@15.10.1)
       '@subsquid/logger': 1.6.0
       '@subsquid/openreader': 5.5.0(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(utf-8-validate@5.0.10)
-      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       '@subsquid/util-internal': 3.2.0
       '@subsquid/util-internal-commander': 1.4.0(commander@11.1.0)
       '@subsquid/util-internal-http-server': 2.0.1
@@ -5261,7 +5263,7 @@ snapshots:
       '@subsquid/big-decimal': 1.0.0
       class-validator: 0.14.2
       type-graphql: 1.2.0-rc.1(class-validator@0.14.2)(graphql@15.10.1)
-      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
+      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -5346,30 +5348,30 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@subsquid/typeorm-config@4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
+  '@subsquid/typeorm-config@4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
     dependencies:
       '@subsquid/logger': 1.6.0
       '@subsquid/util-internal-ts-node': 0.0.0
       '@subsquid/util-naming': 1.3.0
     optionalDependencies:
-      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
+      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
 
-  '@subsquid/typeorm-migration@1.3.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
+  '@subsquid/typeorm-migration@1.3.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
     dependencies:
-      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       '@subsquid/util-internal': 3.2.0
       '@subsquid/util-internal-code-printer': 1.2.2
       '@subsquid/util-internal-ts-node': 0.0.0
       commander: 11.1.0
       dotenv: 16.6.1
-      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
+      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
 
-  '@subsquid/typeorm-store@1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
+  '@subsquid/typeorm-store@1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))':
     dependencies:
       '@subsquid/big-decimal': 1.0.0
-      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
+      '@subsquid/typeorm-config': 4.1.1(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       '@subsquid/util-internal': 3.3.0
-      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
+      typeorm: 0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2))
 
   '@subsquid/util-internal-archive-client@0.1.2(@subsquid/http-client@1.8.1)(@subsquid/logger@1.6.0)':
     dependencies:
@@ -5480,11 +5482,11 @@ snapshots:
 
   '@tanstack/query-core@5.89.0': {}
 
-  '@trivago/prettier-plugin-sort-imports@4.3.0(prettier@3.6.2)(supports-color@8.1.1)':
+  '@trivago/prettier-plugin-sort-imports@4.3.0(prettier@3.6.2)':
     dependencies:
       '@babel/generator': 7.17.7
       '@babel/parser': 7.28.4
-      '@babel/traverse': 7.23.2(supports-color@8.1.1)
+      '@babel/traverse': 7.23.2
       '@babel/types': 7.17.0
       javascript-natural-sort: 0.7.1
       lodash: 4.17.21
@@ -5616,15 +5618,15 @@ snapshots:
     dependencies:
       '@types/node': 18.19.126
 
-  '@typescript-eslint/eslint-plugin@8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2))(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)':
+  '@typescript-eslint/eslint-plugin@8.44.0(@typescript-eslint/parser@8.44.0(eslint@9.35.0)(typescript@5.9.2))(eslint@9.35.0)(typescript@5.9.2)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
+      '@typescript-eslint/parser': 8.44.0(eslint@9.35.0)(typescript@5.9.2)
       '@typescript-eslint/scope-manager': 8.44.0
-      '@typescript-eslint/type-utils': 8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.44.0(eslint@9.35.0(supports-color@8.1.1))(typescript@5.9.2)
+      '@typescript-eslint/type-utils': 8.44.0(eslint@9.35.0)(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.44.0(eslint@9.35.0)(typescript@5.9.2)
       '@typescript-eslint/visitor-keys': 8.44.0
-      eslint: 9.35.0(supports-color@8.1.1)
+      eslint: 9.35.0
       graphemer: 1.4.0
       ignore: 7.0.5
       natural-compare: 1.4.0
@@ -5633,19 +5635,19 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)':
+  '@typescript-eslint/parser@8.44.0(eslint@9.35.0)(typescript@5.9.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.44.0
       '@typescript-eslint/types': 8.44.0
-      '@typescript-eslint/typescript-estree': 8.44.0(supports-color@8.1.1)(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.44.0(typescript@5.9.2)
       '@typescript-eslint/visitor-keys': 8.44.0
       debug: 4.4.3(supports-color@8.1.1)
-      eslint: 9.35.0(supports-color@8.1.1)
+      eslint: 9.35.0
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.44.0(supports-color@8.1.1)(typescript@5.9.2)':
+  '@typescript-eslint/project-service@8.44.0(typescript@5.9.2)':
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.44.0(typescript@5.9.2)
       '@typescript-eslint/types': 8.44.0
@@ -5663,13 +5665,13 @@ snapshots:
     dependencies:
       typescript: 5.9.2
 
-  '@typescript-eslint/type-utils@8.44.0(eslint@9.35.0(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.9.2)':
+  '@typescript-eslint/type-utils@8.44.0(eslint@9.35.0)(typescript@5.9.2)':
     dependencies:
       '@typescript-eslint/types': 8.44.0
-      '@typescript-eslint/typescript-estree': 8.44.0(supports-color@8.1.1)(typescript@5.9.2)
-      '@typescript-eslint/utils': 8.44.0(eslint@9.35.0(supports-color@8.1.1))(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.44.0(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.44.0(eslint@9.35.0)(typescript@5.9.2)
       debug: 4.4.3(supports-color@8.1.1)
-      eslint: 9.35.0(supports-color@8.1.1)
+      eslint: 9.35.0
       ts-api-utils: 2.1.0(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -5677,9 +5679,9 @@ snapshots:
 
   '@typescript-eslint/types@8.44.0': {}
 
-  '@typescript-eslint/typescript-estree@8.44.0(supports-color@8.1.1)(typescript@5.9.2)':
+  '@typescript-eslint/typescript-estree@8.44.0(typescript@5.9.2)':
     dependencies:
-      '@typescript-eslint/project-service': 8.44.0(supports-color@8.1.1)(typescript@5.9.2)
+      '@typescript-eslint/project-service': 8.44.0(typescript@5.9.2)
       '@typescript-eslint/tsconfig-utils': 8.44.0(typescript@5.9.2)
       '@typescript-eslint/types': 8.44.0
       '@typescript-eslint/visitor-keys': 8.44.0
@@ -5693,13 +5695,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.44.0(eslint@9.35.0(supports-color@8.1.1))(typescript@5.9.2)':
+  '@typescript-eslint/utils@8.44.0(eslint@9.35.0)(typescript@5.9.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.35.0(supports-color@8.1.1))
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.35.0)
       '@typescript-eslint/scope-manager': 8.44.0
       '@typescript-eslint/types': 8.44.0
-      '@typescript-eslint/typescript-estree': 8.44.0(supports-color@8.1.1)(typescript@5.9.2)
-      eslint: 9.35.0(supports-color@8.1.1)
+      '@typescript-eslint/typescript-estree': 8.44.0(typescript@5.9.2)
+      eslint: 9.35.0
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -6290,14 +6292,14 @@ snapshots:
 
   eslint-visitor-keys@4.2.1: {}
 
-  eslint@9.35.0(supports-color@8.1.1):
+  eslint@9.35.0:
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.35.0(supports-color@8.1.1))
+      '@eslint-community/eslint-utils': 4.9.0(eslint@9.35.0)
       '@eslint-community/regexpp': 4.12.1
-      '@eslint/config-array': 0.21.0(supports-color@8.1.1)
+      '@eslint/config-array': 0.21.0
       '@eslint/config-helpers': 0.3.1
       '@eslint/core': 0.15.2
-      '@eslint/eslintrc': 3.3.1(supports-color@8.1.1)
+      '@eslint/eslintrc': 3.3.1
       '@eslint/js': 9.35.0
       '@eslint/plugin-kit': 0.3.5
       '@humanfs/node': 0.16.7
@@ -6661,14 +6663,14 @@ snapshots:
       statuses: 2.0.1
       toidentifier: 1.0.1
 
-  http-proxy-agent@7.0.2(supports-color@8.1.1):
+  http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.6(supports-color@8.1.1):
+  https-proxy-agent@7.0.6:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
@@ -6925,9 +6927,9 @@ snapshots:
 
   make-error@1.3.6: {}
 
-  make-fetch-happen@13.0.1(supports-color@8.1.1):
+  make-fetch-happen@13.0.1:
     dependencies:
-      '@npmcli/agent': 2.2.2(supports-color@8.1.1)
+      '@npmcli/agent': 2.2.2
       cacache: 18.0.4
       http-cache-semantics: 4.2.0
       is-lambda: 1.0.1
@@ -7093,13 +7095,13 @@ snapshots:
 
   node-gyp-build@4.8.4: {}
 
-  node-gyp@10.3.1(supports-color@8.1.1):
+  node-gyp@10.3.1:
     dependencies:
       env-paths: 2.2.1
       exponential-backoff: 3.1.2
       glob: 10.4.5
       graceful-fs: 4.2.11
-      make-fetch-happen: 13.0.1(supports-color@8.1.1)
+      make-fetch-happen: 13.0.1
       nopt: 7.2.1
       proc-log: 4.2.0
       semver: 7.7.2
@@ -7529,7 +7531,7 @@ snapshots:
 
   smart-buffer@4.2.0: {}
 
-  socks-proxy-agent@8.0.5(supports-color@8.1.1):
+  socks-proxy-agent@8.0.5:
     dependencies:
       agent-base: 7.1.4
       debug: 4.4.3(supports-color@8.1.1)
@@ -7745,7 +7747,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)):
+  typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
