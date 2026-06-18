@@ -292,7 +292,12 @@ export const createOriginARMProcessors = ({
             return armStateEntity
           }
           const previousState = await getPreviousState(block)
-          const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
+          // An upgrade transaction can emit state-triggering events before BaseAssetAdded.
+          // eth_call sees the upgraded implementation for the entire block, so consider
+          // the ARM upgraded when BaseAssetAdded appears anywhere in the current block.
+          const upgraded =
+            (armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock) ||
+            block.logs.some((log) => baseAssetAddedFilter.matches(log))
           const armContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
           const lidoArmContract = new originLidoArmAbi.Contract(ctx, block.header, armAddress)
           const ethenaArmContract = new originEthenaArmAbi.Contract(ctx, block.header, armAddress)
