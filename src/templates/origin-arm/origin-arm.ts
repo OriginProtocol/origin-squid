@@ -11,7 +11,16 @@ import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
 import * as originLidoArmAbi from '@abi/origin-lido-arm'
 import * as originLidoArmCapManagerAbi from '@abi/origin-lido-arm-cap-manager'
 import * as originMultibaseArmAbi from '@abi/origin-multibase-arm'
-import { Arm, ArmAddressYield, ArmDailyStat, ArmState, ArmSwap, ArmWithdrawalRequest, TraderateChanged } from '@model'
+import {
+  Arm,
+  ArmAddressYield,
+  ArmDailyAssetYield,
+  ArmDailyStat,
+  ArmState,
+  ArmSwap,
+  ArmWithdrawalRequest,
+  TraderateChanged,
+} from '@model'
 import {
   Block,
   Context,
@@ -103,6 +112,15 @@ export const createOriginARMProcessors = ({
     topic0: [originMultibaseArmAbi.events.BaseAssetAdded.topic],
     range: { from },
   })
+  // Lending-market allocations (deposits/withdrawals to the ERC4626 market). Two signatures exist:
+  // Allocated(market, assets) [Lido/EtherFi/OS] and Allocated(market, targetLiquidityDelta,
+  // actualLiquidityDelta) [multibase/Ethena]. Filter on both topics and decode by the one that
+  // matched so the net flow is exact regardless of ARM generation.
+  const allocatedFilter = logFilter({
+    address: [armAddress],
+    topic0: [originOsArmAbi.events.Allocated.topic, originMultibaseArmAbi.events.Allocated.topic],
+    range: { from },
+  })
   const swapFilter = traceFilter({
     type: ['call'],
     callTo: [armAddress],
@@ -178,6 +196,21 @@ export const createOriginARMProcessors = ({
   const previousDayRows = new Map<string, ArmAddressYield>()
   const currentDayRows = new Map<string, ArmAddressYield>()
   let yieldRowsInitialized = false
+  // Per-(date:asset) running accumulator of swap trading profit + volume, for ArmDailyAssetYield.
+  // Persists across batches; seeded once at processor start from today's persisted rows so a
+  // mid-day restart keeps summing. Keyed `${date}:${assetLower}`.
+  const currentDayAssetYield = new Map<string, { tradingYield: bigint; swapVolume: bigint }>()
+  // Per-date running net flow (signed, liquidity-asset terms) into the lending market. Subtracted
+  // from the day's marketAssets change to isolate true lending yield. Flow is derived from the
+  // actual share change x price-per-share at each allocation (NOT the Allocated event's amount,
+  // which on old single-arg ARMs is the target delta, not the filled amount). Keyed by date;
+  // seeded at start from today's persisted ArmDailyStat.marketNetFlow.
+  const currentDayMarketFlow = new Map<string, bigint>()
+  // Market share count + address carried across allocations to compute each flow's share delta.
+  // Seeded from the latest persisted ArmState so a resumed run doesn't book a spurious first flow.
+  let lastMarketShares = 0n
+  let lastMarketAddress = ADDRESS_ZERO
+  let yieldSourceInitialized = false
   let initialize = async (ctx: Context) => {
     if (ctx.blocks[0].header.height < from) return
     const id = `${ctx.chain.id}:${armAddress}`
@@ -234,6 +267,7 @@ export const createOriginARMProcessors = ({
         p.addLog(transferFilter.value)
         p.addLog(baseAssetInboundFilter.value)
         p.addLog(baseAssetAddedFilter.value)
+        p.addLog(allocatedFilter.value)
         p.addTrace(swapFilter.value)
         tradeRateProcessor.setup(p)
         tradeRateMultibaseProcessor.setup(p)
@@ -262,8 +296,37 @@ export const createOriginARMProcessors = ({
           }
           yieldRowsInitialized = true
         }
+        if (!yieldSourceInitialized) {
+          // Seed the trading accumulator from today's persisted ArmDailyAssetYield rows so a
+          // mid-day restart continues summing rather than double-counting from zero.
+          const today = new Date(ctx.blocks[0].header.timestamp).toISOString().slice(0, 10)
+          const rows = await ctx.store.find(ArmDailyAssetYield, {
+            where: { chainId: ctx.chain.id, address: armAddress, date: today },
+          })
+          for (const row of rows) {
+            currentDayAssetYield.set(`${row.date}:${row.asset.toLowerCase()}`, {
+              tradingYield: row.tradingYield,
+              swapVolume: row.swapVolume,
+            })
+          }
+          // Seed today's running market flow so a mid-day restart keeps the net-flow total intact.
+          const todayStat = await ctx.store.get(ArmDailyStat, `${ctx.chain.id}:${today}:${armAddress}`)
+          if (todayStat) currentDayMarketFlow.set(today, todayStat.marketNetFlow)
+          // Seed the market-share baseline from the latest state so the first allocation in a resumed
+          // run computes a correct delta rather than treating the whole position as a fresh inflow.
+          const lastState = await ctx.store.findOne(ArmState, {
+            where: { chainId: ctx.chain.id, address: armAddress },
+            order: { blockNumber: 'DESC' },
+          })
+          if (lastState) {
+            lastMarketShares = lastState.marketShares
+            lastMarketAddress = lastState.activeMarket
+          }
+          yieldSourceInitialized = true
+        }
         const states: ArmState[] = []
         const dailyStatsMap = new Map<string, ArmDailyStat>()
+        const dailyAssetYieldMap = new Map<string, ArmDailyAssetYield>()
         const changedYieldRows = new Map<string, ArmAddressYield>()
         const redemptionMap = new Map<string, ArmWithdrawalRequest>()
         const swaps: ArmSwap[] = []
@@ -356,10 +419,20 @@ export const createOriginARMProcessors = ({
           const activeMarketContract = hasMarket
             ? new originOsArmAbi.Contract(ctx, block.header, activeMarket!)
             : undefined
+          // Always value the market position with convertToAssets (true shares x price), never
+          // previewRedeem — previewRedeem caps at currently-withdrawable liquidity, so it understates
+          // the position when the market is illiquid (the same bug that was fixed in the ARM contract).
           const marketAssets =
             activeMarketContract && marketBalanceOf > 0n
-              ? await activeMarketContract.previewRedeem(marketBalanceOf)
+              ? await activeMarketContract.convertToAssets(marketBalanceOf)
               : 0n
+          // Lending-market factors for yield-source attribution. pricePerShare = convertToAssets(1e18);
+          // defaults to 1e18 when there is no market so day-over-day diffs are no-ops.
+          const marketShares = marketBalanceOf
+          const marketPricePerShare = activeMarketContract
+            ? await activeMarketContract.convertToAssets(10n ** 18n)
+            : 10n ** 18n
+          const activeMarketAddress = hasMarket ? activeMarket!.toLowerCase() : ADDRESS_ZERO
           const date = new Date(block.header.timestamp)
           armStateEntity = new ArmState({
             id: stateId,
@@ -392,6 +465,9 @@ export const createOriginARMProcessors = ({
             ],
             // Per-asset redemptions in-flight, aligned to assets. [0] = 0; sum of [1+] == outstandingAssets1.
             outstandingAssets: outstandingAssetsBig.map((b) => b.toString()),
+            marketShares,
+            marketPricePerShare,
+            activeMarket: activeMarketAddress,
           })
           armStateEntity.totalYield = calculateTotalYield(armStateEntity)
           states.push(armStateEntity)
@@ -428,6 +504,16 @@ export const createOriginARMProcessors = ({
         }
         const calculateTotalYield = (state: ArmState) =>
           state.totalAssets - state.totalDeposits + state.totalWithdrawals
+        // Accumulate a swap's trading profit + liquidity-terms volume into the per-(date:asset)
+        // running total that feeds ArmDailyAssetYield.tradingYield.
+        const accrueTradingYield = (block: Block, asset: string, spread: bigint, token0Volume: bigint) => {
+          const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
+          const key = `${dateStr}:${asset.toLowerCase()}`
+          const acc = currentDayAssetYield.get(key) ?? { tradingYield: 0n, swapVolume: 0n }
+          acc.tradingYield += spread
+          acc.swapVolume += token0Volume
+          currentDayAssetYield.set(key, acc)
+        }
         // A base asset's rate in asset0 (liquidity) terms, 1e18-scaled (token0 per base).
         // Mirrors the assetRates logic: pegged base assets and the liquidity asset are 1:1;
         // appreciating assets use their adapter (post-upgrade) or getRate1 (pre-upgrade single base).
@@ -614,6 +700,25 @@ export const createOriginARMProcessors = ({
               }
               await ctx.store.save(armEntity)
             }
+            if (allocatedFilter.matches(log)) {
+              // An allocation moved liquidity in/out of the market. Snapshot the post-allocation
+              // state and derive the actual flow from the share change x price-per-share — the real
+              // asset value moved, independent of the Allocated event's (target, not actual) amount.
+              // On a market switch the new market starts fresh (the old position was redeemed and its
+              // outflow already counted), so reset the share baseline to 0 — otherwise the new
+              // market's opening deposit is mistaken for the switch and dropped, leaving the later
+              // withdrawals unbalanced and surfacing as phantom lending. The switch day itself is
+              // zeroed by the marketUnchanged guard.
+              const state = await getCurrentState(block)
+              if (lastMarketAddress !== ADDRESS_ZERO && state.activeMarket !== lastMarketAddress) {
+                lastMarketShares = 0n
+              }
+              const flow = ((state.marketShares - lastMarketShares) * state.marketPricePerShare) / 10n ** 18n
+              const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
+              currentDayMarketFlow.set(dateStr, (currentDayMarketFlow.get(dateStr) ?? 0n) + flow)
+              lastMarketShares = state.marketShares
+              lastMarketAddress = state.activeMarket
+            }
           }
 
           const swapHandledTransactions = new Set<string>()
@@ -675,6 +780,8 @@ export const createOriginARMProcessors = ({
                     }
                   }
                   if (sellBaseIn > 0n) {
+                    // Redeemable-value delta: base received (at rateB) − token0 paid out.
+                    const spread = (sellBaseIn * rateB - sellToken0Out * ONE) / ONE
                     swaps.push(
                       new ArmSwap({
                         ...swapMeta,
@@ -687,8 +794,10 @@ export const createOriginARMProcessors = ({
                         rateOut: ONE,
                         assets0: -sellToken0Out,
                         assets1: (sellBaseIn * rateB) / ONE,
+                        spread,
                       }),
                     )
+                    accrueTradingYield(block, baseAsset, spread, sellToken0Out)
                   }
 
                   // Trader buys base with token0: ARM receives token0, sends base.
@@ -711,6 +820,8 @@ export const createOriginARMProcessors = ({
                     }
                   }
                   if (buyBaseOut > 0n) {
+                    // Redeemable-value delta: token0 received − base paid out (at rateB).
+                    const spread = (buyToken0In * ONE - buyBaseOut * rateB) / ONE
                     swaps.push(
                       new ArmSwap({
                         ...swapMeta,
@@ -723,8 +834,10 @@ export const createOriginARMProcessors = ({
                         rateOut: rateB,
                         assets0: buyToken0In,
                         assets1: -(buyBaseOut * rateB) / ONE,
+                        spread,
                       }),
                     )
+                    accrueTradingYield(block, baseAsset, spread, buyToken0In)
                   }
                 }
               }
@@ -761,6 +874,9 @@ export const createOriginARMProcessors = ({
             const previousDailyStat =
               dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
             const armDayApy = calculateArmDailyApy({ block, state, previousDailyStat })
+            // Net lending-market flow accumulated for this date (used below for lendingYield and
+            // persisted on the daily stat for restart-safe seeding).
+            const marketNetFlow = currentDayMarketFlow.get(dateStr) ?? 0n
 
             // asset->liquidity rate, 1e18-scaled, aligned to armEntity.assets. [0] (liquidity) = 1e18.
             const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
@@ -824,14 +940,62 @@ export const createOriginARMProcessors = ({
               assetTotals: state.assetTotals,
               assetRates,
               outstandingAssets: state.outstandingAssets,
+              marketShares: state.marketShares,
+              marketPricePerShare: state.marketPricePerShare,
+              activeMarket: state.activeMarket,
+              marketNetFlow,
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
+
+            // ArmDailyAssetYield: one row per asset, partitioning the day's redeemable-value
+            // change into non-overlapping sources. Drifts are day-over-day vs the previous daily
+            // stat (same prev reference the daily `yield` uses), valued at par (the redeem rate).
+            const ONE_BIG = 10n ** 18n
+            const prevBalances = previousDailyStat?.assetBalances ?? []
+            const prevRates = previousDailyStat?.assetRates ?? []
+            const marketUnchanged =
+              previousDailyStat != null && previousDailyStat.activeMarket === state.activeMarket
+            // Exact lending yield: the day's market-position value change minus net deposits/
+            // withdrawals (which carry their own asset value and are not yield). Zeroed across a
+            // market switch, where the day-over-day marketAssets delta spans incomparable positions.
+            const lendingYield = marketUnchanged
+              ? state.marketAssets - previousDailyStat!.marketAssets - marketNetFlow
+              : 0n
+            for (let i = 0; i < armEntity.assets.length; i++) {
+              const asset = armEntity.assets[i].toLowerCase()
+              const acc = currentDayAssetYield.get(`${dateStr}:${asset}`)
+              const tradingYield = acc?.tradingYield ?? 0n
+              const swapVolume = acc?.swapVolume ?? 0n
+              // Appreciation only for non-pegged base assets (rate moves). prevBalance held at
+              // start-of-day × the day's rate change. Pegged assets and the liquidity asset = 0.
+              let appreciationYield = 0n
+              if (i > 0 && !armEntity.assetPegged[i] && prevBalances[i] != null && prevRates[i] != null) {
+                appreciationYield = (BigInt(prevBalances[i]) * (BigInt(assetRates[i]) - BigInt(prevRates[i]))) / ONE_BIG
+              }
+              const assetLendingYield = i === 0 ? lendingYield : 0n
+              dailyAssetYieldMap.set(`${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`, new ArmDailyAssetYield({
+                id: `${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`,
+                chainId: ctx.chain.id,
+                address: armAddress,
+                asset,
+                assetSymbol: armEntity.assetSymbols[i],
+                date: dateStr,
+                timestamp: new Date(block.header.timestamp),
+                blockNumber: block.header.height,
+                tradingYield,
+                appreciationYield,
+                lendingYield: assetLendingYield,
+                yield: tradingYield + appreciationYield + assetLendingYield,
+                swapVolume,
+              }))
+            }
           }
         }
 
         await Promise.all([
           ctx.store.insert(states),
           ctx.store.upsert([...dailyStatsMap.values()]),
+          ctx.store.upsert([...dailyAssetYieldMap.values()]),
           ctx.store.upsert([...changedYieldRows.values()]),
           ctx.store.upsert([...redemptionMap.values()]),
           ctx.store.insert(swaps),

@@ -78,4 +78,13 @@ export class ArmState {
 
     @StringColumn_({array: true, nullable: false})
     outstandingAssets!: (string)[]
+
+    @BigIntColumn_({nullable: false})
+    marketShares!: bigint
+
+    @BigIntColumn_({nullable: false})
+    marketPricePerShare!: bigint
+
+    @StringColumn_({nullable: false})
+    activeMarket!: string
 }
