@@ -4,6 +4,10 @@ on:
     tags:
       - 'prod-v*'
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
@@ -23,6 +27,11 @@ jobs:
 
       - name: Install squid CLI
         run: pnpm add -g @subsquid/cli
+
+      - name: Configure GitHub Packages auth
+        run: pnpm config set //npm.pkg.github.com/:_authToken "$NODE_AUTH_TOKEN"
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
