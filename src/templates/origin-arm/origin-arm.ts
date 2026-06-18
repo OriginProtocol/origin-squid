@@ -213,7 +213,11 @@ export const createOriginARMProcessors = ({
   let yieldSourceInitialized = false
   let initialize = async (ctx: Context) => {
     if (ctx.blocks[0].header.height < from) return
-    const id = `${ctx.chain.id}:${armAddress}`
+    // Must match the id the entity is created with below (`armAddress`). Previously this looked up
+    // `${chainId}:${armAddress}`, never found the row, and rebuilt a fresh Arm every run — silently
+    // dropping persisted state (upgradeBlock, adapters, appended base assets) and breaking upgrade
+    // detection on any run that resumed past the upgrade block.
+    const id = armAddress
     let entity = await ctx.store.get(Arm, id)
     if (entity) {
       armEntity = entity
