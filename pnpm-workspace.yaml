@@ -1,7 +1,6 @@
 allowBuilds:
   '@apollo/protobufjs': true
   '@lavamoat/preinstall-always-fail': false
-  '@originprotocol/squid-utils': true
   better-sqlite3: true
   bufferutil: true
   es5-ext: true
@@ -9,6 +8,9 @@ allowBuilds:
   keccak: true
   type-graphql: true
   utf-8-validate: true
+
+minimumReleaseAgeExclude:
+  - '@originprotocol/squid-utils@1.0.1'
 
 patchedDependencies:
   '@subsquid/portal-client@0.3.2': patches/@subsquid__portal-client@0.3.2.patch

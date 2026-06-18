@@ -40,7 +40,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.808.0",
     "@lavamoat/preinstall-always-fail": "^2.1.1",
-    "@originprotocol/squid-utils": "github:OriginProtocol/squid-utils#main",
+    "@originprotocol/squid-utils": "1.0.1",
     "@subsquid/big-decimal": "^1.0.0",
     "@subsquid/evm-processor": "^1.30.1",
     "@subsquid/graphql-server": "^4.12.0",
