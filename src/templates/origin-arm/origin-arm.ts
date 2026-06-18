@@ -186,13 +186,15 @@ export const createOriginARMProcessors = ({
       armEntity = entity
     } else {
       const armContract = new originOsArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
-      const [name, symbol, decimals, token0Addr, token1Addr] = await Promise.all([
+      const [name, symbol, decimals] = await Promise.all([
         armContract.name(),
         armContract.symbol(),
         armContract.decimals(),
-        armContract.token0(),
-        armContract.token1(),
       ])
+      // token0()/token1() were removed in the multi-base upgrade — calling them reverts on upgraded
+      // ARMs. Resolve the liquidity + primary-base addresses from the configured Currency symbols.
+      const token0Addr = currencyToAddress(chainId, token0)
+      const token1Addr = currencyToAddress(chainId, token1)
       const arm = new Arm({
         id: armAddress,
         chainId: ctx.chain.id,
