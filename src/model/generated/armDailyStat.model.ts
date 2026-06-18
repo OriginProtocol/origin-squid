@@ -115,7 +115,4 @@ export class ArmDailyStat {
 
     @StringColumn_({nullable: false})
     activeMarket!: string
-
-    @BigIntColumn_({nullable: false})
-    marketNetFlow!: bigint
 }

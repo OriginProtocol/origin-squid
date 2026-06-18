@@ -793,16 +793,11 @@ type ArmDailyStat @entity {
   # Per-asset protocol redemptions in-flight, aligned to Arm.assets. [0] = 0 (liquidity asset);
   # [i>0] = liquidity-denominated pendingRedeemAssets for base asset i. == sum is outstandingAssets1.
   outstandingAssets: [String!]!
-  # Lending-market position factors (carried day-over-day for ArmDailyAssetYield.lendingYield).
-  # See ArmState for semantics.
+  # Lending-market position snapshot (informational; ArmDailyAssetYield.lendingYield is accrued
+  # segment-by-segment, not derived from these). See ArmState for semantics.
   marketShares: BigInt!
   marketPricePerShare: BigInt!
   activeMarket: String!
-  # Net signed flow into the lending market for the day (deposits − withdrawals), liquidity-asset
-  # terms. Derived from the actual market-share change x price-per-share at each allocation (not the
-  # Allocated event amount, which on old ARMs is a target, not the filled amount).
-  # lendingYield = Δ marketAssets − marketNetFlow.
-  marketNetFlow: BigInt!
 }
 
 type ArmAddressYield @entity {

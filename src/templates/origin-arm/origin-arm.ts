@@ -200,15 +200,17 @@ export const createOriginARMProcessors = ({
   // Persists across batches; seeded once at processor start from today's persisted rows so a
   // mid-day restart keeps summing. Keyed `${date}:${assetLower}`.
   const currentDayAssetYield = new Map<string, { tradingYield: bigint; swapVolume: bigint }>()
-  // Per-date running net flow (signed, liquidity-asset terms) into the lending market. Subtracted
-  // from the day's marketAssets change to isolate true lending yield. Flow is derived from the
-  // actual share change x price-per-share at each allocation (NOT the Allocated event's amount,
-  // which on old single-arg ARMs is the target delta, not the filled amount). Keyed by date;
-  // seeded at start from today's persisted ArmDailyStat.marketNetFlow.
-  const currentDayMarketFlow = new Map<string, bigint>()
-  // Market share count + address carried across allocations to compute each flow's share delta.
-  // Seeded from the latest persisted ArmState so a resumed run doesn't book a spurious first flow.
+  // Per-date accrued lending yield (liquidity-asset terms), built by segmented accrual: each segment
+  // between consecutive checkpoints (an allocation or a daily snapshot) earns sharesHeld x Δpps, and
+  // is credited to the segment-end block's day. Closing the appreciation window *before* a flow lands
+  // means a deposit/withdrawal can never bleed across a day boundary — the per-day value is exact.
+  // Keyed by date; seeded at start from today's persisted ArmDailyAssetYield lending row.
+  const currentDayLending = new Map<string, bigint>()
+  // Carried checkpoint of the market position. lastMarketShares/Pps are the position held since the
+  // last checkpoint (constant until the next flow), used to settle the segment's appreciation.
+  // Seeded from the latest persisted ArmState so a resumed run continues from the right baseline.
   let lastMarketShares = 0n
+  let lastMarketPps = 10n ** 18n
   let lastMarketAddress = ADDRESS_ZERO
   let yieldSourceInitialized = false
   let initialize = async (ctx: Context) => {
@@ -312,18 +314,19 @@ export const createOriginARMProcessors = ({
               tradingYield: row.tradingYield,
               swapVolume: row.swapVolume,
             })
+            // Seed today's accrued lending from the liquidity asset's persisted row so a mid-day
+            // restart continues accruing rather than restarting today's total from zero.
+            if (row.lendingYield !== 0n) currentDayLending.set(row.date, row.lendingYield)
           }
-          // Seed today's running market flow so a mid-day restart keeps the net-flow total intact.
-          const todayStat = await ctx.store.get(ArmDailyStat, `${ctx.chain.id}:${today}:${armAddress}`)
-          if (todayStat) currentDayMarketFlow.set(today, todayStat.marketNetFlow)
-          // Seed the market-share baseline from the latest state so the first allocation in a resumed
-          // run computes a correct delta rather than treating the whole position as a fresh inflow.
+          // Seed the carried checkpoint (shares + pps + market) from the latest state so the first
+          // segment after a resume settles from the correct baseline.
           const lastState = await ctx.store.findOne(ArmState, {
             where: { chainId: ctx.chain.id, address: armAddress },
             order: { blockNumber: 'DESC' },
           })
           if (lastState) {
             lastMarketShares = lastState.marketShares
+            lastMarketPps = lastState.marketPricePerShare
             lastMarketAddress = lastState.activeMarket
           }
           yieldSourceInitialized = true
@@ -518,6 +521,23 @@ export const createOriginARMProcessors = ({
           acc.swapVolume += token0Volume
           currentDayAssetYield.set(key, acc)
         }
+        // Settle the lending segment from the last checkpoint up to this block: the position held
+        // since then (lastMarketShares) earned lastShares x (ppsNow - lastPps), credited to this
+        // block's day. Then advance the carried checkpoint to the post-flow position. Call at every
+        // allocation (settle before the flow's share change takes effect) and at each daily snapshot
+        // (the end-of-day boundary). A market switch resets the baseline so pps is never diffed
+        // across two different markets. `state` must be the post-allocation snapshot for this block.
+        const settleLending = (block: Block, state: ArmState) => {
+          const switched = lastMarketAddress !== ADDRESS_ZERO && state.activeMarket !== lastMarketAddress
+          if (!switched && lastMarketShares > 0n) {
+            const appreciation = (lastMarketShares * (state.marketPricePerShare - lastMarketPps)) / 10n ** 18n
+            const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
+            currentDayLending.set(dateStr, (currentDayLending.get(dateStr) ?? 0n) + appreciation)
+          }
+          lastMarketShares = state.marketShares
+          lastMarketPps = state.marketPricePerShare
+          lastMarketAddress = state.activeMarket
+        }
         // A base asset's rate in asset0 (liquidity) terms, 1e18-scaled (token0 per base).
         // Mirrors the assetRates logic: pegged base assets and the liquidity asset are 1:1;
         // appreciating assets use their adapter (post-upgrade) or getRate1 (pre-upgrade single base).
@@ -705,23 +725,13 @@ export const createOriginARMProcessors = ({
               await ctx.store.save(armEntity)
             }
             if (allocatedFilter.matches(log)) {
-              // An allocation moved liquidity in/out of the market. Snapshot the post-allocation
-              // state and derive the actual flow from the share change x price-per-share — the real
-              // asset value moved, independent of the Allocated event's (target, not actual) amount.
-              // On a market switch the new market starts fresh (the old position was redeemed and its
-              // outflow already counted), so reset the share baseline to 0 — otherwise the new
-              // market's opening deposit is mistaken for the switch and dropped, leaving the later
-              // withdrawals unbalanced and surfacing as phantom lending. The switch day itself is
-              // zeroed by the marketUnchanged guard.
+              // An allocation is about to change the market position. Snapshot the post-allocation
+              // state and settle the lending segment first: the pre-flow position earned up to this
+              // block (the deposit/withdraw mints/burns at the current pps, so pps is unchanged across
+              // the flow), then the carried baseline advances to the new position. This closes the
+              // appreciation window before the flow, so the flow never bleeds into another day.
               const state = await getCurrentState(block)
-              if (lastMarketAddress !== ADDRESS_ZERO && state.activeMarket !== lastMarketAddress) {
-                lastMarketShares = 0n
-              }
-              const flow = ((state.marketShares - lastMarketShares) * state.marketPricePerShare) / 10n ** 18n
-              const dateStr = new Date(block.header.timestamp).toISOString().slice(0, 10)
-              currentDayMarketFlow.set(dateStr, (currentDayMarketFlow.get(dateStr) ?? 0n) + flow)
-              lastMarketShares = state.marketShares
-              lastMarketAddress = state.activeMarket
+              settleLending(block, state)
             }
           }
 
@@ -878,9 +888,10 @@ export const createOriginARMProcessors = ({
             const previousDailyStat =
               dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
             const armDayApy = calculateArmDailyApy({ block, state, previousDailyStat })
-            // Net lending-market flow accumulated for this date (used below for lendingYield and
-            // persisted on the daily stat for restart-safe seeding).
-            const marketNetFlow = currentDayMarketFlow.get(dateStr) ?? 0n
+            // Close the day's final lending segment at this end-of-day snapshot (the position held
+            // since the last checkpoint earned up to now). After this, currentDayLending[dateStr]
+            // holds the full, exact lending yield for the day.
+            settleLending(block, state)
 
             // asset->liquidity rate, 1e18-scaled, aligned to armEntity.assets. [0] (liquidity) = 1e18.
             const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
@@ -947,7 +958,6 @@ export const createOriginARMProcessors = ({
               marketShares: state.marketShares,
               marketPricePerShare: state.marketPricePerShare,
               activeMarket: state.activeMarket,
-              marketNetFlow,
             })
             dailyStatsMap.set(currentDayId, armDailyStatEntity)
 
@@ -957,14 +967,10 @@ export const createOriginARMProcessors = ({
             const ONE_BIG = 10n ** 18n
             const prevBalances = previousDailyStat?.assetBalances ?? []
             const prevRates = previousDailyStat?.assetRates ?? []
-            const marketUnchanged =
-              previousDailyStat != null && previousDailyStat.activeMarket === state.activeMarket
-            // Exact lending yield: the day's market-position value change minus net deposits/
-            // withdrawals (which carry their own asset value and are not yield). Zeroed across a
-            // market switch, where the day-over-day marketAssets delta spans incomparable positions.
-            const lendingYield = marketUnchanged
-              ? state.marketAssets - previousDailyStat!.marketAssets - marketNetFlow
-              : 0n
+            // Exact lending yield: the appreciation accrued segment-by-segment over the day (settled
+            // at each allocation + this end-of-day snapshot). No flow subtraction, so it can't carry
+            // day-boundary noise; goes on the liquidity-asset row only.
+            const lendingYield = currentDayLending.get(dateStr) ?? 0n
             for (let i = 0; i < armEntity.assets.length; i++) {
               const asset = armEntity.assets[i].toLowerCase()
               const acc = currentDayAssetYield.get(`${dateStr}:${asset}`)
