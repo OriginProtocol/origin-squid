@@ -39,7 +39,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "0"
+    ],
+    "marketShares": "0",
+    "marketPricePerShare": "1077131924713334012",
+    "activeMarket": "0x8cf42b82fffa3e7714d62a2ca223acbec1eef095"
   },
   {
     "id": "1:2025-12-19:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -81,7 +88,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "24300868987333608824"
+    ],
+    "marketShares": "178522534094028709540",
+    "marketPricePerShare": "1081697224125771803",
+    "activeMarket": "0x8cf42b82fffa3e7714d62a2ca223acbec1eef095"
   },
   {
     "id": "1:2026-02-07:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -123,7 +137,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "179349884831034315316"
+    ],
+    "marketShares": "30902574688643332738",
+    "marketPricePerShare": "1001345191108265093",
+    "activeMarket": "0xe776485b4a12d50503af40dbea519671318472ed"
   },
   {
     "id": "1:2026-03-29:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -165,7 +186,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "0"
+    ],
+    "marketShares": "2248226040174288226686",
+    "marketPricePerShare": "1004225184641217155",
+    "activeMarket": "0xe776485b4a12d50503af40dbea519671318472ed"
   },
   {
     "id": "1:2026-05-18:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
@@ -207,6 +235,13 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "934179692610624523067"
+    ],
+    "marketShares": "1221878101610675244359",
+    "marketPricePerShare": "1007383805923742254",
+    "activeMarket": "0xe776485b4a12d50503af40dbea519671318472ed"
   }
 ]

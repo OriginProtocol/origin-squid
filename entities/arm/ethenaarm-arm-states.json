@@ -26,7 +26,14 @@
     "assetTotals": [
       "10001315316013489607861",
       "0"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "0"
+    ],
+    "marketShares": "7996834380213218566749",
+    "marketPricePerShare": "1000601310166767852",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24100000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -55,7 +62,14 @@
     "assetTotals": [
       "19974947944733243224703",
       "36556721988655572182"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "5426299162516898597162"
+    ],
+    "marketShares": "14459526549574204416373",
+    "marketPricePerShare": "1001145693286989571",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24200000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -84,7 +98,14 @@
     "assetTotals": [
       "19999517769653508293158",
       "23570261070008488766"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "1288075056948500794116"
+    ],
+    "marketShares": "14459526549574204416373",
+    "marketPricePerShare": "1001685731064154164",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24300000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -113,7 +134,14 @@
     "assetTotals": [
       "20036287404579387279393",
       "3443215320943901829"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "1963796975921569021822"
+    ],
+    "marketShares": "17984276114788626944295",
+    "marketPricePerShare": "1002350769876823177",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24400000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -142,7 +170,14 @@
     "assetTotals": [
       "19737810449635881142999",
       "275920330986880183642"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "19650430711826418588379"
+    ],
+    "marketShares": "0",
+    "marketPricePerShare": "1002918774581773269",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24500000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -171,7 +206,14 @@
     "assetTotals": [
       "20073832972852505528817",
       "22252883220373897863"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "6967064899916849503614"
+    ],
+    "marketShares": "10564766574588175923019",
+    "marketPricePerShare": "1003325337763320492",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24600000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -200,7 +242,14 @@
     "assetTotals": [
       "20127675593164842927156",
       "2471661989068897357"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "19984215120075156388408"
+    ],
+    "marketShares": "142169329741130863394",
+    "marketPricePerShare": "1003666187354491317",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24700000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -229,7 +278,14 @@
     "assetTotals": [
       "30027332042337495673768",
       "97035740536133246723"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "4352690759679264664372"
+    ],
+    "marketShares": "22663993730026710552712",
+    "marketPricePerShare": "1003998403038890565",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   },
   {
     "id": "1:24800000:0xceda2d856238aa0d12f6329de20b9115f07c366d",
@@ -258,6 +314,13 @@
     "assetTotals": [
       "26379651776565352316056",
       "3105820844759955880784"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "9853049542198646660286"
+    ],
+    "marketShares": "0",
+    "marketPricePerShare": "1004376708068882919",
+    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   }
 ]

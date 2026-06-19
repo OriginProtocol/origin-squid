@@ -469,6 +469,9 @@ const arm = (prefix: string, armAddress: string) => {
         assetBalances
         assetTotals
         outstandingAssets
+        marketShares
+        marketPricePerShare
+        activeMarket
       }
     `),
     gql(`
@@ -530,6 +533,9 @@ const arm = (prefix: string, armAddress: string) => {
         assetTotals
         assetRates
         outstandingAssets
+        marketShares
+        marketPricePerShare
+        activeMarket
       }
     `),
     gql(`
@@ -547,8 +553,36 @@ const arm = (prefix: string, armAddress: string) => {
         blockNumber
         address
         from
+        tokenIn
+        tokenOut
+        amountIn
+        amountOut
+        rateIn
+        rateOut
+        spread
         assets0
         assets1
+      }
+    `),
+    gql(`
+      ${prefix}_armDailyAssetYields: armDailyAssetYields(
+        limit: ${LIMIT},
+        orderBy: [blockNumber_ASC, id_ASC],
+        where: { address_eq: "${armAddress}", timestamp_lte: "${twoDaysAgo.toISOString()}", timestamp_gte: "2022-01-01T00:00:00Z" }
+      ) {
+        id
+        chainId
+        address
+        asset
+        assetSymbol
+        date
+        timestamp
+        blockNumber
+        tradingYield
+        appreciationYield
+        lendingYield
+        yield
+        swapVolume
       }
     `),
     gql(`

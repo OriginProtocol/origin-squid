@@ -39,7 +39,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "0"
+    ],
+    "marketShares": "0",
+    "marketPricePerShare": "1000000000000000000",
+    "activeMarket": "0x0000000000000000000000000000000000000000"
   },
   {
     "id": "146:2025-07-11:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -81,7 +88,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "603000000000000000000"
+    ],
+    "marketShares": "117407920026373542103263602098",
+    "marketPricePerShare": "1008054432507",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2025-08-30:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -123,7 +137,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "504375258867452823360933"
+    ],
+    "marketShares": "1167170092248412862883279842149",
+    "marketPricePerShare": "1013505872220",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2025-10-19:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -165,7 +186,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "795548768298027981302159"
+    ],
+    "marketShares": "3648953028066444887102063961",
+    "marketPricePerShare": "1019163404630",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2025-12-08:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -207,7 +235,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "727727120132418320107614"
+    ],
+    "marketShares": "156726318937392430117737545668",
+    "marketPricePerShare": "1022931499266",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2026-01-27:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -249,7 +284,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "5261877889059045482990"
+    ],
+    "marketShares": "917787496483041440537580102737",
+    "marketPricePerShare": "1024518721603",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2026-03-18:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -291,7 +333,14 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "63239944414830218393881"
+    ],
+    "marketShares": "337923792699892763459658840530",
+    "marketPricePerShare": "1026101791380",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
     "id": "146:2026-05-07:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
@@ -333,6 +382,13 @@
     "assetRates": [
       "1000000000000000000",
       "1000000000000000000"
-    ]
+    ],
+    "outstandingAssets": [
+      "0",
+      "0"
+    ],
+    "marketShares": "347573210516010452688801614889",
+    "marketPricePerShare": "1028525674816",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   }
 ]
