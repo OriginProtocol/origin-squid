@@ -103,6 +103,21 @@ export const createOriginARMProcessors = ({
     topic2: [armAddress],
     range: { from },
   })
+  // Every ERC20 transfer in/out of the ARM (any token; filtered to registered base assets at
+  // runtime). A rebase grows balanceOf with no Transfer, so the balance change not explained by
+  // these transfers is rebase yield. Token-agnostic so it covers every base asset, including ones
+  // added later via BaseAssetAdded (a static per-token filter can't). Requests are transfers out, so
+  // they net out — keeps it generic, no per-protocol redemption events.
+  const armInboundFilter = logFilter({
+    topic0: [erc20Abi.events.Transfer.topic],
+    topic2: [armAddress],
+    range: { from },
+  })
+  const armOutboundFilter = logFilter({
+    topic0: [erc20Abi.events.Transfer.topic],
+    topic1: [armAddress],
+    range: { from },
+  })
   // Multi-base upgrade (arm-oeth PR #221) registers each base asset + adapter and
   // emits BaseAssetAdded. The first occurrence marks the upgrade for this ARM. The
   // new contract also re-emits TraderateChanged with a different signature/topic, so
@@ -200,18 +215,20 @@ export const createOriginARMProcessors = ({
   // Persists across batches; seeded once at processor start from today's persisted rows so a
   // mid-day restart keeps summing. Keyed `${date}:${assetLower}`.
   const currentDayAssetYield = new Map<string, { tradingYield: bigint; swapVolume: bigint }>()
-  // Per-date accrued lending yield (liquidity-asset terms), built by segmented accrual: each segment
-  // between consecutive checkpoints (an allocation or a daily snapshot) earns sharesHeld x Δpps, and
-  // is credited to the segment-end block's day. Closing the appreciation window *before* a flow lands
-  // means a deposit/withdrawal can never bleed across a day boundary — the per-day value is exact.
-  // Keyed by date; seeded at start from today's persisted ArmDailyAssetYield lending row.
+  // Per-date lending yield, built by segmented accrual (each segment earns sharesHeld × Δpps,
+  // credited to the segment-end day). Settling before each flow keeps it day-boundary-safe.
   const currentDayLending = new Map<string, bigint>()
-  // Carried checkpoint of the market position. lastMarketShares/Pps are the position held since the
-  // last checkpoint (constant until the next flow), used to settle the segment's appreciation.
-  // Seeded from the latest persisted ArmState so a resumed run continues from the right baseline.
+  // Carried market-position checkpoint (shares/pps held since the last settle), seeded from the
+  // latest ArmState so a resumed run continues from the right baseline.
   let lastMarketShares = 0n
   let lastMarketPps = 10n ** 18n
   let lastMarketAddress = ADDRESS_ZERO
+  // Per-date rebase yield (folded into appreciationYield). Keyed by asset: lastBaseBalance is the
+  // balance at the last settle; baseTransferFlow is net transfers since then (reset on settle, so it
+  // covers the same window as Δbalance).
+  const currentDayRebase = new Map<string, bigint>()
+  const lastBaseBalance = new Map<string, bigint>()
+  const baseTransferFlow = new Map<string, bigint>()
   let yieldSourceInitialized = false
   let initialize = async (ctx: Context) => {
     if (ctx.blocks[0].header.height < from) return
@@ -272,6 +289,8 @@ export const createOriginARMProcessors = ({
         p.addLog(feeCollectedFilter.value)
         p.addLog(transferFilter.value)
         p.addLog(baseAssetInboundFilter.value)
+        p.addLog(armInboundFilter.value)
+        p.addLog(armOutboundFilter.value)
         p.addLog(baseAssetAddedFilter.value)
         p.addLog(allocatedFilter.value)
         p.addTrace(swapFilter.value)
@@ -328,6 +347,11 @@ export const createOriginARMProcessors = ({
             lastMarketShares = lastState.marketShares
             lastMarketPps = lastState.marketPricePerShare
             lastMarketAddress = lastState.activeMarket
+            // Seed each base asset's balance baseline so the first rebase settle after a resume
+            // doesn't book the whole position as passive growth.
+            for (let i = 1; i < armEntity.assets.length; i++) {
+              lastBaseBalance.set(armEntity.assets[i].toLowerCase(), BigInt(lastState.assetBalances[i] ?? '0'))
+            }
           }
           yieldSourceInitialized = true
         }
@@ -521,12 +545,10 @@ export const createOriginARMProcessors = ({
           acc.swapVolume += token0Volume
           currentDayAssetYield.set(key, acc)
         }
-        // Settle the lending segment from the last checkpoint up to this block: the position held
-        // since then (lastMarketShares) earned lastShares x (ppsNow - lastPps), credited to this
-        // block's day. Then advance the carried checkpoint to the post-flow position. Call at every
-        // allocation (settle before the flow's share change takes effect) and at each daily snapshot
-        // (the end-of-day boundary). A market switch resets the baseline so pps is never diffed
-        // across two different markets. `state` must be the post-allocation snapshot for this block.
+        // Settle the lending segment up to this block (lastMarketShares × Δpps), then advance the
+        // checkpoint. Call at each allocation (before its share change) and each daily snapshot. A
+        // market switch resets the baseline so pps is never diffed across two markets. `state` must
+        // be the post-allocation snapshot.
         const settleLending = (block: Block, state: ArmState) => {
           const switched = lastMarketAddress !== ADDRESS_ZERO && state.activeMarket !== lastMarketAddress
           if (!switched && lastMarketShares > 0n) {
@@ -537,6 +559,27 @@ export const createOriginARMProcessors = ({
           lastMarketShares = state.marketShares
           lastMarketPps = state.marketPricePerShare
           lastMarketAddress = state.activeMarket
+        }
+        // Rebase per base asset: the balance change since the last settle not explained by transfers,
+        // valued at rate. ~0 for non-rebasing bases.
+        const settleRebase = (state: ArmState, dateStr: string, rates: string[]) => {
+          const ONE = 10n ** 18n
+          for (let i = 1; i < armEntity.assets.length; i++) {
+            const asset = armEntity.assets[i].toLowerCase()
+            const balanceNow = BigInt(state.assetBalances[i] ?? '0')
+            const rate = BigInt(rates[i] ?? ONE.toString())
+            const flow = baseTransferFlow.get(asset) ?? 0n
+            // First settle for this asset (cold start, or a base added mid-history): seed the
+            // baseline to the window-start balance (balanceNow - flow) so the first window books 0
+            // instead of mistaking the opening inflow for rebase.
+            const prevBalance = lastBaseBalance.get(asset) ?? balanceNow - flow
+            const rebaseValue = ((balanceNow - prevBalance - flow) * rate) / ONE
+            if (rebaseValue !== 0n) {
+              currentDayRebase.set(`${dateStr}:${asset}`, (currentDayRebase.get(`${dateStr}:${asset}`) ?? 0n) + rebaseValue)
+            }
+            lastBaseBalance.set(asset, balanceNow)
+            baseTransferFlow.set(asset, 0n)
+          }
         }
         // A base asset's rate in asset0 (liquidity) terms, 1e18-scaled (token0 per base).
         // Mirrors the assetRates logic: pegged base assets and the liquidity asset are 1:1;
@@ -696,6 +739,19 @@ export const createOriginARMProcessors = ({
               // Inbound base-asset transfer changes the ARM's liquidity, which can
               // advance claimable. Snapshot ArmState so the new value is captured.
               await getCurrentState(block)
+            }
+            // Explicit balance moves of a registered base asset, netted out by the rebase settle.
+            // (log.address is the token; only base assets, index >= 1, are tracked. Self-transfer
+            // matches both directions → nets 0.)
+            const inbound = armInboundFilter.matches(log)
+            const outbound = armOutboundFilter.matches(log)
+            if (inbound || outbound) {
+              const idx = armEntity.assets.findIndex((a) => a.toLowerCase() === log.address)
+              if (idx >= 1) {
+                const value = erc20Abi.events.Transfer.decode(log).value
+                const k = armEntity.assets[idx].toLowerCase()
+                baseTransferFlow.set(k, (baseTransferFlow.get(k) ?? 0n) + (inbound ? value : 0n) - (outbound ? value : 0n))
+              }
             }
             if (baseAssetAddedFilter.matches(log)) {
               // Multi-base upgrade: the ARM registered a base asset + adapter. Append
@@ -918,6 +974,9 @@ export const createOriginARMProcessors = ({
               assetRates = [ONE, (rateAsset1 ?? 10n ** 18n).toString()]
             }
 
+            // Close the rebase window at this snapshot now that we have state + rate.
+            settleRebase(state, dateStr, assetRates)
+
             const armDailyStatEntity = new ArmDailyStat({
               id: currentDayId,
               chainId: ctx.chain.id,
@@ -976,11 +1035,11 @@ export const createOriginARMProcessors = ({
               const acc = currentDayAssetYield.get(`${dateStr}:${asset}`)
               const tradingYield = acc?.tradingYield ?? 0n
               const swapVolume = acc?.swapVolume ?? 0n
-              // Appreciation only for non-pegged base assets (rate moves). prevBalance held at
-              // start-of-day × the day's rate change. Pegged assets and the liquidity asset = 0.
-              let appreciationYield = 0n
+              // Appreciation = rebase (rebasing bases) + rate appreciation (non-pegged bases). The
+              // two are orthogonal (a base does one or the other), so they add.
+              let appreciationYield = i > 0 ? (currentDayRebase.get(`${dateStr}:${asset}`) ?? 0n) : 0n
               if (i > 0 && !armEntity.assetPegged[i] && prevBalances[i] != null && prevRates[i] != null) {
-                appreciationYield = (BigInt(prevBalances[i]) * (BigInt(assetRates[i]) - BigInt(prevRates[i]))) / ONE_BIG
+                appreciationYield += (BigInt(prevBalances[i]) * (BigInt(assetRates[i]) - BigInt(prevRates[i]))) / ONE_BIG
               }
               const assetLendingYield = i === 0 ? lendingYield : 0n
               dailyAssetYieldMap.set(`${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`, new ArmDailyAssetYield({
