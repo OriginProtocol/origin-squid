@@ -46,5 +46,16 @@ export const originArmProcessors = [
     capManagerAddress: addresses.arms['ARM-USDe-sUSDe'].capManager,
     armType: 'ethena',
     marketFrom: 23924654,
+    // History cleanup: a since-resolved contract bug corrupted assetsPerShare from 2026-04-23 to
+    // 2026-05-13 (it crashed ~1.0134 -> 0.8615, then recovered), injecting ~1116 phantom fees and
+    // ±4500 yield swings into every yield series. Anchor at the 2026-05-13 post-recovery snapshot
+    // (block 25089644): all yield (ArmDailyStat, ArmDailyAssetYield, ArmAddressYield) starts clean
+    // from the next day, cumulative counters rebased by the on-chain baseline below. Holder share
+    // balances / cost basis are untouched. Funds here are small; the early data is not material.
+    yieldBaseline: {
+      block: 25089644,
+      cumulativeYield: 235834455255935430654n,
+      cumulativeFees: 1195643896382772555709n,
+    },
   }),
 ]

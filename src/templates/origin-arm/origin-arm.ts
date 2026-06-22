@@ -52,6 +52,7 @@ export const createOriginARMProcessors = ({
   capManagerAddress,
   marketFrom,
   armType,
+  yieldBaseline,
 }: {
   chainId?: number
   name: string
@@ -63,6 +64,12 @@ export const createOriginARMProcessors = ({
   capManagerAddress: string
   marketFrom?: number
   armType: 'lido' | 'etherfi' | 'os' | 'ethena'
+  // One-time history cleanup for an ARM whose on-chain assetsPerShare was corrupted by a
+  // since-resolved contract bug (e.g. the sUSDe ARM, 2026-04-23..05-13). All yield series
+  // (ArmDailyStat, ArmDailyAssetYield, ArmAddressYield) start clean at `block`, with cumulative
+  // counters rebased by the captured on-chain baseline. Holder share balances / cost basis are
+  // never touched. Omit for unaffected ARMs.
+  yieldBaseline?: { block: number; cumulativeYield: bigint; cumulativeFees: bigint }
 }): Processor[] => {
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
@@ -211,6 +218,11 @@ export const createOriginARMProcessors = ({
   const previousDayRows = new Map<string, ArmAddressYield>()
   const currentDayRows = new Map<string, ArmAddressYield>()
   let yieldRowsInitialized = false
+  // yieldBaseline history-cleanup state. `sawBelowBaseline` ensures the one-time holder reset only
+  // fires during a backfill that actually processes the pre-baseline blocks — never on a production
+  // resume that starts past the baseline (which would wrongly re-zero accrued yield).
+  let sawBelowBaseline = false
+  let yieldBaselineApplied = false
   // Per-(date:asset) running accumulator of swap trading profit + volume, for ArmDailyAssetYield.
   // Persists across batches; seeded once at processor start from today's persisted rows so a
   // mid-day restart keeps summing. Keyed `${date}:${assetLower}`.
@@ -662,6 +674,25 @@ export const createOriginARMProcessors = ({
         }
 
         for (const block of ctx.blocks) {
+          // yieldBaseline history cleanup: when the backfill crosses the baseline block, reset every
+          // holder's accumulated yield to a clean zero and re-anchor lastR to the current (resolved)
+          // rate, so yield accrues cleanly from here. Share balances and cost basis are left intact.
+          // Guarded by sawBelowBaseline so a resume starting past the baseline never re-fires.
+          if (yieldBaseline) {
+            if (block.header.height < yieldBaseline.block) {
+              sawBelowBaseline = true
+            } else if (sawBelowBaseline && !yieldBaselineApplied) {
+              const baselineState = await getCurrentState(block)
+              const R0 = baselineState.assetsPerShare
+              for (const row of new Set([...currentDayRows.values(), ...previousDayRows.values()])) {
+                row.cumulativeYield = 0n
+                row.yieldRemainder = 0n
+                row.lastR = R0
+                row.yield = 0n
+              }
+              yieldBaselineApplied = true
+            }
+          }
           for (const log of block.logs) {
             // ArmWithdrawalRequest
             if (redeemRequestedFilter.matches(log)) {
@@ -1003,8 +1034,11 @@ export const createOriginARMProcessors = ({
                 state.feesAccrued -
                 ((yesterdayState?.totalFees ?? 0n) + (yesterdayState?.feesAccrued ?? 0n)),
               yield: state.totalYield - (yesterdayState?.totalYield ?? 0n),
-              cumulativeFees: state.totalFees + state.feesAccrued,
-              cumulativeYield: state.totalYield,
+              // Rebase cumulative counters by the captured on-chain baseline so the cleaned series
+              // starts at 0 at the anchor (daily yield/fees above are unaffected — they're deltas of
+              // already-clean post-anchor values).
+              cumulativeFees: state.totalFees + state.feesAccrued - (yieldBaseline?.cumulativeFees ?? 0n),
+              cumulativeYield: state.totalYield - (yieldBaseline?.cumulativeYield ?? 0n),
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
               rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
               rateNative: +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18),
@@ -1061,11 +1095,16 @@ export const createOriginARMProcessors = ({
           }
         }
 
+        // yieldBaseline history cleanup: suppress all yield-series rows at/before the anchor block so
+        // the cleaned history starts at the first full post-anchor day (whose day-over-day delta is
+        // measured against the anchor day's clean, post-recovery ArmState). Raw ArmState and the ERC20
+        // holder-balance tracker are never gated, so balances stay complete and correct.
+        const afterBaseline = (blockNumber: number) => !yieldBaseline || blockNumber > yieldBaseline.block
         await Promise.all([
           ctx.store.insert(states),
-          ctx.store.upsert([...dailyStatsMap.values()]),
-          ctx.store.upsert([...dailyAssetYieldMap.values()]),
-          ctx.store.upsert([...changedYieldRows.values()]),
+          ctx.store.upsert([...dailyStatsMap.values()].filter((r) => afterBaseline(r.blockNumber))),
+          ctx.store.upsert([...dailyAssetYieldMap.values()].filter((r) => afterBaseline(r.blockNumber))),
+          ctx.store.upsert([...changedYieldRows.values()].filter((r) => afterBaseline(r.blockNumber))),
           ctx.store.upsert([...redemptionMap.values()]),
           ctx.store.insert(swaps),
           tradeRateProcessor.process(ctx),
