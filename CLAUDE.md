@@ -88,6 +88,10 @@ Entry points: `src/main-*.ts` files (e.g., `main-oeth.ts`, `main-ousd.ts`)
 
 ## Development Workflow
 
+### Committing
+- **Always pause for human review before committing.** Present the diff/summary and wait for explicit approval; do not run `git commit` until the user confirms. This applies even after tests/validation pass.
+- Never push or open PRs unless the user explicitly asks.
+
 ### Adding New Events/Contracts
 1. Add ABI JSON to `src/abi-json/`
 2. Run `pnpm run typegen` to generate TypeScript interfaces

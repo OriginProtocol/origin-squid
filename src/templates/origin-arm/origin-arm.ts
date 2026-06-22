@@ -777,11 +777,12 @@ export const createOriginARMProcessors = ({
             const inbound = armInboundFilter.matches(log)
             const outbound = armOutboundFilter.matches(log)
             if (inbound || outbound) {
+              // log.address (lowercase) is the token; only registered base assets (index >= 1) accrue
+              // rebase flow. It keys baseTransferFlow directly, matching settleRebase's lowercased key.
               const idx = armEntity.assets.findIndex((a) => a.toLowerCase() === log.address)
               if (idx >= 1) {
                 const value = erc20Abi.events.Transfer.decode(log).value
-                const k = armEntity.assets[idx].toLowerCase()
-                baseTransferFlow.set(k, (baseTransferFlow.get(k) ?? 0n) + (inbound ? value : 0n) - (outbound ? value : 0n))
+                baseTransferFlow.set(log.address, (baseTransferFlow.get(log.address) ?? 0n) + (inbound ? value : 0n) - (outbound ? value : 0n))
               }
             }
             if (baseAssetAddedFilter.matches(log)) {
