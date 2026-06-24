@@ -220,6 +220,9 @@ export const ogv = {
   governance: OGV_GOVERNANCE_ADDRESS,
 }
 
+/** Merkl DistributionCreator (campaign creation) — same address across most chains. */
+export const MERKL_DISTRIBUTION_CREATOR_ADDRESS = '0x8bb4c975ff3c250e0ceea271728547f3802b36fd'
+
 export const arms: Record<string, { address: string; capManager: string; zapper: string }> = {
   ['ARM-WETH-eETH']: {
     address: '0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2',

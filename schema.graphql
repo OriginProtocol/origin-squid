@@ -87,6 +87,32 @@ type CurvePoolRate @entity {
   name: String!
   rate: BigInt!
 }
+# Merkl reward campaigns targeting our ARM LP tokens.
+# Sourced from the DistributionCreator contract's NewCampaign / CampaignOverride events.
+# One row per campaign, upserted on creation and on each override.
+type MerklCampaign @entity {
+  id: ID! # `${chainId}:${campaignId}`
+  chainId: Int! @index
+  campaignId: String! @index
+  # ARM LP token this campaign targets (matched within campaignData).
+  armAddress: String! @index
+  creator: String!
+  rewardToken: String! @index
+  # Gross budget including Merkl fees; immutable after creation.
+  amount: BigInt!
+  campaignType: Int! @index
+  startTimestamp: DateTime!
+  endTimestamp: DateTime!
+  # Seconds; mutable via overrideCampaign.
+  duration: Int!
+  # Raw abi-encoded campaign-specific params, for later typed decode.
+  campaignData: String!
+  createdBlockNumber: Int! @index
+  createdTimestamp: DateTime! @index
+  createdTxHash: String! @index
+  lastUpdatedBlockNumber: Int!
+  lastUpdatedTimestamp: DateTime!
+}
 type ProtocolDailyStat @entity {
   id: ID!
   date: String! @index

@@ -1,5 +1,5 @@
-import { startToastVacuumMonitor } from '@utils/toast-vacuum'
 import { coingeckoProcessor } from 'mainnet/processors/coingecko'
+import { createMerklProcessor } from 'mainnet/processors/merkl'
 import { notionProcessor } from 'mainnet/processors/notion'
 import { ognBuybacks } from 'mainnet/processors/ogn-buybacks'
 import { originArmProcessors } from 'mainnet/processors/origin-arms'
@@ -17,14 +17,17 @@ import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
 import { createTransactionProcessor } from '@templates/transactions'
 import {
+  MERKL_DISTRIBUTION_CREATOR_ADDRESS,
   OGN_ADDRESS,
   OGN_GOVERNANCE_ADDRESS,
   OGN_REWARDS_SOURCE_ADDRESS,
   OGV_GOVERNANCE_ADDRESS,
   XOGN_ADDRESS,
+  arms,
 } from '@utils/addresses'
 import { FIELDS_WITH_RECEIPTS_INFO } from '@utils/batch-proccesor-fields'
 import { initProcessorFromDump } from '@utils/dumps'
+import { startToastVacuumMonitor } from '@utils/toast-vacuum'
 
 import * as dailyStats from './mainnet/post-processors/ogn-daily-stats'
 import * as curve from './mainnet/processors/curve'
@@ -55,6 +58,8 @@ export const processor = defineSquidProcessor({
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     coingeckoProcessor,
     ...originArmProcessors,
+    // Merkl reward campaigns targeting our ARM LP tokens (from earliest mainnet ARM deploy).
+    createMerklProcessor({ from: 20987226, distributionCreator: MERKL_DISTRIBUTION_CREATOR_ADDRESS, arms }),
     // Defender Relayer for Lido ARM
     createTransactionProcessor({ from: 18744591, address: ['0x39878253374355dbcc15c86458f084fb6f2d6de7'] }),
     createPoolsProcessor(mainnet.id),

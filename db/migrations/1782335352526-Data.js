@@ -1,5 +1,5 @@
-module.exports = class Data1781807613637 {
-    name = 'Data1781807613637'
+module.exports = class Data1782335352526 {
+    name = 'Data1782335352526'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -25,6 +25,15 @@ module.exports = class Data1781807613637 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
+        await db.query(`CREATE TABLE "merkl_campaign" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "campaign_id" text NOT NULL, "arm_address" text NOT NULL, "creator" text NOT NULL, "reward_token" text NOT NULL, "amount" numeric NOT NULL, "campaign_type" integer NOT NULL, "start_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "end_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "duration" integer NOT NULL, "campaign_data" text NOT NULL, "created_block_number" integer NOT NULL, "created_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "created_tx_hash" text NOT NULL, "last_updated_block_number" integer NOT NULL, "last_updated_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_f63c33d73458ac2198b17eb14ff" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_29828e1f1a422c9b9c9a749843" ON "merkl_campaign" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_248d29792045fce89602269021" ON "merkl_campaign" ("campaign_id") `)
+        await db.query(`CREATE INDEX "IDX_84ad5bd2bd5d0444f85cfffad4" ON "merkl_campaign" ("arm_address") `)
+        await db.query(`CREATE INDEX "IDX_1a510f1566522095a8cd099a32" ON "merkl_campaign" ("reward_token") `)
+        await db.query(`CREATE INDEX "IDX_6dee0436828f1f0a11fabd33c1" ON "merkl_campaign" ("campaign_type") `)
+        await db.query(`CREATE INDEX "IDX_5a2cf4e75c83685ffcdc24eaf3" ON "merkl_campaign" ("created_block_number") `)
+        await db.query(`CREATE INDEX "IDX_6107053a9fbcf0017dee711744" ON "merkl_campaign" ("created_timestamp") `)
+        await db.query(`CREATE INDEX "IDX_0b789d248a5141139cffd6dc44" ON "merkl_campaign" ("created_tx_hash") `)
         await db.query(`CREATE TABLE "protocol_daily_stat" ("id" character varying NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "rate_usd" numeric NOT NULL, "supply" numeric NOT NULL, "earning_tvl" numeric NOT NULL, "tvl" numeric NOT NULL, "yield" numeric NOT NULL, "revenue" numeric NOT NULL, "apy" numeric NOT NULL, "meta" jsonb NOT NULL, CONSTRAINT "PK_70427505fb8a9474c634fd7a154" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_f196efecb1b717f74494c4416b" ON "protocol_daily_stat" ("date") `)
         await db.query(`CREATE INDEX "IDX_a5af597a96fb8752dc00093192" ON "protocol_daily_stat" ("timestamp") `)
@@ -1014,6 +1023,15 @@ module.exports = class Data1781807613637 {
         await db.query(`DROP INDEX "public"."IDX_a5af597a96fb8752dc00093192"`)
         await db.query(`DROP INDEX "public"."IDX_f196efecb1b717f74494c4416b"`)
         await db.query(`DROP TABLE "protocol_daily_stat"`)
+        await db.query(`DROP INDEX "public"."IDX_0b789d248a5141139cffd6dc44"`)
+        await db.query(`DROP INDEX "public"."IDX_6107053a9fbcf0017dee711744"`)
+        await db.query(`DROP INDEX "public"."IDX_5a2cf4e75c83685ffcdc24eaf3"`)
+        await db.query(`DROP INDEX "public"."IDX_6dee0436828f1f0a11fabd33c1"`)
+        await db.query(`DROP INDEX "public"."IDX_1a510f1566522095a8cd099a32"`)
+        await db.query(`DROP INDEX "public"."IDX_84ad5bd2bd5d0444f85cfffad4"`)
+        await db.query(`DROP INDEX "public"."IDX_248d29792045fce89602269021"`)
+        await db.query(`DROP INDEX "public"."IDX_29828e1f1a422c9b9c9a749843"`)
+        await db.query(`DROP TABLE "merkl_campaign"`)
         await db.query(`DROP INDEX "public"."IDX_cefe6315e78e235fa4ab3de663"`)
         await db.query(`DROP INDEX "public"."IDX_561faf9883f4bb00ae6df34cc1"`)
         await db.query(`DROP TABLE "curve_pool_rate"`)
