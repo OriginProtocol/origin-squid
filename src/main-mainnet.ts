@@ -31,6 +31,7 @@ import * as curve from './mainnet/processors/curve'
 import { erc20s } from './mainnet/processors/erc20s'
 import * as mainnetExchangeRates from './mainnet/processors/exchange-rates'
 import * as legacyStaking from './mainnet/processors/legacy-staking'
+import { nativeBalanceProcessor } from './mainnet/processors/native'
 import * as nativeStaking from './mainnet/processors/native-staking'
 
 export const processor = defineSquidProcessor({
@@ -39,6 +40,7 @@ export const processor = defineSquidProcessor({
     mainnetExchangeRates,
     ognBuybacks,
     nativeStaking,
+    nativeBalanceProcessor,
     legacyStaking,
     curve,
     ccip({ chainId: 1 }),
