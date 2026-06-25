@@ -166,7 +166,6 @@ export const strategies = {
     ConvexStrategy: '0xea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3', // Deprecated
     LUSDMetaStrategy: '0x7A192DD9Cc4Ea9bdEdeC9992df74F1DA55e60a19', // Deprecated
     MetaMorphoStrategy: '0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0',
-    MakerStrategy: '0x6b69b755c629590ed59618a2712d8a2957ca98fc',
     GauntletPrimeUSDCStrategy: '0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1',
     GauntletPrimeUSDTStrategy: '0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26',
     SkySavingsRateStrategy: '0x5bd9af9c2506d29b6d79cb878284a270190eaeaa',
