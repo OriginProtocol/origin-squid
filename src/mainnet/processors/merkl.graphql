@@ -1,13 +1,15 @@
-# Merkl reward campaigns targeting our ARM LP tokens.
-# Sourced from the DistributionCreator contract's NewCampaign / CampaignOverride events.
-# One row per campaign, upserted on creation and on each override.
+# Merkl reward campaigns created by Origin (filtered on-chain by `creator`).
+#
+# The on-chain NewCampaign event does NOT contain the targeted contract — that lives
+# in Merkl's off-chain payload. So we capture our own campaigns trustlessly on-chain
+# (by creator) and resolve `targetToken` (and `armAddress`, when the target is one of
+# our ARMs) inline via the Merkl API at capture time, so each row is written complete.
 type MerklCampaign @entity {
   id: ID! # `${chainId}:${campaignId}`
   chainId: Int! @index
   campaignId: String! @index
-  # ARM LP token this campaign targets (matched within campaignData).
-  armAddress: String! @index
-  creator: String!
+  # On-chain CampaignParameters.creator (msg.sender of createCampaign) — our filter key.
+  creator: String! @index
   rewardToken: String! @index
   # Gross budget including Merkl fees; immutable after creation.
   amount: BigInt!
@@ -16,8 +18,13 @@ type MerklCampaign @entity {
   endTimestamp: DateTime!
   # Seconds; mutable via overrideCampaign.
   duration: Int!
-  # Raw abi-encoded campaign-specific params, for later typed decode.
+  # Raw 32-byte campaignData (off-chain payload pointer/hash), for reference.
   campaignData: String!
+  # Resolved via Merkl API (params.targetToken) at capture time: the contract whose
+  # holders earn rewards. null only if the campaign genuinely has no target.
+  targetToken: String @index
+  # = targetToken when it is one of our ARM LP tokens, else null. For ARM APY joins.
+  armAddress: String @index
   createdBlockNumber: Int! @index
   createdTimestamp: DateTime! @index
   createdTxHash: String! @index

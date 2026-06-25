@@ -19,9 +19,6 @@ export class MerklCampaign {
 
     @Index_()
     @StringColumn_({nullable: false})
-    armAddress!: string
-
-    @StringColumn_({nullable: false})
     creator!: string
 
     @Index_()
@@ -46,6 +43,14 @@ export class MerklCampaign {
 
     @StringColumn_({nullable: false})
     campaignData!: string
+
+    @Index_()
+    @StringColumn_({nullable: true})
+    targetToken!: string | undefined | null
+
+    @Index_()
+    @StringColumn_({nullable: true})
+    armAddress!: string | undefined | null
 
     @Index_()
     @IntColumn_({nullable: false})
