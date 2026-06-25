@@ -35,6 +35,7 @@ export const mainnetCurrencies = {
   BAL: '0xba100000625a3754423978a60c9317c58a424e3d',
   MORPHO: '0x58d97b57bb95320f9a05dc918aef65434969c2b2',
   MORPHO_LEGACY: '0x9994e35db50125e0df82e4c2dde62496ce330999',
+  aglaMerklUSD: '0x3e0ae4c19c3bdfc9eed5a2898d3a57c6f61e847a', // Merkl test reward token, treated as $1
 } as const
 
 export const mainnetCurrenciesByAddress = invertMap(mainnetCurrencies)

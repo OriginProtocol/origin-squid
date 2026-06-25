@@ -11,6 +11,8 @@ type MerklCampaign @entity {
   # On-chain CampaignParameters.creator (msg.sender of createCampaign) — our filter key.
   creator: String! @index
   rewardToken: String! @index
+  # Reward token decimals (Merkl API params.decimalsRewardToken), for valuing `amount`.
+  rewardTokenDecimals: Int!
   # Gross budget including Merkl fees; immutable after creation.
   amount: BigInt!
   campaignType: Int! @index

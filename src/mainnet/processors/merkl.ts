@@ -7,7 +7,7 @@ import { arms } from '@utils/addresses'
 const DISTRIBUTION_CREATOR = '0x8bb4c975ff3c250e0ceea271728547f3802b36fd'
 // Address(es) Origin uses to create Merkl campaigns (CampaignParameters.creator).
 // Used to filter NewCampaign events down to our own campaigns. Extend as needed.
-const CREATORS = ['0x6e74053a3798e0fc9a9775f7995316b27f21c4d2']
+const CREATORS = ['0x074105fdd39e982b2ffe749a193c942db1046ab9']
 // Earliest mainnet ARM deploy — campaigns can only target an ARM after it exists.
 const FROM = 20987226
 const MERKL_API = 'https://api.merkl.xyz/v4'
@@ -29,8 +29,11 @@ type CampaignStruct = ReturnType<typeof abi.events.NewCampaign.decode>['campaign
  * so Subsquid retries it later — no partial/null data is ever written, and the processor
  * pauses rather than crashing.
  */
-const resolveTargetToken = async (ctx: Context, chainId: number, campaignId: string): Promise<string | null> => {
-  const url = `${MERKL_API}/campaigns?chainId=${chainId}&campaignId=${campaignId}`
+type ResolvedCampaign = { targetToken: string | null; rewardTokenDecimals: number }
+
+const resolveCampaign = async (ctx: Context, chainId: number, campaignId: string): Promise<ResolvedCampaign> => {
+  // test=true includes test campaigns in the response (additive — live campaigns still returned).
+  const url = `${MERKL_API}/campaigns?chainId=${chainId}&campaignId=${campaignId}&test=true`
   const maxAttempts = 6
   let lastError: unknown
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -38,16 +41,19 @@ const resolveTargetToken = async (ctx: Context, chainId: number, campaignId: str
     try {
       const res = await fetch(url)
       if (!res.ok) throw new Error(`status ${res.status}`)
-      const data = (await res.json()) as { campaignId?: string; params?: { targetToken?: string } }[]
+      const data = (await res.json()) as { campaignId?: string; params?: { targetToken?: string; decimalsRewardToken?: number } }[]
       const match = data.find((c) => c?.campaignId?.toLowerCase() === campaignId.toLowerCase())
       if (!match) throw new Error('campaign not yet indexed by Merkl')
-      return match.params?.targetToken?.toLowerCase() ?? null
+      return {
+        targetToken: match.params?.targetToken?.toLowerCase() ?? null,
+        rewardTokenDecimals: match.params?.decimalsRewardToken ?? 18,
+      }
     } catch (err) {
       lastError = err
       ctx.log.warn(`merkl resolve attempt ${attempt + 1}/${maxAttempts} failed for ${campaignId}: ${err}`)
     }
   }
-  throw new Error(`merkl: failed to resolve target for ${campaignId} after ${maxAttempts} attempts: ${lastError}`)
+  throw new Error(`merkl: failed to resolve campaign ${campaignId} after ${maxAttempts} attempts: ${lastError}`)
 }
 
 const newCampaignFilter = logFilter({
@@ -71,7 +77,7 @@ const upsertFromStruct = async (
   if (!creatorSet.has(campaign.creator.toLowerCase())) return
 
   const id = `${ctx.chain.id}:${campaign.campaignId}`
-  const targetToken = await resolveTargetToken(ctx, ctx.chain.id, campaign.campaignId)
+  const { targetToken, rewardTokenDecimals } = await resolveCampaign(ctx, ctx.chain.id, campaign.campaignId)
   const timestamp = new Date(block.header.timestamp)
   const existing = campaigns.get(id) ?? (await ctx.store.get(MerklCampaign, id))
 
@@ -90,6 +96,7 @@ const upsertFromStruct = async (
     })
 
   // Resolved target (Merkl API), and the ARM it rewards when the target is one of ours.
+  entity.rewardTokenDecimals = rewardTokenDecimals
   entity.targetToken = targetToken
   entity.armAddress = targetToken && armSet.has(targetToken) ? targetToken : null
   // Mutable fields (overrideCampaign can change start/duration/campaignData).

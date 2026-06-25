@@ -25,6 +25,9 @@ export class MerklCampaign {
     @StringColumn_({nullable: false})
     rewardToken!: string
 
+    @IntColumn_({nullable: false})
+    rewardTokenDecimals!: number
+
     @BigIntColumn_({nullable: false})
     amount!: bigint
 

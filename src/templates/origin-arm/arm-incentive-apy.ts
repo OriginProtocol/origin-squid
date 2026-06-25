@@ -1,0 +1,91 @@
+import dayjs from 'dayjs'
+import { LessThanOrEqual, MoreThanOrEqual } from 'typeorm'
+import { formatUnits, parseUnits } from 'viem'
+
+import { MerklCampaign } from '@model'
+import { Block, Context } from '@originprotocol/squid-utils'
+import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
+import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
+
+const DAY_MS = 86_400_000
+const DAYS_PER_YEAR = 365.25
+// All mainnet ARM liquidity assets (token0: WETH, USDe) are 18-decimal.
+const TOKEN0_DECIMALS = 18
+
+/**
+ * External incentive rewards (currently Merkl campaigns) for an ARM on a given day.
+ *
+ * Sums each active campaign's daily reward value (USD, prorated for the first/last day), then:
+ *   - incentiveYield: that value expressed in token0 units (parallel to ArmDailyStat.yield)
+ *   - incentiveApr:   dailyRewardUSD / TVL_USD * 365.25
+ *   - incentiveApy:   the same, daily-compounded
+ * Reward tokens are valued via the exchange-rate infra; unpriceable ones are skipped rather than
+ * failing the batch. Returns zeros when no campaigns are active.
+ */
+export const calculateArmIncentiveApy = async (
+  ctx: Context,
+  block: Block,
+  {
+    armAddress,
+    totalAssets,
+    rateUSD,
+  }: {
+    armAddress: string
+    totalAssets: bigint
+    rateUSD?: { rate: bigint; decimals: number }
+  },
+): Promise<{ incentiveYield: bigint; incentiveApr: number; incentiveApy: number }> => {
+  const zero = { incentiveYield: 0n, incentiveApr: 0, incentiveApy: 0 }
+
+  const date = new Date(block.header.timestamp)
+  const startOfDay = dayjs.utc(date).startOf('day').toDate()
+  const endOfDay = dayjs.utc(date).endOf('day').toDate()
+
+  const campaigns = await ctx.store.find(MerklCampaign, {
+    where: {
+      armAddress: armAddress.toLowerCase(),
+      startTimestamp: LessThanOrEqual(endOfDay),
+      endTimestamp: MoreThanOrEqual(startOfDay),
+    },
+  })
+  if (campaigns.length === 0) return zero
+
+  let dailyRewardsUSD = 0
+  for (const campaign of campaigns) {
+    const durationDays = campaign.duration / 86_400
+    if (durationDays <= 0) continue
+    let priceUSD = 0
+    try {
+      const rate = await ensureExchangeRate(ctx, block, campaign.rewardToken as Currency, 'USD')
+      if (rate) priceUSD = +formatUnits(rate.rate, rate.decimals)
+    } catch (err) {
+      // Reward token not priceable — skip its contribution rather than failing the batch.
+      ctx.log.warn(`incentive apy: no price for reward token ${campaign.rewardToken}: ${err}`)
+      continue
+    }
+    if (priceUSD <= 0) continue
+    const dailyTokens = +formatUnits(campaign.amount, campaign.rewardTokenDecimals) / durationDays
+    // Prorate the first/last day by how much of it the campaign is active.
+    const overlapMs =
+      Math.min(endOfDay.getTime(), campaign.endTimestamp.getTime()) -
+      Math.max(startOfDay.getTime(), campaign.startTimestamp.getTime())
+    const activeFraction = Math.max(0, Math.min(1, overlapMs / DAY_MS))
+    dailyRewardsUSD += dailyTokens * priceUSD * activeFraction
+  }
+
+  const token0PriceUSD = +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18)
+  if (token0PriceUSD <= 0) return zero
+
+  // Express the day's reward value in token0 units, to parallel ArmDailyStat.yield.
+  const incentiveYield = parseUnits((dailyRewardsUSD / token0PriceUSD).toFixed(TOKEN0_DECIMALS), TOKEN0_DECIMALS)
+
+  const tvlUSD = +formatUnits(totalAssets, TOKEN0_DECIMALS) * token0PriceUSD
+  if (tvlUSD <= 0) return { ...zero, incentiveYield }
+
+  const dailyRate = dailyRewardsUSD / tvlUSD
+  return {
+    incentiveYield,
+    incentiveApr: dailyRate * DAYS_PER_YEAR,
+    incentiveApy: (1 + dailyRate) ** DAYS_PER_YEAR - 1,
+  }
+}

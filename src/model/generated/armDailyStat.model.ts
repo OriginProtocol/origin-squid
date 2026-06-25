@@ -72,6 +72,15 @@ export class ArmDailyStat {
     apy!: number
 
     @BigIntColumn_({nullable: false})
+    incentiveYield!: bigint
+
+    @FloatColumn_({nullable: false})
+    incentiveApr!: number
+
+    @FloatColumn_({nullable: false})
+    incentiveApy!: number
+
+    @BigIntColumn_({nullable: false})
     yield!: bigint
 
     @BigIntColumn_({nullable: false})

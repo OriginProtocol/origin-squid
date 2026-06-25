@@ -96,6 +96,12 @@ type ArmDailyStat @entity {
   totalWithdrawalsClaimed: BigInt!
   apr: Float!
   apy: Float!
+  # External incentive rewards (currently Merkl campaigns) targeting this ARM. Kept separate from
+  # the protocol numbers above — incentives are paid outside the pool, so they don't touch
+  # `yield`/`apr`/`apy`. The frontend sums them for a holder's total. 0 when no campaigns active.
+  incentiveYield: BigInt! # day's incentive reward value, in token0 units (parallel to `yield`)
+  incentiveApr: Float!
+  incentiveApy: Float!
   yield: BigInt!
   fees: BigInt!
   cumulativeYield: BigInt!

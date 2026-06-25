@@ -100,6 +100,8 @@ type MerklCampaign @entity {
   # On-chain CampaignParameters.creator (msg.sender of createCampaign) — our filter key.
   creator: String! @index
   rewardToken: String! @index
+  # Reward token decimals (Merkl API params.decimalsRewardToken), for valuing `amount`.
+  rewardTokenDecimals: Int!
   # Gross budget including Merkl fees; immutable after creation.
   amount: BigInt!
   campaignType: Int! @index
@@ -809,6 +811,12 @@ type ArmDailyStat @entity {
   totalWithdrawalsClaimed: BigInt!
   apr: Float!
   apy: Float!
+  # External incentive rewards (currently Merkl campaigns) targeting this ARM. Kept separate from
+  # the protocol numbers above — incentives are paid outside the pool, so they don't touch
+  # `yield`/`apr`/`apy`. The frontend sums them for a holder's total. 0 when no campaigns active.
+  incentiveYield: BigInt! # day's incentive reward value, in token0 units (parallel to `yield`)
+  incentiveApr: Float!
+  incentiveApy: Float!
   yield: BigInt!
   fees: BigInt!
   cumulativeYield: BigInt!
