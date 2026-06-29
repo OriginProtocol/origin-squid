@@ -38,6 +38,7 @@ import { ADDRESS_ZERO } from '@utils/addresses'
 import { traceFilter } from '@utils/traceFilter'
 
 import { calculateArmDailyApy } from './arm-apy'
+import { calculateArmIncentiveApy } from './arm-incentive-apy'
 
 dayjs.extend(utc)
 
@@ -976,6 +977,11 @@ export const createOriginARMProcessors = ({
             const previousDailyStat =
               dailyStatsMap.get(previousDayId) ?? (await ctx.store.get(ArmDailyStat, previousDayId))
             const armDayApy = calculateArmDailyApy({ block, state, previousDailyStat })
+            const incentive = await calculateArmIncentiveApy(ctx, block, {
+              armAddress,
+              totalAssets: state.totalAssets,
+              rateUSD,
+            })
             // Close the day's final lending segment at this end-of-day snapshot (the position held
             // since the last checkpoint earned up to now). After this, currentDayLending[dateStr]
             // holds the full, exact lending yield for the day.
@@ -1030,6 +1036,9 @@ export const createOriginARMProcessors = ({
               totalWithdrawalsClaimed: state.totalWithdrawalsClaimed,
               apr: armDayApy.apr,
               apy: armDayApy.apy,
+              incentiveYield: incentive.incentiveYield,
+              incentiveApr: incentive.incentiveApr,
+              incentiveApy: incentive.incentiveApy,
               fees:
                 state.totalFees +
                 state.feesAccrued -

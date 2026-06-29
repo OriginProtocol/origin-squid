@@ -366,4 +366,6 @@ export const priceMap: Partial<
     const contract = new originEthenaArmAbi.Contract(ctx, block, mainnetTokens.sUSDe)
     return await contract.convertToAssets(10n ** 18n)
   }),
+  // Merkl test reward token — hardcoded to $1 until a real rate source exists.
+  ...twoWay('aglaMerklUSD', 'USD', async () => 1_000_000_000_000_000_000n, 18),
 }
