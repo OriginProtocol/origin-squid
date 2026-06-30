@@ -7,7 +7,7 @@ import { arms } from '@utils/addresses'
 const DISTRIBUTION_CREATOR = '0x8bb4c975ff3c250e0ceea271728547f3802b36fd'
 // Address(es) Origin uses to create Merkl campaigns (CampaignParameters.creator).
 // Used to filter NewCampaign events down to our own campaigns. Extend as needed.
-const CREATORS = ['0x074105fdd39e982b2ffe749a193c942db1046ab9']
+const CREATORS = ['0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971', '0x67ce815d91de0f843472fe9c171acb036994cd05']
 // Earliest mainnet ARM deploy — campaigns can only target an ARM after it exists.
 const FROM = 20987226
 const MERKL_API = 'https://api.merkl.xyz/v4'
