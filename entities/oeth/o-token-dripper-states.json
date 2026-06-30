@@ -1160,5 +1160,19 @@
     "perSecondTarget": "24700863056871",
     "perSecondMax": "1036747471",
     "dripDuration": "604800"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-25400000-0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "timestamp": "2026-06-26T06:25:47.000000Z",
+    "blockNumber": 25400000,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "wethBalance": "24926322075954266000",
+    "availableFunds": "18031316678902625444",
+    "lastCollect": "1782431183",
+    "perSecond": "24700863056871",
+    "perSecondTarget": "24700863056871",
+    "perSecondMax": "1036747471",
+    "dripDuration": "604800"
   }
 ]

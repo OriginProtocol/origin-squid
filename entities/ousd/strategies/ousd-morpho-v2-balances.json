@@ -141,5 +141,16 @@
     "chainId": 1,
     "symbol": "USDC",
     "strategy": "0x3643cafa6ef3dd7fcc2adad1cabf708075afff6e"
+  },
+  {
+    "id": "1:0x3643cafa6ef3dd7fcc2adad1cabf708075afff6e:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25400000",
+    "blockNumber": 25400000,
+    "timestamp": "2026-06-26T06:25:47.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "3310778800863",
+    "balanceETH": "2145036880",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0x3643cafa6ef3dd7fcc2adad1cabf708075afff6e"
   }
 ]

@@ -24,9 +24,9 @@
     "timestamp": "2024-11-11T23:59:59.000000Z",
     "blockNumber": 21167883,
     "tradingYield": "809569671964943192",
-    "appreciationYield": "0",
+    "appreciationYield": "11507605632123",
     "lendingYield": "0",
-    "yield": "809569671964943192",
+    "yield": "809581179570575315",
     "swapVolume": "2086222116621663913766"
   },
   {
@@ -39,9 +39,9 @@
     "timestamp": "2024-12-06T23:59:59.000000Z",
     "blockNumber": 21346894,
     "tradingYield": "919001094726469049",
-    "appreciationYield": "0",
+    "appreciationYield": "3221890986390909",
     "lendingYield": "0",
-    "yield": "919001094726469049",
+    "yield": "922222985712859958",
     "swapVolume": "2896322236412287341301"
   },
   {
@@ -54,9 +54,9 @@
     "timestamp": "2024-12-31T23:59:59.000000Z",
     "blockNumber": 21525890,
     "tradingYield": "4695094932380779",
-    "appreciationYield": "0",
+    "appreciationYield": "-4",
     "lendingYield": "0",
-    "yield": "4695094932380779",
+    "yield": "4695094932380775",
     "swapVolume": "8683587820409988521"
   },
   {
@@ -69,9 +69,9 @@
     "timestamp": "2025-01-25T23:59:59.000000Z",
     "blockNumber": 21704966,
     "tradingYield": "163034135935607801",
-    "appreciationYield": "0",
+    "appreciationYield": "43827372494487",
     "lendingYield": "0",
-    "yield": "163034135935607801",
+    "yield": "163077963308102288",
     "swapVolume": "134762270070429333633"
   },
   {
@@ -84,9 +84,9 @@
     "timestamp": "2025-02-19T23:59:59.000000Z",
     "blockNumber": 21883855,
     "tradingYield": "97075800626656524",
-    "appreciationYield": "0",
+    "appreciationYield": "582885059002099",
     "lendingYield": "0",
-    "yield": "97075800626656524",
+    "yield": "97658685685658623",
     "swapVolume": "762494319173436536615"
   },
   {
@@ -99,9 +99,9 @@
     "timestamp": "2025-03-16T23:59:59.000000Z",
     "blockNumber": 22062883,
     "tradingYield": "818618458120977657",
-    "appreciationYield": "0",
+    "appreciationYield": "68235545132128148",
     "lendingYield": "0",
-    "yield": "818618458120977657",
+    "yield": "886854003253105805",
     "swapVolume": "2123169525878708729716"
   },
   {
@@ -114,9 +114,9 @@
     "timestamp": "2025-04-10T23:59:59.000000Z",
     "blockNumber": 22241970,
     "tradingYield": "1242845856516607227",
-    "appreciationYield": "0",
+    "appreciationYield": "349767919783668",
     "lendingYield": "0",
-    "yield": "1242845856516607227",
+    "yield": "1243195624436390895",
     "swapVolume": "1241635222853586406176"
   },
   {
@@ -129,9 +129,9 @@
     "timestamp": "2025-05-05T23:59:59.000000Z",
     "blockNumber": 22420967,
     "tradingYield": "544363695575634",
-    "appreciationYield": "0",
+    "appreciationYield": "3799927758186852",
     "lendingYield": "0",
-    "yield": "544363695575634",
+    "yield": "4344291453762486",
     "swapVolume": "824704107713074394"
   },
   {
@@ -144,9 +144,9 @@
     "timestamp": "2025-05-30T23:59:59.000000Z",
     "blockNumber": 22598988,
     "tradingYield": "324480223157066815",
-    "appreciationYield": "0",
+    "appreciationYield": "5420987313262998",
     "lendingYield": "0",
-    "yield": "324480223157066815",
+    "yield": "329901210470329813",
     "swapVolume": "753160440076359259741"
   },
   {
@@ -159,9 +159,9 @@
     "timestamp": "2025-06-24T23:59:59.000000Z",
     "blockNumber": 22777731,
     "tradingYield": "28564685203040",
-    "appreciationYield": "0",
+    "appreciationYield": "20738014999792",
     "lendingYield": "0",
-    "yield": "28564685203040",
+    "yield": "49302700202832",
     "swapVolume": "87348232994529846"
   },
   {
@@ -174,9 +174,9 @@
     "timestamp": "2025-07-19T23:59:59.000000Z",
     "blockNumber": 22956684,
     "tradingYield": "73080962568146105",
-    "appreciationYield": "0",
+    "appreciationYield": "388043365416",
     "lendingYield": "0",
-    "yield": "73080962568146105",
+    "yield": "73081350611511521",
     "swapVolume": "32042309415706979210"
   },
   {
@@ -189,9 +189,9 @@
     "timestamp": "2025-08-13T23:59:59.000000Z",
     "blockNumber": 23135570,
     "tradingYield": "1288273357024922159",
-    "appreciationYield": "0",
+    "appreciationYield": "44919532041152",
     "lendingYield": "0",
-    "yield": "1288273357024922159",
+    "yield": "1288318276556963311",
     "swapVolume": "628927616502313297451"
   },
   {
@@ -204,9 +204,9 @@
     "timestamp": "2025-09-07T23:59:59.000000Z",
     "blockNumber": 23314653,
     "tradingYield": "74682485718813888",
-    "appreciationYield": "0",
+    "appreciationYield": "110362136730496",
     "lendingYield": "0",
-    "yield": "74682485718813888",
+    "yield": "74792847855544384",
     "swapVolume": "43860767807984933335"
   },
   {
@@ -219,9 +219,9 @@
     "timestamp": "2025-10-02T23:59:59.000000Z",
     "blockNumber": 23493531,
     "tradingYield": "273380980443286989",
-    "appreciationYield": "0",
+    "appreciationYield": "150441568230844429",
     "lendingYield": "0",
-    "yield": "273380980443286989",
+    "yield": "423822548674131418",
     "swapVolume": "681570649695292818248"
   },
   {
@@ -234,9 +234,9 @@
     "timestamp": "2025-10-27T23:59:59.000000Z",
     "blockNumber": 23672211,
     "tradingYield": "253550641522655274",
-    "appreciationYield": "0",
+    "appreciationYield": "17493968484113339",
     "lendingYield": "0",
-    "yield": "253550641522655274",
+    "yield": "271044610006768613",
     "swapVolume": "1999749898914859369375"
   },
   {
@@ -249,9 +249,9 @@
     "timestamp": "2025-11-21T23:59:59.000000Z",
     "blockNumber": 23850795,
     "tradingYield": "1430754250081305310",
-    "appreciationYield": "0",
+    "appreciationYield": "89363494031570531",
     "lendingYield": "0",
-    "yield": "1430754250081305310",
+    "yield": "1520117744112875841",
     "swapVolume": "1522212072231916580022"
   },
   {
@@ -264,9 +264,9 @@
     "timestamp": "2025-12-16T23:59:59.000000Z",
     "blockNumber": 24028609,
     "tradingYield": "465123992800500214",
-    "appreciationYield": "0",
+    "appreciationYield": "14531794651375906",
     "lendingYield": "0",
-    "yield": "465123992800500214",
+    "yield": "479655787451876120",
     "swapVolume": "3493104734326106988518"
   },
   {
@@ -279,9 +279,9 @@
     "timestamp": "2026-01-10T23:59:59.000000Z",
     "blockNumber": 24207742,
     "tradingYield": "2074123901114249",
-    "appreciationYield": "0",
+    "appreciationYield": "21528391597463",
     "lendingYield": "0",
-    "yield": "2074123901114249",
+    "yield": "2095652292711712",
     "swapVolume": "61055377301325864619"
   },
   {
@@ -294,9 +294,9 @@
     "timestamp": "2026-02-04T23:59:59.000000Z",
     "blockNumber": 24386914,
     "tradingYield": "579590214672611061",
-    "appreciationYield": "0",
+    "appreciationYield": "22117828104941",
     "lendingYield": "0",
-    "yield": "579590214672611061",
+    "yield": "579612332500716002",
     "swapVolume": "988394316621504368299"
   }
 ]

@@ -1,198 +1,51 @@
 [
   {
-    "id": "1:2025-12-02:0xceda2d856238aa0d12f6329de20b9115f07c366d",
+    "id": "1:2026-05-14:0xceda2d856238aa0d12f6329de20b9115f07c366d",
     "chainId": 1,
-    "blockNumber": 23929210,
-    "timestamp": "2025-12-02T23:59:59.000000Z",
+    "blockNumber": 25096819,
+    "timestamp": "2026-05-14T23:59:59.000000Z",
     "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
     "apr": 0,
     "apy": 0,
-    "assets0": "1000000000000",
+    "assets0": "3024098206293602973340",
     "assets1": "0",
-    "assetsPerShare": "1000000000000000000",
-    "date": "2025-12-02",
-    "fees": "0",
-    "feesAccrued": "0",
-    "outstandingAssets1": "0",
-    "marketAssets": "0",
-    "rateUSD": 0.99937381,
-    "rateETH": 0.0003332411969445,
-    "rateNative": 0.0003332411969445,
-    "rateAsset1": 1.2097758689107192,
-    "totalAssets": "1000000000000",
-    "totalAssetsCap": "100000000000000000000000",
-    "totalSupply": "1000000000000",
-    "totalDeposits": "0",
-    "totalWithdrawals": "0",
-    "totalWithdrawalsClaimed": "0",
-    "yield": "1000000000000",
-    "cumulativeYield": "1000000000000",
-    "cumulativeFees": "0",
-    "assetBalances": [
-      "1000000000000",
-      "0"
-    ],
-    "assetTotals": [
-      "1000000000000",
-      "0"
-    ],
-    "assetRates": [
-      "1000000000000000000",
-      "1209775868910719188"
-    ],
-    "outstandingAssets": [
-      "0",
-      "0"
-    ],
-    "marketShares": "0",
-    "marketPricePerShare": "1000176022765803899",
-    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
-  },
-  {
-    "id": "1:2026-01-21:0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "chainId": 1,
-    "blockNumber": 24286607,
-    "timestamp": "2026-01-21T23:59:59.000000Z",
-    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "apr": 0.02876604214388441,
-    "apy": 0.029182614913239036,
-    "assets0": "20307299700645181079",
-    "assets1": "24639907893812662549",
-    "assetsPerShare": "1002504367682526025",
-    "date": "2026-01-21",
-    "fees": "394520753819830131",
-    "feesAccrued": "1903685016110139",
-    "outstandingAssets1": "1963796975921569021822",
-    "marketAssets": "18024833722314879013466",
-    "rateUSD": 0.99926595,
-    "rateETH": 0.000335653432605,
-    "rateNative": 0.000335653432605,
-    "rateAsset1": 1.2172186964017917,
-    "totalAssets": "20038913254739760990308",
-    "totalAssetsCap": "100000000000000000000000",
-    "totalSupply": "19988853815234151542918",
-    "totalDeposits": "20000000000000000000000",
-    "totalWithdrawals": "0",
-    "totalWithdrawalsClaimed": "0",
-    "yield": "1578083015279320529",
-    "cumulativeYield": "38913254739760990308",
-    "cumulativeFees": "9728313434940247550",
-    "assetBalances": [
-      "20307299700645181079",
-      "24639907893812662549"
-    ],
-    "assetTotals": [
-      "20008937997937093216367",
-      "24639907893812662549"
-    ],
-    "assetRates": [
-      "1000000000000000000",
-      "1217218696401791759"
-    ],
-    "outstandingAssets": [
-      "0",
-      "1963796975921569021822"
-    ],
-    "marketShares": "17984276114788626944295",
-    "marketPricePerShare": "1002255170420393022",
-    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
-  },
-  {
-    "id": "1:2026-03-12:0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "chainId": 1,
-    "blockNumber": 24644820,
-    "timestamp": "2026-03-12T23:59:59.000000Z",
-    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "apr": 0.0020407496477392742,
-    "apy": 0.002042827681796311,
-    "assets0": "3013547591104936927624",
-    "assets1": "402758260210208725",
-    "assetsPerShare": "1007349213814874986",
-    "date": "2026-03-12",
-    "fees": "29896458824204487",
-    "feesAccrued": "790486695932056",
-    "outstandingAssets1": "8533064848731123982967",
-    "marketAssets": "18588659094586662084184",
-    "rateUSD": 0.99947442,
-    "rateETH": 0.0004818366231378,
-    "rateNative": 0.0004818366231378,
-    "rateAsset1": 1.2234656073779568,
-    "totalAssets": "30135763258435041907634",
+    "assetsPerShare": "1010923151527948858",
+    "date": "2026-05-14",
+    "fees": "1711595959962121353",
+    "feesAccrued": "700365242672413",
+    "outstandingAssets1": "23246765303801459917540",
+    "marketAssets": "3971818029365963697599",
+    "rateUSD": 1.00034244,
+    "rateETH": 0.0004380899681736,
+    "rateNative": 0.0004380899681736,
+    "rateAsset1": 1.231369565429795,
+    "totalAssets": "30242680839095783916066",
     "totalAssetsCap": "100000000000000000000000",
     "totalSupply": "29915904877028299532934",
     "totalDeposits": "30000000000000000000000",
     "totalWithdrawals": "0",
     "totalWithdrawalsClaimed": "0",
-    "yield": "119585835296817952",
-    "cumulativeYield": "135763258435041907634",
-    "cumulativeFees": "33940814358760476859",
+    "yield": "6846383839848485412",
+    "cumulativeYield": "6846383839848485412",
+    "cumulativeFees": "1711595959962121353",
     "assetBalances": [
-      "3013547591104936927624",
-      "402758260210208725"
+      "3024098206293602973340",
+      "0"
     ],
     "assetTotals": [
-      "30135271534422722994775",
-      "402758260210208725"
+      "30242681539461026588479",
+      "0"
     ],
     "assetRates": [
       "1000000000000000000",
-      "1223465607377956835"
+      "1231369565429794901"
     ],
     "outstandingAssets": [
       "0",
-      "8533064848731123982967"
+      "23246765303801459917540"
     ],
-    "marketShares": "18518175604328169624159",
-    "marketPricePerShare": "1003806178954368413",
-    "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
-  },
-  {
-    "id": "1:2026-05-01:0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "chainId": 1,
-    "blockNumber": 25003545,
-    "timestamp": "2026-05-01T23:59:59.000000Z",
-    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
-    "apr": 0.037587232721240385,
-    "apy": 0.038300559133819245,
-    "assets0": "2770561955890258916971",
-    "assets1": "141190043344716181391",
-    "assetsPerShare": "984377873702165308",
-    "date": "2026-05-01",
-    "fees": "757546731451867068",
-    "feesAccrued": "994880712702770",
-    "outstandingAssets1": "18803131637430184881191",
-    "marketAssets": "7701226713661357336954",
-    "rateUSD": 0.99905391,
-    "rateETH": 0.0004363168141143,
-    "rateNative": 0.0004363168141143,
-    "rateAsset1": 1.229849231641428,
-    "totalAssets": "29448554832725354623370",
-    "totalAssetsCap": "100000000000000000000000",
-    "totalSupply": "29915904877028299532934",
-    "totalDeposits": "30000000000000000000000",
-    "totalWithdrawals": "0",
-    "totalWithdrawalsClaimed": "0",
-    "yield": "3030186925807468275",
-    "cumulativeYield": "-551445167274645376630",
-    "cumulativeFees": "998823990750127353894",
-    "assetBalances": [
-      "2770561955890258916971",
-      "141190043344716181391"
-    ],
-    "assetTotals": [
-      "29274920306981801135116",
-      "141190043344716181391"
-    ],
-    "assetRates": [
-      "1000000000000000000",
-      "1229849231641427979"
-    ],
-    "outstandingAssets": [
-      "0",
-      "18803131637430184881191"
-    ],
-    "marketShares": "7645839828429584976571",
-    "marketPricePerShare": "1007244055129931819",
+    "marketShares": "3937853946275776636739",
+    "marketPricePerShare": "1008625023567039243",
     "activeMarket": "0x0dc20109ea012f050beda184844c1ed5ec6da33a"
   }
 ]
