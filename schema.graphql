@@ -109,6 +109,12 @@ type MerklCampaign @entity {
   endTimestamp: DateTime!
   # Seconds; mutable via overrideCampaign.
   duration: Int!
+  # Merkl distribution strategy (params.distributionMethodParameters.distributionMethod), e.g.
+  # "MAX_APR". Determines actual emission vs the max (amount/duration). null if unknown.
+  distributionMethod: String
+  # APR cap for MAX_APR campaigns (params.distributionSettings.apr, e.g. 0.02 = 2%); null when
+  # uncapped. Actual daily rewards = min(amount/duration, aprCap * TVL / 365).
+  aprCap: Float
   # Raw 32-byte campaignData (off-chain payload pointer/hash), for reference.
   campaignData: String!
   # Resolved via Merkl API (params.targetToken) at capture time: the contract whose

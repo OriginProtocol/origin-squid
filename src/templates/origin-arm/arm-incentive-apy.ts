@@ -19,6 +19,8 @@ const TOKEN0_DECIMALS = 18
  *   - incentiveYield: that value expressed in token0 units (parallel to ArmDailyStat.yield)
  *   - incentiveApr:   dailyRewardUSD / TVL_USD * 365.25
  *   - incentiveApy:   the same, daily-compounded
+ * MAX_APR campaigns (aprCap set) don't emit their full budget — Merkl caps the daily payout at
+ * aprCap * TVL / 365 — so we use min(maxDaily, cappedDaily), matching what holders actually earn.
  * Reward tokens are valued via the exchange-rate infra; unpriceable ones are skipped rather than
  * failing the batch. Returns zeros when no campaigns are active.
  */
@@ -50,6 +52,10 @@ export const calculateArmIncentiveApy = async (
   })
   if (campaigns.length === 0) return zero
 
+  const token0PriceUSD = +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18)
+  if (token0PriceUSD <= 0) return zero
+  const tvlUSD = +formatUnits(totalAssets, TOKEN0_DECIMALS) * token0PriceUSD
+
   let dailyRewardsUSD = 0
   for (const campaign of campaigns) {
     const durationDays = campaign.duration / 86_400
@@ -64,22 +70,22 @@ export const calculateArmIncentiveApy = async (
       continue
     }
     if (priceUSD <= 0) continue
-    const dailyTokens = +formatUnits(campaign.amount, campaign.rewardTokenDecimals) / durationDays
+    // Max daily emission: the full budget spread evenly over the campaign duration.
+    const maxDailyUSD = (+formatUnits(campaign.amount, campaign.rewardTokenDecimals) / durationDays) * priceUSD
+    // MAX_APR campaigns cap the rate: Merkl distributes only min(maxDaily, aprCap * TVL / 365), so a
+    // small pool earns far less than the max budget. Uncapped campaigns emit the full daily budget.
+    const dailyUSD =
+      campaign.aprCap != null && tvlUSD > 0 ? Math.min(maxDailyUSD, (campaign.aprCap * tvlUSD) / 365) : maxDailyUSD
     // Prorate the first/last day by how much of it the campaign is active.
     const overlapMs =
       Math.min(endOfDay.getTime(), campaign.endTimestamp.getTime()) -
       Math.max(startOfDay.getTime(), campaign.startTimestamp.getTime())
     const activeFraction = Math.max(0, Math.min(1, overlapMs / DAY_MS))
-    dailyRewardsUSD += dailyTokens * priceUSD * activeFraction
+    dailyRewardsUSD += dailyUSD * activeFraction
   }
-
-  const token0PriceUSD = +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18)
-  if (token0PriceUSD <= 0) return zero
 
   // Express the day's reward value in token0 units, to parallel ArmDailyStat.yield.
   const incentiveYield = parseUnits((dailyRewardsUSD / token0PriceUSD).toFixed(TOKEN0_DECIMALS), TOKEN0_DECIMALS)
-
-  const tvlUSD = +formatUnits(totalAssets, TOKEN0_DECIMALS) * token0PriceUSD
   if (tvlUSD <= 0) return { ...zero, incentiveYield }
 
   const dailyRate = dailyRewardsUSD / tvlUSD

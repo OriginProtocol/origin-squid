@@ -29,7 +29,24 @@ type CampaignStruct = ReturnType<typeof abi.events.NewCampaign.decode>['campaign
  * so Subsquid retries it later — no partial/null data is ever written, and the processor
  * pauses rather than crashing.
  */
-type ResolvedCampaign = { targetToken: string | null; rewardTokenDecimals: number }
+type ResolvedCampaign = {
+  targetToken: string | null
+  rewardTokenDecimals: number
+  distributionMethod: string | null
+  aprCap: number | null
+}
+
+type MerklCampaignApi = {
+  campaignId?: string
+  params?: {
+    targetToken?: string
+    decimalsRewardToken?: number
+    distributionMethodParameters?: {
+      distributionMethod?: string
+      distributionSettings?: { apr?: string | number }
+    }
+  }
+}
 
 const resolveCampaign = async (ctx: Context, chainId: number, campaignId: string): Promise<ResolvedCampaign> => {
   // test=true includes test campaigns in the response (additive — live campaigns still returned).
@@ -41,12 +58,19 @@ const resolveCampaign = async (ctx: Context, chainId: number, campaignId: string
     try {
       const res = await fetch(url)
       if (!res.ok) throw new Error(`status ${res.status}`)
-      const data = (await res.json()) as { campaignId?: string; params?: { targetToken?: string; decimalsRewardToken?: number } }[]
+      const data = (await res.json()) as MerklCampaignApi[]
       const match = data.find((c) => c?.campaignId?.toLowerCase() === campaignId.toLowerCase())
       if (!match) throw new Error('campaign not yet indexed by Merkl')
+      const dist = match.params?.distributionMethodParameters
+      // MAX_APR campaigns cap the reward rate; distributionSettings.apr is the cap (e.g. "0.02").
+      const aprCap = dist?.distributionMethod === 'MAX_APR' && dist.distributionSettings?.apr != null
+        ? Number(dist.distributionSettings.apr)
+        : null
       return {
         targetToken: match.params?.targetToken?.toLowerCase() ?? null,
         rewardTokenDecimals: match.params?.decimalsRewardToken ?? 18,
+        distributionMethod: dist?.distributionMethod ?? null,
+        aprCap: Number.isFinite(aprCap) ? aprCap : null,
       }
     } catch (err) {
       lastError = err
@@ -77,7 +101,11 @@ const upsertFromStruct = async (
   if (!creatorSet.has(campaign.creator.toLowerCase())) return
 
   const id = `${ctx.chain.id}:${campaign.campaignId}`
-  const { targetToken, rewardTokenDecimals } = await resolveCampaign(ctx, ctx.chain.id, campaign.campaignId)
+  const { targetToken, rewardTokenDecimals, distributionMethod, aprCap } = await resolveCampaign(
+    ctx,
+    ctx.chain.id,
+    campaign.campaignId,
+  )
   const timestamp = new Date(block.header.timestamp)
   const existing = campaigns.get(id) ?? (await ctx.store.get(MerklCampaign, id))
 
@@ -97,6 +125,8 @@ const upsertFromStruct = async (
 
   // Resolved target (Merkl API), and the ARM it rewards when the target is one of ours.
   entity.rewardTokenDecimals = rewardTokenDecimals
+  entity.distributionMethod = distributionMethod
+  entity.aprCap = aprCap
   entity.targetToken = targetToken
   entity.armAddress = targetToken && armSet.has(targetToken) ? targetToken : null
   // Mutable fields (overrideCampaign can change start/duration/campaignData).
