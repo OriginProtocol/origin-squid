@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_} from "@subsquid/typeorm-store"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, IntColumn as IntColumn_, Index as Index_, StringColumn as StringColumn_, BigIntColumn as BigIntColumn_, DateTimeColumn as DateTimeColumn_, FloatColumn as FloatColumn_} from "@subsquid/typeorm-store"
 
 @Entity_()
 export class MerklCampaign {
@@ -43,6 +43,12 @@ export class MerklCampaign {
 
     @IntColumn_({nullable: false})
     duration!: number
+
+    @StringColumn_({nullable: true})
+    distributionMethod!: string | undefined | null
+
+    @FloatColumn_({nullable: true})
+    aprCap!: number | undefined | null
 
     @StringColumn_({nullable: false})
     campaignData!: string
