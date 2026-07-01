@@ -190,6 +190,13 @@ const getPrice_wOETH_OETH = async (ctx: Context, block: Block['header']) => {
   return woeth.previewRedeem(1_000_000_000_000_000_000n)
 }
 
+// wOUSD is ERC4626-wrapped OUSD; same previewRedeem interface as wOETH (deployed at 14566204).
+const getPrice_wOUSD_OUSD = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 14566204) return 1_000_000_000_000_000_000n
+  const wousd = new woethAbi.Contract(ctx, { height: block.height }, mainnetCurrencies.wOUSD)
+  return wousd.previewRedeem(1_000_000_000_000_000_000n)
+}
+
 const getPrice_OUSD_ETH = async (ctx: Context, block: Block['header']) => {
   const ousdusd = await getPrice_OUSD_USD(ctx, block)
   const ethusd = await getChainlinkPrice(ctx, block.height, 'ETH', 'USD')
@@ -267,6 +274,11 @@ export const priceMap: Partial<
   ...twoWay('ETH', 'rETH', getRETHPrice),
   ...twoWay('ETH', 'frxETH', getFrxEthPrice),
   ...twoWay('wOETH', 'OETH', getPrice_wOETH_OETH),
+  ...twoWay('wOUSD', 'OUSD', getPrice_wOUSD_OUSD),
+  ...derived('wOUSD', 'USD', [
+    { base: 'wOUSD', quote: 'OUSD' },
+    { base: 'OUSD', quote: 'USD' },
+  ]),
   ...twoWay('OUSD', 'USD', getPrice_OUSD_USD),
   ...twoWay('OUSD', 'ETH', getPrice_OUSD_ETH),
   ...twoWay('ETH', 'stETH', (ctx, block) => getOethOraclePrice(ctx, block.height, 'stETH')),
