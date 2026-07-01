@@ -21,6 +21,7 @@ export const mainnetCurrencies = {
   OETH: '0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3',
   OUSD: '0x2a8e1e676ec238d8a992307b495b45b3feaa5e86',
   wOETH: '0xdcee70654261af21c44c093c300ed3bb97b78192',
+  wOUSD: '0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62',
   WETH: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   stETH: '0xae7ab96520de3a18e5e111b5eaab095312d7fe84',
   eETH: '0x35fa164735182de50811e8e2e824cfb9b6118ac2',
