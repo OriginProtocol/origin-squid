@@ -15,7 +15,8 @@ const TOKEN0_DECIMALS = 18
 /**
  * External incentive rewards (currently Merkl campaigns) for an ARM on a given day.
  *
- * Sums each active campaign's daily reward value (USD, prorated for the first/last day), then:
+ * Sums each active campaign's reward value for the day (USD, prorated for the first/last day and
+ * capped at the current block for today's in-progress stat), then:
  *   - incentiveYield: that value expressed in token0 units (parallel to ArmDailyStat.yield)
  *   - incentiveApr:   dailyRewardUSD / TVL_USD * 365.25
  *   - incentiveApy:   the same, daily-compounded
@@ -42,6 +43,8 @@ export const calculateArmIncentiveApy = async (
   const date = new Date(block.header.timestamp)
   const startOfDay = dayjs.utc(date).startOf('day').toDate()
   const endOfDay = dayjs.utc(date).endOf('day').toDate()
+  const isCurrentDay = dayjs.utc(date).isSame(dayjs.utc(), 'day')
+  const endOfRewardWindow = isCurrentDay ? date : endOfDay
 
   const campaigns = await ctx.store.find(MerklCampaign, {
     where: {
@@ -76,9 +79,9 @@ export const calculateArmIncentiveApy = async (
     // small pool earns far less than the max budget. Uncapped campaigns emit the full daily budget.
     const dailyUSD =
       campaign.aprCap != null && tvlUSD > 0 ? Math.min(maxDailyUSD, (campaign.aprCap * tvlUSD) / 365) : maxDailyUSD
-    // Prorate the first/last day by how much of it the campaign is active.
+    // Prorate by how much of the day's current reward window the campaign is active.
     const overlapMs =
-      Math.min(endOfDay.getTime(), campaign.endTimestamp.getTime()) -
+      Math.min(endOfRewardWindow.getTime(), campaign.endTimestamp.getTime()) -
       Math.max(startOfDay.getTime(), campaign.startTimestamp.getTime())
     const activeFraction = Math.max(0, Math.min(1, overlapMs / DAY_MS))
     dailyRewardsUSD += dailyUSD * activeFraction
