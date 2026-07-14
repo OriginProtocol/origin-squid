@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { chunk } from 'lodash'
 import { In, LessThan } from 'typeorm'
 import { parseUnits } from 'viem'
 
@@ -761,24 +762,16 @@ export class OTokenEntityProducer {
         }
       }
     }
+    // Seed each account's latest prior yield row individually. A bulk
+    // `address IN (...)` query here has no per-address LIMIT, so it pulls every
+    // historical row for every account (one row per address per day) and blows
+    // the heap once the holder set is large. `ensureYieldSeed` fetches a single
+    // latest row per address; we run them in bounded-concurrency batches so the
+    // point lookups stay fast without buffering a huge result set.
     if (accountsNeedingSeed.length > 0) {
-      const rows = await this.ctx.store.find(OTokenAddressYield, {
-        where: {
-          chainId: this.ctx.chain.id,
-          otoken: this.otoken.address,
-          address: In(accountsNeedingSeed),
-        },
-        order: { date: 'DESC' },
-      })
-      const today = new Date(this.otoken.block.header.timestamp).toISOString().slice(0, 10)
-      for (const row of rows) {
-        if (row.date === today) {
-          if (!this.currentDayAddressYieldRows.has(row.address)) {
-            this.currentDayAddressYieldRows.set(row.address, row)
-          }
-        } else if (!this.previousDayAddressYieldRows.has(row.address)) {
-          this.previousDayAddressYieldRows.set(row.address, row)
-        }
+      const SEED_CONCURRENCY = 50
+      for (const batch of chunk(accountsNeedingSeed, SEED_CONCURRENCY)) {
+        await Promise.all(batch.map((account) => this.ensureYieldSeed(account)))
       }
     }
 
