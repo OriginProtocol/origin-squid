@@ -127,7 +127,9 @@ export class AddressApyResolver {
     @Arg('chainId', () => Int, { nullable: true }) chainId?: number | null,
   ): Promise<PortfolioApyResult> {
     const manager = await this.tx()
-    const chainFilter = '($2::int IS NULL OR chain_id = $2)'
+    // Qualify chain_id per context: the weight CTE joins two tables that both
+    // have chain_id, so a bare reference would be ambiguous.
+    const chainFilter = (col: string) => `($2::int IS NULL OR ${col} = $2)`
     const sql = `
       WITH native AS (
         -- per-product native all-time daily rate, over the days the position was held
@@ -136,13 +138,13 @@ export class AddressApyResolver {
           SELECT chain_id, arm AS product,
                  sum("yield"::numeric) AS sum_yield, sum(value::numeric) AS sum_denom
           FROM arm_address_yield
-          WHERE address = $1 AND value > 0 AND ${chainFilter}
+          WHERE address = $1 AND value > 0 AND ${chainFilter('chain_id')}
           GROUP BY chain_id, arm
           UNION ALL
           SELECT chain_id, otoken,
                  sum("yield"::numeric), sum(balance::numeric)
           FROM o_token_address_yield
-          WHERE address = $1 AND balance > 0 AND ${chainFilter}
+          WHERE address = $1 AND balance > 0 AND ${chainFilter('chain_id')}
           GROUP BY chain_id, otoken
         ) s
         WHERE sum_denom > 0
@@ -159,7 +161,7 @@ export class AddressApyResolver {
             FROM arm_address_yield ay
             JOIN arm_daily_stat ads
               ON ads.chain_id = ay.chain_id AND ads.address = ay.arm AND ads.date = ay.date
-            WHERE ay.address = $1 AND ${chainFilter}
+            WHERE ay.address = $1 AND ${chainFilter('ay.chain_id')}
             ORDER BY ay.chain_id, ay.arm, ay.date DESC
           )
           UNION ALL
@@ -170,7 +172,7 @@ export class AddressApyResolver {
             FROM o_token_address_yield oy
             JOIN o_token_daily_stat ods
               ON ods.chain_id = oy.chain_id AND ods.otoken = oy.otoken AND ods.date = oy.date
-            WHERE oy.address = $1 AND ${chainFilter}
+            WHERE oy.address = $1 AND ${chainFilter('oy.chain_id')}
             ORDER BY oy.chain_id, oy.otoken, oy.date DESC
           )
         ) w
