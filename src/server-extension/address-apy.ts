@@ -152,23 +152,27 @@ export class AddressApyResolver {
         -- A fully-exited position's latest value is ~0, so it contributes ~0 weight.
         SELECT chain_id, product, usd_value
         FROM (
-          SELECT DISTINCT ON (ay.chain_id, ay.arm)
-                 ay.chain_id, ay.arm AS product,
-                 (ay.value::numeric * ads.rate_usd / ${E18})::float8 AS usd_value
-          FROM arm_address_yield ay
-          JOIN arm_daily_stat ads
-            ON ads.chain_id = ay.chain_id AND ads.address = ay.arm AND ads.date = ay.date
-          WHERE ay.address = $1 AND ${chainFilter}
-          ORDER BY ay.chain_id, ay.arm, ay.date DESC
+          (
+            SELECT DISTINCT ON (ay.chain_id, ay.arm)
+                   ay.chain_id, ay.arm AS product,
+                   (ay.value::numeric * ads.rate_usd / ${E18})::float8 AS usd_value
+            FROM arm_address_yield ay
+            JOIN arm_daily_stat ads
+              ON ads.chain_id = ay.chain_id AND ads.address = ay.arm AND ads.date = ay.date
+            WHERE ay.address = $1 AND ${chainFilter}
+            ORDER BY ay.chain_id, ay.arm, ay.date DESC
+          )
           UNION ALL
-          SELECT DISTINCT ON (oy.chain_id, oy.otoken)
-                 oy.chain_id, oy.otoken,
-                 (oy.balance::numeric * ods.rate_usd::numeric / ${E36})::float8
-          FROM o_token_address_yield oy
-          JOIN o_token_daily_stat ods
-            ON ods.chain_id = oy.chain_id AND ods.otoken = oy.otoken AND ods.date = oy.date
-          WHERE oy.address = $1 AND ${chainFilter}
-          ORDER BY oy.chain_id, oy.otoken, oy.date DESC
+          (
+            SELECT DISTINCT ON (oy.chain_id, oy.otoken)
+                   oy.chain_id, oy.otoken,
+                   (oy.balance::numeric * ods.rate_usd::numeric / ${E36})::float8
+            FROM o_token_address_yield oy
+            JOIN o_token_daily_stat ods
+              ON ods.chain_id = oy.chain_id AND ods.otoken = oy.otoken AND ods.date = oy.date
+            WHERE oy.address = $1 AND ${chainFilter}
+            ORDER BY oy.chain_id, oy.otoken, oy.date DESC
+          )
         ) w
       )
       SELECT
