@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import 'tsconfig-paths/register'
 
+export { AddressApyResolver } from '../address-apy'
 export { ERC20Resolver } from '../erc20'
 export { MorphoVaultApyResolver } from '../morpho'
 export { OGNStatsResolver } from '../ogn-stats'
