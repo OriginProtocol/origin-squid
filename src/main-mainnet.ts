@@ -10,7 +10,7 @@ import { mainnet } from 'viem/chains'
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import * as exchangeRates from '@shared/post-processors/exchange-rates'
 import { ccip } from '@templates/ccip'
-import { createESTracker } from '@templates/exponential-staking'
+import { createESAddressYieldProcessor, createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
 import { createGovernanceProcessor } from '@templates/governance'
 import { createPoolsProcessor } from '@templates/pools/pools'
@@ -55,6 +55,7 @@ export const processor = defineSquidProcessor({
       rewardsAddress: '0x7609c88e5880e934dd3a75bcfef44e31b1badb8b',
       yieldType: 'fixed',
     }),
+    createESAddressYieldProcessor({ from: 19919745, address: XOGN_ADDRESS }),
     createFRRSProcessor({ from: 19917521, address: OGN_REWARDS_SOURCE_ADDRESS }),
     coingeckoProcessor,
     ...originArmProcessors,

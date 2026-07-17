@@ -133,6 +133,27 @@ export class AddressApyResolver {
   }
 
   /**
+   * Realized APR/APY for an address's xOGN staking position. Rewards accrue in OGN; the denominator
+   * is `staked_balance` (the OGN principal). Note the holder is the `account` column here (the
+   * `address` column is the staking contract).
+   *
+   * @param chainId  Chain ID (1 for Ethereum — xOGN is mainnet-only)
+   * @param staking  xOGN staking contract address (checksummed or lowercase)
+   * @param account  Staker address (checksummed or lowercase)
+   *
+   * @example
+   * { esAddressApy(chainId: 1, staking: "0x6389...", account: "0x6330...") { apr apy heldDays } }
+   */
+  @Query(() => AddressApyResult)
+  async esAddressApy(
+    @Arg('chainId', () => Int) chainId: number,
+    @Arg('staking', () => String) staking: string,
+    @Arg('account', () => String) account: string,
+  ): Promise<AddressApyResult> {
+    return this.computeApy('es_address_yield', 'address', 'staked_balance', chainId, staking, account, 'account')
+  }
+
+  /**
    * Blended realized APR/APY across every Origin position (ARM + OToken) an address
    * currently holds. Each position's native APY is weighted by its current USD value.
    *
@@ -173,6 +194,14 @@ export class AddressApyResolver {
           FROM wo_token_address_yield
           WHERE address = $1 AND value > 0 AND ${chainFilter('chain_id')}
           GROUP BY chain_id, wotoken
+          UNION ALL
+          -- xOGN staking: holder is the account column, product is the staking-contract address; the
+          -- denominator is the OGN principal (staked_balance), matching the OGN-denominated yield.
+          SELECT chain_id, address AS product,
+                 sum("yield"::numeric), sum(staked_balance::numeric)
+          FROM es_address_yield
+          WHERE account = $1 AND staked_balance > 0 AND ${chainFilter('chain_id')}
+          GROUP BY chain_id, address
         ) s
         WHERE sum_denom > 0
       ),
@@ -215,6 +244,18 @@ export class AddressApyResolver {
             WHERE wy.address = $1 AND ${chainFilter('wy.chain_id')}
             ORDER BY wy.chain_id, wy.wotoken, wy.date DESC
           )
+          UNION ALL
+          (
+            -- xOGN staking value = OGN principal × current OGN/USD price. OGN is mainnet-only and its
+            -- daily stat has no date column, so the latest price is used as the "current value" ruler.
+            SELECT DISTINCT ON (ey.chain_id, ey.address)
+                   ey.chain_id, ey.address AS product,
+                   (ey.staked_balance::numeric / ${E18})::float8
+                     * (SELECT price_usd FROM ogn_daily_stat ORDER BY timestamp DESC LIMIT 1)
+            FROM es_address_yield ey
+            WHERE ey.account = $1 AND ${chainFilter('ey.chain_id')}
+            ORDER BY ey.chain_id, ey.address, ey.date DESC
+          )
         ) w
       )
       SELECT
@@ -252,12 +293,15 @@ export class AddressApyResolver {
    * as query parameters.
    */
   private async computeApy(
-    table: 'arm_address_yield' | 'o_token_address_yield' | 'wo_token_address_yield',
-    filterColumn: 'arm' | 'otoken' | 'wotoken',
-    denomColumn: 'value' | 'balance',
+    table: 'arm_address_yield' | 'o_token_address_yield' | 'wo_token_address_yield' | 'es_address_yield',
+    filterColumn: 'arm' | 'otoken' | 'wotoken' | 'address',
+    denomColumn: 'value' | 'balance' | 'staked_balance',
     chainId: number,
     filterValue: string,
     address: string,
+    // Which column holds the account. Most tables put it in `address`; es_address_yield uses `account`
+    // (its `address` column is the staking contract). Internal constant, never user input.
+    holderColumn: 'address' | 'account' = 'address',
   ): Promise<AddressApyResult> {
     const manager = await this.tx()
     const sql = `
@@ -267,7 +311,7 @@ export class AddressApyResolver {
           sum("yield"::numeric)        AS sum_yield,
           sum(${denomColumn}::numeric) AS sum_denom
         FROM ${table}
-        WHERE chain_id = $1 AND ${filterColumn} = lower($2) AND address = lower($3)
+        WHERE chain_id = $1 AND ${filterColumn} = lower($2) AND ${holderColumn} = lower($3)
           AND ${denomColumn} > 0
       )
       SELECT

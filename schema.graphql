@@ -1394,6 +1394,27 @@ type ESYield @entity {
   apy: Float!
 }
 
+# Per-holder realized staking yield, one row per staker per day.
+# xOGN is a MasterChef-style accumulator: rewards (OGN) accrue as points * d(accRewardPerShare)/1e12.
+# `balance` is the reward-share basis (xOGN points); `stakedBalance` is the OGN principal, which is
+# the position value and the APY/roi denominator. yield/cumulativeYield are denominated in OGN.
+type ESAddressYield @entity {
+  id: ID! # chainId:address:account:date
+  chainId: Int! @index
+  address: String! @index # xOGN staking contract
+  account: String! @index # staker
+  date: String! @index
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  balance: BigInt! # xOGN points held (reward-share basis)
+  stakedBalance: BigInt! # OGN principal staked (position value / denominator)
+  yield: BigInt! # OGN rewards accrued on this date
+  cumulativeYield: BigInt! # lifetime OGN rewards accrued (claimed + pending)
+  roi: Float! # cumulativeYield / stakedBalance
+  lastR: BigInt! # last checkpointed accRewardPerShare
+  yieldRemainder: BigInt! # sub-unit accrual carry
+}
+
 type ESLockup @entity  {
   id: ID! # `chainId:address:account:lockupId` or `lockupId`
   chainId: Int! @index
