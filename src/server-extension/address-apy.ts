@@ -112,6 +112,27 @@ export class AddressApyResolver {
   }
 
   /**
+   * Realized APR/APY for an address's position in a wrapped OToken (wOETH, wOUSD, wsuperOETHb, wOS).
+   * The denominator is `value` (balance × assetsPerShare, in underlying OToken units) since a wrapped
+   * OToken is non-rebasing — its share balance is constant and yield accrues via the share price.
+   *
+   * @param chainId  Chain ID (e.g. 1 for Ethereum, 8453 for Base, 146 for Sonic)
+   * @param wotoken  Wrapped OToken address (checksummed or lowercase)
+   * @param address  Holder address (checksummed or lowercase)
+   *
+   * @example
+   * { wOTokenAddressApy(chainId: 1, wotoken: "0xdcee...", address: "0xa4c6...") { apr apy heldDays } }
+   */
+  @Query(() => AddressApyResult)
+  async wOTokenAddressApy(
+    @Arg('chainId', () => Int) chainId: number,
+    @Arg('wotoken', () => String) wotoken: string,
+    @Arg('address', () => String) address: string,
+  ): Promise<AddressApyResult> {
+    return this.computeApy('wo_token_address_yield', 'wotoken', 'value', chainId, wotoken, address)
+  }
+
+  /**
    * Blended realized APR/APY across every Origin position (ARM + OToken) an address
    * currently holds. Each position's native APY is weighted by its current USD value.
    *
@@ -146,6 +167,12 @@ export class AddressApyResolver {
           FROM o_token_address_yield
           WHERE address = $1 AND balance > 0 AND ${chainFilter('chain_id')}
           GROUP BY chain_id, otoken
+          UNION ALL
+          SELECT chain_id, wotoken,
+                 sum("yield"::numeric), sum(value::numeric)
+          FROM wo_token_address_yield
+          WHERE address = $1 AND value > 0 AND ${chainFilter('chain_id')}
+          GROUP BY chain_id, wotoken
         ) s
         WHERE sum_denom > 0
       ),
@@ -174,6 +201,19 @@ export class AddressApyResolver {
               ON ods.chain_id = oy.chain_id AND ods.otoken = oy.otoken AND ods.date = oy.date
             WHERE oy.address = $1 AND ${chainFilter('oy.chain_id')}
             ORDER BY oy.chain_id, oy.otoken, oy.date DESC
+          )
+          UNION ALL
+          (
+            -- Wrapped-OToken value is already denominated in the underlying OToken (balance × aps),
+            -- so it is priced with that OToken's own daily USD rate — same scaling as the OToken branch.
+            SELECT DISTINCT ON (wy.chain_id, wy.wotoken)
+                   wy.chain_id, wy.wotoken AS product,
+                   (wy.value::numeric * ods.rate_usd::numeric / ${E36})::float8
+            FROM wo_token_address_yield wy
+            JOIN o_token_daily_stat ods
+              ON ods.chain_id = wy.chain_id AND ods.otoken = wy.otoken AND ods.date = wy.date
+            WHERE wy.address = $1 AND ${chainFilter('wy.chain_id')}
+            ORDER BY wy.chain_id, wy.wotoken, wy.date DESC
           )
         ) w
       )
@@ -212,8 +252,8 @@ export class AddressApyResolver {
    * as query parameters.
    */
   private async computeApy(
-    table: 'arm_address_yield' | 'o_token_address_yield',
-    filterColumn: 'arm' | 'otoken',
+    table: 'arm_address_yield' | 'o_token_address_yield' | 'wo_token_address_yield',
+    filterColumn: 'arm' | 'otoken' | 'wotoken',
     denomColumn: 'value' | 'balance',
     chainId: number,
     filterValue: string,

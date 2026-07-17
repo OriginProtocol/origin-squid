@@ -94,23 +94,30 @@ export const otokenStateProcessor = (params: {
 
       if (params.wotoken && block.header.height >= params.wotoken.from) {
         const wrappedContract = new wotokenAbi.Contract(ctx, block.header, params.wotoken.address)
-        const [totalAssets, totalSupply, assetsPerShare] = await Promise.all([
-          wrappedContract.totalAssets(),
-          wrappedContract.totalSupply(),
-          wrappedContract.previewRedeem(10n ** 18n),
-        ])
-        wotokens.push(
-          new WOToken({
-            id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}`,
-            chainId: ctx.chain.id,
-            otoken: params.otokenAddress,
-            timestamp: new Date(block.header.timestamp),
-            blockNumber: block.header.height,
-            totalAssets,
-            totalSupply,
-            assetsPerShare,
-          }),
-        )
+        // Wrapped tokens are proxy-based ERC4626 vaults that revert on every view until their first
+        // deposit initializes them. Probe the init-gated previewRedeem first and skip the snapshot
+        // until the vault is live (the next frequency block retries). This keeps `from` robust: it can
+        // sit at or before the token's genesis without crashing on the pre-init revert window. Only
+        // the probe is caught — once the vault is live, a genuine error in the real read still throws.
+        const assetsPerShare = await wrappedContract.previewRedeem(10n ** 18n).catch(() => undefined)
+        if (assetsPerShare !== undefined) {
+          const [totalAssets, totalSupply] = await Promise.all([
+            wrappedContract.totalAssets(),
+            wrappedContract.totalSupply(),
+          ])
+          wotokens.push(
+            new WOToken({
+              id: `${ctx.chain.id}-${params.otokenAddress}-${block.header.height}`,
+              chainId: ctx.chain.id,
+              otoken: params.otokenAddress,
+              timestamp: new Date(block.header.timestamp),
+              blockNumber: block.header.height,
+              totalAssets,
+              totalSupply,
+              assetsPerShare,
+            }),
+          )
+        }
       }
 
       if (params.dripper) {

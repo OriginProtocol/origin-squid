@@ -1,5 +1,5 @@
-module.exports = class Data1782410531408 {
-    name = 'Data1782410531408'
+module.exports = class Data1784303438253 {
+    name = 'Data1784303438253'
 
     async up(db) {
         await db.query(`CREATE TABLE "util_cache" ("id" character varying NOT NULL, "data" jsonb NOT NULL, CONSTRAINT "PK_d8dba67b2f156e569ad7ecf21d6" PRIMARY KEY ("id"))`)
@@ -25,7 +25,7 @@ module.exports = class Data1782410531408 {
         await db.query(`CREATE TABLE "curve_pool_rate" ("id" character varying NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "address" text NOT NULL, "name" text NOT NULL, "rate" numeric NOT NULL, CONSTRAINT "PK_91a04fe55298abe8abd8da1b813" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_561faf9883f4bb00ae6df34cc1" ON "curve_pool_rate" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_cefe6315e78e235fa4ab3de663" ON "curve_pool_rate" ("block_number") `)
-        await db.query(`CREATE TABLE "merkl_campaign" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "campaign_id" text NOT NULL, "creator" text NOT NULL, "reward_token" text NOT NULL, "reward_token_decimals" integer NOT NULL, "amount" numeric NOT NULL, "campaign_type" integer NOT NULL, "start_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "end_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "duration" integer NOT NULL, "campaign_data" text NOT NULL, "target_token" text, "arm_address" text, "created_block_number" integer NOT NULL, "created_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "created_tx_hash" text NOT NULL, "last_updated_block_number" integer NOT NULL, "last_updated_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_f63c33d73458ac2198b17eb14ff" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE TABLE "merkl_campaign" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "campaign_id" text NOT NULL, "creator" text NOT NULL, "reward_token" text NOT NULL, "reward_token_decimals" integer NOT NULL, "amount" numeric NOT NULL, "campaign_type" integer NOT NULL, "start_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "end_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "duration" integer NOT NULL, "distribution_method" text, "apr_cap" numeric, "campaign_data" text NOT NULL, "target_token" text, "arm_address" text, "created_block_number" integer NOT NULL, "created_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "created_tx_hash" text NOT NULL, "last_updated_block_number" integer NOT NULL, "last_updated_timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, CONSTRAINT "PK_f63c33d73458ac2198b17eb14ff" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_29828e1f1a422c9b9c9a749843" ON "merkl_campaign" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_248d29792045fce89602269021" ON "merkl_campaign" ("campaign_id") `)
         await db.query(`CREATE INDEX "IDX_48fae994acc1c561c788139528" ON "merkl_campaign" ("creator") `)
@@ -133,6 +133,13 @@ module.exports = class Data1782410531408 {
         await db.query(`CREATE INDEX "IDX_46a8bdc64b39c46a0aa37bb768" ON "wo_token" ("otoken") `)
         await db.query(`CREATE INDEX "IDX_3d57d694c426c319d925b846f8" ON "wo_token" ("timestamp") `)
         await db.query(`CREATE INDEX "IDX_f14aa07c5a85a39318a017d421" ON "wo_token" ("block_number") `)
+        await db.query(`CREATE TABLE "wo_token_address_yield" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "wotoken" text NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "date" text NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, "balance" numeric NOT NULL, "value" numeric NOT NULL, "cost_basis" numeric NOT NULL, "yield" numeric NOT NULL, "cumulative_yield" numeric NOT NULL, "roi" numeric NOT NULL, "last_r" numeric NOT NULL, "yield_remainder" numeric NOT NULL, CONSTRAINT "PK_074cad3a21b1dee7097aa272bca" PRIMARY KEY ("id"))`)
+        await db.query(`CREATE INDEX "IDX_fc84f1c2050bb0459e13586dbb" ON "wo_token_address_yield" ("chain_id") `)
+        await db.query(`CREATE INDEX "IDX_d649a23bf44e3d9833263da713" ON "wo_token_address_yield" ("wotoken") `)
+        await db.query(`CREATE INDEX "IDX_1ea6d2aded21937ab3a084d573" ON "wo_token_address_yield" ("otoken") `)
+        await db.query(`CREATE INDEX "IDX_e9bc471f1fedf1d4288d093835" ON "wo_token_address_yield" ("address") `)
+        await db.query(`CREATE INDEX "IDX_fe067c13ae234e2ccac0f5b7d0" ON "wo_token_address_yield" ("date") `)
+        await db.query(`CREATE INDEX "IDX_66e7a0ecb6941d847e31c37653" ON "wo_token_address_yield" ("block_number") `)
         await db.query(`CREATE TABLE "o_token_asset" ("id" character varying NOT NULL, "chain_id" integer NOT NULL, "otoken" text NOT NULL, "address" text NOT NULL, "symbol" text NOT NULL, CONSTRAINT "PK_eb502dc2745e676b217ea3e0323" PRIMARY KEY ("id"))`)
         await db.query(`CREATE INDEX "IDX_2eb2f24563a058f9d6e746ed47" ON "o_token_asset" ("chain_id") `)
         await db.query(`CREATE INDEX "IDX_7a26c80564bf5fe4e414125e99" ON "o_token_asset" ("otoken") `)
@@ -928,6 +935,13 @@ module.exports = class Data1782410531408 {
         await db.query(`DROP INDEX "public"."IDX_7a26c80564bf5fe4e414125e99"`)
         await db.query(`DROP INDEX "public"."IDX_2eb2f24563a058f9d6e746ed47"`)
         await db.query(`DROP TABLE "o_token_asset"`)
+        await db.query(`DROP INDEX "public"."IDX_66e7a0ecb6941d847e31c37653"`)
+        await db.query(`DROP INDEX "public"."IDX_fe067c13ae234e2ccac0f5b7d0"`)
+        await db.query(`DROP INDEX "public"."IDX_e9bc471f1fedf1d4288d093835"`)
+        await db.query(`DROP INDEX "public"."IDX_1ea6d2aded21937ab3a084d573"`)
+        await db.query(`DROP INDEX "public"."IDX_d649a23bf44e3d9833263da713"`)
+        await db.query(`DROP INDEX "public"."IDX_fc84f1c2050bb0459e13586dbb"`)
+        await db.query(`DROP TABLE "wo_token_address_yield"`)
         await db.query(`DROP INDEX "public"."IDX_f14aa07c5a85a39318a017d421"`)
         await db.query(`DROP INDEX "public"."IDX_3d57d694c426c319d925b846f8"`)
         await db.query(`DROP INDEX "public"."IDX_46a8bdc64b39c46a0aa37bb768"`)

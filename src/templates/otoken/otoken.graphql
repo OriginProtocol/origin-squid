@@ -33,6 +33,25 @@ type WOToken @entity {
   assetsPerShare: BigInt!
 }
 
+type WOTokenAddressYield @entity {
+  id: ID! # chainId:wotoken:address:date
+  chainId: Int! @index
+  wotoken: String! @index # wrapped ERC4626 token address (the ERC20 whose transfers are tracked)
+  otoken: String! @index # underlying OToken address (denomination of value/yield; used for USD valuation)
+  address: String! @index # holder
+  date: String! @index
+  timestamp: DateTime!
+  blockNumber: Int! @index
+  balance: BigInt! # wrapped-share balance
+  value: BigInt! # balance * assetsPerShare / 1e18, in underlying OToken units
+  costBasis: BigInt! # cost of the position, in underlying OToken units
+  yield: BigInt! # yield accrued on this date, in underlying OToken units
+  cumulativeYield: BigInt! # lifetime yield, in underlying OToken units
+  roi: Float!
+  lastR: BigInt! # last checkpointed assetsPerShare (previewRedeem(1e18))
+  yieldRemainder: BigInt! # sub-wei accrual carry
+}
+
 type OTokenAsset @entity {
   id: ID! @index
   chainId: Int! @index

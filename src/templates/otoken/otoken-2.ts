@@ -9,7 +9,6 @@ import * as otokenAbi20241221 from '@abi/otoken-2024-12-21'
 import * as otokenHarvester from '@abi/otoken-base-harvester'
 import * as otokenUpgradeAccountsAbi from '@abi/otoken-upgradeAccounts'
 import * as otokenVaultAbi from '@abi/otoken-vault'
-import OTOKEN_2024_12_21_ABI_JSON from '../../abi-json/otoken-2024-12-21.json'
 import { OTokenAsset, OTokenRawData } from '@model'
 import {
   Block,
@@ -23,11 +22,13 @@ import {
 } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { Trace } from '@subsquid/evm-processor'
+import { createWOTokenYieldProcessor } from '@templates/wotoken-yield'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
 import { sonicAddresses } from '@utils/addresses-sonic'
 import { bigintJsonParse, bigintJsonStringify } from '@utils/bigintJson'
 
+import OTOKEN_2024_12_21_ABI_JSON from '../../abi-json/otoken-2024-12-21.json'
 import { areContracts, loadIsContractCache, saveIsContractCache } from '../../utils/isContract'
 import { OToken_2021_01_02 } from './otoken-2021-01-02'
 import { OToken_2021_01_08 } from './otoken-2021-01-08'
@@ -102,7 +103,7 @@ const logPerformanceStats = () => {
   console.log('=======================\n')
 }
 
-export const createOTokenProcessor2 = (params: {
+export const createOTokenProcessors = (params: {
   name: string
   symbol: string
   from: number
@@ -286,7 +287,7 @@ export const createOTokenProcessor2 = (params: {
   let producer: OTokenEntityProducer
   // let hasUpgraded = false
 
-  return defineProcessor({
+  const otokenProcessor = defineProcessor({
     name: `otoken2-${otokenAddress}`,
     from,
     setup: (processor: EvmBatchProcessor) => {
@@ -798,6 +799,23 @@ export const createOTokenProcessor2 = (params: {
       logPerformanceStats()
     },
   })
+
+  // Creating an OToken automatically wires per-holder yield tracking for its wrapped (ERC4626)
+  // token when one is configured, so a `wotoken` param is all that's needed — no separate
+  // registration. The companion is chain-agnostic (chainId derived from ctx at runtime).
+  return [
+    otokenProcessor,
+    ...(params.wotoken
+      ? [
+          createWOTokenYieldProcessor({
+            name: `w${params.symbol} Address Yield`,
+            from: params.wotoken.from,
+            wotokenAddress: params.wotoken.address,
+            otokenAddress: params.otokenAddress,
+          }),
+        ]
+      : []),
+  ]
 }
 
 const copyData = async (otoken: OTokenClass, newImplementation: OTokenClass) => {

@@ -1,10 +1,10 @@
-import { ousdProcessor } from 'ousd/processors/ousd'
+import { ousdProcessors } from 'ousd/processors/ousd'
 import 'tsconfig-paths/register'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
 import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
-import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
+import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { processStatus } from '@templates/processor-status'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { WOUSD_ADDRESS, addresses } from '@utils/addresses'
@@ -19,7 +19,7 @@ import { ousdStrategiesProcessor } from './ousd/processors/strategies/strategies
 export const processor = defineSquidProcessor({
   stateSchema: 'ousd-processor',
   processors: [
-    ousdProcessor,
+    ...ousdProcessors,
     createOTokenActivityProcessor({
       from: 11590995,
       otokenAddress: addresses.ousd.address,

@@ -1,22 +1,17 @@
-import { parseEther } from 'viem';
-import { base } from 'viem/chains';
+import { parseEther } from 'viem'
+import { base } from 'viem/chains'
 
+import * as erc20Abi from '@abi/erc20'
+import { getPositions } from '@templates/aerodrome/lp'
+import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
+import { createOTokenProcessors } from '@templates/otoken/otoken-2'
+import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
+import { aerodromePools, baseAddresses } from '@utils/addresses-base'
+import { tokensByChain } from '@utils/tokensByChain'
 
+import { baseCurveAMO } from '../base/strategies'
 
-import * as erc20Abi from '@abi/erc20';
-import { getPositions } from '@templates/aerodrome/lp';
-import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor';
-import { createOTokenProcessor2 } from '@templates/otoken/otoken-2';
-import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals';
-import { aerodromePools, baseAddresses } from '@utils/addresses-base';
-import { tokensByChain } from '@utils/tokensByChain';
-
-
-
-import { baseCurveAMO } from '../base/strategies';
-
-
-const otokenProcessor = createOTokenProcessor2({
+const [otokenProcessor, ...otokenCompanionProcessors] = createOTokenProcessors({
   name: 'Super OETHb',
   symbol: 'superOETHb',
   from: 17819702,
@@ -124,4 +119,9 @@ const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   from: 21544908,
 })
 
-export const superOETHb = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor]
+export const superOETHb = [
+  otokenProcessor,
+  otokenActivityProcessor,
+  otokenWithdrawalsProcessor,
+  ...otokenCompanionProcessors,
+]

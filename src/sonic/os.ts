@@ -3,11 +3,11 @@ import { parseEther } from 'viem'
 import * as erc20 from '@abi/erc20'
 import * as initializableAbstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
-import { createOTokenProcessor2 } from '@templates/otoken/otoken-2'
+import { createOTokenProcessors } from '@templates/otoken/otoken-2'
 import { createOTokenWithdrawalsProcessor } from '@templates/withdrawals'
 import { sonicAddresses } from '@utils/addresses-sonic'
 
-const otokenProcessor = createOTokenProcessor2({
+const [otokenProcessor, ...otokenCompanionProcessors] = createOTokenProcessors({
   name: 'OS',
   symbol: 'OS',
   from: sonicAddresses.OS.initializeBlock,
@@ -83,4 +83,4 @@ const otokenWithdrawalsProcessor = createOTokenWithdrawalsProcessor({
   from: sonicAddresses.OS.initializeBlock,
 })
 
-export const OS = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor]
+export const OS = [otokenProcessor, otokenActivityProcessor, otokenWithdrawalsProcessor, ...otokenCompanionProcessors]
