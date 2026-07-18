@@ -1,7 +1,7 @@
 import * as abi from '@abi/exponential-staking'
 import { ESAddressYield } from '@model'
 import { Block, Context, EvmBatchProcessor, Processor, logFilter } from '@originprotocol/squid-utils'
-import { DayBoundaryCarry, forEachBlockByDay } from '@utils/for-each-block-by-day'
+import { DayBoundaryCarry, dayEndBlocks, forEachBlockByDay } from '@utils/for-each-block-by-day'
 
 // xOGN is a MasterChef-style accumulator: previewRewards(user) == balanceOf(user) *
 // (accRewardPerShare - rewardDebtPerShare(user)) / 1e12. So accRewardPerShare is scaled by 1e12 and a
@@ -145,6 +145,19 @@ export const createESAddressYieldProcessor = ({
         row.blockNumber = block.header.height
         changedYieldRows.set(row.id, row)
       }
+
+      // Pre-warm the accRewardPerShare cache in one parallel batch (the RPC client coalesces these
+      // into batched eth_calls): every block that needs R — those with a stake/unstake, plus each
+      // day-end — is fetched concurrently so the sequential per-day pass below never blocks on a
+      // round-trip.
+      const rBlocks = new Map<number, Block>()
+      for (const block of ctx.blocks) {
+        if (block.logs.some((log) => stakeFilter.matches(log) || unstakeFilter.matches(log))) {
+          rBlocks.set(block.header.height, block)
+        }
+      }
+      for (const block of dayEndBlocks(ctx, dayCarry)) rBlocks.set(block.header.height, block)
+      await Promise.all([...rBlocks.values()].map((block) => getR(block).catch(() => undefined)))
 
       // Deterministic per-day accrual: stake/unstake checkpoint at exact event time; each day's pure
       // reward accrual is closed out once, at that day's true last block (`onDayEnd`), regardless of

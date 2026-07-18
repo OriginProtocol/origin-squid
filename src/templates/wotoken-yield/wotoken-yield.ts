@@ -2,7 +2,7 @@ import * as wotokenAbi from '@abi/woeth'
 import { WOTokenAddressYield } from '@model'
 import { Block, Context, EvmBatchProcessor, Processor, logFilter } from '@originprotocol/squid-utils'
 import { ADDRESS_ZERO } from '@utils/addresses'
-import { DayBoundaryCarry, forEachBlockByDay } from '@utils/for-each-block-by-day'
+import { DayBoundaryCarry, dayEndBlocks, forEachBlockByDay } from '@utils/for-each-block-by-day'
 
 const ONE = 10n ** 18n
 
@@ -173,6 +173,18 @@ export const createWOTokenYieldProcessor = ({
         row.blockNumber = block.header.height
         changedYieldRows.set(row.id, row)
       }
+
+      // Pre-warm the rate cache in one parallel batch (the RPC client coalesces these into batched
+      // eth_calls): every block that needs R — those with a wrapped transfer, plus each day-end — is
+      // fetched concurrently so the sequential per-day pass below never blocks on a round-trip.
+      // Best-effort — a pre-init revert on the empty vault is ignored and simply skipped by onDayEnd's
+      // active-holder guard.
+      const rBlocks = new Map<number, Block>()
+      for (const block of ctx.blocks) {
+        if (block.logs.some((log) => transferFilter.matches(log))) rBlocks.set(block.header.height, block)
+      }
+      for (const block of dayEndBlocks(ctx, dayCarry)) rBlocks.set(block.header.height, block)
+      await Promise.all([...rBlocks.values()].map((block) => getR(block).catch(() => undefined)))
 
       // Deterministic per-day accrual: transfers checkpoint at exact event time; each day's pure
       // share-appreciation is closed out once, at that day's true last block (`onDayEnd`), regardless
