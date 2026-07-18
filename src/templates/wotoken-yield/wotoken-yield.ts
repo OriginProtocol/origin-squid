@@ -2,6 +2,7 @@ import * as wotokenAbi from '@abi/woeth'
 import { WOTokenAddressYield } from '@model'
 import { Block, Context, EvmBatchProcessor, Processor, logFilter } from '@originprotocol/squid-utils'
 import { ADDRESS_ZERO } from '@utils/addresses'
+import { DayBoundaryCarry, forEachBlockByDay } from '@utils/for-each-block-by-day'
 
 const ONE = 10n ** 18n
 
@@ -47,6 +48,7 @@ export const createWOTokenYieldProcessor = ({
   // Persisted across batches, seeded once from persisted rows (see `hydrate`).
   const currentDayRows = new Map<string, WOTokenAddressYield>()
   const previousDayRows = new Map<string, WOTokenAddressYield>()
+  const dayCarry: DayBoundaryCarry = {}
   let hydrated = false
   let warnedNegativeBalance = false
 
@@ -77,8 +79,9 @@ export const createWOTokenYieldProcessor = ({
     name,
     from,
     setup: (p: EvmBatchProcessor) => {
-      // includeAllBlocks so the daily forced checkpoint can fire on frequency/end-of-day blocks
-      // even when no wrapped transfer occurred that day (matches the ARM/otoken-state batch).
+      // includeAllBlocks so the day-boundary detection sees consecutive blocks (and thus every true
+      // end-of-day) even on days with no wrapped transfer. Redundant on these chains — the OToken
+      // processor already includes all blocks from an earlier block — but keeps this self-sufficient.
       p.includeAllBlocks({ from })
       p.addLog(transferFilter.value)
     },
@@ -171,33 +174,32 @@ export const createWOTokenYieldProcessor = ({
         changedYieldRows.set(row.id, row)
       }
 
-      for (const block of ctx.blocks) {
-        for (const log of block.logs) {
-          if (transferFilter.matches(log)) {
-            // Mint = from 0 (wrap); burn = to 0 (unwrap); peer transfer otherwise.
-            // Every inbound (wrap or peer-in) marks cost basis at current R: for a wrap you deposit
-            // `shares * R` underlying assets; a peer-in is acquired at current market value. Outbounds
-            // reduce cost basis proportionally (handled inside checkpoint).
-            const event = wotokenAbi.events.Transfer.decode(log)
-            const R = await getR(block)
-            const fromZero = event.from.toLowerCase() === ADDRESS_ZERO
-            const toZero = event.to.toLowerCase() === ADDRESS_ZERO
-            if (!fromZero) {
-              checkpoint(event.from, block, R, -event.value)
-            }
-            if (!toZero) {
-              checkpoint(event.to, block, R, event.value, (event.value * R) / ONE)
+      // Deterministic per-day accrual: transfers checkpoint at exact event time; each day's pure
+      // share-appreciation is closed out once, at that day's true last block (`onDayEnd`), regardless
+      // of how blocks are batched. At the chain head the current day is also swept for freshness.
+      await forEachBlockByDay(ctx, dayCarry, {
+        onBlock: async (block) => {
+          for (const log of block.logs) {
+            if (transferFilter.matches(log)) {
+              // Mint = from 0 (wrap); burn = to 0 (unwrap); peer transfer otherwise.
+              // Every inbound (wrap or peer-in) marks cost basis at current R: for a wrap you deposit
+              // `shares * R` underlying assets; a peer-in is acquired at current market value.
+              // Outbounds reduce cost basis proportionally (handled inside checkpoint).
+              const event = wotokenAbi.events.Transfer.decode(log)
+              const R = await getR(block)
+              const fromZero = event.from.toLowerCase() === ADDRESS_ZERO
+              const toZero = event.to.toLowerCase() === ADDRESS_ZERO
+              if (!fromZero) {
+                checkpoint(event.from, block, R, -event.value)
+              }
+              if (!toZero) {
+                checkpoint(event.to, block, R, event.value, (event.value * R) / ONE)
+              }
             }
           }
-        }
-
-        // Daily forced checkpoint: close out each day's pure share-appreciation accrual for every
-        // known holder, including passive ones with no events. `latestBlockOfDay` is true on the last
-        // block of each day *and* the last block of the batch, so one sweep per day completes the
-        // daily series during backfill and the batch-tail sweep keeps the current day fresh while
-        // live. Intra-day sweeps would only overwrite the same dated row, so they are unnecessary
-        // here (unlike ARM, which also needs sub-daily ArmState snapshots).
-        if (block.header.height >= from && ctx.latestBlockOfDay(block)) {
+        },
+        onDayEnd: async (block) => {
+          if (block.header.height < from) return
           // Collect holders with a live balance first, and skip the block entirely when there are
           // none. Before the vault's first deposit there are no holders and its ERC4626 views revert,
           // so we must not call previewRedeem (getR) yet. This keeps `from` robust: it can sit at (or
@@ -211,8 +213,8 @@ export const createWOTokenYieldProcessor = ({
             const R = await getR(block)
             for (const account of activeHolders) checkpoint(account, block, R, 0n)
           }
-        }
-      }
+        },
+      })
 
       await ctx.store.upsert([...changedYieldRows.values()])
     },

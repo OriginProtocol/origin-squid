@@ -1,6 +1,7 @@
 import * as abi from '@abi/exponential-staking'
 import { ESAddressYield } from '@model'
 import { Block, Context, EvmBatchProcessor, Processor, logFilter } from '@originprotocol/squid-utils'
+import { DayBoundaryCarry, forEachBlockByDay } from '@utils/for-each-block-by-day'
 
 // xOGN is a MasterChef-style accumulator: previewRewards(user) == balanceOf(user) *
 // (accRewardPerShare - rewardDebtPerShare(user)) / 1e12. So accRewardPerShare is scaled by 1e12 and a
@@ -39,6 +40,7 @@ export const createESAddressYieldProcessor = ({
   // Persisted across batches, seeded once from persisted rows (see `hydrate`).
   const currentDayRows = new Map<string, ESAddressYield>()
   const previousDayRows = new Map<string, ESAddressYield>()
+  const dayCarry: DayBoundaryCarry = {}
   let hydrated = false
 
   const hydrate = async (ctx: Context) => {
@@ -67,8 +69,9 @@ export const createESAddressYieldProcessor = ({
     name: `xOGN Address Yield ${staking}`,
     from,
     setup: (p: EvmBatchProcessor) => {
-      // includeAllBlocks so the daily forced checkpoint can fire on the last block of each day even
-      // when no stake/unstake occurred (matches the ARM/otoken batch).
+      // includeAllBlocks so the day-boundary detection sees consecutive blocks (and thus every true
+      // end-of-day) even on days with no stake/unstake. Redundant on mainnet (already all-blocks from
+      // block 15M) but keeps this processor self-sufficient.
       p.includeAllBlocks({ from })
       p.addLog(stakeFilter.value)
       p.addLog(unstakeFilter.value)
@@ -143,28 +146,30 @@ export const createESAddressYieldProcessor = ({
         changedYieldRows.set(row.id, row)
       }
 
-      for (const block of ctx.blocks) {
-        for (const log of block.logs) {
-          if (stakeFilter.matches(log)) {
-            // Stake mints `points` xOGN and locks `amount` OGN (new stake or the relock half of an
-            // extend). Accrue at the old balance first, then apply both deltas.
-            const event = abi.events.Stake.decode(log)
-            const R = await getR(block)
-            checkpoint(event.user, block, R, event.points, event.amount)
-          } else if (unstakeFilter.matches(log)) {
-            // Unstake burns `points` xOGN and withdraws OGN principal. `amount` is the post-penalty
-            // withdrawn amount; the full-exit clamp above zeroes any residual once points hit 0.
-            const event = abi.events.Unstake.decode(log)
-            const R = await getR(block)
-            checkpoint(event.user, block, R, -event.points, -event.amount)
+      // Deterministic per-day accrual: stake/unstake checkpoint at exact event time; each day's pure
+      // reward accrual is closed out once, at that day's true last block (`onDayEnd`), regardless of
+      // how blocks are batched. At the chain head the current day is also swept for freshness.
+      await forEachBlockByDay(ctx, dayCarry, {
+        onBlock: async (block) => {
+          for (const log of block.logs) {
+            if (stakeFilter.matches(log)) {
+              // Stake mints `points` xOGN and locks `amount` OGN (new stake or the relock half of an
+              // extend). Accrue at the old balance first, then apply both deltas.
+              const event = abi.events.Stake.decode(log)
+              const R = await getR(block)
+              checkpoint(event.user, block, R, event.points, event.amount)
+            } else if (unstakeFilter.matches(log)) {
+              // Unstake burns `points` xOGN and withdraws OGN principal. `amount` is the post-penalty
+              // withdrawn amount; the full-exit clamp above zeroes any residual once points hit 0.
+              const event = abi.events.Unstake.decode(log)
+              const R = await getR(block)
+              checkpoint(event.user, block, R, -event.points, -event.amount)
+            }
           }
-        }
-
-        // Daily forced checkpoint: close out each day's accrual for every staker with a live balance,
-        // including passive ones. Skip when there are no active stakers so we never call the contract
-        // before it has any (keeps `from` robust). `latestBlockOfDay` fires on each day's last block
-        // and the batch tail, so one sweep/day completes the series and the tail keeps today fresh.
-        if (block.header.height >= from && ctx.latestBlockOfDay(block)) {
+        },
+        onDayEnd: async (block) => {
+          if (block.header.height < from) return
+          // Skip when there are no active stakers so we never call the contract before it has any.
           const activeStakers: string[] = []
           for (const account of new Set([...currentDayRows.keys(), ...previousDayRows.keys()])) {
             const seedRow = currentDayRows.get(account) ?? previousDayRows.get(account)
@@ -174,8 +179,8 @@ export const createESAddressYieldProcessor = ({
             const R = await getR(block)
             for (const account of activeStakers) checkpoint(account, block, R, 0n, 0n)
           }
-        }
-      }
+        },
+      })
 
       await ctx.store.upsert([...changedYieldRows.values()])
     },
