@@ -318,5 +318,21 @@
     "sellPrice": "999810303492326734000000000000000000",
     "buyLiquidityRemaining": null,
     "sellLiquidityRemaining": null
+  },
+  {
+    "id": "1:0025045279-43c80-000370",
+    "chainId": 1,
+    "txHash": "0x5975279df2c12a7d907840fb0c618df6d6a28e259c70d1321eb81bbf05c89dbb",
+    "txFee": "90946381253070",
+    "timestamp": "2026-05-07T19:34:23.000000Z",
+    "blockNumber": 25045279,
+    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
+    "traderate0": "1000039579678461429981389051029069834",
+    "traderate1": "999760421888027516000000000000000000",
+    "asset": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "buyPrice": "1000039579678461429981389051029069834",
+    "sellPrice": "999760421888027516000000000000000000",
+    "buyLiquidityRemaining": null,
+    "sellLiquidityRemaining": null
   }
 ]

@@ -178,5 +178,14 @@
     "address": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
     "account": "0xbac258862a5108e41b6ce1b462a49961c409576c",
     "balance": "11427431687537390104"
+  },
+  {
+    "id": "1-0x2a8e1e676ec238d8a992307b495b45b3feaa5e86-0xc3e7f54c983e5d5683df11aeccac913d7d63d9a2-2022-01-01T07",
+    "timestamp": "2022-01-01T07:00:46.000000Z",
+    "blockNumber": 13918032,
+    "chainId": 1,
+    "address": "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86",
+    "account": "0xc3e7f54c983e5d5683df11aeccac913d7d63d9a2",
+    "balance": "54126898648267290529"
   }
 ]

@@ -243,10 +243,10 @@
     "blockNumber": 19115608,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
-    "apr": 0.022124498363274236,
-    "apy": 0.022370375028619716,
+    "apr": 0.022124475944143684,
+    "apy": 0.022370352109353453,
     "asset": "0xae78736cd615f374d3085123a210448e74fc6393",
-    "balance": "102740972763205784340",
+    "balance": "102741076872272282692",
     "balanceWeight": 1,
     "earnings": "49473388089359855260",
     "earningsChange": "6223388045836380"
@@ -278,5 +278,19 @@
     "balanceWeight": 1,
     "earnings": "62755501499751254801",
     "earningsChange": "329519839690258532"
+  },
+  {
+    "id": "0x39254033945aa2e4809cc2977e7087bee48bd7ab:0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:2024-03-18",
+    "timestamp": "2024-03-18T23:59:59.999000Z",
+    "blockNumber": 19465095,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "balance": "129498879406994250448",
+    "balanceWeight": 1,
+    "earnings": "0",
+    "earningsChange": "0"
   }
 ]

@@ -258,5 +258,18 @@
     "unallocatedSupply": "0",
     "creditsPerToken": "994544727947295341396697165",
     "holderCount": 0
+  },
+  {
+    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:19663824",
+    "timestamp": "2024-09-12T04:56:35.000000Z",
+    "blockNumber": 19663824,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "chainId": 8453,
+    "nonRebasingSupply": "5013555475817172239902",
+    "rebasingSupply": "1533618875662188490628",
+    "totalSupply": "6547174351479360730530",
+    "unallocatedSupply": "0",
+    "creditsPerToken": "994544727947295341396697165",
+    "holderCount": 0
   }
 ]

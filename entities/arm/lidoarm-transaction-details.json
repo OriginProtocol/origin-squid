@@ -238,5 +238,17 @@
     "gasUsed": "231189",
     "effectiveGasPrice": "3838210607",
     "transactionFee": "887352072021723"
+  },
+  {
+    "id": "1:0x9bfedf64a9358063e6ebc3fcb17e4a45bba92ef4edc9708e6a9f54d43fce1d1a",
+    "chainId": 1,
+    "timestamp": "2024-09-02T01:46:23.000000Z",
+    "blockNumber": 20659688,
+    "txHash": "0x9bfedf64a9358063e6ebc3fcb17e4a45bba92ef4edc9708e6a9f54d43fce1d1a",
+    "from": "0x39878253374355dbcc15c86458f084fb6f2d6de7",
+    "to": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "gasUsed": "85333",
+    "effectiveGasPrice": "1505619084",
+    "transactionFee": "128478993294972"
   }
 ]

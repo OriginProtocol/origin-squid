@@ -398,5 +398,25 @@
     "spread": "-1988049617166221",
     "assets0": "10000000000000000000",
     "assets1": "-10001988049617166221"
+  },
+  {
+    "id": "1::0x8c31e002ebe8a21e2bbbe143f44a672973b4565628682ec1ed80c8fa94336294:0xae7ab96520de3a18e5e111b5eaab095312d7fe84:sell",
+    "chainId": 1,
+    "txHash": "0x8c31e002ebe8a21e2bbbe143f44a672973b4565628682ec1ed80c8fa94336294",
+    "txFrom": "0x65a8f07bd9a8598e1b5b6c0a88f4779dbc077675",
+    "txTo": "0x1111111254eeb25477b68fb85ed929f73a960582",
+    "timestamp": "2024-11-18T00:36:11.000000Z",
+    "blockNumber": 21211055,
+    "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "from": "0x3451b6b219478037a1ac572706627fc2bda1e812",
+    "tokenIn": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+    "tokenOut": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "amountIn": "670568239632909846",
+    "amountOut": "670341865263345788",
+    "rateIn": "1000000000000000000",
+    "rateOut": "1000000000000000000",
+    "spread": "226374369564058",
+    "assets0": "-670341865263345788",
+    "assets1": "670568239632909846"
   }
 ]

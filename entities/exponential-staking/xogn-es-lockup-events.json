@@ -178,5 +178,14 @@
     "blockNumber": 21660998,
     "txHash": "0xe8daff446fc83f8fb38d03c9ad336b5a888619959653aea3585816ba35bf85de",
     "event": "Staked"
+  },
+  {
+    "id": "1:0x63898b3b6ef3d39332082178656e9862bee45c57:0x9ffd0a5b5438b95861167422e745d34d151bcc3b:0:0021840014-a7ef5-000234",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-02-13T20:42:47.000000Z",
+    "blockNumber": 21840014,
+    "txHash": "0xfe4d650eccf0896746b54212c3b7f74533652eccd653ec5406e5d94db995eafe",
+    "event": "Extended"
   }
 ]

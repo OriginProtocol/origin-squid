@@ -278,5 +278,19 @@
     "type": "Yield",
     "txHash": "0xf2b09079ff438ca17aab3860652f6d74680cea4f3d3a33a03795dd030bdbe587",
     "value": "50974453543294"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-0xe6030d4e773888e1dfe4cc31da6e05bfe53091ac-2023-05-16T18",
+    "timestamp": "2023-05-16T18:00:47.000000Z",
+    "blockNumber": 17273900,
+    "chainId": 1,
+    "balance": "25000007419267625311",
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "address": {
+      "address": "0xe6030d4e773888e1dfe4cc31da6e05bfe53091ac"
+    },
+    "type": "Yield",
+    "txHash": "0x07aa22623f27dcae975dc8ff30c61a42c80749f3c7d8f7c63ffa7869399802be",
+    "value": "7419267625311"
   }
 ]

@@ -218,5 +218,16 @@
     "to": "0x31d2737adf35a6981546b4da644ee64973cd4fd8",
     "fromBalance": "4281299369177280272",
     "amount": "149002047648857"
+  },
+  {
+    "id": "8453-0xdbfefd2e8460a6ee4955a68582f85708baea60a3-32394291-0xf583c95c5f2d4245044a8c35b7890da649a7777f-0x2273b2fb1664f100c07cdaa25afd1cd0da3c7437",
+    "timestamp": "2025-07-03T21:25:29.000000Z",
+    "blockNumber": 32394291,
+    "chainId": 8453,
+    "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
+    "from": "0xf583c95c5f2d4245044a8c35b7890da649a7777f",
+    "to": "0x2273b2fb1664f100c07cdaa25afd1cd0da3c7437",
+    "fromBalance": "2439030097526599264",
+    "amount": "56659254617662"
   }
 ]

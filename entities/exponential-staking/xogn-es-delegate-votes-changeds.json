@@ -218,5 +218,16 @@
     "delegate": "0xc198c59eed21c8163b2eea88722dadd64742b927",
     "previousBalance": "26366828348653705420469",
     "newBalance": "26215061669759694268733"
+  },
+  {
+    "id": "1:0021709330-d0c96-000144",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-01-26T14:37:11.000000Z",
+    "blockNumber": 21709330,
+    "txHash": "0xc67fc87a34f908f0149c97bf6332314d3853a32e1ee21659e2557db688d453f3",
+    "delegate": "0xbe8af9f86ffdd3de0220c3fb3decf068ea0ad47b",
+    "previousBalance": "12007698665832931248725",
+    "newBalance": "0"
   }
 ]

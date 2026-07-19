@@ -278,5 +278,19 @@
     "balanceWeight": 1,
     "earnings": "356997548484993906221",
     "earningsChange": "0"
+  },
+  {
+    "id": "0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5:0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee:2026-01-10",
+    "timestamp": "2026-01-10T23:59:59.999000Z",
+    "blockNumber": 24207742,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "strategy": "0x3ff8654d633d4ea0fae24c52aec73b4a20d0d0e5",
+    "apr": 0,
+    "apy": 0,
+    "asset": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "balance": "0",
+    "balanceWeight": 1,
+    "earnings": "356997548484993906221",
+    "earningsChange": "0"
   }
 ]

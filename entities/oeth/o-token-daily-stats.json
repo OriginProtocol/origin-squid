@@ -56,7 +56,7 @@
     "rateNative": "1000000000000000000",
     "yield": "3275230740221737875",
     "marketCapUSD": 2.251908908677701e+25,
-    "accountsOverThreshold": 152,
+    "accountsOverThreshold": 153,
     "rateWrapped": "1031562709626626711"
   },
   {
@@ -86,7 +86,7 @@
     "rateNative": "1000000000000000000",
     "yield": "4083910370761068749",
     "marketCapUSD": 8.503649447795058e+25,
-    "accountsOverThreshold": 282,
+    "accountsOverThreshold": 281,
     "rateWrapped": "1043712280264547403"
   },
   {
@@ -206,7 +206,7 @@
     "rateNative": "1000000000000000000",
     "yield": "2415364781431168034",
     "marketCapUSD": 1.1090831731268584e+26,
-    "accountsOverThreshold": 247,
+    "accountsOverThreshold": 248,
     "rateWrapped": "1079081283796720925"
   },
   {
@@ -236,7 +236,7 @@
     "rateNative": "1000000000000000000",
     "yield": "2447711957784992624",
     "marketCapUSD": 1.5630014240402882e+26,
-    "accountsOverThreshold": 220,
+    "accountsOverThreshold": 221,
     "rateWrapped": "1085171157408856796"
   },
   {
@@ -326,7 +326,7 @@
     "rateNative": "1000000000000000000",
     "yield": "1564214124295399627",
     "marketCapUSD": 8.638142914129745e+25,
-    "accountsOverThreshold": 208,
+    "accountsOverThreshold": 206,
     "rateWrapped": "1101762153117825827"
   },
   {
@@ -446,7 +446,7 @@
     "rateNative": "1000000000000000000",
     "yield": "3203062699047138037",
     "marketCapUSD": 7.562820750640373e+25,
-    "accountsOverThreshold": 182,
+    "accountsOverThreshold": 181,
     "rateWrapped": "1122436398009474159"
   },
   {
@@ -476,7 +476,7 @@
     "rateNative": "1000000000000000000",
     "yield": "3210643441554633661",
     "marketCapUSD": 8.289504245038063e+25,
-    "accountsOverThreshold": 190,
+    "accountsOverThreshold": 191,
     "rateWrapped": "1127138724351477081"
   },
   {
@@ -598,5 +598,35 @@
     "marketCapUSD": 1.37303260679294e+26,
     "accountsOverThreshold": 182,
     "rateWrapped": "1144591556178214698"
+  },
+  {
+    "id": "1-0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3-2026-01-10",
+    "timestamp": "2026-01-10T23:59:59.000000Z",
+    "blockNumber": 24207742,
+    "chainId": 1,
+    "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
+    "date": "2026-01-10",
+    "totalSupply": "44722413910795828910954",
+    "rebasingSupply": "25510160046152698836294",
+    "nonRebasingSupply": "19212253864643130074660",
+    "wrappedSupply": "15298412926938540227860",
+    "amoSupply": "18765179064608994335166",
+    "apr": 0.026174044341183353,
+    "apy": 0.026518630204728222,
+    "apy14": 0.026518367261614956,
+    "apy30": 0.027306789914602024,
+    "apy7": 0.026518402239204524,
+    "cumulativeFees": "776636707943820321262",
+    "cumulativeYield": "3106546831775281290400",
+    "dripperWETH": "22856954617992997073",
+    "fees": "456992349457750954",
+    "peg": "998736226788027800",
+    "rateETH": "1000000000000000000",
+    "rateUSD": "3078220000000000000000",
+    "rateNative": "1000000000000000000",
+    "yield": "1827969397831003821",
+    "marketCapUSD": 1.3766542894848993e+26,
+    "accountsOverThreshold": 161,
+    "rateWrapped": "1148805269274706465"
   }
 ]

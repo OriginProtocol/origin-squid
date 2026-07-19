@@ -258,5 +258,18 @@
     "amount": "54674799387911501750358",
     "end": "1792994951",
     "points": "122950826332965191696721"
+  },
+  {
+    "id": "1:0023818280-6320c-000678",
+    "chainId": 1,
+    "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
+    "timestamp": "2025-11-17T10:24:59.000000Z",
+    "blockNumber": 23818280,
+    "txHash": "0xeba6c8453bacdcdb5e0fac331fdab59ec90b2fda4ce7a54c0c72502273e760ce",
+    "account": "0xc0e88f859de5c9ebdddd7e5c4c46ab7fcecd65d7",
+    "lockupId": "0",
+    "amount": "2449042897929863440328",
+    "end": "1792737491",
+    "points": "5492216598861916915137"
   }
 ]

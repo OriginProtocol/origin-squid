@@ -9,9 +9,9 @@
     "timestamp": "2024-10-17T23:59:59.000000Z",
     "blockNumber": 20988724,
     "tradingYield": "2728488700640310",
-    "appreciationYield": "0",
+    "appreciationYield": "-3",
     "lendingYield": "0",
-    "yield": "2728488700640310",
+    "yield": "2728488700640307",
     "swapVolume": "10911226313860591343"
   },
   {
@@ -298,5 +298,20 @@
     "lendingYield": "0",
     "yield": "579612332500716002",
     "swapVolume": "988394316621504368299"
+  },
+  {
+    "id": "1:2026-02-28:0x85b78aca6deae198fbf201c82daf6ca21942acc6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "chainId": 1,
+    "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+    "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "assetSymbol": "WETH",
+    "date": "2026-02-28",
+    "timestamp": "2026-02-28T23:59:59.000000Z",
+    "blockNumber": 24558867,
+    "tradingYield": "0",
+    "appreciationYield": "0",
+    "lendingYield": "0",
+    "yield": "0",
+    "swapVolume": "0"
   }
 ]

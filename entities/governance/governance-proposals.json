@@ -29,18 +29,18 @@
     "scores": []
   },
   {
-    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:2626764423234271308388524116226544768850357228938163129912794625401165031109",
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:106247227237600433139581351842615975456822599329363014399616832913328325135207",
     "chainId": 1,
-    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
-    "proposalId": "2626764423234271308388524116226544768850357228938163129912794625401165031109",
-    "description": "Deployed a new strategy to convert stETH to WETH at 1:1 using the Lido withdrawal queue.",
-    "proposer": "0xfd9e6005187f448957a0972a7d0c0a6da2911236",
-    "timestamp": "2024-07-02T19:25:59.000000Z",
-    "txHash": "0xe54380b3b4bf8d4cc505a0abacda4eb28824ac1cfd377cca96b15beeef21ff22",
-    "startBlock": "20228103",
-    "endBlock": "20242519",
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "106247227237600433139581351842615975456822599329363014399616832913328325135207",
+    "description": "Automatic Voting Delegation for OGV Staking\n\nCurrently users must take a seperate step to delegate OGV to themselves in order to vote, and this must be done before a vote begins. This suprises many users who expect to be able to vote if they have veOGV.\n\nThis contract change will automaticly delegate a user's own votes to themselves the first or next time they stake or extend.\n\nCode PR:\nhttps://github.com/OriginProtocol/ousd-governance/pull/367\n\nDeploy PR:\nhttps://github.com/OriginProtocol/ousd-governance/pull/378\n\n            ",
+    "proposer": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f",
+    "timestamp": "2023-02-21T20:14:35.000000Z",
+    "txHash": "0x0134d62113439ff280ff97243a2288b262ca817c603c12452181f86a7967d66f",
+    "startBlock": "16679184",
+    "endBlock": "16707497",
     "targets": [
-      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+      "0x0c4576ca1c365868e162554af8e385dc3e7c66d9"
     ],
     "values": [
       "0"
@@ -49,29 +49,354 @@
       ""
     ],
     "calldatas": [
-      "0x3b8ae39700000000000000000000000002087ea54ee7b6421089ae23e7ff6cd506f507f9"
+      "0x3659cfe6000000000000000000000000e61110663334794aba03c349c621a075dc590a42"
     ],
-    "lastUpdated": "2024-07-03T19:34:23.000000Z",
+    "lastUpdated": "2023-02-28T17:10:35.000000Z",
+    "status": "Executed",
+    "quorum": "2646922932688308848940694457",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "8249654974290045752008910624"
+    ]
+  },
+  {
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:30894412376194853647122581916496530536830189795097427662392821757029264128284",
+    "chainId": 1,
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "30894412376194853647122581916496530536830189795097427662392821757029264128284",
+    "description": "Remove Compound and Convex strategies from the OUSD Vault",
+    "proposer": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241",
+    "timestamp": "2023-08-17T13:26:59.000000Z",
+    "txHash": "0x0ab8a83155504963bf1a46ad83fddaaeb878677fe9fb63211ef701475bc0aa55",
+    "startBlock": "17934832",
+    "endBlock": "17958244",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x175188e80000000000000000000000009c459eeb3fa179a40329b81c1635525e9a0ef094",
+      "0x175188e8000000000000000000000000ea2ef2e2e5a749d4a66b41db9ad85a38aa264cb3",
+      "0x175188e80000000000000000000000007a192dd9cc4ea9bdedec9992df74f1da55e60a19"
+    ],
+    "lastUpdated": "2023-08-23T00:16:59.000000Z",
+    "status": "Executed",
+    "quorum": "2983914942831130493776101577",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "8248471637642219512040723887"
+    ]
+  },
+  {
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:106657143654146782218499766782185241541410736110675785019130125273133364011619",
+    "chainId": 1,
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "106657143654146782218499766782185241541410736110675785019130125273133364011619",
+    "description": "Upgrade Buyback contract",
+    "proposer": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241",
+    "timestamp": "2023-10-31T05:49:59.000000Z",
+    "txHash": "0xccae08ab791462d716733648825fd9684e4d22d234cd277517942c512ffd931d",
+    "startBlock": "18468135",
+    "endBlock": "18490313",
+    "targets": [
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0x77314eb392b2be47c014cde0706908b3307ad6a9",
+      "0x6c5cdfb47150efc52072cb93eea1e0f123529748",
+      "0x2a8e1e676ec238d8a992307b495b45b3feaa5e86"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe6000000000000000000000000b06d8c94d4073e249fdec446b1a99a2f5f482a20",
+      "0x4bb2497d000000000000000000000000ef1c6e67703c7bd7107eed8303fbe6ec2554bf6b",
+      "0xad1728cb",
+      "0x2da845a8000000000000000000000000fd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0xad1728cb",
+      "0x1072cbea0000000000000000000000002a8e1e676ec238d8a992307b495b45b3feaa5e86000000000000000000000000000000000000000000000096fbe124e215f8af65",
+      "0x1072cbea0000000000000000000000002a8e1e676ec238d8a992307b495b45b3feaa5e8600000000000000000000000000000000000000000000000124d3b35997cffe21",
+      "0xa9059cbb000000000000000000000000d7b28d06365b85933c64e11e639ea0d3bc0e3bab00000000000000000000000000000000000000000000009820b4d83badc8ad86"
+    ],
+    "lastUpdated": "2023-11-06T13:44:11.000000Z",
+    "status": "Executed",
+    "quorum": "3443274296333297771280653781",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "8399311635093248639572219000"
+    ]
+  },
+  {
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:19953986745691218316817489613719564552439805381746724170485904355958039770871",
+    "chainId": 1,
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "19953986745691218316817489613719564552439805381746724170485904355958039770871",
+    "description": "Upgrade Buyback contracts to use 1inch",
+    "proposer": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241",
+    "timestamp": "2024-03-25T12:43:47.000000Z",
+    "txHash": "0xa6645342379058f06ba5ac62c54715cd30666285b0319404e78539227c26c842",
+    "startBlock": "19511572",
+    "endBlock": "19525972",
+    "targets": [
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe6000000000000000000000000dd753cb1fc4e8c72c5a40254ac064515301d11e0",
+      "0x41273657000000000000000000000000cd0fcf8a31bc78ec07752e9ccd3960e936d18366",
+      "0x87f8b7190000000000000000000000000000000000000000000000000000000000001388",
+      "0x75d7a6b4",
+      "0x3659cfe60000000000000000000000006c952cc410a253e70f3383028c7e0a7f477b921c",
+      "0x41273657000000000000000000000000cd0fcf8a31bc78ec07752e9ccd3960e936d18366",
+      "0x87f8b7190000000000000000000000000000000000000000000000000000000000001388",
+      "0x75d7a6b4"
+    ],
+    "lastUpdated": "2024-03-29T13:37:23.000000Z",
+    "status": "Executed",
+    "quorum": "4362316323969498184839332529",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "8245278961079893275594556435"
+    ]
+  },
+  {
+    "id": "1:0x3cdd07c16614059e66344a7b579dab4f9516c0b6:75553828947200824531996533389336018648943646908019762771026585702238311635754",
+    "chainId": 1,
+    "address": "0x3cdd07c16614059e66344a7b579dab4f9516c0b6",
+    "proposalId": "75553828947200824531996533389336018648943646908019762771026585702238311635754",
+    "description": "OGV>OGN Migration Contracts\n\nThis proposal deploys, funds and enables the Migrator contract which can be used to migrate OGV to OGN and also veOGV to xOGN.\n\nThe proposal mints 409,664,846 OGN (as specified in the previous off-chain snapshot governance proposal). It also uses some OGN from the treasury multisig to account for the increase in OGV supply due to inflation since the snapshot proposal was posted.\n\nThis proposal also revokes all roles that the old OGV Governance has on the Timelock. Buyback contracts are upgraded to buy OGN instead of OGV",
+    "proposer": "0x17768cfd6030e2b65eb5086e34a512fde5dc1f1f",
+    "timestamp": "2024-05-24T22:18:47.000000Z",
+    "txHash": "0x04b0c2adea381ec68d0f7098cda11c272a5c5b5e6051639f35296c4d01691adf",
+    "startBlock": "19942674",
+    "endBlock": "19957074",
+    "targets": [
+      "0x0c4576ca1c365868e162554af8e385dc3e7c66d9",
+      "0x0c4576ca1c365868e162554af8e385dc3e7c66d9",
+      "0x35918cde7233f2dd33fa41ae3cb6ae0e42e0e69f",
+      "0x35918cde7233f2dd33fa41ae3cb6ae0e42e0e69f",
+      "0x35918cde7233f2dd33fa41ae3cb6ae0e42e0e69f",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xd7b28d06365b85933c64e11e639ea0d3bc0e3bab",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0xfd6c58850cacf9ccf6e8aee479bfb4df14a362d2",
+      "0x8207c1ffc5b6804f6024322ccf34f29c3541ae26",
+      "0x8207c1ffc5b6804f6024322ccf34f29c3541ae26",
+      "0x8207c1ffc5b6804f6024322ccf34f29c3541ae26",
+      "0x7609c88e5880e934dd3a75bcfef44e31b1badb8b",
+      "0x95c347d6214614a780847b8aaf4f96eb84f4da6d",
+      "0x95c347d6214614a780847b8aaf4f96eb84f4da6d"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x70bb45b3",
+      "0x3659cfe6",
+      "0xd547741f",
+      "0xd547741f",
+      "0xd547741f",
+      "0x3659cfe6",
+      "0xd1c76638",
+      "0x3659cfe6",
+      "0xd1c76638",
+      "0x40c10f19",
+      "0x23b872dd",
+      "0x23b872dd",
+      "0xdc9ec152",
+      "0xbe9a6555",
+      "0x71628056"
+    ],
+    "lastUpdated": "2024-05-26T22:36:47.000000Z",
     "status": "Canceled",
-    "quorum": "74466762001406430320906748",
+    "quorum": "5330489060536148881443234983",
     "choices": [],
     "scores": []
   },
   {
-    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:102952869103112185385289294460650789441590856926098847130687971800657890659280",
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:4952583864870422832882752992396486341874887833414208719999363086677469346971",
     "chainId": 1,
     "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
-    "proposalId": "102952869103112185385289294460650789441590856926098847130687971800657890659280",
-    "description": "Upgrade Morpho Steakhouse and Gauntlet Prime Strategies",
-    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
-    "timestamp": "2025-05-06T05:00:47.000000Z",
-    "txHash": "0x7a7fa5151bb247cf62e8a3177f8e9735dc972a00440d909db9f32eee557222cf",
-    "startBlock": "22429646",
-    "endBlock": "22445925",
+    "proposalId": "4952583864870422832882752992396486341874887833414208719999363086677469346971",
+    "description": "Upgrade OETH Vault to support queued withdrawals",
+    "proposer": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241",
+    "timestamp": "2024-08-05T08:02:59.000000Z",
+    "txHash": "0x6c24d92fca36e124437661f15f2c2de24fa1f8ad8db86f159bb3d994321a1ffe",
+    "startBlock": "20468246",
+    "endBlock": "20482662",
     "targets": [
-      "0x603cdeaec82a60e3c4a10da6ab546459e5f64fa0",
-      "0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1",
-      "0xe3ae7c80a1b02ccd3fb0227773553aeb14e32f26"
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x175188e8000000000000000000000000d9b488280d723338dd32d56b3900f379eb7a7af1",
+      "0x175188e8000000000000000000000000c1fc9e5ec3058921ea5025d703cbe31764756319",
+      "0x4a5e42b1000000000000000000000000ae7ab96520de3a18e5e111b5eaab095312d7fe84",
+      "0x4a5e42b1000000000000000000000000ae78736cd615f374d3085123a210448e74fc6393",
+      "0x44c54707",
+      "0x3659cfe600000000000000000000000049b60053869a0a7ef60242ea7a4d1317a8d51f54",
+      "0xfc0cfeee0000000000000000000000008a6f6d39bf5203061b5685f672342cbeb4b16590",
+      "0x2e9958ab000000000000000000000000c0f42f73b8f01849a2dd99753524d4ba14317eb3",
+      "0xbc90106b000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000004685db8bf2df743c861d71e6cfb5347222992076",
+      "0x8ec489a200000000000000000000000000000000000000000000000000071afd498d0000",
+      "0xabaa9916"
+    ],
+    "lastUpdated": "2024-08-10T11:40:35.000000Z",
+    "status": "Executed",
+    "quorum": "75838720899389805802967785",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "169667623330418181494739259"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:75087811221559915489997248701865604408180819987973892712738892811928200381194",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "75087811221559915489997248701865604408180819987973892712738892811928200381194",
+    "description": "Add Morpho Gauntlet Prime USDC Strategy to the OUSD Vault",
+    "proposer": "0x6a6d776120f7e4a8dba5f6bf49b85cb340cfe241",
+    "timestamp": "2024-12-18T05:59:11.000000Z",
+    "txHash": "0x29d8780296595602fa58d58c1a051154a2a7e65b040a23045b3f1613ad5cccef",
+    "startBlock": "21434685",
+    "endBlock": "21449101",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0x21fb5812d70b3396880d30e90d9e5c1202266c89",
+      "0x2b8f37893ee713a4e9ff0ceb79f27539f20a32a1"
     ],
     "values": [
       "0",
@@ -84,13 +409,13 @@
       ""
     ],
     "calldatas": [
-      "0x3659cfe600000000000000000000000041bd943923c31d277aa1becbc702b825f2bb8639",
-      "0x3659cfe6000000000000000000000000b08fd21afa2628318cb60d90234559602e7eae10",
-      "0x3659cfe600000000000000000000000093e86b889e03ea8526368e9fa8dfc1a032ebd12d"
+      "0x3b8ae3970000000000000000000000002b8f37893ee713a4e9ff0ceb79f27539f20a32a1",
+      "0x65f6fa940000000000000000000000002b8f37893ee713a4e9ff0ceb79f27539f20a32a10000000000000000000000000000000000000000000000000000000000000001",
+      "0xc2e1e3f400000000000000000000000021fb5812d70b3396880d30e90d9e5c1202266c89"
     ],
-    "lastUpdated": "2025-05-12T00:12:11.000000Z",
+    "lastUpdated": "2024-12-30T08:27:23.000000Z",
     "status": "Executed",
-    "quorum": "140176840132136300500557684",
+    "quorum": "139379277347371970662329341",
     "choices": [
       "For"
     ],
@@ -99,21 +424,95 @@
     ]
   },
   {
-    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:9948092462276445509780797495205471799644905864792185620552351889756709358003",
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:68528526132026080998168122859635399048147530736160306492805070199180314362200",
     "chainId": 1,
     "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
-    "proposalId": "9948092462276445509780797495205471799644905864792185620552351889756709358003",
-    "description": "Upgrade OUSD and OETH vaults: permissioned rebase, drop auto-rebase triggers",
+    "proposalId": "68528526132026080998168122859635399048147530736160306492805070199180314362200",
+    "description": "Grant canceller role to 5/8 Multisig",
     "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
-    "timestamp": "2026-05-10T09:58:11.000000Z",
-    "txHash": "0xb641456a1960e93704f856ed6897c63606734fbe424ff38440c0fa9bacb06441",
-    "startBlock": "25071148",
-    "endBlock": "25085564",
+    "timestamp": "2025-01-27T15:31:35.000000Z",
+    "txHash": "0x7cdc5ee98ec91b7aef45661e3c16b5bf45eccd1790944f72a1b2fe1a515f7808",
+    "startBlock": "21723971",
+    "endBlock": "21738387",
+    "targets": [
+      "0x35918cde7233f2dd33fa41ae3cb6ae0e42e0e69f"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x2f2ff15dfd643c72710c63c0180259aba6b2d05451e3591a24e58b62239378085726f783000000000000000000000000be2ab3d3d8f6a32b96414ebbd865dbd276d3d899"
+    ],
+    "lastUpdated": "2025-02-03T06:26:59.000000Z",
+    "status": "Executed",
+    "quorum": "140176940612422204901485308",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "336139438934931391646879979"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:88299129181157806559379214304016095228552624275043325103321115382026366391938",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "88299129181157806559379214304016095228552624275043325103321115382026366391938",
+    "description": "Remove OUSD Aave Strategy",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-02-19T12:18:11.000000Z",
+    "txHash": "0x620fb36c88b732d1860e5d0ac4f5ed9e50523c03a657e0702f9b9dd128c80a66",
+    "startBlock": "21887562",
+    "endBlock": "21901978",
     "targets": [
       "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
       "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
-      "0x39254033945aa2e4809cc2977e7087bee48bd7ab",
-      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+      "0x21fb5812d70b3396880d30e90d9e5c1202266c89"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0xbc90106b000000000000000000000000dac17f958d2ee523a2206206994597c13d831ec7000000000000000000000000e3ae7c80a1b02ccd3fb0227773553aeb14e32f26",
+      "0x175188e80000000000000000000000005e3646a1db86993f73e6b74a57d8640b69f7e259",
+      "0x65f6fa940000000000000000000000005e3646a1db86993f73e6b74a57d8640b69f7e2590000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "lastUpdated": "2025-03-03T09:49:59.000000Z",
+    "status": "Executed",
+    "quorum": "140745502476140700581437827",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "336139438934931391646879979"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:20041784718370787564331144611892588100610941343726698226969600103440267883569",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "20041784718370787564331144611892588100610941343726698226969600103440267883569",
+    "description": "Update CampaignRemoteManager and Votemarket addresses on TriOGN PoolBooster.",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-03-25T08:59:35.000000Z",
+    "txHash": "0x13e0c7df91903a78bde880ad0bec90222abe36b852b444ed4ac3b6a7a89862f6",
+    "startBlock": "22130083",
+    "endBlock": "22144499",
+    "targets": [
+      "0x514447a1ef103f3cf4b0fe92a947f071239f2809",
+      "0x7b5e7adebc2da89912bffe55c86675cece59803e",
+      "0x514447a1ef103f3cf4b0fe92a947f071239f2809",
+      "0x7b5e7adebc2da89912bffe55c86675cece59803e"
     ],
     "values": [
       "0",
@@ -128,19 +527,311 @@
       ""
     ],
     "calldatas": [
-      "0x3659cfe600000000000000000000000082948060c4b72684bededec342350ab344975145",
-      "0x9e4285520000000000000000000000000abcda6fa7d500cf69b0ea5de9a607cd9941221c",
-      "0x3659cfe60000000000000000000000000e979edf516f88119fa2843fa3f08a9643f8e575",
-      "0x9e4285520000000000000000000000000abcda6fa7d500cf69b0ea5de9a607cd9941221c"
+      "0xbcfb252c00000000000000000000000053ad4cd1f1e52dd02aa9fc4a8250a1b74f351ca2",
+      "0xbcfb252c00000000000000000000000053ad4cd1f1e52dd02aa9fc4a8250a1b74f351ca2",
+      "0x05f568090000000000000000000000008c2c5a295450ddff4cb360ca73fccc12243d14d9",
+      "0x05f568090000000000000000000000008c2c5a295450ddff4cb360ca73fccc12243d14d9"
     ],
-    "lastUpdated": "2026-05-16T09:44:11.000000Z",
+    "lastUpdated": "2025-03-28T09:24:59.000000Z",
+    "status": "Defeated",
+    "quorum": "140785830340098834197620701",
+    "choices": [],
+    "scores": []
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:62736766423374672768580940310861921323283907575465980811344596309308068769219",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "62736766423374672768580940310861921323283907575465980811344596309308068769219",
+    "description": "Add rate limiting to Origin Vault and upgrade Wrapped OUSD",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-04-23T10:31:23.000000Z",
+    "txHash": "0x70deb030b31343a04f4a47343666a7a10ec97c04c697970486bd1f80ce29f1ca",
+    "startBlock": "22338318",
+    "endBlock": "22352734",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62",
+      "0xd2af830e8cbdfed6cc11bab697bb25496ed6fa62"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe60000000000000000000000006b89f2410c45701e1456f9e2c5c3f8fab5137b7a",
+      "0xfc0cfeee000000000000000000000000dfa729e70a0f0182e9e6066b6f6ec4392c1ac39f",
+      "0x0493a0fa0000000000000000000000000000000000000000000000000000000000003840",
+      "0xb4925a20000000000000000000000000000000000000000000000001158e460913d00000",
+      "0x3659cfe6000000000000000000000000deabeb7dfda1deff8a90fde8a16d7a42d316e632",
+      "0x472abf68"
+    ],
+    "lastUpdated": "2025-04-30T08:58:11.000000Z",
     "status": "Executed",
-    "quorum": "280571142902164168144683250",
+    "quorum": "140871067087856155406689672",
     "choices": [
       "For"
     ],
     "scores": [
-      "661653822175422849262388562"
+      "336139438934931391646879979"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:109363689626229981205538511015089771588377155562499137759609037731650725632486",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "109363689626229981205538511015089771588377155562499137759609037731650725632486",
+    "description": "Change fee collector",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-07-07T13:22:23.000000Z",
+    "txHash": "0x9f8eb31594afac63af760f22c8743b57b78f5fd05674fddd928eaf59aa7b553e",
+    "startBlock": "22874785",
+    "endBlock": "22889201",
+    "targets": [
+      "0x85b78aca6deae198fbf201c82daf6ca21942acc6"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0xa42dce80000000000000000000000000bb077e716a5f1f1b63ed5244ebff5214e50fec8c"
+    ],
+    "lastUpdated": "2025-07-12T18:21:23.000000Z",
+    "status": "Executed",
+    "quorum": "154614899187039272347399934",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "336139438934931391646879979"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:49475084247620460343235150587569616034322434304590286062029905326260401839255",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "49475084247620460343235150587569616034322434304590286062029905326260401839255",
+    "description": "Update Lido ARM to add asset() view function",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2025-12-17T13:02:59.000000Z",
+    "txHash": "0x1c52e7d88d2859d72ae82e0bf79b93baba07f99858a8ce95581a2277af0afe7d",
+    "startBlock": "24039709",
+    "endBlock": "24054125",
+    "targets": [
+      "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
+      "0x29c4bb7b1ebcc53e8cbd16480b5bae52c69806d3",
+      "0x29c4bb7b1ebcc53e8cbd16480b5bae52c69806d3"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3659cfe6000000000000000000000000c0297a0e39031f09406f0987c9d9d41c5dfbc3df",
+      "0x3659cfe600000000000000000000000090c7abc962f96de171ee395a242d2ff794d0a04c",
+      "0xa601f7470000000000000000000000003ef3d8ba38ebe18db133cec108f4d14ce00dd9ae"
+    ],
+    "lastUpdated": "2025-12-20T13:31:35.000000Z",
+    "status": "Defeated",
+    "quorum": "257857186380734640543357203",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "127575554875274543400000"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:41400701140158755878550609458362994783256214607829125108336270589939542994095",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "41400701140158755878550609458362994783256214607829125108336270589939542994095",
+    "description": "Allow the initial 1 ETH validator deposits to be made three at a time.",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-01-23T10:41:59.000000Z",
+    "txHash": "0xa426bae73c352990dd8e1bbd0d97fe083337a835b0f22aaf479fdb53cd4d9be0",
+    "startBlock": "24304157",
+    "endBlock": "24324531",
+    "targets": [
+      "0xaf04828ed923216c77dc22a2fc8e077fdadaa87d"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x4c84e6f8"
+    ],
+    "lastUpdated": "2026-01-29T09:37:59.000000Z",
+    "status": "Executed",
+    "quorum": "276152780919230166517374581",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "661685672866971087057621301"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:82859201447218338287719298348503030894203878448854317959506610360592214196029",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "82859201447218338287719298348503030894203878448854317959506610360592214196029",
+    "description": "Add Morpho V2 Crosschain Strategy to OUSD Vault",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-02-10T15:52:35.000000Z",
+    "txHash": "0x923971000e4e021b05013b5b92e01a88aa6d3039cc567ecd98f952ec8d6f1b6d",
+    "startBlock": "24434590",
+    "endBlock": "24449006",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x3b8ae397000000000000000000000000b1d624fc40824683e2bfbefd19eb208dbbe00866"
+    ],
+    "lastUpdated": "2026-02-16T08:32:11.000000Z",
+    "status": "Executed",
+    "quorum": "279153496197704514528494645",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "661526246620547574718988562"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:104173658387164514102242627376769936605154939587861930223165791002445889578794",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "104173658387164514102242627376769936605154939587861930223165791002445889578794",
+    "description": "Add HyperEVM Morpho V2 Crosschain Strategy to OUSD Vault",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-03-17T17:41:59.000000Z",
+    "txHash": "0xaf57c8021304603acdeaad29a7475c0e04da23beffa49ab92e6f382e69b3c1be",
+    "startBlock": "24685968",
+    "endBlock": "24700384",
+    "targets": [
+      "0xe75d77b1865ae93c7eaa3040b038d7aa7bc02f70",
+      "0xe0228db13f8c4eb00fd1e08e076b09ef5cd0ea1e"
+    ],
+    "values": [
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0x3b8ae397000000000000000000000000e0228db13f8c4eb00fd1e08e076b09ef5cd0ea1e",
+      "0xb3ab15fb0000000000000000000000004b91827516f79d6f6a1f292ed99671663b09169a"
+    ],
+    "lastUpdated": "2026-03-23T07:22:11.000000Z",
+    "status": "Executed",
+    "quorum": "274665829873329351295156017",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "661654021018353669668822666"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:103423371549941850803617056393955997738077624682599514660888481101539457353886",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "103423371549941850803617056393955997738077624682599514660888481101539457353886",
+    "description": "Remove the Convex AMO Strategy from the OETH Vault",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-05-29T13:22:59.000000Z",
+    "txHash": "0x581d6d615faaed128ffe129ed7218f585c2a87735b8c478d0e5edc66edeb38d5",
+    "startBlock": "25208493",
+    "endBlock": "25222909",
+    "targets": [
+      "0x39254033945aa2e4809cc2977e7087bee48bd7ab"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x175188e80000000000000000000000001827f9ea98e0bf96550b2fc20f7233277fcd7e63"
+    ],
+    "lastUpdated": "2026-06-01T13:45:59.000000Z",
+    "status": "Defeated",
+    "quorum": "280519291719300363964706352",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "127575554875274543400000"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:105952564920326880829480980653921695351704517467605619581569766325476268429476",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "105952564920326880829480980653921695351704517467605619581569766325476268429476",
+    "description": "Unpause the Ethena ARM",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-06-23T09:58:23.000000Z",
+    "txHash": "0x3dde230eb42ed2c0cae9ce5f2cc5261b1d24d4db473d5715619bb47bd282f536",
+    "startBlock": "25386767",
+    "endBlock": "25403555",
+    "targets": [
+      "0xceda2d856238aa0d12f6329de20b9115f07c366d"
+    ],
+    "values": [
+      "0"
+    ],
+    "signatures": [
+      ""
+    ],
+    "calldatas": [
+      "0x3f4ba83a"
+    ],
+    "lastUpdated": "2026-06-29T08:58:23.000000Z",
+    "status": "Executed",
+    "quorum": "293382418813637655428547763",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "727965272210558193480906786"
     ]
   }
 ]

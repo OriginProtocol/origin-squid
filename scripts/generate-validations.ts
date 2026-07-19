@@ -38,10 +38,6 @@ const takeValidationEntries = (arr: any[]) => {
   return arr.filter((entry) => entry.blockNumber % 100000 === 0)
 }
 
-const takeEvery = (arr: any[], n: number = 25) => {
-  return arr.filter((_, i) => i % n === 0)
-}
-
 /**
  * For exchange rates, ensure we get at least one of every pair.
  * We take a consistent sample by selecting entries at regular block intervals,
@@ -1344,7 +1340,12 @@ const main = async () => {
           // Otherwise, filter to validation entries
           validationData = takeValidationEntries(rawData)
           if (validationData.length < 5) {
-            validationData = takeEvery(rawData, 50)
+            // Some series (e.g. per-day strategy yields) have block numbers that never align to 100k,
+            // so the primary sampler finds nothing. Sample ~20 evenly-spaced rows plus the last one.
+            // The old `takeEvery(rawData, 50)` returned only index 0 for any series under 50 entries,
+            // collapsing a healthy 20–49-row strategy to a single (often zero-balance) first row.
+            const step = Math.max(1, Math.ceil(rawData.length / 20))
+            validationData = rawData.filter((_, i) => i % step === 0 || i === rawData.length - 1)
           }
         }
 
