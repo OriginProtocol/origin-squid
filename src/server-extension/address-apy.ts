@@ -5,6 +5,44 @@ const E18 = 'power(10::numeric, 18)'
 const E36 = 'power(10::numeric, 36)'
 
 /**
+ * Cap on a single day's fractional return, used to discard corrupt per-day yield rows.
+ *
+ * Exit-day / cost-basis-reset checkpoints in the per-address yield series can book a
+ * `yield` that is large relative to the (collapsed, near-zero) denominator that produced
+ * it, giving per-day returns from ~0.4%/day up to 1e9+/day. Money-weighting does NOT
+ * dilute these — Σyield stays large while Σdenom collapses — so the aggregate daily rate
+ * `d` inflates: severe spikes push d past ~6, where power(1 + d, 365) overflows float8
+ * (error 22003) and 500s the whole query; milder ones (~0.4–1%/day) yield absurd-but-
+ * finite rates (150%–6000% APY).
+ *
+ * Empirically, legitimate per-day |yield|/denom tops out around 7e-4/day (0.07%) across
+ * every product (ARM/OToken/wOToken/xOGN, p99 ≤ 3e-4), and the artifact band starts near
+ * 2e-3/day (0.2%) with an empty gap between. 0.2%/day (a ~73% simple-APR-equivalent
+ * single day — far above anything these products actually pay) sits in that gap: it drops
+ * every artifact while leaving real days untouched, so healthy APY/APR is unchanged. The
+ * filter is symmetric (|yield|) so negative artifacts are caught too, and it bounds
+ * |d| ≤ MAX_DAILY_RATE, keeping the annualization finite.
+ */
+const MAX_DAILY_RATE = 0.002
+/** `WHERE`-clause fragment dropping corrupt (large-|yield|-vs-dust-denom) days. */
+const dailyRateFilter = (yieldCol: string, denomCol: string) =>
+  `abs(${yieldCol}::numeric) <= ${denomCol}::numeric * ${MAX_DAILY_RATE}`
+
+/**
+ * Minimum current USD value for a position to count as "held" in the portfolio blend.
+ *
+ * The portfolio APY is meant to describe the holder's *current* positions. A withdrawal
+ * leaves behind share/rounding dust (a few wei), and because a weighted average of a
+ * single position equals that position's rate regardless of how small its absolute weight
+ * is, a holder whose only remaining position is dust would otherwise be assigned that
+ * (now meaningless) position's APY. Excluding positions below one cent drops fully-exited
+ * holdings entirely — a dust-only holder correctly reports productCount 0 / apy 0 — and
+ * matches the frontend already hiding dust from the Yield Positions list. Any genuine
+ * position is worth far more than a cent, so real holdings are never excluded.
+ */
+const DUST_USD = 0.01
+
+/**
  * Per-address realized yield rate for a holder of an ARM vault or an OToken.
  *
  * Both rates are money-weighted: we sum the holder's actual daily yield and
@@ -174,25 +212,32 @@ export class AddressApyResolver {
     const chainFilter = (col: string) => `($2::int IS NULL OR ${col} = $2)`
     const sql = `
       WITH native AS (
-        -- per-product native all-time daily rate, over the days the position was held
-        SELECT chain_id, product, sum_yield / sum_denom AS d_native
+        -- per-product native all-time daily rate, over the days the position was held.
+        -- d_native is clamped to ±MAX_DAILY_RATE as a defensive backstop; the per-day
+        -- filter (${MAX_DAILY_RATE}/day) below already bounds it there by dropping corrupt
+        -- exit-day rows, so the clamp only bites if a future change removes the filter.
+        SELECT chain_id, product,
+               least(greatest((sum_yield / sum_denom)::float8, -${MAX_DAILY_RATE}), ${MAX_DAILY_RATE}) AS d_native
         FROM (
           SELECT chain_id, arm AS product,
                  sum("yield"::numeric) AS sum_yield, sum(value::numeric) AS sum_denom
           FROM arm_address_yield
           WHERE address = $1 AND value > 0 AND ${chainFilter('chain_id')}
+            AND ${dailyRateFilter('"yield"', 'value')}
           GROUP BY chain_id, arm
           UNION ALL
           SELECT chain_id, otoken,
                  sum("yield"::numeric), sum(balance::numeric)
           FROM o_token_address_yield
           WHERE address = $1 AND balance > 0 AND ${chainFilter('chain_id')}
+            AND ${dailyRateFilter('"yield"', 'balance')}
           GROUP BY chain_id, otoken
           UNION ALL
           SELECT chain_id, wotoken,
                  sum("yield"::numeric), sum(value::numeric)
           FROM wo_token_address_yield
           WHERE address = $1 AND value > 0 AND ${chainFilter('chain_id')}
+            AND ${dailyRateFilter('"yield"', 'value')}
           GROUP BY chain_id, wotoken
           UNION ALL
           -- xOGN staking: holder is the account column, product is the staking-contract address; the
@@ -201,6 +246,7 @@ export class AddressApyResolver {
                  sum("yield"::numeric), sum(staked_balance::numeric)
           FROM es_address_yield
           WHERE account = $1 AND staked_balance > 0 AND ${chainFilter('chain_id')}
+            AND ${dailyRateFilter('"yield"', 'staked_balance')}
           GROUP BY chain_id, address
         ) s
         WHERE sum_denom > 0
@@ -257,18 +303,33 @@ export class AddressApyResolver {
             ORDER BY ey.chain_id, ey.address, ey.date DESC
           )
         ) w
+      ),
+      blend AS (
+        -- One row: the USD-weighted daily rate across the holder's current positions.
+        -- The dust floor (>= ${DUST_USD}) drops fully-exited positions so their leftover
+        -- wei can't define the blend; a holder with no position above the floor yields no
+        -- row here, and the final SELECT then returns 0 / 0.
+        SELECT
+          sum(weight.usd_value * native.d_native) AS sum_wd,
+          sum(weight.usd_value)                   AS sum_w,
+          count(*)                                AS product_count,
+          sum(weight.usd_value)                   AS total_usd_value
+        FROM native
+        JOIN weight ON weight.chain_id = native.chain_id AND weight.product = native.product
+        WHERE weight.usd_value >= ${DUST_USD}
       )
       SELECT
-        coalesce(
-          sum(weight.usd_value * (power(1 + native.d_native::float8, 365) - 1))
-            / NULLIF(sum(weight.usd_value), 0), 0)        AS apy,
-        coalesce(
-          sum(weight.usd_value * (native.d_native::float8 * 365))
-            / NULLIF(sum(weight.usd_value), 0), 0)        AS apr,
-        count(*) FILTER (WHERE weight.usd_value > 0)      AS product_count,
-        coalesce(sum(weight.usd_value) FILTER (WHERE weight.usd_value > 0), 0) AS total_usd_value
-      FROM native
-      JOIN weight ON weight.chain_id = native.chain_id AND weight.product = native.product
+        -- Blend the native daily rates by current USD weight, THEN annualize once. This
+        -- compounds the *blended* daily rate rather than averaging each product's already-
+        -- compounded APY (which overstates the blend when the per-product rates diverge).
+        -- d is bounded to ±MAX_DAILY_RATE upstream, so power(1 + d, 365) cannot overflow.
+        CASE WHEN sum_w IS NULL OR sum_w = 0 THEN 0
+             ELSE power(1 + (sum_wd / sum_w), 365) - 1 END  AS apy,
+        CASE WHEN sum_w IS NULL OR sum_w = 0 THEN 0
+             ELSE (sum_wd / sum_w) * 365 END                AS apr,
+        coalesce(product_count, 0)                          AS product_count,
+        coalesce(total_usd_value, 0)                        AS total_usd_value
+      FROM blend
     `
     const rows: Array<{
       apr: number | null
@@ -313,13 +374,18 @@ export class AddressApyResolver {
         FROM ${table}
         WHERE chain_id = $1 AND ${filterColumn} = lower($2) AND ${holderColumn} = lower($3)
           AND ${denomColumn} > 0
+          AND ${dailyRateFilter('"yield"', denomColumn)}
       )
       SELECT
         held_days,
+        -- The daily-rate filter bounds |d| ≤ MAX_DAILY_RATE; LEAST/GREATEST is a
+        -- defensive backstop so power(1 + d, 365) can never overflow float8.
         CASE WHEN sum_denom IS NULL OR sum_denom = 0 THEN 0
-             ELSE (sum_yield / sum_denom)::float8 * 365 END                  AS apr,
+             ELSE least(greatest((sum_yield / sum_denom)::float8, -${MAX_DAILY_RATE}), ${MAX_DAILY_RATE}) * 365 END
+                                                                             AS apr,
         CASE WHEN sum_denom IS NULL OR sum_denom = 0 THEN 0
-             ELSE power(1 + (sum_yield / sum_denom)::float8, 365) - 1 END    AS apy
+             ELSE power(1 + least(greatest((sum_yield / sum_denom)::float8, -${MAX_DAILY_RATE}), ${MAX_DAILY_RATE}), 365) - 1 END
+                                                                             AS apy
       FROM agg
     `
     const rows: Array<{ held_days: string | number | null; apr: number | null; apy: number | null }> =
