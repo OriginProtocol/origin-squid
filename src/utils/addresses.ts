@@ -235,6 +235,16 @@ export const arms: Record<string, { address: string; capManager: string; zapper:
     capManager: '0x687afb5a52a15122fd5fc54a8b52cfd58346fb0c',
     zapper: '',
   },
+  'ARM-USDC': {
+    address: '0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170',
+    capManager: '0x19b1edb2cad902f103a20a30011f125dce44f954',
+    zapper: '',
+  },
+  'ARM-WETH': {
+    address: '0x68025a4615407993a680102b08a23a61d11c657c',
+    capManager: '0x19d2977a1cc5a73bf5d827ace07a3be3e56bdfea',
+    zapper: '',
+  },
 }
 
 export const multisig = {

@@ -9,9 +9,6 @@ import { Currency } from '@shared/post-processors/exchange-rates/mainnetCurrenci
 
 const DAY_MS = 86_400_000
 const DAYS_PER_YEAR = 365.25
-// All mainnet ARM liquidity assets (token0: WETH, USDe) are 18-decimal.
-const TOKEN0_DECIMALS = 18
-
 /**
  * External incentive rewards (currently Merkl campaigns) for an ARM on a given day.
  *
@@ -31,10 +28,12 @@ export const calculateArmIncentiveApy = async (
     armAddress,
     totalAssets,
     rateUSD,
+    liquidityAssetDecimals,
   }: {
     armAddress: string
     totalAssets: bigint
     rateUSD?: { rate: bigint; decimals: number }
+    liquidityAssetDecimals: number
   },
 ): Promise<{ incentiveYield: bigint; incentiveApr: number; incentiveApy: number }> => {
   const zero = { incentiveYield: 0n, incentiveApr: 0, incentiveApy: 0 }
@@ -54,7 +53,7 @@ export const calculateArmIncentiveApy = async (
 
   const token0PriceUSD = +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18)
   if (token0PriceUSD <= 0) return zero
-  const tvlUSD = +formatUnits(totalAssets, TOKEN0_DECIMALS) * token0PriceUSD
+  const tvlUSD = +formatUnits(totalAssets, liquidityAssetDecimals) * token0PriceUSD
 
   let dailyRewardsUSD = 0
   for (const campaign of campaigns) {
@@ -85,7 +84,10 @@ export const calculateArmIncentiveApy = async (
   }
 
   // Express the day's reward value in token0 units, to parallel ArmDailyStat.yield.
-  const incentiveYield = parseUnits((dailyRewardsUSD / token0PriceUSD).toFixed(TOKEN0_DECIMALS), TOKEN0_DECIMALS)
+  const incentiveYield = parseUnits(
+    (dailyRewardsUSD / token0PriceUSD).toFixed(liquidityAssetDecimals),
+    liquidityAssetDecimals,
+  )
   if (tvlUSD <= 0) return { ...zero, incentiveYield }
 
   const dailyRate = dailyRewardsUSD / tvlUSD
