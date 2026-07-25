@@ -1,4 +1,3 @@
-import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
 import { ensureExchangeRate } from '@shared/post-processors/exchange-rates'
 import { createOriginARMProcessors } from '@templates/origin-arm'
 import { addresses } from '@utils/addresses'
@@ -57,5 +56,29 @@ export const originArmProcessors = [
       cumulativeYield: 235834455255935430654n,
       cumulativeFees: 1195643896382772555709n,
     },
+  }),
+
+  // Multi-asset WETH ARM
+  ...createOriginARMProcessors({
+    chainId: 1,
+    name: 'ARM-WETH',
+    from: 25588390,
+    armAddress: addresses.arms['ARM-WETH'].address,
+    token0: 'WETH',
+    capManagerAddress: addresses.arms['ARM-WETH'].capManager,
+    armType: 'multi-asset',
+    marketFrom: 25588390,
+  }),
+
+  // Multi-asset USDC ARM
+  ...createOriginARMProcessors({
+    chainId: 1,
+    name: 'ARM-USDC',
+    from: 25588390,
+    armAddress: addresses.arms['ARM-USDC'].address,
+    token0: 'USDC',
+    capManagerAddress: addresses.arms['ARM-USDC'].capManager,
+    armType: 'multi-asset',
+    marketFrom: 25588390,
   }),
 ]

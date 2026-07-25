@@ -36,6 +36,9 @@ export class Arm {
     @StringColumn_({array: true, nullable: false})
     assetSymbols!: (string)[]
 
+    @IntColumn_({array: true, nullable: false})
+    assetDecimals!: (number)[]
+
     @BooleanColumn_({array: true, nullable: false})
     assetPegged!: (boolean)[]
 

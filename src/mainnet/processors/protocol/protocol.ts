@@ -225,13 +225,18 @@ const getArmDetails = async (
     }
     const detail = await getProtocolDailyStatDetail(ctx, date, product)
     const eth = (value: bigint) => (value * BigInt(Math.round(armDailyStat.rateETH * 1e18))) / BigInt(10 ** 18)
+    const liquidityDecimals = armDailyStat.assetDecimals[0] ?? 18
+    const liquidity18 = (value: bigint) =>
+      liquidityDecimals < 18
+        ? value * 10n ** BigInt(18 - liquidityDecimals)
+        : value / 10n ** BigInt(liquidityDecimals - 18)
     detail.rateUSD = BigInt(Math.round(armDailyStat.rateUSD * 1e18))
     detail.rateETH = BigInt(Math.round(armDailyStat.rateETH * 1e18))
-    detail.earningTvl = eth(armDailyStat.totalAssets)
-    detail.tvl = eth(armDailyStat.totalAssets)
+    detail.earningTvl = eth(liquidity18(armDailyStat.totalAssets))
+    detail.tvl = eth(liquidity18(armDailyStat.totalAssets))
     detail.supply = eth(armDailyStat.totalSupply)
-    detail.yield = eth(armDailyStat.yield + armDailyStat.fees)
-    detail.revenue = eth(armDailyStat.fees)
+    detail.yield = eth(liquidity18(armDailyStat.yield + armDailyStat.fees))
+    detail.revenue = eth(liquidity18(armDailyStat.fees))
     detail.apy = armDailyStat.apy
     details.push(detail)
   }

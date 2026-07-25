@@ -26,6 +26,7 @@ type Arm @entity {
   # alignment key for every asset* array on ArmState / ArmDailyStat. Never reorder/remove.
   assets: [String!]! # asset addresses, e.g. [WETH, stETH, wstETH]
   assetSymbols: [String!]! # e.g. ["WETH", "stETH", "wstETH"]
+  assetDecimals: [Int!]! # ERC20 decimals, aligned to assets
   assetPegged: [Boolean!]! # true = 1:1 with liquidity asset (rate 1.0); [0] is always true
   # IAssetAdapter address per asset (from BaseAssetAdded), used for the rate via
   # convertToAssets. Zero address for [0] (liquidity asset) and pre-upgrade base assets.
@@ -110,12 +111,23 @@ type ArmDailyStat @entity {
   rateETH: Float!
   rateNative: Float!
   rateAsset1: Float! # primary base->liquidity rate; == assetRates[1] (legacy)
-  # Aligned to Arm.assets (append-only). [0] = liquidity asset.
+  # Historical asset registry for this snapshot. All arrays below use the same indexes;
+  # [0] = liquidity asset and [1+] = base assets active by the end of this day.
+  assets: [String!]!
+  assetSymbols: [String!]!
+  assetDecimals: [Int!]!
   assetBalances: [String!]! # raw balanceOf(asset i); [0] = idle liquidity
   # assetTotals[0] = assets0 + outstandingAssets1 + marketAssets; [i>0] = balanceOf(asset i).
   assetTotals: [String!]!
-  # asset->liquidity rate, 1e18-scaled (PRICE_SCALE). [0] = 1e18; pegged base = 1e18.
+  # Raw-unit asset->liquidity conversion factor, 1e18-scaled. This keeps
+  # rawBalance * assetRates / 1e18 in raw liquidity units even when decimals differ.
   assetRates: [String!]!
+  # Human-unit prices, all normalized to 1e18 and aligned to assets.
+  # assetRatesLiquidity[0] = 1e18; the other arrays start with the liquidity asset's price.
+  assetRatesLiquidity: [String!]!
+  assetRatesUSD: [String!]!
+  assetRatesETH: [String!]!
+  assetRatesNative: [String!]!
   # Per-asset protocol redemptions in-flight, aligned to Arm.assets. [0] = 0 (liquidity asset);
   # [i>0] = liquidity-denominated pendingRedeemAssets for base asset i. == sum is outstandingAssets1.
   outstandingAssets: [String!]!
@@ -173,9 +185,9 @@ type ArmSwap @entity {
   # One row per (transaction, base asset, direction), paired from the tx's ERC20 Transfer logs.
   # Modeled as an explicit swap: tokenIn/amountIn = what the trader supplied (ARM received);
   # tokenOut/amountOut = what the trader received (ARM sent). amount* are RAW token units; rate*
-  # is each token's asset0 (liquidity) rate at the swap block, 1e18-scaled (== 1e18 for the
-  # liquidity asset and pegged base assets). Every swap has the liquidity asset on exactly one
-  # side (the contract forbids base<->base). Derived: asset0 value = amount x rate / 1e18;
+  # is each token's raw-unit asset0 (liquidity) conversion factor at the swap block, 1e18-scaled.
+  # Every swap has the liquidity asset on exactly one side (the contract forbids base<->base).
+  # Derived: raw asset0 value = raw amount x rate / 1e18;
   # execution price = amountOut / amountIn; spread = valueOut / valueIn.
   tokenIn: String! @index
   tokenOut: String! @index

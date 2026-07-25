@@ -2,9 +2,10 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { findLast } from 'lodash'
 import { IsNull, LessThan, LessThanOrEqual } from 'typeorm'
-import { formatEther, formatUnits } from 'viem'
+import { formatUnits } from 'viem'
 
 import * as erc20Abi from '@abi/erc20'
+import * as multiAssetArmAbi from '@abi/multi-asset-arm'
 import * as originOsArmAbi from '@abi/origin-arm'
 import * as originEthenaArmAbi from '@abi/origin-ethena-arm'
 import * as originEtherfiArmAbi from '@abi/origin-etherfi-arm'
@@ -60,11 +61,11 @@ export const createOriginARMProcessors = ({
   from: number
   armAddress: string
   token0: Currency
-  token1: Currency
+  token1?: Currency
   getRate1?: (ctx: Context, block: Block) => Promise<bigint>
   capManagerAddress: string
   marketFrom?: number
-  armType: 'lido' | 'etherfi' | 'os' | 'ethena'
+  armType: 'lido' | 'etherfi' | 'os' | 'ethena' | 'multi-asset'
   // One-time history cleanup for an ARM whose on-chain assetsPerShare was corrupted by a
   // since-resolved contract bug (e.g. the sUSDe ARM, 2026-04-23..05-13). All yield series
   // (ArmDailyStat, ArmDailyAssetYield, ArmAddressYield) start clean at `block`, with cumulative
@@ -72,6 +73,8 @@ export const createOriginARMProcessors = ({
   // never touched. Omit for unaffected ARMs.
   yieldBaseline?: { block: number; cumulativeYield: bigint; cumulativeFees: bigint }
 }): Processor[] => {
+  const isMultiAsset = armType === 'multi-asset'
+  if (!isMultiAsset && !token1) throw new Error(`${name}: token1 is required for a legacy ARM`)
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemRequested.topic],
@@ -178,7 +181,7 @@ export const createOriginARMProcessors = ({
         traderate1: decoded.traderate1,
         // Dual-write to the new format so consumers can migrate. token1 here is a Currency
         // symbol, so resolve it to the on-chain address to match the new event's `asset`.
-        asset: currencyToAddress(chainId, token1).toLowerCase(),
+        asset: currencyToAddress(chainId, token1!).toLowerCase(),
         buyPrice: decoded.traderate0,
         sellPrice: decoded.traderate1,
       })
@@ -243,6 +246,11 @@ export const createOriginARMProcessors = ({
   const lastBaseBalance = new Map<string, bigint>()
   const baseTransferFlow = new Map<string, bigint>()
   let yieldSourceInitialized = false
+  const loadAssetMetadata = async (ctx: Context, block: Block, asset: string) => {
+    const contract = new erc20Abi.Contract(ctx, block.header, asset)
+    const [symbol, decimals] = await Promise.all([contract.symbol(), contract.decimals()])
+    return { symbol, decimals }
+  }
   let initialize = async (ctx: Context) => {
     if (ctx.blocks[0].header.height < from) return
     // Must match the id the entity is created with below (`armAddress`). Previously this looked up
@@ -253,17 +261,68 @@ export const createOriginARMProcessors = ({
     let entity = await ctx.store.get(Arm, id)
     if (entity) {
       armEntity = entity
+      // Backfill the registry metadata when deploying this schema over an existing database.
+      if (!armEntity.assetDecimals || armEntity.assetDecimals.length !== armEntity.assets.length) {
+        const metadata = await Promise.all(
+          armEntity.assets.map((asset) => loadAssetMetadata(ctx, ctx.blocks[0], asset)),
+        )
+        armEntity.assetDecimals = metadata.map((m) => m.decimals)
+        await ctx.store.save(armEntity)
+      }
     } else {
-      const armContract = new originOsArmAbi.Contract(ctx, ctx.blocks[0].header, armAddress)
+      const block = ctx.blocks[0]
+      const armContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
       const [name, symbol, decimals] = await Promise.all([
         armContract.name(),
         armContract.symbol(),
         armContract.decimals(),
       ])
-      // token0()/token1() were removed in the multi-base upgrade — calling them reverts on upgraded
-      // ARMs. Resolve the liquidity + primary-base addresses from the configured Currency symbols.
-      const token0Addr = currencyToAddress(chainId, token0)
-      const token1Addr = currencyToAddress(chainId, token1)
+      let token0Addr: string
+      let token1Addr: string
+      let assets: string[]
+      let assetSymbols: string[]
+      let assetDecimals: number[]
+      let assetPegged: boolean[]
+      let assetAdapters: string[]
+      let upgradeBlock: number | undefined
+
+      if (isMultiAsset) {
+        // Fresh multi-asset ARMs expose their complete deployment-time registry. Read it once,
+        // then keep it current from BaseAssetAdded rather than polling getBaseAssets every block.
+        const multiAsset = new multiAssetArmAbi.Contract(ctx, block.header, armAddress)
+        const [liquidityAsset, liquidityDecimals, baseAssets] = await Promise.all([
+          multiAsset.liquidityAsset(),
+          multiAsset.liquidityAssetDecimals(),
+          multiAsset.getBaseAssets(),
+        ])
+        const configs = await Promise.all(baseAssets.map((asset) => multiAsset.baseAssetConfigs(asset)))
+        const metadata = await Promise.all(
+          [liquidityAsset, ...baseAssets].map((asset) => loadAssetMetadata(ctx, block, asset)),
+        )
+        token0Addr = liquidityAsset.toLowerCase()
+        token1Addr = baseAssets[0]?.toLowerCase() ?? ADDRESS_ZERO
+        assets = [token0Addr, ...baseAssets.map((asset) => asset.toLowerCase())]
+        assetSymbols = metadata.map((m) => m.symbol)
+        assetDecimals = [liquidityDecimals, ...configs.map((config) => config.baseAssetDecimals)]
+        assetPegged = [true, ...configs.map((config) => config.peggedToLiquidityAsset)]
+        assetAdapters = [ADDRESS_ZERO, ...configs.map((config) => config.adapter.toLowerCase())]
+        upgradeBlock = from
+        const configuredLiquidityAsset = currencyToAddress(chainId, token0)
+        if (token0Addr !== configuredLiquidityAsset) {
+          throw new Error(`${name}: configured liquidity asset ${configuredLiquidityAsset} != on-chain ${token0Addr}`)
+        }
+      } else {
+        // token0()/token1() were removed in the legacy multi-base upgrade. Resolve the initial
+        // liquidity + primary-base addresses from config and let BaseAssetAdded extend the registry.
+        token0Addr = currencyToAddress(chainId, token0)
+        token1Addr = currencyToAddress(chainId, token1!)
+        assets = [token0Addr, token1Addr]
+        const metadata = await Promise.all(assets.map((asset) => loadAssetMetadata(ctx, block, asset)))
+        assetSymbols = metadata.map((m) => m.symbol)
+        assetDecimals = metadata.map((m) => m.decimals)
+        assetPegged = [true, !getRate1]
+        assetAdapters = [ADDRESS_ZERO, ADDRESS_ZERO]
+      }
       const arm = new Arm({
         id: armAddress,
         chainId: ctx.chain.id,
@@ -277,12 +336,14 @@ export const createOriginARMProcessors = ({
         // The liquidity asset is trivially 1:1 with itself (pegged=true). An appreciating
         // base asset (getRate1 set, e.g. sUSDe) is not pegged; 1:1 assets are. BaseAssetAdded
         // appends further base assets to assets[1+].
-        assets: [token0Addr, token1Addr],
-        assetSymbols: [token0, token1],
-        assetPegged: [true, !getRate1],
+        assets,
+        assetSymbols,
+        assetDecimals,
+        assetPegged,
         // No adapters pre-upgrade (the adapter system ships with the upgrade); populated
         // from BaseAssetAdded when the upgrade registers assets (including the existing one).
-        assetAdapters: [ADDRESS_ZERO, ADDRESS_ZERO],
+        assetAdapters,
+        upgradeBlock,
       })
       await ctx.store.save(arm)
       armEntity = arm
@@ -405,6 +466,7 @@ export const createOriginARMProcessors = ({
           // eth_call sees the upgraded implementation for the entire block, so consider
           // the ARM upgraded when BaseAssetAdded appears anywhere in the current block.
           const upgraded =
+            isMultiAsset ||
             (armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock) ||
             block.logs.some((log) => baseAssetAddedFilter.matches(log))
           const armContract = new originOsArmAbi.Contract(ctx, block.header, armAddress)
@@ -426,8 +488,17 @@ export const createOriginARMProcessors = ({
           let outstandingAssetsBig: bigint[]
           if (upgraded) {
             // Post-upgrade: pending protocol redemptions live per base asset in liquidity terms.
-            const multibase = new originMultibaseArmAbi.Contract(ctx, block.header, armAddress)
-            const configs = await Promise.all(armEntity.assets.slice(1).map((a) => multibase.baseAssetConfigs(a)))
+            const configs = isMultiAsset
+              ? await Promise.all(
+                  armEntity.assets
+                    .slice(1)
+                    .map((a) => new multiAssetArmAbi.Contract(ctx, block.header, armAddress).baseAssetConfigs(a)),
+                )
+              : await Promise.all(
+                  armEntity.assets
+                    .slice(1)
+                    .map((a) => new originMultibaseArmAbi.Contract(ctx, block.header, armAddress).baseAssetConfigs(a)),
+                )
             outstandingAssetsBig = [0n, ...configs.map((c) => c.pendingRedeemAssets)]
           } else {
             // Pre-upgrade: single base asset, one chain-specific withdrawal-queue call.
@@ -439,6 +510,7 @@ export const createOriginARMProcessors = ({
                 if (block.header.height < 24043952) return 0n
                 return await ethenaArmContract.liquidityAmountInCooldown()
               },
+              'multi-asset': async () => 0n,
             }[armType]()
             outstandingAssetsBig = [0n, single]
           }
@@ -588,27 +660,42 @@ export const createOriginARMProcessors = ({
             const prevBalance = lastBaseBalance.get(asset) ?? balanceNow - flow
             const rebaseValue = ((balanceNow - prevBalance - flow) * rate) / ONE
             if (rebaseValue !== 0n) {
-              currentDayRebase.set(`${dateStr}:${asset}`, (currentDayRebase.get(`${dateStr}:${asset}`) ?? 0n) + rebaseValue)
+              currentDayRebase.set(
+                `${dateStr}:${asset}`,
+                (currentDayRebase.get(`${dateStr}:${asset}`) ?? 0n) + rebaseValue,
+              )
             }
             lastBaseBalance.set(asset, balanceNow)
             baseTransferFlow.set(asset, 0n)
           }
         }
-        // A base asset's rate in asset0 (liquidity) terms, 1e18-scaled (token0 per base).
-        // Mirrors the assetRates logic: pegged base assets and the liquidity asset are 1:1;
-        // appreciating assets use their adapter (post-upgrade) or getRate1 (pre-upgrade single base).
+        const pow10 = (decimals: number) => 10n ** BigInt(decimals)
+        // Raw-unit conversion factor scaled by 1e18. Multiplying a raw asset balance by this rate
+        // and dividing by 1e18 always yields raw liquidity units, regardless of token decimals.
         const getBaseAssetRate = async (block: Block, assetIdx: number): Promise<bigint> => {
-          if (assetIdx === 0 || armEntity.assetPegged[assetIdx]) return 10n ** 18n
-          const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
+          const liquidityDecimals = armEntity.assetDecimals[0]
+          const assetDecimals = armEntity.assetDecimals[assetIdx]
+          if (assetIdx === 0) return 10n ** 18n
+          if (armEntity.assetPegged[assetIdx]) {
+            return (pow10(liquidityDecimals) * 10n ** 18n) / pow10(assetDecimals)
+          }
+          const upgraded =
+            isMultiAsset || (armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock)
           if (upgraded) {
-            return new originMultibaseArmAbi.Contract(
+            const unit = pow10(assetDecimals)
+            const converted = await new multiAssetArmAbi.Contract(
               ctx,
               block.header,
               armEntity.assetAdapters[assetIdx],
-            ).convertToAssets(10n ** 18n)
+            ).convertToAssets(unit)
+            return (converted * 10n ** 18n) / unit
           }
-          return getRate1 ? await getRate1(ctx, block) : 10n ** 18n
+          // Legacy configured rates are human-unit prices. Convert them to the raw-unit factor.
+          const humanRate = getRate1 ? await getRate1(ctx, block) : 10n ** 18n
+          return (humanRate * pow10(liquidityDecimals)) / pow10(assetDecimals)
         }
+        const toHumanLiquidityRate = (rawRate: bigint, assetIdx: number) =>
+          (rawRate * pow10(armEntity.assetDecimals[assetIdx])) / pow10(armEntity.assetDecimals[0])
         const checkpoint = (
           account: string,
           block: Block,
@@ -783,7 +870,10 @@ export const createOriginARMProcessors = ({
               const idx = armEntity.assets.findIndex((a) => a.toLowerCase() === log.address)
               if (idx >= 1) {
                 const value = erc20Abi.events.Transfer.decode(log).value
-                baseTransferFlow.set(log.address, (baseTransferFlow.get(log.address) ?? 0n) + (inbound ? value : 0n) - (outbound ? value : 0n))
+                baseTransferFlow.set(
+                  log.address,
+                  (baseTransferFlow.get(log.address) ?? 0n) + (inbound ? value : 0n) - (outbound ? value : 0n),
+                )
               }
             }
             if (baseAssetAddedFilter.matches(log)) {
@@ -795,17 +885,23 @@ export const createOriginARMProcessors = ({
               const asset = event.asset.toLowerCase()
               const adapter = event.adapter.toLowerCase()
               const idx = armEntity.assets.findIndex((a) => a.toLowerCase() === asset)
+              const metadata = await loadAssetMetadata(ctx, block, asset)
+              const baseAssetDecimals = isMultiAsset
+                ? (await new multiAssetArmAbi.Contract(ctx, block.header, armAddress).baseAssetConfigs(asset))
+                    .baseAssetDecimals
+                : metadata.decimals
               if (idx === -1) {
                 // New base asset: append to the registry.
-                const symbol = await new erc20Abi.Contract(ctx, block.header, asset).symbol()
                 armEntity.assets.push(asset)
-                armEntity.assetSymbols.push(symbol)
+                armEntity.assetSymbols.push(metadata.symbol)
+                armEntity.assetDecimals.push(baseAssetDecimals)
                 armEntity.assetPegged.push(event.peggedToLiquidityAsset)
                 armEntity.assetAdapters.push(adapter)
               } else {
                 // Existing asset re-registered (e.g. the pre-upgrade base asset at upgrade time):
                 // refresh its adapter + pegged flag so post-upgrade rate reads use the real adapter.
                 armEntity.assetAdapters[idx] = adapter
+                armEntity.assetDecimals[idx] = baseAssetDecimals
                 armEntity.assetPegged[idx] = event.peggedToLiquidityAsset
               }
               if (armEntity.upgradeBlock == null) {
@@ -860,8 +956,13 @@ export const createOriginARMProcessors = ({
                     .map((log) => erc20Abi.events.Transfer.decode(log))
                   if (transfersB.length === 0) continue
 
-                  const rateB = await getBaseAssetRate(block, assetIdx) // token0 per base
-                  const rateBNumber = +formatEther(rateB)
+                  const rateB = await getBaseAssetRate(block, assetIdx)
+                  const rateMatches = (observed: bigint) => {
+                    const delta = observed >= rateB ? observed - rateB : rateB - observed
+                    // Transfer pairing only needs to reject unrelated transfers in the same tx.
+                    // A 1% relative tolerance works at every decimal scale (unlike Float ±0.01).
+                    return rateB > 0n && delta * 100n <= rateB
+                  }
 
                   // Trader sells base for token0: ARM receives base, sends token0.
                   const transfersOut0 = transfers0.filter((t) => t.from.toLowerCase() === armAddress)
@@ -873,8 +974,8 @@ export const createOriginARMProcessors = ({
                       const out0 = transfersOut0[i]
                       const inB = transfersInB[j]
                       if (out0.value === 0n || inB.value === 0n) continue
-                      const rate = +formatEther((out0.value * ONE) / inB.value) // token0 per base
-                      if (Math.abs(rate - rateBNumber) <= 0.01) {
+                      const rate = (out0.value * ONE) / inB.value
+                      if (rateMatches(rate)) {
                         sellBaseIn += inB.value
                         sellToken0Out += out0.value
                         transfersInB.splice(j, 1)
@@ -913,8 +1014,8 @@ export const createOriginARMProcessors = ({
                       const outB = transfersOutB[i]
                       const in0 = transfersIn0[j]
                       if (outB.value === 0n || in0.value === 0n) continue
-                      const rate = +formatEther((in0.value * ONE) / outB.value) // token0 per base
-                      if (Math.abs(rate - rateBNumber) <= 0.01) {
+                      const rate = (in0.value * ONE) / outB.value
+                      if (rateMatches(rate)) {
                         buyBaseOut += outB.value
                         buyToken0In += in0.value
                         transfersIn0.splice(j, 1)
@@ -949,13 +1050,12 @@ export const createOriginARMProcessors = ({
 
           if (tracker(ctx, block) || (block.header.height > from && ctx.latestBlockOfDay(block))) {
             // ArmState
-            const [state, yesterdayState, rateUSD, rateETH, rateNative, rateAsset1] = await Promise.all([
+            const [state, yesterdayState, rateUSD, rateETH, rateNative] = await Promise.all([
               getCurrentState(block),
               getYesterdayState(block),
               ensureExchangeRate(ctx, block, token0, 'USD'),
               ensureExchangeRate(ctx, block, token0, 'ETH'),
               ensureExchangeRate(ctx, block, token0, ctx.chain.nativeCurrency.symbol as Currency),
-              getRate1?.(ctx, block),
             ])
 
             // Per-holder yield checkpoint: capture share-appreciation accrual for
@@ -981,36 +1081,32 @@ export const createOriginARMProcessors = ({
               armAddress,
               totalAssets: state.totalAssets,
               rateUSD,
+              liquidityAssetDecimals: armEntity.assetDecimals[0],
             })
             // Close the day's final lending segment at this end-of-day snapshot (the position held
             // since the last checkpoint earned up to now). After this, currentDayLending[dateStr]
             // holds the full, exact lending yield for the day.
             settleLending(block, state)
 
-            // asset->liquidity rate, 1e18-scaled, aligned to armEntity.assets. [0] (liquidity) = 1e18.
-            const upgraded = armEntity.upgradeBlock != null && block.header.height >= armEntity.upgradeBlock
-            const ONE = (10n ** 18n).toString()
-            let assetRates: string[]
-            if (upgraded) {
-              const baseRates = await Promise.all(
-                armEntity.assets.slice(1).map(async (_, idx) => {
-                  const i = idx + 1
-                  if (armEntity.assetPegged[i]) return ONE
-                  // Adapter address came from BaseAssetAdded (Arm.assetAdapters) — no baseAssetConfigs
-                  // round-trip. It exposes IAssetAdapter.convertToAssets(uint256)->uint256 (same selector
-                  // as the ARM's), so the generated decoder works pointed at the adapter.
-                  const rate = await new originMultibaseArmAbi.Contract(
-                    ctx,
-                    block.header,
-                    armEntity.assetAdapters[i],
-                  ).convertToAssets(10n ** 18n)
-                  return rate.toString()
-                }),
-              )
-              assetRates = [ONE, ...baseRates]
-            } else {
-              assetRates = [ONE, (rateAsset1 ?? 10n ** 18n).toString()]
-            }
+            const ONE_BIG = 10n ** 18n
+            // `assetRates` is the raw-unit conversion used by accounting. The public rate arrays
+            // are human-unit prices normalized to 1e18 and share the historical asset indexes.
+            const rawAssetRates = await Promise.all(
+              armEntity.assets.map((_, assetIdx) => getBaseAssetRate(block, assetIdx)),
+            )
+            const humanLiquidityRates = rawAssetRates.map((rate, assetIdx) => toHumanLiquidityRate(rate, assetIdx))
+            const normalizeExchangeRate = (rate: bigint | undefined, decimals: number | undefined) =>
+              rate == null ? 0n : (rate * ONE_BIG) / pow10(decimals ?? 18)
+            const liquidityRateUSD = normalizeExchangeRate(rateUSD?.rate, rateUSD?.decimals)
+            const liquidityRateETH = normalizeExchangeRate(rateETH?.rate, rateETH?.decimals)
+            const liquidityRateNative = normalizeExchangeRate(rateNative?.rate, rateNative?.decimals)
+            const composeRates = (liquidityQuoteRate: bigint) =>
+              humanLiquidityRates.map((rate) => (rate * liquidityQuoteRate) / ONE_BIG)
+            const assetRates = rawAssetRates.map((rate) => rate.toString())
+            const assetRatesLiquidity = humanLiquidityRates.map((rate) => rate.toString())
+            const assetRatesUSD = composeRates(liquidityRateUSD).map((rate) => rate.toString())
+            const assetRatesETH = composeRates(liquidityRateETH).map((rate) => rate.toString())
+            const assetRatesNative = composeRates(liquidityRateNative).map((rate) => rate.toString())
 
             // Close the rebase window at this snapshot now that we have state + rate.
             settleRebase(state, dateStr, assetRates)
@@ -1052,11 +1148,18 @@ export const createOriginARMProcessors = ({
               rateUSD: +formatUnits(rateUSD?.rate ?? 0n, rateUSD?.decimals ?? 18),
               rateETH: +formatUnits(rateETH?.rate ?? 0n, rateETH?.decimals ?? 18),
               rateNative: +formatUnits(rateNative?.rate ?? 0n, rateNative?.decimals ?? 18),
-              rateAsset1: +formatUnits(rateAsset1 ?? 10n ** 18n, 18),
-              // Aligned to armEntity.assets (append-only). [0] = liquidity asset.
+              rateAsset1: +formatUnits(humanLiquidityRates[1] ?? ONE_BIG, 18),
+              // Historical aligned registry and valuation arrays. [0] = liquidity asset.
+              assets: [...armEntity.assets],
+              assetSymbols: [...armEntity.assetSymbols],
+              assetDecimals: [...armEntity.assetDecimals],
               assetBalances: state.assetBalances,
               assetTotals: state.assetTotals,
               assetRates,
+              assetRatesLiquidity,
+              assetRatesUSD,
+              assetRatesETH,
+              assetRatesNative,
               outstandingAssets: state.outstandingAssets,
               marketShares: state.marketShares,
               marketPricePerShare: state.marketPricePerShare,
@@ -1067,7 +1170,6 @@ export const createOriginARMProcessors = ({
             // ArmDailyAssetYield: one row per asset, partitioning the day's redeemable-value
             // change into non-overlapping sources. Drifts are day-over-day vs the previous daily
             // stat (same prev reference the daily `yield` uses), valued at par (the redeem rate).
-            const ONE_BIG = 10n ** 18n
             const prevBalances = previousDailyStat?.assetBalances ?? []
             const prevRates = previousDailyStat?.assetRates ?? []
             // Exact lending yield: the appreciation accrued segment-by-segment over the day (settled
@@ -1083,24 +1185,28 @@ export const createOriginARMProcessors = ({
               // two are orthogonal (a base does one or the other), so they add.
               let appreciationYield = i > 0 ? (currentDayRebase.get(`${dateStr}:${asset}`) ?? 0n) : 0n
               if (i > 0 && !armEntity.assetPegged[i] && prevBalances[i] != null && prevRates[i] != null) {
-                appreciationYield += (BigInt(prevBalances[i]) * (BigInt(assetRates[i]) - BigInt(prevRates[i]))) / ONE_BIG
+                appreciationYield +=
+                  (BigInt(prevBalances[i]) * (BigInt(assetRates[i]) - BigInt(prevRates[i]))) / ONE_BIG
               }
               const assetLendingYield = i === 0 ? lendingYield : 0n
-              dailyAssetYieldMap.set(`${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`, new ArmDailyAssetYield({
-                id: `${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`,
-                chainId: ctx.chain.id,
-                address: armAddress,
-                asset,
-                assetSymbol: armEntity.assetSymbols[i],
-                date: dateStr,
-                timestamp: new Date(block.header.timestamp),
-                blockNumber: block.header.height,
-                tradingYield,
-                appreciationYield,
-                lendingYield: assetLendingYield,
-                yield: tradingYield + appreciationYield + assetLendingYield,
-                swapVolume,
-              }))
+              dailyAssetYieldMap.set(
+                `${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`,
+                new ArmDailyAssetYield({
+                  id: `${ctx.chain.id}:${dateStr}:${armAddress}:${asset}`,
+                  chainId: ctx.chain.id,
+                  address: armAddress,
+                  asset,
+                  assetSymbol: armEntity.assetSymbols[i],
+                  date: dateStr,
+                  timestamp: new Date(block.header.timestamp),
+                  blockNumber: block.header.height,
+                  tradingYield,
+                  appreciationYield,
+                  lendingYield: assetLendingYield,
+                  yield: tradingYield + appreciationYield + assetLendingYield,
+                  swapVolume,
+                }),
+              )
             }
           }
         }
@@ -1131,9 +1237,13 @@ export const createOriginARMProcessors = ({
       from,
       addressOrSymbol: token0,
     }),
-    createERC20Entry({
-      from,
-      addressOrSymbol: token1,
-    }),
+    ...(token1
+      ? [
+          createERC20Entry({
+            from,
+            addressOrSymbol: token1,
+          }),
+        ]
+      : []),
   ]
 }

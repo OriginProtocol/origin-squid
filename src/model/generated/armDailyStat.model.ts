@@ -105,6 +105,15 @@ export class ArmDailyStat {
     rateAsset1!: number
 
     @StringColumn_({array: true, nullable: false})
+    assets!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetSymbols!: (string)[]
+
+    @IntColumn_({array: true, nullable: false})
+    assetDecimals!: (number)[]
+
+    @StringColumn_({array: true, nullable: false})
     assetBalances!: (string)[]
 
     @StringColumn_({array: true, nullable: false})
@@ -112,6 +121,18 @@ export class ArmDailyStat {
 
     @StringColumn_({array: true, nullable: false})
     assetRates!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetRatesLiquidity!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetRatesUSD!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetRatesETH!: (string)[]
+
+    @StringColumn_({array: true, nullable: false})
+    assetRatesNative!: (string)[]
 
     @StringColumn_({array: true, nullable: false})
     outstandingAssets!: (string)[]
