@@ -300,17 +300,17 @@
     "txHash": null
   },
   {
-    "id": "146:0xb1e25689d55734fd3fffc939c4c3eb52dff8a794:2026-07-16",
-    "timestamp": "2026-07-16T13:19:26.000000Z",
-    "blockNumber": 76036306,
+    "id": "146:0xb1e25689d55734fd3fffc939c4c3eb52dff8a794:2026-07-22",
+    "timestamp": "2026-07-22T07:26:37.000000Z",
+    "blockNumber": 76321009,
     "chainId": 146,
     "otoken": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
     "apr": 0,
     "apy": 0,
     "apy14DayAvg": 0.00008163859799200804,
-    "apy30DayAvg": 0.01974361664116195,
-    "apy7DayAvg": 0.00016327719598401607,
-    "date": "2026-07-16",
+    "apy30DayAvg": 0.01129487127910768,
+    "apy7DayAvg": 0,
+    "date": "2026-07-22",
     "rebasingCreditsPerToken": "928857657195164187352020446",
     "txHash": null
   }

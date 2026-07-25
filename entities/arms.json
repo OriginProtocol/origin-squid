@@ -27,6 +27,45 @@
     "upgradeBlock": null
   },
   {
+    "id": "0x68025a4615407993a680102b08a23a61d11c657c",
+    "chainId": 1,
+    "address": "0x68025a4615407993a680102b08a23a61d11c657c",
+    "name": "WETH ARM",
+    "symbol": "ARM-WETH",
+    "decimals": 18,
+    "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "token1": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+    "assets": [
+      "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+      "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+      "0x35fa164735182de50811e8e2e824cfb9b6118ac2",
+      "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee"
+    ],
+    "assetSymbols": [
+      "WETH",
+      "stETH",
+      "wstETH",
+      "eETH",
+      "weETH"
+    ],
+    "assetPegged": [
+      true,
+      true,
+      false,
+      true,
+      false
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x7b0a90552d2dc01936301a45bfc813717af7e8a9",
+      "0xe28ca056a12134b6b872d1cbe04cd1a82fdfea95",
+      "0xfa205c9a110a3e82bd8d223ccccb15c5b9e6434e",
+      "0xd5f61bfd890169c28858039f6b6c9b517407c852"
+    ],
+    "upgradeBlock": 25588390
+  },
+  {
     "id": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
     "chainId": 1,
     "address": "0x85b78aca6deae198fbf201c82daf6ca21942acc6",
@@ -52,6 +91,37 @@
       "0x0000000000000000000000000000000000000000"
     ],
     "upgradeBlock": null
+  },
+  {
+    "id": "0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170",
+    "chainId": 1,
+    "address": "0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170",
+    "name": "USDC ARM",
+    "symbol": "ARM-USDC",
+    "decimals": 18,
+    "token0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "token1": "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+    "assets": [
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+      "0xe343167631d89b6ffc58b88d6b7fb0228795491d"
+    ],
+    "assetSymbols": [
+      "USDC",
+      "PYUSD",
+      "USDG"
+    ],
+    "assetPegged": [
+      true,
+      true,
+      true
+    ],
+    "assetAdapters": [
+      "0x0000000000000000000000000000000000000000",
+      "0x0c9ac6d63b2b2a1b502e29ec47a53d0966ea9465",
+      "0xab98ac901b8a26636d9cf3cf38d9acdcd045788f"
+    ],
+    "upgradeBlock": 25588390
   },
   {
     "id": "0xceda2d856238aa0d12f6329de20b9115f07c366d",

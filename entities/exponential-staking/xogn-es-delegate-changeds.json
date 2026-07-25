@@ -220,14 +220,14 @@
     "toDelegate": "0xea59d70e65cc58965177b572386dd750322e6cfe"
   },
   {
-    "id": "1:0025542894-3da5c-000126",
+    "id": "1:0025578253-82956-000238",
     "chainId": 1,
     "address": "0x63898b3b6ef3d39332082178656e9862bee45c57",
-    "timestamp": "2026-07-16T04:39:35.000000Z",
-    "blockNumber": 25542894,
-    "txHash": "0x56cda3c2eebf2847ab8026c07108296b8bd6ed5a7bbb464920616714174d2684",
-    "delegator": "0xbfa1bf9912035c403faa51ea696a65cb4a1a316b",
+    "timestamp": "2026-07-21T02:57:35.000000Z",
+    "blockNumber": 25578253,
+    "txHash": "0x358ce5305bdb2cee0e4fcc0145be3177ff01686a57ec8599ac0ca1090d822a75",
+    "delegator": "0x7aeea1de9bdee80cc302960c5d7a8464727a777c",
     "fromDelegate": "0x0000000000000000000000000000000000000000",
-    "toDelegate": "0xbfa1bf9912035c403faa51ea696a65cb4a1a316b"
+    "toDelegate": "0x7aeea1de9bdee80cc302960c5d7a8464727a777c"
   }
 ]

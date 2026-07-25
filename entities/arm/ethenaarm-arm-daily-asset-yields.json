@@ -100,8 +100,8 @@
     "blockNumber": 25247461,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "36046745638075392",
-    "yield": "36046745638075392",
+    "lendingYield": "36046745638075391",
+    "yield": "36046745638075391",
     "swapVolume": "0"
   },
   {
@@ -190,8 +190,8 @@
     "blockNumber": 25398082,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "844276069706547667",
-    "yield": "844276069706547667",
+    "lendingYield": "844276069706547666",
+    "yield": "844276069706547666",
     "swapVolume": "0"
   },
   {
@@ -280,23 +280,38 @@
     "blockNumber": 25548675,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "1404592666414132559",
-    "yield": "1404592666414132559",
+    "lendingYield": "1404592666414132582",
+    "yield": "1404592666414132582",
     "swapVolume": "0"
   },
   {
-    "id": "1:2026-07-16:0xceda2d856238aa0d12f6329de20b9115f07c366d:0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "id": "1:2026-07-19:0xceda2d856238aa0d12f6329de20b9115f07c366d:0x9d39a5de30e57443bff2a8307a4256c8797a3497",
     "chainId": 1,
     "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
     "asset": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
     "assetSymbol": "sUSDe",
-    "date": "2026-07-16",
-    "timestamp": "2026-07-16T23:59:59.000000Z",
-    "blockNumber": 25548675,
-    "tradingYield": "21045304692525061064",
+    "date": "2026-07-19",
+    "timestamp": "2026-07-19T23:59:59.000000Z",
+    "blockNumber": 25570200,
+    "tradingYield": "84646195488999837",
     "appreciationYield": "0",
     "lendingYield": "0",
-    "yield": "21045304692525061064",
-    "swapVolume": "59620907517480235525682"
+    "yield": "84646195488999837",
+    "swapVolume": "311968004424542018576"
+  },
+  {
+    "id": "1:2026-07-22:0xceda2d856238aa0d12f6329de20b9115f07c366d:0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "chainId": 1,
+    "address": "0xceda2d856238aa0d12f6329de20b9115f07c366d",
+    "asset": "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "assetSymbol": "sUSDe",
+    "date": "2026-07-22",
+    "timestamp": "2026-07-22T23:59:59.000000Z",
+    "blockNumber": 25591708,
+    "tradingYield": "44324961445228021920",
+    "appreciationYield": "0",
+    "lendingYield": "0",
+    "yield": "44324961445228021920",
+    "swapVolume": "199958276006860601798451"
   }
 ]

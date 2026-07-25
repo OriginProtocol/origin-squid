@@ -320,19 +320,19 @@
     "txHash": "0x7ad7659c486dff42c21498254d598bc3024d6f7a5bf9b7b5281e0198d4cc5bd8"
   },
   {
-    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:0xe209772387de1314a5dc498cfbeb44ce279f7545:662",
-    "timestamp": "2026-07-16T09:25:29.000000Z",
-    "blockNumber": 48702291,
+    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:0x99858c5f2668a972419a4c6be3870f988cdc25ed:663",
+    "timestamp": "2026-07-20T15:23:49.000000Z",
+    "blockNumber": 48885841,
     "chainId": 8453,
     "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
-    "requestId": "662",
-    "withdrawer": "0xe209772387de1314a5dc498cfbeb44ce279f7545",
-    "amount": "3004807075466265",
-    "queued": "37995870142336010514381",
+    "requestId": "663",
+    "withdrawer": "0x99858c5f2668a972419a4c6be3870f988cdc25ed",
+    "amount": "43186872183901917854",
+    "queued": "38039057014519912432235",
     "claimed": false,
     "claimedAt": null,
     "claimableAt": null,
-    "queueWait": "830384",
-    "txHash": "0x5ac507b4695e3d99f7e409656dd83c57ed5724917e4d7c7b66b1e563b160a17e"
+    "queueWait": "833454",
+    "txHash": "0x8f74c06bf156d6b63eb5b30f845e244a3caa464f44c5653c5f208fdc0f356f5f"
   }
 ]

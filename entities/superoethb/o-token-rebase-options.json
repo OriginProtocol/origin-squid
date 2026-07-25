@@ -180,12 +180,12 @@
     "delegatedTo": null
   },
   {
-    "id": "8453-0xc1840e415dcb2e21a30b684f93ec1ebe02e791d5f6d1a0a89f3cf71ae443e108-2-0-0-0-0x73c5aa318feb3d9ddfe5bb59117559b37e0dd938",
-    "timestamp": "2026-06-26T07:38:25.000000Z",
-    "blockNumber": 47835079,
+    "id": "8453-0xb899b279a5bfe905c3cf47c8f1b4662e2b0528c50ab6a1df0e125168315f93e1-2-0-0-0-0x20fbc02bcf1d49f4cf20410f3df7b7ecf9d0f910",
+    "timestamp": "2026-07-18T00:42:33.000000Z",
+    "blockNumber": 48773003,
     "chainId": 8453,
     "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
-    "txHash": "0xc1840e415dcb2e21a30b684f93ec1ebe02e791d5f6d1a0a89f3cf71ae443e108",
+    "txHash": "0xb899b279a5bfe905c3cf47c8f1b4662e2b0528c50ab6a1df0e125168315f93e1",
     "status": "OptIn",
     "delegatedTo": null
   }

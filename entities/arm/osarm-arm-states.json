@@ -5146,5 +5146,41 @@
     "marketShares": "111833",
     "marketPricePerShare": "1011299642602",
     "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
+  },
+  {
+    "id": "146:43100000:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "chainId": 146,
+    "timestamp": "2025-08-15T07:52:29.000000Z",
+    "blockNumber": 43100000,
+    "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "assets0": "8002901442210079464554",
+    "assets1": "6558314892036218335",
+    "assetsPerShare": "1014791516758904007",
+    "outstandingAssets1": "872567388139244156064253",
+    "marketAssets": "0",
+    "feesAccrued": "701882515252768",
+    "totalAssets": "880399185461116053397389",
+    "totalAssetsCap": "2000000000000000000000000",
+    "totalDeposits": "1159719585162333255773163",
+    "totalFees": "913309695351271653936",
+    "totalSupply": "867566560147233547039307",
+    "totalWithdrawals": "282973641291152350002691",
+    "totalWithdrawalsClaimed": "282795979557804646905706",
+    "totalYield": "3653241589935147626917",
+    "assetBalances": [
+      "8002901442210079464554",
+      "6558314892036218335"
+    ],
+    "assetTotals": [
+      "880570289581454235528807",
+      "6558314892036218335"
+    ],
+    "outstandingAssets": [
+      "0",
+      "872567388139244156064253"
+    ],
+    "marketShares": "111833",
+    "marketPricePerShare": "1011399762054",
+    "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   }
 ]

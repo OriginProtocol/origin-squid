@@ -130,8 +130,8 @@
     "blockNumber": 54801475,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "4511766026487721783",
-    "yield": "4511766026487721783",
+    "lendingYield": "4511766026487721784",
+    "yield": "4511766026487721784",
     "swapVolume": "0"
   },
   {
@@ -160,8 +160,8 @@
     "blockNumber": 58733140,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "11382323778290445576",
-    "yield": "11382323778290445576",
+    "lendingYield": "11382323778290445574",
+    "yield": "11382323778290445574",
     "swapVolume": "0"
   },
   {
@@ -190,8 +190,8 @@
     "blockNumber": 61988009,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "19216057851687787214",
-    "yield": "19216057851687787214",
+    "lendingYield": "19216057851687787213",
+    "yield": "19216057851687787213",
     "swapVolume": "0"
   },
   {
@@ -250,8 +250,8 @@
     "blockNumber": 69370591,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "25408075989111061689",
-    "yield": "25408075989111061689",
+    "lendingYield": "25408075989111061687",
+    "yield": "25408075989111061687",
     "swapVolume": "0"
   },
   {
@@ -300,18 +300,18 @@
     "swapVolume": "0"
   },
   {
-    "id": "146:2026-07-16:0x2f872623d1e1af5835b08b0e49aad2d81d649d30:0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
+    "id": "146:2026-07-22:0x2f872623d1e1af5835b08b0e49aad2d81d649d30:0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
     "chainId": 146,
     "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
     "asset": "0xb1e25689d55734fd3fffc939c4c3eb52dff8a794",
     "assetSymbol": "OS",
-    "date": "2026-07-16",
-    "timestamp": "2026-07-16T23:59:59.000000Z",
-    "blockNumber": 76058339,
-    "tradingYield": "0",
+    "date": "2026-07-22",
+    "timestamp": "2026-07-22T23:59:58.000000Z",
+    "blockNumber": 76356251,
+    "tradingYield": "483196668964018102",
     "appreciationYield": "0",
     "lendingYield": "0",
-    "yield": "0",
-    "swapVolume": "0"
+    "yield": "483196668964018102",
+    "swapVolume": "205096321783188028997"
   }
 ]
