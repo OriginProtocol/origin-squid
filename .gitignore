@@ -21,3 +21,4 @@
 *.txt
 *.log
 
+.pnpm-store
