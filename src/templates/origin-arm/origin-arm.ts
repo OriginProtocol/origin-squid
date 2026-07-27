@@ -75,6 +75,7 @@ export const createOriginARMProcessors = ({
 }): Processor[] => {
   const isMultiAsset = armType === 'multi-asset'
   if (!isMultiAsset && !token1) throw new Error(`${name}: token1 is required for a legacy ARM`)
+  const withdrawalsSettleAtClaim = isMultiAsset || armType === 'ethena'
   const redeemRequestedFilter = logFilter({
     address: [armAddress],
     topic0: [originLidoArmAbi.events.RedeemRequested.topic],
@@ -618,8 +619,16 @@ export const createOriginARMProcessors = ({
             redemptionMap.set(row.id, row)
           }
         }
+        // Add withdrawals back when the contract's totalAssets() stops counting them. Legacy ARMs
+        // (Lido/EtherFi/OS) deduct the queued assets at requestRedeem, so redemptions are added back
+        // from request time. Escrow-generation ARMs (Ethena, multi-asset) keep queued shares in
+        // totalSupply and only reduce totalAssets when claimRedeem pays out — request-time accounting
+        // there books a phantom +amount yield at request and a matching -amount at claim (seen as
+        // negative daily yield on the sUSDe ARM on 2026-07-27).
         const calculateTotalYield = (state: ArmState) =>
-          state.totalAssets - state.totalDeposits + state.totalWithdrawals
+          state.totalAssets -
+          state.totalDeposits +
+          (withdrawalsSettleAtClaim ? state.totalWithdrawalsClaimed : state.totalWithdrawals)
         // Accumulate a swap's trading profit + liquidity-terms volume into the per-(date:asset)
         // running total that feeds ArmDailyAssetYield.tradingYield.
         const accrueTradingYield = (block: Block, asset: string, spread: bigint, token0Volume: bigint) => {
@@ -829,6 +838,7 @@ export const createOriginARMProcessors = ({
               const event = originLidoArmAbi.events.RedeemClaimed.decode(log)
               const state = await getCurrentState(block)
               state.totalWithdrawalsClaimed += event.assets
+              state.totalYield = calculateTotalYield(state)
             }
             if (feeCollectedFilter.matches(log)) {
               const event = originLidoArmAbi.events.FeeCollected.decode(log)
