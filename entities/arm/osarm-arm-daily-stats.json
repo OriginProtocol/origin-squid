@@ -980,23 +980,23 @@
     "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   },
   {
-    "id": "146:2026-07-22:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
+    "id": "146:2026-07-26:0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
     "chainId": 146,
-    "blockNumber": 76356251,
-    "timestamp": "2026-07-22T23:59:58.000000Z",
+    "blockNumber": 76551411,
+    "timestamp": "2026-07-26T23:59:58.000000Z",
     "address": "0x2f872623d1e1af5835b08b0e49aad2d81d649d30",
-    "apr": 0.004562116717818268,
-    "apy": 0.004572510394152518,
+    "apr": 0,
+    "apy": 0,
     "assets0": "43146391732036923900398",
     "assets1": "1152977851694130725807",
     "assetsPerShare": "1051850030123699743",
-    "date": "2026-07-22",
-    "fees": "92527743423760579",
+    "date": "2026-07-26",
+    "fees": "0",
     "feesAccrued": "106231786193327437",
     "outstandingAssets1": "0",
     "marketAssets": "0",
-    "rateUSD": 0.02457377,
-    "rateETH": 0.000012722844890006,
+    "rateUSD": 0.02332861,
+    "rateETH": 0.000011947339205795,
     "rateNative": 1,
     "rateAsset1": 1,
     "totalAssets": "29112733363231315421869",
@@ -1005,7 +1005,7 @@
     "totalDeposits": "2933103979264581098370307",
     "totalWithdrawals": "2934188324826594576080192",
     "totalWithdrawalsClaimed": "2919001910135666199616366",
-    "yield": "370110973695042318",
+    "yield": "0",
     "cumulativeYield": "30197078925244793131754",
     "cumulativeFees": "7549269731061198282764",
     "assetBalances": [
@@ -1025,7 +1025,7 @@
       "0"
     ],
     "marketShares": "628084",
-    "marketPricePerShare": "1037468464768",
+    "marketPricePerShare": "1038030586560",
     "activeMarket": "0x248dbbc31f2d7675775db4a9308a98444dabaecf"
   }
 ]

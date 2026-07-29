@@ -248,7 +248,7 @@
     "amount": "20001614041272067",
     "chainId": 1,
     "claimed": true,
-    "claimableAt": "2026-07-18T17:34:11.000000Z",
+    "claimableAt": "2026-07-18T17:50:47.000000Z",
     "claimedAt": "2026-07-18T21:28:23.000000Z",
     "queued": "3415294734497483588651",
     "requestId": "48",
@@ -268,5 +268,20 @@
     "queued": "4400085018597076986003",
     "requestId": "51",
     "txHash": "0xb7fb1131735dddb773b9605c0b4c9ea7db7f9ab6244705eb6b9e012a5e89bc9f"
+  },
+  {
+    "id": "1:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2:53",
+    "blockNumber": 25599730,
+    "timestamp": "2026-07-24T02:52:47.000000Z",
+    "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
+    "account": "0x9ebaff2192d2746fec76561bdf72fd249d7a73ab",
+    "amount": "18064586401024358365",
+    "chainId": 1,
+    "claimed": true,
+    "claimableAt": "2026-07-24T03:06:23.000000Z",
+    "claimedAt": "2026-07-24T03:06:23.000000Z",
+    "queued": "4519675250719791144053",
+    "requestId": "53",
+    "txHash": "0xb27a471575bc81d69b8d28cda564ea687531d4fd2ddc14972183f78ed00bb0b8"
   }
 ]

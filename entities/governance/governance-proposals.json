@@ -802,18 +802,18 @@
     ]
   },
   {
-    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:105952564920326880829480980653921695351704517467605619581569766325476268429476",
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:31257177221554002601475684198286132773102114806867329571141981145813260101109",
     "chainId": 1,
     "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
-    "proposalId": "105952564920326880829480980653921695351704517467605619581569766325476268429476",
-    "description": "Unpause the Ethena ARM",
+    "proposalId": "31257177221554002601475684198286132773102114806867329571141981145813260101109",
+    "description": "Unpause EtherFi ARM",
     "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
-    "timestamp": "2026-06-23T09:58:23.000000Z",
-    "txHash": "0x3dde230eb42ed2c0cae9ce5f2cc5261b1d24d4db473d5715619bb47bd282f536",
-    "startBlock": "25386767",
-    "endBlock": "25403555",
+    "timestamp": "2026-07-24T15:00:47.000000Z",
+    "txHash": "0x8baa8e82c99e6fd447497adcc0014116fe2bb504b96a8d20ef60c1ec65a2bab3",
+    "startBlock": "25610561",
+    "endBlock": "25624977",
     "targets": [
-      "0xceda2d856238aa0d12f6329de20b9115f07c366d"
+      "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2"
     ],
     "values": [
       "0"
@@ -824,9 +824,9 @@
     "calldatas": [
       "0x3f4ba83a"
     ],
-    "lastUpdated": "2026-06-29T08:58:23.000000Z",
-    "status": "Executed",
-    "quorum": "293382418813637655428547763",
+    "lastUpdated": "2026-07-28T08:19:11.000000Z",
+    "status": "Queued",
+    "quorum": "294417288148129763445348439",
     "choices": [
       "For"
     ],

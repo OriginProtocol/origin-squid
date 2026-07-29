@@ -280,17 +280,17 @@
     "earningsChange": "1079929425069219468"
   },
   {
-    "id": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-07-22",
-    "timestamp": "2026-07-22T23:59:59.999000Z",
-    "blockNumber": 25591708,
+    "id": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-07-26",
+    "timestamp": "2026-07-26T23:59:59.999000Z",
+    "blockNumber": 25620417,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0xba0e352ab5c13861c26e4e773e7a833c3a223fe6",
-    "apr": 0.01723771584753836,
-    "apy": 0.017386728808507446,
+    "apr": 0.023123274267835947,
+    "apy": 0.0233919407207972,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    "balance": "22136518575299920440588",
+    "balance": "22136530250304308719542",
     "balanceWeight": 1,
-    "earnings": "446817171214650025057",
-    "earningsChange": "1044717363601826800"
+    "earnings": "452495778488051548070",
+    "earningsChange": "1401421109695910310"
   }
 ]

@@ -55,8 +55,8 @@
     "blockNumber": 23978632,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "3317229331368229",
-    "yield": "3317229331368229",
+    "lendingYield": "3317229331368232",
+    "yield": "3317229331368232",
     "swapVolume": "0"
   },
   {
@@ -85,8 +85,8 @@
     "blockNumber": 24171901,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "181948463208243",
-    "yield": "181948463208243",
+    "lendingYield": "181948463208242",
+    "yield": "181948463208242",
     "swapVolume": "0"
   },
   {
@@ -115,8 +115,8 @@
     "blockNumber": 24365453,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "1069167511314915",
-    "yield": "1069167511314915",
+    "lendingYield": "1069167511314916",
+    "yield": "1069167511314916",
     "swapVolume": "0"
   },
   {
@@ -235,8 +235,8 @@
     "blockNumber": 25139893,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "90622230498164494",
-    "yield": "90622230498164494",
+    "lendingYield": "90622230498164495",
+    "yield": "90622230498164495",
     "swapVolume": "0"
   },
   {
@@ -300,18 +300,18 @@
     "swapVolume": "0"
   },
   {
-    "id": "1:2026-07-22:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "id": "1:2026-07-26:0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "chainId": 1,
     "address": "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2",
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "assetSymbol": "WETH",
-    "date": "2026-07-22",
-    "timestamp": "2026-07-22T23:59:59.000000Z",
-    "blockNumber": 25591708,
+    "date": "2026-07-26",
+    "timestamp": "2026-07-26T23:59:59.000000Z",
+    "blockNumber": 25620417,
     "tradingYield": "0",
     "appreciationYield": "0",
-    "lendingYield": "49886740510420506",
-    "yield": "49886740510420506",
+    "lendingYield": "59550539500839226",
+    "yield": "59550539500839226",
     "swapVolume": "0"
   }
 ]

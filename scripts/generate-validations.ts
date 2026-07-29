@@ -1278,6 +1278,8 @@ const main = async () => {
     ...arm('lidoarm', addresses.arms['ARM-WETH-stETH'].address),
     ...arm('etherfiarm', addresses.arms['ARM-WETH-eETH'].address),
     ...arm('ethenaarm', addresses.arms['ARM-USDe-sUSDe'].address),
+    ...arm('wetharm', addresses.arms['ARM-WETH'].address),
+    ...arm('usdcarm', addresses.arms['ARM-USDC'].address),
     ...arm('osarm', sonicAddresses.armOS.address),
     arms(),
     ognDailyStats(),

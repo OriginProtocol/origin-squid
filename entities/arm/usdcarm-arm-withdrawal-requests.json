@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1:0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170:0",
+    "blockNumber": 25597838,
+    "timestamp": "2026-07-23T20:32:23.000000Z",
+    "address": "0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170",
+    "account": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "amount": "0",
+    "chainId": 1,
+    "claimed": true,
+    "claimableAt": "2026-07-23T20:45:23.000000Z",
+    "claimedAt": "2026-07-24T01:26:11.000000Z",
+    "queued": "100000000",
+    "requestId": "0",
+    "txHash": "0xa738333c75a99a65333c201fe30bdc540b9227d9916a93030a91a75f3f52350a"
+  }
+]

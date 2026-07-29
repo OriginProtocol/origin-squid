@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1::0x1f53a84360b3d24f1b3e886f6b567c33b56c9e6f7daf3eee889f58406651d668:0x6c3ea9036406852006290770bedfcaba0e23a0e8:sell",
+    "chainId": 1,
+    "txHash": "0x1f53a84360b3d24f1b3e886f6b567c33b56c9e6f7daf3eee889f58406651d668",
+    "txFrom": "0x052c01a2a88fa6cba8fc2dbef39a442a140a35e3",
+    "txTo": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "timestamp": "2026-07-23T16:05:23.000000Z",
+    "blockNumber": 25596509,
+    "address": "0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170",
+    "from": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "tokenIn": "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+    "tokenOut": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amountIn": "50000000",
+    "amountOut": "49900000",
+    "rateIn": "1000000000000000000",
+    "rateOut": "1000000000000000000",
+    "spread": "100000",
+    "assets0": "-49900000",
+    "assets1": "50000000"
+  },
+  {
+    "id": "1::0x1f53a84360b3d24f1b3e886f6b567c33b56c9e6f7daf3eee889f58406651d668:0xe343167631d89b6ffc58b88d6b7fb0228795491d:sell",
+    "chainId": 1,
+    "txHash": "0x1f53a84360b3d24f1b3e886f6b567c33b56c9e6f7daf3eee889f58406651d668",
+    "txFrom": "0x052c01a2a88fa6cba8fc2dbef39a442a140a35e3",
+    "txTo": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "timestamp": "2026-07-23T16:05:23.000000Z",
+    "blockNumber": 25596509,
+    "address": "0x9e3a7026e5767f2d7ff5e83b0ed011005f45a170",
+    "from": "0x4ff1b9d9ba8558f5eafcec096318ea0d8b541971",
+    "tokenIn": "0xe343167631d89b6ffc58b88d6b7fb0228795491d",
+    "tokenOut": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "amountIn": "50000000",
+    "amountOut": "49900000",
+    "rateIn": "1000000000000000000",
+    "rateOut": "1000000000000000000",
+    "spread": "100000",
+    "assets0": "-49900000",
+    "assets1": "50000000"
+  }
+]
