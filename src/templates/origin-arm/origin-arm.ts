@@ -945,6 +945,7 @@ export const createOriginARMProcessors = ({
                   .map((log) => erc20Abi.events.Transfer.decode(log))
 
                 const ONE = 10n ** 18n
+                const traceAddress = trace.traceAddress.join('-')
                 const swapMeta = {
                   chainId: ctx.chain.id,
                   txHash: transactionHash,
@@ -958,7 +959,12 @@ export const createOriginARMProcessors = ({
 
                 // Every swap is liquidityAsset(token0) <-> one base asset (the contract forbids
                 // base<->base). Pair token0 transfers against each base asset and emit one ArmSwap
-                // per (tx, baseAsset, direction) with raw amounts and each side's asset0 rate.
+                // per (tx, baseAsset, direction) with raw amounts and each side's asset0 rate — a tx
+                // that swaps this ARM twice is one row, summed, keyed by the first swap call.
+                // Key on the swap call's traceAddress, not the tx hash alone: one transaction can swap
+                // the same base asset more than once — a CoW settlement routes WETH/stETH through both
+                // the Lido ARM and the multi-asset WETH ARM — and those swaps share a hash. (Same
+                // convention as otoken-entity-producer.ts; trace.id carries this but isn't typed.)
                 for (let assetIdx = 1; assetIdx < armEntity.assets.length; assetIdx++) {
                   const baseAsset = armEntity.assets[assetIdx]
                   const transfersB = transfers
@@ -999,7 +1005,7 @@ export const createOriginARMProcessors = ({
                     swaps.push(
                       new ArmSwap({
                         ...swapMeta,
-                        id: `${ctx.chain.id}::${transactionHash}:${baseAsset}:sell`,
+                        id: `${ctx.chain.id}:${transactionHash}:${traceAddress}:${baseAsset}:sell`,
                         tokenIn: baseAsset,
                         amountIn: sellBaseIn,
                         rateIn: rateB,
@@ -1039,7 +1045,7 @@ export const createOriginARMProcessors = ({
                     swaps.push(
                       new ArmSwap({
                         ...swapMeta,
-                        id: `${ctx.chain.id}::${transactionHash}:${baseAsset}:buy`,
+                        id: `${ctx.chain.id}:${transactionHash}:${traceAddress}:${baseAsset}:buy`,
                         tokenIn: armEntity.token0,
                         amountIn: buyToken0In,
                         rateIn: ONE,
