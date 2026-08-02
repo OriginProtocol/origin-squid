@@ -271,6 +271,15 @@ export function setupRpcCache(stateSchema: string): void {
 
   const record = (key: string, method: string, value: unknown): void => {
     if (value === null || value === undefined) return
+    // An empty `eth_call` result is never a legitimate answer for a function
+    // with a declared return type — a deployed contract reverts on an unknown
+    // selector, and a revert arrives as an RPC error, not as `0x`. It means the
+    // endpoint failed to serve the call (lagging node, dropped batch entry).
+    // Caching it bakes a transient RPC fault in permanently: every later run
+    // replays `0x` and dies in `decodeResult`, immune to switching providers.
+    // `eth_getCode` is deliberately excluded — `0x` there is the real answer
+    // for an EOA, and `isContract` depends on it.
+    if (method === 'eth_call' && value === '0x') return
     store.set(key, method, value)
     lru.set(key, value)
   }

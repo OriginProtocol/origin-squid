@@ -2,6 +2,7 @@ import { SquidProcessor, run } from '@originprotocol/squid-utils'
 
 import { setupPortalCache } from '../polyfills/portal-cache'
 import { setupRpcCache } from '../polyfills/rpc-cache'
+import { setupRpcRetryEmpty } from '../polyfills/rpc-retry-empty'
 import { DBDumpManager } from './db-dump-manager'
 
 export async function checkAndRestoreDump(processorName: string) {
@@ -41,6 +42,9 @@ export async function checkAndRestoreDump(processorName: string) {
 }
 
 export async function initProcessorFromDump(processor: SquidProcessor) {
+  // Must precede setupRpcCache so the cache only ever sees settled results —
+  // a transient empty `0x` recorded to disk replays forever.
+  setupRpcRetryEmpty()
   setupRpcCache(processor.stateSchema)
   setupPortalCache(processor.stateSchema)
   if (process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
