@@ -20,8 +20,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       '@originprotocol/squid-utils':
-        specifier: 1.0.1
-        version: 1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: 1.0.2
+        version: 1.0.2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@subsquid/big-decimal':
         specifier: ^1.0.0
         version: 1.0.0
@@ -842,8 +842,8 @@ packages:
     resolution: {integrity: sha512-y7efHHwghQfk28G2z3tlZ67pLG0XdfYbcVG26r7YIXALRsrVQcTq4/tdenSmdOrEsNahIYA/eh8aEVROWGFUDg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  '@originprotocol/squid-utils@1.0.1':
-    resolution: {integrity: sha512-Qe/05pj49muH8s8ZVT9/ugUeeq0fYU2iFs42GV9Z8uowcod2o0GYdf0b2Vrx95EKQ9cv5t5N0WQxyXHEG6Usqw==, tarball: https://npm.pkg.github.com/download/@originprotocol/squid-utils/1.0.1/aa72db9485c1dd7011dcefc256586e9215f98df1}
+  '@originprotocol/squid-utils@1.0.2':
+    resolution: {integrity: sha512-mWe4zswhJ08yTbvJtJokvCOgnpSXZSi3bXs/iwxttDVZlXVsvX+pBwHUK3F5dYM3egP/reJCAcif4niLLLJ/tw==, tarball: https://npm.pkg.github.com/download/@originprotocol/squid-utils/1.0.2/dd605ae2fa7dc7f8f80fce1ff83e8012f548caef}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -4701,12 +4701,13 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@originprotocol/squid-utils@1.0.1(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@originprotocol/squid-utils@1.0.2(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@subsquid/archive-registry': 3.3.2(encoding@0.1.13)
       '@subsquid/evm-abi': 1.0.0
       '@subsquid/evm-codec': 1.0.0
       '@subsquid/evm-processor': 1.28.0-portal-api.721f49
+      '@subsquid/http-client': 1.8.1
       '@subsquid/rpc-client': 4.15.0
       '@subsquid/typeorm-store': 1.9.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))
       dayjs: 1.11.18

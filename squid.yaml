@@ -22,6 +22,7 @@ deploy:
       - base.http
       - sonic-mainnet.http
   secrets:
+    - SQD_API_KEY
     - RPC_ENDPOINT
     - RPC_ENV
     - RPC_BASE_ENDPOINT
