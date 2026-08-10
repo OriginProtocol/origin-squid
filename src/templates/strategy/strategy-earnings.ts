@@ -156,6 +156,16 @@ export const setupStrategyEarnings = (processor: EvmBatchProcessor, strategyData
   for (const filter of balanceUpdateFilters) {
     processor.addLog(filter.value)
   }
+
+  for (const filter of strategyData.yieldRecognitionLogFilters ?? []) {
+    processor.addLog(filter.value)
+  }
+
+  // Emitted by another contract, so subscribe explicitly rather than relying on the
+  // source strategy's own config to have put it in the batch.
+  for (const { filter } of strategyData.consolidationInflowLogFilters ?? []) {
+    processor.addLog(filter.value)
+  }
 }
 
 const trackers = new Map<string, ReturnType<typeof blockFrequencyTracker>>()
@@ -213,7 +223,9 @@ export const processStrategyEarnings = async (
           return b
         })
     }
-    const balanceTrackingUpdate = async () => {
+    const balanceTrackingUpdate = async (
+      { compare, capitalInflow }: { compare: number; capitalInflow?: bigint } = { compare: -1 },
+    ) => {
       // Skip if we've already updated balances for this block. Multiple matching
       // logs/traces in the same block would otherwise call processDepositWithdrawal
       // multiple times, and the `current.earningsChange += earningsChange` accumulator
@@ -221,9 +233,32 @@ export const processStrategyEarnings = async (
       // same value regardless of how many events fired, so one pass per block is correct.
       if (didUpdate) return
       didUpdate = true
-      const balances = await getBalances()
-      await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances)
+      const balances = await getBalances({ compare })
+      await processDepositWithdrawal(ctx, strategyData, block, strategyYields, balances, capitalInflow ?? 0n)
     }
+
+    // Principal that arrived from another strategy in this transaction. It shows up in the
+    // verified balance exactly like yield does, so it has to be netted out of the step.
+    const getConsolidationInflow = async (transactionHash: string) => {
+      const filters = strategyData.consolidationInflowLogFilters ?? []
+      if (filters.length === 0) return 0n
+      let inflow = 0n
+      for (const log of block.logs) {
+        if (log.transactionHash !== transactionHash) continue
+        for (const { filter, getAmount } of filters) {
+          if (filter.matches(log)) inflow += await getAmount(ctx, block, log)
+        }
+      }
+      return inflow
+    }
+
+    // Determined up front because log order within a block is arbitrary, and `didUpdate`
+    // lets whichever log we reach first decide the comparison for the entire block.
+    // When capital moved in this block we can't separate it from yield, so we keep the
+    // conservative `block - 1` baseline and skip that block's gain.
+    const capitalFlowInBlock =
+      !!strategyData.earnings?.passiveByDepositWithdrawal &&
+      block.logs.some((log) => depositWithdrawalFilter(strategyData).matches(log))
 
     if (strategyData.balanceUpdateTraceFilters && strategyData.balanceUpdateTraceFilters.length > 0) {
       for (const trace of block.traces) {
@@ -236,6 +271,14 @@ export const processStrategyEarnings = async (
     for (const log of block.logs) {
       if (strategyData.kind === 'BalancerMetaStablePool' && balancerPoolFilter(strategyData).matches(log)) {
         await balanceTrackingUpdate()
+      } else if (strategyData.yieldRecognitionLogFilters?.find((f) => f.matches(log))) {
+        // The balance change *at* this block is yield being recognized, not capital
+        // moving, so it must be included rather than cut out — less any principal that
+        // arrived from another strategy in the same transaction.
+        await balanceTrackingUpdate({
+          compare: capitalFlowInBlock ? -1 : 0,
+          capitalInflow: capitalFlowInBlock ? 0n : await getConsolidationInflow(log.transactionHash),
+        })
       } else if (strategyData.balanceUpdateLogFilters?.find((f) => f.matches(log))) {
         await balanceTrackingUpdate()
       } else if (
@@ -335,6 +378,8 @@ const processDepositWithdrawal = async (
     compareBalance: bigint
     balance: bigint
   }[],
+  /** Principal that entered the strategy at this block and must not count as yield. */
+  capitalInflow = 0n,
 ) => {
   const id = `${block.header.height}:${strategyData.address}:${strategyData.base.address}`
   // ctx.log.info(assets, `processDepositWithdrawal ${id}`)
@@ -367,7 +412,7 @@ const processDepositWithdrawal = async (
   const balanceWeight = Number(formatEther(balanceWeightN))
 
   const timestamp = new Date(block.header.timestamp)
-  let earningsChange = previousBalance - (latest?.balance ?? previousBalance)
+  let earningsChange = previousBalance - (latest?.balance ?? previousBalance) - capitalInflow
 
   // TODO: ??? Probably should listen for add/remove liquidity events
   //  and calculate earnings changes from fees rather than relying on this

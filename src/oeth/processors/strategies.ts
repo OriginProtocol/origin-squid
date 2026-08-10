@@ -3,7 +3,7 @@ import * as compoundStakingSSVAbi from '@abi/strategy-compound-staking-ssv'
 import * as compoundStakingAbi from '@abi/strategy-compounding-staking'
 import * as nativeStakingAbi from '@abi/strategy-native-staking'
 import { AccountingConsensusRewards, ExecutionRewardsCollected } from '@model'
-import { Context, EvmBatchProcessor, defineProcessor, logFilter } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, Log, defineProcessor, logFilter } from '@originprotocol/squid-utils'
 import { mainnetCurrencies } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { createEventProcessor } from '@templates/events/createEventProcessor'
 import { IStrategyData, createStrategyProcessor, createStrategySetup } from '@templates/strategy'
@@ -244,13 +244,35 @@ export const oethStrategies: readonly IStrategyData[] = [
           rewardTokenCollected: true,
           rewardTokenCollectedSimple: true,
         },
-        balanceUpdateLogFilters: [
+        // `checkBalance` here is `lastVerifiedEthBalance + WETH.balanceOf(this)`, and
+        // `lastVerifiedEthBalance` only moves when BalancesVerified fires. Treating it as a
+        // plain balance update would cut the entire gain out of earnings, so it is
+        // registered as yield recognition.
+        yieldRecognitionLogFilters: [
           logFilter({
             address: [strategy.address],
             topic0: [compoundStakingAbi.events.BalancesVerified.topic],
             range: { from: strategy.from },
           }),
         ] as ReturnType<typeof logFilter>[],
+        // A validator consolidation lands here as a bare increase in the proven validator
+        // balance — indistinguishable from yield on this contract alone. The source strategy
+        // accounts for validators at a nominal `FULL_STAKE` each and drops by exactly that,
+        // so removing `consolidationCount * FULL_STAKE` conserves capital across the two and
+        // leaves the consensus rewards those validators accrued (never booked anywhere,
+        // since the source's accounting is nominal) correctly recognized as yield here.
+        consolidationInflowLogFilters: OETH_NATIVE_STRATEGIES.map((source) => ({
+          filter: logFilter({
+            address: [source.address],
+            topic0: [nativeStakingAbi.events.ConsolidationConfirmed.topic],
+            range: { from: strategy.from },
+          }),
+          getAmount: async (ctx: Context, block: Block, log: Log) => {
+            const { consolidationCount } = nativeStakingAbi.events.ConsolidationConfirmed.decode(log)
+            const fullStake = await new nativeStakingAbi.Contract(ctx, block.header, source.address).FULL_STAKE()
+            return consolidationCount * fullStake
+          },
+        })),
       }) as const,
   ),
 ]
