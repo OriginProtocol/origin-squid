@@ -1,8 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 
-import { retry } from '@originprotocol/squid-utils'
-
 import { baseStrategies } from '../src/base/strategies'
 import { oethStrategies } from '../src/oeth/processors/strategies'
 import { ousdStrategies } from '../src/ousd/processors/strategies'
@@ -13,9 +11,21 @@ import { sonicAddresses } from '../src/utils/addresses-sonic'
 
 const LIMIT = 1000
 
+// How hard to push the deployed squid. A freshly deployed version answers from a database
+// that has never been ANALYZEd, so its query plans are at their worst exactly when this
+// script runs. Ten in flight was enough to turn slow queries into gateway timeouts.
+const CONCURRENCY = Number(process.env.VALIDATION_CONCURRENCY ?? 4)
+const RETRIES = Number(process.env.VALIDATION_RETRIES ?? 5)
+const RETRY_BASE_MS = Number(process.env.VALIDATION_RETRY_BASE_MS ?? 3000)
+const BATCH_DELAY_MS = Number(process.env.VALIDATION_BATCH_DELAY_MS ?? 250)
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
 const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 
 const gql = (query: string) => query
+
+const queryName = (query: string) => query.replace(/(\n|\s)+/g, ' ').match(/query Query \{ (\w+)/)?.[1] ?? 'unknown'
 
 const executeQuery = async (query: string) => {
   const response = await fetch(`https://origin.squids.live/origin-squid@${process.argv[2]}/api/graphql`, {
@@ -28,10 +38,31 @@ const executeQuery = async (query: string) => {
   const text = await response.text()
   try {
     return JSON.parse(text)
-  } catch (err) {
-    console.log(text)
-    throw err
+  } catch {
+    // A non-JSON body is a gateway page, not a GraphQL response — usually a 504 relaying a
+    // Postgres statement timeout. Name the query and the status: the bare
+    // `SyntaxError: Unexpected token '<'` said neither, and printed an HTML page instead.
+    throw new Error(`HTTP ${response.status} (non-JSON body) for \`${queryName(query)}\``)
   }
+}
+
+// Exponential backoff with jitter. The previous immediate retry hammered a squid that was
+// already timing out; where the cause is load rather than a bad plan, waiting is the thing
+// that actually helps.
+const retryWithBackoff = async <T>(fn: () => Promise<T>, name: string, attempts = RETRIES): Promise<T> => {
+  let lastError: unknown
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      return await fn()
+    } catch (err) {
+      lastError = err
+      if (attempt === attempts) break
+      const backoff = Math.round(RETRY_BASE_MS * 2 ** (attempt - 1) * (0.5 + Math.random()))
+      console.log(`  ! ${name} attempt ${attempt}/${attempts} failed, retrying in ${backoff}ms — ${err}`)
+      await sleep(backoff)
+    }
+  }
+  throw lastError
 }
 
 const takeValidationEntries = (arr: any[]) => {
@@ -1252,15 +1283,11 @@ const main = async () => {
   console.log(`Generating validations for: ${process.argv[2]}${filter ? ` (filter: ${filter})` : ''}`)
 
   const entitiesDir = path.join(__dirname, '../entities')
-  if (!filter) {
-    // Clear existing validation data to prevent stale files
-    if (fs.existsSync(entitiesDir)) {
-      console.log('Clearing existing validation data...')
-      fs.rmSync(entitiesDir, { recursive: true, force: true })
-    }
-    console.log('✓ Entities directory cleared\n')
-  }
-  fs.mkdirSync(entitiesDir, { recursive: true })
+  // NOTHING IS WRITTEN TO DISK UNTIL EVERY QUERY HAS SUCCEEDED. This used to wipe
+  // `entities/` up front and write each file as its query returned, so a failure partway
+  // left the directory half-deleted and half-regenerated — a state that looks like a
+  // legitimate diff and that `git commit -a` would happily record as a postdeploy.
+  const pending = new Map<string, string>()
 
   let queries: string[] = [
     ...oethStrategies.map((s: IStrategyData) => strategy(`oeth_${s.address}`, s.address)),
@@ -1313,6 +1340,9 @@ const main = async () => {
     while (queue.length > 0) {
       const batch = queue.splice(0, concurrency)
       await Promise.all(batch.map((fn) => fn()))
+      // Breathe between batches. Cheap insurance against tipping a struggling squid over,
+      // and it costs a couple of seconds across the whole run.
+      if (queue.length > 0 && BATCH_DELAY_MS > 0) await sleep(BATCH_DELAY_MS)
     }
   }
 
@@ -1320,11 +1350,12 @@ const main = async () => {
   for (let i = 0; i < queries.length; i++) {
     const fn = async () => {
       const query = queries[i]
+      const name = queryName(query)
       console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
-      const result = await retry(() => executeQuery(query), 5)
+      const result = await retryWithBackoff(() => executeQuery(query), name)
       if (!result.data) {
         console.log(result)
-        throw new Error('Query failed')
+        throw new Error(`Query \`${name}\` failed: ${JSON.stringify(result.errors ?? result).slice(0, 300)}`)
       }
 
       const takeAll = ['ognDailyStats']
@@ -1352,24 +1383,32 @@ const main = async () => {
         }
 
         const filePath = getFilePathForEntity(key)
-        const dir = path.dirname(filePath)
-
-        // Ensure directory exists
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true })
-        }
-
-        // Write the file
-        fs.writeFileSync(filePath, JSON.stringify(validationData, null, 2))
-        console.log(`  ✓ Wrote ${validationData.length} entries to ${path.relative(__dirname + '/..', filePath)}`)
+        pending.set(filePath, JSON.stringify(validationData, null, 2))
+        console.log(`  ✓ ${validationData.length} entries staged for ${path.relative(__dirname + '/..', filePath)}`)
       }
     }
     fns.push(fn)
   }
 
-  await runConcurrently(fns, 10)
+  await runConcurrently(fns, CONCURRENCY)
 
-  console.log('\n✓ All validation files generated successfully')
+  // Every query succeeded — only now is it safe to touch the working tree.
+  if (!filter) {
+    if (fs.existsSync(entitiesDir)) {
+      console.log('\nClearing existing validation data...')
+      fs.rmSync(entitiesDir, { recursive: true, force: true })
+    }
+  }
+  fs.mkdirSync(entitiesDir, { recursive: true })
+  for (const [filePath, contents] of pending) {
+    fs.mkdirSync(path.dirname(filePath), { recursive: true })
+    fs.writeFileSync(filePath, contents)
+  }
+
+  console.log(`\n✓ All validation files generated successfully (${pending.size} files)`)
 }
 
-main()
+main().catch((err) => {
+  console.error(`\n✗ Validation generation failed — entities/ left untouched.\n  ${err}`)
+  process.exit(1)
+})
