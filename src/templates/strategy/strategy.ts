@@ -1,4 +1,4 @@
-import { Context, EvmBatchProcessor, LogFilter, blockFrequencyUpdater } from '@originprotocol/squid-utils'
+import { Block, Context, EvmBatchProcessor, Log, LogFilter, blockFrequencyUpdater } from '@originprotocol/squid-utils'
 import { ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { OTokenContractAddress } from '@templates/otoken'
@@ -53,6 +53,34 @@ export type IStrategyData = {
     }
   }[]
   balanceUpdateLogFilters?: LogFilter[]
+  /**
+   * Logs signalling that the reported balance just moved to recognize accrued yield,
+   * rather than to reflect capital entering or leaving. Unlike `balanceUpdateLogFilters`,
+   * the balance change *at* these blocks is counted as earnings.
+   *
+   * Needed when `checkBalance` is a step function that only moves on these events, since
+   * the usual `block - 1` comparison would see a flat balance and report zero earnings.
+   */
+  yieldRecognitionLogFilters?: LogFilter[]
+  /**
+   * Capital arriving from *another* strategy without passing through this one's deposit
+   * path, so nothing here marks it as principal and a `yieldRecognitionLogFilters` block
+   * would otherwise book all of it as yield.
+   *
+   * The case this exists for is an EIP-7251 validator consolidation: the source strategy
+   * emits `ConsolidationConfirmed` and drops its nominal balance, while the destination
+   * only ever sees a larger proven validator balance at its next verification — no event,
+   * no new verified validator, no change in `totalDepositsWei`. Sharing a transaction is
+   * what identifies the destination: the controller calls the target's `verifyBalances`
+   * inside `confirmConsolidation`, and `onlyRegistrator` makes that the only reachable
+   * verification while a consolidation is pending.
+   *
+   * `getAmount` returns the principal to remove from that block's recognized yield.
+   */
+  consolidationInflowLogFilters?: {
+    filter: LogFilter
+    getAmount: (ctx: Context, block: Block, log: Log) => Promise<bigint>
+  }[]
   balanceUpdateTraceFilters?: TraceFilter[]
   aaveInfo?: {
     lendingPool: string
