@@ -300,18 +300,18 @@
     "txHash": "0xd718865cdcd6aa59c12b6a48749fd40a467577aa878458a4616133b04d993900"
   },
   {
-    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:2026-07-26",
-    "timestamp": "2026-07-26T21:25:09.000000Z",
-    "blockNumber": 49155881,
+    "id": "8453:0xdbfefd2e8460a6ee4955a68582f85708baea60a3:2026-08-08",
+    "timestamp": "2026-08-08T21:25:09.000000Z",
+    "blockNumber": 49717481,
     "chainId": 8453,
     "otoken": "0xdbfefd2e8460a6ee4955a68582f85708baea60a3",
     "apr": 0.028122031156088353,
     "apy": 0.028520074960836084,
-    "apy14DayAvg": 0.028525727989817895,
-    "apy30DayAvg": 0.028105022538739078,
-    "apy7DayAvg": 0.028531381018725765,
-    "date": "2026-07-26",
-    "rebasingCreditsPerToken": "906085075865569126124185410",
-    "txHash": "0x229180b56b0da8a1023c7bdbe5d7d5179163c7d4e903af93df2680dba050ecdf"
+    "apy14DayAvg": 0.02853460760388517,
+    "apy30DayAvg": 0.02851980034530677,
+    "apy7DayAvg": 0.028520074960910056,
+    "date": "2026-08-08",
+    "rebasingCreditsPerToken": "905178644564688113310158740",
+    "txHash": "0xe29d87c5d0afe5caac185e0a090cca6a03e22c99d9dc7077351fb372b989f3e8"
   }
 ]

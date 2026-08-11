@@ -802,18 +802,95 @@
     ]
   },
   {
-    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:31257177221554002601475684198286132773102114806867329571141981145813260101109",
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:24977470468734366985508521635848311695522621005005638690937767796597338110006",
     "chainId": 1,
     "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
-    "proposalId": "31257177221554002601475684198286132773102114806867329571141981145813260101109",
-    "description": "Unpause EtherFi ARM",
+    "proposalId": "24977470468734366985508521635848311695522621005005638690937767796597338110006",
+    "description": "Repoint Curve Pool Boosters to the new Stake DAO CampaignRemoteManager\n\nStake DAO replaced their mainnet CampaignRemoteManager and moved the platform whitelist over to the new contract. Campaign creation and management from our Curve Pool Boosters revert until they point at the new manager. This proposal updates the campaignRemoteManager on all 12 boosters. No other booster configuration changes.",
     "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
-    "timestamp": "2026-07-24T15:00:47.000000Z",
-    "txHash": "0x8baa8e82c99e6fd447497adcc0014116fe2bb504b96a8d20ef60c1ec65a2bab3",
-    "startBlock": "25610561",
-    "endBlock": "25624977",
+    "timestamp": "2026-08-05T11:41:59.000000Z",
+    "txHash": "0x85c04dc0d3824ec39968788516794230d1551ac4094397221f765608deb0dcfe",
+    "startBlock": "25695695",
+    "endBlock": "25710111",
     "targets": [
-      "0xfb0a3cf9b019bfd8827443d131b235b3e0fc58d2"
+      "0x2425ff98a23021bf056e96fb690bf49910a8ce49",
+      "0x1a43d2f1bb24ac262d1d7ac05d16823e526fca32",
+      "0xdaff0d96037b0f7bf72c6e2b3125b5d19273b149",
+      "0xc835bca1378acb32c522f3831b8dba161a763fbe",
+      "0xd5d46b7e8ff91c3227d2cf0aae263f87743e3340",
+      "0xe9ca668d5c31ea5162651667103537bda5458500",
+      "0x5400a839c198d787c784f370f5a27672285b2133",
+      "0xae6058d732f0f3e098a068a338db07bbd5169d3d",
+      "0x5677d1da3876e86f96f4492bdb8fdbb79c2bf56c",
+      "0xfc5fef2d566f77262cef4e86749fdf1170b6f63f",
+      "0x077486b01c8670e7f51dbf7e09cd648d4a538f87",
+      "0x634bd2921fab3413f7db3f03310fd5f7663badcc"
+    ],
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "signatures": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "calldatas": [
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542",
+      "0xbcfb252c000000000000000000000000177198adb759a9715bc7259be1b7be535bed7542"
+    ],
+    "lastUpdated": "2026-08-10T14:05:11.000000Z",
+    "status": "Executed",
+    "quorum": "298879248877296476175190987",
+    "choices": [
+      "For"
+    ],
+    "scores": [
+      "754350338383759155480956793"
+    ]
+  },
+  {
+    "id": "1:0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec:13619862798102287603142635100561705774916410894676700149607004174315463386215",
+    "chainId": 1,
+    "address": "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec",
+    "proposalId": "13619862798102287603142635100561705774916410894676700149607004174315463386215",
+    "description": "Increase proposal threshold to 250k xOGN\n\nThis proposal raises the minimum voting power required to submit a governance proposal from 100,000 xOGN to 250,000 xOGN.",
+    "proposer": "0x1f7bbf0c68852b20f078491d75af9fd1d6784824",
+    "timestamp": "2026-08-06T08:49:35.000000Z",
+    "txHash": "0xc1bfc71c6b2b07a1023049bc3bf4464645c6cca61aac470cf9fdd35c70a53faa",
+    "startBlock": "25702016",
+    "endBlock": "25716432",
+    "targets": [
+      "0x1d3fbd4d129ddd2372ea85c5fa00b2682081c9ec"
     ],
     "values": [
       "0"
@@ -822,16 +899,16 @@
       ""
     ],
     "calldatas": [
-      "0x3f4ba83a"
+      "0xece40cc10000000000000000000000000000000000000000000034f086f3b33b68400000"
     ],
-    "lastUpdated": "2026-07-28T08:19:11.000000Z",
+    "lastUpdated": "2026-08-10T10:25:35.000000Z",
     "status": "Queued",
-    "quorum": "294417288148129763445348439",
+    "quorum": "298938017019995568688082612",
     "choices": [
       "For"
     ],
     "scores": [
-      "727965272210558193480906786"
+      "754350338383759155480956793"
     ]
   }
 ]
