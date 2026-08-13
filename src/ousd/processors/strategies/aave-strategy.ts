@@ -35,6 +35,6 @@ balanceUpdateFilters.push(
     topic0: [aaveLendingPool.events.Deposit.topic, aaveLendingPool.events.Withdraw.topic],
     topic1: [DAI, USDT].map((a) => pad(a.address)),
     topic2: [pad(aaveStrategy.address)],
-    range: { from: aaveStrategy.from },
+    range: { from: aaveStrategy.from, to: aaveStrategy.to },
   }),
 )
