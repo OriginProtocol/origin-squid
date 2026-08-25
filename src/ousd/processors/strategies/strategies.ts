@@ -86,6 +86,34 @@ export const ousdStrategies: readonly IStrategyData[] = [
     assets: [USDC],
     earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
   },
+  // The cross-chain strategies bridge USDC to a remote chain via CCTP and report a
+  // cached `remoteStrategyBalance` back; `checkBalance(USDC)` is idle USDC + in-flight
+  // USDC + that cached number. `from` is the block the proxy's implementation was set —
+  // `checkBalance` reverts before it.
+  {
+    chainId: 1,
+    from: 24427348,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Cross-Chain Base',
+    contractName: 'CrossChainMasterStrategy',
+    address: mainnetAddresses.strategies.ousd.CrossChainMasterStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDC],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
+  {
+    chainId: 1,
+    from: 24678361,
+    oTokenAddress: mainnetAddresses.OUSD_ADDRESS,
+    kind: 'Generic',
+    name: 'OUSD Cross-Chain HyperEVM',
+    contractName: 'CrossChainMasterStrategy',
+    address: mainnetAddresses.strategies.ousd.CrossChainHyperEVMMasterStrategy,
+    base: { address: mainnetCurrencies.USD, decimals: 18 },
+    assets: [USDC],
+    earnings: { passiveByDepositWithdrawal: true, rewardTokenCollected: true },
+  },
   // Deprecated
   // {
   //   from: 13369299,
