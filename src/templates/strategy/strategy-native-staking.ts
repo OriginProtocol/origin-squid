@@ -1,7 +1,7 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
 import { Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
-import { convertRate } from '@shared/post-processors/exchange-rates'
+import { convertRateTo18 } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { IStrategyData } from '@templates/strategy/strategy'
 import { processStrategyEarnings, setupStrategyEarnings } from '@templates/strategy/strategy-earnings'
@@ -21,7 +21,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
   const data: StrategyBalance[] = []
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
     const balances = await getStrategyBalances(ctx, block.header, strategyData)
-    for (const { address, asset, balance } of balances) {
+    for (const { address, asset, decimals, balance } of balances) {
       data.push(
         new StrategyBalance({
           id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
@@ -33,7 +33,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
           asset,
           symbol: addressToSymbol(asset),
           balance,
-          balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+          balanceETH: await convertRateTo18(ctx, block, asset as CurrencyAddress, 'ETH', balance, decimals),
         }),
       )
     }
@@ -47,7 +47,7 @@ export const getStrategyBalances = async (ctx: Context, block: { height: number 
     strategyData.assets.map(async (asset) => {
       const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
       const balance = await contract.checkBalance(asset.address)
-      return { address: strategyData.address, asset: asset.address, balance }
+      return { address: strategyData.address, asset: asset.address, decimals: asset.decimals, balance }
     }),
   )
 }

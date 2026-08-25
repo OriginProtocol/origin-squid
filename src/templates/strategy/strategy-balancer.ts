@@ -3,11 +3,12 @@ import * as balancerRateProvider from '@abi/balancer-rate-provider'
 import * as balancerVaultAbi from '@abi/balancer-vault'
 import { StrategyBalance } from '@model'
 import { Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
-import { convertRate } from '@shared/post-processors/exchange-rates'
+import { convertRateTo18 } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { getBalancePoolRateProviders } from '@shared/post-processors/exchange-rates/price-routing-mainnet'
 import { ADDRESS_ZERO, BALANCER_VAULT, ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses'
 import { addressToSymbol } from '@utils/symbols'
+import { findAssetDecimals } from '@utils/utils'
 
 import { IStrategyData } from './index'
 import { processStrategyEarnings, setupStrategyEarnings } from './strategy-earnings'
@@ -26,7 +27,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
   const data: StrategyBalance[] = []
   await blockFrequencyUpdate(ctx, async (ctx, block) => {
     const balances = await getBalancerStrategyHoldings(ctx, block.header, strategyData)
-    for (const { address, asset, balance } of balances) {
+    for (const { address, asset, decimals, balance } of balances) {
       data.push(
         new StrategyBalance({
           id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
@@ -38,7 +39,7 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
           asset,
           symbol: addressToSymbol(asset),
           balance,
-          balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+          balanceETH: await convertRateTo18(ctx, block, asset as CurrencyAddress, 'ETH', balance, decimals),
         }),
       )
     }
@@ -99,10 +100,17 @@ export const getBalancerStrategyHoldings = async (
     totalPoolValue += tokenBalance // Balance of asset in WETH
   }
 
-  return poolAssets.map((asset, i) => {
-    const poolAssetSplit = (BigInt(10000) * assetBalances[i]) / totalPoolValue
-    const balance = (eth1 * totalStrategyBalance * poolAssetSplit) / assetRates[i] / BigInt(10000)
+  return await Promise.all(
+    poolAssets.map(async (asset, i) => {
+      const poolAssetSplit = (BigInt(10000) * assetBalances[i]) / totalPoolValue
+      const balance = (eth1 * totalStrategyBalance * poolAssetSplit) / assetRates[i] / BigInt(10000)
 
-    return { address, asset: asset.toLowerCase(), balance }
-  })
+      return {
+        address,
+        asset: asset.toLowerCase(),
+        decimals: await findAssetDecimals(ctx, block, strategyData.assets, asset),
+        balance,
+      }
+    }),
+  )
 }

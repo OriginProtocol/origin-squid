@@ -1,7 +1,7 @@
 import * as erc20 from '@abi/erc20'
 import { StrategyBalance } from '@model'
 import { Block, Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils'
-import { convertRate } from '@shared/post-processors/exchange-rates'
+import { convertRateTo18 } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { addressToSymbol } from '@utils/symbols'
 import { convertDecimals } from '@utils/utils'
@@ -36,7 +36,7 @@ const getStrategyHoldings = async (
 ): Promise<StrategyBalance[]> => {
   const data: StrategyBalance[] = []
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
-  for (const { address, asset, balance } of balances) {
+  for (const { address, asset, decimals, balance } of balances) {
     data.push(
       new StrategyBalance({
         id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
@@ -48,7 +48,7 @@ const getStrategyHoldings = async (
         asset,
         symbol: addressToSymbol(asset),
         balance,
-        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+        balanceETH: await convertRateTo18(ctx, block, asset as CurrencyAddress, 'ETH', balance, decimals),
       }),
     )
   }
@@ -69,6 +69,9 @@ const getStrategyBalances = async (
       return {
         address: strategyData.address,
         asset: asset.address,
+        // `balance` is restated in the strategy's base units, so that — not the asset's
+        // own scale — is what the value carries.
+        decimals: strategyData.base.decimals,
         balance: convertDecimals(asset.decimals, strategyData.base.decimals, balance),
       }
     }),

@@ -3,10 +3,11 @@ import * as erc20 from '@abi/erc20';
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy';
 import { StrategyBalance } from '@model';
 import { Block, Context, EvmBatchProcessor, blockFrequencyUpdater } from '@originprotocol/squid-utils';
-import { convertRate } from '@shared/post-processors/exchange-rates';
+import { convertRateTo18 } from '@shared/post-processors/exchange-rates';
 import { CurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies';
 import { ETH_ADDRESS, WETH_ADDRESS } from '@utils/addresses';
 import { addressToSymbol } from '@utils/symbols';
+import { findAssetDecimals } from '@utils/utils';
 
 
 
@@ -41,7 +42,7 @@ const getCurveAMOStrategyHoldings = async (
 ): Promise<StrategyBalance[]> => {
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
   let strategyBalances: StrategyBalance[] = []
-  for (const { address, asset, balance } of balances) {
+  for (const { address, asset, decimals, balance } of balances) {
     strategyBalances.push(
       new StrategyBalance({
         id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
@@ -51,7 +52,7 @@ const getCurveAMOStrategyHoldings = async (
         asset,
         symbol: addressToSymbol(asset),
         balance,
-        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+        balanceETH: await convertRateTo18(ctx, block, asset as CurrencyAddress, 'ETH', balance, decimals),
         blockNumber: block.header.height,
         timestamp: new Date(block.header.timestamp),
       }),
@@ -71,7 +72,7 @@ export const getStrategyBalances = async (ctx: Context, block: { height: number 
       .map(async (asset) => {
         const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
         const balance = await contract.checkBalance(asset.address)
-        return { address: strategyData.address, asset: asset.address, balance }
+        return { address: strategyData.address, asset: asset.address, decimals: asset.decimals, balance }
       }),
   )
 }
@@ -101,9 +102,20 @@ export const getCurveGaugeBalances = async (
   const eth1 = 1000000000000000000n
   const share = totalSupply > 0n ? (strategyLpBalance * eth1) / totalSupply : 0n
 
+  // Pool coins carry their own decimals — a stablecoin leg is not 18 like the LP maths above.
   return [
-    { address, asset: coin0.toLowerCase(), balance: (poolBalance0 * share) / eth1 },
-    { address, asset: coin1.toLowerCase(), balance: (poolBalance1 * share) / eth1 },
+    {
+      address,
+      asset: coin0.toLowerCase(),
+      decimals: await findAssetDecimals(ctx, block, strategyData.assets, coin0),
+      balance: (poolBalance0 * share) / eth1,
+    },
+    {
+      address,
+      asset: coin1.toLowerCase(),
+      decimals: await findAssetDecimals(ctx, block, strategyData.assets, coin1),
+      balance: (poolBalance1 * share) / eth1,
+    },
   ]
 }
 

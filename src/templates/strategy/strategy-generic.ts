@@ -1,7 +1,7 @@
 import * as abstractStrategyAbi from '@abi/initializable-abstract-strategy'
 import { StrategyBalance } from '@model'
 import { Block, Context, EvmBatchProcessor, blockFrequencyTracker, logFilter } from '@originprotocol/squid-utils'
-import { convertRate, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
+import { convertRateTo18, ensureExchangeRates } from '@shared/post-processors/exchange-rates'
 import { CurrencyAddress, MainnetCurrencyAddress } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
 import { addressToSymbol } from '@utils/symbols'
 
@@ -66,7 +66,7 @@ const getStrategyHoldings = async (
 ): Promise<StrategyBalance[]> => {
   const data: StrategyBalance[] = []
   const balances = await getStrategyBalances(ctx, block.header, strategyData)
-  for (const { address, asset, balance } of balances) {
+  for (const { address, asset, decimals, balance } of balances) {
     data.push(
       new StrategyBalance({
         id: `${ctx.chain.id}:${address}:${asset}:${block.header.height}`,
@@ -78,7 +78,7 @@ const getStrategyHoldings = async (
         asset,
         symbol: addressToSymbol(asset),
         balance,
-        balanceETH: await convertRate(ctx, block, asset as CurrencyAddress, 'ETH', balance),
+        balanceETH: await convertRateTo18(ctx, block, asset as CurrencyAddress, 'ETH', balance, decimals),
       }),
     )
   }
@@ -90,7 +90,7 @@ const getStrategyBalances = async (ctx: Context, block: { height: number }, stra
     strategyData.assets.map(async (asset) => {
       const contract = new abstractStrategyAbi.Contract(ctx, block, strategyData.address)
       const balance = await contract.checkBalance(asset.address)
-      return { address: strategyData.address, asset: asset.address, balance }
+      return { address: strategyData.address, asset: asset.address, decimals: asset.decimals, balance }
     }),
   )
 }

@@ -4,6 +4,7 @@ import { LessThanOrEqual } from 'typeorm'
 import { ExchangeRate, ExchangeRateDaily } from '@model'
 import { Block, Context, useProcessorState } from '@originprotocol/squid-utils'
 import { getPrice, translateSymbol } from '@shared/post-processors/exchange-rates/price-routing'
+import { convertDecimals } from '@utils/utils'
 
 import { Currency } from './mainnetCurrencies'
 
@@ -93,11 +94,38 @@ export const getLatestExchangeRateForDate = async (ctx: Context, pair: string, d
   })
 }
 
-const E18 = 10n ** 18n
-export const convertUsingRate = (value: bigint, rate: bigint) => (value * rate) / E18
+/**
+ * Apply an exchange rate to `value`.
+ *
+ * `rateDecimals` is the rate's own scale (`ExchangeRate.decimals`) — not every pair is
+ * 18-decimal: `DAI_ETH` and `USDS_ETH` are 8, as is every `*_USD` pair.
+ *
+ * The result carries `value`'s decimals, because only the rate is divided out. Callers
+ * writing an 18-decimal field must pass an 18-decimal `value` — see `convertRateTo18`.
+ */
+export const convertUsingRate = (value: bigint, rate: bigint, rateDecimals: number) =>
+  (value * rate) / 10n ** BigInt(rateDecimals)
+
 export const convertRate = async (ctx: Context, block: Block, from: Currency, to: Currency, value: bigint) => {
   if (from === to) return value
   const exchangeRate = await ensureExchangeRate(ctx, block, from, to)
   if (!exchangeRate) return 0n
-  return convertUsingRate(value, exchangeRate.rate)
+  return convertUsingRate(value, exchangeRate.rate, exchangeRate.decimals)
 }
+
+/**
+ * `convertRate` for a `value` that is not 18-decimal: normalizes the input first, so the
+ * result is 18-decimal whatever the source token's scale.
+ *
+ * Anything writing an 18-decimal field must use this. `convertRate` alone returns the
+ * converted amount still carrying `valueDecimals`, which silently understates every
+ * 6-decimal asset by 1e12 and makes sums over mixed-decimal assets meaningless.
+ */
+export const convertRateTo18 = async (
+  ctx: Context,
+  block: Block,
+  from: Currency,
+  to: Currency,
+  value: bigint,
+  valueDecimals: number,
+) => convertRate(ctx, block, from, to, convertDecimals(valueDecimals, 18, value))
