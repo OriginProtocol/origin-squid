@@ -171,6 +171,8 @@ export const strategies = {
     SkySavingsRateStrategy: '0x5bd9af9c2506d29b6d79cb878284a270190eaeaa',
     CurveUSDCAMOStrategy: '0x26a02ec47acc2a3442b757f45e0a82b8e993ce11',
     MorphoV2Strategy: '0x3643cafa6ef3dd7fcc2adad1cabf708075afff6e',
+    CrossChainMasterStrategy: '0xb1d624fc40824683e2bfbefd19eb208dbbe00866',
+    CrossChainHyperEVMMasterStrategy: '0xe0228db13f8c4eb00fd1e08e076b09ef5cd0ea1e',
   },
 } as const
 

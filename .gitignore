@@ -22,3 +22,7 @@
 *.log
 
 .pnpm-store
+
+# Local secret backups (STD-002 migration) — never commit
+.env.bak
+.env.*.bak

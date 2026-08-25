@@ -7,6 +7,7 @@ import { USDC } from './const'
 export const metamorphoStrategy: IStrategyData = {
   chainId: 1,
   from: 20685100,
+  to: 24092357,
   oTokenAddress: OUSD_ADDRESS,
   kind: 'Generic',
   name: 'OUSD MetaMorpho',
