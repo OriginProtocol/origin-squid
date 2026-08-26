@@ -184,7 +184,7 @@ const getPrice_OUSD_USD = async (ctx: Context, block: Block['header']) => {
     // New Oracle Address
     '0x3583f79886AA6fcbd5d2575B3d27311399d447A6',
   )
-  return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
+  return diaOracle.getValue('OUSD/USD').then((d) => d._0)
 }
 
 const getPrice_wOETH_OETH = async (ctx: Context, block: Block['header']) => {
