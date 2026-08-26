@@ -179,7 +179,10 @@ const getPrice_OUSD_USD = async (ctx: Context, block: Block['header']) => {
   const diaOracle = new diaOracleAbi.Contract(
     ctx,
     { height: block.height },
-    '0xafa00e7eff2ea6d216e432d99807c159d08c2b79',
+    // Old Oracle Address
+    // '0xafa00e7eff2ea6d216e432d99807c159d08c2b79',
+    // New Oracle Address
+    '0x3583f79886AA6fcbd5d2575B3d27311399d447A6',
   )
   return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
 }
