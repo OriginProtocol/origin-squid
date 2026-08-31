@@ -1,9 +1,29 @@
-import { SquidProcessor, run } from '@originprotocol/squid-utils'
+import { sonic } from 'viem/chains'
 
-import { setupPortalCache } from '../polyfills/portal-cache'
+import { SquidProcessor, chainConfigs, createPortalClient, run, runPortal } from '@originprotocol/squid-utils'
+
+import { withPortalCache } from '../polyfills/portal-cache'
 import { setupRpcCache } from '../polyfills/rpc-cache'
 import { setupRpcRetryEmpty } from '../polyfills/rpc-retry-empty'
 import { DBDumpManager } from './db-dump-manager'
+
+/**
+ * Chain ids that stay on the gateway-era SDK (`run()`); everything else runs on
+ * the Portal SDK (`runPortal()`), consuming the portal's real-time `/stream`
+ * instead of polling RPC for the chain head.
+ *
+ * Sonic is here because it has no real-time Portal dataset — gateway, `/stream`
+ * and `/finalized` all sit at the same stalled height. `GATEWAY_CHAIN_IDS` is
+ * env-driven so a single container can be rolled back onto the old path without
+ * a code change: `GATEWAY_CHAIN_IDS=1,146` to add mainnet, `GATEWAY_CHAIN_IDS=`
+ * to put every chain on the portal.
+ */
+const gatewayChainIds = new Set(
+  (process.env.GATEWAY_CHAIN_IDS ?? String(sonic.id))
+    .split(',')
+    .map((id) => Number(id.trim()))
+    .filter((id) => Number.isFinite(id)),
+)
 
 export async function checkAndRestoreDump(processorName: string) {
   const dumpManager = new DBDumpManager()
@@ -46,7 +66,6 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
   // a transient empty `0x` recorded to disk replays forever.
   setupRpcRetryEmpty()
   setupRpcCache(processor.stateSchema)
-  setupPortalCache(processor.stateSchema)
   if (process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
     const blockHeight = await checkAndRestoreDump(processor.stateSchema)
     if (blockHeight) {
@@ -59,5 +78,15 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
       })
     }
   }
-  return run(processor)
+
+  const chainId = processor.chainId ?? 1
+  if (gatewayChainIds.has(chainId)) {
+    console.log(`Gateway SDK path (chain ${chainId})`)
+    return run(processor)
+  }
+  console.log(`Portal SDK path (chain ${chainId})`)
+  // The cache wraps a client *instance* rather than `PortalClient.prototype`;
+  // the install tree resolves more than one physical copy of the class.
+  processor.portalClient = withPortalCache(createPortalClient(chainConfigs[chainId]), processor.stateSchema)
+  return runPortal(processor)
 }

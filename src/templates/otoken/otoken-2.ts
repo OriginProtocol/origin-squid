@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { pick, uniq } from 'lodash'
-import { type AbiFunction, getAddress, toFunctionSelector } from 'viem'
+import { type AbiFunction, toFunctionSelector } from 'viem'
 
 import * as proxyAbi from '@abi/governed-upgradeability-proxy'
 import * as otokenAbi from '@abi/otoken'
@@ -14,6 +14,7 @@ import {
   Block,
   Context,
   EvmBatchProcessor,
+  Trace,
   defineProcessor,
   env,
   logFilter,
@@ -21,7 +22,6 @@ import {
   traceFilter,
 } from '@originprotocol/squid-utils'
 import { CurrencyAddress, CurrencySymbol } from '@shared/post-processors/exchange-rates/mainnetCurrencies'
-import { Trace } from '@subsquid/evm-processor'
 import { createWOTokenYieldProcessor } from '@templates/wotoken-yield'
 import { OETH_ADDRESS, OUSD_ADDRESS } from '@utils/addresses'
 import { baseAddresses } from '@utils/addresses-base'
@@ -305,37 +305,9 @@ export const createOTokenProcessors = (params: {
       //   range: { from },
       // })
 
-      // Monkeypatch Hack
-      // eslint-disable-next-line
-      const originalAddTrace = processor.addTrace
-      function modifiedMapRequest<T extends { range?: { from: number } }>(options: T): Omit<T, 'range'> {
-        // eslint-disable-next-line
-        let { range, ...req } = options
-        for (let key in req) {
-          let val = (req as any)[key]
-          if (Array.isArray(val)) {
-            ;(req as any)[key] = val.map((s) => {
-              return typeof s == 'string' ? s : s
-            })
-          }
-        }
-        return req
-      }
-      processor.addTrace = function (options: Parameters<typeof originalAddTrace>[0]): EvmBatchProcessor {
-        const privateThis: any = this
-        privateThis.assertNotRunning()
-        privateThis.add(
-          {
-            traces: [modifiedMapRequest(options)],
-          },
-          options.range,
-        )
-        return this
-      }
-
       processor.addTrace({
         type: ['call'],
-        callTo: [otokenAddress, getAddress(otokenAddress)],
+        callTo: [otokenAddress],
         ...generalTraceParams,
       })
 

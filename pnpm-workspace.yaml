@@ -11,6 +11,3 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - '@originprotocol/squid-utils@1.0.2'
-
-patchedDependencies:
-  '@subsquid/portal-client@0.3.2': patches/@subsquid__portal-client@0.3.2.patch

@@ -50,6 +50,26 @@ pnpm run serve
 - `DEBUG_PERF=true` - Enable performance logging
 - `BLOCK_FROM=<number>` - Start processing at specific block
 - `BLOCK_TO=<number>` - Process up to specific block
+- `GATEWAY_CHAIN_IDS=<ids>` - Comma-separated chain ids that stay on the gateway-era SDK
+  (`run()`) instead of the Portal SDK (`runPortal()`). Defaults to Sonic's id, which has
+  no real-time Portal dataset. Set it to roll a container back onto the old path without
+  a code change; set it empty to put every chain on the Portal.
+
+### Working against an unreleased `@originprotocol/squid-utils`
+
+`@originprotocol/squid-utils` is consumed from the GitHub package registry. To build and
+run against a local checkout of it before publishing:
+
+```bash
+pnpm add "@originprotocol/squid-utils@file:/path/to/squid-utils"
+pnpm run build
+```
+
+Revert before committing — neither the `file:` dep nor its lockfile entry belongs in git:
+
+```bash
+git checkout package.json pnpm-lock.yaml && pnpm install
+```
 
 ## Architecture
 

@@ -2,16 +2,25 @@
  * In-process Portal cache for the Subsquid processor. Off by default;
  * opt-in via `PORTAL_CACHE=true`.
  *
- * Monkey-patches `PortalClient.prototype.getStream` to replay cached
+ * Wraps `getStream` on one `PortalClient` **instance** to replay cached
  * finalized chunks from SQLite first, then fall through to the live
  * portal stream. Live batches' finalized portion is compressed and
  * stored keyed by (query_hash, block_from, block_to).
  *
+ * It has to be an instance, not `PortalClient.prototype`: the install tree
+ * resolves more than one physical copy of `@subsquid/portal-client` (the
+ * gateway-era `evm-processor` prerelease carries its own), so a prototype
+ * patch can attach to a class nobody on this path instantiates and fail
+ * silently. Assigning an own property keeps `instanceof PortalClient` true,
+ * which `DataSourceBuilder.build()` checks.
+ *
  * Algorithm is a direct port of `@subsquid/pipes`' `portalSqliteCache`
- * (MIT). Two adaptations for portal-client@0.3.2 which our processor
- * uses:
- *   - read `batch.finalizedHead?.number` instead of `batch.head.finalized?.number`
- *   - track `requestedFromBlock` locally (0.3.2 doesn't emit it in meta)
+ * (MIT), with `requestedFromBlock` tracked locally since the portal client
+ * doesn't emit it in `batch.meta`.
+ *
+ * Applies to the Portal SDK path only. Sonic/OS run the gateway path, whose
+ * SDK takes a portal URL rather than a client, so those containers have no
+ * portal cache.
  *
  * Storage is namespaced per processor `stateSchema` so concurrent
  * processors don't share or contend on cache files. Wire from
@@ -159,14 +168,22 @@ function openCacheDb(path: string): PortalCacheDb {
  */
 // Generic stream signature we operate against; intentionally looser
 // than PortalClient.prototype.getStream so we don't pin to the exact
-// block type emitted by the evm-processor branch.
-type AnyGetStream = (this: PortalClient, query: any, options?: any) => AsyncIterable<PortalStreamData<BlockLike>>
+// block type emitted by the evm-stream branch. `finalized` selects the
+// portal's /finalized endpoint over /stream and must be forwarded — it is
+// the only way evm-stream asks for finalized data.
+type AnyGetStream = (
+  this: PortalClient,
+  query: any,
+  options?: any,
+  finalized?: boolean,
+) => AsyncIterable<PortalStreamData<BlockLike>>
 
 async function* cachedStream(
   client: PortalClient,
   innerGetStream: AnyGetStream,
   query: any,
   options: any,
+  finalized: boolean | undefined,
   db: PortalCacheDb,
   watermarks: Map<string, number>,
   stats: PortalCacheStats,
@@ -224,21 +241,21 @@ async function* cachedStream(
   // 2. Live tail. Save finalized portion of every batch.
   //
   // `requestedFromBlock` mirrors portal-client's internal per-HTTP-request
-  // cursor (which 0.3.2 doesn't expose in batch.meta). It must advance for
-  // EVERY batch — even ones without a `finalizedHead` — because the next
+  // cursor, which it doesn't expose in `batch.meta`. It must advance for
+  // EVERY batch — even ones with no finalized head — because the next
   // HTTP request the portal makes uses (last block we received + 1). If we
   // only advance on save, we'd later save a chunk whose claimed range
   // [requestedFromBlock, last] is wider than its actual content, silently
   // hiding the un-saved blocks from future replays.
   let requestedFromBlock = cursor.number
   const liveQuery = { ...query, fromBlock: cursor.number, parentBlockHash: cursor.hash }
-  const liveStream = innerGetStream.call(client, liveQuery, options)
+  const liveStream = innerGetStream.call(client, liveQuery, options, finalized)
   for await (const batch of liveStream) {
     const chunkStart = requestedFromBlock
     if (batch.blocks.length > 0) {
       requestedFromBlock = lastOf(batch.blocks).header.number + 1
     }
-    const finalizedHead = batch.finalizedHead?.number
+    const finalizedHead = batch.meta?.finalizedHeadNumber
     let saved = false
     if (finalizedHead !== undefined) {
       const finalizedBlocks = batch.blocks.filter((b: BlockLike) => b.header.number <= finalizedHead)
@@ -265,18 +282,21 @@ async function* cachedStream(
 let initialized = false
 
 /**
- * Install the cache wrapper on `PortalClient.prototype.getStream`.
- * Idempotent: first call wins; subsequent calls with a different
- * stateSchema are ignored with a warning so the file path stays stable
- * for the life of the process.
+ * Wrap `getStream` on a single `PortalClient` instance and return that same
+ * client, so it stays `instanceof PortalClient`. Returns the client untouched
+ * when `PORTAL_CACHE` is off.
+ *
+ * Idempotent: first call wins; subsequent calls with a different stateSchema
+ * are ignored with a warning so the file path stays stable for the life of
+ * the process.
  */
-export function setupPortalCache(stateSchema: string): void {
+export function withPortalCache<T extends PortalClient>(client: T, stateSchema: string): T {
   if (!process.env.PORTAL_CACHE || process.env.PORTAL_CACHE === 'false' || process.env.PORTAL_CACHE === '0') {
-    return
+    return client
   }
   if (initialized) {
-    console.warn(`[portal-cache] already initialized; ignoring setupPortalCache(${stateSchema})`)
-    return
+    console.warn(`[portal-cache] already initialized; ignoring withPortalCache(${stateSchema})`)
+    return client
   }
   initialized = true
 
@@ -294,15 +314,13 @@ export function setupPortalCache(stateSchema: string): void {
   console.log(`[portal-cache ${stateSchema}] enabled at ${dbPath} (compression=${compressor})`)
   const log = (msg: string) => console.log(`[portal-cache ${stateSchema}] ${msg}`)
 
-  // evm-processor consumes `getFinalizedStream`; we wrap `getStream` too
-  // since both go through identical streaming code paths (different portal
-  // endpoint, same response shape).
-  const innerGetStream = PortalClient.prototype.getStream as unknown as AnyGetStream
-  const innerGetFinalizedStream = PortalClient.prototype.getFinalizedStream as unknown as AnyGetStream
-  PortalClient.prototype.getStream = function (this: PortalClient, query: any, options?: any): any {
-    return cachedStream(this, innerGetStream, query, options, db, watermarks, stats, log)
-  }
-  PortalClient.prototype.getFinalizedStream = function (this: PortalClient, query: any, options?: any): any {
-    return cachedStream(this, innerGetFinalizedStream, query, options, db, watermarks, stats, log)
-  }
+  // Only `getStream` needs wrapping: `getFinalizedStream(q, o)` is
+  // `this.getStream(q, o, true)`, so it goes through this override too, and
+  // evm-stream calls `getStream(query, options, finalized)` directly anyway.
+  const innerGetStream = client.getStream.bind(client) as unknown as AnyGetStream
+  client.getStream = function (this: PortalClient, query: any, options?: any, finalized?: boolean): any {
+    return cachedStream(this, innerGetStream, query, options, finalized, db, watermarks, stats, log)
+  } as PortalClient['getStream']
+
+  return client
 }
