@@ -1,0 +1,13 @@
+diff --git a/lib/query/evm.js b/lib/query/evm.js
+index c292e9057cf671369bc221cbbe388eba4506272d..c33550b6e3e027c738b84a11354e5f0bc621bd95 100644
+--- a/lib/query/evm.js
++++ b/lib/query/evm.js
+@@ -172,7 +172,7 @@ const TraceCreateActionShape = {
+ const TraceCreateResultShape = {
+     gasUsed: util_internal_validation_1.QTY,
+     code: (0, util_internal_validation_1.option)(util_internal_validation_1.BYTES),
+-    address: util_internal_validation_1.BYTES,
++    address: (0, util_internal_validation_1.withDefault)('0x0000000000000000000000000000000000000000', util_internal_validation_1.BYTES),
+ };
+ const TraceCallActionShape = {
+     callType: util_internal_validation_1.STRING,
