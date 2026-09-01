@@ -14,9 +14,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-07-18",
-    "timestamp": "2024-07-18T23:59:59.999000Z",
-    "blockNumber": 20336850,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-07-19",
+    "timestamp": "2024-07-19T23:59:59.999000Z",
+    "blockNumber": 20344022,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -28,23 +28,23 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-08-27",
-    "timestamp": "2024-08-27T23:59:59.999000Z",
-    "blockNumber": 20623367,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-08-29",
+    "timestamp": "2024-08-29T23:59:59.999000Z",
+    "blockNumber": 20637675,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
-    "apr": 0,
-    "apy": 0,
+    "apr": 0.26944119999865235,
+    "apy": 0.3091026033186939,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "15968000000000000000000",
     "balanceWeight": 1,
-    "earnings": "53480491803316478615",
-    "earningsChange": "0"
+    "earnings": "65259922553701018530",
+    "earningsChange": "11779430750384539915"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-10-06",
-    "timestamp": "2024-10-06T23:59:59.999000Z",
-    "blockNumber": 20909955,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-10-09",
+    "timestamp": "2024-10-09T23:59:59.999000Z",
+    "blockNumber": 20931482,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -56,9 +56,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-11-15",
-    "timestamp": "2024-11-15T23:59:59.999000Z",
-    "blockNumber": 21196531,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-11-19",
+    "timestamp": "2024-11-19T23:59:59.999000Z",
+    "blockNumber": 21225225,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -66,41 +66,41 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "15968000000000000000000",
     "balanceWeight": 1,
-    "earnings": "175870956826149638504",
+    "earnings": "177018378464392658494",
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-12-25",
-    "timestamp": "2024-12-25T23:59:59.999000Z",
-    "blockNumber": 21482924,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2024-12-30",
+    "timestamp": "2024-12-30T23:59:59.999000Z",
+    "blockNumber": 21518734,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
-    "apr": 0.015348119932198867,
-    "apy": 0.015466179774701327,
+    "apr": 0,
+    "apy": 0,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "15968000000000000000000",
     "balanceWeight": 1,
-    "earnings": "226439807149706096059",
-    "earningsChange": "670989128207498802"
+    "earnings": "237801992980594124730",
+    "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-02-03",
-    "timestamp": "2025-02-03T23:59:59.999000Z",
-    "blockNumber": 21769421,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-02-09",
+    "timestamp": "2025-02-09T23:59:59.999000Z",
+    "blockNumber": 21812397,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
-    "apr": 0.2296653421169061,
-    "apy": 0.25808807380333887,
+    "apr": 0,
+    "apy": 0,
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "11520000000000000000000",
     "balanceWeight": 1,
     "earnings": "288142669420883901378",
-    "earningsChange": "9839297121000000000"
+    "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-03-15",
-    "timestamp": "2025-03-15T23:59:59.999000Z",
-    "blockNumber": 22055722,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-03-22",
+    "timestamp": "2025-03-22T23:59:59.999000Z",
+    "blockNumber": 22105862,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -108,13 +108,13 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "2688000000000000000000",
     "balanceWeight": 1,
-    "earnings": "304957843501453104371",
+    "earnings": "306893360577064251398",
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-04-24",
-    "timestamp": "2025-04-24T23:59:59.999000Z",
-    "blockNumber": 22342307,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-05-02",
+    "timestamp": "2025-05-02T23:59:59.999000Z",
+    "blockNumber": 22399543,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -122,13 +122,13 @@
     "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "balance": "2048000000000000000000",
     "balanceWeight": 1,
-    "earnings": "314375600437207917847",
+    "earnings": "316039019258755464716",
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-06-03",
-    "timestamp": "2025-06-03T23:59:59.999000Z",
-    "blockNumber": 22627564,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-06-12",
+    "timestamp": "2025-06-12T23:59:59.999000Z",
+    "blockNumber": 22691920,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -140,9 +140,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-07-13",
-    "timestamp": "2025-07-13T23:59:59.999000Z",
-    "blockNumber": 22913694,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-07-23",
+    "timestamp": "2025-07-23T23:59:59.999000Z",
+    "blockNumber": 22985302,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -154,9 +154,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-08-22",
-    "timestamp": "2025-08-22T23:59:59.999000Z",
-    "blockNumber": 23200063,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-09-02",
+    "timestamp": "2025-09-02T23:59:59.999000Z",
+    "blockNumber": 23278858,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -168,9 +168,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-10-01",
-    "timestamp": "2025-10-01T23:59:59.999000Z",
-    "blockNumber": 23486383,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-10-13",
+    "timestamp": "2025-10-13T23:59:59.999000Z",
+    "blockNumber": 23572225,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -182,9 +182,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-11-10",
-    "timestamp": "2025-11-10T23:59:59.999000Z",
-    "blockNumber": 23772288,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-11-23",
+    "timestamp": "2025-11-23T23:59:59.999000Z",
+    "blockNumber": 23865016,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -196,9 +196,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2025-12-20",
-    "timestamp": "2025-12-20T23:59:59.999000Z",
-    "blockNumber": 24057253,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-01-03",
+    "timestamp": "2026-01-03T23:59:59.999000Z",
+    "blockNumber": 24157566,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -210,9 +210,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-01-29",
-    "timestamp": "2026-01-29T23:59:59.999000Z",
-    "blockNumber": 24343955,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-02-13",
+    "timestamp": "2026-02-13T23:59:59.999000Z",
+    "blockNumber": 24451302,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -224,9 +224,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-03-10",
-    "timestamp": "2026-03-10T23:59:59.999000Z",
-    "blockNumber": 24630504,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-03-26",
+    "timestamp": "2026-03-26T23:59:59.999000Z",
+    "blockNumber": 24745175,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -238,9 +238,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-04-19",
-    "timestamp": "2026-04-19T23:59:59.999000Z",
-    "blockNumber": 24917376,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-05-06",
+    "timestamp": "2026-05-06T23:59:59.999000Z",
+    "blockNumber": 25039432,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -252,9 +252,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-05-29",
-    "timestamp": "2026-05-29T23:59:59.999000Z",
-    "blockNumber": 25204464,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-06-16",
+    "timestamp": "2026-06-16T23:59:59.999000Z",
+    "blockNumber": 25333536,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -266,9 +266,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-07-08",
-    "timestamp": "2026-07-08T23:59:59.999000Z",
-    "blockNumber": 25491296,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-07-27",
+    "timestamp": "2026-07-27T23:59:59.999000Z",
+    "blockNumber": 25627590,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,
@@ -280,9 +280,9 @@
     "earningsChange": "0"
   },
   {
-    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-08-08",
-    "timestamp": "2026-08-08T23:59:59.999000Z",
-    "blockNumber": 25713689,
+    "id": "0x34edb2ee25751ee67f68a45813b22811687c0238:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:2026-08-29",
+    "timestamp": "2026-08-29T23:59:59.999000Z",
+    "blockNumber": 25864358,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
     "strategy": "0x34edb2ee25751ee67f68a45813b22811687c0238",
     "apr": 0,

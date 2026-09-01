@@ -6,8 +6,8 @@
 /data
 /cache
 /out
-/.rpc-cache
-/.portal-cache
+/.rpc-cache*
+/.portal-cache*
 
 /**Versions.json
 

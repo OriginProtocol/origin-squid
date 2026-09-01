@@ -320,19 +320,19 @@
     "txHash": "0xdb35781934b21d699cbb32e45fe765cc5fc21352190c04b5fa62d1fc1e0ca399"
   },
   {
-    "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0xf285361059b2c17e4f3c562bd8a1868ce22ae826:750",
-    "timestamp": "2026-07-30T07:15:35.000000Z",
-    "blockNumber": 25644112,
+    "id": "1:0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3:0xf6d3fba71e4e399c8312882dbc26c14b23c44184:757",
+    "timestamp": "2026-08-20T23:08:59.000000Z",
+    "blockNumber": 25799525,
     "chainId": 1,
     "otoken": "0x856c4efb76c1d1ae02e20ceb03a2a6a08b0b8dc3",
-    "requestId": "750",
-    "withdrawer": "0xf285361059b2c17e4f3c562bd8a1868ce22ae826",
-    "amount": "1130794762703470942789",
-    "queued": "66054784673731721630614",
+    "requestId": "757",
+    "withdrawer": "0xf6d3fba71e4e399c8312882dbc26c14b23c44184",
+    "amount": "461148310937516189",
+    "queued": "67059017697697062583652",
     "claimed": true,
-    "claimedAt": "2026-08-05T10:55:11.000000Z",
-    "claimableAt": "2026-08-05T09:08:47.000000Z",
-    "queueWait": null,
-    "txHash": "0x023064ee61f5835bafd964cbbca03df5667a19df657729fe93d169b2f0d24a26"
+    "claimedAt": "2026-08-21T07:59:35.000000Z",
+    "claimableAt": "2026-08-21T00:20:47.000000Z",
+    "queueWait": "600",
+    "txHash": "0x88cb7a6c40f7cb363946b50cc418fd1d097a30b31b0c53947621f88ca545ca6e"
   }
 ]

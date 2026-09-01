@@ -1,0 +1,233 @@
+[
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25403134",
+    "blockNumber": 25403134,
+    "timestamp": "2026-06-26T16:55:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "2108884349350",
+    "balanceETH": "1335787657",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25535880",
+    "blockNumber": 25535880,
+    "timestamp": "2026-07-15T05:12:23.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1352042413968",
+    "balanceETH": "721416222",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25659582",
+    "blockNumber": 25659582,
+    "timestamp": "2026-08-01T10:59:47.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "643347256",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25697256",
+    "blockNumber": 25697256,
+    "timestamp": "2026-08-06T16:58:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "627673341",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25733136",
+    "blockNumber": 25733136,
+    "timestamp": "2026-08-11T17:06:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "648609351",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25770789",
+    "blockNumber": 25770789,
+    "timestamp": "2026-08-16T23:02:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "639952638",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25806649",
+    "blockNumber": 25806649,
+    "timestamp": "2026-08-21T22:58:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "477330903",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25830342",
+    "blockNumber": 25830342,
+    "timestamp": "2026-08-25T06:12:47.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "482995194",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25833471",
+    "blockNumber": 25833471,
+    "timestamp": "2026-08-25T16:41:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1202608312291",
+    "balanceETH": "488206287",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25836600",
+    "blockNumber": 25836600,
+    "timestamp": "2026-08-26T03:08:59.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1208788874783",
+    "balanceETH": "490733093",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25839729",
+    "blockNumber": 25839729,
+    "timestamp": "2026-08-26T13:36:47.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1208859501530",
+    "balanceETH": "490761765",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25842858",
+    "blockNumber": 25842858,
+    "timestamp": "2026-08-27T00:05:47.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1208905713500",
+    "balanceETH": "485236112",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25845987",
+    "blockNumber": 25845987,
+    "timestamp": "2026-08-27T10:33:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1208979580626",
+    "balanceETH": "485537907",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25849116",
+    "blockNumber": 25849116,
+    "timestamp": "2026-08-27T21:00:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209051953803",
+    "balanceETH": "480661348",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25852245",
+    "blockNumber": 25852245,
+    "timestamp": "2026-08-28T07:28:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209100572081",
+    "balanceETH": "485536606",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25855374",
+    "blockNumber": 25855374,
+    "timestamp": "2026-08-28T17:56:59.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209173196023",
+    "balanceETH": "496913854",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25858503",
+    "blockNumber": 25858503,
+    "timestamp": "2026-08-29T04:25:35.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209221324451",
+    "balanceETH": "496933633",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25861632",
+    "blockNumber": 25861632,
+    "timestamp": "2026-08-29T14:53:59.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209293560557",
+    "balanceETH": "496963319",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25864761",
+    "blockNumber": 25864761,
+    "timestamp": "2026-08-30T01:21:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209365563007",
+    "balanceETH": "494001379",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25867890",
+    "blockNumber": 25867890,
+    "timestamp": "2026-08-30T11:48:59.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209414681232",
+    "balanceETH": "494021442",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  },
+  {
+    "id": "1:0xb1d624fc40824683e2bfbefd19eb208dbbe00866:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:25870125",
+    "blockNumber": 25870125,
+    "timestamp": "2026-08-30T19:17:11.000000Z",
+    "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "balance": "1209463101971",
+    "balanceETH": "483616457",
+    "chainId": 1,
+    "symbol": "USDC",
+    "strategy": "0xb1d624fc40824683e2bfbefd19eb208dbbe00866"
+  }
+]
