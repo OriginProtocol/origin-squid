@@ -11,3 +11,12 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - '@originprotocol/squid-utils@1.0.2'
+
+# The gateway-era path (Sonic/OS) still resolves portal-client 0.3.2, via the
+# pinned @subsquid/evm-processor prerelease. 0.3.2 validates a CREATE trace's
+# `result.address` as required BYTES, so a failed contract creation - where the
+# node returns null - aborts ingest with a DataValidationError and the squid
+# crash-loops on that block forever. Fixed upstream in 0.7.0, which the Portal
+# path uses; this patch is only for the 0.3.2 copy the gateway path still has.
+patchedDependencies:
+  '@subsquid/portal-client@0.3.2': patches/@subsquid__portal-client@0.3.2.patch
