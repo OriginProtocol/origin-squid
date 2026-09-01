@@ -165,6 +165,13 @@ export const getBalancePoolRateProviders = memoize(
   (_ctx, _block, address) => address.toLowerCase(),
 )
 
+const DIA_OUSD_USD_V1_ADDRESS = '0xafa00e7eff2ea6d216e432d99807c159d08c2b79'
+const DIA_OUSD_USD_V2_ADDRESS = '0x3583f79886AA6fcbd5d2575B3d27311399d447A6'
+// The block production switched over on. v2 first carried an OUSD/USD value at
+// 25825569, so 25825569–25841364 could also be read from v2; production read v1
+// there, and this height keeps a resync byte-identical to the deployed history.
+const DIA_OUSD_USD_V2_HEIGHT = 25841364
+
 const getPrice_OUSD_USD = async (ctx: Context, block: Block['header']) => {
   if (block.height < 18071236) return 1_000_000_000_000_000_000n
   if (block.height > 21696108 && block.height < 23390149) {
@@ -176,14 +183,17 @@ const getPrice_OUSD_USD = async (ctx: Context, block: Block['header']) => {
       return 1_000_000_000_000_000_000n
     }
   }
-  const diaOracle = new diaOracleAbi.Contract(
-    ctx,
-    { height: block.height },
-    // Old Oracle Address
-    // '0xafa00e7eff2ea6d216e432d99807c159d08c2b79',
-    // New Oracle Address
-    '0x3583f79886AA6fcbd5d2575B3d27311399d447A6',
-  )
+  // DIA publishes OUSD/USD from two oracles and they do not overlap:
+  //   v1 0xafa00e7e… — code from 18071145, 8 decimals, still updating today.
+  //   v2 0x3583f798… — code from 25427435, 18 decimals, but its OUSD/USD key
+  //                    was not written until 25825569; before that it answers 0.
+  // Reading v2 below its code height returns `0x`, which the ABI decoder throws
+  // on, so a historical resync must route by height rather than pin one address.
+  if (block.height < DIA_OUSD_USD_V2_HEIGHT) {
+    const diaOracle = new diaOracleAbi.Contract(ctx, { height: block.height }, DIA_OUSD_USD_V1_ADDRESS)
+    return diaOracle.getValue('OUSD/USD').then((d) => d._0 * 10n ** 10n)
+  }
+  const diaOracle = new diaOracleAbi.Contract(ctx, { height: block.height }, DIA_OUSD_USD_V2_ADDRESS)
   return diaOracle.getValue('OUSD/USD').then((d) => d._0)
 }
 
