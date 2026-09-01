@@ -237,12 +237,37 @@ export const loadIsContractCache = async (ctx: Context) => {
   } else {
     cache = new Map()
   }
+  // Whatever we just loaded is already durable; only growth beyond it counts.
+  lastSavedSize = cache.size
 }
 
+const SAVE_INTERVAL_MS = 5 * 60 * 1000
+// Save regardless of the interval once this many new addresses have been
+// learned. See below for why the interval alone is not enough.
+const SAVE_GROWTH_THRESHOLD = 250
+
 let lastSave = 0
+let lastSavedSize = 0
+
+/**
+ * Persist the cache into `util_cache`.
+ *
+ * The write goes through `ctx.store`, so it commits with the batch and is
+ * discarded with it. `lastSave` is advanced when `store.save()` resolves,
+ * which is *not* the same as the batch committing — so a batch that later
+ * rolls back leaves `lastSave` advanced while nothing was persisted, and the
+ * time-based throttle then suppresses the next several saves. On a processor
+ * whose batches are failing that turns one lost batch into minutes of lost
+ * learning, precisely when re-learning is most expensive.
+ *
+ * Growth is the durable signal: after a rollback the retry re-walks the same
+ * range and repopulates `cache`, so `cache.size` climbs back past
+ * `lastSavedSize` and forces a save that the clock alone would have skipped.
+ */
 export const saveIsContractCache = async (ctx: Context, force: boolean = false) => {
   if (!cache) return
-  if (Date.now() - lastSave < 5 * 60 * 1000 && !force) return
+  const grown = cache.size - lastSavedSize >= SAVE_GROWTH_THRESHOLD
+  if (!force && !grown && Date.now() - lastSave < SAVE_INTERVAL_MS) return
   const id = `${ctx.chain.id}-isContract`
   await ctx.store.save(
     new UtilCache({
@@ -251,4 +276,5 @@ export const saveIsContractCache = async (ctx: Context, force: boolean = false) 
     }),
   )
   lastSave = Date.now()
+  lastSavedSize = cache.size
 }
