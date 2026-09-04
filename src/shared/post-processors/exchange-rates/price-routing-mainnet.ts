@@ -13,6 +13,7 @@ import * as stakedFraxEth from '@abi/sfrx-eth'
 import * as uniswapV3 from '@abi/uniswap-v3'
 import * as woethAbi from '@abi/woeth'
 import { Block, Context } from '@originprotocol/squid-utils'
+import { RpcError } from '@subsquid/rpc-client'
 import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { CURVE_ETH_OETH_POOL_ADDRESS, STETH_ADDRESS, mainnetTokens } from '@utils/addresses'
 
@@ -44,7 +45,6 @@ const chainlinkPriceFeeds: Record<
   CRV_USDC: { height: 12162244, get: createChainlinkPriceFeed('0xcd627aa160a6fa45eb793d19ef54f5062f20f33f', 8n) },
   USDe_USD: { height: 19711161, get: createChainlinkPriceFeed('0xa569d910839ae8865da8f8e70fffb0cba869f961', 8n) },
   CVX_USD: { height: 13960589, get: createChainlinkPriceFeed('0xd962fc30a72a84ce50161031391756bf2876af5d', 8n) },
-  OETH_ETH: { height: 19384550, get: createChainlinkPriceFeed('0x703118c4cbcccbf2ab31913e0f8075fbbb15f563', 18n) },
   COMP_USD: { height: 10730672, get: createChainlinkPriceFeed('0xdbd020caef83efd542f4de03e3cf0c28a4428bd5', 8n) },
   COMP_ETH: { height: 10679326, get: createChainlinkPriceFeed('0x1b39ee86ec5979ba5c322b826b3ecb8c79991699', 18n) },
 }
@@ -71,19 +71,35 @@ export const getMainnetPrice = async (
   throw new Error(`No price for ${base}_${quote}`)
 }
 
-const getOETHETHPrice = async (ctx: Context, block: Block['header']) => {
-  if (block.height < 17230232) return 10n ** 18n
-  if (block.height < 19384550) {
-    const contract = new curveLpToken.Contract(ctx, { height: block.height }, CURVE_ETH_OETH_POOL_ADDRESS)
-    return await contract.get_dy(0n, 1n, 1000000000000000000n)
-  }
-  return chainlinkPriceFeeds['OETH_ETH']!.get(ctx, block.height)
+const OETH_ETH_CHAINLINK_HEIGHT = 19384550
+const getOETHETHChainlinkPrice = createChainlinkPriceFeed('0x703118c4cbcccbf2ab31913e0f8075fbbb15f563', 18n)
+
+// OETHVaultLens.getRate(): vault.totalValue() * 1e18 / totalSupply, ETH per OETH.
+const OETH_VAULT_LENS_ADDRESS = '0xad2b1657e2c3243750b32cb9a51169575945b05b'
+// First block the lens answers; earlier heights revert on a stale verified balance.
+const OETH_VAULT_LENS_HEIGHT = 25896839
+
+// Curve pool coins: 0 = ETH, 1 = OETH, so dy(1 -> 0) is ETH per OETH.
+const getOETHETHCurvePrice = (ctx: Context, block: Block['header']) => {
+  const pool = new curveLpToken.Contract(ctx, { height: block.height }, CURVE_ETH_OETH_POOL_ADDRESS)
+  return pool.get_dy(1n, 0n, 1_000_000_000_000_000_000n)
 }
 
-const getETHOETHPrice = async (ctx: Context, block: Block['header']) => {
-  if (block.height < 17230232) return 10n ** 18n
-  const contract = new curveLpToken.Contract(ctx, { height: block.height }, CURVE_ETH_OETH_POOL_ADDRESS)
-  return await contract.get_dy(1n, 0n, 1000000000000000000n)
+const getOETHETHPrice = async (ctx: Context, block: Block['header']) => {
+  if (block.height < 17230232) return 1_000_000_000_000_000_000n
+  if (block.height < OETH_ETH_CHAINLINK_HEIGHT) return getOETHETHCurvePrice(ctx, block)
+  if (block.height >= OETH_VAULT_LENS_HEIGHT) {
+    const lens = new balancerRateProvider.Contract(ctx, { height: block.height }, OETH_VAULT_LENS_ADDRESS)
+    try {
+      return await lens.getRate()
+    } catch (err) {
+      // A revert (stale verified balance) arrives as an RpcError; anything else is a real failure.
+      if (!(err instanceof RpcError)) throw err
+    }
+  }
+  const chainlink = await getOETHETHChainlinkPrice(ctx, block.height)
+  // The feed answered 0 for its first hours after OETH_ETH_CHAINLINK_HEIGHT.
+  return chainlink || getOETHETHCurvePrice(ctx, block)
 }
 
 const getRETHPrice = async (ctx: Context, block: Block['header']) => {
@@ -279,8 +295,7 @@ export const priceMap: Partial<
   ETH_WETH: [async () => 1_000_000_000_000_000_000n, 18],
   WETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
   ETH_ETH: [async () => 1_000_000_000_000_000_000n, 18],
-  ETH_OETH: [getETHOETHPrice, 18],
-  OETH_ETH: [getOETHETHPrice, 18],
+  ...twoWay('OETH', 'ETH', getOETHETHPrice),
   ...twoWay('MORPHO', 'ETH', getMorphoEthPrice, 18),
   ...twoWay('MORPHO_LEGACY', 'ETH', getMorphoEthPrice, 18),
   ...twoWay('ETH', 'sfrxETH', getStakedFraxPrice),

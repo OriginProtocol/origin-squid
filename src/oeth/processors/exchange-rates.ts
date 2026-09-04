@@ -12,6 +12,7 @@ export const oethExchangeRatesProcessor = defineProcessor({
     await blockFrequencyUpdate(ctx, async (ctx, block) => {
       await ensureExchangeRates(ctx, block, [
         ['ETH', 'USD'],
+        ['OETH', 'ETH'],
         ['wOETH', 'OETH'],
       ])
     })
