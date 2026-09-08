@@ -10,15 +10,20 @@ RUN corepack enable
 WORKDIR /app
 
 # Install dependencies first to maximize layer cache reuse.
-COPY package.json pnpm-lock.yaml .npmrc* ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
+COPY patches ./patches
+# @originprotocol/* resolves from GitHub Packages, which requires a token even
+# for public packages. Railway exposes service variables to the build as ARGs.
+ARG NODE_AUTH_TOKEN
 # Note: no `--mount=type=cache` here — Railway's BuildKit rejects custom cache
 # IDs without their internal cacheKey prefix. Docker layer caching still applies.
-RUN pnpm install --frozen-lockfile
+RUN printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> .npmrc \
+  && pnpm install --frozen-lockfile \
+  && sed -i '/_authToken/d' .npmrc
 
 # Copy the rest of the source and build.
 COPY tsconfig.json commands.json ./
 COPY src ./src
-COPY abi ./abi
 COPY db ./db
 COPY scripts ./scripts
 COPY schema.graphql ./schema.graphql
