@@ -66,7 +66,11 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
   // a transient empty `0x` recorded to disk replays forever.
   setupRpcRetryEmpty()
   setupRpcCache(processor.stateSchema)
-  if (process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
+  const dumpsReachable = !!process.env.AWS_ACCESS_KEY_ID
+  if (!dumpsReachable) {
+    console.log('No AWS credentials; skipping database dump restore')
+  }
+  if (dumpsReachable && process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
     const blockHeight = await checkAndRestoreDump(processor.stateSchema)
     if (blockHeight) {
       console.log(`Starting processor from block height ${blockHeight}`)
