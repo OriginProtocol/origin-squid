@@ -172,6 +172,21 @@ railway run --service api node -e 'console.log(process.env.DB_HOST)'
 railway connect Postgres
 ```
 
+## Keeping an old version as a cold rollback target
+
+Each release runs in its own environment, named after its branch (`railway-v164`). Once a newer version has taken traffic, stop the old one instead of deleting it:
+
+```bash
+bash deploy/railway-hibernate.sh railway-v164   # api, processors, then Postgres
+bash deploy/railway-wake.sh railway-v164        # Postgres, wait for it, processors, then api
+```
+
+Both scripts refuse any environment not named `railway-v<N>`, and check that Postgres, every `<chain>-processor` and `api` exist in it before touching anything.
+
+The invariant they rely on: **removing a deployment stops the container but keeps the service, its variables and its volume**; billing drops to volume storage. Only `railway service delete` or `railway environment delete` lose data. Waking redeploys the removed deployment, so processors resume from their committed height and catch up the gap. If Railway has since garbage-collected the old deployment, wake falls back to `railway up` from the working tree for processors and the api, and requires the checkout to be on the branch that matches the environment name; Postgres has no source here and must then be redeployed from the dashboard's deployment history.
+
+`railway redeploy` has no `--environment` flag, so wake links the target environment while it runs and relinks the previous one on exit.
+
 ## Adding a new processor later
 
 1. Add `src/main-foo.ts` and corresponding `process:foo:prod` command (you'd do this for the squid regardless).
