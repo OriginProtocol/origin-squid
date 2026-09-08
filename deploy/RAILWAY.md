@@ -9,32 +9,36 @@ All services build from the **same Dockerfile**; they differ only by the `SERVIC
 ```bash
 # one-time, interactive
 railway login
+railway link                                   # pick the origin-squid project
 cp deploy/.env.railway.example deploy/.env.railway
-$EDITOR deploy/.env.railway                    # paste in RPC URLs + any secrets
+$EDITOR deploy/.env.railway                    # RPC URLs, SQD_API_KEY, any secrets
 
-# bootstrap everything (creates the project if not already linked)
+# per version: check out its branch, then bootstrap its environment
+git checkout railway-v164
 bash deploy/railway-bootstrap.sh               # add -y to skip the prompt
 ```
 
 The script is idempotent — re-running it adjusts variables and triggers fresh deploys without duplicating services.
 
-## Project naming
+## Project and environments
 
-If no Railway project is linked when you run the script, it creates one named **`origin-squid-<git-branch>`** (e.g. `origin-squid-rw-proto` on the current branch). Override by setting `RAILWAY_PROJECT_NAME=...` in `deploy/.env.railway`, or by running `railway init --name <whatever>` yourself before invoking the script.
+One Railway project, **`origin-squid`**, holds one **environment per squid version**, named after its branch: `railway-v164`, `railway-v165`, … Each environment has its own `Postgres`, ten `<chain>-processor` services and an `api`, so versions run side by side and an old one can be kept as a cold rollback target (see below).
 
-To deploy a second copy (e.g. to test a branch alongside main), check out that branch in a separate clone and run the script — it'll create a new project.
+The bootstrap targets the environment named after the current branch (override with `ENVIRONMENT_NAME=railway-v<N>`), refuses any name that doesn't match `railway-v<N>`, and creates the environment if the project doesn't have it yet. If no project is linked at all, it creates `origin-squid` (override with `RAILWAY_PROJECT_NAME`).
+
+`railway add` and `railway domain` have no `--environment` flag, so the script links the target environment for its duration and relinks the previous one on exit; `railway variables` and `railway up` are passed `--environment` explicitly.
 
 ---
 
 ## What the script does
 
-1. Verifies you're logged in and a project is linked to this repo.
+1. Verifies you're logged in, a project is linked, and the target environment exists (creating it if not).
 2. Loads `deploy/.env.railway` (gitignored).
 3. Adds the **Postgres** plugin if it doesn't exist.
 4. For each of 10 processors (mainnet, oeth, ogv, ousd, arbitrum, base, oethb, sonic, os, hyperevm):
    - Creates a service named `<chain>-processor`.
    - Sets shared variables (`DB_*` referencing `${{Postgres.PG*}}`, RPC URLs, common config) plus per-service `SERVICE_ROLE=processor` and `PROCESSOR_NAME=<chain>`.
-   - Triggers a deploy with `railway up --service ... --detach`.
+   - Triggers a deploy with `railway up --service ... --environment ... --detach`.
 5. Creates the `api` service, sets variables (with `SERVICE_ROLE=api`), generates a public `*.up.railway.app` domain, and deploys.
 
 ## Service roles (handled by `scripts/entrypoint.sh`)
@@ -55,14 +59,14 @@ Railway's default per-service limits depend on your plan tier. To cap each servi
 # Create a personal token at https://railway.com/account/tokens
 export RAILWAY_API_TOKEN=<token>
 
-# Defaults: processors 4 vCPU / 8 GB, api 2 vCPU / 4 GB
+# Defaults: processors 4 vCPU / 8 GB, api 2 vCPU / 4 GB; environment = current branch
 bash deploy/railway-set-limits.sh
 
 # Or override
-PROCESSOR_VCPU=2 PROCESSOR_MEMORY=4 bash deploy/railway-set-limits.sh
+PROCESSOR_VCPU=2 PROCESSOR_MEMORY=4 ENVIRONMENT_NAME=railway-v164 bash deploy/railway-set-limits.sh
 ```
 
-The Railway CLI doesn't expose limit settings, so this script uses the public GraphQL API directly. Limits take effect on the next deploy of each service. Re-run `bash deploy/railway-bootstrap.sh -y` (or `railway up --service <name>` per service) to redeploy with the new caps.
+The Railway CLI doesn't expose limit settings, so this script uses the public GraphQL API directly. Limits take effect on the next deploy of each service. Re-run `bash deploy/railway-bootstrap.sh -y` (or `railway up --service <name> --environment <env>` per service) to redeploy with the new caps.
 
 ## Backoff behavior
 
@@ -106,18 +110,16 @@ UNION ALL SELECT 'hyperevm-processor', height, finalized_height FROM "hyperevm-p
 Backoff smoke-test — set a bogus RPC URL on one service:
 
 ```bash
-railway service hyperevm-processor
-railway variables --set RPC_HYPEREVM_ENDPOINT=https://invalid.example
-railway logs
+railway variables --service hyperevm-processor -e railway-v164 --set RPC_HYPEREVM_ENDPOINT=https://invalid.example
+railway logs --service hyperevm-processor -e railway-v164
 # look for: "main-hyperevm exited code=1 ... sleeping Ns before restart" with N doubling
 ```
 
 Restore the real URL; after a 60 s healthy run the delay resets to 5 s.
 
-API:
+API (with the environment linked — `railway domain` has no `-e`):
 ```bash
-railway service api
-railway domain   # prints the public URL
+railway domain --service api   # prints the public URL
 # open https://<domain>/graphql in a browser
 ```
 
@@ -152,21 +154,20 @@ If Postgres dominates, try Neon/Supabase/RDS — only the `DB_*` variables need 
 
 ## Manual operations
 
-Common things you'll do without re-running the bootstrap:
+Common things you'll do without re-running the bootstrap (`-e` = `--environment`; omit it to use the linked one):
 
 ```bash
 # Tail logs for a service
-railway logs --service mainnet-processor
+railway logs --service mainnet-processor -e railway-v164
 
 # Redeploy one service after a code change
-railway up --service base-processor --detach
+railway up --service base-processor -e railway-v164 --detach
 
 # Update one variable
-railway service oeth-processor
-railway variables --set RPC_ENDPOINT=https://new-url
+railway variables --service oeth-processor -e railway-v164 --set RPC_ENDPOINT=https://new-url
 
 # Run a one-off command in any service's environment
-railway run --service api node -e 'console.log(process.env.DB_HOST)'
+railway run --service api -e railway-v164 node -e 'console.log(process.env.DB_HOST)'
 
 # Open Postgres shell (if external proxy is enabled on the plugin)
 railway connect Postgres

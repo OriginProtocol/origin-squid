@@ -1,20 +1,29 @@
 #!/usr/bin/env bash
-# Bootstrap the entire Origin Squid deployment on Railway.
+# Bootstrap one version of the Origin Squid on Railway.
 #
-# Idempotent: safe to re-run. Creates services / sets variables / triggers
-# deploys that don't yet exist; leaves existing ones alone.
+# One Railway project (origin-squid) holds one environment per squid version,
+# named after its branch (railway-v164). This script targets one environment:
+# it creates it if missing, then creates services / sets variables / triggers
+# deploys inside it. Idempotent: re-running adjusts variables and redeploys
+# without duplicating services.
 #
 # Prerequisites (one-time, must be done by hand because they need a browser):
 #   1. Install the Railway CLI:    https://docs.railway.com/develop/cli
 #   2. railway login
-#   3. From the repo root: railway init     (or: railway link <project-id>)
+#   3. From the repo root: railway link     (pick the origin-squid project)
 #   4. cp deploy/.env.railway.example deploy/.env.railway  and fill it in
 #
-# Then:
+# Then, with the version branch checked out:
 #   bash deploy/railway-bootstrap.sh        # interactive (asks before deploying)
 #   bash deploy/railway-bootstrap.sh -y     # non-interactive
 #
-# To redeploy a single service later, use `railway up --service <name>` directly.
+# Tunables:
+#   ENVIRONMENT_NAME=railway-v164       target environment; defaults to the
+#                                       current branch, must match railway-v<N>
+#   RAILWAY_PROJECT_NAME=origin-squid   used only when no project is linked
+#
+# To redeploy a single service later:
+#   railway up --service <name> --environment <env> --detach
 
 set -euo pipefail
 
@@ -39,32 +48,11 @@ require_cmd() {
 
 require_cli() {
   require_cmd railway "https://docs.railway.com/develop/cli"
+  require_cmd jq "brew install jq"
 }
 
-default_project_name() {
-  local branch
-  branch=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo unknown)
-  # Railway project names: keep it simple — alphanumerics, dash, underscore.
-  branch=$(printf '%s' "$branch" | tr -c '[:alnum:]_-' '-' | sed 's/--*/-/g; s/-$//')
-  printf 'origin-squid-%s' "$branch"
-}
-
-require_linked() {
-  if railway status >/dev/null 2>&1; then
-    log "Linked Railway project:"
-    railway status 2>&1 | sed 's/^/    /'
-    return 0
-  fi
-
-  local name="${RAILWAY_PROJECT_NAME:-$(default_project_name)}"
-  log "No project linked; creating: $name"
-  log "(override with RAILWAY_PROJECT_NAME in deploy/.env.railway)"
-  if ! railway init --name "$name"; then
-    err "railway init failed. Run it manually:"
-    err "    railway init --name \"$name\""
-    err "Then re-run this script."
-    exit 1
-  fi
+current_branch() {
+  git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo unknown
 }
 
 require_env_file() {
@@ -78,7 +66,7 @@ require_env_file() {
   set -a; . "$ENV_FILE"; set +a
 
   local missing=()
-  for v in RPC_ENDPOINT RPC_BASE_ENDPOINT RPC_ARBITRUM_ENDPOINT RPC_SONIC_ENDPOINT RPC_HYPEREVM_ENDPOINT; do
+  for v in RPC_ENDPOINT RPC_BASE_ENDPOINT RPC_ARBITRUM_ENDPOINT RPC_SONIC_ENDPOINT RPC_HYPEREVM_ENDPOINT SQD_API_KEY; do
     [ -n "${!v:-}" ] || missing+=("$v")
   done
   if [ "${#missing[@]}" -gt 0 ]; then
@@ -87,9 +75,80 @@ require_env_file() {
   fi
 }
 
+require_linked() {
+  if railway status >/dev/null 2>&1; then
+    log "Linked Railway project:"
+    railway status 2>&1 | sed 's/^/    /'
+    return 0
+  fi
+
+  local name="${RAILWAY_PROJECT_NAME:-origin-squid}"
+  log "No project linked; creating: $name"
+  log "(override with RAILWAY_PROJECT_NAME in deploy/.env.railway)"
+  if ! railway init --name "$name"; then
+    err "railway init failed. Run it manually:"
+    err "    railway init --name \"$name\""
+    err "Then re-run this script."
+    exit 1
+  fi
+}
+
+# ---------- environment ----------
+ENVIRONMENT_NAME=${ENVIRONMENT_NAME:-$(current_branch)}
+
+require_environment_name() {
+  # Version environments are named after their branch (railway-vNN). Anything
+  # else — production, the default environment, a typo — is refused outright.
+  if ! printf '%s' "$ENVIRONMENT_NAME" | grep -qE '^railway-v[0-9]+$'; then
+    err "refusing to bootstrap environment '$ENVIRONMENT_NAME': only version environments (railway-v<N>) are handled here"
+    err "check out a railway-v<N> branch, or set ENVIRONMENT_NAME=railway-v<N>"
+    exit 1
+  fi
+}
+
+environment_exists() {
+  railway status --json 2>/dev/null \
+    | jq -e --arg n "$1" 'any(.environments.edges[]; .node.name == $n)' >/dev/null
+}
+
+strip_ansi() { sed -E "s/$(printf '\033')\[[0-9;]*m//g"; }
+
+previous_env=""
+
+link_environment() {
+  railway environment "$1" >/dev/null 2>&1 || railway environment link "$1" >/dev/null 2>&1
+}
+
+restore_environment_link() {
+  [ -n "$previous_env" ] || { warn "could not read the previously linked environment; run 'railway environment <name>' to relink"; return 0; }
+  [ "$previous_env" = "$ENVIRONMENT_NAME" ] && return 0
+  link_environment "$previous_env" || warn "could not relink environment '$previous_env'; run 'railway environment $previous_env'"
+}
+
+# `railway add` and `railway domain` have no --environment flag, so the target
+# environment is linked for the whole run and the previous link restored on exit.
+ensure_environment() {
+  previous_env=$(railway status 2>/dev/null | strip_ansi \
+    | sed -nE 's/^Environment:[[:space:]]*//p' | head -n 1)
+
+  if environment_exists "$ENVIRONMENT_NAME"; then
+    log "Environment exists: $ENVIRONMENT_NAME"
+  else
+    log "Creating environment: $ENVIRONMENT_NAME"
+    railway environment new "$ENVIRONMENT_NAME" 2>&1 | sed "s/^/${c_dim}    /; s/$/${c_off}/"
+    environment_exists "$ENVIRONMENT_NAME" || { err "environment '$ENVIRONMENT_NAME' not found after creation"; exit 1; }
+  fi
+
+  if ! link_environment "$ENVIRONMENT_NAME"; then
+    err "couldn't link environment '$ENVIRONMENT_NAME'"
+    exit 1
+  fi
+  trap restore_environment_link EXIT
+}
+
 confirm() {
   [ "$YES" -eq 1 ] && return 0
-  printf '\n%s\n' "About to bootstrap Railway with:"
+  printf '\n%s\n' "About to bootstrap Railway environment '$ENVIRONMENT_NAME' with:"
   printf '  - Postgres plugin\n'
   printf '  - %d processor services (%s)\n' "${#PROCESSORS[@]}" "${PROCESSORS[*]}"
   printf '  - 1 API service (with public domain)\n\n'
@@ -97,12 +156,13 @@ confirm() {
   [[ "$ans" =~ ^[Yy]$ ]] || { log "aborted"; exit 0; }
 }
 
-# List service names in the linked project, parsed from `railway status --json`.
-# Railway nests them at environments[].serviceInstances[].serviceName.
+# ---------- services ----------
 list_service_names() {
   railway status --json 2>/dev/null \
-    | grep -oE '"serviceName"[[:space:]]*:[[:space:]]*"[^"]+"' \
-    | sed -E 's/.*"serviceName"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/' \
+    | jq -r --arg envname "$ENVIRONMENT_NAME" \
+      '.environments.edges[]
+       | select(.node.name == $envname)
+       | .node.serviceInstances.edges[].node.serviceName' \
     | sort -u
 }
 
@@ -145,17 +205,6 @@ ensure_service() {
   fi
 }
 
-# Switch the linked-service context. railway CLI v3+ accepts the name as an arg.
-link_service() {
-  railway service "$1" >/dev/null 2>&1 || {
-    # Some CLI versions require --service:
-    railway link --service "$1" >/dev/null 2>&1 || {
-      err "couldn't switch to service '$1' — run 'railway service' manually to debug"
-      return 1
-    }
-  }
-}
-
 # Common variables that every Subsquid service needs. The ${{Postgres.PG*}}
 # refs are interpolated by Railway at deploy time — keep them single-quoted.
 common_vars() {
@@ -192,11 +241,12 @@ apply_vars() {
     warn "no variables to set on $svc"
     return 0
   fi
-  link_service "$svc"
-  railway variables "${args[@]}" >/dev/null
+  railway variables --service "$svc" --environment "$ENVIRONMENT_NAME" "${args[@]}" >/dev/null
 }
 
 # All processor + api services share the secrets block; emit it on stdout.
+# Blank optional values are dropped by apply_vars, so an unset PORTAL_URL_*
+# leaves squid-utils on its default portal.
 secrets_block() {
   cat <<EOV
 RPC_ENDPOINT=${RPC_ENDPOINT}
@@ -204,6 +254,12 @@ RPC_BASE_ENDPOINT=${RPC_BASE_ENDPOINT}
 RPC_ARBITRUM_ENDPOINT=${RPC_ARBITRUM_ENDPOINT}
 RPC_SONIC_ENDPOINT=${RPC_SONIC_ENDPOINT}
 RPC_HYPEREVM_ENDPOINT=${RPC_HYPEREVM_ENDPOINT}
+SQD_API_KEY=${SQD_API_KEY}
+PORTAL_URL_ETHEREUM=${PORTAL_URL_ETHEREUM:-}
+PORTAL_URL_BASE=${PORTAL_URL_BASE:-}
+PORTAL_URL_SONIC=${PORTAL_URL_SONIC:-}
+PORTAL_URL_ARBITRUM=${PORTAL_URL_ARBITRUM:-}
+PORTAL_URL_HYPEREVM=${PORTAL_URL_HYPEREVM:-}
 NOTION_SECRET=${NOTION_SECRET:-}
 AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-}
 AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
@@ -213,14 +269,18 @@ EOV
 deploy_service() {
   local svc=$1
   log "Deploying $svc"
-  ( cd "$REPO_ROOT" && railway up --service "$svc" --detach )
+  ( cd "$REPO_ROOT" && railway up --service "$svc" --environment "$ENVIRONMENT_NAME" --detach )
 }
 
 # ---------- main ----------
 require_cli
-require_linked
 require_env_file
+require_environment_name
+require_linked
+ensure_environment
 confirm
+
+log "Environment: $ENVIRONMENT_NAME"
 
 ensure_postgres
 
@@ -246,14 +306,13 @@ log "Setting variables on api"
 } | apply_vars api
 
 log "Generating public domain for api"
-link_service api
-railway domain 2>&1 | sed "s/^/${c_dim}    /; s/$/${c_off}/" || \
-  warn "could not create domain — run 'railway domain' manually under the api service"
+railway domain --service api 2>&1 | sed "s/^/${c_dim}    /; s/$/${c_off}/" || \
+  warn "could not create domain — run 'railway domain --service api' with environment '$ENVIRONMENT_NAME' linked"
 
 deploy_service api
 
 log "Done. Useful follow-ups:"
-printf '  railway open                       # open the project in browser\n'
-printf '  railway logs --service api         # tail API logs\n'
-printf '  railway logs --service mainnet-processor\n'
-printf '  railway run --service api psql     # connect to Postgres via the API service env\n'
+printf '  railway open                                                 # open the project in browser\n'
+printf '  railway logs --service api --environment %s\n' "$ENVIRONMENT_NAME"
+printf '  railway logs --service mainnet-processor --environment %s\n' "$ENVIRONMENT_NAME"
+printf '  railway run --service api --environment %s psql   # connect to Postgres via the API service env\n' "$ENVIRONMENT_NAME"

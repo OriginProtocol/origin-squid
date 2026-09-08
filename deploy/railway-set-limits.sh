@@ -19,17 +19,20 @@
 #   PROCESSOR_MEMORY=8        (GB)
 #   API_VCPU=2
 #   API_MEMORY=4              (GB)
-#   ENVIRONMENT_NAME=production
+#   ENVIRONMENT_NAME=railway-v164   defaults to the current branch, must match railway-v<N>
 
 set -euo pipefail
 
 PROCESSORS=(mainnet oeth ogv ousd arbitrum base oethb sonic os hyperevm)
 
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+
 PROCESSOR_VCPU=${PROCESSOR_VCPU:-4}
 PROCESSOR_MEMORY=${PROCESSOR_MEMORY:-8}
 API_VCPU=${API_VCPU:-2}
 API_MEMORY=${API_MEMORY:-4}
-ENVIRONMENT_NAME=${ENVIRONMENT_NAME:-production}
+ENVIRONMENT_NAME=${ENVIRONMENT_NAME:-$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo unknown)}
 
 GQL_URL=https://backboard.railway.com/graphql/v2
 
@@ -41,6 +44,14 @@ err() { printf '%sERR%s %s\n' "$c_red" "$c_off" "$*" >&2; }
 for c in railway jq curl; do
   command -v "$c" >/dev/null || { err "$c is required"; exit 1; }
 done
+
+# Version environments are named after their branch (railway-vNN). Anything
+# else — production, the default environment, a typo — is refused outright.
+if ! printf '%s' "$ENVIRONMENT_NAME" | grep -qE '^railway-v[0-9]+$'; then
+  err "refusing to set limits on '$ENVIRONMENT_NAME': only version environments (railway-v<N>) are handled here"
+  err "check out a railway-v<N> branch, or set ENVIRONMENT_NAME=railway-v<N>"
+  exit 1
+fi
 
 if [ -z "${RAILWAY_API_TOKEN:-}" ]; then
   err "RAILWAY_API_TOKEN is required."
