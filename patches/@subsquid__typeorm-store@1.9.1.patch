@@ -1,0 +1,30 @@
+diff --git a/lib/database.js b/lib/database.js
+index c7296130b9572b02270d4d8c3ebfe69886b2e4c0..623c8433f2566835102aff9288973c793e9da13e 100644
+--- a/lib/database.js
++++ b/lib/database.js
+@@ -194,8 +194,8 @@ class TypeormDatabase {
+         // Orphan hot_block rows that have no sentinel/change-log entry —
+         // they did not go through insertHotBlock. The cascade FK on
+         // hot_change_log cleans up the (empty) child rows automatically.
+-        await em.query(`DELETE FROM ${schema}.hot_block
+-              WHERE height NOT IN (SELECT block_height FROM ${schema}.hot_change_log)`);
++        await em.query(`DELETE FROM ${schema}.hot_block b
++              WHERE NOT EXISTS (SELECT 1 FROM ${schema}.hot_change_log c WHERE c.block_height = b.height)`);
+         // Orphan template_registry rows whose height matches neither a
+         // finalized state nor any surviving hot_block.
+         await em.query(`DELETE FROM ${schema}.template_registry
+diff --git a/src/database.ts b/src/database.ts
+index 236f7f17aef7c1f5fa8a0727a864d0514aa949e4..e3f9f7e438cb53ae0d786dcec44bf24803898a64 100644
+--- a/src/database.ts
++++ b/src/database.ts
+@@ -310,8 +310,8 @@ export class TypeormDatabase {
+         // they did not go through insertHotBlock. The cascade FK on
+         // hot_change_log cleans up the (empty) child rows automatically.
+         await em.query(
+-            `DELETE FROM ${schema}.hot_block
+-              WHERE height NOT IN (SELECT block_height FROM ${schema}.hot_change_log)`
++            `DELETE FROM ${schema}.hot_block b
++              WHERE NOT EXISTS (SELECT 1 FROM ${schema}.hot_change_log c WHERE c.block_height = b.height)`
+         )
+ 
+         // Orphan template_registry rows whose height matches neither a
