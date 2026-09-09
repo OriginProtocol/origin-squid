@@ -1,20 +1,12 @@
-import { exec } from 'child_process'
-import { promisify } from 'util'
-
-const execAsync = promisify(exec)
-
-const PROCESSORS = [
-  'mainnet',
-  'oeth',
-  'ogv',
-  'ousd',
-  'arbitrum',
-  'base',
-  'oethb',
-  'sonic',
-  'os',
-  'hyperevm',
-] as const
+import {
+  AT_HEAD_MS,
+  PROCESSORS,
+  fetchLogProgress,
+  fetchStatuses,
+  formatDuration,
+  graphqlUrl,
+  pad,
+} from './squid-status'
 
 const TARGET = process.argv[2]
 if (!TARGET) {
@@ -24,112 +16,17 @@ if (!TARGET) {
   process.exit(2)
 }
 
-const GRAPHQL_URL = /^https?:\/\//.test(TARGET)
-  ? TARGET
-  : `https://origin.squids.live/origin-squid@${TARGET}/api/graphql`
-
-interface ProcessingStatus {
-  id: string
-  blockNumber: number
-  timestamp: string
-  startTimestamp: string
-  headTimestamp: string | null
-}
-
-async function fetchStatuses(): Promise<Map<string, ProcessingStatus>> {
-  const resp = await fetch(GRAPHQL_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: `{ processingStatuses(limit: 100) { id blockNumber timestamp startTimestamp headTimestamp } }`,
-    }),
-  })
-  if (!resp.ok) throw new Error(`GraphQL ${resp.status}: ${await resp.text()}`)
-  const json = (await resp.json()) as { data?: { processingStatuses: ProcessingStatus[] }; errors?: unknown[] }
-  if (json.errors) throw new Error(`GraphQL errors: ${JSON.stringify(json.errors)}`)
-  return new Map(json.data!.processingStatuses.map((s) => [s.id, s]))
-}
-
-interface LogProgress {
-  current: number
-  total: number
-  pct: number
-  rate: string
-  eta: string
-}
-
-// Parses lines like:
-//   27700701 / 45578674, rate: 990 blocks/sec, mapping: 1652 blocks/sec, 5 items/sec, eta: 5h 2m
-const PROGRESS_RE = /(\d+)\s*\/\s*(\d+),\s*rate:\s*(\d+).*?eta:\s*(.+?)\s*$/
-
-async function fetchLogProgress(serviceName: string): Promise<LogProgress | null> {
-  // Some services (mainnet, base) emit thousands of log lines per second; the
-  // CLI's initial buffer dump can take 10-15 s. Cap the wait so one slow
-  // service doesn't starve others.
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 20_000)
-  try {
-    const { stdout } = await execAsync(
-      `railway logs --service ${serviceName} --json 2>/dev/null | tail -500`,
-      { maxBuffer: 50 * 1024 * 1024, signal: controller.signal },
-    )
-    const lines = stdout.trim().split('\n').reverse()
-    for (const raw of lines) {
-      let msg = ''
-      try {
-        msg = (JSON.parse(raw) as { message?: string }).message ?? ''
-      } catch {
-        msg = raw
-      }
-      const m = msg.match(PROGRESS_RE)
-      if (m) {
-        const [, current, total, rate, eta] = m
-        const cur = Number(current)
-        const tot = Number(total)
-        return {
-          current: cur,
-          total: tot,
-          pct: tot > 0 ? (cur / tot) * 100 : 0,
-          rate: `${rate} blk/s`,
-          eta,
-        }
-      }
-    }
-  } catch {
-    // timeout, CLI missing, or service not found — fall through
-  } finally {
-    clearTimeout(timer)
-  }
-  return null
-}
-
-function formatDuration(ms: number): string {
-  if (ms < 0) return '0s'
-  const s = Math.floor(ms / 1000)
-  if (s < 60) return `${s}s`
-  const m = Math.floor(s / 60)
-  if (m < 60) return `${m}m`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ${m % 60}m`
-  const d = Math.floor(h / 24)
-  return `${d}d ${h % 24}h`
-}
-
-function pad(s: string, len: number) {
-  return s.length >= len ? s : s + ' '.repeat(len - s.length)
-}
+const GRAPHQL_URL = graphqlUrl(TARGET)
 
 async function main() {
   console.log(`Querying: ${GRAPHQL_URL}`)
   console.log()
 
-  const statuses = await fetchStatuses()
+  const statuses = await fetchStatuses(GRAPHQL_URL)
   const now = Date.now()
 
   // Fetch log progress for everyone in parallel — we'll only use it for catching-up rows.
-  const progressPromises = new Map(
-    PROCESSORS.map((p) => [p, fetchLogProgress(`${p}-processor`)] as const),
-  )
+  const progressPromises = new Map(PROCESSORS.map((p) => [p, fetchLogProgress(`${p}-processor`)] as const))
 
   const rows: Array<{ name: string; status: string; block: string; behind: string; pct: string; rate: string; eta: string }> = []
 
@@ -141,7 +38,7 @@ async function main() {
     }
     const blockTime = Date.parse(s.timestamp)
     const behindMs = now - blockTime
-    const isAtHead = s.headTimestamp != null && behindMs < 5 * 60 * 1000
+    const isAtHead = s.headTimestamp != null && behindMs < AT_HEAD_MS
 
     let rate = '-'
     let eta = '-'
