@@ -43,8 +43,9 @@ export class DBDumpManager {
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
+      max: 2, // clients are acquired serially; every processor opens this pool at boot
       connectionTimeoutMillis: 60000, // 60 seconds to establish connection
-      idleTimeoutMillis: 600000, // 10 minutes before closing idle connections
+      idleTimeoutMillis: 30000,
       query_timeout: 1800000, // 30 minutes for long-running queries
       statement_timeout: 1800000, // 30 minutes server-side statement timeout
     })
