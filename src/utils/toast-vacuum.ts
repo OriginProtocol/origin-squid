@@ -75,8 +75,9 @@ export function startToastVacuumMonitor(): void {
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
+    max: 2, // clients are acquired serially; this pool lives for the process lifetime
     connectionTimeoutMillis: 60000,
-    idleTimeoutMillis: 600000,
+    idleTimeoutMillis: 30000,
     query_timeout: 3600000, // 1 hour — VACUUM FULL can take a while
     statement_timeout: 3600000,
   })
