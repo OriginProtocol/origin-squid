@@ -8,6 +8,8 @@ import { createGunzip } from 'zlib'
 
 import { GetObjectCommand, GetObjectCommandOutput, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3'
 
+import { bucketName, createObjectStoreClient } from './object-store'
+
 interface DumpInfo {
   processorName: string
   blockHeight: number
@@ -50,19 +52,8 @@ export class DBDumpManager {
       statement_timeout: 1800000, // 30 minutes server-side statement timeout
     })
 
-    this.s3Client = new S3Client({
-      region: 'us-east-1',
-      ...(process.env.AWS_ACCESS_KEY_ID
-        ? {
-            credentials: {
-              accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-            },
-          }
-        : { profile: 'origin' }),
-    })
-
-    this.BUCKET_NAME = 'origin-squid'
+    this.s3Client = createObjectStoreClient()
+    this.BUCKET_NAME = bucketName
   }
 
   async listAvailableDumps(): Promise<DumpInfo[]> {

@@ -5,6 +5,7 @@ import { SquidProcessor, chainConfigs, createPortalClient, run, runPortal } from
 import { withPortalCache } from '../polyfills/portal-cache'
 import { setupRpcCache } from '../polyfills/rpc-cache'
 import { setupRpcRetryEmpty } from '../polyfills/rpc-retry-empty'
+import { seedCaches } from './cache-seed'
 import { DBDumpManager } from './db-dump-manager'
 
 /**
@@ -65,12 +66,19 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
   // Must precede setupRpcCache so the cache only ever sees settled results —
   // a transient empty `0x` recorded to disk replays forever.
   setupRpcRetryEmpty()
-  setupRpcCache(processor.stateSchema)
-  const dumpsReachable = !!process.env.AWS_ACCESS_KEY_ID
-  if (!dumpsReachable) {
-    console.log('No AWS credentials; skipping database dump restore')
+  const objectStoreReachable = !!process.env.AWS_ACCESS_KEY_ID
+  if (objectStoreReachable) {
+    await seedCaches(processor.stateSchema)
+  } else {
+    console.log('No object store credentials; skipping cache seed and database dump restore')
   }
-  if (dumpsReachable && process.env.NODE_ENV !== 'development' && !process.env.BLOCK_FROM && !process.env.BLOCK_TO) {
+  setupRpcCache(processor.stateSchema)
+  if (
+    objectStoreReachable &&
+    process.env.NODE_ENV !== 'development' &&
+    !process.env.BLOCK_FROM &&
+    !process.env.BLOCK_TO
+  ) {
     const blockHeight = await checkAndRestoreDump(processor.stateSchema)
     if (blockHeight) {
       console.log(`Starting processor from block height ${blockHeight}`)

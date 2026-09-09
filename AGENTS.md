@@ -54,6 +54,12 @@ pnpm run serve
   (`run()`) instead of the Portal SDK (`runPortal()`). Defaults to Sonic's id, which has
   no real-time Portal dataset. Set it to roll a container back onto the old path without
   a code change; set it empty to put every chain on the Portal.
+- `BUCKET_NAME` / `BUCKET_REGION` / `BUCKET_ENDPOINT` - the S3-compatible bucket holding
+  database dumps and cache backups. Defaults are the AWS `origin-squid` bucket in
+  `us-east-1`; set `BUCKET_ENDPOINT` to point at another provider's bucket.
+- `CACHE_SEED=true` - on boot, download `cache/{rpc,portal}/<processor>.sqlite` from that
+  bucket into the cache dirs when the local files are missing. Best-effort; a failure just
+  means a cold cache.
 
 ### Working against an unreleased `@originprotocol/squid-utils`
 
