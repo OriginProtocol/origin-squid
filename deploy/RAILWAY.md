@@ -179,14 +179,17 @@ Each release runs in its own environment, named after its branch (`railway-v164`
 
 ```bash
 bash deploy/railway-hibernate.sh railway-v164   # api, processors, then Postgres
-bash deploy/railway-wake.sh railway-v164        # Postgres, wait for it, processors, then api
+git checkout railway-v164
+bash deploy/railway-wake.sh railway-v164        # Postgres, wait for it, then rebuild processors and api
 ```
 
 Both scripts refuse any environment not named `railway-v<N>`, and check that Postgres, every `<chain>-processor` and `api` exist in it before touching anything.
 
-The invariant they rely on: **removing a deployment stops the container but keeps the service, its variables and its volume**; billing drops to volume storage. Only `railway service delete` or `railway environment delete` lose data. Waking redeploys the removed deployment, so processors resume from their committed height and catch up the gap. If Railway has since garbage-collected the old deployment, wake falls back to `railway up` from the working tree for processors and the api, and requires the checkout to be on the branch that matches the environment name; Postgres has no source here and must then be redeployed from the dashboard's deployment history.
+The invariant they rely on: **removing a deployment stops the container but keeps the service, its variables and its volume**; billing drops to volume storage. Only `railway service delete` or `railway environment delete` lose data. On wake, processors resume from their committed height and catch up the gap.
 
-`railway redeploy` has no `--environment` flag, so wake links the target environment while it runs and relinks the previous one on exit.
+Waking **rebuilds** processors and the api with `railway up` from the working tree, so the checked-out branch must equal the environment name or the script refuses before touching anything. `railway redeploy` on a service stopped with `railway down` rebuilds an arbitrary earlier deployment (observed: the very first bootstrap upload), so it is not used for app services. Each service uploads and builds once; the script does not wait for builds, so expect the environment to be serving again after a normal build cycle, not immediately. Watch progress with `railway deployment list --service <svc> -e railway-v164`.
+
+Postgres is an image service with no source here, so it is redeployed, not rebuilt: `railway redeploy`, then `railway redeploy --from-source`, and if both fail the script stops and points at the dashboard's deployment history. `railway redeploy` has no `--environment` flag, so wake links the target environment while it runs and relinks the previous one on exit.
 
 ## Adding a new processor later
 

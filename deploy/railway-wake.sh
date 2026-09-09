@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
 # Restart every service in a Railway environment stopped by
-# deploy/railway-hibernate.sh. Redeploys each service's latest deployment;
-# volumes and variables were never touched, so processors resume from their
-# committed height.
+# deploy/railway-hibernate.sh. Volumes and variables were never touched, so
+# processors resume from their committed height.
 #
-# `railway redeploy` has no --environment flag, so the script links the target
-# environment for its duration and relinks the previous one on exit.
+# Invariant: processors and the api are rebuilt with `railway up` from the
+# working tree, and the checked-out branch must equal the environment name.
+# `railway redeploy` on a service stopped with `railway down` rebuilds an
+# arbitrary earlier deployment (observed: the very first bootstrap upload, with
+# a Dockerfile since fixed), so the only version this script can vouch for is
+# the branch the environment is named after. Expect a wake to take as long as
+# a build.
+#
+# Postgres is an image service with no source here, so it is the one service
+# that is redeployed rather than rebuilt. `railway redeploy` has no
+# --environment flag, so the script links the target environment for its
+# duration and relinks the previous one on exit.
 #
 # Usage:
 #   bash deploy/railway-wake.sh <environment>      # e.g. railway-v164
@@ -83,6 +92,17 @@ if [ "${#missing[@]}" -gt 0 ]; then
   exit 1
 fi
 
+require_matching_checkout() {
+  local branch
+  branch=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo unknown)
+  if [ "$branch" != "$ENVIRONMENT_NAME" ]; then
+    err "refusing to rebuild from branch '$branch' into environment '$ENVIRONMENT_NAME'"
+    err "check out '$ENVIRONMENT_NAME' and re-run; nothing was changed"
+    return 1
+  fi
+}
+require_matching_checkout || exit 1
+
 # ---- environment link ----
 strip_ansi() { sed -E "s/$(printf '\033')\[[0-9;]*m//g"; }
 
@@ -148,11 +168,20 @@ wait_for_postgres() {
   return 1
 }
 
-# Postgres is an image service with no source in this repo, so `railway up`
-# can never rebuild it; if the removed deployment cannot be redeployed, the
-# only remaining path is the dashboard's deployment history.
+print_cli_failure() {
+  local rc=$1 out=$2
+  if [ -n "$out" ]; then
+    printf '%s\n' "$out" >&2
+  else
+    printf '    (no output from the CLI)\n' >&2
+  fi
+  printf '    exit code %s\n' "$rc" >&2
+}
+
+# `railway up` can never rebuild Postgres; if the removed deployment cannot be
+# redeployed, the only remaining path is the dashboard's deployment history.
 start_postgres() {
-  local out
+  local out rc=0
   log "Starting $POSTGRES_SERVICE"
   if out=$(redeploy "$POSTGRES_SERVICE"); then
     printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
@@ -160,45 +189,30 @@ start_postgres() {
     return 0
   fi
   warn "redeploy failed ($out); retrying from the configured image"
-  if out=$(railway redeploy --service "$POSTGRES_SERVICE" --yes --from-source 2>&1); then
+  out=$(railway redeploy --service "$POSTGRES_SERVICE" --yes --from-source 2>&1) || rc=$?
+  if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
     started+=("$POSTGRES_SERVICE")
     return 0
   fi
   err "could not start $POSTGRES_SERVICE:"
-  printf '%s\n' "$out" >&2
+  print_cli_failure "$rc" "$out"
   err "redeploy it from the deployment history in the Railway dashboard, then re-run this script"
   return 1
 }
 
-# The `railway up` fallback builds from the working tree, so it is only a
-# faithful restart when the checkout is the version this environment runs.
-require_matching_checkout() {
-  local branch
-  branch=$(git -C "$REPO_ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo unknown)
-  if [ "$branch" != "$ENVIRONMENT_NAME" ]; then
-    err "refusing to rebuild from branch '$branch' into environment '$ENVIRONMENT_NAME'"
-    err "check out '$ENVIRONMENT_NAME' and re-run"
-    return 1
-  fi
-}
-
-start_service() {
-  local svc=$1 out
-  log "Starting $svc"
-  if out=$(redeploy "$svc"); then
-    printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
-    started+=("$svc")
-    return 0
-  fi
-  warn "redeploy failed ($out); rebuilding with 'railway up' instead"
-  require_matching_checkout || { failed+=("$svc"); return 0; }
-  if out=$( cd "$REPO_ROOT" && railway up --detach --service "$svc" --environment "$ENVIRONMENT_NAME" 2>&1 ); then
+# --detach returns once the upload is accepted; builds run on Railway's side
+# and overlap across services.
+rebuild_service() {
+  local svc=$1 out rc=0
+  log "Rebuilding $svc"
+  out=$( cd "$REPO_ROOT" && railway up --detach --service "$svc" --environment "$ENVIRONMENT_NAME" 2>&1 ) || rc=$?
+  if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
     rebuilt+=("$svc")
   else
-    err "failed to start $svc:"
-    printf '%s\n' "$out" >&2
+    err "failed to rebuild $svc:"
+    print_cli_failure "$rc" "$out"
     failed+=("$svc")
   fi
 }
@@ -210,9 +224,9 @@ log "Environment: $ENVIRONMENT_NAME"
 start_postgres
 wait_for_postgres
 for p in "${PROCESSORS[@]}"; do
-  start_service "${p}-processor"
+  rebuild_service "${p}-processor"
 done
-start_service api
+rebuild_service api
 
 echo
 log "Summary: started ${#started[@]} (${started[*]:-none}); rebuilt ${#rebuilt[@]} (${rebuilt[*]:-none}); failed ${#failed[@]} (${failed[*]:-none})"
@@ -220,3 +234,4 @@ if [ "${#failed[@]}" -gt 0 ]; then
   err "some services could not be started; see errors above"
   exit 1
 fi
+log "Builds are running on Railway; watch with: railway deployment list --service <svc> --environment $ENVIRONMENT_NAME"

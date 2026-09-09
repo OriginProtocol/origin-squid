@@ -80,9 +80,10 @@ skipped=()
 failed=()
 
 stop_service() {
-  local svc=$1 out
+  local svc=$1 out rc=0
   log "Stopping $svc"
-  if out=$(railway down --service "$svc" --environment "$ENVIRONMENT_NAME" --yes 2>&1); then
+  out=$(railway down --service "$svc" --environment "$ENVIRONMENT_NAME" --yes 2>&1) || rc=$?
+  if [ "$rc" -eq 0 ]; then
     printf '%s\n' "$out" | sed "s/^/${c_dim}    /; s/$/${c_off}/"
     stopped+=("$svc")
   elif printf '%s' "$out" | grep -qiE 'no (active |recent )?deployment'; then
@@ -90,7 +91,12 @@ stop_service() {
     skipped+=("$svc")
   else
     err "failed to stop $svc:"
-    printf '%s\n' "$out" >&2
+    if [ -n "$out" ]; then
+      printf '%s\n' "$out" >&2
+    else
+      printf '    (no output from the CLI)\n' >&2
+    fi
+    printf '    exit code %s\n' "$rc" >&2
     failed+=("$svc")
   fi
 }
