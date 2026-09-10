@@ -7,6 +7,11 @@
 # deploys inside it. Idempotent: re-running adjusts variables and redeploys
 # without duplicating services.
 #
+# Processors with no database dump also get a persistent volume mounted at
+# /app/.cache and the RPC/Portal cache seed switched on, so a fresh environment
+# downloads the cache SQLite files from the object store once and keeps them
+# across redeploys. Volume size is dashboard-only; the CLI cannot set it.
+#
 # Prerequisites (one-time, must be done by hand because they need a browser):
 #   1. Install the Railway CLI:    https://docs.railway.com/develop/cli
 #   2. railway login
@@ -28,6 +33,11 @@
 set -euo pipefail
 
 PROCESSORS=(mainnet oeth ogv ousd arbitrum base oethb sonic os hyperevm)
+
+# Processors that ship no database dump: a cold sync is only fast if the RPC
+# and Portal caches survive, so these get a volume and the cache seed.
+CACHE_PROCESSORS=(mainnet ogv arbitrum base sonic)
+CACHE_MOUNT_PATH=/app/.cache
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
@@ -151,6 +161,7 @@ confirm() {
   printf '\n%s\n' "About to bootstrap Railway environment '$ENVIRONMENT_NAME' with:"
   printf '  - Postgres plugin\n'
   printf '  - %d processor services (%s)\n' "${#PROCESSORS[@]}" "${PROCESSORS[*]}"
+  printf '  - a %s volume on %d of them (%s)\n' "$CACHE_MOUNT_PATH" "${#CACHE_PROCESSORS[@]}" "${CACHE_PROCESSORS[*]}"
   printf '  - 1 API service (with public domain)\n\n'
   read -rp "Continue? [y/N] " ans
   [[ "$ans" =~ ^[Yy]$ ]] || { log "aborted"; exit 0; }
@@ -200,6 +211,31 @@ ensure_service() {
     log "Created service: $name"
   else
     err "failed to create service '$name':"
+    printf '%s\n' "$out" >&2
+    return 1
+  fi
+}
+
+# A service holds at most one volume, and `railway volume add` fails outright on
+# one that already has it. The -s/-e flags belong to `railway volume`, so they
+# go ahead of the subcommand; `add` takes no size flag — resizing is
+# dashboard-only.
+service_volume_exists() {
+  railway volume -e "$ENVIRONMENT_NAME" list --json 2>/dev/null \
+    | jq -e --arg n "$1" 'any(.volumes[]?; .serviceName == $n)' >/dev/null
+}
+
+ensure_volume() {
+  local name=$1 mount=$2
+  if service_volume_exists "$name"; then
+    log "Volume exists: $name"
+    return 0
+  fi
+  local out
+  if out=$(railway volume -s "$name" -e "$ENVIRONMENT_NAME" add -m "$mount" 2>&1); then
+    log "Created volume: $name at $mount"
+  else
+    err "failed to create volume on '$name':"
     printf '%s\n' "$out" >&2
     return 1
   fi
@@ -266,6 +302,20 @@ AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
 EOV
 }
 
+is_cache_processor() {
+  printf '%s\n' "${CACHE_PROCESSORS[@]}" | grep -qFx "$1"
+}
+
+cache_vars() {
+  cat <<EOV
+RPC_CACHE=true
+PORTAL_CACHE=true
+CACHE_SEED=true
+RPC_CACHE_DIR=${CACHE_MOUNT_PATH}/rpc
+PORTAL_CACHE_DIR=${CACHE_MOUNT_PATH}/portal
+EOV
+}
+
 deploy_service() {
   local svc=$1
   log "Deploying $svc"
@@ -287,12 +337,16 @@ ensure_postgres
 for p in "${PROCESSORS[@]}"; do
   svc="${p}-processor"
   ensure_service "$svc"
+  if is_cache_processor "$p"; then
+    ensure_volume "$svc" "$CACHE_MOUNT_PATH"
+  fi
   log "Setting variables on $svc"
   {
     common_vars
     secrets_block
     printf 'SERVICE_ROLE=processor\n'
     printf 'PROCESSOR_NAME=%s\n' "$p"
+    if is_cache_processor "$p"; then cache_vars; fi
   } | apply_vars "$svc"
   deploy_service "$svc"
 done
