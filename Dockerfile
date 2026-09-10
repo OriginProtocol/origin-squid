@@ -23,15 +23,20 @@ COPY patches ./patches
 ARG NODE_AUTH_TOKEN
 # Note: no `--mount=type=cache` here — Railway's BuildKit rejects custom cache
 # IDs without their internal cacheKey prefix. Docker layer caching still applies.
-# `.npmrc` sets ignore-scripts=true, which suppresses install scripts even for the
-# packages pnpm-workspace.yaml allows to build, so better-sqlite3's binding is
-# compiled explicitly. The check opens a database rather than requiring the module:
-# the binding loads on `new Database`, so a bare require() passes without it.
 RUN printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> .npmrc \
   && pnpm install --frozen-lockfile \
-  && npm_config_ignore_scripts=false pnpm rebuild better-sqlite3 \
-  && node -e "new (require('better-sqlite3'))(':memory:')" \
   && sed -i '/_authToken/d' .npmrc
+
+# better-sqlite3 publishes no prebuilt binary for node 20 on linux/x64, and
+# `pnpm rebuild` silently declines to run its install script while `.npmrc` sets
+# ignore-scripts=true, so node-gyp is invoked directly. The check opens a database
+# rather than requiring the module: the binding loads on `new Database`, so a bare
+# require() succeeds without it and hides a missing binding until runtime.
+RUN BS="$(node -p "require('path').dirname(require.resolve('better-sqlite3/package.json'))")" \
+  && cd "$BS" \
+  && npx --yes node-gyp rebuild --release \
+  && cd /app \
+  && node -e "new (require('better-sqlite3'))(':memory:')"
 
 # Copy the rest of the source and build.
 COPY tsconfig.json commands.json ./
