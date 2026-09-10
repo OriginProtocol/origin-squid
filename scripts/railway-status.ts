@@ -3,47 +3,25 @@ import { promisify } from 'util'
 
 import {
   AT_HEAD_MS,
+  CleanError,
   PROCESSORS,
   ProcessingStatus,
+  RailwayServiceInstance,
+  apiGraphqlUrl,
   fetchLogProgress,
   fetchStatuses,
   formatCount,
   formatDuration,
   pad,
   padStart,
+  railwayProject,
+  resolveEnvironment,
 } from './squid-status'
 
 const execAsync = promisify(exec)
 
-interface RailwayDeployment {
-  id: string
-  status: string
-  createdAt: string
-  deploymentStopped?: boolean
-  instances?: { id: string; status: string }[] | null
-}
-
-interface RailwayServiceInstance {
-  serviceName: string
-  latestDeployment?: RailwayDeployment | null
-  activeDeployments?: RailwayDeployment[] | null
-  domains?: { serviceDomains?: { domain: string }[]; customDomains?: { domain: string }[] } | null
-}
-
-interface RailwayEnvironment {
-  name: string
-  serviceInstances?: { edges: { node: RailwayServiceInstance }[] } | null
-}
-
-interface RailwayProject {
-  name: string
-  environments: { edges: { node: RailwayEnvironment }[] }
-}
-
 const FAILURE_STATUSES = new Set(['FAILED', 'CRASHED'])
 const IDLE_STATUSES = new Set(['REMOVED', 'REMOVING', 'SKIPPED'])
-
-class CleanError extends Error {}
 
 const ESC = String.fromCharCode(27)
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR
@@ -54,24 +32,6 @@ const yellow = color('33')
 const dim = color('2')
 const bold = color('1')
 
-async function railwayProject(): Promise<RailwayProject> {
-  let stdout: string
-  try {
-    ;({ stdout } = await execAsync('railway status --json', { maxBuffer: 32 * 1024 * 1024 }))
-  } catch (err) {
-    const stderr = (err as { stderr?: string }).stderr?.trim()
-    if ((err as { code?: string }).code === 'ENOENT') {
-      throw new CleanError('railway CLI not found — install it with `brew install railway`')
-    }
-    throw new CleanError(`railway status failed: ${stderr || (err as Error).message}`)
-  }
-  try {
-    return JSON.parse(stdout) as RailwayProject
-  } catch {
-    throw new CleanError(`could not parse \`railway status --json\` output:\n${stdout.trim()}`)
-  }
-}
-
 async function currentBranch(): Promise<string> {
   try {
     const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD')
@@ -79,20 +39,6 @@ async function currentBranch(): Promise<string> {
   } catch {
     throw new CleanError('no environment given and the current git branch could not be read')
   }
-}
-
-/** `v164` and `railway-v164` both name the `railway-v164` environment. */
-function resolveEnvironment(project: RailwayProject, requested: string): RailwayEnvironment {
-  const environments = project.environments.edges.map((e) => e.node)
-  const match =
-    environments.find((e) => e.name === requested) ?? environments.find((e) => e.name === `railway-${requested}`)
-  if (!match) {
-    throw new CleanError(
-      `no environment named "${requested}" in project ${project.name}\n` +
-        `available: ${environments.map((e) => e.name).join(', ')}`,
-    )
-  }
-  return match
 }
 
 interface DeployState {
@@ -117,12 +63,6 @@ function deployState(service: RailwayServiceInstance): DeployState {
     failed: false,
     hibernated: false,
   }
-}
-
-function apiGraphqlUrl(services: RailwayServiceInstance[]): string | null {
-  const api = services.find((s) => s.serviceName === 'api')
-  const domain = api?.domains?.customDomains?.[0]?.domain ?? api?.domains?.serviceDomains?.[0]?.domain
-  return domain ? `https://${domain}/graphql` : null
 }
 
 interface IndexingCells {

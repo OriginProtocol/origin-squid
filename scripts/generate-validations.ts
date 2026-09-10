@@ -10,20 +10,18 @@ import { IStrategyData } from '../src/templates/strategy'
 import { addresses } from '../src/utils/addresses'
 import { baseAddresses } from '../src/utils/addresses-base'
 import { sonicAddresses } from '../src/utils/addresses-sonic'
+import { CleanError, resolveGraphqlUrl } from './squid-status'
 
 const LIMIT = 1000
 
 const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
 
 const TARGET = process.argv[2]
-const GRAPHQL_URL = /^https?:\/\//.test(TARGET)
-  ? TARGET
-  : `https://origin.squids.live/origin-squid@${TARGET}/api/graphql`
 
 const gql = (query: string) => query
 
-const executeQuery = async (query: string) => {
-  const response = await fetch(GRAPHQL_URL, {
+const executeQuery = async (url: string, query: string) => {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1254,7 +1252,10 @@ const getFilePathForEntity = (entityKey: string): string => {
 
 const main = async () => {
   const filter = process.argv[3]?.toLowerCase()
-  console.log(`Generating validations for: ${TARGET}${filter ? ` (filter: ${filter})` : ''}`)
+  const url = await resolveGraphqlUrl(TARGET)
+  console.log(
+    `Generating validations for: ${TARGET}${url === TARGET ? '' : ` (${url})`}${filter ? ` (filter: ${filter})` : ''}`,
+  )
 
   const entitiesDir = path.join(__dirname, '../entities')
   if (!filter) {
@@ -1326,7 +1327,7 @@ const main = async () => {
     const fn = async () => {
       const query = queries[i]
       console.log(`Executing: \`${query.replace(/(\n|\s)+/g, ' ').slice(0, 80)}\`...`)
-      const result = await retry(() => executeQuery(query), 5)
+      const result = await retry(() => executeQuery(url, query), 5)
       if (!result.data) {
         console.log(result)
         throw new Error('Query failed')
@@ -1377,4 +1378,11 @@ const main = async () => {
   console.log('\n✓ All validation files generated successfully')
 }
 
-main()
+main().catch((err) => {
+  if (err instanceof CleanError) {
+    console.error(err.message)
+    process.exit(2)
+  }
+  console.error(err)
+  process.exit(1)
+})

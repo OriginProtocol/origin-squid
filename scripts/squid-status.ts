@@ -29,8 +29,85 @@ export interface ProcessingStatus {
   headTimestamp: string | null
 }
 
+export class CleanError extends Error {}
+
+export interface RailwayDeployment {
+  id: string
+  status: string
+  createdAt: string
+  deploymentStopped?: boolean
+  instances?: { id: string; status: string }[] | null
+}
+
+export interface RailwayServiceInstance {
+  serviceName: string
+  latestDeployment?: RailwayDeployment | null
+  activeDeployments?: RailwayDeployment[] | null
+  domains?: { serviceDomains?: { domain: string }[]; customDomains?: { domain: string }[] } | null
+}
+
+export interface RailwayEnvironment {
+  name: string
+  serviceInstances?: { edges: { node: RailwayServiceInstance }[] } | null
+}
+
+export interface RailwayProject {
+  name: string
+  environments: { edges: { node: RailwayEnvironment }[] }
+}
+
+export async function railwayProject(): Promise<RailwayProject> {
+  let stdout: string
+  try {
+    ;({ stdout } = await execAsync('railway status --json', { maxBuffer: 32 * 1024 * 1024 }))
+  } catch (err) {
+    const stderr = (err as { stderr?: string }).stderr?.trim()
+    if ((err as { code?: string }).code === 'ENOENT') {
+      throw new CleanError('railway CLI not found — install it with `brew install railway`')
+    }
+    throw new CleanError(`railway status failed: ${stderr || (err as Error).message}`)
+  }
+  try {
+    return JSON.parse(stdout) as RailwayProject
+  } catch {
+    throw new CleanError(`could not parse \`railway status --json\` output:\n${stdout.trim()}`)
+  }
+}
+
+/** `v164` and `railway-v164` both name the `railway-v164` environment. */
+export function resolveEnvironment(project: RailwayProject, requested: string): RailwayEnvironment {
+  const environments = project.environments.edges.map((e) => e.node)
+  const match =
+    environments.find((e) => e.name === requested) ?? environments.find((e) => e.name === `railway-${requested}`)
+  if (!match) {
+    throw new CleanError(
+      `no environment named "${requested}" in project ${project.name}\n` +
+        `available: ${environments.map((e) => e.name).join(', ')}`,
+    )
+  }
+  return match
+}
+
+export function apiGraphqlUrl(services: RailwayServiceInstance[]): string | null {
+  const api = services.find((s) => s.serviceName === 'api')
+  const domain = api?.domains?.customDomains?.[0]?.domain ?? api?.domains?.serviceDomains?.[0]?.domain
+  return domain ? `https://${domain}/graphql` : null
+}
+
 export function graphqlUrl(target: string): string {
   return /^https?:\/\//.test(target) ? target : `https://origin.squids.live/origin-squid@${target}/api/graphql`
+}
+
+/**
+ * Same as `graphqlUrl`, plus `railway-v164` — the api service of that Railway environment.
+ * Only the `railway-` prefix goes to Railway; `164` and `v164` are SQD Cloud slot tags.
+ */
+export async function resolveGraphqlUrl(target: string): Promise<string> {
+  if (!/^railway-/.test(target)) return graphqlUrl(target)
+  const environment = resolveEnvironment(await railwayProject(), target)
+  const url = apiGraphqlUrl((environment.serviceInstances?.edges ?? []).map((e) => e.node))
+  if (!url) throw new CleanError(`environment ${environment.name} has no api domain`)
+  return url
 }
 
 export async function fetchStatuses(url: string): Promise<Map<string, ProcessingStatus>> {

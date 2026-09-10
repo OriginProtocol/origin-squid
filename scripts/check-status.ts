@@ -1,28 +1,29 @@
 import {
   AT_HEAD_MS,
+  CleanError,
   PROCESSORS,
   fetchLogProgress,
   fetchStatuses,
   formatDuration,
-  graphqlUrl,
   pad,
+  resolveGraphqlUrl,
 } from './squid-status'
 
 const TARGET = process.argv[2]
 if (!TARGET) {
   console.error('usage: pnpm run check-status <graphql-url-or-version>')
   console.error('       pnpm run check-status https://api-production-d3fd.up.railway.app/graphql')
+  console.error('       pnpm run check-status railway-v164')
   console.error('       pnpm run check-status 999')
   process.exit(2)
 }
 
-const GRAPHQL_URL = graphqlUrl(TARGET)
-
 async function main() {
-  console.log(`Querying: ${GRAPHQL_URL}`)
+  const url = await resolveGraphqlUrl(TARGET)
+  console.log(`Querying: ${url}`)
   console.log()
 
-  const statuses = await fetchStatuses(GRAPHQL_URL)
+  const statuses = await fetchStatuses(url)
   const now = Date.now()
 
   // Fetch log progress for everyone in parallel — we'll only use it for catching-up rows.
@@ -83,6 +84,10 @@ async function main() {
 }
 
 main().catch((err) => {
+  if (err instanceof CleanError) {
+    console.error(err.message)
+    process.exit(2)
+  }
   console.error(err)
   process.exit(1)
 })

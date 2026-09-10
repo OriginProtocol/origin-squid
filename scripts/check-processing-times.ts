@@ -1,16 +1,15 @@
 import fs from 'fs'
 
+import { CleanError, resolveGraphqlUrl } from './squid-status'
+
 const LIMIT = 1000
 
 const TARGET = process.argv[2]
-const GRAPHQL_URL = /^https?:\/\//.test(TARGET)
-  ? TARGET
-  : `https://origin.squids.live/origin-squid@${TARGET}/api/graphql`
 
 const gql = (query: string) => query
 
-const executeQuery = async <T>(query: string): Promise<T> => {
-  const response = await fetch(GRAPHQL_URL, {
+const executeQuery = async <T>(url: string, query: string): Promise<T> => {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,7 +29,8 @@ const executeQuery = async <T>(query: string): Promise<T> => {
 }
 
 const main = async () => {
-  console.log(`Checking processing times for: ${TARGET}`)
+  const url = await resolveGraphqlUrl(TARGET)
+  console.log(`Checking processing times for: ${TARGET}${url === TARGET ? '' : ` (${url})`}`)
   const result = await executeQuery<{
     data: {
       processingStatuses: {
@@ -42,6 +42,7 @@ const main = async () => {
       }[]
     }
   }>(
+    url,
     gql(`
     query MyQuery {
       processingStatuses(limit: 10, orderBy: id_ASC) {
@@ -67,4 +68,11 @@ const main = async () => {
   fs.writeFileSync(`processing-times.log`, output)
 }
 
-main()
+main().catch((err) => {
+  if (err instanceof CleanError) {
+    console.error(err.message)
+    process.exit(2)
+  }
+  console.error(err)
+  process.exit(1)
+})

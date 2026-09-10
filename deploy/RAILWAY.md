@@ -124,6 +124,16 @@ railway domain --service api   # prints the public URL
 # open https://<domain>/graphql in a browser
 ```
 
+The post-deploy checks find that domain themselves, given the environment name:
+
+```bash
+pnpm run postdeploy railway-v164   # this environment's api service
+pnpm run postdeploy 164            # the SQD Cloud slot tagged 164
+pnpm run postdeploy https://api-railway-v164.up.railway.app/graphql
+```
+
+Only a `railway-` prefix goes to Railway — a bare `164` or `v164` is an SQD Cloud slot tag. `pnpm run check-status` takes the same three forms.
+
 ---
 
 ## Avoiding a multi-week catch-up
