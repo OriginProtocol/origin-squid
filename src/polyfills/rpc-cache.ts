@@ -19,10 +19,13 @@
  *   RPC_CACHE_MEM_ENTRIES      default 10_000
  *   RPC_CACHE_LOG_INTERVAL     seconds; 0 disables (default 30)
  */
-import { CallOptions, RpcClient } from '@subsquid/rpc-client'
-import { RpcCall } from '@subsquid/rpc-client/src/interfaces'
 import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
+
+import { CallOptions, RpcClient } from '@subsquid/rpc-client'
+import { RpcCall } from '@subsquid/rpc-client/src/interfaces'
+
+import { envEnabled } from '../utils/env'
 
 /** Methods whose result is immutable per chain — cache unconditionally. */
 const CACHE_FOREVER = new Set([
@@ -98,9 +101,7 @@ function openSqlite(path: string): SqliteStore {
   db.pragma('journal_mode = WAL')
   db.pragma('synchronous = NORMAL')
   const getStmt = db.prepare('SELECT response FROM rpc_cache WHERE key = ?')
-  const setStmt = db.prepare(
-    'INSERT OR REPLACE INTO rpc_cache (key, method, response, created_at) VALUES (?, ?, ?, ?)',
-  )
+  const setStmt = db.prepare('INSERT OR REPLACE INTO rpc_cache (key, method, response, created_at) VALUES (?, ?, ?, ?)')
   return {
     get(key: string): unknown | undefined {
       const row = getStmt.get(key) as { response: string } | undefined
@@ -197,7 +198,7 @@ let initialized = false
  * stays stable for the life of the process.
  */
 export function setupRpcCache(stateSchema: string): void {
-  if (!process.env.RPC_CACHE || process.env.RPC_CACHE === 'false' || process.env.RPC_CACHE === '0') {
+  if (!envEnabled('RPC_CACHE')) {
     return
   }
   if (initialized) {
@@ -236,11 +237,7 @@ export function setupRpcCache(stateSchema: string): void {
 
   // Decide if a single (method, params) should hit the cache. Returns the
   // key when cacheable, or null when not. The block-depth check is async.
-  const tryCacheKey = async (
-    client: RpcClient,
-    method: string,
-    params: unknown,
-  ): Promise<string | null> => {
+  const tryCacheKey = async (client: RpcClient, method: string, params: unknown): Promise<string | null> => {
     if (CACHE_FOREVER.has(method)) return cacheKey(method, params)
     const idx = BLOCK_PARAM_INDEX[method]
     if (idx === undefined) return null
@@ -302,15 +299,13 @@ export function setupRpcCache(stateSchema: string): void {
     return result
   }
 
-  RpcClient.prototype.batchCall = async function <T = any>(
-    batch: RpcCall[],
-    options?: CallOptions<T>,
-  ): Promise<T[]> {
+  RpcClient.prototype.batchCall = async function <T = any>(batch: RpcCall[], options?: CallOptions<T>): Promise<T[]> {
     // Resolve cache keys + lookups for every call up front. Anything that
     // missed gets forwarded as a smaller batch; results are spliced back
     // into the original positions before returning.
-    const slots: Array<{ kind: 'hit'; value: T } | { kind: 'miss'; key: string; method: string } | { kind: 'pass'; method: string }> =
-      new Array(batch.length)
+    const slots: Array<
+      { kind: 'hit'; value: T } | { kind: 'miss'; key: string; method: string } | { kind: 'pass'; method: string }
+    > = new Array(batch.length)
     for (let i = 0; i < batch.length; i++) {
       const { method, params } = batch[i]
       const key = await tryCacheKey(this, method, params)

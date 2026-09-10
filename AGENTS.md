@@ -58,8 +58,9 @@ pnpm run serve
   database dumps and cache backups. Defaults are the AWS `origin-squid` bucket in
   `us-east-1`; set `BUCKET_ENDPOINT` to point at another provider's bucket.
 - `CACHE_SEED=true` - on boot, download `cache/{rpc,portal}/<processor>.sqlite` from that
-  bucket into the cache dirs when the local files are missing. Best-effort; a failure just
-  means a cold cache.
+  bucket into the cache dirs when the local files are missing. Only seeds a cache that is
+  itself on (`RPC_CACHE`, `PORTAL_CACHE`). Best-effort; a failure just means a cold cache.
+  `pnpm run cache:backup` (`scripts/cache-s3.ts`) is what writes those objects.
 
 ### Working against an unreleased `@originprotocol/squid-utils`
 

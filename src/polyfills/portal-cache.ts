@@ -39,6 +39,7 @@ import zlib from 'node:zlib'
 import { PortalClient, PortalStreamData } from '@subsquid/portal-client'
 
 import { bigintJsonParse, bigintJsonStringify } from '../utils/bigintJson'
+import { envEnabled } from '../utils/env'
 
 // zstd is faster + smaller than gzip; available in Node 22+. Fall back
 // to gzip so this works on older Node too. Compression target is the
@@ -291,7 +292,7 @@ let initialized = false
  * the process.
  */
 export function withPortalCache<T extends PortalClient>(client: T, stateSchema: string): T {
-  if (!process.env.PORTAL_CACHE || process.env.PORTAL_CACHE === 'false' || process.env.PORTAL_CACHE === '0') {
+  if (!envEnabled('PORTAL_CACHE')) {
     return client
   }
   if (initialized) {

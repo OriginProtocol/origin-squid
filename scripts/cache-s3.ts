@@ -1,63 +1,63 @@
 /**
- * Back up the local portal/rpc caches to S3 and restore them back.
+ * Back up the local portal/rpc caches to the object store and restore them back.
  *
  * The caches (`.portal-cache`, `.rpc-cache`) are per-processor SQLite files
  * named `<processor>.sqlite`. They only accelerate the historic-load phase
- * and are append-only, so S3 is just a durable backup / share point for the
- * dev box that generates DB dumps — NOT a deployment dependency.
+ * and are append-only, so the bucket is a durable backup / share point — and
+ * the source a processor's own `CACHE_SEED` step pulls from on a cold start.
  *
- * Everything goes through the `aws` CLI (metadata via `s3api` with JSON
- * output, transfers via `s3 cp`). That's deliberate: the CLI resolves
- * whatever credential mechanism is active in your shell — including custom
- * `aws login` setups the JS SDK can't understand — so if `aws s3 ls` works
- * in your console, this tool works too. No `--profile` needed unless you
- * want to override the ambient config.
+ * Bucket, region, endpoint and credentials come from `src/utils/object-store`,
+ * so this writes to exactly the bucket the seed reads (`BUCKET_NAME`,
+ * `BUCKET_REGION`, `BUCKET_ENDPOINT`).
  *
  * Layout:
- *   .portal-cache/<processor>.sqlite  <->  s3://origin-squid/cache/portal/<processor>.sqlite
- *   .rpc-cache/<processor>.sqlite     <->  s3://origin-squid/cache/rpc/<processor>.sqlite
+ *   .portal-cache/<processor>.sqlite  <->  <bucket>/cache/portal/<processor>.sqlite
+ *   .rpc-cache/<processor>.sqlite     <->  <bucket>/cache/rpc/<processor>.sqlite
  *
  * Usage:
- *   tsx scripts/cache-s3.ts backup  [processor] [--cache portal|rpc|all] [--profile <aws>] [-y] [--dry-run]
- *   tsx scripts/cache-s3.ts restore [processor] [--cache portal|rpc|all] [--profile <aws>] [-y] [--force] [--dry-run]
- *   tsx scripts/cache-s3.ts list    [processor] [--cache portal|rpc|all] [--profile <aws>]
+ *   ts-node scripts/cache-s3.ts backup  [processor] [--cache portal|rpc|all] [--profile <aws>] [-y] [--dry-run]
+ *   ts-node scripts/cache-s3.ts restore [processor] [--cache portal|rpc|all] [--profile <aws>] [-y] [--force] [--dry-run]
+ *   ts-node scripts/cache-s3.ts list    [processor] [--cache portal|rpc|all] [--profile <aws>]
  *
  *   processor   e.g. oeth-processor. Omit to operate on every cache found
- *               (locally for backup, in S3 for restore).
+ *               (locally for backup, in the bucket for restore).
  *   --cache     which cache(s) to act on (default: all).
- *   --profile   AWS CLI profile to pass through (default: ambient config).
+ *   --profile   AWS shared-config profile to authenticate with; overrides the
+ *               default credential choice (`AWS_ACCESS_KEY_ID` if set, else
+ *               `AWS_PROFILE`, else the `origin` profile).
  *   -y/--yes    skip the overwrite confirmation (restore) and the
  *               running-processor warning (backup).
- *   --force     restore: overwrite local even when it looks newer than S3.
+ *   --force     restore: overwrite local even when it looks newer than the bucket.
  *   --dry-run   print what would happen, transfer nothing.
  *
  * Restore NEVER overwrites a local cache without confirmation — the local
- * copy is almost always more up to date than S3. In a non-interactive shell
- * it skips existing files unless -y/--force is passed.
+ * copy is almost always more up to date than the bucket. In a non-interactive
+ * shell it skips existing files unless -y/--force is passed.
  */
-import { spawn } from 'child_process'
 import 'dotenv/config'
 import * as fs from 'fs'
 import * as path from 'path'
 import { createInterface } from 'readline'
 
-const BUCKET = 'origin-squid'
+import { HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 
-interface CacheKind {
-  name: 'portal' | 'rpc'
-  dir: string
-  prefix: string // s3 prefix, e.g. cache/portal/
-}
+import {
+  CacheLocation,
+  bucketName,
+  cacheLocations,
+  createObjectStoreClient,
+  downloadToFile,
+} from '../src/utils/object-store'
 
-const CACHES: Record<'portal' | 'rpc', CacheKind> = {
-  portal: { name: 'portal', dir: process.env.PORTAL_CACHE_DIR ?? '.portal-cache', prefix: 'cache/portal/' },
-  rpc: { name: 'rpc', dir: process.env.RPC_CACHE_DIR ?? '.rpc-cache', prefix: 'cache/rpc/' },
-}
+const CACHES = Object.fromEntries(cacheLocations().map((cache) => [cache.name, cache])) as Record<
+  'portal' | 'rpc',
+  CacheLocation
+>
 
 interface Args {
   command: 'backup' | 'restore' | 'list'
   processor?: string
-  caches: CacheKind[]
+  caches: CacheLocation[]
   awsProfile?: string
   assumeYes: boolean
   force: boolean
@@ -129,38 +129,12 @@ function fmtDate(d?: Date): string {
   return d ? d.toISOString().replace('T', ' ').slice(0, 19) + ' UTC' : '—'
 }
 
-/** Prepend the `aws` argv with `--profile` when one was requested. */
-function withProfile(args: string[], awsProfile?: string): string[] {
-  return awsProfile ? [...args, '--profile', awsProfile] : args
+function cacheKey(cache: CacheLocation, processor: string): string {
+  return `${cache.prefix}${processor}.sqlite`
 }
 
-interface AwsResult {
-  code: number
-  stdout: string
-  stderr: string
-}
-
-/** Run the `aws` CLI, capturing stdout/stderr (or streaming when `inherit`). */
-function runAws(args: string[], opts: { inherit?: boolean } = {}): Promise<AwsResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn('aws', args, {
-      stdio: opts.inherit ? 'inherit' : ['ignore', 'pipe', 'pipe'],
-    })
-    let stdout = ''
-    let stderr = ''
-    if (!opts.inherit) {
-      child.stdout!.on('data', (d: Buffer) => (stdout += d.toString()))
-      child.stderr!.on('data', (d: Buffer) => (stderr += d.toString()))
-    }
-    child.on('error', (err: any) => {
-      if (err?.code === 'ENOENT') {
-        reject(new Error('The AWS CLI (`aws`) is required but was not found on PATH.'))
-      } else {
-        reject(err)
-      }
-    })
-    child.on('close', (code) => resolve({ code: code ?? 0, stdout, stderr }))
-  })
+function objectUrl(key: string): string {
+  return `s3://${bucketName}/${key}`
 }
 
 interface RemoteInfo {
@@ -168,36 +142,38 @@ interface RemoteInfo {
   lastModified?: Date
 }
 
-async function headRemote(key: string, awsProfile?: string): Promise<RemoteInfo | null> {
-  const { code, stdout, stderr } = await runAws(
-    withProfile(['s3api', 'head-object', '--bucket', BUCKET, '--key', key, '--output', 'json'], awsProfile),
-  )
-  if (code !== 0) {
-    if (/\b404\b|Not Found|NoSuchKey/i.test(stderr)) return null
-    throw new Error(`aws s3api head-object failed for ${key}: ${stderr.trim()}`)
-  }
-  const j = JSON.parse(stdout)
-  return { size: j.ContentLength ?? 0, lastModified: j.LastModified ? new Date(j.LastModified) : undefined }
+function isNotFound(err: unknown): boolean {
+  const e = err as { name?: string; $metadata?: { httpStatusCode?: number } }
+  return e?.$metadata?.httpStatusCode === 404 || e?.name === 'NotFound' || e?.name === 'NoSuchKey'
 }
 
-async function listRemoteProcessors(cache: CacheKind, awsProfile?: string): Promise<string[]> {
-  const { code, stdout, stderr } = await runAws(
-    withProfile(['s3api', 'list-objects-v2', '--bucket', BUCKET, '--prefix', cache.prefix, '--output', 'json'], awsProfile),
-  )
-  if (code !== 0) {
-    throw new Error(`aws s3api list-objects-v2 failed: ${stderr.trim()}`)
+async function headRemote(client: S3Client, key: string): Promise<RemoteInfo | null> {
+  try {
+    const head = await client.send(new HeadObjectCommand({ Bucket: bucketName, Key: key }))
+    return { size: head.ContentLength ?? 0, lastModified: head.LastModified }
+  } catch (err) {
+    if (isNotFound(err)) return null
+    throw new Error(`head-object failed for ${key}: ${(err as Error).message}`)
   }
-  // An empty prefix yields empty stdout with exit 0.
-  const j = stdout.trim() ? JSON.parse(stdout) : {}
+}
+
+async function listRemoteProcessors(client: S3Client, cache: CacheLocation): Promise<string[]> {
   const out: string[] = []
-  for (const obj of j.Contents ?? []) {
-    const base = (obj.Key as string)?.slice(cache.prefix.length)
-    if (base && base.endsWith('.sqlite')) out.push(base.replace(/\.sqlite$/, ''))
-  }
+  let continuationToken: string | undefined
+  do {
+    const page = await client.send(
+      new ListObjectsV2Command({ Bucket: bucketName, Prefix: cache.prefix, ContinuationToken: continuationToken }),
+    )
+    for (const object of page.Contents ?? []) {
+      const base = object.Key?.slice(cache.prefix.length)
+      if (base && base.endsWith('.sqlite')) out.push(base.replace(/\.sqlite$/, ''))
+    }
+    continuationToken = page.IsTruncated ? page.NextContinuationToken : undefined
+  } while (continuationToken)
   return out
 }
 
-function listLocalProcessors(cache: CacheKind): string[] {
+function listLocalProcessors(cache: CacheLocation): string[] {
   if (!fs.existsSync(cache.dir)) return []
   return fs
     .readdirSync(cache.dir)
@@ -217,11 +193,22 @@ async function promptYesNo(message: string): Promise<boolean> {
   }
 }
 
-async function awsCp(src: string, dst: string, awsProfile?: string): Promise<void> {
-  const args = withProfile(['s3', 'cp', src, dst], awsProfile)
-  console.log(`  aws ${args.join(' ')}`)
-  const { code } = await runAws(args, { inherit: true })
-  if (code !== 0) throw new Error(`aws s3 cp failed (exit ${code})`)
+/**
+ * Upload the `.sqlite` alone — the `-wal`/`-shm` sidecars are worthless away
+ * from the machine that wrote them, and `checkpointWal` has already folded the
+ * WAL's contents into the file. `ContentLength` is required for a stream body.
+ */
+async function uploadFile(client: S3Client, localPath: string, key: string): Promise<void> {
+  const size = fs.statSync(localPath).size
+  console.log(`  uploading ${fmtBytes(size)} to ${objectUrl(key)}`)
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: fs.createReadStream(localPath),
+      ContentLength: size,
+    }),
+  )
 }
 
 /**
@@ -243,18 +230,14 @@ function checkpointWal(filePath: string): boolean {
   return true
 }
 
-function s3Url(cache: CacheKind, processor: string): string {
-  return `s3://${BUCKET}/${cache.prefix}${processor}.sqlite`
-}
-
-async function resolveProcessors(args: Args, cache: CacheKind): Promise<string[]> {
+async function resolveProcessors(client: S3Client, args: Args, cache: CacheLocation): Promise<string[]> {
   if (args.processor) return [args.processor]
-  return args.command === 'backup' ? listLocalProcessors(cache) : await listRemoteProcessors(cache, args.awsProfile)
+  return args.command === 'backup' ? listLocalProcessors(cache) : await listRemoteProcessors(client, cache)
 }
 
-async function runBackup(args: Args) {
+async function runBackup(client: S3Client, args: Args) {
   for (const cache of args.caches) {
-    const processors = await resolveProcessors(args, cache)
+    const processors = await resolveProcessors(client, args, cache)
     if (processors.length === 0) {
       console.log(`[${cache.name}] no local caches found in ${cache.dir}`)
       continue
@@ -268,7 +251,7 @@ async function runBackup(args: Args) {
 
       console.log(`\n[${cache.name}] ${processor}`)
       console.log(`  local:  ${localPath} (${fmtBytes(fs.statSync(localPath).size)})`)
-      const remote = await headRemote(`${cache.prefix}${processor}.sqlite`, args.awsProfile)
+      const remote = await headRemote(client, cacheKey(cache, processor))
       console.log(`  remote: ${remote ? `${fmtBytes(remote.size)} @ ${fmtDate(remote.lastModified)}` : '(none)'}`)
 
       if (args.dryRun) {
@@ -285,24 +268,25 @@ async function runBackup(args: Args) {
           continue
         }
       }
-      await awsCp(localPath, s3Url(cache, processor), args.awsProfile)
+      await uploadFile(client, localPath, cacheKey(cache, processor))
       console.log('  uploaded')
     }
   }
 }
 
-async function runRestore(args: Args) {
+async function runRestore(client: S3Client, args: Args) {
   for (const cache of args.caches) {
-    const processors = await resolveProcessors(args, cache)
+    const processors = await resolveProcessors(client, args, cache)
     if (processors.length === 0) {
       console.log(`[${cache.name}] nothing to restore`)
       continue
     }
     for (const processor of processors) {
       const localPath = path.join(cache.dir, `${processor}.sqlite`)
-      const remote = await headRemote(`${cache.prefix}${processor}.sqlite`, args.awsProfile)
+      const key = cacheKey(cache, processor)
+      const remote = await headRemote(client, key)
       if (!remote) {
-        console.warn(`[${cache.name}] ${processor}: not found in S3; skipping`)
+        console.warn(`[${cache.name}] ${processor}: not found at ${objectUrl(key)}; skipping`)
         continue
       }
 
@@ -314,15 +298,17 @@ async function runRestore(args: Args) {
         const stat = fs.statSync(localPath)
         const localNewer = stat.mtime > (remote.lastModified ?? new Date(0))
         console.log(`  local:  ${localPath} (${fmtBytes(stat.size)} @ ${fmtDate(stat.mtime)})`)
-        console.log(`  ${localNewer ? 'Local looks NEWER than S3.' : 'S3 looks newer than local.'}`)
+        console.log(`  ${localNewer ? 'Local looks NEWER than the bucket.' : 'The bucket looks newer than local.'}`)
 
         // Local is the source of truth — never clobber it silently.
         if (!args.force && !args.assumeYes) {
           if (!process.stdin.isTTY) {
-            console.warn('  non-interactive shell: refusing to overwrite local. Pass -y or --force to override. Skipping.')
+            console.warn(
+              '  non-interactive shell: refusing to overwrite local. Pass -y or --force to override. Skipping.',
+            )
             continue
           }
-          const ok = await promptYesNo(`  Overwrite local cache with the S3 copy? [y/N]: `)
+          const ok = await promptYesNo(`  Overwrite local cache with the stored copy? [y/N]: `)
           if (!ok) {
             console.log('  kept local')
             continue
@@ -335,23 +321,17 @@ async function runRestore(args: Args) {
         continue
       }
 
-      fs.mkdirSync(cache.dir, { recursive: true })
-      await awsCp(s3Url(cache, processor), localPath, args.awsProfile)
-      // Drop any stale WAL/SHM so the freshly downloaded db isn't shadowed
-      // by leftover journal files from the previous local copy.
-      for (const sfx of ['-wal', '-shm']) {
-        const p = `${localPath}${sfx}`
-        if (fs.existsSync(p)) fs.rmSync(p)
-      }
+      console.log(`  downloading ${objectUrl(key)}`)
+      await downloadToFile(client, key, localPath)
       console.log('  restored')
     }
   }
 }
 
-async function runList(args: Args) {
+async function runList(client: S3Client, args: Args) {
   for (const cache of args.caches) {
-    console.log(`\n[${cache.name}] s3://${BUCKET}/${cache.prefix}`)
-    const remoteProcs = args.processor ? [args.processor] : await listRemoteProcessors(cache, args.awsProfile)
+    console.log(`\n[${cache.name}] ${objectUrl(cache.prefix)}`)
+    const remoteProcs = args.processor ? [args.processor] : await listRemoteProcessors(client, cache)
     const localProcs = new Set(listLocalProcessors(cache))
     const all = new Set([...remoteProcs, ...localProcs])
     if (all.size === 0) {
@@ -359,7 +339,7 @@ async function runList(args: Args) {
       continue
     }
     for (const processor of [...all].sort()) {
-      const remote = await headRemote(`${cache.prefix}${processor}.sqlite`, args.awsProfile)
+      const remote = await headRemote(client, cacheKey(cache, processor))
       const localPath = path.join(cache.dir, `${processor}.sqlite`)
       const local = fs.existsSync(localPath) ? fs.statSync(localPath) : null
       console.log(
@@ -373,9 +353,14 @@ async function runList(args: Args) {
 
 async function main() {
   const args = parseArgs()
-  if (args.command === 'backup') await runBackup(args)
-  else if (args.command === 'restore') await runRestore(args)
-  else await runList(args)
+  const client = createObjectStoreClient({ profile: args.awsProfile })
+  try {
+    if (args.command === 'backup') await runBackup(client, args)
+    else if (args.command === 'restore') await runRestore(client, args)
+    else await runList(client, args)
+  } finally {
+    client.destroy()
+  }
 }
 
 main().catch((err) => {
