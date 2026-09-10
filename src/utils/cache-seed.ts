@@ -22,7 +22,10 @@ import { CacheLocation, bucketName, cacheLocations, createObjectStoreClient, dow
 
 async function seedCache(client: S3Client, cache: CacheLocation, stateSchema: string): Promise<void> {
   const destination = join(cache.dir, `${stateSchema}.sqlite`)
-  if (existsSync(destination)) return
+  if (existsSync(destination)) {
+    console.log(`[cache-seed ${stateSchema}] ${cache.name} cache already present at ${destination}`)
+    return
+  }
 
   const key = `${cache.prefix}${stateSchema}.sqlite`
   try {
@@ -36,10 +39,16 @@ async function seedCache(client: S3Client, cache: CacheLocation, stateSchema: st
 }
 
 export async function seedCaches(stateSchema: string): Promise<void> {
-  if (!envEnabled('CACHE_SEED')) return
+  if (!envEnabled('CACHE_SEED')) {
+    console.log(`[cache-seed ${stateSchema}] disabled (CACHE_SEED is not set)`)
+    return
+  }
 
   const caches = cacheLocations().filter((cache) => envEnabled(cache.enabledBy))
-  if (caches.length === 0) return
+  if (caches.length === 0) {
+    console.log(`[cache-seed ${stateSchema}] no cache enabled (RPC_CACHE, PORTAL_CACHE both off)`)
+    return
+  }
 
   const client = createObjectStoreClient()
   try {
