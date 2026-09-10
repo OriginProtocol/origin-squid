@@ -17,8 +17,14 @@ COPY patches ./patches
 ARG NODE_AUTH_TOKEN
 # Note: no `--mount=type=cache` here — Railway's BuildKit rejects custom cache
 # IDs without their internal cacheKey prefix. Docker layer caching still applies.
+# `.npmrc` sets ignore-scripts=true, which also suppresses the install scripts of
+# the packages `pnpm-workspace.yaml` lists under `allowBuilds`. better-sqlite3
+# needs its to fetch the native binding; without it the RPC and Portal caches
+# throw "Could not locate the bindings file" the moment they open.
 RUN printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> .npmrc \
   && pnpm install --frozen-lockfile \
+  && npm_config_ignore_scripts=false pnpm rebuild better-sqlite3 \
+  && node -e "require('better-sqlite3')" \
   && sed -i '/_authToken/d' .npmrc
 
 # Copy the rest of the source and build.
