@@ -7,6 +7,12 @@ ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
 
+# better-sqlite3 publishes no prebuilt binary for node 20 on linux/x64, so its
+# binding has to be compiled here. Only the builder needs the toolchain.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies first to maximize layer cache reuse.
@@ -17,8 +23,14 @@ COPY patches ./patches
 ARG NODE_AUTH_TOKEN
 # Note: no `--mount=type=cache` here — Railway's BuildKit rejects custom cache
 # IDs without their internal cacheKey prefix. Docker layer caching still applies.
+# `.npmrc` sets ignore-scripts=true, which suppresses install scripts even for the
+# packages pnpm-workspace.yaml allows to build, so better-sqlite3's binding is
+# compiled explicitly. The check opens a database rather than requiring the module:
+# the binding loads on `new Database`, so a bare require() passes without it.
 RUN printf '//npm.pkg.github.com/:_authToken=%s\n' "$NODE_AUTH_TOKEN" >> .npmrc \
   && pnpm install --frozen-lockfile \
+  && npm_config_ignore_scripts=false pnpm rebuild better-sqlite3 \
+  && node -e "new (require('better-sqlite3'))(':memory:')" \
   && sed -i '/_authToken/d' .npmrc
 
 # Copy the rest of the source and build.
@@ -51,15 +63,11 @@ COPY --from=builder /app/schema.graphql ./schema.graphql
 COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/commands.json ./commands.json
 COPY --from=builder /app/package.json ./package.json
-COPY pnpm-workspace.yaml .npmrc* ./
 
-# better-sqlite3's native binding does not survive the node_modules copy, so it is
-# fetched here rather than in the builder. `.npmrc` sets ignore-scripts=true, which
-# suppresses install scripts even for the packages pnpm-workspace.yaml allows to
-# build; without the binding the RPC and Portal caches throw "Could not locate the
-# bindings file" on open. The require() keeps that a build failure, not a crash loop.
-RUN npm_config_ignore_scripts=false pnpm rebuild better-sqlite3 \
-  && node -e "require('better-sqlite3')"
+# Fails the build if the compiled binding did not survive the node_modules copy;
+# without it the RPC and Portal caches throw "Could not locate the bindings file"
+# on their first open, which surfaces only as a restart loop at runtime.
+RUN node -e "new (require('better-sqlite3'))(':memory:')"
 
 RUN chmod +x scripts/run-with-backoff.sh scripts/serve.sh scripts/entrypoint.sh
 
