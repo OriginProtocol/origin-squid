@@ -7,10 +7,10 @@
 # deploys inside it. Idempotent: re-running adjusts variables and redeploys
 # without duplicating services.
 #
-# Processors with no database dump also get a persistent volume mounted at
-# /app/.cache and the RPC/Portal cache seed switched on, so a fresh environment
-# downloads the cache SQLite files from the object store once and keeps them
-# across redeploys. Volume size is dashboard-only; the CLI cannot set it.
+# Every processor gets a persistent volume mounted at /app/.cache and the
+# RPC/Portal cache seed switched on, so a fresh environment downloads the cache
+# SQLite files from the object store once and keeps them across redeploys.
+# Volume size is dashboard-only; the CLI cannot set it.
 #
 # Prerequisites (one-time, must be done by hand because they need a browser):
 #   1. Install the Railway CLI:    https://docs.railway.com/develop/cli
@@ -34,9 +34,6 @@ set -euo pipefail
 
 PROCESSORS=(mainnet oeth ogv ousd arbitrum base oethb sonic os hyperevm)
 
-# Processors that ship no database dump: a cold sync is only fast if the RPC
-# and Portal caches survive, so these get a volume and the cache seed.
-CACHE_PROCESSORS=(mainnet ogv arbitrum base sonic)
 CACHE_MOUNT_PATH=/app/.cache
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -161,7 +158,7 @@ confirm() {
   printf '\n%s\n' "About to bootstrap Railway environment '$ENVIRONMENT_NAME' with:"
   printf '  - Postgres plugin\n'
   printf '  - %d processor services (%s)\n' "${#PROCESSORS[@]}" "${PROCESSORS[*]}"
-  printf '  - a %s volume on %d of them (%s)\n' "$CACHE_MOUNT_PATH" "${#CACHE_PROCESSORS[@]}" "${CACHE_PROCESSORS[*]}"
+  printf '  - a %s volume on each of them\n' "$CACHE_MOUNT_PATH"
   printf '  - 1 API service (with public domain)\n\n'
   read -rp "Continue? [y/N] " ans
   [[ "$ans" =~ ^[Yy]$ ]] || { log "aborted"; exit 0; }
@@ -305,10 +302,9 @@ AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY:-}
 EOV
 }
 
-is_cache_processor() {
-  printf '%s\n' "${CACHE_PROCESSORS[@]}" | grep -qFx "$1"
-}
-
+# PORTAL_CACHE is set even on gateway-path chains, which never open that cache:
+# GATEWAY_CHAIN_IDS moves a chain onto the portal path without a redeploy, and
+# the seed itself is skipped at runtime where the cache can't be read.
 cache_vars() {
   cat <<EOV
 RPC_CACHE=true
@@ -340,16 +336,14 @@ ensure_postgres
 for p in "${PROCESSORS[@]}"; do
   svc="${p}-processor"
   ensure_service "$svc"
-  if is_cache_processor "$p"; then
-    ensure_volume "$svc" "$CACHE_MOUNT_PATH"
-  fi
+  ensure_volume "$svc" "$CACHE_MOUNT_PATH"
   log "Setting variables on $svc"
   {
     common_vars
     secrets_block
     printf 'SERVICE_ROLE=processor\n'
     printf 'PROCESSOR_NAME=%s\n' "$p"
-    if is_cache_processor "$p"; then cache_vars; fi
+    cache_vars
   } | apply_vars "$svc"
   deploy_service "$svc"
 done

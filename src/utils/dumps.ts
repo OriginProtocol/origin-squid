@@ -66,9 +66,11 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
   // Must precede setupRpcCache so the cache only ever sees settled results —
   // a transient empty `0x` recorded to disk replays forever.
   setupRpcRetryEmpty()
+  const chainId = processor.chainId ?? 1
+  const gatewayPath = gatewayChainIds.has(chainId)
   const objectStoreReachable = !!process.env.AWS_ACCESS_KEY_ID
   if (objectStoreReachable) {
-    await seedCaches(processor.stateSchema)
+    await seedCaches(processor.stateSchema, { portalCacheInUse: !gatewayPath })
   } else {
     console.log('No object store credentials; skipping cache seed and database dump restore')
   }
@@ -91,8 +93,7 @@ export async function initProcessorFromDump(processor: SquidProcessor) {
     }
   }
 
-  const chainId = processor.chainId ?? 1
-  if (gatewayChainIds.has(chainId)) {
+  if (gatewayPath) {
     console.log(`Gateway SDK path (chain ${chainId})`)
     return run(processor)
   }

@@ -5,9 +5,10 @@
  * `scripts/cache-s3.ts` writes the same layout in the other direction.
  *
  * Off by default; opt-in via `CACHE_SEED=true`, and only for caches that are
- * themselves on (`RPC_CACHE`, `PORTAL_CACHE`). Best-effort throughout: a
- * missing object, a failed transfer or a bad credential leaves the processor
- * with a cold cache rather than failing the boot.
+ * themselves on (`RPC_CACHE`, `PORTAL_CACHE`) and reachable from the SDK path
+ * the processor runs on. Best-effort throughout: a missing object, a failed
+ * transfer or a bad credential leaves the processor with a cold cache rather
+ * than failing the boot.
  *
  * Only seeds a cache whose local file is absent — the local copy is always at
  * least as fresh as the backup.
@@ -38,7 +39,10 @@ async function seedCache(client: S3Client, cache: CacheLocation, stateSchema: st
   }
 }
 
-export async function seedCaches(stateSchema: string): Promise<void> {
+export async function seedCaches(
+  stateSchema: string,
+  { portalCacheInUse }: { portalCacheInUse: boolean },
+): Promise<void> {
   if (!envEnabled('CACHE_SEED')) {
     console.log(`[cache-seed ${stateSchema}] disabled (CACHE_SEED is not set)`)
     return
@@ -53,6 +57,10 @@ export async function seedCaches(stateSchema: string): Promise<void> {
   const client = createObjectStoreClient()
   try {
     for (const cache of caches) {
+      if (cache.name === 'portal' && !portalCacheInUse) {
+        console.log(`[cache-seed ${stateSchema}] skipping portal cache, the gateway SDK path never opens it`)
+        continue
+      }
       await seedCache(client, cache, stateSchema)
     }
   } catch (err) {
