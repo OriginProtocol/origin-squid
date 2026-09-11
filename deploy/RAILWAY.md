@@ -37,7 +37,7 @@ The bootstrap targets the environment named after the current branch (override w
 3. Adds the **Postgres** plugin if it doesn't exist.
 4. For each of 10 processors (mainnet, oeth, ogv, ousd, arbitrum, base, oethb, sonic, os, hyperevm):
    - Creates a service named `<chain>-processor`.
-   - Adds a persistent volume at `/app/.cache` and sets the cache variables (see [Cache seeding](#cache-seeding)).
+   - For the processors listed in `CACHE_PROCESSORS`, adds a persistent volume at `/app/.cache` and sets the cache variables (see [Cache seeding](#cache-seeding)).
    - Sets shared variables (`DB_*` referencing `${{Postgres.PG*}}`, RPC URLs, common config) plus per-service `SERVICE_ROLE=processor` and `PROCESSOR_NAME=<chain>`.
    - Triggers a deploy with `railway up --service ... --environment ... --detach`.
 5. Creates the `api` service, sets variables (with `SERVICE_ROLE=api`), generates a public `*.up.railway.app` domain, and deploys.
@@ -152,15 +152,17 @@ pg_restore --no-owner --no-acl --jobs 4 \
 
 ## Cache seeding
 
-The RPC + Portal caches are per-processor SQLite files (`<schema>.sqlite`) that replay the historic chunks a previous run already fetched. Every processor gets them: one with no dump in the bucket syncs from its start block, and one restored from a dump still syncs from the dump height to head — cached processors were 36–95% faster on a full reload than uncached ones, which were flat (measured 2026-09-11).
+The RPC + Portal caches are per-processor SQLite files (`<schema>.sqlite`) that replay the historic chunks a previous run already fetched. `CACHE_PROCESSORS` in the bootstrap lists the processors that get them — `mainnet ogv arbitrum base sonic` — and is maintained by hand.
 
-Each processor service gets:
+The cut is block-range coverage. Cache keys are `(method, params)` and params carry the block number, so a seed only answers calls in the block range it was built over. A processor that syncs a large historical range reads most of its calls out of the seed; a processor that restores a dump and syncs only the recent tail asks for blocks no seed contains, and pays the seed download and the cache writes for nothing. Measured over a full reload on 2026-09-11: `base` (genesis→51M) 94.4% of 262k calls served from disk, `ousd` (dump at 25.4M, tail only) 31.7%, `os` (dump at 76M, syncing 76M→79M) 0.4%. The overhead is not free either: with seeding switched on, ousd's sync takes 28 minutes longer and the full reload 10.
+
+Each of those services gets:
 
 - a persistent volume mounted at `/app/.cache`,
 - `RPC_CACHE=true`, `PORTAL_CACHE=true`, `CACHE_SEED=true`,
 - `RPC_CACHE_DIR=/app/.cache/rpc`, `PORTAL_CACHE_DIR=/app/.cache/portal`.
 
-Only the chains on the Portal SDK path use both caches. A chain in `GATEWAY_CHAIN_IDS` (sonic by default, so `sonic-processor` and `os-processor`) runs `run()` instead of `runPortal()` and never opens the portal cache, so it caches over RPC alone; `PORTAL_CACHE` stays set there because that list is env-driven and a chain can move onto the portal path without a redeploy.
+Only the chains on the Portal SDK path use both caches. A chain in `GATEWAY_CHAIN_IDS` (sonic by default, so `sonic-processor`) runs `run()` instead of `runPortal()` and never opens the portal cache, so it caches over RPC alone; `PORTAL_CACHE` stays set there because that list is env-driven and a chain can move onto the portal path without a redeploy.
 
 On boot, `initProcessorFromDump` calls `seedCaches`, which downloads `cache/{rpc,portal}/<schema>.sqlite` from the object store — **skipping any cache whose local file already exists**, and skipping the portal seed outright on a gateway-path chain. The volume is what makes that skip meaningful: the download happens once per environment, and every later redeploy finds the files it left behind, including whatever the processor has appended since. Seeding is best-effort — a missing object, a bad credential or a failed transfer logs a warning and leaves the processor with a cold cache rather than failing the boot.
 
@@ -240,5 +242,5 @@ Postgres is an image service with no source here, so it is redeployed, not rebui
 ## Adding a new processor later
 
 1. Add `src/main-foo.ts` and corresponding `process:foo:prod` command (you'd do this for the squid regardless).
-2. Append `foo` to the `PROCESSORS=( ... )` array in `deploy/railway-bootstrap.sh`.
+2. Append `foo` to the `PROCESSORS=( ... )` array in `deploy/railway-bootstrap.sh`, and to `CACHE_PROCESSORS=( ... )` as well if it syncs a large historical block range rather than restoring a dump and following the tail.
 3. Re-run `bash deploy/railway-bootstrap.sh -y`.
