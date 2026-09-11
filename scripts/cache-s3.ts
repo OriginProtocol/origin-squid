@@ -39,7 +39,17 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { createInterface } from 'readline'
 
-import { HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import {
+  AbortMultipartUploadCommand,
+  CompleteMultipartUploadCommand,
+  CompletedPart,
+  CreateMultipartUploadCommand,
+  HeadObjectCommand,
+  ListObjectsV2Command,
+  PutObjectCommand,
+  S3Client,
+  UploadPartCommand,
+} from '@aws-sdk/client-s3'
 
 import {
   CacheLocation,
@@ -194,6 +204,13 @@ async function promptYesNo(message: string): Promise<boolean> {
 }
 
 /**
+ * S3 allows 10,000 parts of at least 5 MiB each (the last part may be smaller),
+ * so 128 MiB parts carry files up to 1.25 TiB. A file that fits in one part is
+ * sent as a single PutObject instead.
+ */
+const PART_SIZE = 128 * 1024 * 1024
+
+/**
  * Upload the `.sqlite` alone — the `-wal`/`-shm` sidecars are worthless away
  * from the machine that wrote them, and `checkpointWal` has already folded the
  * WAL's contents into the file. `ContentLength` is required for a stream body.
@@ -201,6 +218,10 @@ async function promptYesNo(message: string): Promise<boolean> {
 async function uploadFile(client: S3Client, localPath: string, key: string): Promise<void> {
   const size = fs.statSync(localPath).size
   console.log(`  uploading ${fmtBytes(size)} to ${objectUrl(key)}`)
+  if (size > PART_SIZE) {
+    await uploadMultipart(client, localPath, key, size)
+    return
+  }
   await client.send(
     new PutObjectCommand({
       Bucket: bucketName,
@@ -209,6 +230,65 @@ async function uploadFile(client: S3Client, localPath: string, key: string): Pro
       ContentLength: size,
     }),
   )
+}
+
+async function readExact(handle: fs.promises.FileHandle, buffer: Buffer, offset: number): Promise<void> {
+  let filled = 0
+  while (filled < buffer.length) {
+    const { bytesRead } = await handle.read(buffer, filled, buffer.length - filled, offset + filled)
+    if (bytesRead === 0) throw new Error(`unexpected end of file at byte ${offset + filled}`)
+    filled += bytesRead
+  }
+}
+
+/**
+ * Multi-GB bodies fail a single PutObject against the Railway bucket, which
+ * answers with an HTML error page the SDK can't deserialize. Each part is read
+ * into a buffer so the body length is exact and stays out of `aws-chunked`
+ * framing, which this endpoint doesn't decode. Any failure aborts the upload:
+ * parts left behind are billed but don't appear in an object listing.
+ */
+async function uploadMultipart(client: S3Client, localPath: string, key: string, size: number): Promise<void> {
+  const partCount = Math.ceil(size / PART_SIZE)
+  const { UploadId } = await client.send(new CreateMultipartUploadCommand({ Bucket: bucketName, Key: key }))
+  if (!UploadId) throw new Error(`create-multipart-upload returned no upload id for ${key}`)
+
+  const handle = await fs.promises.open(localPath, 'r')
+  try {
+    const parts: CompletedPart[] = []
+    for (let partNumber = 1; partNumber <= partCount; partNumber++) {
+      const offset = (partNumber - 1) * PART_SIZE
+      const buffer = Buffer.allocUnsafe(Math.min(PART_SIZE, size - offset))
+      await readExact(handle, buffer, offset)
+      const part = await client.send(
+        new UploadPartCommand({
+          Bucket: bucketName,
+          Key: key,
+          UploadId,
+          PartNumber: partNumber,
+          Body: buffer,
+          ContentLength: buffer.length,
+        }),
+      )
+      parts.push({ ETag: part.ETag, PartNumber: partNumber })
+      console.log(`  part ${partNumber}/${partCount} (${fmtBytes(buffer.length)})`)
+    }
+    await client.send(
+      new CompleteMultipartUploadCommand({
+        Bucket: bucketName,
+        Key: key,
+        UploadId,
+        MultipartUpload: { Parts: parts },
+      }),
+    )
+  } catch (err) {
+    await client
+      .send(new AbortMultipartUploadCommand({ Bucket: bucketName, Key: key, UploadId }))
+      .catch((abortErr) => console.warn(`  WARNING: abort of multipart upload ${UploadId} failed: ${abortErr.message}`))
+    throw err
+  } finally {
+    await handle.close()
+  }
 }
 
 /**
