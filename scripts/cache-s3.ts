@@ -51,13 +51,16 @@ import {
   UploadPartCommand,
 } from '@aws-sdk/client-s3'
 
+// The alias rather than a relative path into `src`: this script also runs inside
+// the deployed image, to publish a processor's live cache, and there only the
+// compiled `lib` exists (the entrypoint sets TS_NODE_BASEURL=./lib).
 import {
   CacheLocation,
   bucketName,
   cacheLocations,
   createObjectStoreClient,
   downloadToFile,
-} from '../src/utils/object-store'
+} from '@utils/object-store'
 
 const CACHES = Object.fromEntries(cacheLocations().map((cache) => [cache.name, cache])) as Record<
   'portal' | 'rpc',
