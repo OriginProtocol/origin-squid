@@ -20,8 +20,8 @@ import * as morphoAbi from '@abi/morpho'
 import { Block, Context, multicall, range } from '@originprotocol/squid-utils'
 import { ADDRESS_ZERO } from '@utils/addresses'
 
-import IRM_ABI_JSON_RAW from '../../abi-json/aave-lending-pool.json'
 import ERC20_ABI_JSON_RAW from '../../abi-json/erc20.json'
+import IRM_ABI_JSON_RAW from '../../abi-json/irm-adaptive-curve.json'
 import META_MORPHO_ABI_JSON_RAW from '../../abi-json/meta-morpho.json'
 import MORPHO_ABI_JSON_RAW from '../../abi-json/morpho.json'
 
