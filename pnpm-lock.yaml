@@ -23,8 +23,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       '@originprotocol/squid-utils':
-        specifier: 1.0.3
-        version: 1.0.3(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(prom-client@14.2.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: 1.0.5
+        version: 1.0.5(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(prom-client@14.2.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@subsquid/big-decimal':
         specifier: ^1.0.0
         version: 1.0.0
@@ -845,8 +845,8 @@ packages:
     resolution: {integrity: sha512-y7efHHwghQfk28G2z3tlZ67pLG0XdfYbcVG26r7YIXALRsrVQcTq4/tdenSmdOrEsNahIYA/eh8aEVROWGFUDg==}
     engines: {node: ^16.14.0 || >=18.0.0}
 
-  '@originprotocol/squid-utils@1.0.3':
-    resolution: {integrity: sha512-bDSLCJnDS9CkBiT+rQUegzRdCQWRp36Ti5M23fVrvllprebTpROui9SPFeFDU+vd9fdQVw7d1Vd9VxR4JasMEw==, tarball: https://npm.pkg.github.com/download/@originprotocol/squid-utils/1.0.3/26dfefcb75f71279a28d8e8bea29795131246135}
+  '@originprotocol/squid-utils@1.0.5':
+    resolution: {integrity: sha512-UwPBgYn1tOpzr8FE2LRaicUveu2nn84vJ4MN9W1dbaZbbZnmpUvKo84v9WODjBsCEJLGYpCIwfL5XdApn9keQw==, tarball: https://npm.pkg.github.com/download/@originprotocol/squid-utils/1.0.5/ad314c5f99b5c3f9caf66ef04d9ccb894a4ca5b7}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -4729,7 +4729,7 @@ snapshots:
       - bluebird
       - supports-color
 
-  '@originprotocol/squid-utils@1.0.3(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(prom-client@14.2.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@originprotocol/squid-utils@1.0.5(@subsquid/big-decimal@1.0.0)(bufferutil@4.0.9)(encoding@0.1.13)(prom-client@14.2.0)(typeorm@0.3.26(better-sqlite3@12.10.0)(ioredis@5.7.0)(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.19.126)(typescript@5.9.2)))(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@subsquid/archive-registry': 3.3.2(encoding@0.1.13)
       '@subsquid/batch-processor': 1.1.0(prom-client@14.2.0)

@@ -11,16 +11,21 @@ const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rate
 const useDailyExchangeRates = (ctx: Context) =>
   useProcessorState(ctx, 'exchange-rates-daily', new Map<string, ExchangeRateDaily>())
 
+// Several processors on the same chain upsert the same rows (e.g. os + sonic both write chain 146).
+// Upserting in a stable id order makes every transaction lock rows in the same order, so they
+// queue behind each other instead of deadlocking (40P01) and crash-looping the processor.
+const byId = <T extends { id: string }>(a: T, b: T) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+
 export const process = async (ctx: Context) => {
   const [rates] = useExchangeRates(ctx)
   if (rates.size > 0) {
     ctx.log.debug({ count: rates.size }, 'exchange-rates')
-    await ctx.store.upsert([...rates.values()])
+    await ctx.store.upsert([...rates.values()].sort(byId))
   }
   const [dailyRates] = useDailyExchangeRates(ctx)
   if (dailyRates.size > 0) {
     ctx.log.debug({ count: dailyRates.size }, 'exchange-rates-daily')
-    await ctx.store.upsert([...dailyRates.values()])
+    await ctx.store.upsert([...dailyRates.values()].sort(byId))
   }
 }
 
