@@ -69,7 +69,6 @@
     "viem": "^2.40.1"
   },
   "devDependencies": {
-    "@lavamoat/allow-scripts": "^3.3.4",
     "@subsquid/evm-abi": "1.0.0",
     "@subsquid/evm-codec": "1.0.0",
     "@subsquid/evm-typegen": "^5.0.0",
@@ -97,19 +96,5 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "~5.9.2"
-  },
-  "lavamoat": {
-    "allowScripts": {
-      "@lavamoat/preinstall-always-fail": false,
-      "@subsquid/evm-processor>@subsquid/rpc-client>websocket>es5-ext": false,
-      "@subsquid/evm-typegen>@subsquid/evm-abi>keccak256>keccak": false,
-      "@subsquid/graphql-server>@subsquid/apollo-server-core>@apollo/utils.usagereporting>@apollo/usage-reporting-protobuf>@apollo/protobufjs": false,
-      "@subsquid/graphql-server>@subsquid/apollo-server-core>apollo-reporting-protobuf>@apollo/protobufjs": false,
-      "esbuild": false,
-      "pg>pg-native>libpq": false,
-      "type-graphql": false,
-      "viem>ws>bufferutil": false,
-      "viem>ws>utf-8-validate": false
-    }
   }
 }
