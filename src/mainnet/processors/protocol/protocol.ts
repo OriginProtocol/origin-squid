@@ -23,6 +23,14 @@ import { ProductName, armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
 
+// TODO(oethb-v3): set to the UTC date (YYYY-MM-DD) of the Base block where governance proposal 008
+// removes the Bridged WOETH Strategy (see OETHB_V3_MIGRATION_END_BLOCK in src/base/strategies.ts).
+// The old strategy keeps writing balance rows after that, and its in-flight term comes back whenever
+// the V3 Master withdraws, so its balance must be ignored after this date.
+export const OETHB_V3_MIGRATION_END_DATE = undefined as string | undefined
+const isAfterOETHbV3Migration = (date: string) =>
+  OETHB_V3_MIGRATION_END_DATE !== undefined && date > OETHB_V3_MIGRATION_END_DATE
+
 export const protocolProcessor = defineProcessor({
   name: 'protocol',
   from: 15000000,
@@ -255,6 +263,17 @@ const getLatestStrategyBalance = async (ctx: Context, strategy: string, date: st
   })
 }
 
+// superOETHb's wOETH sits in the old Bridged WOETH Strategy and the V3 Master during the migration.
+// The old strategy counts migrated wOETH as in flight until Master reports it, so the sum is exact.
+const getSuperOETHbWOETHBalance = async (ctx: Context, date: string) => {
+  const [oldStrategy, master] = await Promise.all([
+    getLatestStrategyBalance(ctx, baseAddresses.superOETHb.strategies.bridgedWOETH, date),
+    getLatestStrategyBalance(ctx, baseAddresses.superOETHb.strategies.crossChainV3Master, date),
+  ])
+  const oldEth = isAfterOETHbV3Migration(date) ? 0n : (oldStrategy?.balanceETH ?? 0n)
+  return oldEth + (master?.balanceETH ?? 0n)
+}
+
 const calculateOTokenBasicStats = async (
   ctx: Context,
   detail: ProtocolDailyStatDetail,
@@ -281,12 +300,7 @@ const calculateOTokenBasicStats = async (
   } else if (detail.product === 'superOETHb') {
     // Prefer in-memory OETH data computed earlier in this run to avoid races
     const detailOETH = opts?.oethCacheByDate?.[date] ?? (await getProtocolDailyStatDetail(ctx, date, 'OETH'))
-    const superOETHbWrappedOETH = await getLatestStrategyBalance(
-      ctx,
-      baseAddresses.superOETHb.strategies.bridgedWOETH,
-      date,
-    )
-    const woethBalance = superOETHbWrappedOETH?.balanceETH ?? 0n
+    const woethBalance = await getSuperOETHbWOETHBalance(ctx, date)
     detail.bridgedTvl = woethBalance
     const oethTvl = detailOETH?.tvl ?? 0n
     const oethRevenue = detailOETH?.revenue ?? 0n
@@ -297,16 +311,12 @@ const calculateOTokenBasicStats = async (
 }
 
 const calculateOETHInheritedStats = async (ctx: Context, detail: ProtocolDailyStatDetail, date: string) => {
-  const superOETHbWrappedOETH = await getLatestStrategyBalance(
-    ctx,
-    baseAddresses.superOETHb.strategies.bridgedWOETH,
-    date,
-  )
+  const woethBalance = await getSuperOETHbWOETHBalance(ctx, date)
 
-  detail.inheritedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
+  detail.inheritedTvl = woethBalance
   detail.inheritedYield = detail.earningTvl !== 0n ? (detail.yield * detail.inheritedTvl) / detail.earningTvl : 0n
   detail.inheritedRevenue = detail.earningTvl !== 0n ? (detail.revenue * detail.inheritedTvl) / detail.earningTvl : 0n
-  detail.bridgedTvl = superOETHbWrappedOETH?.balanceETH ?? 0n
+  detail.bridgedTvl = woethBalance
 }
 
 const calculateForDates = async (
