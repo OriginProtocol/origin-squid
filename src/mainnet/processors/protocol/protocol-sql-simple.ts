@@ -1,5 +1,8 @@
 import { Context, defineProcessor } from '@originprotocol/squid-utils'
+import { baseAddresses } from '@utils/addresses-base'
 import { armProducts, otokenProducts } from '@utils/products'
+
+import { OETHB_V3_MIGRATION_END_DATE } from './protocol'
 
 const startDate = '2022-01-01'
 const FIVE_MINUTES_MS = 5 * 60 * 1000
@@ -123,20 +126,32 @@ const upsertProtocolDailyStatDetails = async (ctx: Context, fromDate: string) =>
 
   // Step 3: Calculate bridged TVL for super tokens
   // Using LATERAL join for efficiency - finds latest balance at or before end of each day
+  // superOETHb: old Bridged WOETH Strategy + OETHb V3 Master (wOETH migrating from one to the other).
+  // The old strategy is ignored after the migration ends (see OETHB_V3_MIGRATION_END_DATE).
+  const oldStrategyDateCutoff = OETHB_V3_MIGRATION_END_DATE ? `AND p2.date <= '${OETHB_V3_MIGRATION_END_DATE}'` : ''
   await runner.query(`
     UPDATE protocol_daily_stat_detail p
-    SET bridged_tvl = COALESCE(latest.balance_eth, 0)
+    SET bridged_tvl = COALESCE(latest.old_eth, 0) + COALESCE(latest.master_eth, 0)
     FROM (
-      SELECT p2.date, sb.balance_eth
+      SELECT p2.date, old_sb.balance_eth AS old_eth, master_sb.balance_eth AS master_eth
       FROM protocol_daily_stat_detail p2
       LEFT JOIN LATERAL (
         SELECT balance_eth
         FROM strategy_balance
-        WHERE strategy = '0x80c864704dd06c3693ed5179190786ee38acf835'
+        WHERE strategy = '${baseAddresses.superOETHb.strategies.bridgedWOETH}'
+          AND timestamp <= (p2.date::date + interval '1 day')::timestamp
+          ${oldStrategyDateCutoff}
+        ORDER BY timestamp DESC
+        LIMIT 1
+      ) old_sb ON true
+      LEFT JOIN LATERAL (
+        SELECT balance_eth
+        FROM strategy_balance
+        WHERE strategy = '${baseAddresses.superOETHb.strategies.crossChainV3Master}'
           AND timestamp <= (p2.date::date + interval '1 day')::timestamp
         ORDER BY timestamp DESC
         LIMIT 1
-      ) sb ON true
+      ) master_sb ON true
       WHERE p2.product = 'superOETHb' AND p2.date >= '${fromDate}'
     ) latest
     WHERE p.product = 'superOETHb'

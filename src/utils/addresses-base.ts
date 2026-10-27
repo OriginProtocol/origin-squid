@@ -7,7 +7,8 @@ const superOETHb = {
   oracleRouter: '0xc72bda59e382be10bb5d71abd01ecc65aa16fd83',
   dripper: '0x02f2c609950e90934ce99e58b4d7326ad0d7f8d6',
   strategies: {
-    bridgedWOETH: '0x80c864704dd06c3693ed5179190786ee38acf835',
+    bridgedWOETH: '0x80c864704dd06c3693ed5179190786ee38acf835', // old, being migrated to crossChainV3Master
+    crossChainV3Master: '0xa03360b3f6d902f1b3334c0adbd5c6995d3513fe',
     aerodromeAMO: '0xf611cc500eee7e4e4763a05fe623e2363c86d2af',
     curveAMO: '0x9cfcaf81600155e01c63e4d2993a8a81a8205829',
   },
