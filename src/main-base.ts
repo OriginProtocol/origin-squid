@@ -2,7 +2,7 @@ import 'tsconfig-paths/register'
 import { base } from 'viem/chains'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
-import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createExchangeRatesPostProcessor } from '@shared/post-processors/exchange-rates'
 import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
@@ -27,7 +27,7 @@ export const processor = defineSquidProcessor({
       from: 43_839_000, // ~7 days before 2026-04-01
     }),
   ],
-  postProcessors: [exchangeRatesPostProcessor, processStatus('base')],
+  postProcessors: [createExchangeRatesPostProcessor('base'), processStatus('base')],
   validators: [],
   fields: DEFAULT_FIELDS,
 })

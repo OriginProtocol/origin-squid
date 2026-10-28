@@ -11,21 +11,66 @@ const useExchangeRates = (ctx: Context) => useProcessorState(ctx, 'exchange-rate
 const useDailyExchangeRates = (ctx: Context) =>
   useProcessorState(ctx, 'exchange-rates-daily', new Map<string, ExchangeRateDaily>())
 
-// Several processors on the same chain upsert the same rows (e.g. os + sonic both write chain 146).
-// Upserting in a stable id order makes every transaction lock rows in the same order, so they
-// queue behind each other instead of deadlocking (40P01) and crash-looping the processor.
+// Stable id order makes concurrent writers lock rows in the same order, so they queue
+// instead of deadlocking (40P01).
 const byId = <T extends { id: string }>(a: T, b: T) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
 
-export const process = async (ctx: Context) => {
-  const [rates] = useExchangeRates(ctx)
-  if (rates.size > 0) {
-    ctx.log.debug({ count: rates.size }, 'exchange-rates')
-    await ctx.store.upsert([...rates.values()].sort(byId))
-  }
-  const [dailyRates] = useDailyExchangeRates(ctx)
-  if (dailyRates.size > 0) {
-    ctx.log.debug({ count: dailyRates.size }, 'exchange-rates-daily')
-    await ctx.store.upsert([...dailyRates.values()].sort(byId))
+/**
+ * Pairs that more than one processor on the same chain computes, mapped to the one
+ * processor (its `processStatus` id) that persists them. The others still compute the
+ * rate in memory for their own entities; they just do not upsert it. Two processes
+ * upserting the same ids in long catch-up transactions otherwise wait on each other's
+ * row locks until `statement_timeout` and restart.
+ *
+ * Pairs not listed here are persisted by whichever processor computes them. Owners are
+ * the processors that write the pair most often, so the fewest rows are dropped.
+ */
+const PAIR_OWNERS: Record<number, Record<string, string>> = {
+  1: {
+    ETH_USD: 'mainnet', // mainnet/processors/exchange-rates.ts exists for this pair
+    WETH_ETH: 'oeth', // OETH strategies; mainnet only for the WETH ARMs
+    USDC_USD: 'ousd', // OUSD strategies; mainnet only for the USDC ARM
+    USDC_ETH: 'ousd',
+    // Also computed by mainnet's OGN buybacks when a buyback sells the token.
+    OETH_USD: 'oeth', // read back by protocol-sql-simple.ts
+    OUSD_USD: 'ousd',
+    DAI_USD: 'ousd',
+    USDT_USD: 'ousd',
+    USDS_USD: 'ousd',
+  },
+  8453: {
+    ETH_USD: 'base',
+    superOETHb_USD: 'base',
+  },
+  146: {
+    S_USD: 'sonic',
+    S_ETH: 'sonic',
+  },
+}
+
+const isPersistedBy = (processorId: string) => (rate: { chainId: number; pair: string }) => {
+  const owner = PAIR_OWNERS[rate.chainId]?.[rate.pair]
+  return owner === undefined || owner === processorId
+}
+
+/** Post-processor that persists the rates this processor owns (see `PAIR_OWNERS`). */
+export const createExchangeRatesPostProcessor = (processorId: string) => {
+  const persisted = isPersistedBy(processorId)
+  return {
+    async process(ctx: Context) {
+      const [rates] = useExchangeRates(ctx)
+      const toUpsert = [...rates.values()].filter(persisted).sort(byId)
+      if (toUpsert.length > 0) {
+        ctx.log.debug({ count: toUpsert.length, skipped: rates.size - toUpsert.length }, 'exchange-rates')
+        await ctx.store.upsert(toUpsert)
+      }
+      const [dailyRates] = useDailyExchangeRates(ctx)
+      const dailyToUpsert = [...dailyRates.values()].filter(persisted).sort(byId)
+      if (dailyToUpsert.length > 0) {
+        ctx.log.debug({ count: dailyToUpsert.length }, 'exchange-rates-daily')
+        await ctx.store.upsert(dailyToUpsert)
+      }
+    },
   }
 }
 

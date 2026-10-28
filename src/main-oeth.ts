@@ -1,7 +1,7 @@
 import 'tsconfig-paths/register'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
-import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createExchangeRatesPostProcessor } from '@shared/post-processors/exchange-rates'
 import { processStatus } from '@templates/processor-status'
 import { addresses } from '@utils/addresses'
 import { DEFAULT_FIELDS } from '@utils/batch-proccesor-fields'
@@ -25,7 +25,7 @@ export const processor = defineSquidProcessor({
       from: 20428558,
     }),
   ],
-  postProcessors: [exchangeRatesPostProcessor, processStatus('oeth')],
+  postProcessors: [createExchangeRatesPostProcessor('oeth'), processStatus('oeth')],
   validators: [],
   fields: DEFAULT_FIELDS,
 })

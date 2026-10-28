@@ -8,7 +8,7 @@ import 'tsconfig-paths/register'
 import { mainnet } from 'viem/chains'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
-import * as exchangeRates from '@shared/post-processors/exchange-rates'
+import { createExchangeRatesPostProcessor } from '@shared/post-processors/exchange-rates'
 import { ccip } from '@templates/ccip'
 import { createESAddressYieldProcessor, createESTracker } from '@templates/exponential-staking'
 import { createFRRSProcessor } from '@templates/fixed-rate-rewards-source'
@@ -66,7 +66,12 @@ export const processor = defineSquidProcessor({
     createPoolsProcessor(mainnet.id),
     notionProcessor,
   ],
-  postProcessors: [exchangeRates, dailyStats, processStatus('mainnet'), protocolSqlSimpleProcessor],
+  postProcessors: [
+    createExchangeRatesPostProcessor('mainnet'),
+    dailyStats,
+    processStatus('mainnet'),
+    protocolSqlSimpleProcessor,
+  ],
   validators: [],
   fields: FIELDS_WITH_RECEIPTS_INFO,
 })

@@ -2,7 +2,7 @@ import { ousdProcessors } from 'ousd/processors/ousd'
 import 'tsconfig-paths/register'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
-import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createExchangeRatesPostProcessor } from '@shared/post-processors/exchange-rates'
 import { createMorphoVaultApyProcessor } from '@templates/morpho/processor'
 import { createOTokenActivityProcessor } from '@templates/otoken/activity-processor/activity-processor'
 import { processStatus } from '@templates/processor-status'
@@ -41,7 +41,7 @@ export const processor = defineSquidProcessor({
     }),
     ...erc20s(),
   ],
-  postProcessors: [exchangeRatesPostProcessor, processStatus('ousd')],
+  postProcessors: [createExchangeRatesPostProcessor('ousd'), processStatus('ousd')],
   validators: [],
   fields: DEFAULT_FIELDS,
 })

@@ -6,7 +6,7 @@ import 'tsconfig-paths/register'
 import { sonic } from 'viem/chains'
 
 import { defineSquidProcessor } from '@originprotocol/squid-utils'
-import * as exchangeRatesPostProcessor from '@shared/post-processors/exchange-rates'
+import { createExchangeRatesPostProcessor } from '@shared/post-processors/exchange-rates'
 import { createPoolBoosterProcessor } from '@templates/otoken/pool-booster'
 import { createPoolsProcessor } from '@templates/pools/pools'
 import { processStatus } from '@templates/processor-status'
@@ -24,7 +24,7 @@ export const processor = defineSquidProcessor({
     createPoolsProcessor(sonic.id),
     ...sonicArmProcessors,
   ],
-  postProcessors: [exchangeRatesPostProcessor, processStatus('sonic')],
+  postProcessors: [createExchangeRatesPostProcessor('sonic'), processStatus('sonic')],
   validators: [],
   fields: FIELDS_WITH_RECEIPTS_INFO, // Extra fields for gas info used by arm processor
 })
