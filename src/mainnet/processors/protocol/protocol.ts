@@ -23,11 +23,12 @@ import { ProductName, armProducts, otokenProducts } from '@utils/products'
 
 const startDate = '2022-01-01'
 
-// TODO(oethb-v3): set to the UTC date (YYYY-MM-DD) of the Base block where governance proposal 008
-// removes the Bridged WOETH Strategy (see OETHB_V3_MIGRATION_END_BLOCK in src/base/strategies.ts).
-// The old strategy keeps writing balance rows after that, and its in-flight term comes back whenever
-// the V3 Master withdraws, so its balance must be ignored after this date.
-export const OETHB_V3_MIGRATION_END_DATE = undefined as string | undefined
+// UTC date of OETHB_V3_MIGRATION_END_BLOCK (src/base/strategies.ts): the report that carried the last
+// migration batch. The old Bridged WOETH Strategy's balance is ignored after this date. It held nothing
+// after that, and only reported a phantom in-flight term when Master's balance dipped (2026-10-30 to
+// 11-01). Governance proposal 008 removed it from the vault later, at Base block 53402332 (2026-11-02).
+// Keep the cast: without it the `!== undefined` check below fails to compile (TS2367).
+export const OETHB_V3_MIGRATION_END_DATE = '2026-10-28' as string | undefined
 const isAfterOETHbV3Migration = (date: string) =>
   OETHB_V3_MIGRATION_END_DATE !== undefined && date > OETHB_V3_MIGRATION_END_DATE
 

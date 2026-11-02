@@ -189,6 +189,9 @@ export const processStrategyEarnings = async (
   const days = new Map<string, Block>()
   const strategyYields = new Map<string, StrategyYield[]>()
   for (const block of ctx.blocks) {
+    // The interval and day-end reads below only know `from`, so retired strategies must be cut off
+    // here. Skipping before `days.set` also stops daily rows after `to`.
+    if (strategyData.to !== undefined && block.header.height > strategyData.to) continue
     let didUpdate = false
     days.set(dayjs.utc(block.header.timestamp).format('YYYY-MM-DD'), block)
     const txIgnore = new Set<string>()
