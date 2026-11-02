@@ -49,6 +49,8 @@ export const process = async (ctx: Context, strategyData: IStrategyData) => {
     strategyBalances.push(...results)
   }
   for (const block of ctx.blocks) {
+    // The interval tracker only knows `from`, so retired strategies must be cut off here.
+    if (strategyData.to !== undefined && block.header.height > strategyData.to) continue
     const intervalMatch = tracker(ctx, block)
     const match = intervalMatch || block.logs.find((log) => depositFilter.matches(log) || withdrawFilter.matches(log))
     if (match) {

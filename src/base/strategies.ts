@@ -31,14 +31,15 @@ export const baseCurveAMO: IStrategyData = {
 // at the next balance report (`RemoteStrategyBalanceUpdated`), in the same block the old
 // strategy's in-flight term collapses. Both steps are capital, not yield.
 //
-// TODO(oethb-v3): once governance proposal 008 (removes the old strategy) executes on Base:
-//  - set OETHB_V3_MIGRATION_END_BLOCK to its block,
-//  - set OETHB_V3_MIGRATION_END_DATE in src/mainnet/processors/protocol/protocol.ts,
-//  - stop processing the Bridged WOETH Strategy after that block (its in-flight term comes back
-//    whenever Master withdraws, which would show as fake earnings),
-//  - ship a new version.
-// While undefined the migration window stays open and Master's report steps count as capital.
-export const OETHB_V3_MIGRATION_END_BLOCK = undefined as number | undefined
+// OETHB_V3_MIGRATION_END_BLOCK closes the migration window. It is the block of the report that
+// carried the last migration batch (2026-10-28 19:34:55 UTC): the old strategy's balance hit 0 here
+// and never held real value again. After it, Master's report steps are yield, and the old strategy
+// is no longer processed: its in-flight term came back as a phantom whenever Master's balance
+// dipped (2026-10-30 to 11-01). Governance proposal 008, which removed the old strategy from the
+// vault, executed later at Base block 53402332 (2026-11-02). Using that block would book the
+// phantom and four days of Master yield as capital.
+// Keep the cast: the template code checks for undefined.
+export const OETHB_V3_MIGRATION_END_BLOCK = 53213374 as number | undefined
 const OETHB_V3_MASTER_FROM = 52847373 // proxy initialised; checkBalance reverts before this
 const OETHB_V3_GOVERNANCE_BLOCK = 53110252 // migration impl + vault approval executed
 
@@ -80,6 +81,7 @@ export const baseStrategies: readonly IStrategyData[] = [
   {
     chainId: 8453,
     from: 18689563,
+    to: OETHB_V3_MIGRATION_END_BLOCK,
     name: 'Bridged WOETH Strategy',
     contractName: 'BridgedWOETHStrategy',
     address: baseAddresses.superOETHb.strategies.bridgedWOETH,
