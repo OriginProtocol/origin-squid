@@ -24,6 +24,7 @@ export const baseTokens = {
   OGN: '0x7002458b1df59eccb57387bc79ffc7c29e22e6f7',
   cbETH: '0x2ae3f1ec7f1f5012cfeab0185bfc7aa3cf0dec22',
   AERO: '0x940181a94a35a4569e4529a3cdfb74e38fd98631',
+  CRV: '0x8ee73c484a26e0a5df2ee2a4960b789967dd0415',
   bridgedWOETH: '0xd8724322f44e5c58d7a815f542036fb17dbbf839',
   superOETHb: superOETHb.address,
   wsuperOETHb: superOETHb.wrapped,
