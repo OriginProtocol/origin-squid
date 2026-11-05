@@ -423,7 +423,7 @@ const processDepositWithdrawal = async (
   //  remove OETH from APY considerations then we need more detail.
   if (strategyData.kind === 'CurveAMO') {
     // Only consider earnings on this event by ETH proportion.
-    earningsChange *= balanceWeightN / eth1
+    earningsChange = (earningsChange * balanceWeightN) / eth1
   }
 
   // There may be an existing entry on this block from RewardTokenCollected
