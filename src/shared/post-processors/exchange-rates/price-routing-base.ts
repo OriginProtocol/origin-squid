@@ -1,11 +1,26 @@
 import * as aerodromeClPoolAbi from '@abi/aerodrome-cl-pool'
 import * as aerodromePoolAbi from '@abi/aerodrome-pool'
+import * as curvePoolAbi from '@abi/curve-lp-token'
 import * as eacAggregatorProxy from '@abi/eac-aggregator-proxy'
 import { Block, Context, invertMap } from '@originprotocol/squid-utils'
 import { getPriceFromSqrtPriceX96N } from '@templates/aerodrome/prices'
 import { PoolDefinition, baseAddresses } from '@utils/addresses-base'
 
 const ONE_ETH = 10n ** 18n
+
+// Curve factory-crypto-4: coins(0) = CRV, coins(1) = crvUSD.
+// https://api.curve.finance/v1/getPools/base/factory-crypto
+const CRV_CRVUSD_POOL = '0xde37e221442fa15c35dc19fbae11ed106ba52fb2'
+const CRV_CRVUSD_POOL_HEIGHT = 3327708
+
+const getCRVUSDPrice = async (ctx: Context, height: number) => {
+  const pool = new curvePoolAbi.Contract(ctx, { height }, CRV_CRVUSD_POOL)
+  // price_oracle is CRV per crvUSD, scaled by 1e18. Invert to crvUSD per CRV.
+  // Treat crvUSD as $1 for analytics, just as the Base routes treat USDC as USD.
+  const crvPerCrvUsd = await pool.price_oracle()
+  if (crvPerCrvUsd <= 0n) throw new Error('Invalid CRV/crvUSD oracle price')
+  return (ONE_ETH * ONE_ETH) / crvPerCrvUsd
+}
 
 const createChainlinkPriceFeed = (address: string, decimals: bigint) => {
   return async (ctx: Context, height: number) => {
@@ -36,6 +51,14 @@ const createAMMPriceFeed = (pool: PoolDefinition) => async (ctx: Context, height
 }
 
 const alternativePriceFeeds: Record<string, (ctx: Context, height: number) => Promise<bigint>> = {
+  CRV_USD: getCRVUSDPrice,
+  CRV_ETH: async (ctx, height) => {
+    const crvUsd = await getCRVUSDPrice(ctx, height)
+    const ethUsd = await chainlinkPriceFeeds['ETH_USD'].get(ctx, height)
+    // A missing price must stop processing rather than silently discard harvested CRV.
+    if (ethUsd <= 0n) throw new Error('Invalid ETH/USD oracle price for CRV')
+    return (crvUsd * ONE_ETH) / ethUsd
+  },
   ETH_superOETHb: async (ctx, height) => {
     if (height < baseAddresses.aerodrome.pools['CL1-WETH/superOETHb'].from) {
       return 10n ** 18n
@@ -92,6 +115,7 @@ export const getBasePrice = async (ctx: Context, block: Block['header'], base: B
     base = translateBaseSymbol(base)
     quote = translateBaseSymbol(quote)
     if (base === quote) return [1_000_000_000_000_000_000n, 18] as const
+    if (base === 'CRV' && block.height < CRV_CRVUSD_POOL_HEIGHT) return undefined
     const feed = chainlinkPriceFeeds[`${base}_${quote}`]
     if (feed && feed.height <= block.height) {
       return [await feed.get(ctx, block.height), 18] as const
